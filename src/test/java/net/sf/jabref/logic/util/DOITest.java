@@ -3,7 +3,6 @@ package net.sf.jabref.logic.util;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 
 public class DOITest {
     @Test

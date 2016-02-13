@@ -3,6 +3,7 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -60,12 +61,24 @@ public class UnlinkedFilesCrawler {
             return null;
         }
 
-        List<File> files = Arrays.asList(directory.listFiles(ff));
+        File[] filesArray = directory.listFiles(ff);
+        List<File> files;
+        if (filesArray == null) {
+            files = Collections.emptyList();
+        } else {
+            files = Arrays.asList(filesArray);
+        }
         CheckableTreeNode root = new CheckableTreeNode(null);
 
         int filesCount = 0;
 
-        List<File> subDirectories = Arrays.asList(directory.listFiles(DIRECTORY_FILTER));
+        filesArray = directory.listFiles(DIRECTORY_FILTER);
+        List<File> subDirectories;
+        if (filesArray == null) {
+            subDirectories = Collections.emptyList();
+        } else {
+            subDirectories = Arrays.asList(filesArray);
+        }
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
             if ((subRoot != null) && (subRoot.getChildCount() > 0)) {

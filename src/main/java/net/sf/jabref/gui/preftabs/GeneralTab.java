@@ -24,7 +24,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -66,18 +65,20 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     public class DefaultBibModeRenderer extends DefaultListCellRenderer {
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             setText(((BibDatabaseMode) value).getFormattedName());
             return this;
         }
     }
 
-    public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
+
+    public GeneralTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
-        biblatexMode = new JComboBox(BibDatabaseMode.values());
+        biblatexMode = new JComboBox<>(BibDatabaseMode.values());
         biblatexMode.setRenderer(new DefaultBibModeRenderer());
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 

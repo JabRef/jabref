@@ -20,7 +20,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
@@ -114,7 +113,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
      * Tab to create custom Name Formatters
      *
      */
-    public NameFormatterTab(AboutDialog aboutDialog) {
+    public NameFormatterTab() {
         setLayout(new BorderLayout());
 
         TableModel tableModel = new AbstractTableModel() {

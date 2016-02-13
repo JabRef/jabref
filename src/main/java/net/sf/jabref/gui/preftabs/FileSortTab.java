@@ -18,25 +18,16 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Preference tab for file sorting options.
@@ -81,8 +72,6 @@ class FileSortTab extends JPanel implements PrefsTab {
         exportInSpecifiedOrder.addActionListener(listener);
 
         // create GUI
-        JLabel lab;
-
         builder.appendSeparator(Localization.lang("Export sort order"));
         builder.append(exportInOriginalOrder, 1);
         builder.nextLine();

@@ -369,16 +369,10 @@ public class EntryTableTransferHandler extends TransferHandler {
             if ((fileType != null) && (dropRow >= 0)) {
 
                 /*
-                 * TODO: need to signal if this is a local or autodownloaded
-                 * file
-                 */
-                boolean local = true;
-
-                /*
                  * TODO: make this an instance variable?
                  */
                 DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                dfh.handleDroppedfile(fileName, fileType, local, entryTable, dropRow);
+                dfh.handleDroppedfile(fileName, fileType, entryTable, dropRow);
 
                 continue;
             }

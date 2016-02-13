@@ -116,11 +116,10 @@ public class DroppedFileHandler {
      * @param mainTable The MainTable the file was dragged to.
      * @param dropRow   The row where the file was dropped.
      */
-    public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
-                                  MainTable mainTable, int dropRow) {
+    public void handleDroppedfile(String fileName, ExternalFileType fileType, MainTable mainTable, int dropRow) {
 
         BibEntry entry = mainTable.getEntryAt(dropRow);
-        handleDroppedfile(fileName, fileType, localFile, entry);
+        handleDroppedfile(fileName, fileType, entry);
     }
 
     /**
@@ -130,11 +129,10 @@ public class DroppedFileHandler {
      *                  to a local temporary file.
      * @param entry     The target entry for the drop.
      */
-    public void handleDroppedfile(String fileName, ExternalFileType fileType, boolean localFile,
-                                  BibEntry entry) {
+    public void handleDroppedfile(String fileName, ExternalFileType fileType, BibEntry entry) {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
-        if (tryXmpImport(fileName, fileType, localFile, edits)) {
+        if (tryXmpImport(fileName, fileType, edits)) {
             edits.end();
             panel.undoManager.addEdit(edits);
             return;
@@ -159,9 +157,9 @@ public class DroppedFileHandler {
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
-                success = doCopy(fileName, fileType, destFilename, edits);
+                success = doCopy(fileName, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doMove(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, destFilename, edits);
             }
         }
 
@@ -178,10 +176,10 @@ public class DroppedFileHandler {
     // Done by MrDlib
     public void linkPdfToEntry(String fileName, MainTable entryTable, int dropRow) {
         BibEntry entry = entryTable.getEntryAt(dropRow);
-        linkPdfToEntry(fileName, entryTable, entry);
+        linkPdfToEntry(fileName, entry);
     }
 
-    public void linkPdfToEntry(String fileName, MainTable entryTable, BibEntry entry) {
+    public void linkPdfToEntry(String fileName, BibEntry entry) {
         ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
         // Show dialog
@@ -204,9 +202,9 @@ public class DroppedFileHandler {
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
-                success = doCopy(fileName, fileType, destFilename, edits);
+                success = doCopy(fileName, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doMove(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, destFilename, edits);
             }
         }
 
@@ -239,9 +237,9 @@ public class DroppedFileHandler {
             }
 
             if (copyRadioButton.isSelected()) {
-                success = doCopy(fileName, fileType, destFilename, edits);
+                success = doCopy(fileName, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doMove(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, destFilename, edits);
             }
         }
         if (success) {
@@ -263,8 +261,7 @@ public class DroppedFileHandler {
 
     // Done by MrDlib
 
-    private boolean tryXmpImport(String fileName, ExternalFileType fileType, boolean localFile,
-                                 NamedCompound edits) {
+    private boolean tryXmpImport(String fileName, ExternalFileType fileType, NamedCompound edits) {
 
         if (!"pdf".equals(fileType.getExtension())) {
             return false;
@@ -327,9 +324,9 @@ public class DroppedFileHandler {
             }
 
             if (copyRadioButton.isSelected()) {
-                success = doCopy(fileName, fileType, destFilename, edits);
+                success = doCopy(fileName, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
-                success = doMove(fileName, fileType, destFilename, edits);
+                success = doMove(fileName, destFilename, edits);
             }
         }
         if (success) {
@@ -491,12 +488,11 @@ public class DroppedFileHandler {
      * it to the given filename.
      *
      * @param fileName     The name of the source file.
-     * @param fileType     The FileType associated with the file.
      * @param destFilename The destination filename.
      * @param edits        TODO we should be able to undo this action
      * @return true if the operation succeeded.
      */
-    private boolean doMove(String fileName, ExternalFileType fileType, String destFilename,
+    private boolean doMove(String fileName, String destFilename,
                            NamedCompound edits) {
         List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
@@ -546,8 +542,7 @@ public class DroppedFileHandler {
      * @param edits    TODO we should be able to undo this!
      * @return
      */
-    private boolean doCopy(String fileName, ExternalFileType fileType, String toFile,
-                           NamedCompound edits) {
+    private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
         List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
@@ -560,7 +555,7 @@ public class DroppedFileHandler {
         if (found < 0) {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
-            System.out.println("dir: " + dirs.get(found) + "\t ext: " + fileType.getExtension());
+            // This should not happen!!
             return false;
         }
         toFile = new File(toFile).getName();

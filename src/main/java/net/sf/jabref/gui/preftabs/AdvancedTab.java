@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import net.sf.jabref.*;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -59,7 +58,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final RemotePreferences remotePreferences;
 
 
-    public AdvancedTab(JabRefPreferences prefs, AboutDialog diag, JabRef jabRef) {
+    public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
         this.jabRef = jabRef;
         preferences = prefs;
         this.remotePreferences = new RemotePreferences(preferences);
