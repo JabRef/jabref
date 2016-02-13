@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +15,8 @@
 */
 package net.sf.jabref.logic.mods;
 
-import java.util.ArrayList;
 import java.util.List;
-import net.sf.jabref.exporter.layout.WSITools;
-
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
@@ -52,7 +50,6 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        List<String> names = new ArrayList<>();
         String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma
@@ -63,7 +60,7 @@ public class PersonName {
 
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
-        WSITools.tokenize(names, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
+        List<String> names = StringUtil.tokenizeToList(authorMod.substring(endOfLastName + 1).trim(), " \n\r");
         if (endOfLastName >= 0) {
             names.add(authorMod.substring(0, endOfLastName));
         }

@@ -18,6 +18,8 @@ package net.sf.jabref.logic.util.strings;
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -528,7 +530,7 @@ public class StringUtil {
         }
         StringBuilder out = new StringBuilder(); // Used to hold the output.
         char current; // Used to reference the current character.
-    
+
         for (int i = 0; i < in.length(); i++) {
             current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
             if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
@@ -537,5 +539,24 @@ public class StringUtil {
             }
         }
         return out.toString();
+    }
+
+    /*
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
+    public static List<String> tokenizeToList(String buf, String delimstr)
+    {
+        List<String> list = new ArrayList<>();
+        buf = buf + '\n';
+
+        StringTokenizer st = new StringTokenizer(buf, delimstr);
+
+        while (st.hasMoreTokens()) {
+            list.add(st.nextToken());
+        }
+
+        return list;
     }
 }
