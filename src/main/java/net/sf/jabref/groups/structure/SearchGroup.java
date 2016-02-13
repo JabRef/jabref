@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,6 +30,9 @@ import java.util.List;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Internally, it consists of a search pattern.
  *
@@ -44,6 +47,9 @@ public class SearchGroup extends AbstractGroup {
     private final boolean regExp;
 
     private final SearchRule searchRule;
+
+    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
+
 
     /**
      * Creates a SearchGroup with the specified properties.
@@ -193,9 +199,8 @@ public class SearchGroup extends AbstractGroup {
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            System.err.println("Internal error: Exception " + t
-                    + " in SearchGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            LOGGER.error("Internal error in SearchGroup.deepCopy(). "
+                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }
     }
