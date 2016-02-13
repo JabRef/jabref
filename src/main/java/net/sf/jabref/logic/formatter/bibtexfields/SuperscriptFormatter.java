@@ -25,11 +25,10 @@ import java.util.regex.Pattern;
 public class SuperscriptFormatter implements Formatter {
 
     // find possible superscripts on word boundaries
-    private static final Pattern PATTERN = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b",
+    private static final Pattern SUPERSCRIPT_DETECT_PATTERN = Pattern.compile("\\b(\\d+)(st|nd|rd|th)\\b",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-    // adds superscript tag
-    private static final String REPLACE = "$1\\\\textsuperscript{$2}";
+    private static final String SUPERSCRIPT_REPLACE_PATTERN = "$1\\\\textsuperscript{$2}";
 
     @Override
     public String getName() {
@@ -57,9 +56,10 @@ public class SuperscriptFormatter implements Formatter {
             return value;
         }
 
-        Matcher matcher = PATTERN.matcher(value);
+        Matcher matcher = SUPERSCRIPT_DETECT_PATTERN.matcher(value);
         // replace globally
 
-        return matcher.replaceAll(REPLACE);
+        // adds superscript tag
+        return matcher.replaceAll(SUPERSCRIPT_REPLACE_PATTERN);
     }
 }

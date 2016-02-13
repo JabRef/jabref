@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
  */
 public class PageNumbersFormatter implements Formatter {
 
-    private static final Pattern PAGES_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
+    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
 
     private static final String REJECT_LITERALS = "[^0-9,\\-\\+]";
-    private static final String REPLACE = "$1--$2";
+    private static final String PAGES_REPLACE_PATTERN = "$1--$2";
 
 
     @Override
@@ -57,9 +57,9 @@ public class PageNumbersFormatter implements Formatter {
         // remove unwanted literals incl. whitespace
         String cleanValue = value.replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
-        Matcher matcher = PAGES_PATTERN.matcher(cleanValue);
+        Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         // replace
-        String newValue = matcher.replaceFirst(REPLACE);
+        String newValue = matcher.replaceFirst(PAGES_REPLACE_PATTERN);
         // replacement?
         if(!newValue.equals(cleanValue)) {
             // write field

@@ -109,7 +109,8 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             }
 
         }.visit(parseTree));
-        stringBuilder.append(". ").append(caseSensitive ? Localization
+        stringBuilder.append(". ");
+        stringBuilder.append(caseSensitive ? Localization
                 .lang("The search is case sensitive.") :
             Localization.lang("The search is case insensitive."));
         return stringBuilder.toString();
