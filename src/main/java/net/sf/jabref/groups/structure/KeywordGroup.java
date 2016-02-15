@@ -20,6 +20,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
@@ -42,6 +45,9 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean caseSensitive;
     private final boolean regExp;
     private Pattern pattern;
+
+    private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
+
 
     /**
      * Creates a KeywordGroup with the specified properties.
@@ -346,9 +352,8 @@ public class KeywordGroup extends AbstractGroup {
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            System.err.println("Internal error: Exception " + t
-                    + " in KeywordGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            LOGGER.error("Internal error in KeywordGroup.deepCopy(). "
+                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }
     }

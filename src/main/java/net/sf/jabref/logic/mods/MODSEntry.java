@@ -29,6 +29,8 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.format.XMLChars;
+import net.sf.jabref.logic.util.strings.StringUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -207,7 +209,7 @@ class MODSEntry {
             if (title != null) {
                 Element titleInfo = d.createElement("titleInfo");
                 Element mainTitle = d.createElement("title");
-                mainTitle.appendChild(d.createTextNode(stripNonValidXMLCharacters(title)));
+                mainTitle.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(title)));
                 titleInfo.appendChild(mainTitle);
                 mods.appendChild(titleInfo);
             }
@@ -218,13 +220,15 @@ class MODSEntry {
                     if (name.getSurname() != null) {
                         Element namePart = d.createElement("namePart");
                         namePart.setAttribute("type", "family");
-                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getSurname())));
+                        namePart.appendChild(
+                                d.createTextNode(StringUtil.stripNonValidXMLCharacters(name.getSurname())));
                         modsName.appendChild(namePart);
                     }
                     if (name.getGivenNames() != null) {
                         Element namePart = d.createElement("namePart");
                         namePart.setAttribute("type", "given");
-                        namePart.appendChild(d.createTextNode(stripNonValidXMLCharacters(name.getGivenNames())));
+                        namePart.appendChild(
+                                d.createTextNode(StringUtil.stripNonValidXMLCharacters(name.getGivenNames())));
                         modsName.appendChild(namePart);
                     }
                     Element role = d.createElement("role");
@@ -241,34 +245,34 @@ class MODSEntry {
             mods.appendChild(originInfo);
             if (this.publisher != null) {
                 Element publisher = d.createElement("publisher");
-                publisher.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.publisher)));
+                publisher.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
                 originInfo.appendChild(publisher);
             }
             if (date != null) {
                 Element dateIssued = d.createElement("dateIssued");
-                dateIssued.appendChild(d.createTextNode(stripNonValidXMLCharacters(date)));
+                dateIssued.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(date)));
                 originInfo.appendChild(dateIssued);
             }
             Element issuance = d.createElement("issuance");
-            issuance.appendChild(d.createTextNode(stripNonValidXMLCharacters(this.issuance)));
+            issuance.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.issuance)));
             originInfo.appendChild(issuance);
 
             if (id != null) {
                 Element idref = d.createElement("identifier");
-                idref.appendChild(d.createTextNode(stripNonValidXMLCharacters(id)));
+                idref.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(id)));
                 mods.appendChild(idref);
                 mods.setAttribute("ID", id);
 
             }
             Element typeOfResource = d.createElement("typeOfResource");
             String type = "text";
-            typeOfResource.appendChild(d.createTextNode(stripNonValidXMLCharacters(type)));
+            typeOfResource.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(type)));
             mods.appendChild(typeOfResource);
 
             if (genre != null) {
                 Element genreElement = d.createElement("genre");
                 genreElement.setAttribute("authority", "marc");
-                genreElement.appendChild(d.createTextNode(stripNonValidXMLCharacters(genre)));
+                genreElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(genre)));
                 mods.appendChild(genreElement);
             }
 
@@ -290,7 +294,7 @@ class MODSEntry {
                     continue;
                 }
                 Element theData = d.createElement(field);
-                theData.appendChild(d.createTextNode(stripNonValidXMLCharacters(value)));
+                theData.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
                 extension.appendChild(theData);
                 mods.appendChild(extension);
             }
@@ -301,37 +305,6 @@ class MODSEntry {
             throw new Error(e);
         }
         // return result;
-    }
-
-    /**
-     * This method ensures that the output String has only
-     * valid XML unicode characters as specified by the
-     * XML 1.0 standard. For reference, please see
-     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
-     * standard</a>. This method will return an empty
-     * String if the input is null or empty.
-     *
-     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
-     *
-     * @param in The String whose non-valid characters we want to remove.
-     * @return The in String, stripped of non-valid characters.
-     */
-    private static String stripNonValidXMLCharacters(String in) {
-        if (com.google.common.base.Strings.isNullOrEmpty(in)) {
-            return ""; // vacancy test.
-        }
-
-        StringBuffer out = new StringBuffer(); // Used to hold the output.
-        char current; // Used to reference the current character.
-
-        for (int i = 0; i < in.length(); i++) {
-            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
-                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
-                out.append(current);
-            }
-        }
-        return out.toString();
     }
 
     /*
