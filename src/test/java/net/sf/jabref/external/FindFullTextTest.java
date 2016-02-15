@@ -33,4 +33,13 @@ public class FindFullTextTest {
 
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
     }
+
+    @Test
+    public void rejectNonPdfUrls() throws Exception {
+        URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
+        FullTextFinder finder = (e) -> Optional.of(pdfUrl);
+        FindFullText fetcher = new FindFullText(Arrays.asList(finder));
+
+        assertEquals(Optional.empty(), fetcher.findFullTextPDF(entry));
+    }
 }
