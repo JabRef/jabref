@@ -4,6 +4,7 @@ import net.sf.jabref.logic.fetcher.FullTextFinder;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
@@ -25,6 +26,7 @@ public class FindFullTextTest {
         entry = null;
     }
 
+    @Ignore
     @Test
     public void acceptPdfUrls() throws Exception {
         URL pdfUrl = new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf");
