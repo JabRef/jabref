@@ -75,9 +75,15 @@ public class SaveActionsPanel extends JPanel {
         java.util.List<String> actions = new ArrayList<>();
 
         if (enabled.isSelected()) {
-            actions.add("enabled;");
+            actions.add("enabled");
         } else {
-            actions.add("disabled;");
+            actions.add("disabled");
+        }
+
+        List<SaveAction> newActions = ((SaveActionsListModel)actionsList.getModel()).getAllActions();
+        for(SaveAction action: newActions){
+            actions.add(action.getFieldName());
+            actions.add(action.getFormatter().getKey());
         }
 
         metaData.putData(SaveActions.META_KEY, actions);
@@ -100,7 +106,12 @@ public class SaveActionsPanel extends JPanel {
                 }
             }
 
-            SaveAction newAction = new SaveAction(keyField.getText(), selectedFormatter);
+            String fieldKey = keyField.getText();
+            if (fieldKey == null || fieldKey.equals("")) {
+                return;
+            }
+
+            SaveAction newAction = new SaveAction(fieldKey, selectedFormatter);
 
             ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
             keyField.setText("");

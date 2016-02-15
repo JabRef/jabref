@@ -28,6 +28,10 @@ class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
         }
     }
 
+    public List<SaveAction> getAllActions() {
+        return saveActions;
+    }
+
 
     @Override
     public int getSize() {
