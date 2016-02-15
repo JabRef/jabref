@@ -20,21 +20,15 @@ public class SaveActionsPanel extends JPanel {
 
     private SaveActions saveActions;
 
-    private List<SaveAction> displayedActions;
-
-    private JList<String> actionsList;
+    private JList actionsList;
 
     private JTextField keyField;
 
     private JComboBox<String> formatters;
 
-    private DatabasePropertiesDialog parent;
-
-    public SaveActionsPanel(DatabasePropertiesDialog parent) {
+    public SaveActionsPanel() {
 
         enabled = new JCheckBox(Localization.lang("Enable save actions"));
-        displayedActions = new ArrayList<>();
-        this.parent = parent;
     }
 
     public void setValues(MetaData metaData) {
@@ -50,11 +44,7 @@ public class SaveActionsPanel extends JPanel {
         this.add(enabled);
         this.add(getSelectorPanel());
 
-        String[] data = new String[configuredActions.size()];
-        for (int i = 0; i < configuredActions.size(); i++) {
-            data[i] = configuredActions.get(i).toString();
-        }
-        actionsList = new JList<>(data);
+        actionsList = new JList(new SaveActionsListModel<>(configuredActions));
         this.add(actionsList);
     }
 
@@ -70,7 +60,7 @@ public class SaveActionsPanel extends JPanel {
         panel.add(formatters);
 
         JButton addButton = new JButton(Localization.lang("Add"));
-        addButton.addActionListener(new AddButtonListener(parent));
+        addButton.addActionListener(new AddButtonListener());
         panel.add(addButton);
 
         return panel;
@@ -94,12 +84,6 @@ public class SaveActionsPanel extends JPanel {
 
     class AddButtonListener implements ActionListener {
 
-        private DatabasePropertiesDialog container;
-
-        public AddButtonListener(DatabasePropertiesDialog container) {
-            this.container = container;
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             Formatter selectedFormatter = null;
@@ -111,9 +95,14 @@ public class SaveActionsPanel extends JPanel {
                 }
             }
 
-            displayedActions.add(new SaveAction(keyField.getText(), selectedFormatter));
+            ListModel<String> model = actionsList.getModel();
+            int modelSize = model.getSize();
+            String[] listData = new String[modelSize + 1];
+            for(int i=0;i< modelSize;i++){
+                listData[i] = model.getElementAt(i);
+            }
+            listData[modelSize  + 1 ] = new SaveAction(keyField.getText(), selectedFormatter).toString();
             keyField.setText("");
-            container.repaint();
         }
     }
 
