@@ -57,6 +57,7 @@ public class DateFormatter implements Formatter {
             try {
                 return DateTimeFormatter.ofPattern(formatString).parse(dateString);
             } catch (DateTimeParseException ignored) {
+                // Ignored
             }
         }
 

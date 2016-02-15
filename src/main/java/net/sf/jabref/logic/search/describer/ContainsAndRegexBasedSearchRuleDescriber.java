@@ -37,13 +37,13 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
     @Override
     public String getDescription() {
         List<String> words = new SentenceAnalyzer(query).getWords();
-        String firstWord = !words.isEmpty() ? words.get(0) : "";
+        String firstWord = words.isEmpty() ? "" : words.get(0);
 
-        String searchDescription = regExp ? Localization.lang(
+        StringBuilder searchDescription = new StringBuilder(regExp ? Localization.lang(
                 "This search contains entries in which any field contains the regular expression <b>%0</b>",
                 StringUtil.quoteForHTML(firstWord))
                 : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>",
-                StringUtil.quoteForHTML(firstWord));
+                        StringUtil.quoteForHTML(firstWord)));
 
         if(words.size() > 1) {
             List<String> unprocessedWords = words.subList(1, words.size());
@@ -53,12 +53,12 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
             }
             String andSeparator = String.format(" %s ", Localization.lang("and"));
             String[] unprocessedWordsInHtmlFormatArray = unprocessedWordsInHtmlFormat.toArray(new String[unprocessedWordsInHtmlFormat.size()]);
-            searchDescription += StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator);
+            searchDescription.append(StringUtil.join(unprocessedWordsInHtmlFormatArray, andSeparator));
         }
 
         String caseSensitiveDescription = getCaseSensitiveDescription();
         String genericDescription = "<p><br>" + Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
-        return String.format("%s (%s). %s", searchDescription, caseSensitiveDescription, genericDescription);
+        return String.format("%s (%s). %s", searchDescription.toString(), caseSensitiveDescription, genericDescription);
     }
 
     private String getCaseSensitiveDescription() {

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class SearchQueryHighlightObservable {
 
-    private final ArrayList<SearchQueryHighlightListener> listeners = new ArrayList<>();
+    private final List<SearchQueryHighlightListener> listeners = new ArrayList<>();
 
     private Optional<Pattern> pattern = Optional.empty();
 
@@ -62,7 +62,7 @@ public class SearchQueryHighlightObservable {
      */
     public void fireSearchlistenerEvent(SearchQuery searchQuery) {
         // Parse the search string to words
-        if (searchQuery == null || searchQuery.isGrammarBasedSearch()) {
+        if ((searchQuery == null) || searchQuery.isGrammarBasedSearch()) {
             pattern = Optional.empty();
         } else {
             pattern = getPatternForWords(getSearchwords(searchQuery.query), searchQuery.regularExpression, searchQuery.caseSensitive);
