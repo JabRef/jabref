@@ -50,6 +50,7 @@ public class SaveActionsPanel extends JPanel {
         }
 
         actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
+        actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.add(actionsList);
 
         JButton deleteButton = new JButton(Localization.lang("Delete"));
