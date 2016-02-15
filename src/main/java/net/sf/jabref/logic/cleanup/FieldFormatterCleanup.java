@@ -17,6 +17,7 @@ package net.sf.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.FieldChange;
@@ -68,5 +69,32 @@ public class FieldFormatterCleanup implements CleanupJob {
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
         }
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public Formatter getFormatter() {
+        return formatter;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldFormatterCleanup that = (FieldFormatterCleanup) o;
+        return Objects.equals(field, that.field) &&
+                Objects.equals(formatter, that.formatter);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, formatter);
+    }
+
+    @Override
+    public String toString() {
+        return field + ": " + formatter.getKey();
     }
 }

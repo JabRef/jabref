@@ -6,13 +6,13 @@ import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
 
-class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
+class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldFormatterCleanup> {
 
-    private List<SaveAction> saveActions;
+    private List<FieldFormatterCleanup> saveActions;
 
     private List<ListDataListener> listeners;
 
-    public SaveActionsListModel(List<SaveAction> saveActions) {
+    public SaveActionsListModel(List<FieldFormatterCleanup> saveActions) {
         if (saveActions == null) {
             throw new IllegalArgumentException("Input data must not be null");
         }
@@ -21,7 +21,7 @@ class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
         listeners = new ArrayList<>();
     }
 
-    public void addSaveAction(SaveAction action) {
+    public void addSaveAction(FieldFormatterCleanup action) {
         saveActions.add(action);
         for (ListDataListener listener : listeners) {
             listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_ADDED, saveActions.size(), saveActions.size()));
@@ -33,14 +33,14 @@ class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
             throw new IndexOutOfBoundsException("Index must be within 0 and " + saveActions.size() + " but was " + index);
         }
 
-        SaveAction action = saveActions.remove(index);
+        FieldFormatterCleanup action = saveActions.remove(index);
 
         for (ListDataListener listener : listeners) {
             listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_REMOVED, index, index));
         }
     }
 
-    public List<SaveAction> getAllActions() {
+    public List<FieldFormatterCleanup> getAllActions() {
         return saveActions;
     }
 
@@ -51,7 +51,7 @@ class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
     }
 
     @Override
-    public SaveAction getElementAt(int index) {
+    public FieldFormatterCleanup getElementAt(int index) {
         return saveActions.get(index);
     }
 

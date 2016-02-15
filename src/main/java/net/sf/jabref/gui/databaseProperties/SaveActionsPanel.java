@@ -3,6 +3,7 @@ package net.sf.jabref.gui.databaseProperties;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveAction;
 import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -36,7 +37,7 @@ public class SaveActionsPanel extends JPanel {
         this.removeAll();
 
         saveActions = new SaveActions(metaData);
-        List<SaveAction> configuredActions = saveActions.getConfiguredActions();
+        List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
 
         enabled.setSelected(saveActions.isEnabled());
 
@@ -44,8 +45,8 @@ public class SaveActionsPanel extends JPanel {
         this.add(enabled);
         this.add(getSelectorPanel());
 
-        List<SaveAction> actionsToDisplay = new ArrayList<>(configuredActions.size());
-        for (SaveAction action : configuredActions) {
+        List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
+        for (FieldFormatterCleanup action : configuredActions) {
             actionsToDisplay.add(action);
         }
 
@@ -85,9 +86,9 @@ public class SaveActionsPanel extends JPanel {
             actions.add("disabled");
         }
 
-        List<SaveAction> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        for (SaveAction action : newActions) {
-            actions.add(action.getFieldName());
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        for (FieldFormatterCleanup action : newActions) {
+            actions.add(action.getField());
             actions.add(action.getFormatter().getKey());
         }
 
@@ -116,7 +117,7 @@ public class SaveActionsPanel extends JPanel {
                 return;
             }
 
-            SaveAction newAction = new SaveAction(fieldKey, selectedFormatter);
+            FieldFormatterCleanup newAction = new FieldFormatterCleanup(fieldKey, selectedFormatter);
 
             ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
             keyField.setText("");

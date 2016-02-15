@@ -1,6 +1,7 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
@@ -11,7 +12,7 @@ import java.util.*;
 
 public class SaveActions {
 
-    private final List<SaveAction> actions;
+    private final List<FieldFormatterCleanup> actions;
 
     private List<Formatter> availableFormatters;
 
@@ -42,7 +43,7 @@ public class SaveActions {
         return enabled;
     }
 
-    public List<SaveAction> getConfiguredActions() {
+    public List<FieldFormatterCleanup> getConfiguredActions() {
         return Collections.unmodifiableList(actions);
     }
 
@@ -76,7 +77,7 @@ public class SaveActions {
                 String field = formatters.get(i);
                 Formatter formatter = getFormatterFromString(formatters.get(i + 1));
 
-                actions.add(new SaveAction(field, formatter));
+                actions.add(new FieldFormatterCleanup(field, formatter));
             } catch (IndexOutOfBoundsException e) {
                 // the meta data string in the file is broken. -> Ignore the last item
                 break;
@@ -109,21 +110,8 @@ public class SaveActions {
     }
 
     private void applyAllActions(BibEntry entry) {
-        for (SaveAction action : actions) {
-            applyActionForField(entry, action);
-        }
-    }
-
-    private void applyActionForField(BibEntry entry, SaveAction action) {
-        Formatter formatter = action.getFormatter();
-
-        String fieldContent = entry.getField(action.getFieldName());
-        if (fieldContent != null) {
-            String formattedContent = formatter.format(fieldContent);
-            // only set if something has changed
-            if (!fieldContent.equals(formattedContent)) {
-                entry.setField(action.getFieldName(), formattedContent);
-            }
+        for (FieldFormatterCleanup action : actions) {
+            action.cleanup(entry);
         }
     }
 
