@@ -51,6 +51,10 @@ public class SaveActionsPanel extends JPanel {
 
         actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
         this.add(actionsList);
+
+        JButton deleteButton = new JButton(Localization.lang("Delete"));
+        deleteButton.addActionListener(new DeleteButtonListener());
+        this.add(deleteButton);
     }
 
     private JPanel getSelectorPanel() {
@@ -80,8 +84,8 @@ public class SaveActionsPanel extends JPanel {
             actions.add("disabled");
         }
 
-        List<SaveAction> newActions = ((SaveActionsListModel)actionsList.getModel()).getAllActions();
-        for(SaveAction action: newActions){
+        List<SaveAction> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        for (SaveAction action : newActions) {
             actions.add(action.getFieldName());
             actions.add(action.getFormatter().getKey());
         }
@@ -117,5 +121,14 @@ public class SaveActionsPanel extends JPanel {
             keyField.setText("");
         }
     }
+
+    class DeleteButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ((SaveActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex());
+        }
+    }
+
 
 }

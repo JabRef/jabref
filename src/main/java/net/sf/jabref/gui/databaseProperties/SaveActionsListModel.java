@@ -28,6 +28,18 @@ class SaveActionsListModel<SaveAction> implements ListModel<SaveAction> {
         }
     }
 
+    public void removeAtIndex(int index) {
+        if (index < 0 || index > saveActions.size()) {
+            throw new IndexOutOfBoundsException("Index must be within 0 and " + saveActions.size() + " but was " + index);
+        }
+
+        SaveAction action = saveActions.remove(index);
+
+        for (ListDataListener listener : listeners) {
+            listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_REMOVED, index, index));
+        }
+    }
+
     public List<SaveAction> getAllActions() {
         return saveActions;
     }
