@@ -29,10 +29,19 @@ public class FindFullTextTest {
     @Ignore
     @Test
     public void acceptPdfUrls() throws Exception {
-        URL pdfUrl = new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf");
+        URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FullTextFinder finder = (e) -> Optional.of(pdfUrl);
         FindFullText fetcher = new FindFullText(Arrays.asList(finder));
 
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
+    }
+
+    @Test
+    public void rejectNonPdfUrls() throws Exception {
+        URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
+        FullTextFinder finder = (e) -> Optional.of(pdfUrl);
+        FindFullText fetcher = new FindFullText(Arrays.asList(finder));
+
+        assertEquals(Optional.empty(), fetcher.findFullTextPDF(entry));
     }
 }
