@@ -27,7 +27,7 @@ public class FindFullTextTest {
 
     @Test
     public void acceptPdfUrls() throws Exception {
-        URL pdfUrl = new URL("https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf");
+        URL pdfUrl = new URL("https://github.com/JabRef/jabref/tree/master/src/test/resources/net/sf/jabref/logic/io/empty.pdf");
         FullTextFinder finder = (e) -> Optional.of(pdfUrl);
         FindFullText fetcher = new FindFullText(Arrays.asList(finder));
 
