@@ -44,7 +44,12 @@ public class SaveActionsPanel extends JPanel {
         this.add(enabled);
         this.add(getSelectorPanel());
 
-        actionsList = new JList(new SaveActionsListModel<>(configuredActions));
+        List<SaveAction> actionsToDisplay = new ArrayList<>(configuredActions.size());
+        for (SaveAction action : configuredActions) {
+            actionsToDisplay.add(action);
+        }
+
+        actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
         this.add(actionsList);
     }
 
@@ -95,13 +100,9 @@ public class SaveActionsPanel extends JPanel {
                 }
             }
 
-            ListModel<String> model = actionsList.getModel();
-            int modelSize = model.getSize();
-            String[] listData = new String[modelSize + 1];
-            for(int i=0;i< modelSize;i++){
-                listData[i] = model.getElementAt(i);
-            }
-            listData[modelSize  + 1 ] = new SaveAction(keyField.getText(), selectedFormatter).toString();
+            SaveAction newAction = new SaveAction(keyField.getText(), selectedFormatter);
+
+            ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
             keyField.setText("");
         }
     }
