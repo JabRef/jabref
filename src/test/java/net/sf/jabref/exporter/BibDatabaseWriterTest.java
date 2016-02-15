@@ -9,17 +9,12 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
-import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.internal.util.io.IOUtil;
-import sun.misc.IOUtils;
-
 import static org.mockito.Mockito.*;
 
 import java.io.*;
@@ -27,8 +22,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Scanner;
-
-import static org.junit.Assert.*;
 
 public class BibDatabaseWriterTest {
 
@@ -307,8 +300,9 @@ public class BibDatabaseWriterTest {
                 new Defaults(BibDatabaseMode.BIBTEX));
         StringWriter stringWriter = new StringWriter();
         databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
-
-        Assert.assertEquals(new Scanner(testBibtexFile).useDelimiter("\\A").next(), stringWriter.toString());
+        try (Scanner scanner = new Scanner(testBibtexFile)) {
+            Assert.assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
     }
 
     @Test

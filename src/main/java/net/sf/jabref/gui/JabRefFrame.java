@@ -717,7 +717,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         GUIGlobals.sidePaneManager = this.sidePaneManager;
-        GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
 
@@ -1411,7 +1410,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setRollover(true);
 
         tlb.setFloatable(false);
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             tlb.addAction(newBiblatexDatabaseAction);
         } else {
             tlb.addAction(newBibtexDatabaseAction);
@@ -1597,7 +1596,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             encoding = Globals.prefs.getDefaultEncoding();
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
         addTab(bp, file, raisePanel);
         return bp;

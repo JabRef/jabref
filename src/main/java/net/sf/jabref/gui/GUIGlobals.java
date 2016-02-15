@@ -81,7 +81,6 @@ public class GUIGlobals {
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
-    public static AboutDialog helpDiag;
 
     //	Colors.
     public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.

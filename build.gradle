@@ -102,7 +102,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
 
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.7'
+    compile 'com.mashape.unirest:unirest-java:1.4.8'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.5'
     compile 'org.apache.logging.log4j:log4j-api:2.5'
