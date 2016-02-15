@@ -1,5 +1,7 @@
 package net.sf.jabref.gui.databaseProperties;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -10,6 +12,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,9 +45,11 @@ public class SaveActionsPanel extends JPanel {
 
         enabled.setSelected(saveActions.isEnabled());
 
-        this.setLayout(new GridLayout(2 + configuredActions.size(), 1));
-        this.add(enabled);
-        this.add(getSelectorPanel());
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
+        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        builder.add(enabled).xy(3, 1);
+        builder.add(getSelectorPanel()).xy(3, 3);
 
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
         for (FieldFormatterCleanup action : configuredActions) {
@@ -52,29 +58,44 @@ public class SaveActionsPanel extends JPanel {
 
         actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.add(actionsList);
+        builder.add(actionsList).xyw(3, 5, 2);
 
         JButton deleteButton = new JButton(Localization.lang("Delete"));
         deleteButton.addActionListener(new DeleteButtonListener());
-        this.add(deleteButton);
+        builder.add(deleteButton).xy(3, 7);
+
+        this.setLayout(new BorderLayout());
+        this.add(builder.getPanel(), BorderLayout.WEST);
     }
 
     private JPanel getSelectorPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(1, 3));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
+                "pref, 2dlu,"));
 
         keyField = new JTextField(20);
-        panel.add(keyField);
+        keyField.setText("field name");
+        keyField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                keyField.setText("");
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+
+            }
+        });
+        builder.add(keyField).xy(1, 1);
 
         List<String> formatterNames = saveActions.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
         formatters = new JComboBox(formatterNames.toArray());
-        panel.add(formatters);
+        builder.add(formatters).xy(3, 1);
 
         JButton addButton = new JButton(Localization.lang("Add"));
         addButton.addActionListener(new AddButtonListener());
-        panel.add(addButton);
+        builder.add(addButton).xy(5, 1);
 
-        return panel;
+        return builder.getPanel();
     }
 
     public boolean storeSettings(MetaData metaData) {

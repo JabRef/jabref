@@ -96,7 +96,7 @@ public class DatabasePropertiesDialog extends JDialog {
         setupSortOrderConfiguration();
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 40dlu, pref, "));
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 135dlu, pref,"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -104,7 +104,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
         builder.add(Localization.lang("General file directory")).xy(1, 5);
-        builder.add(fileDir).xy(3, 5);
+        builder.add(fileDir).xy(3, 1);
         builder.add(browseFile).xy(5, 5);
         builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
         builder.add(fileDirIndv).xy(3, 7);
