@@ -21,9 +21,8 @@ public class SaveActions {
     private boolean enabled;
 
     public SaveActions(MetaData metaData) {
-        if (metaData == null) {
-            throw new IllegalArgumentException("MetaData must not be null");
-        }
+        Objects.requireNonNull(metaData);
+
         actions = new ArrayList<>();
         setAvailableFormatters();
 

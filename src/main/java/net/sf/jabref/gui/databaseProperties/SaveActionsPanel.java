@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.databaseProperties;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.SaveAction;
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
@@ -12,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.List;
 
@@ -78,6 +78,8 @@ public class SaveActionsPanel extends JPanel {
     }
 
     public boolean storeSettings(MetaData metaData) {
+        Objects.requireNonNull(metaData);
+
         java.util.List<String> actions = new ArrayList<>();
 
         if (enabled.isSelected()) {

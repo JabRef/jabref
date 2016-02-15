@@ -5,6 +5,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldFormatterCleanup> {
 
@@ -13,9 +14,7 @@ class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldForm
     private List<ListDataListener> listeners;
 
     public SaveActionsListModel(List<FieldFormatterCleanup> saveActions) {
-        if (saveActions == null) {
-            throw new IllegalArgumentException("Input data must not be null");
-        }
+        Objects.requireNonNull(saveActions);
 
         this.saveActions = saveActions;
         listeners = new ArrayList<>();
