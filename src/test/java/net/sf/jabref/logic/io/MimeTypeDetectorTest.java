@@ -24,7 +24,7 @@ public class MimeTypeDetectorTest {
 
     @Test
     public void beTrueForPdfMimeType() {
-        String pdfUrl = "https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf";
+        String pdfUrl = "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 

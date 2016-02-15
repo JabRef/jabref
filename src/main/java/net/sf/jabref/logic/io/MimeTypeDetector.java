@@ -16,10 +16,10 @@ public class MimeTypeDetector {
 
     public static String getMimeType(String url) {
         try {
-            String contentType = Unirest.head(url).asBinary().getHeaders().getFirst("content-type");
+            String contentType = Unirest.head(url).asBinary().getHeaders().getFirst("Content-Type");
             // HEAD and GET headers might differ, try real GET request
             if(contentType == null) {
-                contentType = Unirest.get(url).asBinary().getHeaders().getFirst("content-type");
+                contentType = Unirest.get(url).asBinary().getHeaders().getFirst("Content-Type");
             }
             return contentType;
         } catch (UnirestException | RuntimeException e) {
