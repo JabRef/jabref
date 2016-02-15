@@ -18,6 +18,8 @@ package net.sf.jabref.exporter.layout.format;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.exporter.layout.StringInt;
+import net.sf.jabref.logic.util.strings.RtfCharMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

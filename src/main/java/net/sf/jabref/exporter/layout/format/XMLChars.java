@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.logic.util.strings.XmlCharsMap;
 
 /**
  * Changes {\^o} or {\^{o}} to ?

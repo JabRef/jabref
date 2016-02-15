@@ -1,9 +1,9 @@
-package net.sf.jabref.exporter.layout.format;
+package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
 
-class RtfCharMap extends HashMap<String, String> {
+public class RtfCharMap extends HashMap<String, String> {
     public RtfCharMap () {
 
 
@@ -84,8 +84,8 @@ put("AE", "{\\u198A}"); // "AElig"
         put("o", "\\'f8");
         put("`U", "\\u217U"); // "Ugrave"
         put("'U", "\\u218U"); // "Uacute"
-        put("^U", "\\u219U"); // "Ucirc"       
-        put("\"U", "\\u220U"); // "Uuml" 
+        put("^U", "\\u219U"); // "Ucirc"
+        put("\"U", "\\u220U"); // "Uuml"
         put("'Y", "\\u221Y"); // "Yacute"
         put("TH", "{\\uc2\\u222TH}"); // "THORN"
         put("ss", "{\\uc2\\u223ss}"); // "szlig"
