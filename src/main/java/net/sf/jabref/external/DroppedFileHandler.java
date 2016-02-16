@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -346,7 +346,7 @@ public class DroppedFileHandler {
     }
 
     //
-    // @return true if user pushed "Ok", false otherwise
+    // @return true if user pushed "OK", false otherwise
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
                                                  BibEntry entry, boolean newEntry, final boolean multipleEntries, BibDatabase database) {
@@ -506,6 +506,7 @@ public class DroppedFileHandler {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
             // This should not happen!!
+            LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
         File toFile = new File(dirs.get(found) + System.getProperty("file.separator") + destFilename);
@@ -556,6 +557,7 @@ public class DroppedFileHandler {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
             // This should not happen!!
+            LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
         toFile = new File(toFile).getName();
