@@ -110,10 +110,7 @@ public class SaveActionsPanel extends JPanel {
         }
 
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        for (FieldFormatterCleanup action : newActions) {
-            actions.add(action.getField());
-            actions.add(action.getFormatter().getKey());
-        }
+        actions.add(SaveActions.getMetaDataString(newActions));
 
         metaData.putData(SaveActions.META_KEY, actions);
 

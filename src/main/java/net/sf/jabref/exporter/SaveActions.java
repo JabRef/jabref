@@ -31,9 +31,9 @@ public class SaveActions {
             // no save actions defined in the meta data
             return;
         } else {
-            parseEnabledStatus(formatters);
+            parseEnabledStatus(formatters.get(0));
 
-            parseSaveActions(formatters);
+            parseSaveActions(formatters.get(1));
         }
 
     }
@@ -69,25 +69,47 @@ public class SaveActions {
         return result;
     }
 
-    private void parseSaveActions(List<String> formatters) {
+    private void parseSaveActions(String formatterString) {
         //read concrete actions
-        for (int i = 1; i < formatters.size(); i += 2) {
-            try {
-                String field = formatters.get(i);
-                Formatter formatter = getFormatterFromString(formatters.get(i + 1));
+        int startIndex = 0;
+        int index = 0;
+        String remainingString = formatterString;
+        try {
+            while (startIndex < formatterString.length()) {
+                // read the field name
+                index = remainingString.indexOf("[");
+                String fieldKey = remainingString.substring(0, index);
+                int endIndex = remainingString.indexOf("]");
+                startIndex += endIndex + 1;
 
-                actions.add(new FieldFormatterCleanup(field, formatter));
-            } catch (IndexOutOfBoundsException e) {
-                // the meta data string in the file is broken. -> Ignore the last item
-                break;
+                //read each formatter
+                int commaIndex = remainingString.indexOf(",");
+                do {
+                    String formatterKey = remainingString.substring(index + 1, commaIndex);
+                    actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
+
+                    remainingString = remainingString.substring(commaIndex + 1);
+                    commaIndex = remainingString.indexOf(",");
+                    index = -1;
+                } while (commaIndex != -1 && commaIndex < endIndex);
+
+                if ("]".equals(remainingString)) {
+                    return;
+                } else {
+                    remainingString = remainingString.substring(1, remainingString.length());
+                }
+
             }
+        } catch (StringIndexOutOfBoundsException ignore) {
+            // if this exception occurs, the remaining part of the save actions string is invalid.
+            // Thus we stop parsing and take what we have parsed until now
+            return;
         }
     }
 
-    private void parseEnabledStatus(List<String> formatters) {
+    private void parseEnabledStatus(String enablementString) {
         //read if save actions should be enabled
-        String enableActions = formatters.get(0);
-        if ("enabled".equals(enableActions)) {
+        if ("enabled".equals(enablementString)) {
             enabled = true;
         } else {
             enabled = false;
@@ -123,6 +145,36 @@ public class SaveActions {
         return new IdentityFormatter();
     }
 
+    public static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
+        //first, group all formatters by the field for which they apply
+        HashMap<String, List<String>> groupedByField = new HashMap<>();
+        for (FieldFormatterCleanup cleanup : actionList) {
+            String key = cleanup.getField();
+
+            // add new list into the hashmap if needed
+            if (!groupedByField.containsKey(key)) {
+                groupedByField.put(key, new ArrayList<>());
+            }
+
+            //add the formatter to the map if it is not already there
+            List<String> formattersForKey = groupedByField.get(key);
+            if (!formattersForKey.contains(cleanup.getFormatter().getKey())) {
+                formattersForKey.add(cleanup.getFormatter().getKey());
+            }
+        }
+
+        // convert the contents of the hashmap into the correct serialization
+        StringBuilder result = new StringBuilder();
+        for (String fieldKey : groupedByField.keySet()) {
+            result.append(fieldKey + "[");
+            for (String formatterKey : groupedByField.get(fieldKey)) {
+                result.append(formatterKey + ",");
+            }
+            result.append("],");
+        }
+
+        return result.toString();
+    }
 
 
 }
