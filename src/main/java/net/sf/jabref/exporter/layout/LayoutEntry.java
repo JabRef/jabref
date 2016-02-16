@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,8 +64,7 @@ class LayoutEntry {
         } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            List<String> v = new ArrayList<>();
-            WSITools.tokenize(v, si.s, "\n");
+            List<String> v = StringUtil.tokenizeToList(si.s, "\n");
 
             if (v.size() == 1) {
                 text = v.get(0);
