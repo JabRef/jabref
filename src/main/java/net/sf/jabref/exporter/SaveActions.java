@@ -89,6 +89,9 @@ public class SaveActions {
                     actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
 
                     remainingString = remainingString.substring(commaIndex + 1);
+                    if(commaIndex == endIndex -1 ){
+                        break;
+                    }
                     commaIndex = remainingString.indexOf(",");
                     index = -1;
                 } while (commaIndex != -1 && commaIndex < endIndex);
@@ -170,7 +173,7 @@ public class SaveActions {
             for (String formatterKey : groupedByField.get(fieldKey)) {
                 result.append(formatterKey + ",");
             }
-            result.append("],");
+            result.append("]");
         }
 
         return result.toString();

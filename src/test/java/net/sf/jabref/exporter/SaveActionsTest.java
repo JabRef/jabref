@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -179,16 +180,25 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,]pages[PageNumbersFormatter,]}"));
+                "@comment{jabref-meta: saveActions:enabled;pages[PageNumbersFormatter,]title[LowerCaseChanger,]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[LowerCaseChanger,]pages[PageNumbersFormatter,]", saveActions.get(1));
+        assertEquals("pages[PageNumbersFormatter,]title[LowerCaseChanger,]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
+        List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
+        assertEquals(2, formatterCleanups.size());
+        for(FieldFormatterCleanup cleanup: formatterCleanups){
+            if(cleanup.getField().equals("title")){
+                assertEquals("LowerCaseChanger", cleanup.getFormatter().getKey());
+            }  else if(cleanup.getField().equals("pages")) {
+                assertEquals("PageNumbersFormatter", cleanup.getFormatter().getKey());
+            }
+        }
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
 
