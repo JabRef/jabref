@@ -88,8 +88,7 @@ class DatabaseFileLookup {
                 continue;
             }
 
-            Optional<File> expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            fileLinks.add(expandedFilename.get());
+            FileUtil.expandFilename(link, possibleFilePaths).ifPresent(fileLinks::add);
         }
 
         return fileLinks;
