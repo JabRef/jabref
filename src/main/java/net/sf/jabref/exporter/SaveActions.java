@@ -89,7 +89,7 @@ public class SaveActions {
                     actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
 
                     remainingString = remainingString.substring(commaIndex + 1);
-                    if(commaIndex == endIndex -1 ){
+                    if(remainingString.startsWith("]")){
                         break;
                     }
                     commaIndex = remainingString.indexOf(",");
