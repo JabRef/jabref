@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.mods;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.List;
 import net.sf.jabref.exporter.layout.WSITools;
 
 import net.sf.jabref.model.entry.AuthorList;
@@ -52,7 +52,7 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        Vector<String> names = new Vector<>();
+        List<String> names = new ArrayList<>();
         String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma

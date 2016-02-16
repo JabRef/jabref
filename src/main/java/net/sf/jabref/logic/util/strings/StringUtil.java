@@ -488,7 +488,6 @@ public class StringUtil {
      * @return the int value of str
      */
     public static int intValueOf(String str) {
-        int ival = 0;
         int idx = 0;
         int end;
         boolean sign = false;
@@ -498,6 +497,7 @@ public class StringUtil {
             throw new NumberFormatException(str);
         }
 
+        int ival = 0;
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
@@ -507,5 +507,35 @@ public class StringUtil {
                 throw new NumberFormatException(str);
             }
         }
+    }
+
+    /**
+     * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * <p>
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public static String stripNonValidXMLCharacters(String in) {
+        if ((in == null) || in.isEmpty()) {
+            return ""; // vacancy test.
+        }
+        StringBuilder out = new StringBuilder(); // Used to hold the output.
+        char current; // Used to reference the current character.
+    
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+                out.append(current);
+            }
+        }
+        return out.toString();
     }
 }

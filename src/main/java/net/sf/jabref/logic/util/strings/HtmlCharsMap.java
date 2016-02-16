@@ -1,8 +1,8 @@
-package net.sf.jabref.exporter.layout.format;
+package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
-class HtmlCharsMap extends HashMap<String, String> {
+public class HtmlCharsMap extends HashMap<String, String> {
     public HtmlCharsMap() {
         // HTML named entities from #192 - #255 (UNICODE Latin-1)
         put("`A", "&Agrave;"); // #192
