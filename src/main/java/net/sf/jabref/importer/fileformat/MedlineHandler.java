@@ -24,7 +24,6 @@ import java.util.TreeSet;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.xml.sax.Attributes;

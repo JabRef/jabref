@@ -20,7 +20,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
@@ -51,7 +50,8 @@ public class LabelPatternPanel extends JPanel {
     private final Map<String, JTextField> textFields = new HashMap<>();
     private final BasePanel panel;
 
-    public LabelPatternPanel(AboutDialog helpDiag, BasePanel panel) {
+
+    public LabelPatternPanel(BasePanel panel) {
         this.panel = panel;
         help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.labelPatternHelp);
         buildGUI();

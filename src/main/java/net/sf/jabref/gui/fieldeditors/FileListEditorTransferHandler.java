@@ -130,7 +130,7 @@ class FileListEditorTransferHandler extends TransferHandler {
                                 if (droppedFileHandler == null) {
                                     droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
                                 }
-                                droppedFileHandler.handleDroppedfile(name, fileType, true, entryContainer.getEntry());
+                                droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
                             }
                         }
                     }

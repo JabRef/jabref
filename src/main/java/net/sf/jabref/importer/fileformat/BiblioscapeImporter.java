@@ -23,7 +23,6 @@ import java.util.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on

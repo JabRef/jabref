@@ -274,7 +274,7 @@ public class PdfImporter {
                     panel.markBaseChanged();
                     LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
                     dfh = new DroppedFileHandler(frame, panel);
-                    dfh.linkPdfToEntry(fileName, entryTable, entry);
+                    dfh.linkPdfToEntry(fileName, entry);
                     panel.highlightEntry(entry);
                     if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                         EntryEditor editor = panel.getEntryEditor(entry);
@@ -302,7 +302,7 @@ public class PdfImporter {
         BibEntry newEntry = createNewEntry();
         if (newEntry != null) {
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-            dfh.linkPdfToEntry(fileName, entryTable, newEntry);
+            dfh.linkPdfToEntry(fileName, newEntry);
         }
         return newEntry;
     }

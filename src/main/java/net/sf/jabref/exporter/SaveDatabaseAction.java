@@ -30,7 +30,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import javax.swing.*;
 
-import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
