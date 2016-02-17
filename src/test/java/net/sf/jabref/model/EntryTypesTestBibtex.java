@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.model;
 
 import static org.junit.Assert.*;
 
@@ -19,20 +19,6 @@ import net.sf.jabref.model.entry.CustomEntryType;
 
 
 public class EntryTypesTestBibtex {
-
-    private JabRefPreferences backup;
-
-
-    @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        backup = Globals.prefs;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        Globals.prefs.overwritePreferences(backup);
-    }
 
     @Test
     public void testBibtexMode() {
