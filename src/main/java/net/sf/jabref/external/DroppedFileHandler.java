@@ -216,49 +216,6 @@ public class DroppedFileHandler {
         panel.undoManager.addEdit(edits);
     }
 
-    public void importXmp(List<BibEntry> xmpEntriesInFile, String fileName) {
-        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
-
-        boolean isSingle = xmpEntriesInFile.size() == 1;
-        BibEntry single = isSingle ? xmpEntriesInFile.get(0) : null;
-
-        boolean success = true;
-
-        String destFilename;
-
-        if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
-        } else {
-            if (renameCheckBox.isSelected()) {
-                destFilename = fileName;
-            } else {
-                destFilename = single.getCiteKey() + "." + fileType.getExtension();
-            }
-
-            if (copyRadioButton.isSelected()) {
-                success = doCopy(fileName, destFilename, edits);
-            } else if (moveRadioButton.isSelected()) {
-                success = doMove(fileName, destFilename, edits);
-            }
-        }
-        if (success) {
-
-            for (BibEntry aXmpEntriesInFile : xmpEntriesInFile) {
-
-                aXmpEntriesInFile.setId(IdGenerator.next());
-                edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
-                panel.getDatabase().insertEntry(aXmpEntriesInFile);
-                doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
-
-            }
-            panel.markBaseChanged();
-            panel.updateEntryEditorIfShowing();
-        }
-        edits.end();
-        panel.undoManager.addEdit(edits);
-    }
-
     // Done by MrDlib
 
     private boolean tryXmpImport(String fileName, ExternalFileType fileType, NamedCompound edits) {
@@ -455,15 +412,35 @@ public class DroppedFileHandler {
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
             List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
-            String absFilename = !new File(filename).isAbsolute() && (dirs.isEmpty()) ? FileUtil
-                    .expandFilename(filename, dirs).get().getAbsolutePath() : filename;
+            String absFilename;
+            if (new File(filename).isAbsolute() || dirs.isEmpty()) {
+                absFilename = filename;
+            } else {
+                Optional<File> file = FileUtil.expandFilename(filename, dirs);
+                if (file.isPresent()) {
+                    absFilename = file.get().getAbsolutePath();
+                } else {
+                    absFilename = ""; // This shouldn't happen based on the old code, so maybe one should set it something else?
+                }
+            }
+
+            LOGGER.debug("absFilename: " + absFilename);
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName = !new File(flEntry.link).isAbsolute() && (!dirs.isEmpty()) ? FileUtil
-                        .expandFilename(flEntry.link, dirs).get().getAbsolutePath() : flEntry.link;
-                System.out.println("absName: " + absName);
+                String absName;
+                if (new File(flEntry.link).isAbsolute() || dirs.isEmpty()) {
+                    absName = flEntry.link;
+                } else {
+                    Optional<File> file = FileUtil.expandFilename(flEntry.link, dirs);
+                    if (file.isPresent()) {
+                        absName = file.get().getAbsolutePath();
+                    } else {
+                        absName = null;
+                    }
+                }
+                LOGGER.debug("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
                 if (absFilename.equals(absName)) {
                     return;
