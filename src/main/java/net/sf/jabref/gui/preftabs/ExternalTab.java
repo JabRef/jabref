@@ -39,8 +39,6 @@ import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.help.AboutDialog;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -69,8 +67,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JRadioButton matchStartsWithKey = new JRadioButton(Localization.lang("Autolink files with names starting with the BibTeX key"));
 
 
-    public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs,
-            AboutDialog aboutDialog) {
+    public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
         this.frame = frame;
         setLayout(new BorderLayout());

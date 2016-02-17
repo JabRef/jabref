@@ -1,18 +1,9 @@
-package net.sf.jabref.logic.search;
-
-import net.sf.jabref.logic.search.rules.RegexBasedSearchRule;
-import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
-import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
+package net.sf.jabref.logic.search.rules;
 
 public class SearchRules {
 
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
-     *
-     * @param query
-     * @param caseSensitive
-     * @param regex
-     * @return
      */
     public static SearchRule getSearchRuleByQuery(String query, boolean caseSensitive, boolean regex) {
         // this searches specified fields if specified,

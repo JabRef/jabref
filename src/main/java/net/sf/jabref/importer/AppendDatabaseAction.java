@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -116,7 +117,7 @@ public class AppendDatabaseAction implements BaseAction {
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
-            } catch (Throwable ex) {
+            } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
                 JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open database"),
                         JOptionPane.ERROR_MESSAGE);

@@ -542,7 +542,7 @@ public class EmacsKeyBindings
     }
 
     /**
-     * This action sets a beginning mark for a selection.
+     * This action matchers a beginning mark for a selection.
      */
     @SuppressWarnings("serial")
     public static class SetMarkCommandAction extends TextAction

@@ -163,34 +163,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     };
 
-    class ToolBar extends OSXCompatibleToolbar {
-
-        void addAction(Action a) {
-            JButton b = new JButton(a);
-            b.setText(null);
-            if (!OS.OS_X) {
-                b.setMargin(marg);
-            }
-            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
-            Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
-                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(b);
-        }
-
-        void addJToogleButton(JToggleButton button) {
-            button.setText(null);
-            if (!OS.OS_X) {
-                button.setMargin(marg);
-            }
-            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
-                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(button);
-        }
-    }
 
     private final ToolBar tlb = new ToolBar();
 
@@ -208,7 +180,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
-    public final AboutDialog helpDiag = new AboutDialog(this);
+    private final AboutDialog aboutDiag = new AboutDialog(this);
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -270,7 +242,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
             HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), helpDiag,
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
             Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
@@ -2213,4 +2185,34 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
     }
+
+    class ToolBar extends OSXCompatibleToolbar {
+
+        void addAction(Action a) {
+            JButton b = new JButton(a);
+            b.setText(null);
+            if (!OS.OS_X) {
+                b.setMargin(marg);
+            }
+            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
+            Object obj = a.getValue(Action.LARGE_ICON_KEY);
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
+                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
+            add(b);
+        }
+
+        void addJToogleButton(JToggleButton button) {
+            button.setText(null);
+            if (!OS.OS_X) {
+                button.setMargin(marg);
+            }
+            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
+            if ((obj instanceof IconTheme.FontBasedIcon)) {
+                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
+            add(button);
+        }
+    }
+
 }

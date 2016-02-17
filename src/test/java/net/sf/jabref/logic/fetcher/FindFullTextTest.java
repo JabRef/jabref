@@ -1,6 +1,5 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.fetcher;
 
-import net.sf.jabref.logic.fetcher.FullTextFinder;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.After;
 import org.junit.Before;

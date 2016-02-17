@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.search.rules.util;
+package net.sf.jabref.logic.search.rules;
 
 import java.util.ArrayList;
 import java.util.List;

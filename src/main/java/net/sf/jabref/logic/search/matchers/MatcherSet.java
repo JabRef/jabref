@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,29 +13,20 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.search.rules.sets;
+package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.SearchMatcher;
 
-/**
- * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
- * 1.
- */
-public class OrSearchRuleSet extends SearchRuleSet {
+import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
 
-    @Override
-    public boolean applyRule(String searchString, BibEntry bibEntry) {
-        int score = 0;
+public abstract class MatcherSet implements SearchMatcher {
 
-        // We let each rule add a maximum of 1 to the score.
-        for (SearchRule rule : ruleSet) {
-            if(rule.applyRule(searchString, bibEntry)) {
-                score++;
-            }
-        }
+    protected final List<SearchMatcher> matchers = new Vector<>();
 
-        // OR rule demands score > 0.
-        return score > 0;
+    public void addRule(SearchMatcher newRule) {
+        matchers.add(Objects.requireNonNull(newRule));
     }
+
 }

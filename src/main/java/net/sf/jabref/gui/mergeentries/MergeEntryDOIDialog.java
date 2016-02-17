@@ -22,7 +22,6 @@ import java.util.TreeSet;
 
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;

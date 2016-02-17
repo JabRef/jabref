@@ -1,13 +1,9 @@
 package net.sf.jabref.logic.io;
 
-import net.sf.jabref.support.DevEnvironment;
-import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.Ignore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MimeTypeDetectorTest {
     @Test

@@ -26,7 +26,6 @@ import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
@@ -314,9 +313,8 @@ public class RepecNepImporter extends ImportFormat {
                 readLine();
             }
 
-            if (author != null) {
-                authors += "".equals(authors) ? author : " and " + author;
-            }
+            authors += "".equals(authors) ? author : " and " + author;
+
             if (institution.length() > 0) {
                 institutions.append(
                         (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());

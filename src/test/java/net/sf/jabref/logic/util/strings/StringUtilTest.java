@@ -87,8 +87,6 @@ public class StringUtilTest {
         assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
         assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
-
-        assertEquals("a:b", StringUtil.join(stringArray1[0], ":"));
     }
 
     @Test

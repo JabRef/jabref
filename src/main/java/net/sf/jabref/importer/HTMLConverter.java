@@ -48,15 +48,43 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         if (text == null) {
             return null;
         }
+
+        if (text.isEmpty()) {
+            return text;
+        }
+
+        // Standard symbols
         Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_SYMBOLS.keySet();
         for (Character character : chars) {
-            // System.err.println(new Integer((int) character).toString() + ": " + character.toString() + ": " + unicodeSymbols.get(character));
             text = text.replaceAll(character.toString(), HTMLUnicodeConversionMaps.UNICODE_SYMBOLS.get(character));
         }
 
-        Integer cp;
+        // Combining accents
+        StringBuilder sb = new StringBuilder();
+        boolean consumed = false;
+        for (int i = 0; i <= (text.length() - 2); i++) {
+            if (!consumed && (i < (text.length() - 1))) {
+                int cpCurrent = text.codePointAt(i);
+                Integer cpNext = text.codePointAt(i + 1);
+                String code = HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(cpNext);
+                if (code == null) {
+                    sb.append((char) cpCurrent);
+                } else {
+                    sb.append("{\\" + code + '{' + (char) cpCurrent + "}}");
+                    consumed = true;
+                }
+            } else {
+                consumed = false;
+            }
+        }
+        if (!consumed) {
+            sb.append((char) text.codePointAt(text.length() - 1));
+        }
+        text = sb.toString();
+
+        // Check if any symbols is not converted
         for (int i = 0; i <= (text.length() - 1); i++) {
-            cp = text.codePointAt(i);
+            int cp = text.codePointAt(i);
             if (cp >= 129) {
                 LOGGER.warn("Unicode character not converted: " + cp);
             }
@@ -69,6 +97,11 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         if (text == null) {
             return null;
         }
+
+        if (text.isEmpty()) {
+            return text;
+        }
+
         StringBuffer sb = new StringBuffer();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         // If the result is in text or equation form can be controlled
@@ -106,8 +139,6 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         // Handle numerical HTML entities
         Matcher m = ESCAPED_PATTERN.matcher(text);
         while (m.find()) {
-            //      System.err.println("Found pattern: " + m.group(1));
-            //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (HTMLUnicodeConversionMaps.NUMERICAL_SYMBOLS.containsKey(num)) {
                 text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
@@ -115,10 +146,9 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
             }
         }
 
+        // Combining accents
         m = ESCAPED_PATTERN2.matcher(text);
         while (m.find()) {
-            //      System.err.println("Found pattern: " + m.group(1));
-            //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if (HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.containsKey(num)) {
                 if ("i".equals(m.group(1))) {
@@ -134,10 +164,9 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
             }
         }
 
+        // Find non-converted numerical characters
         m = ESCAPED_PATTERN3.matcher(text);
         while (m.find()) {
-            //      System.err.println("Found pattern: " + m.group(1));
-            //      System.err.println("Found pattern: " + m.group(2));
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             LOGGER.warn("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
         }

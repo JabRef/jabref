@@ -1,6 +1,6 @@
-package net.sf.jabref.exporter.layout;
+package net.sf.jabref.exporter.layout.format;
 
-import net.sf.jabref.exporter.layout.format.HTMLChars;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,8 +16,8 @@ public class HTMLCharsTest {
 
         Assert.assertEquals("hallo", layout.format("hallo"));
 
-        Assert.assertEquals("Réflexions sur le timing de la quantité", layout
-                .format("Réflexions sur le timing de la quantité"));
+        Assert.assertEquals("Réflexions sur le timing de la quantité",
+                layout.format("Réflexions sur le timing de la quantité"));
 
         Assert.assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 

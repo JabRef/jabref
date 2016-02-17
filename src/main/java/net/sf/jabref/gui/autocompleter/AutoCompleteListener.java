@@ -48,7 +48,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     // run before the focus listener responsible for storing the current edit.
     private FocusListener nextFocusListener;
 
-
     public AutoCompleteListener(AutoCompleter<String> completer) {
         //    	if (logger.getHandlers().length == 0) {
         //	    	logger.setLevel(Level.FINEST);
@@ -110,11 +109,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         //        	doCompletion(currentword, e);
         //        }
         else if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-            if (e.getKeyCode() != KeyEvent.VK_SHIFT) {
-                // shift is OK, everyhting else leads to a reset
-                resetAutoCompletion();
-            } else {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                // shift is OK, everything else leads to a reset
                 LOGGER.debug("Special case: shift pressed. No action.");
+            } else {
+                resetAutoCompletion();
             }
         } else {
             LOGGER.debug("Special case: defined character, but not caught above");
@@ -446,31 +445,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         }
 
         return res;
-    }
-
-
-    private static final int ANY_NAME = 0;
-    private static final int FIRST_NAME = 1;
-    static final int LAST_NAME = 2;
-
-
-    protected int findNamePositionStatus(JTextComponent comp) {
-        String upToCaret;
-        try {
-            upToCaret = comp.getText(0, comp.getCaretPosition());
-            // Clip off evertyhing up to and including the last " and " before:
-            upToCaret = upToCaret.substring(upToCaret.lastIndexOf(" and ") + 1);
-            int commaIndex = upToCaret.indexOf(',');
-            if (commaIndex < 0) {
-                return AutoCompleteListener.ANY_NAME;
-            } else {
-                return AutoCompleteListener.FIRST_NAME;
-            }
-
-        } catch (BadLocationException ex) {
-            return AutoCompleteListener.ANY_NAME;
-        }
-
     }
 
     @Override

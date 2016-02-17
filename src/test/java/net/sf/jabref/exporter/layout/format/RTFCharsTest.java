@@ -1,6 +1,6 @@
-package net.sf.jabref.exporter.layout;
+package net.sf.jabref.exporter.layout.format;
 
-import net.sf.jabref.exporter.layout.format.RTFChars;
+import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -18,7 +18,8 @@ public class RTFCharsTest {
         Assert.assertEquals("hallo", layout.format("hallo"));
 
         // We should be able to replace the ? with e
-        Assert.assertEquals("R\\u233?flexions sur le timing de la quantit\\u233?", layout.format("Réflexions sur le timing de la quantité"));
+        Assert.assertEquals("R\\u233?flexions sur le timing de la quantit\\u233?",
+                layout.format("Réflexions sur le timing de la quantité"));
 
         Assert.assertEquals("h\\u225allo", layout.format("h\\'allo"));
         Assert.assertEquals("h\\u225allo", layout.format("h\\'allo"));
@@ -44,7 +45,8 @@ public class RTFCharsTest {
     public void testComplicated() {
         LayoutFormatter layout = new RTFChars();
 
-        Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e \\u230ae should be \\u230ae", layout.format("Réflexions sur le timing de la quantité \\ae should be æ"));
+        Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e \\u230ae should be \\u230ae",
+                layout.format("Réflexions sur le timing de la quantité \\ae should be æ"));
 
         Assert.assertEquals("h\\u225all{\\uc2\\u339oe}", layout.format("h\\'all\\oe "));
     }

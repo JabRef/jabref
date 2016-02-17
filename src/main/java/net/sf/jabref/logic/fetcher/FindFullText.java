@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.io.MimeTypeDetector;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.fetcher.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

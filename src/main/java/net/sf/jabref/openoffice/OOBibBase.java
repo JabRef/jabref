@@ -584,7 +584,7 @@ class OOBibBase {
                         seenBefore.add(bibtexKeys[j][k]);
                     }
                     String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if ((uniq != null) && (uniq.length() >= 0)) {
+                    if (uniq != null) {
                         needsChange = true;
                         BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
                         if (database != null) {

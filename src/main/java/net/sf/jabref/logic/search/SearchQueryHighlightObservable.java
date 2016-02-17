@@ -1,11 +1,8 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
+import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class SearchQueryHighlightObservable {
@@ -21,6 +18,8 @@ public class SearchQueryHighlightObservable {
      * @param l SearchQueryHighlightListener to be added
      */
     public void addSearchListener(SearchQueryHighlightListener l) {
+        Objects.requireNonNull(l);
+
         if (listeners.contains(l)) {
             return;
         } else {
@@ -41,6 +40,8 @@ public class SearchQueryHighlightObservable {
      * @param l SearchQueryHighlightListener to be removed
      */
     public void removeSearchListener(SearchQueryHighlightListener l) {
+        Objects.requireNonNull(l);
+
         listeners.remove(l);
     }
 
@@ -58,14 +59,16 @@ public class SearchQueryHighlightObservable {
     /**
      * Fires an event if a search was started (or cleared)
      *
-     * @param searchText the search query
+     * @param searchQuery the search query
      */
     public void fireSearchlistenerEvent(SearchQuery searchQuery) {
+        Objects.requireNonNull(searchQuery);
+
         // Parse the search string to words
-        if ((searchQuery == null) || searchQuery.isGrammarBasedSearch()) {
+        if (searchQuery.isGrammarBasedSearch()) {
             pattern = Optional.empty();
         } else {
-            pattern = getPatternForWords(getSearchwords(searchQuery.query), searchQuery.regularExpression, searchQuery.caseSensitive);
+            pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
         }
 
         update();

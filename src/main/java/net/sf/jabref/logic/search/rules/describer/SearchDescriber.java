@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.search.describer;
+package net.sf.jabref.logic.search.rules.describer;
 
 public interface SearchDescriber {
 

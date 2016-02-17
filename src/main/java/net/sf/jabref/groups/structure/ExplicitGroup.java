@@ -15,11 +15,11 @@
  */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -87,22 +87,6 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public SearchRule getSearchRule() {
-        return new SearchRule() {
-
-            @Override
-            public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(query, bibEntry);
-            }
-
-            @Override
-            public boolean validateSearchStrings(String query) {
-                return true;
-            }
-        };
-    }
-
-    @Override
     public boolean supportsAdd() {
         return true;
     }
@@ -152,11 +136,6 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean contains(String query, BibEntry entry) {
-        return contains(entry);
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(name, context);
         copy.entries.addAll(entries);
@@ -191,11 +170,7 @@ public class ExplicitGroup extends AbstractGroup {
                 return false;
             }
         }
-        if (!keys.isEmpty()) {
-            return false;
-        }
-        return other.name.equals(name)
-                && (other.getHierarchicalContext() == getHierarchicalContext());
+        return keys.isEmpty() && other.name.equals(name) && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**

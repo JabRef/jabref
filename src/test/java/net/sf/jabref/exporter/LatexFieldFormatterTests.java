@@ -1,8 +1,7 @@
-package net.sf.jabref.exporter.layout;
+package net.sf.jabref.exporter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

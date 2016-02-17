@@ -19,10 +19,10 @@ import java.util.List;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * This group contains all entries. Always. At any time!
@@ -54,21 +54,6 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public SearchRule getSearchRule() {
-        return new SearchRule() {
-            @Override
-            public boolean applyRule(String query, BibEntry bibEntry) {
-                return true; // contains everything
-            }
-
-            @Override
-            public boolean validateSearchStrings(String query) {
-                return true;
-            }
-        };
-    }
-
-    @Override
     public boolean supportsAdd() {
         return false;
     }
@@ -88,11 +73,6 @@ public class AllEntriesGroup extends AbstractGroup {
     public AbstractUndoableEdit remove(List<BibEntry> entries) {
         // not supported -> ignore
         return null;
-    }
-
-    @Override
-    public boolean contains(String query, BibEntry entry) {
-        return true; // contains everything
     }
 
     @Override
