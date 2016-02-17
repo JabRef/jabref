@@ -15,20 +15,27 @@
 */
 package net.sf.jabref.logic.search.matchers;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 
-import ca.odell.glazedlists.matchers.Matcher;
-
 /**
- * Matcher that accepts all entries. Used for filtering when so search is
- * active.
+ * Subclass of MatcherSet that ANDs or ORs between its rules, returning 0 or
+ * 1.
  */
-public class EverythingMatcher implements Matcher<BibEntry> {
-
-    public static final Matcher<BibEntry> INSTANCE = new EverythingMatcher();
+public class OrMatcher extends MatcherSet {
 
     @Override
-    public boolean matches(BibEntry object) {
-        return true;
+    public boolean isMatch(BibEntry bibEntry) {
+        int score = 0;
+
+        // We let each rule add a maximum of 1 to the score.
+        for (SearchMatcher rule : matchers) {
+            if(rule.isMatch(bibEntry)) {
+                score++;
+            }
+        }
+
+        // OR rule demands score > 0.
+        return score > 0;
     }
 }

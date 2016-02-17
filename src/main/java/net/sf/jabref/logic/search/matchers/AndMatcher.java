@@ -13,29 +13,29 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.search.rules.sets;
+package net.sf.jabref.logic.search.matchers;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.SearchRule;
 
 /**
- * Subclass of SearchRuleSet that ANDs or ORs between its rules, returning 0 or
+ * Subclass of MatcherSet that ANDs or ORs between its rules, returning 0 or
  * 1.
  */
-public class AndSearchRuleSet extends SearchRuleSet {
+public class AndMatcher extends MatcherSet {
 
     @Override
-    public boolean applyRule(String searchString, BibEntry bibEntry) {
+    public boolean isMatch(BibEntry bibEntry) {
         int score = 0;
 
         // We let each rule add a maximum of 1 to the score.
-        for (SearchRule rule : ruleSet) {
-            if(rule.applyRule(searchString, bibEntry)) {
+        for (SearchMatcher rule : matchers) {
+            if(rule.isMatch(bibEntry)) {
                 score++;
             }
         }
 
         // Then an AND rule demands that score == number of rules
-        return score == ruleSet.size();
+        return score == matchers.size();
     }
 }

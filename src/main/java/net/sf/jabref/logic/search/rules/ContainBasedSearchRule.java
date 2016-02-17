@@ -19,8 +19,6 @@ import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 /**
  * Search rule for contain-based search.

@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -123,24 +123,6 @@ public class KeywordGroup extends AbstractGroup {
             default:
                 throw new UnsupportedVersionException("KeywordGroup", version);
         }
-    }
-
-    /**
-     * @see AbstractGroup#getSearchRule()
-     */
-    @Override
-    public SearchRule getSearchRule() {
-        return new SearchRule() {
-            @Override
-            public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(bibEntry);
-            }
-
-            @Override
-            public boolean validateSearchStrings(String query) {
-                return true;
-            }
-        };
     }
 
     /**

@@ -1,28 +1,21 @@
 package net.sf.jabref.logic.search.rules;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * Mock search rule that returns the values passed. Useful for testing.
  */
-public class MockSearchRule implements SearchRule {
+public class MockSearchRule implements SearchMatcher {
 
     private final boolean result;
-    private final boolean valid;
 
-    public MockSearchRule(boolean result, boolean valid) {
+    public MockSearchRule(boolean result) {
         this.result = result;
-        this.valid = valid;
     }
 
     @Override
-    public boolean applyRule(String query, BibEntry bibEntry) {
+    public boolean isMatch(BibEntry entry) {
         return result;
-    }
-
-    @Override
-    public boolean validateSearchStrings(String query) {
-        return valid;
     }
 }

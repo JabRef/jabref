@@ -1,12 +1,14 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.describer.SearchDescriber;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
+import net.sf.jabref.logic.search.rules.describer.SearchDescriber;
+import net.sf.jabref.logic.search.rules.describer.SearchDescribers;
 import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
+import net.sf.jabref.logic.search.rules.SearchRule;
+import net.sf.jabref.logic.search.rules.SearchRules;
 import net.sf.jabref.model.entry.BibEntry;
 
-public class SearchQuery {
+public class SearchQuery implements SearchMatcher {
 
     private final String query;
     private final boolean caseSensitive;
@@ -31,7 +33,7 @@ public class SearchQuery {
         return this.getRule().applyRule(getQuery(), entry);
     }
 
-    public boolean isValidQuery() {
+    public boolean isValid() {
         return this.getRule().validateSearchStrings(getQuery());
     }
 
@@ -83,7 +85,7 @@ public class SearchQuery {
         return description;
     }
 
-    public SearchRule getRule() {
+    private SearchRule getRule() {
         return rule;
     }
 }

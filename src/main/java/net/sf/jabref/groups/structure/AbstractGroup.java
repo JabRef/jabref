@@ -19,14 +19,14 @@ import java.util.List;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * A group of BibtexEntries.
  */
-public abstract class AbstractGroup {
+public abstract class AbstractGroup implements SearchMatcher {
 
     /**
      * The group's name (every type of group has one).
@@ -59,12 +59,6 @@ public abstract class AbstractGroup {
      * representation
      */
     static final String SEPARATOR = ";";
-
-
-    /**
-     * @return A search rule that will identify this group's entries.
-     */
-    public abstract SearchRule getSearchRule();
 
     /**
      * Re-create a group instance from a textual representation.
@@ -138,6 +132,10 @@ public abstract class AbstractGroup {
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(BibEntry entry);
+
+    public boolean isMatch(BibEntry entry) {
+        return contains(entry);
+    }
 
     /**
      * @return true if this group contains any of the specified entries, false

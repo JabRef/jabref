@@ -281,7 +281,7 @@ public class SearchBar extends JPanel {
         SearchQuery searchQuery = getSearchQuery();
         LOGGER.debug("Searching " + searchQuery + " in " + basePanel.getTabTitle());
 
-        if (!searchQuery.isValidQuery()) {
+        if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
 
             return;

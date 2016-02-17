@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchLexer;

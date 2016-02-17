@@ -1,6 +1,6 @@
-package net.sf.jabref.logic.search.describer;
+package net.sf.jabref.logic.search.rules.describer;
 
-import net.sf.jabref.logic.search.SearchRule;
+import net.sf.jabref.logic.search.rules.SearchRule;
 import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
 import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.search.rules.RegexBasedSearchRule;

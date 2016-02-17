@@ -15,13 +15,13 @@
 */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -105,14 +105,6 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public String getTypeId() {
         return SearchGroup.ID;
-    }
-
-    /**
-     * @see AbstractGroup#getSearchRule()
-     */
-    @Override
-    public SearchRule getSearchRule() {
-        return this.query.getRule();
     }
 
     /**

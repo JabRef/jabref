@@ -24,19 +24,11 @@ Further information about the GNU GPL is available at:
 http://www.gnu.org/copyleft/gpl.ja.html
 
 */
-package net.sf.jabref.logic.search;
+package net.sf.jabref.logic.search.rules;
 
 import net.sf.jabref.model.entry.BibEntry;
 
 public interface SearchRule {
-
-    /*
-     * Because some rules require the query in the constructor,
-     * the parameter query is not always used as expected.
-     * The two constants provide means to mark this as dummy.
-     * As I am not sure whether null could be substituted by "dummy" I leave everything as is.
-     */
-    String DUMMY_QUERY = "dummy";
 
     boolean applyRule(String query, BibEntry bibEntry);
 

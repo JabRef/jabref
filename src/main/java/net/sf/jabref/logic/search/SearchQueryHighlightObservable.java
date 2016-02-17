@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
+import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,11 +15,11 @@
  */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -84,22 +84,6 @@ public class ExplicitGroup extends AbstractGroup {
             entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
             Collections.addAll(this.entries, entries);
         }
-    }
-
-    @Override
-    public SearchRule getSearchRule() {
-        return new SearchRule() {
-
-            @Override
-            public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(bibEntry);
-            }
-
-            @Override
-            public boolean validateSearchStrings(String query) {
-                return true;
-            }
-        };
     }
 
     @Override
