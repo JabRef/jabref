@@ -89,7 +89,7 @@ public class SaveActions {
                     actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
 
                     remainingString = remainingString.substring(commaIndex + 1);
-                    if(remainingString.startsWith("]")){
+                    if (remainingString.startsWith("]")) {
                         break;
                     }
                     commaIndex = remainingString.indexOf(",");
@@ -112,11 +112,7 @@ public class SaveActions {
 
     private void parseEnabledStatus(String enablementString) {
         //read if save actions should be enabled
-        if ("enabled".equals(enablementString)) {
-            enabled = true;
-        } else {
-            enabled = false;
-        }
+        enabled = "enabled".equals(enablementString);
     }
 
     private void setAvailableFormatters() {
