@@ -15,11 +15,7 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * This is an immutable class representing information of either <CODE>author</CODE>
@@ -252,6 +248,8 @@ public class AuthorList {
      * @return An AuthorList object representing the given authors.
      */
     public static AuthorList getAuthorList(String authors) {
+        Objects.requireNonNull(authors);
+
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
             authorList = new AuthorList(authors);
@@ -1233,7 +1231,7 @@ public class AuthorList {
          * 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
          */
         public String getLastFirst(boolean abbr) {
-            StringBuffer res = new StringBuffer(getLastOnly());
+            StringBuilder res = new StringBuilder(getLastOnly());
             if (jrPart != null) {
                 res.append(", ").append(jrPart);
             }
@@ -1259,7 +1257,7 @@ public class AuthorList {
          * von Last, Jr.' (if <CODE>abbr==true</CODE>)
          */
         public String getFirstLast(boolean abbr) {
-            StringBuffer res = new StringBuffer();
+            StringBuilder res = new StringBuilder();
             if (abbr) {
                 res.append(firstAbbr == null ? "" : firstAbbr + ' ').append(getLastOnly());
             } else {

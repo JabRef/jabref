@@ -34,4 +34,16 @@ public class MatcherSetsTest {
         assertTrue(matcherSet.isMatch(new BibEntry()));
     }
 
+    @Test
+    public void testBuildNotWithTrue() {
+        NotMatcher matcher = new NotMatcher(new MockSearchRule(true));
+        assertFalse(matcher.isMatch(new BibEntry()));
+    }
+
+    @Test
+    public void testBuildNotWithFalse() {
+        NotMatcher matcher = new NotMatcher(new MockSearchRule(false));
+        assertTrue(matcher.isMatch(new BibEntry()));
+    }
+
 }
