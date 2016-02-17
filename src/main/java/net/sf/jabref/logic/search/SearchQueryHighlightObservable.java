@@ -58,14 +58,14 @@ public class SearchQueryHighlightObservable {
     /**
      * Fires an event if a search was started (or cleared)
      *
-     * @param searchText the search query
+     * @param searchQuery the search query
      */
     public void fireSearchlistenerEvent(SearchQuery searchQuery) {
         // Parse the search string to words
         if ((searchQuery == null) || searchQuery.isGrammarBasedSearch()) {
             pattern = Optional.empty();
         } else {
-            pattern = getPatternForWords(getSearchwords(searchQuery.query), searchQuery.regularExpression, searchQuery.caseSensitive);
+            pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
         }
 
         update();

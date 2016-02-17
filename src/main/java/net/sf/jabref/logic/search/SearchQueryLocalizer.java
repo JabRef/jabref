@@ -10,13 +10,13 @@ public class SearchQueryLocalizer {
         Objects.requireNonNull(searchQuery);
 
         return String.format("\"%s\" (%s, %s)",
-                searchQuery.query,
+                searchQuery.getQuery(),
                 getLocalizedCaseSensitiveDescription(searchQuery),
                 getLocalizedRegularExpressionDescription(searchQuery));
     }
 
     private static String getLocalizedCaseSensitiveDescription(SearchQuery searchQuery) {
-        if (searchQuery.caseSensitive) {
+        if (searchQuery.isCaseSensitive()) {
             return Localization.lang("case sensitive");
         } else {
             return Localization.lang("case insensitive");
@@ -24,7 +24,7 @@ public class SearchQueryLocalizer {
     }
 
     private static String getLocalizedRegularExpressionDescription(SearchQuery searchQuery) {
-        if (searchQuery.regularExpression) {
+        if (searchQuery.isRegularExpression()) {
             return Localization.lang("regular expression");
         } else {
             return Localization.lang("plain text");

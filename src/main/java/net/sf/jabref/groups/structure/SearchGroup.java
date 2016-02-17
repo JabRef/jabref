@@ -22,8 +22,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -114,7 +112,7 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public SearchRule getSearchRule() {
-        return this.query.rule;
+        return this.query.getRule();
     }
 
     /**
@@ -131,7 +129,7 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public String getSearchExpression() {
-        return this.query.query;
+        return this.query.getQuery();
     }
 
     @Override
@@ -189,11 +187,11 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public boolean isCaseSensitive() {
-        return this.query.caseSensitive;
+        return this.query.isCaseSensitive();
     }
 
     public boolean isRegExp() {
-        return this.query.regularExpression;
+        return this.query.isRegularExpression();
     }
 
     @Override
@@ -203,7 +201,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return this.query.description;
+        return this.query.getDescription();
     }
 
     @Override

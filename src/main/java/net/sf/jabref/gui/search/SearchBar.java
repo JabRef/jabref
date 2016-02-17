@@ -76,7 +76,7 @@ public class SearchBar extends JPanel {
     /**
      * Initializes the search bar.
      *
-     * @param frame the main window
+     * @param basePanel the base panel
      */
     public SearchBar(BasePanel basePanel) {
         super();
@@ -323,9 +323,9 @@ public class SearchBar extends JPanel {
     }
 
     public boolean isStillValidQuery(SearchQuery query) {
-        return query.query.equals(this.searchField.getText())
-                && (query.regularExpression == regularExp.isSelected())
-                && (query.caseSensitive == caseSensitive.isSelected());
+        return query.getQuery().equals(this.searchField.getText())
+                && (query.isRegularExpression() == regularExp.isSelected())
+                && (query.isCaseSensitive() == caseSensitive.isSelected());
     }
 
     private SearchQuery getSearchQuery() {

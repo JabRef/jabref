@@ -8,11 +8,11 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class SearchQuery {
 
-    public final String query;
-    public final boolean caseSensitive;
-    public final boolean regularExpression;
-    public final SearchRule rule;
-    public final String description;
+    private final String query;
+    private final boolean caseSensitive;
+    private final boolean regularExpression;
+    private final SearchRule rule;
+    private final String description;
 
     public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
         this.query = query;
@@ -24,31 +24,31 @@ public class SearchQuery {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s)", query, getCaseSensitiveDescription(), getRegularExpressionDescription());
+        return String.format("\"%s\" (%s, %s)", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription());
     }
 
     public boolean isMatch(BibEntry entry) {
-        return this.rule.applyRule(query, entry);
+        return this.getRule().applyRule(getQuery(), entry);
     }
 
     public boolean isValidQuery() {
-        return this.rule.validateSearchStrings(query);
+        return this.getRule().validateSearchStrings(getQuery());
     }
 
     public boolean isContainsBasedSearch() {
-        return this.rule instanceof ContainBasedSearchRule;
+        return this.getRule() instanceof ContainBasedSearchRule;
     }
 
     private SearchRule getSearchRule() {
-        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
+        return SearchRules.getSearchRuleByQuery(getQuery(), isCaseSensitive(), isRegularExpression());
     }
 
     private SearchDescriber getSearchDescriber() {
-        return SearchDescribers.getSearchDescriberFor(getSearchRule(), query);
+        return SearchDescribers.getSearchDescriberFor(getSearchRule(), getQuery());
     }
 
     private String getCaseSensitiveDescription() {
-        if (caseSensitive) {
+        if (isCaseSensitive()) {
             return "case sensitive";
         } else {
             return "case insensitive";
@@ -56,7 +56,7 @@ public class SearchQuery {
     }
 
     private String getRegularExpressionDescription() {
-        if (regularExpression) {
+        if (isRegularExpression()) {
             return "regular expression";
         } else {
             return "plain text";
@@ -64,6 +64,26 @@ public class SearchQuery {
     }
 
     public boolean isGrammarBasedSearch() {
-        return this.rule instanceof GrammarBasedSearchRule;
+        return this.getRule() instanceof GrammarBasedSearchRule;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public boolean isRegularExpression() {
+        return regularExpression;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public SearchRule getRule() {
+        return rule;
     }
 }
