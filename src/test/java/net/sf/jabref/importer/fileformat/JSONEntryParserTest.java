@@ -62,7 +62,7 @@ public class JSONEntryParserTest {
                 + "        }";
 
         JSONObject jo = new JSONObject(jsonString);
-        BibEntry be = jc.SpringerJSONtoBibtex(jo);
+        BibEntry be = JSONEntryParser.SpringerJSONtoBibtex(jo);
         Assert.assertEquals("1992", be.getField("year"));
         Assert.assertEquals("5", be.getField("number"));
         Assert.assertEquals("#sep#", be.getField("month"));
