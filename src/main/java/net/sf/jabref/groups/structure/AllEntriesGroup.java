@@ -91,11 +91,6 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean contains(String query, BibEntry entry) {
-        return true; // contains everything
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         return new AllEntriesGroup();
     }

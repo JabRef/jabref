@@ -11,7 +11,7 @@ public class SearchQuery {
     public final String query;
     public final boolean caseSensitive;
     public final boolean regularExpression;
-    private final SearchRule rule;
+    public final SearchRule rule;
     public final String description;
 
     public SearchQuery(String query, boolean caseSensitive, boolean regularExpression) {

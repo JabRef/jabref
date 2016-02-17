@@ -92,7 +92,7 @@ public class ExplicitGroup extends AbstractGroup {
 
             @Override
             public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(query, bibEntry);
+                return contains(bibEntry);
             }
 
             @Override
@@ -152,11 +152,6 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean contains(String query, BibEntry entry) {
-        return contains(entry);
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(name, context);
         copy.entries.addAll(entries);
@@ -191,11 +186,7 @@ public class ExplicitGroup extends AbstractGroup {
                 return false;
             }
         }
-        if (!keys.isEmpty()) {
-            return false;
-        }
-        return other.name.equals(name)
-                && (other.getHierarchicalContext() == getHierarchicalContext());
+        return keys.isEmpty() && other.name.equals(name) && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**

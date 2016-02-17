@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -42,11 +43,7 @@ public class SearchGroup extends AbstractGroup {
 
     public static final String ID = "SearchGroup:";
 
-    private final String searchExpression;
-    private final boolean caseSensitive;
-    private final boolean regExp;
-
-    private final SearchRule searchRule;
+    private final SearchQuery query;
 
     private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
 
@@ -56,11 +53,8 @@ public class SearchGroup extends AbstractGroup {
      */
     public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp, GroupHierarchyType context) {
         super(name, context);
-        this.searchExpression = searchExpression;
-        this.caseSensitive = caseSensitive;
-        this.regExp = regExp;
 
-        this.searchRule = SearchRules.getSearchRuleByQuery(searchExpression, caseSensitive, regExp);
+        this.query = new SearchQuery(searchExpression, caseSensitive, regExp);
     }
 
     /**
@@ -120,7 +114,7 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public SearchRule getSearchRule() {
-        return this.searchRule;
+        return this.query.rule;
     }
 
     /**
@@ -131,13 +125,13 @@ public class SearchGroup extends AbstractGroup {
     public String toString() {
         return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + context.ordinal() + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
-                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
+                + StringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive()) + AbstractGroup.SEPARATOR
+                + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {
-        return searchExpression;
+        return this.query.query;
     }
 
     @Override
@@ -169,33 +163,22 @@ public class SearchGroup extends AbstractGroup {
         }
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
-                && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && (regExp == other.regExp)
+                && this.getSearchExpression().equals(other.getSearchExpression())
+                && (this.isCaseSensitive() == other.isCaseSensitive())
+                && (isRegExp() == other.isRegExp())
                 && (getHierarchicalContext() == other.getHierarchicalContext());
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
-     *      net.sf.jabref.BibEntry)
-     */
-    @Override
-    public boolean contains(String searchOptions, BibEntry entry) {
-        return getSearchRule().applyRule(searchOptions, entry);
     }
 
     @Override
     public boolean contains(BibEntry entry) {
-        return contains(SearchRule.DUMMY_QUERY, entry);
+        return this.query.isMatch(entry);
     }
 
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(name, searchExpression, caseSensitive,
-                    regExp, context);
+            return new SearchGroup(getName(), getSearchExpression(), isCaseSensitive(),
+                    isRegExp(), getHierarchicalContext());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -206,11 +189,11 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public boolean isCaseSensitive() {
-        return caseSensitive;
+        return this.query.caseSensitive;
     }
 
     public boolean isRegExp() {
-        return regExp;
+        return this.query.regularExpression;
     }
 
     @Override
@@ -220,7 +203,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return SearchDescribers.getSearchDescriberFor(searchRule, searchExpression).getDescription();
+        return this.query.description;
     }
 
     @Override
@@ -237,7 +220,7 @@ public class SearchGroup extends AbstractGroup {
         sb.append(" (");
         sb.append(Localization.lang("search expression"));
         sb.append(" <b>").
-                append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
+                append(StringUtil.quoteForHTML(getSearchExpression())).append("</b>)");
         switch (getHierarchicalContext()) {
         case INCLUDING:
             sb.append(", ").append(Localization.lang("includes subgroups"));

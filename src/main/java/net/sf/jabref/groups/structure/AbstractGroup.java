@@ -135,12 +135,6 @@ public abstract class AbstractGroup {
     public abstract AbstractUndoableEdit remove(List<BibEntry> entries);
 
     /**
-     * @param query The search option to apply.
-     * @return true if this group contains the specified entry, false otherwise.
-     */
-    public abstract boolean contains(String query, BibEntry entry);
-
-    /**
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(BibEntry entry);

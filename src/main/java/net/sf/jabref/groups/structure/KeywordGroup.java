@@ -133,7 +133,7 @@ public class KeywordGroup extends AbstractGroup {
         return new SearchRule() {
             @Override
             public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(query, bibEntry);
+                return contains(bibEntry);
             }
 
             @Override
@@ -178,7 +178,7 @@ public class KeywordGroup extends AbstractGroup {
                     Localization.lang("add entries to group"));
             boolean modified = false;
             for (BibEntry entry : entries) {
-                if (!getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
+                if (!contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
                     String pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
@@ -213,7 +213,7 @@ public class KeywordGroup extends AbstractGroup {
             NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
             boolean modified = false;
             for (BibEntry entry : entries) {
-                if (getSearchRule().applyRule(SearchRule.NULL_QUERY, entry)) {
+                if (contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
                     removeMatches(entry);
@@ -247,17 +247,6 @@ public class KeywordGroup extends AbstractGroup {
                 && (caseSensitive == other.caseSensitive)
                 && (regExp == other.regExp)
                 && (getHierarchicalContext() == other.getHierarchicalContext());
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
-     *      net.sf.jabref.BibEntry)
-     */
-    @Override
-    public boolean contains(String query, BibEntry entry) {
-        return contains(entry);
     }
 
     @Override
