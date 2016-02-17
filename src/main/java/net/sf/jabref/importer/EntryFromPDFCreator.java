@@ -82,17 +82,16 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param entry
      */
     private void addEntryDataFromPDDocumentInformation(File pdfFile, BibEntry entry) {
-        PDDocument document = null;
-        try {
-            document = PDDocument.load(pdfFile.getAbsoluteFile());
+        try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             PDDocumentInformation pdfDocInfo = document
                     .getDocumentInformation();
 
             if (pdfDocInfo != null) {
-                BibEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                Optional<BibEntry> entryDI = XMPUtil
+                        .getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
-                if (entryDI != null) {
-                    addEntryDataToEntry(entry, entryDI);
+                if (entryDI.isPresent()) {
+                    addEntryDataToEntry(entry, entryDI.get());
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
@@ -109,14 +108,6 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             }
         } catch (IOException e) {
             // no canceling here, just no data added.
-        } finally {
-            if (document != null) {
-                try {
-                    document.close();
-                } catch (IOException e) {
-                    // no canceling here, just no data added.
-                }
-            }
         }
     }
 

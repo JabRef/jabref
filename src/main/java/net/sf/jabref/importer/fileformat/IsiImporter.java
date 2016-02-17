@@ -29,7 +29,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -450,7 +449,7 @@ public class IsiImporter extends ImportFormat {
 
     public static String isiAuthorsConvert(String authors) {
         String[] s = IsiImporter.isiAuthorsConvert(authors.split(" and |;"));
-        return StringUtil.join(s, " and ");
+        return String.join(" and ", s);
     }
 
 }
