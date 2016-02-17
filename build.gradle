@@ -16,6 +16,7 @@ plugins {
     id "com.github.kt3k.coveralls" version "2.4.0x"
     id "com.github.youribonnaffe.gradle.format" version "1.2"
     id "com.coverity.ondemand" version "1.5.61"
+    id "net.ltgt.errorprone" version "0.0.8"
 }
 
 apply plugin: "java"
