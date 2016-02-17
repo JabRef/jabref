@@ -172,9 +172,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
-                    for (BibEntry appendedEntry : appendedEntries) {
-                        group.addEntry(appendedEntry);
-                    }
+                    appendedEntries.stream().map(group::addEntry);
                 }
 
                 // groupsSelector is always created, even when no groups

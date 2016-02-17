@@ -24,6 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -68,10 +69,10 @@ class MetaDataChange extends Change {
 
     @Override
     public JComponent description() {
-        StringBuilder sb = new StringBuilder("<html>" + Localization.lang("Changes have been made to the following metadata elements") + ":<p>");
-        for (MetaDataChangeUnit unit : changes) {
-            sb.append("<br>&nbsp;&nbsp;").append(unit.key);
-        }
+        StringBuilder sb = new StringBuilder(
+                "<html>" + Localization.lang("Changes have been made to the following metadata elements")
+                        + ":<p><br>&nbsp;&nbsp;");
+        sb.append(changes.stream().map(unit -> unit.key).collect(Collectors.joining("<br>&nbsp;&nbsp;")));
         sb.append("</html>");
         tp.setText(sb.toString());
         return sp;
