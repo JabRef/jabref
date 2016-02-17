@@ -27,7 +27,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 
@@ -372,7 +372,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             bp.entryEditors.remove(typeName);
 
             for (BibEntry entry : bp.database().getEntries()) {
-                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(newType -> entry.setType(newType));
+                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(entry::setType);
             }
         }
 

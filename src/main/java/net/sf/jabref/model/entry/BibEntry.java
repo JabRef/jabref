@@ -493,7 +493,6 @@ public class BibEntry {
     /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
-     * @param entry
      * @return will return the publication date of the entry or null if no year was found.
      */
     public String getPublicationDate() {
@@ -582,10 +581,10 @@ public class BibEntry {
      * @param keywords Keywords to add
      */
     public void addKeywords(List<String> keywords) {
-        if (keywords != null) {
-            for (String keyword : keywords) {
-                this.addKeyword(keyword);
-            }
+        Objects.requireNonNull(keywords);
+
+        for (String keyword : keywords) {
+            this.addKeyword(keyword);
         }
     }
 

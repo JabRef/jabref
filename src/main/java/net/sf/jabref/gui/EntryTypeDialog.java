@@ -30,7 +30,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.*;
 import org.jdesktop.swingx.VerticalLayout;
 

@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.menus;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;

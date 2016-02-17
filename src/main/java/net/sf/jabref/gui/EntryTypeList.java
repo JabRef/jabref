@@ -29,7 +29,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.util.Util;
 

@@ -313,9 +313,8 @@ public class RepecNepImporter extends ImportFormat {
                 readLine();
             }
 
-            if (author != null) {
-                authors += "".equals(authors) ? author : " and " + author;
-            }
+            authors += "".equals(authors) ? author : " and " + author;
+
             if (institution.length() > 0) {
                 institutions.append(
                         (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());

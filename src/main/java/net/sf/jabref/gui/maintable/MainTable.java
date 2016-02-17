@@ -48,7 +48,7 @@ import net.sf.jabref.gui.util.FirstColumnComparator;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
