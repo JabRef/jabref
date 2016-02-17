@@ -171,22 +171,22 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = Globals.prefs.fileDirForDatabase;
                         }
 
-                        File f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
+                        Optional<File> f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
 
                         /*
                          * Stumbled over this while investigating
                          *
                          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
                          */
-                        if (f == null) {
-                            sb.append(replaceStrings(flEntry.link));
-                        } else {
+                        if (f.isPresent()) {
                             try {
-                                sb.append(replaceStrings(f.getCanonicalPath()));//f.toURI().toString();
+                                sb.append(replaceStrings(f.get().getCanonicalPath()));//f.toURI().toString();
                             } catch (IOException ex) {
                                 LOGGER.warn("Problem getting path", ex);
-                                sb.append(replaceStrings(f.getPath()));
+                                sb.append(replaceStrings(f.get().getPath()));
                             }
+                        } else {
+                            sb.append(replaceStrings(flEntry.link));
                         }
 
                         break;

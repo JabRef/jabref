@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Initial Version:
@@ -179,9 +180,9 @@ public class ExternalFilePanel extends JPanel {
                 List<String> dirs = metaData.getFileDirectory(fieldName);
                 File file = null;
                 if (dirs.size() > 0) {
-                    File tmp = FileUtil.expandFilename(editor.getText(), dirs);
-                    if (tmp != null) {
-                        file = tmp;
+                    Optional<File> tmp = FileUtil.expandFilename(editor.getText(), dirs);
+                    if (tmp.isPresent()) {
+                        file = tmp.get();
                     }
                 }
 
