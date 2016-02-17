@@ -39,7 +39,7 @@ public class DatabaseSearcher {
         this.database = Objects.requireNonNull(database);
     }
 
-    public BibDatabase getDatabasefromMatches() {
+    public BibDatabase getDatabaseFromMatches() {
         LOGGER.debug("Search term: " + query);
 
         if (!query.isValid()) {

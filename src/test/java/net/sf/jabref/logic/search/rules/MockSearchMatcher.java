@@ -6,11 +6,11 @@ import net.sf.jabref.model.entry.BibEntry;
 /**
  * Mock search rule that returns the values passed. Useful for testing.
  */
-public class MockSearchRule implements SearchMatcher {
+public class MockSearchMatcher implements SearchMatcher {
 
     private final boolean result;
 
-    public MockSearchRule(boolean result) {
+    public MockSearchMatcher(boolean result) {
         this.result = result;
     }
 

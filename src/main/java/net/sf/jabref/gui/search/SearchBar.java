@@ -28,7 +28,6 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
@@ -97,7 +96,7 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(), Localization.lang("Search results in database %0 for %1",
-                    basePanel.getBibDatabaseContext().getDatabaseFile().getName(), SearchQueryLocalizer.localize(this.getSearchQuery())));
+                    basePanel.getBibDatabaseContext().getDatabaseFile().getName(), this.getSearchQuery().localize()));
             List<BibEntry> entries = basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit).collect(Collectors.toList());
             searchDialog.addEntries(entries, basePanel);
             searchDialog.selectFirstEntry();

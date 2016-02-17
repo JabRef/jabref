@@ -5,7 +5,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.search.SearchQueryLocalizer;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.List;
@@ -24,7 +23,7 @@ class GlobalSearchWorker extends AbstractWorker {
 
         dialog = new SearchResultsDialog(frame,
                 Localization.lang("Search results in all databases for %0",
-                        SearchQueryLocalizer.localize(this.searchQuery)));
+                        this.searchQuery.localize()));
     }
 
     /* (non-Javadoc)

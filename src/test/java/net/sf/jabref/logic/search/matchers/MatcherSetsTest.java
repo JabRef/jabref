@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.logic.search.rules.MockSearchRule;
+import net.sf.jabref.logic.search.rules.MockSearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 
@@ -15,10 +15,10 @@ public class MatcherSetsTest {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.AND);
         assertTrue(matcherSet.isMatch(new BibEntry()));
 
-        matcherSet.addRule(new MockSearchRule(true));
+        matcherSet.addRule(new MockSearchMatcher(true));
         assertTrue(matcherSet.isMatch(new BibEntry()));
 
-        matcherSet.addRule(new MockSearchRule(false));
+        matcherSet.addRule(new MockSearchMatcher(false));
         assertFalse(matcherSet.isMatch(new BibEntry()));
     }
 
@@ -27,22 +27,22 @@ public class MatcherSetsTest {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.OR);
         assertFalse(matcherSet.isMatch(new BibEntry()));
 
-        matcherSet.addRule(new MockSearchRule(true));
+        matcherSet.addRule(new MockSearchMatcher(true));
         assertTrue(matcherSet.isMatch(new BibEntry()));
 
-        matcherSet.addRule(new MockSearchRule(false));
+        matcherSet.addRule(new MockSearchMatcher(false));
         assertTrue(matcherSet.isMatch(new BibEntry()));
     }
 
     @Test
     public void testBuildNotWithTrue() {
-        NotMatcher matcher = new NotMatcher(new MockSearchRule(true));
+        NotMatcher matcher = new NotMatcher(new MockSearchMatcher(true));
         assertFalse(matcher.isMatch(new BibEntry()));
     }
 
     @Test
     public void testBuildNotWithFalse() {
-        NotMatcher matcher = new NotMatcher(new MockSearchRule(false));
+        NotMatcher matcher = new NotMatcher(new MockSearchMatcher(false));
         assertTrue(matcher.isMatch(new BibEntry()));
     }
 
