@@ -3,6 +3,12 @@ package net.sf.jabref.logic.io;
 import org.junit.Test;
 import org.junit.Ignore;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import static org.junit.Assert.*;
 
 public class MimeTypeDetectorTest {
@@ -24,18 +30,17 @@ public class MimeTypeDetectorTest {
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 
+    @Test
+    public void beTrueForLocalPdfUri() throws URISyntaxException {
+        String localPath = MimeTypeDetectorTest.class.getResource("empty.pdf").toURI().toASCIIString();
+        assertTrue(MimeTypeDetector.isPdfContentType(localPath));
+    }
+
     @Ignore
     @Test
     public void acceptPDFMimeTypeVariations() {
         // application/pdf;charset=ISO-8859-1
         String pdfUrl = "http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
-    }
-
-    @Ignore
-    @Test
-    public void useGetRequestIfHeadRequestHasNoContentType() {
-        String pdfUrl = "http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014010/pdf";
-        assertEquals("application/pdf", MimeTypeDetector.getMimeType(pdfUrl));
     }
 }
