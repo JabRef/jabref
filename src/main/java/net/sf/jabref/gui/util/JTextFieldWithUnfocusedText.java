@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.search;
+package net.sf.jabref.gui.util;
 
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -11,24 +11,16 @@ import java.awt.event.FocusListener;
  * A text field which displays a predefined text (e.g. "Search") if it has not the focus and no text is entered.
  * Implementation based on https://gmigdos.wordpress.com/2010/03/30/java-a-custom-jtextfield-for-searching/
  */
-public class JSearchTextField extends JTextField implements FocusListener {
+public class JTextFieldWithUnfocusedText extends JTextField implements FocusListener {
 
-    private String textWhenNotFocused;
+    private final String textWhenNotFocused;
 
-    public JSearchTextField() {
+    public JTextFieldWithUnfocusedText(String textWhenNotFocused) {
         super();
         this.setEditable(true);
         this.setText("");
-        this.textWhenNotFocused = Localization.lang("Search")+"...";
+        this.textWhenNotFocused = textWhenNotFocused;
         this.addFocusListener(this);
-    }
-
-    public String getTextWhenNotFocused() {
-        return this.textWhenNotFocused;
-    }
-
-    public void setTextWhenNotFocused(String newText) {
-        this.textWhenNotFocused = newText;
     }
 
     @Override
