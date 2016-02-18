@@ -1,11 +1,13 @@
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.*;
@@ -73,6 +75,7 @@ public class SaveActions {
         //read concrete actions
         int startIndex = 0;
         int index = 0;
+        formatterString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(formatterString).replaceAll(Globals.NEWLINE, "");
         String remainingString = formatterString;
         try {
             while (startIndex < formatterString.length()) {
@@ -86,7 +89,7 @@ public class SaveActions {
                 int tokenIndex = remainingString.indexOf(",");
                 do {
                     boolean doBreak = false;
-                    if(tokenIndex == -1 || tokenIndex > endIndex){
+                    if (tokenIndex == -1 || tokenIndex > endIndex) {
                         tokenIndex = remainingString.indexOf("]");
                         doBreak = true;
                     }
@@ -169,7 +172,7 @@ public class SaveActions {
         for (Map.Entry<String, List<String>> entry : groupedByField.entrySet()) {
             result.append(entry.getKey());
 
-            StringJoiner joiner = new StringJoiner(",", "[", "]");
+            StringJoiner joiner = new StringJoiner(",", "[", "]" + Globals.NEWLINE);
             entry.getValue().forEach(joiner::add);
             result.append(joiner.toString());
         }
