@@ -47,7 +47,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[IdentityFormatter]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
 
@@ -71,7 +71,7 @@ public class SaveActionsTest {
 
         ParserResult parserResult = parser.parse();
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
 
@@ -100,7 +100,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[LowerCaseChanger]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
 
@@ -129,7 +129,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[LowerCaseChanger,IdentityFormatter]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
         assertEquals(2, actions.getConfiguredActions().size());
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
@@ -159,7 +159,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[LowerCaseChanger,IdentityFormatter,DateFormatter]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
         assertEquals(3, actions.getConfiguredActions().size());
 
         BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
@@ -190,7 +190,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("pages[PageNumbersFormatter]title[LowerCaseChanger]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
         assertEquals(2, formatterCleanups.size());
         for(FieldFormatterCleanup cleanup: formatterCleanups){
@@ -229,7 +229,7 @@ public class SaveActionsTest {
         assertEquals("enabled", saveActions.get(0));
         assertEquals("pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]", saveActions.get(1));
 
-        SaveActions actions = new SaveActions(parserResult.getMetaData());
+        SaveActions actions = parserResult.getMetaData().getSaveActions();
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
         assertEquals(3, formatterCleanups.size());
         for(FieldFormatterCleanup cleanup: formatterCleanups){

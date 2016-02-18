@@ -229,7 +229,7 @@ public class BibDatabaseWriter {
             // save actions defined -> apply for every entry
             List<BibEntry> result = new ArrayList<>(toChange.size());
 
-            SaveActions saveActions = new SaveActions(metaData);
+            SaveActions saveActions = metaData.getSaveActions();
 
             for (BibEntry entry : toChange) {
                 result.add(saveActions.applySaveActions(entry));

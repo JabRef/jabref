@@ -1,7 +1,6 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.CaseChangers;
@@ -22,20 +21,17 @@ public class SaveActions {
 
     private boolean enabled;
 
-    public SaveActions(MetaData metaData) {
-        Objects.requireNonNull(metaData);
+    public SaveActions(boolean enabled, String formatterString) {
 
         actions = new ArrayList<>();
         setAvailableFormatters();
+        this.enabled = enabled;
 
-        List<String> formatters = metaData.getData(META_KEY);
-        if (formatters == null) {
+        if (formatterString == null || "".equals(formatterString)) {
             // no save actions defined in the meta data
             return;
         } else {
-            parseEnabledStatus(formatters.get(0));
-
-            parseSaveActions(formatters.get(1));
+            parseSaveActions(formatterString);
         }
 
     }
@@ -113,11 +109,6 @@ public class SaveActions {
             // Thus we stop parsing and take what we have parsed until now
             return;
         }
-    }
-
-    private void parseEnabledStatus(String enablementString) {
-        //read if save actions should be enabled
-        enabled = "enabled".equals(enablementString);
     }
 
     private void setAvailableFormatters() {
