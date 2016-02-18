@@ -278,6 +278,11 @@ public class BibDatabaseWriter {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
             stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
+
+            //in case of save actions, add an additional newline
+            if(SaveActions.META_KEY.equals(key)){
+                stringBuilder.append(Globals.NEWLINE);
+            }
             for (String metaItem : metaData.getData(key)) {
                 stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
             }
