@@ -70,14 +70,16 @@ public class SaveActions {
     private void parseSaveActions(String formatterString) {
         //read concrete actions
         int startIndex = 0;
-        int index = 0;
+
+        // first remove all newlines for easier parsing
         formatterString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(formatterString).replaceAll(Globals.NEWLINE, "");
+
         String remainingString = formatterString;
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name
-                index = remainingString.indexOf("[");
-                String fieldKey = remainingString.substring(0, index);
+                int currentIndex = remainingString.indexOf("[");
+                String fieldKey = remainingString.substring(0, currentIndex);
                 int endIndex = remainingString.indexOf("]");
                 startIndex += endIndex + 1;
 
@@ -90,7 +92,7 @@ public class SaveActions {
                         doBreak = true;
                     }
 
-                    String formatterKey = remainingString.substring(index + 1, tokenIndex);
+                    String formatterKey = remainingString.substring(currentIndex + 1, tokenIndex);
                     actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
 
                     remainingString = remainingString.substring(tokenIndex + 1);
@@ -99,7 +101,7 @@ public class SaveActions {
                     }
                     tokenIndex = remainingString.indexOf(",");
 
-                    index = -1;
+                    currentIndex = -1;
                 } while (true);
 
 
