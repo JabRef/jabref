@@ -31,6 +31,10 @@ public class SaveActionsPanel extends JPanel {
 
     private JComboBox<String> formatters;
 
+    private JButton addButton;
+
+    private JButton deleteButton;
+
     public SaveActionsPanel() {
 
         enabled = new JCheckBox(Localization.lang("Enable save actions"));
@@ -49,6 +53,7 @@ public class SaveActionsPanel extends JPanel {
         List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
 
         enabled.setSelected(saveActions.isEnabled());
+        enabled.addActionListener(new EnablementStatusListener());
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
@@ -65,7 +70,7 @@ public class SaveActionsPanel extends JPanel {
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         builder.add(actionsList).xyw(3, 5, 2);
 
-        JButton deleteButton = new JButton(Localization.lang("Delete"));
+        deleteButton = new JButton(Localization.lang("Delete"));
         deleteButton.addActionListener(new DeleteButtonListener());
         builder.add(deleteButton).xy(3, 7);
 
@@ -96,7 +101,7 @@ public class SaveActionsPanel extends JPanel {
         formatters = new JComboBox(formatterNames.toArray());
         builder.add(formatters).xy(3, 1);
 
-        JButton addButton = new JButton(Localization.lang("Add"));
+        addButton = new JButton(Localization.lang("Add"));
         addButton.addActionListener(new AddButtonListener());
         builder.add(addButton).xy(5, 1);
 
@@ -155,6 +160,19 @@ public class SaveActionsPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             ((SaveActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex());
+        }
+    }
+
+    class EnablementStatusListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            boolean enablementStatus = enabled.isSelected();
+            actionsList.setEnabled(enablementStatus);
+            keyField.setEnabled(enablementStatus);
+            formatters.setEnabled(enablementStatus);
+            addButton.setEnabled(enablementStatus);
+            deleteButton.setEnabled(enablementStatus);
         }
     }
 
