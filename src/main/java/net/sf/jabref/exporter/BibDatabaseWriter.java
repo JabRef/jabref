@@ -273,12 +273,13 @@ public class BibDatabaseWriter {
             stringBuilder.append(Globals.NEWLINE);
             stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
 
-            //in case of save actions, add an additional newline
-            if(SaveActions.META_KEY.equals(key)){
-                stringBuilder.append(Globals.NEWLINE);
-            }
             for (String metaItem : metaData.getData(key)) {
                 stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
+
+                //in case of save actions, add an additional newline after the enabled flag
+                if (key.equals(SaveActions.META_KEY) && "enabled".equals(metaItem)) {
+                    stringBuilder.append(Globals.NEWLINE);
+                }
             }
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);
