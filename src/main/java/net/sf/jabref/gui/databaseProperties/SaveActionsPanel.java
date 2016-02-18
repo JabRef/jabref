@@ -125,7 +125,7 @@ public class SaveActionsPanel extends JPanel {
 
         metaData.putData(SaveActions.META_KEY, actions);
 
-        boolean hasChanged = saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
+        boolean hasChanged = !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
 
         return hasChanged;
     }
