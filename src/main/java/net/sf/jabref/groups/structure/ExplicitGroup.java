@@ -18,7 +18,6 @@ package net.sf.jabref.groups.structure;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -183,7 +182,7 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(EntryUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
         append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
@@ -195,7 +194,7 @@ public class ExplicitGroup extends AbstractGroup {
             }
         }
         for (String sortedKey : sortedKeys) {
-            sb.append(EntryUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
         }
         return sb.toString();
     }

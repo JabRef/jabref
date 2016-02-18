@@ -46,6 +46,7 @@ import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
@@ -945,7 +946,7 @@ public class JabRefPreferences {
             return;
         }
 
-        put(key, value.stream().map(val -> EntryUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
+        put(key, value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
     }
 
 
