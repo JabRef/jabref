@@ -49,9 +49,11 @@ public class SaveActionsTest {
 
         SaveActions actions = parserResult.getMetaData().getSaveActions();
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("Educational session 1", actedUpon.getField("title"));
+        actions.applySaveActions(entry);
+
+        assertEquals("Educational session 1", entry.getField("title"));
     }
 
     @Test
@@ -73,9 +75,11 @@ public class SaveActionsTest {
 
         SaveActions actions = parserResult.getMetaData().getSaveActions();
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("Educational session 1", actedUpon.getField("title"));
+        actions.applySaveActions(entry);
+
+        assertEquals("Educational session 1", entry.getField("title"));
     }
 
     @Test
@@ -102,9 +106,11 @@ public class SaveActionsTest {
 
         SaveActions actions = parserResult.getMetaData().getSaveActions();
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("educational session 1", actedUpon.getField("title"));
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
     }
 
     @Test
@@ -132,9 +138,11 @@ public class SaveActionsTest {
         SaveActions actions = parserResult.getMetaData().getSaveActions();
         assertEquals(2, actions.getConfiguredActions().size());
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("educational session 1", actedUpon.getField("title"));
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
     }
 
     @Test
@@ -162,9 +170,11 @@ public class SaveActionsTest {
         SaveActions actions = parserResult.getMetaData().getSaveActions();
         assertEquals(3, actions.getConfiguredActions().size());
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("educational session 1", actedUpon.getField("title"));
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
     }
 
 
@@ -201,10 +211,12 @@ public class SaveActionsTest {
             }
         }
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("educational session 1", actedUpon.getField("title"));
-        assertEquals("1--7", actedUpon.getField("pages"));
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
+        assertEquals("1--7", entry.getField("pages"));
     }
 
     @Test
@@ -242,10 +254,12 @@ public class SaveActionsTest {
             }
         }
 
-        BibEntry actedUpon = actions.applySaveActions(parserResult.getDatabase().getEntries().iterator().next());
+        BibEntry entry = parserResult.getDatabase().getEntries().iterator().next();
 
-        assertEquals("educational session 1", actedUpon.getField("title"));
-        assertEquals("1--7", actedUpon.getField("pages"));
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
+        assertEquals("1--7", entry.getField("pages"));
     }
 
 }

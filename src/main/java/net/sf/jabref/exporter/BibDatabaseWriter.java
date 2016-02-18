@@ -183,7 +183,7 @@ public class BibDatabaseWriter {
         // Write database entries.
         List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
                 entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
-        sortedEntries = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
         for (BibEntry entry : sortedEntries) {
             exceptionCause = entry;
@@ -224,21 +224,15 @@ public class BibDatabaseWriter {
         return savePartOfDatabase(bibDatabaseContext, entries, preferences);
     }
 
-    private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+    private static void applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         if (metaData.getData(SaveActions.META_KEY) != null) {
             // save actions defined -> apply for every entry
-            List<BibEntry> result = new ArrayList<>(toChange.size());
-
             SaveActions saveActions = metaData.getSaveActions();
 
             for (BibEntry entry : toChange) {
-                result.add(saveActions.applySaveActions(entry));
+                saveActions.applySaveActions(entry);
             }
 
-            return result;
-        } else {
-            // no save actions defined -> do nothing
-            return toChange;
         }
     }
 

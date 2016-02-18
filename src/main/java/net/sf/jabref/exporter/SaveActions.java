@@ -118,11 +118,10 @@ public class SaveActions {
         availableFormatters.addAll(CaseChangers.ALL);
     }
 
-    public BibEntry applySaveActions(BibEntry entry) {
+    public void applySaveActions(BibEntry entry) {
         if (enabled) {
             applyAllActions(entry);
         }
-        return entry;
     }
 
     private void applyAllActions(BibEntry entry) {
