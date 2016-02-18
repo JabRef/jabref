@@ -16,10 +16,11 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
-import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.groups.structure.EntriesGroupChange;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
@@ -55,12 +56,12 @@ public class RemoveFromGroupAction extends AbstractAction {
             return; // user aborted operation
         }
 
-        AbstractUndoableEdit undo = mNode.removeFromGroup(mPanel.getSelectedEntries());
-        if (undo == null) {
+        Optional<EntriesGroupChange> undo = mNode.removeFromGroup(mPanel.getSelectedEntries());
+        if (! undo.isPresent()) {
             return; // no changed made
         }
 
-        mPanel.undoManager.addEdit(undo);
+        mPanel.undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo.get()));
         mPanel.markBaseChanged();
         mPanel.updateEntryEditorIfShowing();
         mPanel.getGroupSelector().valueChanged(null);

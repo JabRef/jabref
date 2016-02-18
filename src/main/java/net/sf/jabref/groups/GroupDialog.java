@@ -42,8 +42,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -493,7 +493,10 @@ class GroupDialog extends JDialog {
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
             if (!(mResultingGroup instanceof ExplicitGroup)) {
-                mUndoAddPreviousEntires = mResultingGroup.add(list);
+                Optional<EntriesGroupChange> addChange = mResultingGroup.add(list);
+                if(addChange.isPresent()) {
+                    mUndoAddPreviousEntires = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
+                }
             }
         }
     }

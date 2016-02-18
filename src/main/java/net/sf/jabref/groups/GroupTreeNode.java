@@ -19,22 +19,16 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
+import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
 
 /**
@@ -225,57 +219,50 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
                 && !(getGroup() instanceof AllEntriesGroup);
     }
 
-    public AbstractUndoableEdit moveUp(GroupSelector groupSelector) {
-        final GroupTreeNode myParent = (GroupTreeNode) getParent();
-        final int index = myParent.getIndex(this);
+    public Optional<MoveGroupChange> moveUp() {
+        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final int index = parent.getIndex(this);
         if (index > 0) {
-            UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-                    groupSelector.getGroupTreeRoot(), this, myParent, index - 1);
-            myParent.insert(this, index - 1);
-            return undo;
+            parent.insert(this, index - 1);
+            return Optional.of(new MoveGroupChange(parent, index, parent, index - 1));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public AbstractUndoableEdit moveDown(GroupSelector groupSelector) {
-        final GroupTreeNode myParent = (GroupTreeNode) getParent();
-        final int index = myParent.getIndex(this);
-        if (index < (parent.getChildCount() - 1)) {
-            UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-                    groupSelector.getGroupTreeRoot(), this, myParent, index + 1);
-            myParent.insert(this, index + 1);
-            return undo;
+    public Optional<MoveGroupChange> moveDown() {
+        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final int index = parent.getIndex(this);
+        if (index < (this.parent.getChildCount() - 1)) {
+            parent.insert(this, index + 1);
+            return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public AbstractUndoableEdit moveLeft(GroupSelector groupSelector) {
-        final GroupTreeNode myParent = (GroupTreeNode) getParent();
-        final GroupTreeNode myGrandParent = (GroupTreeNode) myParent
-                .getParent();
-        // paranoia
-        if (myGrandParent == null) {
-            return null;
+    public Optional<MoveGroupChange> moveLeft() {
+        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final GroupTreeNode grandParent = (GroupTreeNode) parent.getParent();
+        final int index = this.getPositionInParent();
+
+        if (grandParent == null) {
+            return Optional.empty();
         }
-        final int index = myGrandParent.getIndex(myParent);
-        UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-                groupSelector.getGroupTreeRoot(), this, myGrandParent,
-                index + 1);
-        myGrandParent.insert(this, index + 1);
-        return undo;
+        final int indexOfParent = grandParent.getIndex(parent);
+        grandParent.insert(this, indexOfParent + 1);
+        return Optional.of(new MoveGroupChange(parent, index, grandParent, indexOfParent + 1));
     }
 
-    public AbstractUndoableEdit moveRight(GroupSelector groupSelector) {
-        final GroupTreeNode myPreviousSibling = (GroupTreeNode) getPreviousSibling();
-        // paranoia
-        if (myPreviousSibling == null) {
-            return null;
+    public Optional<MoveGroupChange> moveRight() {
+        final GroupTreeNode previousSibling = (GroupTreeNode) getPreviousSibling();
+        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final int index = this.getPositionInParent();
+
+        if (previousSibling == null) {
+            return Optional.empty();
         }
-        UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-                groupSelector.getGroupTreeRoot(), this, myPreviousSibling,
-                myPreviousSibling.getChildCount());
-        myPreviousSibling.add(this);
-        return undo;
+
+        previousSibling.add(this);
+        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getChildCount()));
     }
 
     /**
@@ -295,29 +282,21 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> addToGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
-            return null; // paranoia
+            return Optional.empty(); // paranoia
         }
-        AbstractUndoableEdit undo = getGroup().add(entries);
-        if (undo instanceof UndoableChangeAssignment) {
-            ((UndoableChangeAssignment) undo).setEditedNode(this);
-        }
-        return undo;
+        return getGroup().add(entries);
     }
 
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> removeFromGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
-            return null; // paranoia
+            return Optional.empty(); // paranoia
         }
-        AbstractUndoableEdit undo = getGroup().remove(entries);
-        if (undo instanceof UndoableChangeAssignment) {
-            ((UndoableChangeAssignment) undo).setEditedNode(this);
-        }
-        return undo;
+        return getGroup().remove(entries);
     }
 
     @Override
@@ -390,5 +369,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         }
 
         return groups;
+    }
+
+    public int getPositionInParent() {
+        return this.getParent().getIndex(this);
     }
 }

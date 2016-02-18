@@ -25,8 +25,7 @@ import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.util.List;
-
-import javax.swing.undo.AbstractUndoableEdit;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -134,15 +133,13 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(List<BibEntry> entries) {
-        // nothing to do, add is not supported
-        return null;
+    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
+        throw new UnsupportedOperationException("Search group does not support adding entries.");
     }
 
     @Override
-    public AbstractUndoableEdit remove(List<BibEntry> entries) {
-        // nothing to do, remove is not supported
-        return null;
+    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
+        throw new UnsupportedOperationException("Search group does not support removing entries.");
     }
 
     @Override

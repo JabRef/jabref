@@ -17,11 +17,12 @@ package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
-import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.groups.structure.EntriesGroupChange;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
@@ -96,16 +97,16 @@ public class AddToGroupAction extends AbstractAction {
 
         // first remove
         for (GroupTreeNode group : groupsContainingEntries) {
-            AbstractUndoableEdit undoRemove = group.removeFromGroup(entries);
-            if (undoRemove != null) {
-                undoAll.addEdit(undoRemove);
+            Optional<EntriesGroupChange> undoRemove = group.removeFromGroup(entries);
+            if (undoRemove.isPresent()) {
+                undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoRemove.get()));
             }
         }
 
         // then add
-        AbstractUndoableEdit undoAdd = node.addToGroup(entries);
-        if (undoAdd != null) {
-            undoAll.addEdit(undoAdd);
+        Optional<EntriesGroupChange> undoAdd = node.addToGroup(entries);
+        if (undoAdd.isPresent()) {
+            undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }
     }
 
@@ -114,9 +115,9 @@ public class AddToGroupAction extends AbstractAction {
             return; // user aborted operation
         }
 
-        AbstractUndoableEdit undoAdd = node.addToGroup(entries);
-        if (undoAdd != null) {
-            undo.addEdit(undoAdd);
+        Optional<EntriesGroupChange> undoAdd = node.addToGroup(entries);
+        if (undoAdd.isPresent()) {
+            undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }
     }
 

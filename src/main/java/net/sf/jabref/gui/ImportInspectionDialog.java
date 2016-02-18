@@ -33,9 +33,10 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.UndoableChangeAssignment;
+import net.sf.jabref.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.EntriesGroupChange;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -64,7 +65,6 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-import javax.swing.undo.AbstractUndoableEdit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -737,8 +737,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             for (GroupTreeNode node : groups) {
                                 if (node.getGroup().supportsAdd()) {
                                     // Add the entry:
-                                    AbstractUndoableEdit undo = node.addToGroup(Collections.singletonList(entry));
-                                    ce.addEdit(undo);
+
+                                    Optional<EntriesGroupChange> undo = node.addToGroup(
+                                            Collections.singletonList(entry));
+                                    if (undo.isPresent()) {
+                                        ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undo.get()));
+                                    }
                                 }
                             }
                         }

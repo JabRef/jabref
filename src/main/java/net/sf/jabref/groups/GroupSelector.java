@@ -30,6 +30,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -57,6 +58,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
+import net.sf.jabref.groups.structure.EntriesGroupChange;
+import net.sf.jabref.groups.structure.MoveGroupChange;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
@@ -663,8 +666,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private void updateGroupContent(GroupTreeNode node) {
         List<BibEntry> entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
-        AbstractUndoableEdit undoRemove = null;
-        AbstractUndoableEdit undoAdd = null;
+        Optional<EntriesGroupChange> changesRemove = null;
+        Optional<EntriesGroupChange> changesAdd = null;
 
         // Sort entries into current members and non-members of the group
         // Current members will be removed
@@ -685,22 +688,23 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // If there are entries to remove
         if (!toRemove.isEmpty()) {
-            undoRemove = node.removeFromGroup(toRemove);
+            changesRemove = node.removeFromGroup(toRemove);
         }
         // If there are entries to add
         if (!toAdd.isEmpty()) {
-            undoAdd = node.addToGroup(toAdd);
+            changesAdd = node.addToGroup(toAdd);
         }
 
         // Remember undo information
-        if (undoRemove != null) {
-            if (undoAdd != null) {
+        if (changesRemove.isPresent()) {
+            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(node, changesRemove.get());
+            if (changesAdd.isPresent()) {
                 // we removed and added entries
-                undoRemove.addEdit(undoAdd);
+                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, changesAdd.get()));
             }
             panel.undoManager.addEdit(undoRemove);
-        } else if (undoAdd != null) {
-            panel.undoManager.addEdit(undoAdd);
+        } else if (changesAdd != null) {
+            panel.undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, changesAdd.get()));
         }
     }
 
@@ -1273,8 +1277,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.output(MOVE_ONE_GROUP);
             return false; // not possible
         }
-        AbstractUndoableEdit undo;
-        if (!node.canMoveUp() || ((undo = node.moveUp(GroupSelector.this)) == null)) {
+        Optional<MoveGroupChange> moveChange;
+        if (!node.canMoveUp() || (! (moveChange = node.moveUp()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" up.", node.getGroup().getName()));
             return false; // not possible
         }
@@ -1282,7 +1286,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // moving among siblings, but I'm paranoid)
         revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
                 groupsTree.refreshPaths(getExpandedPaths()));
-        concludeMoveGroup(undo, node);
+        concludeMoveGroup(moveChange.get(), node);
         return true;
     }
 
@@ -1295,8 +1299,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.output(MOVE_ONE_GROUP);
             return false; // not possible
         }
-        AbstractUndoableEdit undo;
-        if (!node.canMoveDown() || ((undo = node.moveDown(GroupSelector.this)) == null)) {
+        Optional<MoveGroupChange> moveChange;
+        if (!node.canMoveDown() || (! (moveChange = node.moveDown()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" down.", node.getGroup().getName()));
             return false; // not possible
         }
@@ -1304,7 +1308,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // moving among siblings, but I'm paranoid)
         revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
                 groupsTree.refreshPaths(getExpandedPaths()));
-        concludeMoveGroup(undo, node);
+        concludeMoveGroup(moveChange.get(), node);
         return true;
     }
 
@@ -1317,15 +1321,15 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.output(MOVE_ONE_GROUP);
             return false; // not possible
         }
-        AbstractUndoableEdit undo;
-        if (!node.canMoveLeft() || ((undo = node.moveLeft(GroupSelector.this)) == null)) {
+        Optional<MoveGroupChange> moveChange;
+        if (!node.canMoveLeft() || (! (moveChange = node.moveLeft()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" left.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
         revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
                 groupsTree.refreshPaths(getExpandedPaths()));
-        concludeMoveGroup(undo, node);
+        concludeMoveGroup(moveChange.get(), node);
         return true;
     }
 
@@ -1338,15 +1342,15 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.output(MOVE_ONE_GROUP);
             return false; // not possible
         }
-        AbstractUndoableEdit undo;
-        if (!node.canMoveRight() || ((undo = node.moveRight(GroupSelector.this)) == null)) {
+        Optional<MoveGroupChange> moveChange;
+        if (!node.canMoveRight() || (! (moveChange = node.moveRight()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" right.", node.getGroup().getName()));
             return false; // not possible
         }
         // update selection/expansion state
         revalidateGroups(groupsTree.refreshPaths(groupsTree.getSelectionPaths()),
                 groupsTree.refreshPaths(getExpandedPaths()));
-        concludeMoveGroup(undo, node);
+        concludeMoveGroup(moveChange.get(), node);
         return true;
     }
 
@@ -1354,11 +1358,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * Concludes the moving of a group tree node by storing the specified undo information, marking the change, and
      * setting the status line.
      *
-     * @param undo Undo information for the move operation.
+     * @param moveChange Undo information for the move operation.
      * @param node The node that has been moved.
      */
-    public void concludeMoveGroup(AbstractUndoableEdit undo, GroupTreeNode node) {
-        panel.undoManager.addEdit(undo);
+    public void concludeMoveGroup(MoveGroupChange moveChange, GroupTreeNode node) {
+        panel.undoManager.addEdit(new UndoableMoveGroup(this, moveChange));
         panel.markBaseChanged();
         frame.output(Localization.lang("Moved group \"%0\".", node.getGroup().getName()));
     }

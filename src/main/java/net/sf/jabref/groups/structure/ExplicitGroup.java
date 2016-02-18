@@ -18,17 +18,11 @@ package net.sf.jabref.groups.structure;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.
@@ -97,15 +91,15 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(List<BibEntry> entries) {
-        if (entries.isEmpty()) {
-            return null; // nothing to do
+    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
+        if (entriesToAdd.isEmpty()) {
+            return Optional.empty(); // nothing to do
         }
 
         HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        this.entries.addAll(entries);
+        this.entries.addAll(entriesToAdd);
 
-        return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
+        return Optional.of(new EntriesGroupChange(entriesBeforeEdit, this.entries));
     }
 
     public boolean addEntry(BibEntry entry) {
@@ -113,17 +107,17 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(List<BibEntry> entries) {
-        if (entries.isEmpty()) {
-            return null; // nothing to do
+    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
+        if (entriesToRemove.isEmpty()) {
+            return Optional.empty(); // nothing to do
         }
 
         HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        for (BibEntry entry : entries) {
+        for (BibEntry entry : entriesToRemove) {
             this.entries.remove(entry);
         }
 
-        return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
+        return Optional.of(new EntriesGroupChange(entriesBeforeEdit, this.entries));
     }
 
     public boolean removeEntry(BibEntry entry) {

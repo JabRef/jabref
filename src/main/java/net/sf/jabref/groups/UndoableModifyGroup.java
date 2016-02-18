@@ -22,7 +22,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 class UndoableModifyGroup extends AbstractUndoableEdit {
 
-    private final GroupSelector m_groupSelector;
+    private final GroupSelector groupSelector;
     private final AbstractGroup m_oldGroupBackup;
     private final AbstractGroup m_newGroupBackup;
     private final GroupTreeNode m_groupsRootHandle;
@@ -38,7 +38,7 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
      */
     public UndoableModifyGroup(GroupSelector gs, GroupTreeNode groupsRoot,
             GroupTreeNode node, AbstractGroup newGroup) {
-        m_groupSelector = gs;
+        groupSelector = gs;
         m_oldGroupBackup = node.getGroup().deepCopy();
         m_newGroupBackup = newGroup.deepCopy();
         m_pathToNode = node.getIndexedPath();
@@ -62,7 +62,7 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
         super.undo();
         m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(
                 m_oldGroupBackup.deepCopy());
-        m_groupSelector.revalidateGroups();
+        groupSelector.revalidateGroups();
     }
 
     @Override
@@ -70,6 +70,6 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
         super.redo();
         m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(
                 m_newGroupBackup.deepCopy());
-        m_groupSelector.revalidateGroups();
+        groupSelector.revalidateGroups();
     }
 }

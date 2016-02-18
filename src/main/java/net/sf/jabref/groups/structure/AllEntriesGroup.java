@@ -16,8 +16,7 @@
 package net.sf.jabref.groups.structure;
 
 import java.util.List;
-
-import javax.swing.undo.AbstractUndoableEdit;
+import java.util.Optional;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
@@ -64,13 +63,13 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
         // not supported -> ignore
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
         // not supported -> ignore
         return null;
     }

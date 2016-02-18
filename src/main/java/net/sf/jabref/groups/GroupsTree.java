@@ -24,10 +24,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -35,8 +32,9 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.groups.structure.EntriesGroupChange;
+import net.sf.jabref.groups.structure.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.Globals;
@@ -259,14 +257,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     return;
                 }
                 Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
-                UndoableMoveGroup undo = new UndoableMoveGroup(groupSelector,
-                        groupSelector.getGroupTreeRoot(), source, target,
-                        target.getChildCount());
+                MoveGroupChange undo = new MoveGroupChange((GroupTreeNode) source.getParent(),
+                        source.getPositionInParent(), target, target.getChildCount());
                 target.add(source);
                 dtde.getDropTargetContext().dropComplete(true);
                 // update selection/expansion state
-                groupSelector.revalidateGroups(new TreePath[] {new TreePath(
-                        source.getPath())}, refreshPaths(expandedPaths));
+                groupSelector.revalidateGroups(new TreePath[] {new TreePath(source.getPath())},
+                        refreshPaths(expandedPaths));
                 groupSelector.concludeMoveGroup(undo, source);
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
@@ -299,10 +296,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                AbstractUndoableEdit undo = target.addToGroup(selection.getSelection());
-                dtde.getDropTargetContext().dropComplete(true);
-                groupSelector.revalidateGroups();
-                groupSelector.concludeAssignment(undo, target, assignedEntries);
+                Optional<EntriesGroupChange> undo = target.addToGroup(selection.getSelection());
+                if (undo.isPresent()) {
+                    dtde.getDropTargetContext().dropComplete(true);
+                    groupSelector.revalidateGroups();
+                    groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo.get()), target,
+                            assignedEntries);
+                }
             } else {
                 dtde.rejectDrop();
             }

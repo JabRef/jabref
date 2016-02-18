@@ -16,8 +16,7 @@
 package net.sf.jabref.groups.structure;
 
 import java.util.List;
-
-import javax.swing.undo.AbstractUndoableEdit;
+import java.util.Optional;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
@@ -117,7 +116,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit add(List<BibEntry> entries);
+    public abstract Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd);
 
     /**
      * Removes the specified entries from this group.
@@ -126,7 +125,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit remove(List<BibEntry> entries);
+    public abstract Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove);
 
     /**
      * @return true if this group contains the specified entry, false otherwise.

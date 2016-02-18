@@ -15,19 +15,18 @@
 */
 package net.sf.jabref.groups.structure;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
-
-import javax.swing.undo.AbstractUndoableEdit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchMatcher;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
@@ -151,15 +150,14 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
         if (!supportsAdd()) {
-            return null;
+            return Optional.empty();
         }
-        if ((entries != null) && !(entries.isEmpty())) {
-            NamedCompound ce = new NamedCompound(
-                    Localization.lang("add entries to group"));
+        if ((entriesToAdd != null) && !(entriesToAdd.isEmpty())) {
+            List<FieldChange> changes = new ArrayList<>();
             boolean modified = false;
-            for (BibEntry entry : entries) {
+            for (BibEntry entry : entriesToAdd) {
                 if (!contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
@@ -169,52 +167,43 @@ public class KeywordGroup extends AbstractGroup {
                             + searchExpression;
                     entry.setField(searchField, newContent);
 
-                    // Store undo information.
-                    ce.addEdit(new UndoableFieldChange(entry,
-                            searchField, oldContent, newContent));
+                    // Store change information.
+                    changes.add(new FieldChange(entry, searchField, oldContent, newContent));
                     modified = true;
                 }
             }
-            if (modified) {
-                ce.end();
-            }
 
-            return modified ? ce : null;
+            return modified ? Optional.of(new EntriesGroupChange(changes)) : Optional.empty();
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public AbstractUndoableEdit remove(List<BibEntry> entries) {
+    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
         if (!supportsRemove()) {
-            return null;
+            return Optional.empty();
         }
 
-        if ((entries != null) && (entries.size() > 0)) {
-            NamedCompound ce = new NamedCompound(Localization.lang("remove from group"));
+        if ((entriesToRemove != null) && (entriesToRemove.size() > 0)) {
+            List<FieldChange> changes = new ArrayList<>();
             boolean modified = false;
-            for (BibEntry entry : entries) {
+            for (BibEntry entry : entriesToRemove) {
                 if (contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
                     removeMatches(entry);
-                    // Store undo information.
-                    ce.addEdit(new UndoableFieldChange(entry,
-                            searchField, oldContent, entry
-                            .getField(searchField)
-                    ));
+
+                    // Store change information.
+                    changes.add(new FieldChange(entry, searchField, oldContent, entry.getField(searchField)));
                     modified = true;
                 }
             }
-            if (modified) {
-                ce.end();
-            }
 
-            return modified ? ce : null;
+            return modified ? Optional.of(new EntriesGroupChange(changes)) : Optional.empty();
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override

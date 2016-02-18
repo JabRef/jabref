@@ -17,76 +17,63 @@ package net.sf.jabref.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.groups.structure.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
+
+import java.util.Objects;
 
 /**
  * @author jzieren
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *
  */
 class UndoableMoveGroup extends AbstractUndoableEdit {
 
-    private final GroupSelector m_groupSelector;
-    private final GroupTreeNode m_groupsRootHandle;
-    private final int[] m_pathToNewParent;
-    private final int m_newChildIndex;
-    private final int[] m_pathToOldParent;
-    private final int m_oldChildIndex;
+    private final GroupSelector groupSelector;
+    private final GroupTreeNode root;
+    private final int[] pathToNewParent;
+    private final int newChildIndex;
+    private final int[] pathToOldParent;
+    private final int oldChildIndex;
 
 
-    /**
-     * @param moveNode
-     *            The node which is being moved. At the time of construction of
-     *            this object, it must not have moved yet.
-     * @param newParent
-     *            The new parent node to which <b>moveNode </b> will be moved.
-     * @param newChildIndex
-     *            The child index at <b>newParent </b> to which <b>moveNode </b>
-     *            will be moved.
-     */
-    public UndoableMoveGroup(GroupSelector gs, GroupTreeNode groupsRoot,
-            GroupTreeNode moveNode, GroupTreeNode newParent, int newChildIndex) {
-        m_groupSelector = gs;
-        m_groupsRootHandle = groupsRoot;
-        m_pathToNewParent = newParent.getIndexedPath();
-        m_newChildIndex = newChildIndex;
-        m_pathToOldParent = ((GroupTreeNode) moveNode.getParent())
-                .getIndexedPath();
-        m_oldChildIndex = moveNode.getParent().getIndex(moveNode);
+    public UndoableMoveGroup(GroupSelector groupSelector, MoveGroupChange moveChange) {
+        this.groupSelector = Objects.requireNonNull(groupSelector);
+
+        Objects.requireNonNull(moveChange);
+        root = groupSelector.getGroupTreeRoot();
+        pathToOldParent = moveChange.getOldParent().getIndexedPath();
+        pathToNewParent = moveChange.getNewParent().getIndexedPath();
+        oldChildIndex = moveChange.getOldChildIndex();
+        newChildIndex = moveChange.getNewChildIndex();
     }
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": "
-                + Localization.lang("move group");
+        return Localization.lang("Undo") + ": " + Localization.lang("move group");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": "
-                + Localization.lang("move group");
+        return Localization.lang("Redo") + ": " + Localization.lang("move group");
     }
 
     @Override
     public void undo() {
         super.undo();
-        GroupTreeNode cursor = m_groupsRootHandle
-                .getDescendant(m_pathToNewParent);
-        cursor = (GroupTreeNode) cursor.getChildAt(m_newChildIndex);
-        m_groupsRootHandle.getDescendant(m_pathToOldParent).insert(cursor,
-                m_oldChildIndex);
-        m_groupSelector.revalidateGroups();
+
+        GroupTreeNode newParent = root.getDescendant(pathToNewParent);
+        GroupTreeNode node = (GroupTreeNode) newParent.getChildAt(newChildIndex);
+        root.getDescendant(pathToOldParent).insert(node, oldChildIndex);
+        groupSelector.revalidateGroups();
     }
 
     @Override
     public void redo() {
         super.redo();
-        GroupTreeNode cursor = m_groupsRootHandle
-                .getDescendant(m_pathToOldParent);
-        cursor = (GroupTreeNode) cursor.getChildAt(m_oldChildIndex);
-        m_groupsRootHandle.getDescendant(m_pathToNewParent).insert(cursor,
-                m_newChildIndex);
-        m_groupSelector.revalidateGroups();
+
+        GroupTreeNode oldParent = root.getDescendant(pathToOldParent);
+        GroupTreeNode node = (GroupTreeNode) oldParent.getChildAt(oldChildIndex);
+        root.getDescendant(pathToNewParent).insert(node, newChildIndex);
+        groupSelector.revalidateGroups();
     }
 }

@@ -26,72 +26,51 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * @author jzieren
- *
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
-    private final Set<BibEntry> m_previousAssignmentBackup;
-    private final Set<BibEntry> m_newAssignmentBackup;
-    /** The path to the edited node */
-    private int[] mPathToNode;
-    /** The root of the global groups tree */
-    private GroupTreeNode mGroupsRootHandle;
-
+    private final Set<BibEntry> previousAssignments;
+    private final Set<BibEntry> newAssignments;
+    /**
+     * The path to the edited node
+     */
+    private int[] pathToNode;
+    /**
+     * The root of the global groups tree
+     */
+    private GroupTreeNode root;
 
     /**
-     * Constructor for use in a group itself, where the enclosing node is
-     * unknown. The node must be set using setEditedNode() before this instance
-     * may be used.
-     *
-     * @param previousAssignment
-     * @param currentAssignment
+     * @param node The node whose assignments were edited.
      */
-    public UndoableChangeAssignment(Set<BibEntry> previousAssignment,
-            Set<BibEntry> currentAssignment) {
-        m_previousAssignmentBackup = new HashSet<>(previousAssignment);
-        m_newAssignmentBackup = new HashSet<>(currentAssignment);
-    }
-
-    public UndoableChangeAssignment(Set<BibEntry> previousAssignment,
-            Set<BibEntry> currentAssignment, GroupTreeNode node) {
-        this(previousAssignment, currentAssignment);
-        setEditedNode(node);
-    }
-
-    /**
-     * Sets the node of the group that was edited. If this node was not
-     * specified at construction time, this method has to be called before this
-     * instance may be used.
-     *
-     * @param node
-     *            The node whose assignments were edited.
-     */
-    public void setEditedNode(GroupTreeNode node) {
-        mGroupsRootHandle = (GroupTreeNode) node.getRoot();
-        mPathToNode = node.getIndexedPath();
+    public UndoableChangeAssignment(GroupTreeNode node, Set<BibEntry> previousAssignments,
+            Set<BibEntry> newAssignments) {
+        this.previousAssignments = new HashSet<>(previousAssignments);
+        this.newAssignments = new HashSet<>(newAssignments);
+        this.root = (GroupTreeNode) node.getRoot();
+        this.pathToNode = node.getIndexedPath();
     }
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": "
-                + Localization.lang("change assignment of entries");
+        return Localization.lang("Undo") + ": " + Localization.lang("change assignment of entries");
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": "
-                + Localization.lang("change assignment of entries");
+        return Localization.lang("Redo") + ": " + Localization.lang("change assignment of entries");
     }
 
     @Override
     public void undo() {
         super.undo();
-        GroupTreeNode treeNode =  mGroupsRootHandle.getChildAt(mPathToNode);
-        if (treeNode != null) {
-            ExplicitGroup group = (ExplicitGroup) treeNode.getGroup();
+
+        GroupTreeNode node = root.getChildAt(pathToNode);
+        if (node != null) {
+            ExplicitGroup group = (ExplicitGroup) node.getGroup();
             group.clearAssignments();
-            for (final BibEntry aM_previousAssignmentBackup : m_previousAssignmentBackup) {
-                group.addEntry(aM_previousAssignmentBackup);
+            for (final BibEntry entry : previousAssignments) {
+                group.addEntry(entry);
             }
         }
     }
@@ -99,12 +78,13 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     @Override
     public void redo() {
         super.redo();
-        GroupTreeNode treeNode = mGroupsRootHandle.getChildAt(mPathToNode);
-        if (treeNode != null) {
-            ExplicitGroup group = (ExplicitGroup) treeNode.getGroup();
+
+        GroupTreeNode node = root.getChildAt(pathToNode);
+        if (node != null) {
+            ExplicitGroup group = (ExplicitGroup) node.getGroup();
             group.clearAssignments();
-            for (final BibEntry aM_newAssignmentBackup : m_newAssignmentBackup) {
-                group.addEntry(aM_newAssignmentBackup);
+            for (final BibEntry entry : newAssignments) {
+                group.addEntry(entry);
             }
         }
     }
