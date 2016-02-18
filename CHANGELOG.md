@@ -46,6 +46,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
 - Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
 - Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
+- Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
+
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
