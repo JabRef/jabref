@@ -110,7 +110,7 @@ public class FromAuxDialog extends JDialog {
         parentTabbedPane = viewedDBs;
         parent = frame;
 
-        auxParser = new AuxSubGenerator(null);
+        auxParser = new AuxSubGenerator();
 
         jbInit();
         pack();

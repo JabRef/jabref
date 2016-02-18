@@ -91,8 +91,7 @@ public class AuxSubGenerator {
 
 
 
-    public AuxSubGenerator(BibDatabase refDBase) {
-        db = refDBase;
+    public AuxSubGenerator() {
     }
 
     /**
@@ -345,7 +344,9 @@ public class AuxSubGenerator {
         mySet.clear();
         notFoundList.clear();
         crossreferencedEntriesCount = 0;
-        // db = null ;  ???
+        nestedAuxCounter = 0;
+        db = null;
+        auxDB = null;
     }
 
     /**
