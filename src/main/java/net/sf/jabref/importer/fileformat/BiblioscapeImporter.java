@@ -272,11 +272,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 }
 
                 if (!comments.isEmpty()) { // set comment if present
-                    StringBuilder s = new StringBuilder();
-                    for (int i = 0; i < comments.size(); ++i) {
-                        s.append(i > 0 ? "; " : "").append(comments.elementAt(i));
-                    }
-                    hm.put("comment", s.toString());
+                    hm.put("comment", String.join(";", comments));
                 }
                 BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, bibtexType);
                 b.setField(hm);

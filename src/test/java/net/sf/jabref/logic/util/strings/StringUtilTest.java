@@ -2,12 +2,12 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
-import net.sf.jabref.model.entry.FileField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.entry.FileField;
 
 public class StringUtilTest {
     @BeforeClass
@@ -129,14 +129,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testQuote() {
-        assertEquals("a::", StringUtil.quote("a:", "", ':'));
-        assertEquals("a::", StringUtil.quote("a:", null, ':'));
-        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
-        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
-    }
-
-    @Test
     public void testUnquote() {
         assertEquals("a:", StringUtil.unquote("a::", ':'));
         assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
@@ -240,4 +232,30 @@ public class StringUtilTest {
     public void testIntValueOfExceptionfIfStringEmpty() {
             StringUtil.intValueOf("");
     }
+
+    @Test
+    public void testQuoteSimple() {
+        assertEquals("a::", StringUtil.quote("a:", "", ':'));
+    }
+
+    @Test
+    public void testQuoteNullQuotation() {
+        assertEquals("a::", StringUtil.quote("a:", null, ':'));
+    }
+
+    @Test
+    public void testQuoteNullString() {
+        assertNull(StringUtil.quote(null, ";", ':'));
+    }
+
+    @Test
+    public void testQuoteQuotationCharacter() {
+        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
+    }
+
+    @Test
+    public void testQuoteMoreComplicated() {
+        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
+    }
+
 }

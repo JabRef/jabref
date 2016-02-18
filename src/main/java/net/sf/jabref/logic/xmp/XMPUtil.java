@@ -632,10 +632,8 @@ public class XMPUtil {
 
                 AuthorList list = AuthorList.getAuthorList(authors);
 
-                int n = list.size();
-                for (int i = 0; i < n; i++) {
-                    dcSchema.addContributor(list.getAuthor(i).getFirstLast(
-                            false));
+                for (AuthorList.Author author : list.getAuthorList()) {
+                    dcSchema.addContributor(author.getFirstLast(false));
                 }
                 continue;
             }

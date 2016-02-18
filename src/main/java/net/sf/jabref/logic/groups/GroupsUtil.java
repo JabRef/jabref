@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
@@ -65,13 +66,9 @@ public class GroupsUtil {
                 String val = be.getField(field);
                 if ((val != null) && !val.isEmpty()) {
                     AuthorList al = AuthorList.getAuthorList(val);
-                    for (int i = 0; i < al.size(); i++) {
-                        AuthorList.Author a = al.getAuthor(i);
-                        String lastName = a.getLast();
-                        if ((lastName != null) && !lastName.isEmpty()) {
-                            res.add(lastName);
-                        }
-                    }
+                    res.addAll(al.getAuthorList().stream().map(author -> author.getLast())
+                            .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
+                            .collect(Collectors.toList()));
                 }
 
             }
