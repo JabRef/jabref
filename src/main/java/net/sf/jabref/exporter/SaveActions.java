@@ -148,7 +148,7 @@ public class SaveActions {
 
     public static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
         //first, group all formatters by the field for which they apply
-        HashMap<String, List<String>> groupedByField = new HashMap<>();
+        Map<String, List<String>> groupedByField = new HashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
             String key = cleanup.getField();
 
@@ -166,13 +166,11 @@ public class SaveActions {
 
         // convert the contents of the hashmap into the correct serialization
         StringBuilder result = new StringBuilder();
-        for (String fieldKey : groupedByField.keySet()) {
-            result.append(fieldKey);
+        for (Map.Entry<String, List<String>> entry : groupedByField.entrySet()) {
+            result.append(entry.getKey());
 
             StringJoiner joiner = new StringJoiner(",", "[", "]");
-            for (String formatterKey : groupedByField.get(fieldKey)) {
-                joiner.add(formatterKey);
-            }
+            entry.getValue().forEach(joiner::add);
             result.append(joiner.toString());
         }
 
