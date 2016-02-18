@@ -487,7 +487,7 @@ class GroupDialog extends JDialog {
             }
         }
         if (!list.isEmpty()) {
-            if (!Util.warnAssignmentSideEffects(Arrays.asList(mResultingGroup), this)) {
+            if (!Util.warnAssignmentSideEffects(mResultingGroup, this)) {
                 return;
             }
             // the undo information for a conversion to an ExplicitGroup is

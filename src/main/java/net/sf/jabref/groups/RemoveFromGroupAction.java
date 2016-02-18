@@ -16,7 +16,6 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -52,7 +51,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!Util.warnAssignmentSideEffects(Arrays.asList(mNode.getGroup()), mPanel.frame())) {
+        if (!Util.warnAssignmentSideEffects(mNode.getGroup(), mPanel.frame())) {
             return; // user aborted operation
         }
 

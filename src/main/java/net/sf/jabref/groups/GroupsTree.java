@@ -289,7 +289,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(Arrays.asList(group), groupSelector.frame))
+                if (!Util.warnAssignmentSideEffects(group, groupSelector.frame))
                  {
                     return; // user aborted operation
                 }
@@ -299,10 +299,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                AbstractUndoableEdit undo = group.add(selection.getSelection());
-                if (undo instanceof UndoableChangeAssignment) {
-                    ((UndoableChangeAssignment) undo).setEditedNode(target);
-                }
+                AbstractUndoableEdit undo = target.addToGroup(selection.getSelection());
                 dtde.getDropTargetContext().dropComplete(true);
                 groupSelector.revalidateGroups();
                 groupSelector.concludeAssignment(undo, target, assignedEntries);

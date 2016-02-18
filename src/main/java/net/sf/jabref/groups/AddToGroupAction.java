@@ -16,12 +16,8 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -35,108 +31,93 @@ import net.sf.jabref.gui.undo.NamedCompound;
 
 public class AddToGroupAction extends AbstractAction {
 
-    private GroupTreeNode mNode;
-    private final boolean m_move;
-    private BasePanel mPanel;
-
+    private final boolean move;
+    private GroupTreeNode node;
+    private BasePanel panel;
 
     /**
-     * @param move If true, remove node from all other groups.
+     * @param move If true, remove entries from all other groups.
      */
-    public AddToGroupAction(GroupTreeNode node, boolean move,
-            BasePanel panel) {
+    public AddToGroupAction(GroupTreeNode node, boolean move, BasePanel panel) {
         super(node.getGroup().getName());
-        mNode = node;
-        m_move = move;
-        mPanel = panel;
+        this.node = node;
+        this.move = move;
+        this.panel = panel;
     }
 
     public AddToGroupAction(boolean move) {
-        super(move ? Localization.lang("Assign entry selection exclusively to this group")
-                : Localization.lang("Add entry selection to this group"));
-        m_move = move;
+        super(move ? Localization.lang("Assign entry selection exclusively to this group") :
+                Localization.lang("Add entry selection to this group"));
+        this.move = move;
     }
 
     public void setBasePanel(BasePanel panel) {
-        mPanel = panel;
+        this.panel = panel;
     }
 
     public void setNode(GroupTreeNode node) {
-        mNode = node;
+        this.node = node;
     }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final List<BibEntry> entries = mPanel.getSelectedEntries();
-        final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
+        final List<BibEntry> entries = panel.getSelectedEntries();
 
-        if (m_move) {
-            // collect warnings for removal
-            Enumeration<GroupTreeNode> e = ((GroupTreeNode) mNode.getRoot()).preorderEnumeration();
-            for (GroupTreeNode node : Collections.list(e)) {
-                if (!node.getGroup().supportsRemove()) {
-                    continue;
-                }
-                for (BibEntry entry : entries) {
-                    if (node.getGroup().contains(entry)) {
-                        removeGroupsNodes.add(node);
-                    }
-                }
-            }
-            // warning for all groups from which the entries are removed, and
-            // for the one to which they are added! hence the magical +1
-            List<AbstractGroup> groups = new ArrayList<>(removeGroupsNodes.size() + 1);
-            for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                groups.add(removeGroupsNodes.elementAt(i).getGroup());
-            }
-            groups.add(mNode.getGroup());
-            if (!Util.warnAssignmentSideEffects(groups, mPanel.frame())) {
-                return; // user aborted operation
-            }
-        } else {
-            // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(Arrays.asList(mNode.getGroup()), mPanel.frame())) {
-                return; // user aborted operation
-            }
-        }
-
-        // if an editor is showing, its fields must be updated
-        // after the assignment, and before that, the current
-        // edit has to be stored:
-        mPanel.storeCurrentEdit();
+        // if an editor is showing, its fields must be updated after the assignment,
+        // and before that, the current edit has to be stored:
+        panel.storeCurrentEdit();
 
         NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
 
-        if (m_move) {
-            // first remove
-            for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                GroupTreeNode node = removeGroupsNodes.elementAt(i);
-                if (node.getGroup().containsAny(entries)) {
-                    AbstractUndoableEdit undoRemove = node.removeFromGroup(entries);
-                    if (undoRemove != null) {
-                        undoAll.addEdit(undoRemove);
-                    }
-                }
-            }
-            // then add
-            AbstractUndoableEdit undoAdd = mNode.addToGroup(entries);
-            if (undoAdd != null) {
-                undoAll.addEdit(undoAdd);
-            }
+        if (move) {
+            moveToGroup(entries, undoAll);
         } else {
-            AbstractUndoableEdit undoAdd = mNode.addToGroup(entries);
-            if (undoAdd == null)
-            {
-                return; // no changed made
-            }
-            undoAll.addEdit(undoAdd);
+            addToGroup(entries, undoAll);
         }
 
         undoAll.end();
 
-        mPanel.undoManager.addEdit(undoAll);
-        mPanel.markBaseChanged();
-        mPanel.updateEntryEditorIfShowing();
-        mPanel.getGroupSelector().valueChanged(null);
+        panel.undoManager.addEdit(undoAll);
+        panel.markBaseChanged();
+        panel.updateEntryEditorIfShowing();
+        panel.getGroupSelector().valueChanged(null);
     }
+
+    public void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
+        List<GroupTreeNode> groupsContainingEntries =
+                ((GroupTreeNode) node.getRoot()).getParentGroupsSupportingRemoval(entries);
+
+        List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(node -> node.getGroup()).collect(
+                Collectors.toList());
+        affectedGroups.add(node.getGroup());
+        if (!Util.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
+            return; // user aborted operation
+        }
+
+        // first remove
+        for (GroupTreeNode group : groupsContainingEntries) {
+            AbstractUndoableEdit undoRemove = group.removeFromGroup(entries);
+            if (undoRemove != null) {
+                undoAll.addEdit(undoRemove);
+            }
+        }
+
+        // then add
+        AbstractUndoableEdit undoAdd = node.addToGroup(entries);
+        if (undoAdd != null) {
+            undoAll.addEdit(undoAdd);
+        }
+    }
+
+    public void addToGroup(List<BibEntry> entries, NamedCompound undo) {
+        if (!Util.warnAssignmentSideEffects(node.getGroup(), panel.frame())) {
+            return; // user aborted operation
+        }
+
+        AbstractUndoableEdit undoAdd = node.addToGroup(entries);
+        if (undoAdd != null) {
+            undo.addEdit(undoAdd);
+        }
+    }
+
 }

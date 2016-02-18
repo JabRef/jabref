@@ -507,6 +507,10 @@ public class Util {
         // return true; // found no side effects
     }
 
+    public static boolean warnAssignmentSideEffects(AbstractGroup group, Component parent) {
+        return warnAssignmentSideEffects(Collections.singletonList(group), parent);
+    }
+
     public static boolean updateTimeStampIsSet() {
         return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
     }

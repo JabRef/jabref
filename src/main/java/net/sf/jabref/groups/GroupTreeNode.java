@@ -19,6 +19,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -368,5 +370,25 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     @Override
     public int hashCode() {
         return getGroup().getName().hashCode();
+    }
+
+    /**
+     * Get all groups which contain any of the entries and which support removal of entries.
+     */
+    public List<GroupTreeNode> getParentGroupsSupportingRemoval(List<BibEntry> entries) {
+        List<GroupTreeNode> groups = new ArrayList<>();
+
+        Enumeration<GroupTreeNode> e = preorderEnumeration();
+        for (GroupTreeNode node : Collections.list(e)) {
+            AbstractGroup group = node.getGroup();
+            if (!group.supportsRemove()) {
+                continue;
+            }
+            if (group.containsAny(entries)) {
+                groups.add(node);
+            }
+        }
+
+        return groups;
     }
 }
