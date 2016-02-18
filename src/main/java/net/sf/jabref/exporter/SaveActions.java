@@ -165,11 +165,13 @@ public class SaveActions {
         // convert the contents of the hashmap into the correct serialization
         StringBuilder result = new StringBuilder();
         for (String fieldKey : groupedByField.keySet()) {
-            result.append(fieldKey + "[");
+            result.append(fieldKey);
+
+            StringJoiner joiner = new StringJoiner(",","[","]");
             for (String formatterKey : groupedByField.get(fieldKey)) {
-                result.append(formatterKey + ",");
+                joiner.add(formatterKey);
             }
-            result.append("]");
+            result.append(joiner.toString());
         }
 
         return result.toString();
