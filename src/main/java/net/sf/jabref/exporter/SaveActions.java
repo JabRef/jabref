@@ -83,24 +83,26 @@ public class SaveActions {
                 startIndex += endIndex + 1;
 
                 //read each formatter
-                int commaIndex = remainingString.indexOf(",");
+                int tokenIndex = remainingString.indexOf(",");
                 do {
-                    String formatterKey = remainingString.substring(index + 1, commaIndex);
+                    boolean doBreak = false;
+                    if(tokenIndex == -1 || tokenIndex > endIndex){
+                        tokenIndex = remainingString.indexOf("]");
+                        doBreak = true;
+                    }
+
+                    String formatterKey = remainingString.substring(index + 1, tokenIndex);
                     actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
 
-                    remainingString = remainingString.substring(commaIndex + 1);
-                    if (remainingString.startsWith("]")) {
+                    remainingString = remainingString.substring(tokenIndex + 1);
+                    if (remainingString.startsWith("]") || doBreak) {
                         break;
                     }
-                    commaIndex = remainingString.indexOf(",");
-                    index = -1;
-                } while (commaIndex != -1 && commaIndex < endIndex);
+                    tokenIndex = remainingString.indexOf(",");
 
-                if ("]".equals(remainingString)) {
-                    return;
-                } else {
-                    remainingString = remainingString.substring(1, remainingString.length());
-                }
+                    index = -1;
+                } while (true);
+
 
             }
         } catch (StringIndexOutOfBoundsException ignore) {
@@ -167,7 +169,7 @@ public class SaveActions {
         for (String fieldKey : groupedByField.keySet()) {
             result.append(fieldKey);
 
-            StringJoiner joiner = new StringJoiner(",","[","]");
+            StringJoiner joiner = new StringJoiner(",", "[", "]");
             for (String formatterKey : groupedByField.get(fieldKey)) {
                 joiner.add(formatterKey);
             }

@@ -38,14 +38,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;title[IdentityFormatter,]}"));
+                "@comment{jabref-meta: saveActions:enabled;title[IdentityFormatter]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[IdentityFormatter,]", saveActions.get(1));
+        assertEquals("title[IdentityFormatter]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
 
@@ -91,14 +91,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,]}"));
+                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[LowerCaseChanger,]", saveActions.get(1));
+        assertEquals("title[LowerCaseChanger]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
 
@@ -120,14 +120,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,IdentityFormatter,]}"));
+                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,IdentityFormatter]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[LowerCaseChanger,IdentityFormatter,]", saveActions.get(1));
+        assertEquals("title[LowerCaseChanger,IdentityFormatter]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
         assertEquals(2, actions.getConfiguredActions().size());
@@ -150,14 +150,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,IdentityFormatter,DateFormatter,]}"));
+                "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger,IdentityFormatter,DateFormatter]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[LowerCaseChanger,IdentityFormatter,DateFormatter,]", saveActions.get(1));
+        assertEquals("title[LowerCaseChanger,IdentityFormatter,DateFormatter]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
         assertEquals(3, actions.getConfiguredActions().size());
@@ -181,14 +181,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;pages[PageNumbersFormatter,]title[LowerCaseChanger,]}"));
+                "@comment{jabref-meta: saveActions:enabled;pages[PageNumbersFormatter]title[LowerCaseChanger]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("pages[PageNumbersFormatter,]title[LowerCaseChanger,]", saveActions.get(1));
+        assertEquals("pages[PageNumbersFormatter]title[LowerCaseChanger]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
@@ -220,14 +220,14 @@ public class SaveActionsTest {
                 "  ISSN                     = {0886-5930}\n" +
                 "}\n" +
                 "\n" +
-                "@comment{jabref-meta: saveActions:enabled;pages[PageNumbersFormatter,DateFormatter,]title[LowerCaseChanger,]}"));
+                "@comment{jabref-meta: saveActions:enabled;pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("pages[PageNumbersFormatter,DateFormatter,]title[LowerCaseChanger,]", saveActions.get(1));
+        assertEquals("pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]", saveActions.get(1));
 
         SaveActions actions = new SaveActions(parserResult.getMetaData());
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
