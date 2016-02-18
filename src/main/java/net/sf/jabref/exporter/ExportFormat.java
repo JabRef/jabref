@@ -298,12 +298,7 @@ public class ExportFormat implements IExportFormat {
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
-                for (Iterator<String> i = missingFormatters.iterator(); i.hasNext(); ) {
-                    sb.append(i.next());
-                    if (i.hasNext()) {
-                        sb.append(", ");
-                    }
-                }
+                sb.append(String.join(", ", missingFormatters));
                 LOGGER.warn(sb);
             }
             finalizeSaveSession(ss, outFile);

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -900,17 +901,7 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        StringBuilder allAuthorsSB = new StringBuilder();
-        boolean first = true;
-
-        for (PersonName name : authors) {
-            if (!first) {
-                allAuthorsSB.append(" and ");
-            }
-            allAuthorsSB.append(name.getFullname());
-            first = false;
-        }
-        String allAuthors = allAuthorsSB.toString();
+        String allAuthors = authors.stream().map(name -> name.getFullname()).collect(Collectors.joining(" and "));
 
         map.put(type, allAuthors);
     }

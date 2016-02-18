@@ -91,9 +91,8 @@ public class XMPSchemaBibtex extends XMPSchema {
     public void setPersonList(String field, String value) {
         AuthorList list = AuthorList.getAuthorList(value);
 
-        int n = list.size();
-        for (int i = 0; i < n; i++) {
-            addSequenceValue(field, list.getAuthor(i).getFirstLast(false));
+        for (AuthorList.Author author : list.getAuthorList()) {
+            addSequenceValue(field, author.getFirstLast(false));
         }
     }
 

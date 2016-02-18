@@ -17,8 +17,6 @@ package net.sf.jabref.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
-
 import javax.swing.*;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
@@ -177,14 +175,7 @@ public class GenFieldsCustomizer extends JDialog {
         for (int i = 0; i < tabList.getTabCount(); i++) {
             sb.append(tabList.getTabName(i));
             sb.append(':');
-            for (Iterator<String> j = tabList.getTabFields(i).iterator(); j
-                    .hasNext();) {
-                String field = j.next();
-                sb.append(field);
-                if (j.hasNext()) {
-                    sb.append(';');
-                }
-            }
+            sb.append(String.join(";", tabList.getTabFields(i)));
             sb.append('\n');
         }
 
