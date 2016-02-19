@@ -4,6 +4,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
@@ -71,7 +72,7 @@ public class SaveActionsPanel extends JPanel {
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         builder.add(actionsList).xyw(3, 5, 2);
 
-        deleteButton = new JButton(Localization.lang("Delete"));
+        deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE.getSmallIcon());
         deleteButton.addActionListener(new DeleteButtonListener());
         builder.add(deleteButton).xy(3, 7);
 
@@ -102,7 +103,7 @@ public class SaveActionsPanel extends JPanel {
         formatters = new JComboBox(formatterNames.toArray());
         builder.add(formatters).xy(3, 1);
 
-        addButton = new JButton(Localization.lang("Add"));
+        addButton = new JButton(IconTheme.JabRefIcon.ADD.getSmallIcon());
         addButton.addActionListener(new AddButtonListener());
         builder.add(addButton).xy(5, 1);
 
