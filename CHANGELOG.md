@@ -26,6 +26,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
+- Added Ordinal formatter (1 -> 1st etc)
 
 
 ### Fixed
