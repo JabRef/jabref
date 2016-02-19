@@ -36,17 +36,11 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  */
 public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
-    private static final int MAX_DISPLAYED_LETTERS = 35;
-
     /** The cell over which the user is currently dragging */
     private Object highlight1Cell;
     private Object[] highlight2Cells;
     private Object[] highlight3Cells;
     private Object highlightBorderCell;
-
-    private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
-    private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
-    private static final Icon GROUP_REGULAR_ICON = null;
 
 
     @Override
@@ -60,13 +54,14 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, tmpHasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
-        if (!(value instanceof GroupTreeNode)) {
+        if (!(value instanceof GroupTreeNodeViewModel)) {
             return c;
         }
-        AbstractGroup group = ((GroupTreeNode) value).getGroup();
-        if ((group == null) || !(c instanceof JLabel)) {
+        if (!(c instanceof JLabel)) {
             return c; // sanity check
         }
+
+        GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) value;
         JLabel label = (JLabel) c;
 
         if ((highlightBorderCell != null) && (highlightBorderCell.equals(value))) {
@@ -74,93 +69,65 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());
         }
-        boolean italics = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) && group.isDynamic();
-        boolean red = false;
-        if (highlight2Cells != null) {
-            for (Object highlight2Cell : highlight2Cells) {
-                if (highlight2Cell == value) {
-                    // label.setForeground(Color.RED);
-                    red = true;
-                    break;
-                }
-            }
-        }
-        boolean underline = false;
-        if (highlight3Cells != null) {
-            for (Object highlight3Cell : highlight3Cells) {
-                if (highlight3Cell == value) {
-                    underline = true;
-                    break;
-                }
-            }
-        }
-        String name = StringUtil.limitStringLength(group.getName(), GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS);
+
+        Boolean red = printInRed(value);
+        Boolean underlined = printUnderlined(value);
         StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
         if (red) {
             sb.append("<font color=\"#FF0000\">");
         }
-        if (underline) {
+        if (underlined) {
             sb.append("<u>");
         }
-        if (italics) {
+        if (viewModel.printInItalics()) {
             sb.append("<i>");
         }
-        sb.append(StringUtil.quoteForHTML(name));
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
-            if (group instanceof ExplicitGroup) {
-                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
-            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
-                int hits = 0;
-                BasePanel currentBasePanel = JabRef.jrf.getCurrentBasePanel();
-                if(currentBasePanel != null) {
-                    for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
-                        if (group.contains(entry)) {
-                            hits++;
-                        }
-                    }
-                }
-                sb.append(" [").append(hits).append(']');
-            }
-        }
-        if (italics) {
+        sb.append(StringUtil.quoteForHTML(viewModel.getText()));
+        if (viewModel.printInItalics()) {
             sb.append("</i>");
         }
-        if (underline) {
+        if (underlined) {
             sb.append("</u>");
         }
         if (red) {
             sb.append("</font>");
         }
         sb.append("</html>");
-        final String text = sb.toString();
 
+        String text = sb.toString();
         if (!label.getText().equals(text)) {
             label.setText(text);
         }
-        label.setToolTipText("<html>" + group.getShortDescription() + "</html>");
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
-            switch (group.getHierarchicalContext()) {
-            case REFINING:
-                if (label.getIcon() != GroupTreeCellRenderer.GROUP_REFINING_ICON) {
-                    label.setIcon(GroupTreeCellRenderer.GROUP_REFINING_ICON);
-                }
-                break;
-            case INCLUDING:
-                if (label.getIcon() != GroupTreeCellRenderer.GROUP_INCLUDING_ICON) {
-                    label.setIcon(GroupTreeCellRenderer.GROUP_INCLUDING_ICON);
-                }
-                break;
-            default:
-                if (label.getIcon() != GroupTreeCellRenderer.GROUP_REGULAR_ICON) {
-                    label.setIcon(GroupTreeCellRenderer.GROUP_REGULAR_ICON);
-                }
-                break;
-            }
-        } else {
-            label.setIcon(null);
+        label.setToolTipText(viewModel.getDescription());
+
+        Icon icon = viewModel.getIcon();
+        if(label.getIcon() != icon) {
+            label.setIcon(icon);
         }
         return c;
+    }
+
+    private boolean printInRed(Object value) {
+        if (highlight2Cells != null) {
+            for (Object highlight2Cell : highlight2Cells) {
+                if (highlight2Cell == value) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean printUnderlined(Object value) {
+        if (highlight3Cells != null) {
+            for (Object highlight3Cell : highlight3Cells) {
+                if (highlight3Cell == value) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

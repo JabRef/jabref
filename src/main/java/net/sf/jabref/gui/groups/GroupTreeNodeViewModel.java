@@ -15,7 +15,14 @@
  */
 package net.sf.jabref.gui.groups;
 
-import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.groups.*;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -29,6 +36,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
+
+    private static final int MAX_DISPLAYED_LETTERS = 35;
+    private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
+    private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
+    private static final Icon GROUP_REGULAR_ICON = null;
 
     public static final DataFlavor FLAVOR;
     private static final DataFlavor[] FLAVORS;
@@ -150,5 +162,54 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             children.add(new GroupTreeNodeViewModel(child));
         }
         return children;
+    }
+
+    boolean printInItalics() {
+        return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
+    }
+
+    public String getText() {
+        AbstractGroup group = node.getGroup();
+        String name = StringUtil.limitStringLength(group.getName(), MAX_DISPLAYED_LETTERS);
+        StringBuilder sb = new StringBuilder(60);
+        sb.append(name);
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
+            if (group instanceof ExplicitGroup) {
+                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
+            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+                int hits = 0;
+                BasePanel currentBasePanel = JabRef.jrf.getCurrentBasePanel();
+                if(currentBasePanel != null) {
+                    for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
+                        if (group.contains(entry)) {
+                            hits++;
+                        }
+                    }
+                }
+                sb.append(" [").append(hits).append(']');
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public String getDescription() {
+        return "<html>" + node.getGroup().getShortDescription() + "</html>";
+    }
+
+    public Icon getIcon() {
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
+            switch (node.getGroup().getHierarchicalContext()) {
+            case REFINING:
+                return GROUP_REFINING_ICON;
+            case INCLUDING:
+                return GROUP_INCLUDING_ICON;
+            default:
+                return GROUP_REGULAR_ICON;
+            }
+        } else {
+            return null;
+        }
     }
 }
