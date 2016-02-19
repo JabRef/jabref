@@ -2,6 +2,7 @@ package net.sf.jabref.logic.config;
 
 import net.sf.jabref.JabRefPreferences;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
@@ -66,7 +67,7 @@ public class SaveOrderConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, sortCriteria);
+        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, Arrays.hashCode(sortCriteria));
     }
 
     public SaveOrderConfig() {
