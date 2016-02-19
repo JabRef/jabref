@@ -4,7 +4,13 @@ import net.sf.jabref.exporter.SaveSession;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FileBasedLock {
+
+    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
+
 
     /**
      * This method checks whether there is a lock file for the given file. If
@@ -61,7 +67,9 @@ public class FileBasedLock {
         if (!lock.exists()) {
             return false;
         }
-        lock.delete();
+        if (!lock.delete()) {
+            LOGGER.warn("Cannot delete lock file");
+        }
         return true;
     }
 }

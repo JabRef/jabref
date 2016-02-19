@@ -80,7 +80,7 @@ public class LayoutHelper {
         LayoutHelper.currentGroup = newGroup;
     }
 
-    private void getBracketedField(final int field) throws IOException {
+    private void doBracketedField(final int field) throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -118,14 +118,12 @@ public class LayoutHelper {
                 }
             }
         }
-
-        return;
     }
 
     /**
      *
      */
-    private void getBracketedOptionField() throws IOException {
+    private void doBracketedOptionField() throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -137,7 +135,6 @@ public class LayoutHelper {
         while (!endOfFile) {
             c = read();
 
-            //System.out.println((char)c);
             if (c == -1) {
                 endOfFile = true;
 
@@ -150,8 +147,6 @@ public class LayoutHelper {
                     }
 
                     parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
-
-                    //System.out.println("\nbracketedOptionEOF: " + buffer.toString());
                 }
 
                 return;
@@ -214,8 +209,6 @@ public class LayoutHelper {
                 }
             }
         }
-
-        return;
     }
 
     private void parse() throws IOException, StringIndexOutOfBoundsException {
@@ -268,8 +261,6 @@ public class LayoutHelper {
                 escaped = (c == '\\') && !escaped;
             }
         }
-
-        return;
     }
 
     private void parseField() throws IOException, StringIndexOutOfBoundsException {
@@ -280,7 +271,6 @@ public class LayoutHelper {
 
         while (!endOfFile) {
             c = read();
-            // System.out.print((char)c);
             if (c == -1) {
                 endOfFile = true;
             }
@@ -288,7 +278,6 @@ public class LayoutHelper {
             if (!Character.isLetter((char) c) && (c != '_') && (c != '-')) {
                 unread(c);
 
-                //System.out.println("\n#" + (char) c);
                 name = buffer == null ? "" : buffer.toString();
 
                 try {
@@ -304,17 +293,15 @@ public class LayoutHelper {
                             + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
-                //System.out.println("NAME:" + name);
-
                 if (firstLetter == 'b') {
                     if ("begin".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_FIELD_START);
+                        doBracketedField(LayoutHelper.IS_FIELD_START);
 
                         return;
                     } else if ("begingroup".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_GROUP_START);
+                        doBracketedField(LayoutHelper.IS_GROUP_START);
                         return;
                     }
                 } else if (firstLetter == 'f') {
@@ -322,12 +309,12 @@ public class LayoutHelper {
                         if (c == '[') {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField();
+                            doBracketedOptionField();
 
                             return;
                         } else {
                             // get field name
-                            getBracketedField(LayoutHelper.IS_OPTION_FIELD);
+                            doBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
@@ -347,11 +334,11 @@ public class LayoutHelper {
                 } else if (firstLetter == 'e') {
                     if ("end".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_FIELD_END);
+                        doBracketedField(LayoutHelper.IS_FIELD_END);
                         return;
                     } else if ("endgroup".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_GROUP_END);
+                        doBracketedField(LayoutHelper.IS_GROUP_END);
                         return;
                     } else if ("encoding".equalsIgnoreCase(name)) {
                         // Print the name of the current encoding used for export.
@@ -365,7 +352,6 @@ public class LayoutHelper {
                 // for all other cases
                 parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_FIELD));
 
-                //System.out.println(name);
                 return;
             } else {
                 if (buffer == null) {

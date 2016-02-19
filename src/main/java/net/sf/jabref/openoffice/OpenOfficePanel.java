@@ -48,6 +48,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -442,14 +443,15 @@ public class OpenOfficePanel extends AbstractWorker {
 
         // Add OO jars to the classpath:
         try {
-            File[] jarFiles = new File[] {new File(ooBaseDirectory, "unoil.jar"), new File(ooBaseDirectory, "jurt.jar"),
-                    new File(ooBaseDirectory, "juh.jar"), new File(ooBaseDirectory, "ridl.jar")};
-            URL[] jarList = new URL[jarFiles.length];
-            for (int i = 0; i < jarList.length; i++) {
-                if (!jarFiles[i].exists()) {
-                    throw new IOException("File not found: " + jarFiles[i].getPath());
+            List<File> jarFiles = Arrays.asList(new File(ooBaseDirectory, "unoil.jar"),
+                    new File(ooBaseDirectory, "jurt.jar"), new File(ooBaseDirectory, "juh.jar"),
+                    new File(ooBaseDirectory, "ridl.jar"));
+            List<URL> jarList = new ArrayList<>(jarFiles.size());
+            for (File jarFile : jarFiles) {
+                if (!jarFile.exists()) {
+                    throw new IOException("File not found: " + jarFile.getPath());
                 }
-                jarList[i] = jarFiles[i].toURI().toURL();
+                jarList.add(jarFile.toURI().toURL());
             }
             addURL(jarList);
 
@@ -522,7 +524,8 @@ public class OpenOfficePanel extends AbstractWorker {
             Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
             style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
         } else {
-            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository());
+            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository(),
+                    Globals.prefs.getDefaultEncoding());
         }
     }
 
@@ -532,14 +535,14 @@ public class OpenOfficePanel extends AbstractWorker {
     private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
 
 
-    private static void addURL(URL[] u) throws IOException {
+    private static void addURL(List<URL> jarList) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
 
         try {
             Method method = sysclass.getDeclaredMethod("addURL", CLASS_PARAMETERS);
             method.setAccessible(true);
-            for (URL anU : u) {
+            for (URL anU : jarList) {
                 method.invoke(sysloader, anU);
             }
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |

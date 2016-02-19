@@ -24,6 +24,7 @@ import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -122,10 +123,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
-    public OOBibStyle(File styleFile, JournalAbbreviationRepository repository) throws IOException {
+
+    public OOBibStyle(File styleFile, JournalAbbreviationRepository repository, Charset encoding) throws IOException {
         this.repository = Objects.requireNonNull(repository);
         setDefaultProperties();
-        try (Reader in = new FileReader(styleFile)) {
+        try (InputStream stream = new FileInputStream(styleFile); Reader in = new InputStreamReader(stream, encoding)) {
             initialize(in);
         }
         this.styleFile = styleFile;

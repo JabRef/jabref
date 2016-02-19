@@ -44,12 +44,11 @@ import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.openoffice.sorting.AuthorYearTitleComparator;
-import net.sf.jabref.openoffice.sorting.YearAuthorTitleComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,8 +91,27 @@ class OOBibBase {
     private XPropertyContainer userProperties;
 
     private final boolean atEnd;
-    private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
-    private final YearAuthorTitleComparator yearAuthorTitleComparator = new YearAuthorTitleComparator();
+    private final Comparator<BibEntry> entryComparator;
+    private final Comparator<BibEntry> yearAuthorTitleComparator;
+    private final FieldComparator authComp = new FieldComparator("author");
+    private final FieldComparator yearComp = new FieldComparator("year");
+    private final FieldComparator titleComp = new FieldComparator("title");
+
+    private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+    private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
+    {
+        authorYearTitleList.add(authComp);
+        authorYearTitleList.add(yearComp);
+        authorYearTitleList.add(titleComp);
+
+        yearAuthorTitleList.add(yearComp);
+        yearAuthorTitleList.add(authComp);
+        yearAuthorTitleList.add(titleComp);
+
+        entryComparator = new FieldComparatorStack<>(authorYearTitleList);
+        yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
+    }
+
 
     private final Map<String, String> uniquefiers = new HashMap<>();
 

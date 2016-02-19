@@ -199,7 +199,9 @@ public class PdfImporter {
                         LOGGER.warn("Cannot import entries", ex);
                     } finally {
                         try {
-                            in.close();
+                            if (in != null) {
+                                in.close();
+                            }
                         } catch (IOException ignored) {
                             // Ignored
                         }
