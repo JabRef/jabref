@@ -2,10 +2,7 @@ package net.sf.jabref.logic.config;
 
 import net.sf.jabref.JabRefPreferences;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Stores the save order config from MetaData
@@ -153,20 +150,20 @@ public class SaveOrderConfig {
     /**
      * Outputs the current configuration to be consumed later by the constructor
      */
-    public Vector<String> getVector() {
-        Vector<String> res = new Vector<>(7);
+    public List<String> getConfigurationList() {
+        List<String> res = new ArrayList<>(7);
         if (saveInOriginalOrder) {
-            res.insertElementAt("original", 0);
+            res.add("original");
         } else {
-            res.insertElementAt("specified", 0);
+            res.add("specified");
         }
 
-        res.insertElementAt(sortCriteria[0].field, 1);
-        res.insertElementAt(Boolean.toString(sortCriteria[0].descending), 2);
-        res.insertElementAt(sortCriteria[1].field, 3);
-        res.insertElementAt(Boolean.toString(sortCriteria[1].descending), 4);
-        res.insertElementAt(sortCriteria[2].field, 5);
-        res.insertElementAt(Boolean.toString(sortCriteria[2].descending), 6);
+        res.add(sortCriteria[0].field);
+        res.add(Boolean.toString(sortCriteria[0].descending));
+        res.add(sortCriteria[1].field);
+        res.add(Boolean.toString(sortCriteria[1].descending));
+        res.add(sortCriteria[2].field);
+        res.add(Boolean.toString(sortCriteria[2].descending));
 
         return res;
     }

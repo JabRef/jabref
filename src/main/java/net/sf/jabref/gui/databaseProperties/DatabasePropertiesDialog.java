@@ -26,7 +26,6 @@ import java.util.Vector;
 import javax.swing.*;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -317,7 +316,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if(saveOrderConfigChanged) {
-            Vector<String> serialized = newSaveOrderConfig.getVector();
+            List<String> serialized = newSaveOrderConfig.getConfigurationList();
             if(newSaveOrderConfig.equals(defaultSaveOrderConfig)){
                 metaData.remove(MetaData.SAVE_ORDER_CONFIG);
             }  else {
