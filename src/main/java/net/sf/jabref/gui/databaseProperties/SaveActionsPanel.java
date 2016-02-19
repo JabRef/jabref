@@ -4,6 +4,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -27,7 +28,7 @@ public class SaveActionsPanel extends JPanel {
 
     private JList actionsList;
 
-    private JTextField keyField;
+    private JTextFieldWithUnfocusedText keyField;
 
     private JComboBox<String> formatters;
 
@@ -82,8 +83,8 @@ public class SaveActionsPanel extends JPanel {
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu,"));
 
-        keyField = new JTextField(20);
-        keyField.setText("field name");
+        keyField = new JTextFieldWithUnfocusedText(Localization.lang("Enter field name (e.g., title, author)"));
+        keyField.setColumns(25);
         keyField.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
