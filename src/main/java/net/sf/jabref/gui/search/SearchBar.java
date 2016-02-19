@@ -24,6 +24,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -60,7 +61,7 @@ public class SearchBar extends JPanel {
     private final BasePanel basePanel;
 
     private final SearchQueryHighlightObservable searchQueryHighlightObservable;
-    private final JSearchTextField searchField;
+    private final JTextFieldWithUnfocusedText searchField;
 
     private SearchMode searchMode = getSearchModeFromSettings();
 
@@ -165,9 +166,9 @@ public class SearchBar extends JPanel {
     }
 
     private static SearchMode getSearchModeFromSettings() {
-        if(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FILTER)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FILTER)) {
             return SearchMode.FILTER;
-        } else if(Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT)) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.SEARCH_MODE_FLOAT)) {
             return SearchMode.FLOAT;
         } else {
             return SearchMode.FILTER;
@@ -189,16 +190,15 @@ public class SearchBar extends JPanel {
     /**
      * Initializes the search text field
      */
-    private JSearchTextField initSearchField() {
-        JSearchTextField searchField = new JSearchTextField();
-        searchField.setTextWhenNotFocused(Localization.lang("Search")+"...");
+    private JTextFieldWithUnfocusedText initSearchField() {
+        JTextFieldWithUnfocusedText searchField = new JTextFieldWithUnfocusedText(Localization.lang("Search") + "...");
         searchField.setColumns(30);
 
         searchField.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
+                if (e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE) {
                     endSearch();
                 }
             }
@@ -344,7 +344,7 @@ public class SearchBar extends JPanel {
         this.searchField.setToolTipText("<html>" + description + "</html>");
 
 
-        if(grammarBasedSearch) {
+        if (grammarBasedSearch) {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(ADVANCED_SEARCH_COLOR));
             searchIcon.setToolTipText(Localization.lang("Advanced search active."));
         } else {
