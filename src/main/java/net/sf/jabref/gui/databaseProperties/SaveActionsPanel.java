@@ -45,11 +45,16 @@ public class SaveActionsPanel extends JPanel {
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
 
+        List<String> saveActionsMetaList = metaData.getData(SaveActions.META_KEY);
+        boolean enablementStatus = false;
+        String formatterString = "";
+        if (saveActionsMetaList != null && saveActionsMetaList.size() >= 2) {
+            enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
+            formatterString = saveActionsMetaList.get(1);
+        }
+
         // first clear existing content
         this.removeAll();
-
-        boolean enablementStatus = metaData.getData(SaveActions.META_KEY).get(0).equals("enabled");
-        String formatterString = metaData.getData(SaveActions.META_KEY).get(1);
 
         saveActions = new SaveActions(enablementStatus, formatterString);
         List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
