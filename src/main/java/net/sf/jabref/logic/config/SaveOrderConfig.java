@@ -15,7 +15,6 @@ import java.util.Vector;
 public class SaveOrderConfig {
 
     public boolean saveInOriginalOrder;
-    public boolean saveInSpecifiedOrder;
 
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
@@ -61,13 +60,12 @@ public class SaveOrderConfig {
                 sortCriteria[2].equals(that.sortCriteria[2]);
 
         return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
-                Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder) &&
                 sortCriteriaEquals;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, Arrays.hashCode(sortCriteria));
+        return Objects.hash(saveInOriginalOrder, Arrays.hashCode(sortCriteria));
     }
 
     public SaveOrderConfig() {
@@ -112,16 +110,10 @@ public class SaveOrderConfig {
 
     public void setSaveInOriginalOrder() {
         this.saveInOriginalOrder = true;
-        this.saveInSpecifiedOrder = false;
     }
 
     public void setSaveInSpecifiedOrder() {
         this.saveInOriginalOrder = false;
-        this.saveInSpecifiedOrder = true;
-    }
-
-    public SortCriterion[] getSortCriteria() {
-        return sortCriteria;
     }
 
     public static SaveOrderConfig loadExportSaveOrderFromPreferences(JabRefPreferences preferences) {
@@ -166,7 +158,6 @@ public class SaveOrderConfig {
         if (saveInOriginalOrder) {
             res.insertElementAt("original", 0);
         } else {
-            assert saveInSpecifiedOrder;
             res.insertElementAt("specified", 0);
         }
 
