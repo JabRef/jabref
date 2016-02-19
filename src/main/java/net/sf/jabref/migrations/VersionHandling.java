@@ -18,11 +18,11 @@ package net.sf.jabref.migrations;
 import java.util.List;
 
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**

@@ -20,9 +20,9 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.UndoableModifySubtree;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.gui.groups.UndoableModifySubtree;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 

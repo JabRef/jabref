@@ -27,11 +27,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;

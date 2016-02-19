@@ -40,7 +40,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.groups.EntryTableTransferHandler;
+import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 
 class FileListEditorTransferHandler extends TransferHandler {
     private DataFlavor urlFlavor;

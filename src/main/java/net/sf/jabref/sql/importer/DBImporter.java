@@ -24,14 +24,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.logic.groups.*;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBImporterExporter;
 import net.sf.jabref.sql.DBStrings;

@@ -34,7 +34,7 @@ import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.util.strings.StringUtil;

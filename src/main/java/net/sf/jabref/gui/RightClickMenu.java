@@ -23,10 +23,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.*;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.Printed;

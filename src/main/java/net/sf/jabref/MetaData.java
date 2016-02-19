@@ -18,7 +18,7 @@ package net.sf.jabref;
 import java.io.*;
 import java.util.*;
 
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.migrations.VersionHandling;

@@ -36,7 +36,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.groups.GroupMatcher;
+import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
@@ -58,7 +58,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.EntryTableTransferHandler;
+import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
