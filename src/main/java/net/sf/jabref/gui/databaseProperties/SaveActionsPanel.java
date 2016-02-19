@@ -115,7 +115,7 @@ public class SaveActionsPanel extends JPanel {
         return builder.getPanel();
     }
 
-    public boolean storeSettings(MetaData metaData) {
+    public void storeSettings(MetaData metaData) {
         Objects.requireNonNull(metaData);
 
         java.util.List<String> actions = new ArrayList<>();
@@ -127,11 +127,22 @@ public class SaveActionsPanel extends JPanel {
         }
 
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+
+        // if all actions have been removed, remove the save actions from the MetaData
+        if(newActions.isEmpty()){
+            metaData.remove(SaveActions.META_KEY);
+            return;
+        }
+
         String formatterString = SaveActions.getMetaDataString(newActions);
         actions.add(formatterString);
 
         metaData.putData(SaveActions.META_KEY, actions);
+    }
 
+    public boolean hasChanged() {
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        String formatterString = SaveActions.getMetaDataString(newActions);
         boolean hasChanged = !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
 
         return hasChanged;

@@ -317,7 +317,10 @@ public class DatabasePropertiesDialog extends JDialog {
             saveOrderConfigChanged = !oldSaveOrderConfig.getVector().equals(newSaveOrderConfig.getVector());
         }
 
-        boolean saveActionsChanged = saveActionsPanel.storeSettings(metaData);
+        boolean saveActionsChanged = saveActionsPanel.hasChanged();
+        if(saveActionsChanged) {
+            saveActionsPanel.storeSettings(metaData);
+        }
 
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
