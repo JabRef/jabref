@@ -235,6 +235,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 session = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
 
             }
+            panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") +

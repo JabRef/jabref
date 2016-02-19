@@ -17,6 +17,7 @@ package net.sf.jabref.exporter;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -26,21 +27,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Class used to handle safe storage to disk.
- *
+ * <p>
  * Usage: create a SaveSession giving the file to save to, the encoding, and whether to make a backup. The SaveSession
  * will provide a Writer to store to, which actually goes to a temporary file. The Writer keeps track of whether all
  * characters could be saved, and if not, which characters were not encodable.
- *
+ * <p>
  * After saving is finished, the client should close the Writer. If the save should be put into effect, call commit(),
  * otherwise call cancel(). When cancelling, the temporary file is simply deleted and the target file remains unchanged.
  * When committing, the temporary file is copied to the target file after making a backup if requested and if the target
  * file already existed, and finally the temporary file is deleted.
- *
+ * <p>
  * If committing fails, the temporary file will not be deleted.
  */
 public class SaveSession {
@@ -60,13 +64,15 @@ public class SaveSession {
 
     private final VerifyingWriter writer;
 
+    private final List<FieldChange> undoableFieldChanges = new ArrayList<>();
+
 
     public SaveSession(Charset encoding, boolean backup) throws IOException {
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
-	/* Using
+    /* Using
 	   try (FileOutputStream fos = new FileOutputStream(tmp)) {
 	       writer = new VerifyingWriter(fos, encoding);
 	   }
@@ -182,5 +188,13 @@ public class SaveSession {
 
     public File getTemporaryFile() {
         return tmp;
+    }
+
+    public List<FieldChange> getUndoableFieldChanges() {
+        return undoableFieldChanges;
+    }
+
+    public void addUndoableFieldChanges(List<FieldChange> undoableFieldChanges) {
+        this.undoableFieldChanges.addAll(undoableFieldChanges);
     }
 }

@@ -1,6 +1,7 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.CaseChangers;
@@ -120,16 +121,22 @@ public class SaveActions {
         availableFormatters.addAll(CaseChangers.ALL);
     }
 
-    public void applySaveActions(BibEntry entry) {
+    public List<FieldChange> applySaveActions(BibEntry entry) {
         if (enabled) {
-            applyAllActions(entry);
+            return applyAllActions(entry);
+        } else {
+            return new ArrayList<>();
         }
     }
 
-    private void applyAllActions(BibEntry entry) {
+    private List<FieldChange> applyAllActions(BibEntry entry) {
+        List<FieldChange> result = new ArrayList<>();
+
         for (FieldFormatterCleanup action : actions) {
-            action.cleanup(entry);
+            result.addAll(action.cleanup(entry));
         }
+
+        return result;
     }
 
     private Formatter getFormatterFromString(String formatterName) {
