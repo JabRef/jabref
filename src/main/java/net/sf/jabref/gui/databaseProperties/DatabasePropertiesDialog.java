@@ -60,6 +60,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
     private SaveOrderConfig oldSaveOrderConfig;
+    private SaveOrderConfig defaultSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
@@ -196,6 +197,9 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
+        defaultSaveOrderConfig = new SaveOrderConfig();
+        defaultSaveOrderConfig.setSaveInOriginalOrder();
+
         List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
@@ -267,14 +271,6 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void storeSettings() {
-        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
-        if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig.setSaveInOriginalOrder();
-        } else {
-            newSaveOrderConfig.setSaveInSpecifiedOrder();
-        }
-        Vector<String> serialized = newSaveOrderConfig.getVector();
-        metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
 
         Charset oldEncoding = panel.getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();
@@ -306,15 +302,28 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.PROTECTED_FLAG_META);
         }
 
+        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+        if (saveInOriginalOrder.isSelected()) {
+            newSaveOrderConfig.setSaveInOriginalOrder();
+        } else {
+            newSaveOrderConfig.setSaveInSpecifiedOrder();
+        }
+
         // See if any of the values have been modified:
         boolean saveOrderConfigChanged;
-        if (oldSaveOrderConfig == newSaveOrderConfig) {
+        if (newSaveOrderConfig.equals(oldSaveOrderConfig)) {
             saveOrderConfigChanged = false;
-        } else if ((oldSaveOrderConfig == null) || (newSaveOrderConfig == null)) {
-            saveOrderConfigChanged = true;
         } else {
-            // check on vector basis. This is slower than directly implementing equals, but faster to implement
-            saveOrderConfigChanged = !oldSaveOrderConfig.getVector().equals(newSaveOrderConfig.getVector());
+            saveOrderConfigChanged = true;
+        }
+
+        if(saveOrderConfigChanged) {
+            Vector<String> serialized = newSaveOrderConfig.getVector();
+            if(newSaveOrderConfig.equals(defaultSaveOrderConfig)){
+                metaData.remove(MetaData.SAVE_ORDER_CONFIG);
+            }  else {
+                metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+            }
         }
 
         boolean saveActionsChanged = saveActionsPanel.hasChanged();

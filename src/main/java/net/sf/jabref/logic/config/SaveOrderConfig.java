@@ -3,11 +3,12 @@ package net.sf.jabref.logic.config;
 import net.sf.jabref.JabRefPreferences;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
  * Stores the save order config from MetaData
- *
+ * <p>
  * Format: <choice>, pair of field + ascending (boolean)
  */
 public class SaveOrderConfig {
@@ -18,7 +19,7 @@ public class SaveOrderConfig {
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
-        public static class SortCriterion {
+    public static class SortCriterion {
 
         public String field;
         public boolean descending;
@@ -32,8 +33,41 @@ public class SaveOrderConfig {
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SortCriterion that = (SortCriterion) o;
+            return Objects.equals(descending, that.descending) &&
+                    Objects.equals(field, that.field);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(field, descending);
+        }
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SaveOrderConfig that = (SaveOrderConfig) o;
+        boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0]) &&
+                sortCriteria[1].equals(that.sortCriteria[1]) &&
+                sortCriteria[2].equals(that.sortCriteria[2]);
+
+        return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
+                Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder) &&
+                sortCriteriaEquals;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(saveInOriginalOrder, saveInSpecifiedOrder, sortCriteria);
+    }
 
     public SaveOrderConfig() {
         // fill default values
@@ -83,6 +117,10 @@ public class SaveOrderConfig {
     public void setSaveInSpecifiedOrder() {
         this.saveInOriginalOrder = false;
         this.saveInSpecifiedOrder = true;
+    }
+
+    public SortCriterion[] getSortCriteria() {
+        return sortCriteria;
     }
 
     public static SaveOrderConfig loadExportSaveOrderFromPreferences(JabRefPreferences preferences) {
