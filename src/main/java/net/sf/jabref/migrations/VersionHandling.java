@@ -216,7 +216,7 @@ public class VersionHandling {
                 } else {
                     // insert at desired location
                     while (level <= cursor.getLevel()) {
-                        cursor = (GroupTreeNode) cursor.getParent();
+                        cursor = cursor.getParent();
                     }
                     cursor.add(newNode);
                     cursor = newNode;

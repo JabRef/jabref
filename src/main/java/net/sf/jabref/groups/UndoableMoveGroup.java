@@ -20,6 +20,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.groups.structure.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,9 +31,9 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
 
     private final GroupSelector groupSelector;
     private final GroupTreeNode root;
-    private final int[] pathToNewParent;
+    private final List<Integer> pathToNewParent;
     private final int newChildIndex;
-    private final int[] pathToOldParent;
+    private final List<Integer> pathToOldParent;
     private final int oldChildIndex;
 
 
@@ -62,7 +63,7 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
         super.undo();
 
         GroupTreeNode newParent = root.getDescendant(pathToNewParent);
-        GroupTreeNode node = (GroupTreeNode) newParent.getChildAt(newChildIndex);
+        GroupTreeNode node = newParent.getChildAt(newChildIndex);
         root.getDescendant(pathToOldParent).insert(node, oldChildIndex);
         groupSelector.revalidateGroups();
     }
@@ -72,7 +73,7 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
         super.redo();
 
         GroupTreeNode oldParent = root.getDescendant(pathToOldParent);
-        GroupTreeNode node = (GroupTreeNode) oldParent.getChildAt(oldChildIndex);
+        GroupTreeNode node = oldParent.getChildAt(oldChildIndex);
         root.getDescendant(pathToNewParent).insert(node, newChildIndex);
         groupSelector.revalidateGroups();
     }

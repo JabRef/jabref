@@ -73,7 +73,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     private final GroupSelector groupSelector;
 
-    private GroupTreeNode dragNode;
+    private GroupTreeNodeViewModel dragNode;
 
     private final GroupTreeCellRenderer localCellRenderer = new GroupTreeCellRenderer();
 
@@ -122,7 +122,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 return;
             }
             final GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
-            if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
+            if ((target == null) || dragNode.getNode().isNodeDescendant(target) || (dragNode.equals(target))) {
                 dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
                 return;
             }
@@ -166,7 +166,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setHighlight1Cell(target);
 
         // accept or reject
-        if (dtde.isDataFlavorSupported(GroupTreeNode.FLAVOR)) {
+        if (dtde.isDataFlavorSupported(GroupTreeNodeViewModel.FLAVOR)) {
             // accept: move nodes within tree
             dtde.acceptDrag(DnDConstants.ACTION_MOVE);
         } else if (dtde
@@ -245,9 +245,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     .getLastPathComponent();
             // check supported flavors
             final Transferable transferable = dtde.getTransferable();
-            if (transferable.isDataFlavorSupported(GroupTreeNode.FLAVOR)) {
-                GroupTreeNode source = (GroupTreeNode) transferable
-                        .getTransferData(GroupTreeNode.FLAVOR);
+            if (transferable.isDataFlavorSupported(GroupTreeNodeViewModel.FLAVOR)) {
+                GroupTreeNode source = ((GroupTreeNodeViewModel) transferable
+                        .getTransferData(GroupTreeNodeViewModel.FLAVOR)).getNode();
                 if (source == target) {
                     dtde.rejectDrop(); // ignore this
                     return;
@@ -257,7 +257,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                     return;
                 }
                 Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
-                MoveGroupChange undo = new MoveGroupChange((GroupTreeNode) source.getParent(),
+                MoveGroupChange undo = new MoveGroupChange(source.getParent(),
                         source.getPositionInParent(), target, target.getChildCount());
                 target.add(source);
                 dtde.getDropTargetContext().dropComplete(true);
@@ -320,7 +320,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     @Override
     public void dragGestureRecognized(DragGestureEvent dge) {
-        GroupTreeNode selectedNode = getSelectedNode();
+        GroupTreeNodeViewModel selectedNode = getSelectedNode();
         if (selectedNode == null)
          {
             return; // nothing to transfer (select manually?)
@@ -331,9 +331,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
     }
 
     /** Returns the first selected node, or null if nothing is selected. */
-    private GroupTreeNode getSelectedNode() {
+    private GroupTreeNodeViewModel getSelectedNode() {
         TreePath selectionPath = getSelectionPath();
-        return selectionPath == null ? null : (GroupTreeNode) selectionPath.getLastPathComponent();
+        return selectionPath == null ? null : (GroupTreeNodeViewModel) selectionPath.getLastPathComponent();
     }
 
     /**
@@ -417,8 +417,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
             lastModified = j + 1;
             j = -1;
             for (int i = 1; i < lastModified; ++i) {
-                child1 = (GroupTreeNode) node.getChildAt(i - 1);
-                child2 = (GroupTreeNode) node.getChildAt(i);
+                child1 = node.getChildAt(i - 1);
+                child2 = node.getChildAt(i);
                 if (child2.getGroup().getName().compareToIgnoreCase(
                         child1.getGroup().getName()) < 0) {
                     node.remove(child1);
@@ -429,23 +429,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
         }
         if (recursive) {
             for (int i = 0; i < node.getChildCount(); ++i) {
-                sortWithoutRevalidate((GroupTreeNode) node.getChildAt(i), true);
+                sortWithoutRevalidate(node.getChildAt(i), true);
             }
-        }
-    }
-
-    /** Expand this node and all its children. */
-    public void expandSubtree(GroupTreeNode node) {
-        for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();) {
-            expandPath(new TreePath(e.nextElement().getPath()));
-        }
-    }
-
-    /** Collapse this node and all its children. */
-    public void collapseSubtree(GroupTreeNode node) {
-        for (Enumeration<GroupTreeNode> e = node.depthFirstEnumeration(); e.hasMoreElements();) {
-            collapsePath(new TreePath(e.nextElement()
-                    .getPath()));
         }
     }
 
@@ -455,8 +440,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      */
     public boolean hasExpandedDescendant(TreePath path) {
         GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-        for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
-            GroupTreeNode child = e.nextElement();
+        for (GroupTreeNode child : node.children()) {
             if (child.isLeaf())
              {
                 continue; // don't care about this case
@@ -475,8 +459,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      */
     public boolean hasCollapsedDescendant(TreePath path) {
         GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-        for (Enumeration<GroupTreeNode> e = node.children(); e.hasMoreElements();) {
-            GroupTreeNode child = e.nextElement();
+        for (GroupTreeNode child : node.children()) {
             if (child.isLeaf())
              {
                 continue; // don't care about this case

@@ -19,6 +19,8 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
 
+import java.util.List;
+
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 
     /** The root of the global groups tree */
@@ -31,7 +33,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      */
     private final int m_subtreeRootChildCount;
     /** The path to the edited subtree's root node */
-    private final int[] m_pathToNode;
+    private final List<Integer> m_pathToNode;
     /**
      * The type of the editing (ADD_NODE, REMOVE_NODE_KEEP_CHILDREN,
      * REMOVE_NODE_AND_CHILDREN)
@@ -116,10 +118,10 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 
     private void doOperation(boolean undo) {
         GroupTreeNode cursor = m_groupsRootHandle;
-        final int childIndex = m_pathToNode[m_pathToNode.length - 1];
+        final int childIndex = m_pathToNode.get(m_pathToNode.size() - 1);
         // traverse path up to but last element
-        for (int i = 0; i < (m_pathToNode.length - 1); ++i) {
-            cursor = (GroupTreeNode) cursor.getChildAt(m_pathToNode[i]);
+        for (int i = 0; i < (m_pathToNode.size() - 1); ++i) {
+            cursor = cursor.getChildAt(m_pathToNode.get(i));
         }
         if (undo) {
             switch (m_editType) {
@@ -131,7 +133,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 GroupTreeNode newNode = m_subtreeBackup.deepCopy();
                 for (int i = childIndex; i < (childIndex
                         + m_subtreeRootChildCount); ++i) {
-                    newNode.add((GroupTreeNode) cursor.getChildAt(childIndex));
+                    newNode.add(cursor.getChildAt(childIndex));
                 }
                 cursor.insert(newNode, childIndex);
                 break;
@@ -148,11 +150,11 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 break;
             case REMOVE_NODE_KEEP_CHILDREN:
                 // remove node, then insert all children
-                GroupTreeNode removedNode = (GroupTreeNode) cursor
+                GroupTreeNode removedNode = cursor
                         .getChildAt(childIndex);
                 cursor.remove(childIndex);
                 while (removedNode.getChildCount() > 0) {
-                    cursor.insert((GroupTreeNode) removedNode.getFirstChild(),
+                    cursor.insert(removedNode.getFirstChild(),
                             childIndex);
                 }
                 break;

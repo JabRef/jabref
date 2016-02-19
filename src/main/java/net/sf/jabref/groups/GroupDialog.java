@@ -492,7 +492,7 @@ class GroupDialog extends JDialog {
             }
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
-            if (!(mResultingGroup instanceof ExplicitGroup)) {
+            if (!(mResultingGroup instanceof ExplicitGroup) && mResultingGroup.supportsAdd()) {
                 Optional<EntriesGroupChange> addChange = mResultingGroup.add(list);
                 if(addChange.isPresent()) {
                     mUndoAddPreviousEntires = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());

@@ -15,14 +15,7 @@
 */
 package net.sf.jabref.groups;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.*;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
@@ -36,28 +29,15 @@ import net.sf.jabref.logic.search.matchers.MatcherSets;
  *
  * @author jzieren
  */
-public class GroupTreeNode extends DefaultMutableTreeNode implements Transferable {
+public class GroupTreeNode extends TreeNode {
 
-    public static final DataFlavor FLAVOR;
-    private static final DataFlavor[] FLAVORS;
-
-    static {
-        DataFlavor df = null;
-        try {
-            df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=net.sf.jabref.groups.GroupTreeNode");
-        } catch (ClassNotFoundException e) {
-            // never happens
-        }
-        FLAVOR = df;
-        FLAVORS = new DataFlavor[] {GroupTreeNode.FLAVOR};
-    }
-
+    private AbstractGroup group;
 
     /**
      * Creates this node and associates the specified group with it.
      */
     public GroupTreeNode(AbstractGroup group) {
+        super();
         setGroup(group);
     }
 
@@ -65,14 +45,14 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * @return The group associated with this node.
      */
     public AbstractGroup getGroup() {
-        return (AbstractGroup) getUserObject();
+        return group;
     }
 
     /**
      * Associates the specified group with this node.
      */
     public void setGroup(AbstractGroup group) {
-        setUserObject(group);
+        this.group = Objects.requireNonNull(group);
     }
 
     /**
@@ -83,12 +63,15 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      */
     public String getTreeAsString() {
         StringBuilder sb = new StringBuilder();
-        Enumeration<GroupTreeNode> e = preorderEnumeration();
-        GroupTreeNode cursor;
-        while (e.hasMoreElements()) {
-            cursor = e.nextElement();
-            sb.append(cursor.getLevel()).append(' ').append(cursor.getGroup()).append('\n');
+
+        // Append myself
+        sb.append(this.getLevel()).append(' ').append(this.getGroup().toString()).append('\n');
+
+        // Append children
+        for(GroupTreeNode child : children()) {
+            sb.append(child.getTreeAsString());
         }
+
         return sb.toString();
     }
 
@@ -99,9 +82,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * @return This object's deep copy.
      */
     public GroupTreeNode deepCopy() {
-        GroupTreeNode copy = new GroupTreeNode(getGroup());
+        GroupTreeNode copy = new GroupTreeNode(group);
         for (int i = 0; i < getChildCount(); ++i) {
-            copy.add(((GroupTreeNode) getChildAt(i)).deepCopy());
+            copy.add(getChildAt(i).deepCopy());
         }
         return copy;
     }
@@ -115,54 +98,10 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      */
     public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (int i = 0; i < getChildCount(); ++i) {
-            GroupTreeNode node = (GroupTreeNode) getChildAt(i);
+            GroupTreeNode node = getChildAt(i);
             node.getGroup().refreshForNewDatabase(db);
             node.refreshGroupsForNewDatabase(db);
         }
-    }
-
-    /**
-     * @return An indexed path from the root node to this node. The elements in
-     * the returned array represent the child index of each node in the
-     * path. If this node is the root node, the returned array has zero
-     * elements.
-     */
-    public int[] getIndexedPath() {
-        TreeNode[] path = getPath();
-        int[] indexedPath = new int[path.length - 1];
-        for (int i = 1; i < path.length; ++i) {
-            indexedPath[i - 1] = path[i - 1].getIndex(path[i]);
-        }
-        return indexedPath;
-    }
-
-    /**
-     * Returns the node indicated by the specified indexedPath, which contains
-     * child indices obtained e.g. by getIndexedPath().
-     */
-    public GroupTreeNode getNode(int[] indexedPath) {
-        GroupTreeNode cursor = this;
-        for (int anIndexedPath : indexedPath) {
-            cursor = (GroupTreeNode) cursor.getChildAt(anIndexedPath);
-        }
-        return cursor;
-    }
-
-    /**
-     * @param indexedPath A sequence of child indices that describe a path from this
-     *                    node to one of its desendants. Be aware that if <b>indexedPath
-     *                    </b> was obtained by getIndexedPath(), this node should
-     *                    usually be the root node.
-     * @return The descendant found by evaluating <b>indexedPath </b>. If the
-     * path could not be traversed completely (i.e. one of the child
-     * indices did not exist), null will be returned.
-     */
-    public GroupTreeNode getDescendant(int[] indexedPath) {
-        GroupTreeNode cursor = this;
-        for (int i = 0; (i < indexedPath.length) && (cursor != null); ++i) {
-            cursor = (GroupTreeNode) cursor.getChildAt(indexedPath[i]);
-        }
-        return cursor;
     }
 
     /**
@@ -175,25 +114,25 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      * @return A SearchRule that finds the desired elements.
      */
     public SearchMatcher getSearchRule() {
-        return getSearchRule(getGroup().getHierarchicalContext());
+        return getSearchRule(group.getHierarchicalContext());
     }
 
     private SearchMatcher getSearchRule(GroupHierarchyType originalContext) {
-        final GroupHierarchyType context = getGroup().getHierarchicalContext();
+        final GroupHierarchyType context = group.getHierarchicalContext();
         if (context == GroupHierarchyType.INDEPENDENT) {
-            return getGroup();
+            return group;
         }
         MatcherSet searchRule = MatcherSets.build(context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
-        searchRule.addRule(getGroup());
+        searchRule.addRule(group);
         if ((context == GroupHierarchyType.INCLUDING)
                 && (originalContext != GroupHierarchyType.REFINING)) {
             for (int i = 0; i < getChildCount(); ++i) {
-                searchRule.addRule(((GroupTreeNode) getChildAt(i))
+                searchRule.addRule(getChildAt(i)
                         .getSearchRule(originalContext));
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot()
                 && (originalContext != GroupHierarchyType.INCLUDING)) {
-            searchRule.addRule(((GroupTreeNode) getParent())
+            searchRule.addRule(getParent()
                     .getSearchRule(originalContext));
         }
         return searchRule;
@@ -201,26 +140,26 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     public boolean canMoveUp() {
         return (getPreviousSibling() != null)
-                && !(getGroup() instanceof AllEntriesGroup);
+                && !(group instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
         return (getNextSibling() != null)
-                && !(getGroup() instanceof AllEntriesGroup);
+                && !(group instanceof AllEntriesGroup);
     }
 
     public boolean canMoveLeft() {
         return !(getGroup() instanceof AllEntriesGroup)
-                && !(((GroupTreeNode) getParent()).getGroup() instanceof AllEntriesGroup);
+                && !(getParent().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveRight() {
         return (getPreviousSibling() != null)
-                && !(getGroup() instanceof AllEntriesGroup);
+                && !(group instanceof AllEntriesGroup);
     }
 
     public Optional<MoveGroupChange> moveUp() {
-        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final GroupTreeNode parent = getParent();
         final int index = parent.getIndex(this);
         if (index > 0) {
             parent.insert(this, index - 1);
@@ -230,9 +169,9 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     public Optional<MoveGroupChange> moveDown() {
-        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final GroupTreeNode parent = getParent();
         final int index = parent.getIndex(this);
-        if (index < (this.parent.getChildCount() - 1)) {
+        if (index < (parent.getChildCount() - 1)) {
             parent.insert(this, index + 1);
             return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
         }
@@ -240,8 +179,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     public Optional<MoveGroupChange> moveLeft() {
-        final GroupTreeNode parent = (GroupTreeNode) getParent();
-        final GroupTreeNode grandParent = (GroupTreeNode) parent.getParent();
+        final GroupTreeNode parent = getParent();
+        final GroupTreeNode grandParent = parent.getParent();
         final int index = this.getPositionInParent();
 
         if (grandParent == null) {
@@ -253,8 +192,8 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     public Optional<MoveGroupChange> moveRight() {
-        final GroupTreeNode previousSibling = (GroupTreeNode) getPreviousSibling();
-        final GroupTreeNode parent = (GroupTreeNode) getParent();
+        final GroupTreeNode previousSibling = getPreviousSibling();
+        final GroupTreeNode parent = getParent();
         final int index = this.getPositionInParent();
 
         if (previousSibling == null) {
@@ -266,56 +205,27 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     }
 
     /**
-     * @param path A sequence of child indices that designate a node relative to
-     *             this node.
-     * @return The node designated by the specified path, or null if one or more
-     * indices in the path could not be resolved.
-     */
-    public GroupTreeNode getChildAt(int[] path) {
-        GroupTreeNode cursor = this;
-        for (int i = 0; (i < path.length) && (cursor != null); ++i) {
-            cursor = (GroupTreeNode) cursor.getChildAt(path[i]);
-        }
-        return cursor;
-    }
-
-    /**
      * Adds the selected entries to this node's group.
      */
     public Optional<EntriesGroupChange> addToGroup(List<BibEntry> entries) {
-        if (getGroup() == null) {
-            return Optional.empty(); // paranoia
+        if(group.supportsAdd()) {
+            return group.add(entries);
         }
-        return getGroup().add(entries);
+        else {
+            return Optional.empty();
+        }
     }
 
     /**
      * Removes the selected entries from this node's group.
      */
     public Optional<EntriesGroupChange> removeFromGroup(List<BibEntry> entries) {
-        if (getGroup() == null) {
-            return Optional.empty(); // paranoia
+        if(group.supportsRemove()) {
+            return group.remove(entries);
         }
-        return getGroup().remove(entries);
-    }
-
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        return GroupTreeNode.FLAVORS;
-    }
-
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(GroupTreeNode.FLAVOR);
-    }
-
-    @Override
-    public Object getTransferData(DataFlavor someFlavor)
-            throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor)) {
-            throw new UnsupportedFlavorException(someFlavor);
+        else {
+            return Optional.empty();
         }
-        return this;
     }
 
     /**
@@ -330,7 +240,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
         if (getChildCount() != otherNode.getChildCount()) {
             return false;
         }
-        AbstractGroup g1 = getGroup();
+        AbstractGroup g1 = group;
         AbstractGroup g2 = otherNode.getGroup();
         if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
             return false;
@@ -348,30 +258,90 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
 
     @Override
     public int hashCode() {
-        return getGroup().getName().hashCode();
+        return group.getName().hashCode();
     }
 
     /**
      * Get all groups which contain any of the entries and which support removal of entries.
      */
-    public List<GroupTreeNode> getParentGroupsSupportingRemoval(List<BibEntry> entries) {
+    public List<GroupTreeNode> getContainingGroupsSupportingRemoval(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
-        Enumeration<GroupTreeNode> e = preorderEnumeration();
-        for (GroupTreeNode node : Collections.list(e)) {
-            AbstractGroup group = node.getGroup();
-            if (!group.supportsRemove()) {
-                continue;
-            }
-            if (group.containsAny(entries)) {
-                groups.add(node);
-            }
+        // Add myself if I contain the entries
+        if(this.group.supportsRemove() && this.group.containsAny(entries)) {
+            groups.add(this);
+        }
+
+        // Traverse children
+        for(GroupTreeNode child : children()) {
+            groups.addAll(child.getContainingGroupsSupportingRemoval(entries));
         }
 
         return groups;
     }
 
-    public int getPositionInParent() {
-        return this.getParent().getIndex(this);
+    public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
+        List<GroupTreeNode> groups = new ArrayList<>();
+
+        // Add myself if I contain the entries
+        if(requireAll) {
+            if(this.group.containsAll(entries)) {
+                groups.add(this);
+            }
+        } else {
+            if(this.group.containsAny(entries)) {
+                groups.add(this);
+            }
+        }
+
+        // Traverse children
+        for(GroupTreeNode child : children()) {
+            groups.addAll(child.getContainingGroups(entries, requireAll));
+        }
+
+        return groups;
     }
+
+    public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
+        List<GroupTreeNode> groups = new ArrayList<>();
+
+        // Add myself if I contain the entries
+        SearchMatcher matcher = getSearchRule();
+        for (BibEntry entry : entries) {
+            if (matcher.isMatch(entry)) {
+                groups.add(this);
+                break;
+            }
+        }
+
+        // Traverse children
+        for(GroupTreeNode child : children()) {
+            groups.addAll(child.getMatchingGroups(entries));
+        }
+
+        return groups;
+    }
+
+    /**
+     * For all explicit subgroups, replace the i'th entry of originalEntries with the i'th entry of newEntries.
+     */
+    public void replaceEntriesInExplicitGroup(List<BibEntry> originalEntries, List<BibEntry> newEntries) {
+
+        if(this.group instanceof ExplicitGroup) {
+            ExplicitGroup group = (ExplicitGroup)this.group;
+            for (int i = 0; i < originalEntries.size(); ++i) {
+                BibEntry entry = originalEntries.get(i);
+                if (group.contains(entry)) {
+                    group.removeEntry(entry);
+                    group.addEntry(newEntries.get(i));
+                }
+            }
+        }
+
+        // Traverse children
+        for(GroupTreeNode child : children()) {
+            child.replaceEntriesInExplicitGroup(originalEntries, newEntries);
+        }
+    }
+
 }

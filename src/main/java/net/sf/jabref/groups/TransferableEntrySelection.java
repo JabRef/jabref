@@ -54,7 +54,7 @@ class TransferableEntrySelection implements Transferable {
     public TransferableEntrySelection(List<BibEntry> list) {
         this.selectedEntries = list;
         selectedEntriesCiteKeys = String.join(",",
-                this.selectedEntries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                this.selectedEntries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
     }
 
     @Override

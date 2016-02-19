@@ -411,7 +411,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new GroupsTree(this);
         groupsTree.addTreeSelectionListener(this);
-        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
+        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(new GroupTreeNodeViewModel(groupsRoot)));
         JScrollPane sp = new JScrollPane(groupsTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         revalidateGroups();
@@ -666,8 +666,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private void updateGroupContent(GroupTreeNode node) {
         List<BibEntry> entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
-        Optional<EntriesGroupChange> changesRemove = null;
-        Optional<EntriesGroupChange> changesAdd = null;
+        Optional<EntriesGroupChange> changesRemove = Optional.empty();
+        Optional<EntriesGroupChange> changesAdd = Optional.empty();
 
         // Sort entries into current members and non-members of the group
         // Current members will be removed
@@ -698,7 +698,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // Remember undo information
         if (changesRemove.isPresent()) {
             AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(node, changesRemove.get());
-            if (changesAdd.isPresent()) {
+            if (changesAdd.isPresent() && undoRemove != null) {
                 // we removed and added entries
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, changesAdd.get()));
             }
@@ -902,10 +902,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     private void setGroups(GroupTreeNode groupsRoot) {
-        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
+        GroupTreeNodeViewModel root = new GroupTreeNodeViewModel(groupsRoot);
+        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(root));
         this.groupsRoot = groupsRoot;
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
-            groupsTree.expandSubtree(groupsRoot);
+            root.expandSubtree(groupsTree);
         }
     }
 
@@ -1010,7 +1011,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (node == null) {
                 groupsRoot.add(newNode);
             } else {
-                ((GroupTreeNode) node.getParent()).insert(newNode, node.getParent().getIndex(node) + 1);
+                node.getParent().insert(newNode, node.getParent().getIndex(node) + 1);
             }
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, newNode,
                     UndoableAddOrRemoveGroup.ADD_NODE);
@@ -1118,11 +1119,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-                final GroupTreeNode parent = (GroupTreeNode) node.getParent();
+                final GroupTreeNode parent = node.getParent();
                 final int childIndex = parent.getIndex(node);
                 node.removeFromParent();
                 while (node.getChildCount() > 0) {
-                    parent.insert((GroupTreeNode) node.getFirstChild(), childIndex);
+                    parent.insert(node.getFirstChild(), childIndex);
                 }
                 revalidateGroups();
                 // Store undo information.
@@ -1195,7 +1196,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
             TreePath path = new TreePath(node.getPath());
-            groupsTree.expandSubtree((GroupTreeNode) path.getLastPathComponent());
+            ((GroupTreeNodeViewModel) path.getLastPathComponent()).expandSubtree(groupsTree);
             revalidateGroups();
         }
     }
@@ -1210,7 +1211,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNode node = getNodeToUse();
             TreePath path = new TreePath(node.getPath());
-            groupsTree.collapseSubtree((GroupTreeNode) path.getLastPathComponent());
+            ((GroupTreeNodeViewModel) path.getLastPathComponent()).collapseSubtree(groupsTree);
             revalidateGroups();
         }
     }
@@ -1439,32 +1440,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             groupsTree.revalidate();
             return;
         }
-        List<GroupTreeNode> nodeList = new ArrayList<>();
-        for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements();) {
-            GroupTreeNode node = e.nextElement();
-            AbstractGroup group = node.getGroup();
-            boolean breakFromLoop = false;
-            for (BibEntry entry : list) {
-                if (requireAll) {
-                    if (!group.contains(entry)) {
-                        breakFromLoop = true;
-                        break;
-                    }
-                } else {
-                    if (group.contains(entry)) {
-                        nodeList.add(node);
-                    }
-                }
-            }
-            if (requireAll && (!breakFromLoop)) // did not break from loop
-            {
-                nodeList.add(node);
-            }
-        }
+        List<GroupTreeNode> nodeList = groupsRoot.getContainingGroups(list, requireAll);
         groupsTree.setHighlight3Cells(nodeList.toArray());
         // ensure that all highlighted nodes are visible
         for (GroupTreeNode node : nodeList) {
-            GroupTreeNode parentNode = (GroupTreeNode) node.getParent();
+            GroupTreeNode parentNode = node.getParent();
             if (parentNode != null) {
                 groupsTree.expandPath(new TreePath(parentNode.getPath()));
             }
@@ -1476,17 +1456,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * Show groups that, if selected, would show at least one of the entries found in the specified search.
      */
     private void showOverlappingGroups(List<BibEntry> matches) { //DatabaseSearch search) {
-        List<GroupTreeNode> nodes = new ArrayList<>();
-        for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
-            GroupTreeNode node = e.nextElement();
-            SearchMatcher matcher = node.getSearchRule();
-            for (BibEntry match : matches) {
-                if (matcher.isMatch(match)) {
-                    nodes.add(node);
-                    break;
-                }
-            }
-        }
+        List<GroupTreeNode> nodes = groupsRoot.getMatchingGroups(matches);
         groupsTree.setHighlight2Cells(nodes.toArray());
     }
 

@@ -179,8 +179,8 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
 
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
-                currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+            for (GroupTreeNode child : cursor.children()) {
+                currentID = populateEntryGroupsTable(child, myID, currentID, out, database_id);
             }
             //Unfortunatley, AutoCloseable throws only Exception
         } catch (Exception e) {
@@ -300,9 +300,9 @@ public abstract class DBExporter extends DBImporterExporter {
                     ((Statement) response).close();
                 }
             }
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+            for (GroupTreeNode child : cursor.children()) {
                 ++currentID;
-                currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+                currentID = populateGroupsTable(child, myID, currentID, out, database_id);
             }
             //Unfortunatley, AutoCloseable throws only Exception
         } catch (Exception e) {

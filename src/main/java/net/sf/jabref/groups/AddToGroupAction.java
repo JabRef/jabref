@@ -86,9 +86,9 @@ public class AddToGroupAction extends AbstractAction {
 
     public void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
         List<GroupTreeNode> groupsContainingEntries =
-                ((GroupTreeNode) node.getRoot()).getParentGroupsSupportingRemoval(entries);
+                node.getRoot().getContainingGroupsSupportingRemoval(entries);
 
-        List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(node -> node.getGroup()).collect(
+        List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
                 Collectors.toList());
         affectedGroups.add(node.getGroup());
         if (!Util.warnAssignmentSideEffects(affectedGroups, panel.frame())) {

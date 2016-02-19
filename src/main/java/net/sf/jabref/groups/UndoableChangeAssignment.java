@@ -16,6 +16,7 @@
 package net.sf.jabref.groups;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -34,7 +35,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     /**
      * The path to the edited node
      */
-    private int[] pathToNode;
+    private List<Integer> pathToNode;
     /**
      * The root of the global groups tree
      */
@@ -47,7 +48,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
             Set<BibEntry> newAssignments) {
         this.previousAssignments = new HashSet<>(previousAssignments);
         this.newAssignments = new HashSet<>(newAssignments);
-        this.root = (GroupTreeNode) node.getRoot();
+        this.root = node.getRoot();
         this.pathToNode = node.getIndexedPath();
     }
 

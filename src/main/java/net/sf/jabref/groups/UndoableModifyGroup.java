@@ -20,13 +20,15 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
 
+import java.util.List;
+
 class UndoableModifyGroup extends AbstractUndoableEdit {
 
     private final GroupSelector groupSelector;
     private final AbstractGroup m_oldGroupBackup;
     private final AbstractGroup m_newGroupBackup;
     private final GroupTreeNode m_groupsRootHandle;
-    private final int[] m_pathToNode;
+    private final List<Integer> m_pathToNode;
 
 
     /**
