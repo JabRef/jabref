@@ -21,9 +21,11 @@ class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldForm
     }
 
     public void addSaveAction(FieldFormatterCleanup action) {
-        saveActions.add(action);
-        for (ListDataListener listener : listeners) {
-            listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_ADDED, saveActions.size(), saveActions.size()));
+        if (!saveActions.contains(action)) {
+            saveActions.add(action);
+            for (ListDataListener listener : listeners) {
+                listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_ADDED, saveActions.size(), saveActions.size()));
+            }
         }
     }
 
