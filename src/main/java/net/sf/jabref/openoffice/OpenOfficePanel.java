@@ -46,6 +46,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -277,9 +278,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
                     ooBase.updateSortedReferenceMarks();
 
-                    java.util.List<BibDatabase> databases = getBaseList();
-                    java.util.List<String> unresolvedKeys = ooBase.refreshCiteMarkers
-                            (databases, style);
+                    List<BibDatabase> databases = getBaseList();
+                    List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
                     ooBase.rebuildBibTextSection(databases, style);
                     //ooBase.sync(frame.getCurrentBasePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
@@ -384,8 +384,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
     }
 
-    private java.util.List<BibDatabase> getBaseList() {
-        java.util.List<BibDatabase> databases = new ArrayList<>();
+    private List<BibDatabase> getBaseList() {
+        List<BibDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.database());
@@ -417,8 +417,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
             ooBaseDirectory = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
             sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
-        }
-        else { // Manual connect
+        } else { // Manual connect
 
             showConnectDialog();
             if (!dialogOkPressed) {
@@ -432,12 +431,10 @@ public class OpenOfficePanel extends AbstractWorker {
             if (OS.WINDOWS) {
                 ooBaseDirectory = ooPath + "\\program\\classes";
                 sOffice = ooPath + "\\program\\soffice.exe";
-            }
-            else if (OS.OS_X) {
+            } else if (OS.OS_X) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
                 ooBaseDirectory = ooPath + "/Contents/Resources/java";
-            }
-            else {
+            } else {
                 // Linux:
                 ooBaseDirectory = ooJars + "/program/classes";
             }
@@ -518,15 +515,13 @@ public class OpenOfficePanel extends AbstractWorker {
     private void readStyleFile() throws IOException {
         if (useDefaultAuthoryearStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_AUTHORYEAR_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
             style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
-        }
-        else if (useDefaultNumericalStyle) {
+        } else if (useDefaultNumericalStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_NUMERICAL_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
             style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
-        }
-        else {
+        } else {
             style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository());
         }
     }
@@ -580,8 +575,7 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.append(ooPath);
             builder.append(browseOOPath);
             builder.nextLine();
-        }
-        else {
+        } else {
             builder.append(Localization.lang("Path to OpenOffice executable"));
             builder.append(ooExec);
             builder.append(browseOOExec);

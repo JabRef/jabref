@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -80,7 +80,7 @@ public class LayoutHelper {
         LayoutHelper.currentGroup = newGroup;
     }
 
-    private String getBracketedField(final int field) throws IOException {
+    private void getBracketedField(final int field) throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -95,7 +95,7 @@ public class LayoutHelper {
                     parsedEntries.add(new StringInt(buffer.toString(), field));
                 }
 
-                return null;
+                return;
             }
 
             if ((c == '{') || (c == '}')) {
@@ -103,7 +103,7 @@ public class LayoutHelper {
                     if (buffer != null) {
                         parsedEntries.add(new StringInt(buffer.toString(), field));
 
-                        return null;
+                        return;
                     }
                 } else {
                     start = true;
@@ -119,13 +119,13 @@ public class LayoutHelper {
             }
         }
 
-        return null;
+        return;
     }
 
     /**
      *
      */
-    private String getBracketedOptionField() throws IOException {
+    private void getBracketedOptionField() throws IOException {
         StringBuffer buffer = null;
         int c;
         boolean start = false;
@@ -154,7 +154,7 @@ public class LayoutHelper {
                     //System.out.println("\nbracketedOptionEOF: " + buffer.toString());
                 }
 
-                return null;
+                return;
             }
             if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))) {
                 if ((c == ']') || (doneWithOptions && (c == '}'))) {
@@ -180,7 +180,7 @@ public class LayoutHelper {
 
                         parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
-                        return null;
+                        return;
                     }
                     // changed section end - arudert
                     // changed section start - arudert
@@ -215,10 +215,10 @@ public class LayoutHelper {
             }
         }
 
-        return null;
+        return;
     }
 
-    private Object parse() throws IOException, StringIndexOutOfBoundsException {
+    private void parse() throws IOException, StringIndexOutOfBoundsException {
         skipWhitespace();
 
         int c;
@@ -240,7 +240,7 @@ public class LayoutHelper {
                     parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
                 }
 
-                return null;
+                return;
             }
 
             if ((c == '\\') && (peek() != '\\') && !escaped) {
@@ -269,7 +269,7 @@ public class LayoutHelper {
             }
         }
 
-        return null;
+        return;
     }
 
     private void parseField() throws IOException, StringIndexOutOfBoundsException {

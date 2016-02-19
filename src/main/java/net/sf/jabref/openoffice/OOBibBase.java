@@ -302,7 +302,12 @@ class OOBibBase {
                 }
             }
             xViewCursor.goLeft((short) 1, false);
-            String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, database, inParenthesis,
+            Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
+            for (BibEntry entry : entries) {
+                databaseMap.put(entry, database);
+            }
+            String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, databaseMap,
+                    inParenthesis,
                     null, null);
             insertReferenceMark(bName, citeText, xViewCursor, withText, style);
             //xViewCursor.collapseToEnd();
@@ -511,11 +516,12 @@ class OOBibBase {
                         }
                     }
 
-                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
+                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries,
                             type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(cEntries[j], entries.get(cEntries), true, null, -1);
+                        normCitMarker[j] = style.getCitationMarker(Arrays.asList(cEntries[j]), entries, true, null,
+                                new int[] {-1});
                     }
                 }
                 citMarkers[i] = citationMarker;
@@ -607,7 +613,7 @@ class OOBibBase {
                     }
                 }
                 if (needsChange) {
-                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
+                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries,
                             types[j] == OOBibBase.AUTHORYEAR_PAR, uniquif, firstLimAuthors);
                 }
             }

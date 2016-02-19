@@ -146,34 +146,17 @@ public class Layout {
      */
     public String doLayout(BibDatabase database, Charset encoding)
     {
-        //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuilder sb = new StringBuilder(100);
         String fieldText;
-        boolean previousSkipped = false;
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             fieldText = layoutEntry.doLayout(database, encoding);
 
             if (fieldText == null) {
                 fieldText = "";
-                if (previousSkipped) {
-                    int eol = 0;
-
-                    while ((eol < fieldText.length()) &&
-                            ((fieldText.charAt(eol) == '\n') ||
-                                    (fieldText.charAt(eol) == '\r'))) {
-                        eol++;
-                    }
-
-                    if (eol < fieldText.length()) {
-                        sb.append(fieldText.substring(eol));
-                    }
-                }
-            } else {
-                sb.append(fieldText);
             }
 
-            previousSkipped = false;
+            sb.append(fieldText);
         }
 
         return sb.toString();

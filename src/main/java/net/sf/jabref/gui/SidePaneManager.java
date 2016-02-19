@@ -86,7 +86,7 @@ public class SidePaneManager {
         return components.get(name) != null;
     }
 
-    public boolean isComponentVisible(String name) {
+    public synchronized boolean isComponentVisible(String name) {
         Object o = components.get(name);
         if (o == null) {
             return false;
@@ -139,11 +139,11 @@ public class SidePaneManager {
         }
     }
 
-    public SidePaneComponent getComponent(String name) {
+    public synchronized SidePaneComponent getComponent(String name) {
         return components.get(name);
     }
 
-    private String getComponentName(SidePaneComponent comp) {
+    private synchronized String getComponentName(SidePaneComponent comp) {
         return componentNames.get(comp);
     }
 
@@ -270,7 +270,7 @@ public class SidePaneManager {
         }
     }
 
-    public void updateView() {
+    public synchronized void updateView() {
         sidep.setComponents(visible);
         if (visible.isEmpty()) {
             if (sidep.isVisible()) {

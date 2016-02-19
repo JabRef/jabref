@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,7 @@ import javax.swing.*;
 
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.
- * 
+ *
  * @author kleinms, strassfn
  */
 class DragDropPane extends JTabbedPane {
@@ -51,15 +51,7 @@ class DragDropPane extends JTabbedPane {
                 // Calculates the tab index based on the mouse position
                 int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
                         e.getX(), e.getY());
-                if (!draggingState) { // We are not at tab dragging
-                    if (indexActTab >= 0) { // Mouse is above a tab, otherwise tabNumber would be -1
-                                            // -->Now we are at tab tragging
-                        draggingState = true; // Mark now we are at dragging
-                        indexDraggedTab = indexActTab; // Set draggedTabIndex to the tabNumber where we are now
-                        repaint();
-                    }
-
-                } else { //We are at tab tragging
+                if (draggingState) { // We are at tab dragging
                     if ((indexDraggedTab >= 0) && (indexActTab >= 0)) { //Is it a valid scenario?
                         boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
                         DragDropPane.this.getRootPane().setGlassPane(markerPane); //Set the MarkerPane as glass Pane
@@ -81,6 +73,14 @@ class DragDropPane extends JTabbedPane {
                         markerPane.setVisible(false);
                         markerPane.repaint();
                     }
+
+                } else { //We are not at tab dragging
+                    if (indexActTab >= 0) { // Mouse is above a tab, otherwise tabNumber would be -1
+                        // -->Now we are at tab tragging
+                        draggingState = true; // Mark now we are at dragging
+                        indexDraggedTab = indexActTab; // Set draggedTabIndex to the tabNumber where we are now
+                        repaint();
+                    }
                 }
                 super.mouseDragged(e);
             }
@@ -94,7 +94,7 @@ class DragDropPane extends JTabbedPane {
                 int indexActTab = getUI().tabForCoordinate(DragDropPane.this,
                         e.getX(), e.getY());
                 if ((indexDraggedTab >= 0) && (indexActTab >= 0) && (indexDraggedTab != indexActTab)) { //Is it a valid scenario?
-                    if (draggingState) { //We are at tab tragging
+                    if (draggingState) { //We are at tab dragging
                         boolean toTheLeft = e.getX() <= getUI().getTabBounds(DragDropPane.this, indexActTab).getCenterX(); //Go to the left or to the right of the actual Tab
                         DragDropPane.this.markerPane.setVisible(false);
 
@@ -108,8 +108,7 @@ class DragDropPane extends JTabbedPane {
                             } else {
                                 newTabPos = indexActTab + 1;
                             }
-                        }
-                        else { //We are dragging the tab to the right of the old position
+                        } else { //We are dragging the tab to the right of the old position
                             if (toTheLeft && (indexActTab > 0)) {
                                 newTabPos = indexActTab - 1;
                             } else {
@@ -128,7 +127,7 @@ class DragDropPane extends JTabbedPane {
 
     /**
      * A glass panel which sets the marker for Dragging of Tabs.
-     * 
+     *
      */
     static class MarkerPane extends JPanel {
 
@@ -145,7 +144,8 @@ class DragDropPane extends JTabbedPane {
 
         @Override
         public void paintComponent(Graphics g) {
-            ((Graphics2D) g).setComposite(AlphaComposite.getInstance(
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
             g.setFont(IconTheme.FONT.deriveFont(Font.BOLD, 24f));
             g.drawString(moveTabArrow.getCode(), locationP.x - (moveTabArrow.getIcon().getIconWidth() / 2),
@@ -155,7 +155,7 @@ class DragDropPane extends JTabbedPane {
 
         /**
          * Sets the new location, where the marker should be placed.
-         * 
+         *
          * @param pt the point for the marker
          */
         public void setPicLocation(Point pt) {
