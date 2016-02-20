@@ -36,8 +36,8 @@ public class OOPreFormatter implements LayoutFormatter {
         int i;
         field = field.replaceAll("&|\\\\&", "&");
 
-        StringBuffer sb = new StringBuffer();
-        StringBuffer currentCommand = null;
+        StringBuilder sb = new StringBuilder();
+        StringBuilder currentCommand = null;
 
         char c;
         boolean escaped = false;
@@ -61,7 +61,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 }
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')

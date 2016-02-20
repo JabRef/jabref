@@ -93,14 +93,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static OpenOfficePanel instance;
 
-
-    public static OpenOfficePanel getInstance() {
-        if (OpenOfficePanel.instance == null) {
-            OpenOfficePanel.instance = new OpenOfficePanel();
-        }
-        return OpenOfficePanel.instance;
-    }
-
     private OpenOfficePanel() {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
@@ -138,6 +130,13 @@ public class OpenOfficePanel extends AbstractWorker {
         Globals.prefs.putDefaultValue(JabRefPreferences.OO_STYLE_DIRECTORY, "");
         styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
 
+    }
+
+    public static OpenOfficePanel getInstance() {
+        if (OpenOfficePanel.instance == null) {
+            OpenOfficePanel.instance = new OpenOfficePanel();
+        }
+        return OpenOfficePanel.instance;
     }
 
     public SidePaneComponent getSidePaneComponent() {
@@ -265,16 +264,10 @@ public class OpenOfficePanel extends AbstractWorker {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    try {
-                        if (style == null) {
-                            readStyleFile();
-                        } else {
-                            style.ensureUpToDate();
-                        }
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
-                                Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                        return;
+                    if (style == null) {
+                        readStyleFile();
+                    } else {
+                        style.ensureUpToDate();
                     }
 
                     ooBase.updateSortedReferenceMarks();
@@ -282,7 +275,6 @@ public class OpenOfficePanel extends AbstractWorker {
                     List<BibDatabase> databases = getBaseList();
                     List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
                     ooBase.rebuildBibTextSection(databases, style);
-                    //ooBase.sync(frame.getCurrentBasePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
@@ -293,11 +285,15 @@ public class OpenOfficePanel extends AbstractWorker {
                     reportUndefinedParagraphFormat(ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
+                } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
+                                Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Problem with style file", ex);
+                        return;
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                             ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
-                }
-                catch (Exception e1) {
+                } catch (Exception e1) {
                     LOGGER.warn("Could not update bibliography", e1);
                 }
             }
@@ -636,7 +632,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     }
 
-    private void pushEntries(boolean inParenthesis, boolean withText, boolean addPageInfo) {
+    private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
         if (!ooBase.isConnectedToDocument()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Not connected to any Writer document. Please"
                             + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
@@ -644,6 +640,7 @@ public class OpenOfficePanel extends AbstractWorker {
             return;
         }
 
+        Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
             AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
@@ -672,6 +669,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
                             Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Problem with style file", ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
@@ -779,15 +777,15 @@ public class OpenOfficePanel extends AbstractWorker {
 
     class OOPanel extends SidePaneComponent {
 
-        private final OpenOfficePanel ooPanel;
+        private final OpenOfficePanel openOfficePanel;
         public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
             super(sidePaneManager, url, s);
-            ooPanel = panel;
+            openOfficePanel = panel;
         }
 
         @Override
         public String getName() {
-            return ooPanel.getName();
+            return openOfficePanel.getName();
         }
 
         @Override

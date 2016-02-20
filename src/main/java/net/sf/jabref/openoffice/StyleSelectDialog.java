@@ -215,7 +215,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
-        preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
+        preview.setEntry(prevEntry);
 
         tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());

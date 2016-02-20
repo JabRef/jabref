@@ -81,7 +81,7 @@ public class LayoutHelper {
     }
 
     private void doBracketedField(final int field) throws IOException {
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         int c;
         boolean start = false;
 
@@ -110,7 +110,7 @@ public class LayoutHelper {
                 }
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if (start && (c != '}')) {
@@ -124,7 +124,7 @@ public class LayoutHelper {
      *
      */
     private void doBracketedOptionField() throws IOException {
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         int c;
         boolean start = false;
         boolean inQuotes = false;
@@ -139,7 +139,6 @@ public class LayoutHelper {
                 endOfFile = true;
 
                 if (buffer != null) {
-                    //myStrings.add(buffer.toString());
                     if (option == null) {
                         tmp = buffer.toString();
                     } else {
@@ -188,12 +187,12 @@ public class LayoutHelper {
                 inQuotes = !inQuotes;
 
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
                 buffer.append('"');
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if (start) {
@@ -216,7 +215,7 @@ public class LayoutHelper {
 
         int c;
 
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         boolean escaped = false;
 
         while (!endOfFile) {
@@ -250,7 +249,7 @@ public class LayoutHelper {
                 escaped = false;
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if ((c != '\\') || escaped)// (previous == '\\')))
@@ -265,7 +264,7 @@ public class LayoutHelper {
 
     private void parseField() throws IOException, StringIndexOutOfBoundsException {
         int c;
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         char firstLetter;
         String name;
 
@@ -355,7 +354,7 @@ public class LayoutHelper {
                 return;
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 buffer.append((char) c);

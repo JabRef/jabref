@@ -99,7 +99,15 @@ class OOBibBase {
 
     private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
     private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
-    {
+
+    private final Map<String, String> uniquefiers = new HashMap<>();
+
+    private List<String> sortedReferenceMarks;
+
+    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
+
+
+    public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
         authorYearTitleList.add(authComp);
         authorYearTitleList.add(yearComp);
         authorYearTitleList.add(titleComp);
@@ -110,17 +118,7 @@ class OOBibBase {
 
         entryComparator = new FieldComparatorStack<>(authorYearTitleList);
         yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
-    }
 
-
-    private final Map<String, String> uniquefiers = new HashMap<>();
-
-    private List<String> sortedReferenceMarks;
-
-    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
-
-
-    public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
         this.atEnd = atEnd;
         xDesktop = simpleBootstrap(pathToOO);
         selectDocument();

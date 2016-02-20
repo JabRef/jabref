@@ -46,6 +46,18 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class OOUtil {
 
+    private static final String PARA_STYLE_NAME = "ParaStyleName";
+
+    private static final String CHAR_CASE_MAP = "CharCaseMap";
+
+    private static final String CHAR_POSTURE = "CharPosture";
+
+    private static final String CHAR_WEIGHT = "CharWeight";
+
+    private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
+
+    private static final String CHAR_ESCAPEMENT = "CharEscapement";
+
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
     private static final String UNIQUEFIER_FIELD = "uniq";
@@ -115,7 +127,7 @@ class OOUtil {
                 XPropertySet.class, parCursor);
 
         try {
-            props.setPropertyValue("ParaStyleName", parStyle);
+            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
         } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
@@ -193,27 +205,27 @@ class OOUtil {
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
                 XPropertySet.class, cursor);
         if (bold) {
-            xCursorProps.setPropertyValue("CharWeight",
+            xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.BOLD);
         } else {
-            xCursorProps.setPropertyValue("CharWeight",
+            xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.NORMAL);
         }
 
         if (italic) {
-            xCursorProps.setPropertyValue("CharPosture",
+            xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.ITALIC);
         } else {
-            xCursorProps.setPropertyValue("CharPosture",
+            xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.NONE);
         }
 
         if (smallCaps) {
-            xCursorProps.setPropertyValue("CharCaseMap",
+            xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
         }
         else {
-            xCursorProps.setPropertyValue("CharCaseMap",
+            xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.NONE);
         }
 
@@ -228,21 +240,21 @@ class OOUtil {
                             com.sun.star.awt.FontPitch.VARIABLE);
         } */
         if (subscript) {
-            xCursorProps.setPropertyValue("CharEscapement",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) -101);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
         }
         else if (superscript) {
-            xCursorProps.setPropertyValue("CharEscapement",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 101);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
         }
         else {
-            xCursorProps.setPropertyValue("CharEscapement",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 0);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 100);
         }
 
@@ -261,7 +273,7 @@ class OOUtil {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, parCursor);
         try {
-            props.setPropertyValue("ParaStyleName", parStyle);
+            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
         } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
