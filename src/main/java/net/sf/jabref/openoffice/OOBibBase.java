@@ -937,8 +937,7 @@ class OOBibBase {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
                         style.getNumCitationMarker(Arrays.asList(number++), minGroupingCount, true), false, false,
-                        false, false, false,
-                        false);
+                        false, false, false, false, false, false);
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);

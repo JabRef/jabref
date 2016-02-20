@@ -34,7 +34,9 @@ public class OOPreFormatter implements LayoutFormatter {
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&");
+        field = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
+                .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -134,15 +136,42 @@ public class OOPreFormatter implements LayoutFormatter {
                     // Then test if we are dealing with a italics or bold
                     // command.
                     // If so, handle.
-                    if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)) {
+                    if ("em".equals(command) || "emph".equals(command)) {
                         String part = StringUtil.getPart(field, i, true);
-
                         i += part.length();
                         sb.append("<em>").append(part).append("</em>");
-                    } else if ("textbf".equals(command)) {
+                    } else if ("it".equals(command) || "textit".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<i>").append(part).append("</i>");
+                    } else if ("bf".equals(command) || "textbf".equals(command)) {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         sb.append("<b>").append(part).append("</b>");
+                    } else if ("textsuperscript".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<sup>").append(part).append("</sup>");
+                    } else if ("textsubscript".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<sub>").append(part).append("</sub>");
+                    } else if ("texttt".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<tt>").append(part).append("</tt>");
+                    } else if ("textsc".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<smallcaps>").append(part).append("</smallcaps>");
+                    } else if ("underline".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<u>").append(part).append("</u>");
+                    } else if ("sout".equals(command)) {
+                        String part = StringUtil.getPart(field, i, true);
+                        i += part.length();
+                        sb.append("<s>").append(part).append("</s>");
                     } else if (c == '{') {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
@@ -198,7 +227,7 @@ public class OOPreFormatter implements LayoutFormatter {
             }
         }
 
-        return sb.toString();
+        return sb.toString().replace("&dollar;", "$");
     }
 
 }

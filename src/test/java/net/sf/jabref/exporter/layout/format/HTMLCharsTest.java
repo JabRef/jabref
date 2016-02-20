@@ -38,12 +38,19 @@ public class HTMLCharsTest {
 
         Assert.assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
         Assert.assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
+        Assert.assertEquals("<em>hallo</em>", layout.format("{\\em hallo}"));
 
-        Assert.assertEquals("<em>hallo</em>", layout.format("\\textit{hallo}"));
-        Assert.assertEquals("<em>hallo</em>", layout.format("{\\textit hallo}"));
+        Assert.assertEquals("<i>hallo</i>", layout.format("\\textit{hallo}"));
+        Assert.assertEquals("<i>hallo</i>", layout.format("{\\textit hallo}"));
+        Assert.assertEquals("<i>hallo</i>", layout.format("{\\it hallo}"));
 
         Assert.assertEquals("<b>hallo</b>", layout.format("\\textbf{hallo}"));
         Assert.assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
+        Assert.assertEquals("<b>hallo</b>", layout.format("{\\bf hallo}"));
+
+        Assert.assertEquals("<sup>hallo</sup>", layout.format("\\textsuperscript{hallo}"));
+        Assert.assertEquals("<sub>hallo</sub>", layout.format("\\textsubscript{hallo}"));
+
     }
 
     @Test

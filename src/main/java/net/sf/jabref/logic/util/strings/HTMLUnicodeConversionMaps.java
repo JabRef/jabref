@@ -487,6 +487,7 @@ public class HTMLUnicodeConversionMaps {
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket
+            {"42", "", "*"}, // Asterisk
             {"43", "plus", "\\+"}, // Plus
             {"44", "comma", ","}, // Comma
             {"45", "hyphen", "-"}, // Hyphen

@@ -140,6 +140,8 @@ class OOUtil {
         int sub = 0;
         int mono = 0;
         int smallCaps = 0;
+        int underline = 0;
+        int strikeout = 0;
         //insertTextAtCurrentLocation(text, cursor, "_",
         //    false, false, false, false, false, false);
         //cursor.goLeft((short)1, true);
@@ -147,8 +149,8 @@ class OOUtil {
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
-                        mono > 0, smallCaps > 0, sup > 0, sub > 0);
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0, mono > 0,
+                        smallCaps > 0, sup > 0, sub > 0, underline > 0, strikeout > 0);
             }
             String tag = m.group();
             // Handle tags:
@@ -160,9 +162,9 @@ class OOUtil {
                 italic++;
             } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
                 italic--;
-            } else if ("</monospace>".equals(tag)) {
+            } else if ("</tt>".equals(tag)) {
                 mono = 0;
-            } else if ("<monospace>".equals(tag)) {
+            } else if ("<tt>".equals(tag)) {
                 mono = 1;
             } else if ("</smallcaps>".equals(tag)) {
                 smallCaps = 0;
@@ -176,6 +178,14 @@ class OOUtil {
                 sub = 0;
             } else if ("<sub>".equals(tag)) {
                 sub = 1;
+            } else if ("</u>".equals(tag)) {
+                underline = 0;
+            } else if ("<u>".equals(tag)) {
+                underline = 1;
+            } else if ("</s>".equals(tag)) {
+                strikeout = 0;
+            } else if ("<s>".equals(tag)) {
+                strikeout = 1;
             }
 
             piv = m.end();
@@ -183,8 +193,8 @@ class OOUtil {
         }
 
         if (piv < lText.length()) {
-            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
-                    (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv), (bold % 2) > 0, (italic % 2) > 0,
+                    mono > 0, smallCaps > 0, sup > 0, sub > 0, underline > 0, strikeout > 0);
         }
 
         cursor.collapseToEnd();
@@ -196,7 +206,8 @@ class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, boolean bold,
-            boolean italic, boolean monospace, boolean smallCaps, boolean superscript, boolean subscript)
+            boolean italic, boolean monospace, boolean smallCaps, boolean superscript, boolean subscript,
+            boolean underline, boolean strikeout)
                     throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
                     IllegalArgumentException {
         text.insertString(cursor, string, true);
@@ -223,8 +234,7 @@ class OOUtil {
         if (smallCaps) {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
-        }
-        else {
+        }        else {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.NONE);
         }
@@ -244,20 +254,27 @@ class OOUtil {
                     (byte) -101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        }
-        else if (superscript) {
+        } else if (superscript) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        }
-        else {
+        } else {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 0);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 100);
         }
-
+        if (underline) {
+            xCursorProps.setPropertyValue("CharUnderline", com.sun.star.awt.FontUnderline.SINGLE);
+        } else {
+            xCursorProps.setPropertyValue("CharUnderline", com.sun.star.awt.FontUnderline.NONE);
+        }
+        if (strikeout) {
+            xCursorProps.setPropertyValue("CharStrikeout", com.sun.star.awt.FontStrikeout.SINGLE);
+        } else {
+            xCursorProps.setPropertyValue("CharStrikeout", com.sun.star.awt.FontStrikeout.NONE);
+        }
         cursor.collapseToEnd();
 
     }
