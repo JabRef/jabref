@@ -27,7 +27,10 @@ package net.sf.jabref.exporter.layout.format;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 
 public class FormatCharsTest {
@@ -46,6 +49,16 @@ public class FormatCharsTest {
     @Test
     public void testFormatStripLatexCommands() {
         assertEquals("-", new FormatChars().format("\\mbox{-}"));
+    }
+
+    @Test
+    public void testEquations() {
+        LayoutFormatter layout = new FormatChars();
+
+        Assert.assertEquals("$", layout.format("\\$"));
+        Assert.assertEquals("σ", layout.format("$\\sigma$"));
+        Assert.assertEquals("A 32\u00A0mA ΣΔ-modulator",
+                layout.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
 }

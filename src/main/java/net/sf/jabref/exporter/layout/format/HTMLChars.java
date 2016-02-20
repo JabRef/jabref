@@ -32,7 +32,11 @@ public class HTMLChars implements LayoutFormatter {
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{2,}", "<p>").replace("\n", "<br>");
+        field = field.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
+                .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                .replace("\n", "<br>") // Replace single line breaks with <br>
+                .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
@@ -200,7 +204,7 @@ public class HTMLChars implements LayoutFormatter {
             }
         }
 
-        return sb.toString();
+        return sb.toString().replace("~", "&nbsp;"); // Replace any remaining ~ with &nbsp; (non-breaking spaces)
     }
 
 }

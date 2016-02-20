@@ -753,16 +753,22 @@ public class HTMLUnicodeConversionMaps {
                 String strippedLaTeX = cleanLaTeX(aConversionList[2]);
                 if (!(aConversionList[1].isEmpty())) {
                     HTML_LATEX_CONVERSION_MAP.put("&" + aConversionList[1] + ";", aConversionList[2]);
-                    LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&" + aConversionList[1] + ";");
+                    if (!strippedLaTeX.isEmpty()) {
+                        LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&" + aConversionList[1] + ";");
+                    }
                 } else if (!(aConversionList[0].isEmpty())) {
-                    LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
+                    if (!strippedLaTeX.isEmpty()) {
+                        LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
+                    }
                 }
                 if (!(aConversionList[0].isEmpty())) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
                         Character c = (char) Integer.decode(aConversionList[0]).intValue();
                         UNICODE_LATEX_CONVERSION_MAP.put(c, aConversionList[2]);
-                        LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, c.toString());
+                        if (!strippedLaTeX.isEmpty()) {
+                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, c.toString());
+                        }
                     }
                 }
             }
@@ -770,6 +776,12 @@ public class HTMLUnicodeConversionMaps {
         for (String[] anAccentList : accentList) {
             ESCAPED_ACCENTS.put(Integer.decode(anAccentList[0]), anAccentList[1]);
         }
+        // Manually added values which are killed by cleanLaTeX
+        LATEX_HTML_CONVERSION_MAP.put("$", "&dollar;");
+        LATEX_UNICODE_CONVERSION_MAP.put("$", "$");
+
+        // Manual corrections
+        LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
     }
 
     private static String cleanLaTeX(String escapedString) {

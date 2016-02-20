@@ -46,6 +46,16 @@ public class HTMLCharsTest {
         Assert.assertEquals("<b>hallo</b>", layout.format("{\\textbf hallo}"));
     }
 
+    @Test
+    public void testEquations() {
+        LayoutFormatter layout = new HTMLChars();
+
+        Assert.assertEquals("&dollar;", layout.format("\\$"));
+        Assert.assertEquals("&sigma;", layout.format("$\\sigma$"));
+        Assert.assertEquals("A 32&nbsp;mA &Sigma;&Delta;-modulator",
+                layout.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+    }
+
     /*
      * Is missing a lot of test cases for the individual chars...
      */

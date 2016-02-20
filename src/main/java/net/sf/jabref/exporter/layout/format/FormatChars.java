@@ -33,7 +33,8 @@ public class FormatChars implements LayoutFormatter {
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>");
+        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
 
         StringBuilder sb = new StringBuilder();
         StringBuffer currentCommand = null;
@@ -189,7 +190,8 @@ public class FormatChars implements LayoutFormatter {
             }
         }
 
-        return sb.toString();
+        return sb.toString().replace("&amp;", "&").replace("<p>", Globals.NEWLINE).replace("&dollar;", "$").replace("~",
+                "\u00A0");
     }
 
 }
