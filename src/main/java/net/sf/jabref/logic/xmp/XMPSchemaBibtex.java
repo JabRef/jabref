@@ -40,6 +40,14 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     private static final String KEY = "bibtex";
 
+    private static final Set<String> PRESERVE_WHITE_SPACE = new HashSet<>();
+
+
+    static {
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("abstract");
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("note");
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("review");
+    }
 
     /**
      * Create a new empty XMPSchemaBibtex as a child in the given XMPMetadata.
@@ -83,9 +91,8 @@ public class XMPSchemaBibtex extends XMPSchema {
     public void setPersonList(String field, String value) {
         AuthorList list = AuthorList.getAuthorList(value);
 
-        int n = list.size();
-        for (int i = 0; i < n; i++) {
-            addSequenceValue(field, list.getAuthor(i).getFirstLast(false));
+        for (AuthorList.Author author : list.getAuthorList()) {
+            addSequenceValue(field, author.getFirstLast(false));
         }
     }
 
@@ -248,7 +255,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         for (Map.Entry<String, String> entry : result.entrySet()) {
             String key = entry.getKey();
-            if (XMPSchemaBibtex.preserveWhiteSpace.contains(key)) {
+            if (XMPSchemaBibtex.PRESERVE_WHITE_SPACE.contains(key)) {
                 continue;
             }
             entry.setValue(entry.getValue().replaceAll("\\s+", " ").trim());
@@ -257,13 +264,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         return result;
     }
 
-
-    private static final HashSet<String> preserveWhiteSpace = new HashSet<>();
-    static {
-        XMPSchemaBibtex.preserveWhiteSpace.add("abstract");
-        XMPSchemaBibtex.preserveWhiteSpace.add("note");
-        XMPSchemaBibtex.preserveWhiteSpace.add("review");
-    }
 
 
     public void setBibtexEntry(BibEntry entry) {

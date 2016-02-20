@@ -67,8 +67,8 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
             autoCompFF = true;
             autoCompLF = true;
         }
-        autoCompFirstnameMode = preferences.getFirstnameMode() != null ? preferences
-                .getFirstnameMode() : AutoCompleteFirstNameMode.BOTH;
+        autoCompFirstnameMode = preferences.getFirstnameMode() == null ? AutoCompleteFirstNameMode.BOTH : preferences
+                .getFirstnameMode();
     }
 
     @Override

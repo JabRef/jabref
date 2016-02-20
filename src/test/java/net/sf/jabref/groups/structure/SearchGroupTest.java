@@ -1,10 +1,24 @@
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class SearchGroupTest {
+
+    @Test
+    public void testContains() {
+        SearchGroup group = new SearchGroup("myExplicitGroup", "review",
+                true, true, GroupHierarchyType.INDEPENDENT);
+        assertEquals("SearchGroup:myExplicitGroup;0;review;1;1;", group.toString());
+
+        BibEntry entry = new BibEntry();
+        assertFalse(group.contains(entry));
+
+        entry.addKeyword("review");
+        assertTrue(group.contains(entry));
+    }
 
     @Test
     public void testToStringSimple() {

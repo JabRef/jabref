@@ -122,7 +122,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 } else {
                     return; // More than one new selected. Do nothing.
                 }
-
             }
         }
 
@@ -154,16 +153,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
                 }
-
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {
                     updatePreview(toShow, false);
                 }
-
             }
         }
-
     }
 
     private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
@@ -368,7 +364,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * Process general right-click events on the table. Show the table context menu at
      * the position where the user right-clicked.
      * @param e The mouse event defining the popup trigger.
-     * @param row The row where the event occured.
+     * @param row The row where the event occurred.
      */
     private void processPopupTrigger(MouseEvent e, int row) {
         int selRow = table.getSelectedRow();
@@ -504,12 +500,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     @Override
     public void keyTyped(KeyEvent e) {
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
-                //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
             final long QUICK_JUMP_TIMEOUT = 2000;
-            if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT)
-             {
+            if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT) {
                 lastPressedCount = 0; // Reset last pressed character
             }
             // Update timestamp:
@@ -522,56 +516,35 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             }
 
             int sortingColumn = table.getSortingColumn(0);
-            if (sortingColumn == -1)
-             {
+            if (sortingColumn == -1) {
                 return; // No sorting? TODO: look up by author, etc.?
             }
             // TODO: the following lookup should be done by a faster algorithm,
             // such as binary search. But the table may not be sorted properly,
             // due to marked entries, search etc., which rules out the binary search.
-            int startRow = 0;
-            /*if ((c == lastPressed) && (lastQuickJumpRow >= 0)) {
-                if (lastQuickJumpRow < table.getRowCount()-1)
-                    startRow = lastQuickJumpRow+1;
-            }*/
 
-            boolean done = false;
-            while (!done) {
-                for (int i = startRow; i < table.getRowCount(); i++) {
-                    Object o = table.getValueAt(i, sortingColumn);
-                    if (o == null) {
-                        continue;
-                    }
-                    String s = o.toString().toLowerCase();
-                    if (s.length() >= lastPressedCount)
-                     {
-                        for (int j = 0; j < lastPressedCount; j++) {
-                            if (s.charAt(j) != lastPressed[j]) {
-                                break; // Escape the loop immediately when we find a mismatch
-                            } else if (j == (lastPressedCount - 1)) {
-                                // We found a match:
-                                table.setRowSelectionInterval(i, i);
-                                table.ensureVisible(i);
-                                return;
-                            }
+            for (int i = 0; i < table.getRowCount(); i++) {
+                Object o = table.getValueAt(i, sortingColumn);
+                if (o == null) {
+                    continue;
+                }
+                String s = o.toString().toLowerCase();
+                if (s.length() >= lastPressedCount) {
+                    for (int j = 0; j < lastPressedCount; j++) {
+                        if (s.charAt(j) != lastPressed[j]) {
+                            break; // Escape the loop immediately when we find a mismatch
+                        } else if (j == (lastPressedCount - 1)) {
+                            // We found a match:
+                            table.setRowSelectionInterval(i, i);
+                            table.ensureVisible(i);
+                            return;
                         }
-                    //if ((s.length() >= 1) && (s.charAt(0) == c)) {
-                    //}
                     }
                 }
-                // Finished, no result. If we didn't start at the beginning of
-                // the table, try that. Otherwise, exit the while loop.
-                if (startRow > 0) {
-                    startRow = 0;
-                } else {
-                    done = true;
-                }
-
             }
 
         } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
             lastPressedCount = 0;
-
         }
     }
 

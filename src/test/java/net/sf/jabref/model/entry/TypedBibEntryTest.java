@@ -4,8 +4,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Optional;
-
 public class TypedBibEntryTest {
     @Test
     public void hasAllRequiredFieldsFail() {

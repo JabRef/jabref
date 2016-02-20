@@ -109,7 +109,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //add request header
             dl.addParameters("Accept", "application/json");
-            dl.addParameters("Content-type", "application/json");
+            dl.addParameters("Content-Type", "application/json");
 
             // set post data
             dl.setPostData(postData);

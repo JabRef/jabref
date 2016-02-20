@@ -29,6 +29,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
 import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
@@ -245,7 +246,7 @@ public class JabRef {
 
                 SearchQuery query = new SearchQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabasefromMatches(); //newBase contains only match entries
+                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {

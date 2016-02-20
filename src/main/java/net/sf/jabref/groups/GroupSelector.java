@@ -61,6 +61,8 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.search.SearchMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -68,10 +70,8 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.rules.InvertSearchRule;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
+import net.sf.jabref.logic.search.matchers.NotMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import org.apache.commons.logging.Log;
@@ -193,13 +193,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
             }
         });
-        grayOut.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
-            }
-        });
+        grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
@@ -272,10 +266,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (settings.isVisible()) {
-                    // System.out.println("oee");
-                    // settings.setVisible(false);
-                } else {
+                if (!settings.isVisible()) {
                     JButton src = (JButton) e.getSource();
                     showNumberOfElements
                             .setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
@@ -750,46 +741,39 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     private void updateSelections() {
-        final SearchRuleSet searchRules = SearchRuleSets
-                .build(andCb.isSelected() ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
+        final MatcherSet searchRules = MatcherSets
+                .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
         TreePath[] selection = groupsTree.getSelectionPaths();
+        if(selection == null) {
+            selection = new TreePath[0];
+        }
 
         for (TreePath aSelection : selection) {
-            SearchRule searchRule = ((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule();
+            SearchMatcher searchRule = ((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule();
             searchRules.addRule(searchRule);
         }
-        SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
-        GroupingWorker worker = new GroupingWorker(searchRule, SearchRule.DUMMY_QUERY);
+        SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
+        GroupingWorker worker = new GroupingWorker(searchRule);
         worker.getWorker().run();
         worker.getCallBack().update();
-        /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
-        DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
-                panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
-                        .getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS),
-                //true,
-                select.isSelected());
-        search.start();*/
     }
 
 
     class GroupingWorker extends AbstractWorker {
 
-        private final SearchRule rules;
-        private final String searchTerm;
+        private final SearchMatcher matcher;
         private final List<BibEntry> matches = new ArrayList<>();
         private final boolean showOverlappingGroupsP;
 
-
-        public GroupingWorker(SearchRule rules, String searchTerm) {
-            this.rules = rules;
-            this.searchTerm = searchTerm;
+        public GroupingWorker(SearchMatcher matcher) {
+            this.matcher = matcher;
             showOverlappingGroupsP = showOverlappingGroups.isSelected();
         }
 
         @Override
         public void run() {
             for (BibEntry entry : panel.getDatabase().getEntries()) {
-                boolean hit = rules.applyRule(searchTerm, entry);
+                boolean hit = matcher.isMatch(entry);
                 entry.setGroupHit(hit);
                 if (hit && showOverlappingGroupsP) {
                     matches.add(entry);
@@ -1491,9 +1475,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         List<GroupTreeNode> nodes = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
-            SearchRule rule = node.getSearchRule();
+            SearchMatcher matcher = node.getSearchRule();
             for (BibEntry match : matches) {
-                if (rule.applyRule(SearchRule.DUMMY_QUERY, match)) {
+                if (matcher.isMatch(match)) {
                     nodes.add(node);
                     break;
                 }

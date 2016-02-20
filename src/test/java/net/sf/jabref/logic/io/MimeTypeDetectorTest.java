@@ -1,12 +1,9 @@
 package net.sf.jabref.logic.io;
 
-import net.sf.jabref.support.DevEnvironment;
-import org.junit.Assume;
 import org.junit.Test;
+import org.junit.Ignore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MimeTypeDetectorTest {
     @Test
@@ -23,10 +20,11 @@ public class MimeTypeDetectorTest {
 
     @Test
     public void beTrueForPdfMimeType() {
-        String pdfUrl = "https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf";
+        String pdfUrl = "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 
+    @Ignore
     @Test
     public void acceptPDFMimeTypeVariations() {
         // application/pdf;charset=ISO-8859-1
@@ -34,6 +32,7 @@ public class MimeTypeDetectorTest {
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 
+    @Ignore
     @Test
     public void useGetRequestIfHeadRequestHasNoContentType() {
         String pdfUrl = "http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014010/pdf";

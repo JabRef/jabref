@@ -23,7 +23,7 @@ import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class UnitFormatter implements Formatter {
 
-    private static final String[] unitList = new String[] {
+    private static final String[] UNIT_LIST = new String[] {
             "A", // Ampere
             "Ah", // Ampere hours
             "B", // Byte
@@ -65,7 +65,7 @@ public class UnitFormatter implements Formatter {
             "sr", // steradians
     };
 
-    private static final String[] unitPrefixList = new String[] {
+    private static final String[] UNIT_PREFIX_LIST = new String[] {
             "y", // yocto
             "z", // zepto
             "a", // atto
@@ -90,16 +90,16 @@ public class UnitFormatter implements Formatter {
             "Y", // yotta
     };
 
-    private static final String[] unitCombinations;
+    private static final String[] UNIT_COMBINATIONS;
 
     static {
-        int uLLength = UnitFormatter.unitList.length;
-        int uPLLength = UnitFormatter.unitPrefixList.length;
+        int uLLength = UnitFormatter.UNIT_LIST.length;
+        int uPLLength = UnitFormatter.UNIT_PREFIX_LIST.length;
         int uCLength = uLLength * uPLLength;
-        unitCombinations = new String[uCLength];
+        UNIT_COMBINATIONS = new String[uCLength];
         for (int i = 0; i < uLLength; i++) {
             for (int j = 0; j < uPLLength; j++) {
-                UnitFormatter.unitCombinations[(i * uPLLength) + j] = UnitFormatter.unitPrefixList[j] + UnitFormatter.unitList[i];
+                UnitFormatter.UNIT_COMBINATIONS[(i * uPLLength) + j] = UnitFormatter.UNIT_PREFIX_LIST[j] + UnitFormatter.UNIT_LIST[i];
             }
         }
 
@@ -132,7 +132,7 @@ public class UnitFormatter implements Formatter {
         if ((text == null) || text.isEmpty()) {
             return text;
         }
-        return format(text, UnitFormatter.unitCombinations);
+        return format(text, UnitFormatter.UNIT_COMBINATIONS);
     }
 
     @Override

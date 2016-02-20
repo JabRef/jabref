@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -439,7 +440,13 @@ class StyleSelectDialog {
     private void addStyles(String dir, boolean recurse) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
-            List<File> files = Arrays.asList(dirF.listFiles());
+            File[] fileArray = dirF.listFiles();
+            List<File> files;
+            if (fileArray == null) {
+                files = Collections.emptyList();
+            } else {
+                files = Arrays.asList(fileArray);
+            }
             for (File file : files) {
                 // If the file looks like a style file, parse it:
                 if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {

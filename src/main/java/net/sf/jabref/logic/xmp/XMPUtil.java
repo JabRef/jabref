@@ -157,26 +157,27 @@ public class XMPUtil {
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
-                        BibEntry entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
+                        Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
 
-                        if (entry != null) {
-                            if(entry.getType() == null) {
-                                entry.setType("misc");
+                        if (entry.isPresent()) {
+                            if (entry.get().getType() == null) {
+                                entry.get().setType("misc");
                             }
-                            result.add(entry);
+                            result.add(entry.get());
                         }
                     }
                 }
             }
             if (result.isEmpty()) {
-                BibEntry entry = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                Optional<BibEntry> entry = XMPUtil
+                        .getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
 
-                if (entry != null) {
-                    if(entry.getType() == null) {
-                        entry.setType("misc");
+                if (entry.isPresent()) {
+                    if (entry.get().getType() == null) {
+                        entry.get().setType("misc");
                     }
-                    result.add(entry);
+                    result.add(entry.get());
                 }
             }
         }
@@ -203,7 +204,7 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    public static BibEntry getBibtexEntryFromDocumentInformation(
+    public static Optional<BibEntry> getBibtexEntryFromDocumentInformation(
             PDDocumentInformation di) {
 
         BibEntry entry = new BibEntry();
@@ -244,7 +245,7 @@ public class XMPUtil {
         }
 
         // Return null if no values were found
-        return entry.getFieldNames().isEmpty() ? null : entry;
+        return entry.getFieldNames().isEmpty() ? Optional.empty() : Optional.of(entry);
     }
 
     /**
@@ -262,7 +263,7 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    public static BibEntry getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema) {
+    public static Optional<BibEntry> getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema) {
 
         BibEntry entry = new BibEntry();
 
@@ -315,7 +316,7 @@ public class XMPUtil {
             Calendar c = null;
             try {
                 c = DateConverter.toCalendar(date);
-            } catch (Exception ignored) {
+            } catch (IOException ignored) {
                 // Ignored
             }
             if (c != null) {
@@ -436,7 +437,7 @@ public class XMPUtil {
             }
         }
 
-        return entry.getFieldNames().isEmpty() ? null : entry;
+        return entry.getFieldNames().isEmpty() ? Optional.empty() : Optional.of(entry);
     }
 
     /**
@@ -631,10 +632,8 @@ public class XMPUtil {
 
                 AuthorList list = AuthorList.getAuthorList(authors);
 
-                int n = list.size();
-                for (int i = 0; i < n; i++) {
-                    dcSchema.addContributor(list.getAuthor(i).getFirstLast(
-                            false));
+                for (AuthorList.Author author : list.getAuthorList()) {
+                    dcSchema.addContributor(author.getFirstLast(false));
                 }
                 continue;
             }
@@ -1283,7 +1282,7 @@ public class XMPUtil {
         try {
             List<BibEntry> l = XMPUtil.readXMP(is);
             return !l.isEmpty();
-        } catch (Exception e) {
+        } catch (IOException e) {
             return false;
         }
     }

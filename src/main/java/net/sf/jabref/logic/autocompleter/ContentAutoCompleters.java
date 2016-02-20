@@ -12,18 +12,17 @@ import net.sf.jabref.logic.journals.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
-    AutoCompletePreferences preferences;
     private final JournalAbbreviationLoader abbreviationLoader;
 
 
-    public ContentAutoCompleters(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public ContentAutoCompleters(JournalAbbreviationLoader abbreviationLoader) {
         this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
     }
 
     public ContentAutoCompleters(BibDatabase database, MetaData metaData, AutoCompletePreferences preferences,
             JournalAbbreviationLoader abbreviationLoader) {
-        this(preferences, abbreviationLoader);
+        this(abbreviationLoader);
+        Objects.requireNonNull(preferences);
 
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
         List<String> completeFields = preferences.getCompleteNames();

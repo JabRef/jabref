@@ -2,7 +2,7 @@ package net.sf.jabref.exporter;
 
 import com.google.common.base.Charsets;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.importer.ImportFormatReader;

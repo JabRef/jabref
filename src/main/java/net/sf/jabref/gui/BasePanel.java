@@ -60,8 +60,8 @@ import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.matchers.EverythingMatcher;
-import net.sf.jabref.logic.search.matchers.SearchMatcher;
+import net.sf.jabref.gui.search.matchers.EverythingMatcher;
+import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.*;
@@ -223,24 +223,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public String getTabTitle() {
-        String title;
+        StringBuilder title = new StringBuilder();
 
         if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title = GUIGlobals.untitledTitle;
+            title.append(GUIGlobals.untitledTitle);
 
             if (!database().getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
                 // This also happens internally at basepanel to ensure consistency line 224
-                title = title + '*';
+                title.append('*');
             }
         } else {
             // check if file is modified
             String changeFlag = isModified() ? "*" : "";
-            title = getBibDatabaseContext().getDatabaseFile().getName() + changeFlag;
+            title.append(getBibDatabaseContext().getDatabaseFile().getName()).append(changeFlag);
         }
-        return title;
+        return title.toString();
     }
 
     public boolean isModified() {
@@ -1643,7 +1643,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);
         }
 
         // restore floating search result

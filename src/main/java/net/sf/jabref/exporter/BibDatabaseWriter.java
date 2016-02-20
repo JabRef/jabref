@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;

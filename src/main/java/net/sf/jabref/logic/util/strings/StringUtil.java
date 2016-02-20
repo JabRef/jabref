@@ -17,7 +17,8 @@ package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,15 +79,6 @@ public class StringUtil {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
-    }
-
-    public static String join(Collection<String> strings, String separator) {
-        String[] arr = strings.toArray(new String[strings.size()]);
-        return join(arr, separator, 0, arr.length);
-    }
-
-    public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
     }
 
     /**
@@ -225,35 +217,6 @@ public class StringUtil {
     }
 
     /**
-     * Quote special characters.
-     *
-     * @param toQuote         The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting
-     *                  character itself, which is automatically quoted.
-     * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting
-     * character itself) quoted.
-     */
-    public static String quote(String toQuote, String specials, char quoteChar) {
-        StringBuilder result = new StringBuilder();
-        char c;
-        boolean isSpecial;
-        for (int i = 0; i < toQuote.length(); ++i) {
-            c = toQuote.charAt(i);
-
-            isSpecial = (c == quoteChar);
-            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
-            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
-
-            if (isSpecial) {
-                result.append(quoteChar);
-            }
-            result.append(c);
-        }
-        return result.toString();
-    }
-
-    /**
      * Unquote special characters.
      *
      * @param toUnquote         The String which may contain quoted special characters.
@@ -293,9 +256,9 @@ public class StringUtil {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<>();
+        List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        List<String> thisEntry = new ArrayList<>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -488,7 +451,6 @@ public class StringUtil {
      * @return the int value of str
      */
     public static int intValueOf(String str) {
-        int ival = 0;
         int idx = 0;
         int end;
         boolean sign = false;
@@ -498,6 +460,7 @@ public class StringUtil {
             throw new NumberFormatException(str);
         }
 
+        int ival = 0;
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
@@ -507,5 +470,87 @@ public class StringUtil {
                 throw new NumberFormatException(str);
             }
         }
+    }
+
+    /**
+     * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * <p>
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public static String stripNonValidXMLCharacters(String in) {
+        if ((in == null) || in.isEmpty()) {
+            return ""; // vacancy test.
+        }
+        StringBuilder out = new StringBuilder(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+                out.append(current);
+            }
+        }
+        return out.toString();
+    }
+
+    /*
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
+    public static List<String> tokenizeToList(String buf, String delimstr)
+    {
+        List<String> list = new ArrayList<>();
+        buf = buf + '\n';
+
+        StringTokenizer st = new StringTokenizer(buf, delimstr);
+
+        while (st.hasMoreTokens()) {
+            list.add(st.nextToken());
+        }
+
+        return list;
+    }
+
+    /**
+     * Quote special characters.
+     *
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @return A String with every special character (including the quoting
+     * character itself) quoted.
+     */
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        if (toQuote == null) {
+            return null;
+        }
+    
+        StringBuilder result = new StringBuilder();
+        char c;
+        boolean isSpecial;
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
+    
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+    
+            if (isSpecial) {
+                result.append(quoteChar);
+            }
+            result.append(c);
+        }
+        return result.toString();
     }
 }

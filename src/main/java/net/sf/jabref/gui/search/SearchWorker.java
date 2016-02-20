@@ -87,7 +87,7 @@ class SearchWorker extends AbstractWorker {
             basePanel.mainTable.setSelected(0);
         }
 
-        basePanel.getSearchBar().updateResults(hits, searchQuery.description, searchQuery.isGrammarBasedSearch());
+        basePanel.getSearchBar().updateResults(hits, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
         basePanel.getSearchBar().getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 

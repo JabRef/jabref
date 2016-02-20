@@ -79,4 +79,25 @@ public class FileFieldTest {
 
         assertEquals(Collections.singletonList(new FileField.ParsedFileField("desc", "file.pdf", "PDF")), FileField.parse(input));
     }
+
+    @Test
+    public void testQuoteStandard() {
+        assertEquals("a", FileField.quote("a"));
+    }
+
+    @Test
+    public void testQuoteAllCharacters() {
+        assertEquals("a\\:\\;\\\\", FileField.quote("a:;\\"));
+    }
+
+    @Test
+    public void testQuoteEmpty() {
+        assertEquals("", FileField.quote(""));
+    }
+
+    @Test
+    public void testQuoteNull() {
+        assertNull(FileField.quote(null));
+    }
+
 }

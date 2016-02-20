@@ -36,11 +36,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 package net.sf.jabref.exporter.layout.format;
 
-import net.sf.jabref.exporter.layout.WSITools;
-
-import java.util.ArrayList;
 import java.util.List;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
@@ -130,11 +128,10 @@ public class CreateDocBookAuthors implements LayoutFormatter
     protected void singleAuthor(StringBuffer sb, String author)
     {
         // TODO: replace special characters
-        List<String> v = new ArrayList<>();
 
         String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
 
-        WSITools.tokenize(v, authorMod, " \n\r");
+        List<String> v = StringUtil.tokenizeToList(authorMod, " \n\r");
 
         if (v.size() == 1) {
             sb.append("<surname>").append(v.get(0)).append("</surname>");

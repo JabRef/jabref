@@ -37,14 +37,14 @@ public class BibtexKeyPatternDialog extends JDialog {
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
         super(parent, Localization.lang("BibTeX key patterns"), true);
-        this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag, panel);
+        this.labelPatternPanel = new LabelPatternPanel(panel);
         setPanel(panel);
         init();
     }
 
     /**
      * Used for updating an existing Dialog
-     * 
+     *
      * @param panel the panel to read the data from
      */
     public void setPanel(BasePanel panel) {

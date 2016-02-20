@@ -2,7 +2,6 @@ package net.sf.jabref.logic.remote.client;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.shared.Protocol;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,15 +35,14 @@ public class RemoteListenerClient {
                     System.out.println(error);
                     return false;
                 }
-                protocol.sendMessage(StringUtil.join(args, "\n"));
+                protocol.sendMessage(String.join("\n", args));
                 return true;
             } finally {
                 protocol.close();
             }
         } catch (Exception e) {
             LOGGER.debug(
-                    "Could not send args " + StringUtil.join(args, ", ") + " to the server at port " + remoteServerPort,
-                    e);
+                    "Could not send args " + String.join(", ", args) + " to the server at port " + remoteServerPort, e);
             return false;
         }
     }

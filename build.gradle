@@ -1,3 +1,4 @@
+
 import org.gradle.internal.os.OperatingSystem
 
 buildscript {
@@ -8,14 +9,16 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.install4j', name: 'gradle-plugin', version: '6.0'
+        classpath 'com.github.edwgiz:maven-shade-plugin.log4j2-cachefile-transformer:2.1'
     }
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.2'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
     id "com.github.kt3k.coveralls" version "2.4.0x"
-    id "com.github.youribonnaffe.gradle.format" version "1.2"
+    id "com.github.youribonnaffe.gradle.format" version "1.3"
     id "com.coverity.ondemand" version "1.5.61"
+    id "net.ltgt.errorprone" version "0.0.8"
 }
 
 apply plugin: "java"
@@ -32,8 +35,8 @@ apply from: 'eclipse.gradle'
 gradle.taskGraph.whenReady { taskGraph ->
     def tasks = taskGraph.getAllTasks()
     if (System.env.CI == null) {
-        tasks.findAll {it.name.startsWith('coverityCheck')}.each { task ->
-                task.enabled = false
+        tasks.findAll { it.name.startsWith('coverityCheck') }.each { task ->
+            task.enabled = false
         }
     }
 }
@@ -119,10 +122,10 @@ sourceSets {
 
 processResources {
     filesMatching("build.properties") {
-        expand (version: project.version,
+        expand(version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "))
+                "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
     }
 
     filesMatching("resource/**/meta.xml") {
@@ -220,6 +223,33 @@ format {
 
 shadowJar {
     classifier 'fat'
+
+    transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {
+
+        // this is an adapter required for generating a fat jar with correct log4j2 output
+
+        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer();
+
+        @Override
+        boolean canTransformResource(FileTreeElement element) {
+            return target.canTransformResource(element.getPath());
+        }
+
+        @Override
+        void transform(String path, InputStream is, List<com.github.jengelman.gradle.plugins.shadow.relocation.Relocator> relocators) {
+            target.processResource(path, is, relocators);
+        }
+
+        @Override
+        boolean hasTransformedResource() {
+            return target.hasTransformedResource();
+        }
+
+        @Override
+        void modifyOutputStream(org.apache.tools.zip.ZipOutputStream jos) {
+            target.modifyOutputStream(jos);
+        }
+    })
 }
 
 /*
@@ -260,9 +290,9 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
     release = project.version
     variables = [
-        versionFourDots: project.ext.threeDotVersion,
-        buildFileName: jar.archiveName,
-        version: project.version
+            versionFourDots: project.ext.threeDotVersion,
+            buildFileName  : jar.archiveName,
+            version        : project.version
     ]
 
     doLast {
@@ -299,7 +329,7 @@ task releaseJar(dependsOn: "shadowJar") {
 // see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
 // better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
 task getdeps(type: Copy) {
-    from (configurations.compile+configurations.antlr3+configurations.antlr4+configurations.testCompile) {
+    from(configurations.compile + configurations.antlr3 + configurations.antlr4 + configurations.testCompile) {
         include "*.jar"
     }
     into 'build/tmp/alldeps/'
