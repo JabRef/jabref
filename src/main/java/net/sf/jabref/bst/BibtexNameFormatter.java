@@ -15,6 +15,9 @@
 */
 package net.sf.jabref.bst;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.AuthorList.Author;
 
@@ -55,7 +58,7 @@ public class BibtexNameFormatter {
      */
     public static String formatName(Author author, String format, Warn warn) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         char[] c = format.toCharArray();
         int n = c.length;
@@ -68,8 +71,8 @@ public class BibtexNameFormatter {
                 group++;
                 i++;
                 braceLevel++;
-                StringBuffer level1Chars = new StringBuffer();
-                StringBuffer wholeChar = new StringBuffer();
+                StringBuilder level1Chars = new StringBuilder();
+                StringBuilder wholeChar = new StringBuilder();
                 while ((i < n) && (braceLevel > 0)) {
                     wholeChar.append(c[i]);
                     if (c[i] == '{') {
@@ -165,7 +168,7 @@ public class BibtexNameFormatter {
                             j++;
                         }
                         if (((j + 1) < d.length) && (d[j + 1] == '{')) {
-                            StringBuffer interTokenSb = new StringBuffer();
+                            StringBuilder interTokenSb = new StringBuilder();
                             j = BibtexNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);
                             interToken = interTokenSb.substring(1, interTokenSb.length() - 1);
                         }
@@ -175,15 +178,8 @@ public class BibtexNameFormatter {
                             if (abbreviateThatIsSingleLetter) {
                                 String[] dashes = token.split("-");
 
-                                StringBuffer abbToken = new StringBuffer();
-                                for (int t = 0; t < (dashes.length - 1); t++) {
-                                    abbToken.append(BibtexNameFormatter.getFirstCharOfString(dashes[t])).append(".-");
-                                }
-                                if (dashes.length > 0) {
-                                    abbToken.append(BibtexNameFormatter.getFirstCharOfString(dashes[dashes.length - 1]));
-                                }
-
-                                token = abbToken.toString();
+                                token = Arrays.asList(dashes).stream().map(BibtexNameFormatter::getFirstCharOfString)
+                                        .collect(Collectors.joining(".-"));
                             }
 
                             // Output token
@@ -250,30 +246,26 @@ public class BibtexNameFormatter {
     /**
      * Including the matching brace.
      *
-     * @param sb
+     * @param interTokenSb
      * @param c
      * @param pos
      * @return
-     *
-     * assert c[pos] == '{'
      */
-    public static int consumeToMatchingBrace(StringBuffer sb, char[] c, int pos) {
+    public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
 
         int braceLevel = 0;
-
-        // assert c[pos] == '{';
 
         for (int i = pos; i < c.length; i++) {
             if (c[i] == '}') {
                 braceLevel--;
                 if (braceLevel == 0) {
-                    sb.append('}');
+                    interTokenSb.append('}');
                     return i;
                 }
             } else if (c[i] == '{') {
                 braceLevel++;
             }
-            sb.append(c[i]);
+            interTokenSb.append(c[i]);
         }
         return c.length;
     }
@@ -291,7 +283,7 @@ public class BibtexNameFormatter {
                 return String.valueOf(c[i]);
             }
             if ((c[i] == '{') && ((i + 1) < c.length) && (c[i + 1] == '\\')) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 BibtexNameFormatter.consumeToMatchingBrace(sb, c, i);
                 return sb.toString();
             }
@@ -299,8 +291,8 @@ public class BibtexNameFormatter {
         return "";
     }
 
-    public static int numberOfChars(String token, int stop) {
-
+    public static int numberOfChars(String token, int inStop) {
+        int stop = inStop;
         if (stop < 0) {
             stop = Integer.MAX_VALUE;
         }
