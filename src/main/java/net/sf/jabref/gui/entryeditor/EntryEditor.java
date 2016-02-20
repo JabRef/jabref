@@ -42,6 +42,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.gui.actions.CleanupAction;
+import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
@@ -116,6 +119,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
     private final AbstractAction writeXmp;
+
+    // The action that performs a quick cleanup
+    private final AbstractAction quickCleanup = new QuickCleanupAction();
 
     final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
@@ -361,6 +367,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         toolBar.add(typeButton);
         toolBar.add(generateKeyAction);
         toolBar.add(autoLinkAction);
+
+        toolBar.add(quickCleanup);
 
         toolBar.add(writeXmp);
 
@@ -1311,6 +1319,24 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             updateSource();
             panel.markBaseChanged();
 
+        }
+    }
+
+    class QuickCleanupAction extends AbstractAction {
+
+        private static final String DESCRIPTION =
+                "Run quick cleanup on entry (the cleanup procedures can be controlled in the preferences)";
+
+        public QuickCleanupAction() {
+            super(Localization.lang(DESCRIPTION), IconTheme.JabRefIcon.CLEANUP_ENTRIES.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang(DESCRIPTION));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            CleanupPreset preset = CleanupPreset.loadQuickPresetFromPreferences(prefs);
+            CleanupWorker worker = new CleanupWorker(preset);
+            worker.cleanup(entry);
         }
     }
 

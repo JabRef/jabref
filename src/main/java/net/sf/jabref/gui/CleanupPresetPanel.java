@@ -92,7 +92,7 @@ public class CleanupPresetPanel {
         panel = builder.build();
     }
 
-    private void updateDisplay(CleanupPreset preset) {
+    public void updateDisplay(CleanupPreset preset) {
         cleanUpSuperscripts.setSelected(preset.isCleanUpSuperscripts());
         cleanUpDOI.setSelected(preset.isCleanUpDOI());
         cleanUpMonth.setSelected(preset.isCleanUpMonth());
