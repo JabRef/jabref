@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -356,7 +354,7 @@ class ContentSelectorDialog2 extends JDialog {
             boolean bNewField = false;
             if (data == null) {
                 bNewField = true;
-                data = new Vector<>();
+                data = new ArrayList<>();
                 changedFieldSet = true;
 
             } else {
