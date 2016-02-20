@@ -190,8 +190,8 @@ public class GroupAddRemoveDialog implements BaseAction {
 
         @Override
         public void valueChanged(TreeSelectionEvent e) {
-            GroupTreeNode node = (GroupTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
-            AbstractGroup group = node.getGroup();
+            GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) e.getNewLeadSelectionPath().getLastPathComponent();
+            AbstractGroup group = node.getNode().getGroup();
             ok.setEnabled(checkGroupEnable(group));
         }
     }
@@ -202,8 +202,8 @@ public class GroupAddRemoveDialog implements BaseAction {
         if (path == null) {
             return false;
         } else {
-            GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
-            AbstractGroup group = node.getGroup();
+            GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
+            AbstractGroup group = node.getNode().getGroup();
             if (checkGroupEnable(group)) {
 
                 if (add) {

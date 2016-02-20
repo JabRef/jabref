@@ -44,11 +44,11 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
      *            The root node of the subtree that was modified (this node may
      *            not be modified, it is just used as a convenience handle).
      */
-    public UndoableModifySubtree(GroupSelector groupSelector, GroupTreeNode groupRoot,
-            GroupTreeNode subtree, String name) {
-        m_subtreeBackup = subtree.deepCopy();
-        m_groupRoot = groupRoot;
-        m_subtreeRootPath = subtree.getIndexedPath();
+    public UndoableModifySubtree(GroupSelector groupSelector, GroupTreeNodeViewModel groupRoot,
+            GroupTreeNodeViewModel subtree, String name) {
+        m_subtreeBackup = subtree.getNode().deepCopy();
+        m_groupRoot = groupRoot.getNode();
+        m_subtreeRootPath = subtree.getNode().getIndexedPath();
         m_groupSelector = groupSelector;
         m_name = name;
     }

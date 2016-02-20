@@ -27,7 +27,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 public class UndoableChangeEntriesOfGroup {
 
-   public static AbstractUndoableEdit getUndoableEdit(GroupTreeNode node, EntriesGroupChange change) {
+   public static AbstractUndoableEdit getUndoableEdit(GroupTreeNodeViewModel node, EntriesGroupChange change) {
 
        if(change.getOldEntries().size() != change.getNewEntries().size()) {
            return new UndoableChangeAssignment(node, change.getOldEntries(), change.getNewEntries());

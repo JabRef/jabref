@@ -34,14 +34,14 @@ import net.sf.jabref.gui.undo.NamedCompound;
 public class AddToGroupAction extends AbstractAction {
 
     private final boolean move;
-    private GroupTreeNode node;
+    private GroupTreeNodeViewModel node;
     private BasePanel panel;
 
     /**
      * @param move If true, remove entries from all other groups.
      */
-    public AddToGroupAction(GroupTreeNode node, boolean move, BasePanel panel) {
-        super(node.getGroup().getName());
+    public AddToGroupAction(GroupTreeNodeViewModel node, boolean move, BasePanel panel) {
+        super(node.getNode().getGroup().getName());
         this.node = node;
         this.move = move;
         this.panel = panel;
@@ -57,7 +57,7 @@ public class AddToGroupAction extends AbstractAction {
         this.panel = panel;
     }
 
-    public void setNode(GroupTreeNode node) {
+    public void setNode(GroupTreeNodeViewModel node) {
         this.node = node;
     }
 
@@ -87,11 +87,11 @@ public class AddToGroupAction extends AbstractAction {
 
     public void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
         List<GroupTreeNode> groupsContainingEntries =
-                node.getRoot().getContainingGroupsSupportingRemoval(entries);
+                node.getNode().getRoot().getContainingGroupsSupportingRemoval(entries);
 
         List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
                 Collectors.toList());
-        affectedGroups.add(node.getGroup());
+        affectedGroups.add(node.getNode().getGroup());
         if (!Util.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
             return; // user aborted operation
         }
@@ -105,18 +105,18 @@ public class AddToGroupAction extends AbstractAction {
         }
 
         // then add
-        Optional<EntriesGroupChange> undoAdd = node.addToGroup(entries);
+        Optional<EntriesGroupChange> undoAdd = node.getNode().addToGroup(entries);
         if (undoAdd.isPresent()) {
             undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }
     }
 
     public void addToGroup(List<BibEntry> entries, NamedCompound undo) {
-        if (!Util.warnAssignmentSideEffects(node.getGroup(), panel.frame())) {
+        if (!Util.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undoAdd = node.addToGroup(entries);
+        Optional<EntriesGroupChange> undoAdd = node.getNode().addToGroup(entries);
         if (undoAdd.isPresent()) {
             undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }

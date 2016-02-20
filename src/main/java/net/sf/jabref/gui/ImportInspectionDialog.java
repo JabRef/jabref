@@ -32,6 +32,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.logic.groups.AbstractGroup;
@@ -741,7 +742,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                     Optional<EntriesGroupChange> undo = node.addToGroup(
                                             Collections.singletonList(entry));
                                     if (undo.isPresent()) {
-                                        ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undo.get()));
+                                        ce.addEdit(UndoableChangeEntriesOfGroup
+                                                .getUndoableEdit(new GroupTreeNodeViewModel(node), undo.get()));
                                     }
                                 }
                             }

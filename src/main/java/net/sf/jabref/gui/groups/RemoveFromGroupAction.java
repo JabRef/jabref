@@ -28,12 +28,12 @@ import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
-    private GroupTreeNode mNode;
+    private GroupTreeNodeViewModel mNode;
     private BasePanel mPanel;
 
 
-    public RemoveFromGroupAction(GroupTreeNode node, BasePanel panel) {
-        super(node.getGroup().getName());
+    public RemoveFromGroupAction(GroupTreeNodeViewModel node, BasePanel panel) {
+        super(node.getNode().getGroup().getName());
         mNode = node;
         mPanel = panel;
     }
@@ -42,7 +42,7 @@ public class RemoveFromGroupAction extends AbstractAction {
         super(Localization.lang("Remove entry selection from this group"));
     }
 
-    public void setNode(GroupTreeNode node) {
+    public void setNode(GroupTreeNodeViewModel node) {
         mNode = node;
     }
 
@@ -53,11 +53,11 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!Util.warnAssignmentSideEffects(mNode.getGroup(), mPanel.frame())) {
+        if (!Util.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undo = mNode.removeFromGroup(mPanel.getSelectedEntries());
+        Optional<EntriesGroupChange> undo = mNode.getNode().removeFromGroup(mPanel.getSelectedEntries());
         if (! undo.isPresent()) {
             return; // no changed made
         }

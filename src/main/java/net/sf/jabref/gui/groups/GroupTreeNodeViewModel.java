@@ -140,7 +140,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     /** Collapse this node and all its children. */
     public void collapseSubtree(JTree tree) {
-        tree.collapsePath(new TreePath(this.node.getPath()));
+        tree.collapsePath(this.getTreePath());
 
         for(GroupTreeNodeViewModel child : getChildren()) {
             child.collapseSubtree(tree);
@@ -149,7 +149,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     /** Expand this node and all its children. */
     public void expandSubtree(JTree tree) {
-        tree.expandPath(new TreePath(this.node.getPath()));
+        tree.expandPath(this.getTreePath());
 
         for(GroupTreeNodeViewModel child : getChildren()) {
             child.collapseSubtree(tree);
@@ -211,5 +211,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         } else {
             return null;
         }
+    }
+
+    public TreePath getTreePath() {
+        List<GroupTreeNode> pathToNode = node.getPath();
+        return new TreePath(pathToNode.stream().map(node -> new GroupTreeNodeViewModel(node)).toArray());
     }
 }

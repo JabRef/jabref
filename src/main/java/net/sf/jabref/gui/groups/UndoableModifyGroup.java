@@ -40,13 +40,13 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
      *            The new group to replace the one currently stored in <b>node
      *            </b>.
      */
-    public UndoableModifyGroup(GroupSelector gs, GroupTreeNode groupsRoot,
-            GroupTreeNode node, AbstractGroup newGroup) {
+    public UndoableModifyGroup(GroupSelector gs, GroupTreeNodeViewModel groupsRoot,
+            GroupTreeNodeViewModel node, AbstractGroup newGroup) {
         groupSelector = gs;
-        m_oldGroupBackup = node.getGroup().deepCopy();
+        m_oldGroupBackup = node.getNode().getGroup().deepCopy();
         m_newGroupBackup = newGroup.deepCopy();
-        m_pathToNode = node.getIndexedPath();
-        m_groupsRootHandle = groupsRoot;
+        m_pathToNode = node.getNode().getIndexedPath();
+        m_groupsRootHandle = groupsRoot.getNode();
     }
 
     @Override

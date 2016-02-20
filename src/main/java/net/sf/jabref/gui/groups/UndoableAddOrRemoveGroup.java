@@ -25,7 +25,7 @@ import java.util.List;
 class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
 
     /** The root of the global groups tree */
-    private final GroupTreeNode m_groupsRootHandle;
+    private final GroupTreeNodeViewModel m_groupsRootHandle;
     /** The subtree that was added or removed */
     private final GroupTreeNode m_subtreeBackup;
     /**
@@ -65,20 +65,20 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      *            then call this constructor. When removing, you first have to
      *            call this constructor, then remove the node.
      */
-    public UndoableAddOrRemoveGroup(GroupSelector gs, GroupTreeNode groupsRoot,
-            GroupTreeNode editedNode, int editType) {
+    public UndoableAddOrRemoveGroup(GroupSelector gs, GroupTreeNodeViewModel groupsRoot,
+            GroupTreeNodeViewModel editedNode, int editType) {
         m_groupSelector = gs;
         m_groupsRootHandle = groupsRoot;
         m_editType = editType;
         m_subtreeRootChildCount = editedNode.getChildCount();
         // storing a backup of the whole subtree is not required when children
         // are kept
-        m_subtreeBackup = editType == UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? new GroupTreeNode(
-                editedNode.getGroup().deepCopy()) : editedNode.deepCopy();
+        m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? editedNode.getNode()
+                .deepCopy() : new GroupTreeNode(editedNode.getNode().getGroup().deepCopy());
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.
-        m_pathToNode = editedNode.getIndexedPath();
+        m_pathToNode = editedNode.getNode().getIndexedPath();
     }
 
     @Override
@@ -118,7 +118,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
     }
 
     private void doOperation(boolean undo) {
-        GroupTreeNode cursor = m_groupsRootHandle;
+        GroupTreeNode cursor = m_groupsRootHandle.getNode();
         final int childIndex = m_pathToNode.get(m_pathToNode.size() - 1);
         // traverse path up to but last element
         for (int i = 0; i < (m_pathToNode.size() - 1); ++i) {

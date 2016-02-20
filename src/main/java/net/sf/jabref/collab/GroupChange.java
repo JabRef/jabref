@@ -19,6 +19,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -42,9 +43,9 @@ class GroupChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups();
-        final UndoableModifySubtree undo = new UndoableModifySubtree(
-                panel.getGroupSelector(), panel.getBibDatabaseContext().getMetaData().getGroups(),
-                root, Localization.lang("Modified groups"));
+        final UndoableModifySubtree undo = new UndoableModifySubtree(panel.getGroupSelector(),
+                new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups()),
+                new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible
@@ -53,7 +54,7 @@ class GroupChange extends Change {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(changedGroups.getGroup());
             for (int i = 0; i < changedGroups.getChildCount(); ++i) {
-                root.add(((GroupTreeNode) changedGroups.getChildAt(i)).deepCopy());
+                root.add(changedGroups.getChildAt(i).deepCopy());
             }
             // the group tree is now appled to a different BibDatabase than it was created
             // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
@@ -61,7 +62,7 @@ class GroupChange extends Change {
             root.refreshGroupsForNewDatabase(panel.database());
         }
 
-        if (panel.getGroupSelector().getGroupTreeRoot() == root) {
+        if (panel.getGroupSelector().getGroupTreeRoot().getNode() == root) {
             panel.getGroupSelector().revalidateGroups();
         }
         undoEdit.addEdit(undo);

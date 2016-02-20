@@ -45,12 +45,12 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     /**
      * @param node The node whose assignments were edited.
      */
-    public UndoableChangeAssignment(GroupTreeNode node, Set<BibEntry> previousAssignments,
+    public UndoableChangeAssignment(GroupTreeNodeViewModel node, Set<BibEntry> previousAssignments,
             Set<BibEntry> newAssignments) {
         this.previousAssignments = new HashSet<>(previousAssignments);
         this.newAssignments = new HashSet<>(newAssignments);
-        this.root = node.getRoot();
-        this.pathToNode = node.getIndexedPath();
+        this.root = node.getNode().getRoot();
+        this.pathToNode = node.getNode().getIndexedPath();
     }
 
     @Override

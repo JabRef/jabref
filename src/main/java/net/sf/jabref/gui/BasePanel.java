@@ -32,6 +32,7 @@ import net.sf.jabref.external.*;
 import net.sf.jabref.gui.groups.GroupAddRemoveDialog;
 import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.groups.GroupSelector;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
@@ -1349,7 +1350,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
                     for (final TreePath tree : selection) {
-                        ((GroupTreeNode) tree.getLastPathComponent()).addToGroup(entries);
+                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).getNode().addToGroup(entries);
                     }
                 }
                 //BasePanel.this.updateEntryEditorIfShowing(); // doesn't seem to be necessary
@@ -1519,7 +1520,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
                 final TreePath path = frame.groupSelector.getSelectionPath();
-                final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
+                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path.getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {

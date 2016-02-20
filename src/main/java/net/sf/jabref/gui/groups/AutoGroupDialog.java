@@ -53,7 +53,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
     private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Localization.lang("OK"));
-    private final GroupTreeNode m_groupsRoot;
+    private final GroupTreeNodeViewModel m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
@@ -63,7 +63,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
      * @param groupsRoot The original set of groups, which is required as undo information when all groups are cleared.
      */
     public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel, GroupSelector groupSelector,
-            GroupTreeNode groupsRoot, String defaultField, String defaultRemove, String defaultDeliminator) {
+            GroupTreeNodeViewModel groupsRoot, String defaultField, String defaultRemove, String defaultDeliminator) {
         super(jabrefFrame, Localization.lang("Automatically create groups"), true);
         frame = jabrefFrame;
         gs = groupSelector;
@@ -110,10 +110,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     autoGroupsRoot.add(new GroupTreeNode(group));
                 }
 
-                m_groupsRoot.add(autoGroupsRoot);
+                m_groupsRoot.getNode().add(autoGroupsRoot);
                 NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
-                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot, autoGroupsRoot,
-                        UndoableAddOrRemoveGroup.ADD_NODE);
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot,
+                        new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
                 undo.setRevalidate(true);
                 ce.addEdit(undo);
 

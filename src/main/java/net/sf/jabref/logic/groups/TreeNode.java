@@ -30,7 +30,9 @@ public abstract class TreeNode {
      */
     public List<Integer> getIndexedPath() {
         if (parent == null) {
-            return Collections.singletonList(0);
+            List<Integer> pathToMe = new ArrayList<>();
+            pathToMe.add(0);
+            return pathToMe;
         }
 
         List<Integer> path = parent.getIndexedPath();
@@ -134,7 +136,9 @@ public abstract class TreeNode {
      */
     public List<GroupTreeNode> getPath() {
         if (parent == null) {
-            return Collections.singletonList((GroupTreeNode) this);
+            List<GroupTreeNode> pathToMe = new ArrayList<>();
+            pathToMe.add((GroupTreeNode) this);
+            return pathToMe;
         }
 
         List<GroupTreeNode> path = parent.getPath();

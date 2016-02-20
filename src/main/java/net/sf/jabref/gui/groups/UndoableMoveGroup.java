@@ -32,7 +32,7 @@ import java.util.Objects;
 class UndoableMoveGroup extends AbstractUndoableEdit {
 
     private final GroupSelector groupSelector;
-    private final GroupTreeNode root;
+    private final GroupTreeNodeViewModel root;
     private final List<Integer> pathToNewParent;
     private final int newChildIndex;
     private final List<Integer> pathToOldParent;
@@ -64,9 +64,9 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     public void undo() {
         super.undo();
 
-        GroupTreeNode newParent = root.getDescendant(pathToNewParent);
+        GroupTreeNode newParent = root.getNode().getDescendant(pathToNewParent);
         GroupTreeNode node = newParent.getChildAt(newChildIndex);
-        root.getDescendant(pathToOldParent).insert(node, oldChildIndex);
+        root.getNode().getDescendant(pathToOldParent).insert(node, oldChildIndex);
         groupSelector.revalidateGroups();
     }
 
@@ -74,9 +74,9 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     public void redo() {
         super.redo();
 
-        GroupTreeNode oldParent = root.getDescendant(pathToOldParent);
+        GroupTreeNode oldParent = root.getNode().getDescendant(pathToOldParent);
         GroupTreeNode node = oldParent.getChildAt(oldChildIndex);
-        root.getDescendant(pathToNewParent).insert(node, newChildIndex);
+        root.getNode().getDescendant(pathToNewParent).insert(node, newChildIndex);
         groupSelector.revalidateGroups();
     }
 }
