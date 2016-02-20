@@ -3,7 +3,7 @@ package net.sf.jabref.exporter.layout.format;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BibtexNameLayoutFormatterTest {
+public class NameFormatterTest {
 
     @Test
     public void testFormatStringStringBibtexEntry() {
