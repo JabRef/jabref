@@ -169,6 +169,9 @@ public class InternalBibtexFields {
         // some semi-standard fields
         dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
         dummy.setPrivate();
+        // the field is displayed and written with a special handling. Therefore, we set displayable and writable to false
+        dummy.setWriteable(false);
+        dummy.setDisplayable(false);
         add(dummy);
 
         dummy = new BibtexSingleField("doi", true, GUIGlobals.SMALL_W);
