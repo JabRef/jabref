@@ -173,7 +173,7 @@ public class BibtexParser {
             } else if ("comment".equals(entryType)) {
                 parseJabRefComment(meta);
             } else {
-                // Not a comment, preamble or string thus it is an entry
+                // Not a comment, preamble, or string. Thus, it is an entry
                 parseAndAddEntry(entryType);
             }
 
@@ -796,9 +796,9 @@ public class BibtexParser {
             int character = read();
             if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
-            } else if (character == '{' || character == '(') {
+            } else if ((character == '{') || (character == '(')) {
                 brackets++;
-            } else if (character == '}' || character == ')') {
+            } else if ((character == '}') || (character == ')')) {
                 brackets--;
             }
 

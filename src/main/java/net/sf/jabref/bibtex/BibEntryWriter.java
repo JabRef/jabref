@@ -30,6 +30,15 @@ public class BibEntryWriter {
     public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode) throws IOException {
         write(entry, out, bibDatabaseMode, false);
     }
+
+    /**
+     * Writes the given BibEntry using the given writer
+     *
+     * @param entry The entry to write
+     * @param out The writer to use
+     * @param bibDatabaseMode The database mode (bibtex or biblatex)
+     * @param reformat Should the entry be in any case, even if no change occurred?
+     */
     public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
@@ -159,7 +168,7 @@ public class BibEntryWriter {
      * The was a long discussion about how JabRef should write the fields.
      * See https://github.com/JabRef/jabref/issues/116
      * <p>
-     * The team decided to do the biber way and use lower case for the field names.
+     * The team decided to do the biblatex way and use lower case for the field names.
      *
      * @param field The name of the field.
      * @return The display version of the field name.
