@@ -110,8 +110,23 @@ public class AuthorsTest {
     public void testLastName() {
         ParamLayoutFormatter a = new Authors();
         a.setArgument("LastName");
-        Assert.assertEquals("Bruce, Manson and Jumper",
-                a.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper"));
+        Assert.assertEquals("Bruce, von Manson and Jumper",
+                a.format("Bruce, Bob Croydon and Charles von Manson and Jolly Jumper"));
     }
 
+    @Test
+    public void testMiddleInitial() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("MiddleInitial");
+        Assert.assertEquals("Bob C. Bruce, Charles K. von Manson and Jolly Jumper",
+                a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
+    }
+
+    @Test
+    public void testNoPeriod() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("NoPeriod");
+        Assert.assertEquals("B C Bruce, C K von Manson and J Jumper",
+                a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
+    }
 }

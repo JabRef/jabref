@@ -10,46 +10,53 @@ public class WrapContentTest {
     @Test
     public void testSimpleText() {
         ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Bob,Ben");
-        Assert.assertEquals("BobBob BruceBen", a.format("Bob Bruce"));
+        a.setArgument("<,>");
+        Assert.assertEquals("<Bob>", a.format("Bob"));
     }
 
     @Test
     public void testEmptyStart() {
         ParamLayoutFormatter a = new WrapContent();
-        a.setArgument(",Ben");
-        Assert.assertEquals("Bob BruceBen", a.format("Bob Bruce"));
+        a.setArgument(",:");
+        Assert.assertEquals("Bob:", a.format("Bob"));
     }
 
     @Test
     public void testEmptyEnd() {
         ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Bob,");
-        Assert.assertEquals("BobBob Bruce", a.format("Bob Bruce"));
+        a.setArgument("Content: ,");
+        Assert.assertEquals("Content: Bob", a.format("Bob"));
     }
 
     @Test
-    public void testFormatNull() {
+    public void testEscaping() {
+        ParamLayoutFormatter a = new WrapContent();
+        a.setArgument("Name\\,Field\\,,\\,Author");
+        Assert.assertEquals("Name,Field,Bob,Author", a.format("Bob"));
+    }
+
+    @Test
+    public void testFormatNullExpectNothingAdded() {
         ParamLayoutFormatter a = new WrapContent();
         a.setArgument("Eds.,Ed.");
         Assert.assertEquals(null, a.format(null));
     }
 
     @Test
-    public void testFormatEmpty() {
+    public void testFormatEmptyExpectNothingAdded() {
         ParamLayoutFormatter a = new WrapContent();
         a.setArgument("Eds.,Ed.");
         Assert.assertEquals("", a.format(""));
     }
 
     @Test
-    public void testNoArgumentSet() {
+    public void testNoArgumentSetExpectNothingAdded() {
         ParamLayoutFormatter a = new WrapContent();
         Assert.assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
     }
 
     @Test
-    public void testNoProperArgument() {
+    public void testNoProperArgumentExpectNothingAdded() {
         ParamLayoutFormatter a = new WrapContent();
         a.setArgument("Eds.");
         Assert.assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));

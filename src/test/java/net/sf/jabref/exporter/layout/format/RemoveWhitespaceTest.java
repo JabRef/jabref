@@ -8,12 +8,12 @@ import org.junit.Test;
 public class RemoveWhitespaceTest {
 
     @Test
-    public void testEmpty() {
+    public void testEmptyExpectEmpty() {
         assertEquals("", new RemoveWhitespace().format(""));
     }
 
     @Test
-    public void testNull() {
+    public void testNullExpectNull() {
         assertNull(new RemoveWhitespace().format(null));
     }
 

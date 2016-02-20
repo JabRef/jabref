@@ -15,7 +15,7 @@ public class DefaultTest {
     }
 
     @Test
-    public void testFormatNull() {
+    public void testFormatNullExpectReplace() {
         ParamLayoutFormatter a = new Default();
         a.setArgument("DEFAULT TEXT");
         Assert.assertEquals("DEFAULT TEXT", a.format(null));
@@ -32,6 +32,18 @@ public class DefaultTest {
     public void testNoArgumentSet() {
         ParamLayoutFormatter a = new Default();
         Assert.assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+    }
+
+    @Test
+    public void testNoArgumentSetNullInput() {
+        ParamLayoutFormatter a = new Default();
+        Assert.assertEquals("", a.format(null));
+    }
+
+    @Test
+    public void testNoArgumentSetEmptyInput() {
+        ParamLayoutFormatter a = new Default();
+        Assert.assertEquals("", a.format(""));
     }
 
 }
