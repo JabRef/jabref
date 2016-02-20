@@ -16,7 +16,7 @@
 package net.sf.jabref.openoffice;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.strings.LatexToUnicodeCharMap;
+import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final Map<String, String> CHARS = new LatexToUnicodeCharMap();
+    private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
     @Override
     public String format(String field) {

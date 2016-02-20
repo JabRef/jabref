@@ -27,6 +27,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
 - Added Ordinal formatter (1 -> 1st etc)
+- The LaTeX to Unicode/HTML functionality is much improved by covering many more cases
+- Ability to convert from LaTeX to Unicode in right-click field menu
 
 - [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
 

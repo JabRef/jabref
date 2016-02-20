@@ -15,9 +15,11 @@
 */
 package net.sf.jabref.exporter.layout.format;
 
+import java.util.Map;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.strings.HtmlCharsMap;
+import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
@@ -25,7 +27,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  */
 public class HTMLChars implements LayoutFormatter {
 
-    private static final HtmlCharsMap HTML_CHARS = new HtmlCharsMap();
+    private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
 
     @Override
     public String format(String field) {

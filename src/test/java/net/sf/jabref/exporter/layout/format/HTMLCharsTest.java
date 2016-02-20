@@ -21,14 +21,14 @@ public class HTMLCharsTest {
 
         Assert.assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
-        Assert.assertEquals("&#305; &#305;", layout.format("\\i \\i"));
-        Assert.assertEquals("&#305;", layout.format("\\i"));
-        Assert.assertEquals("&#305;", layout.format("\\{i}"));
-        Assert.assertEquals("&#305;&#305;", layout.format("\\i\\i"));
+        Assert.assertEquals("&imath; &imath;", layout.format("\\i \\i"));
+        Assert.assertEquals("&imath;", layout.format("\\i"));
+        Assert.assertEquals("&imath;", layout.format("\\{i}"));
+        Assert.assertEquals("&imath;&imath;", layout.format("\\i\\i"));
 
-        Assert.assertEquals("&#319;&#305;", layout.format("\\Lmidot\\i"));
+        Assert.assertEquals("&Lmidot;&imath;", layout.format("\\Lmidot\\i"));
 
-        Assert.assertEquals("&ntilde; &ntilde; &iacute; &#305; &#305;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
+        Assert.assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
     }
 
     @Test

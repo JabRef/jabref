@@ -53,9 +53,9 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         }
 
         // Standard symbols
-        Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_SYMBOLS.keySet();
+        Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.keySet();
         for (Character character : chars) {
-            text = text.replaceAll(character.toString(), HTMLUnicodeConversionMaps.UNICODE_SYMBOLS.get(character));
+            text = text.replaceAll(character.toString(), HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(character));
         }
 
         // Combining accents
@@ -128,18 +128,18 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         text = sb.toString();
 
         // Handle text based HTML entities
-        Set<String> patterns = HTMLUnicodeConversionMaps.ESCAPED_SYMBOLS.keySet();
+        Set<String> patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
         for (String pattern : patterns) {
-            text = text.replaceAll(pattern, HTMLUnicodeConversionMaps.ESCAPED_SYMBOLS.get(pattern));
+            text = text.replaceAll(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));
         }
 
         // Handle numerical HTML entities
         Matcher m = ESCAPED_PATTERN.matcher(text);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
-            if (HTMLUnicodeConversionMaps.NUMERICAL_SYMBOLS.containsKey(num)) {
+            if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
                 text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
-                        HTMLUnicodeConversionMaps.NUMERICAL_SYMBOLS.get(num));
+                        HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num));
             }
         }
 

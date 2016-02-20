@@ -19,6 +19,7 @@ package net.sf.jabref.logic.util.strings;
 
 import java.util.*;
 
+import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.importer.HTMLConverter;
 
 /**
@@ -30,10 +31,12 @@ public class Converters {
 
     private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
 
+    public static final LatexToUnicodeConverter LATEX_TO_UNICODE = new LatexToUnicodeConverter();
     public static final UnicodeToLatexConverter UNICODE_TO_LATEX = new UnicodeToLatexConverter();
     public static final HTMLToLatexConverter HTML_TO_LATEX = new HTMLToLatexConverter();
 
-    public static final List<Converter> ALL = Arrays.asList(Converters.HTML_TO_LATEX, Converters.UNICODE_TO_LATEX);
+    public static final List<Converter> ALL = Arrays.asList(Converters.HTML_TO_LATEX, Converters.UNICODE_TO_LATEX,
+            Converters.LATEX_TO_UNICODE);
 
     public interface Converter {
 
@@ -52,6 +55,21 @@ public class Converters {
         @Override
         public String convert(String input) {
             return Converters.HTML_CONVERTER.formatUnicode(input);
+        }
+    }
+
+    public static class LatexToUnicodeConverter implements Converter {
+
+        private final FormatChars formatter = new FormatChars();
+
+        @Override
+        public String getName() {
+            return "LaTeX to Unicode";
+        }
+
+        @Override
+        public String convert(String input) {
+            return formatter.format(input);
         }
     }
 
