@@ -258,4 +258,20 @@ public class StringUtilTest {
         assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
+    @Test
+    public void testLimitStringLengthShort() {
+        assertEquals("Test", StringUtil.limitStringLength("Test", 20));
+    }
+
+    @Test
+    public void testLimitStringLengthLimiting() {
+        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
+        assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
+    }
+
+    @Test
+    public void testLimitStringLengthNullInput() {
+        assertNull(StringUtil.limitStringLength(null, 10));
+    }
+
 }

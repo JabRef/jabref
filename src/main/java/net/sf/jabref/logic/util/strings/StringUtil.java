@@ -553,4 +553,16 @@ public class StringUtil {
         }
         return result.toString();
     }
+
+    public static String limitStringLength(String s, int maxLength) {
+        if (s == null) {
+            return null;
+        }
+    
+        if (s.length() <= maxLength) {
+            return s;
+        }
+    
+        return s.substring(0, maxLength - 3) + "...";
+    }
 }
