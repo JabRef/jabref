@@ -36,6 +36,7 @@ import net.sf.jabref.sql.SQLUtil;
 final public class MySQLExporter extends DBExporter {
 
     private static MySQLExporter instance;
+    private static final String OPT_ALLOW_MULTI_QUERIES = "?allowMultiQueries=true";
 
 
     private MySQLExporter() {
@@ -55,15 +56,19 @@ final public class MySQLExporter extends DBExporter {
     @Override
     public Connection connectToDB(DBStrings dbstrings) throws Exception {
         this.dbStrings = dbstrings;
+
+        dbStrings.setDbParameters(OPT_ALLOW_MULTI_QUERIES);
         String url = SQLUtil.createJDBCurl(dbstrings, false);
         String drv = "com.mysql.jdbc.Driver";
+
 
         Class.forName(drv).newInstance();
         Connection conn = DriverManager.getConnection(url,
                 dbstrings.getUsername(), dbstrings.getPassword());
         SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `"
                 + dbStrings.getDatabase() + '`');
-        SQLUtil.processQuery(conn, "USE `" + dbStrings.getDatabase() + '`');
+
+        conn.setCatalog(dbStrings.getDatabase());
         return conn;
     }
 
