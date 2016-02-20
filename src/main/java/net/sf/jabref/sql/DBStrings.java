@@ -33,6 +33,7 @@ public class DBStrings {
     private String database;
     private String username;
     private String password;
+    private String dbParameters = "";
 
     private List<String> serverTypes;
     private boolean isInitialized;
@@ -124,6 +125,25 @@ public class DBStrings {
     }
 
     /**
+     * Returns the database parameters set
+     * @return dbParameters: The concatenated parameters
+     */
+    public String getDbParameters() {
+        return dbParameters;
+    }
+
+    /**
+     * Add server specific database parameter(s) <br>
+     * Multiple parameters must be concatenated in the format <br>
+     * {@code ?Parameter1=value&parameter2=value2}
+     * @param dbParameter The concatendated parameter
+     */
+    public void setDbParameters(String dbParameters) {
+        this.dbParameters = dbParameters;
+    }
+
+
+    /**
      * Store these db strings into JabRef preferences.
      */
     public void storeToPreferences() {
@@ -132,4 +152,6 @@ public class DBStrings {
         Globals.prefs.put(JabRefPreferences.DB_CONNECT_DATABASE, getDatabase());
         Globals.prefs.put(JabRefPreferences.DB_CONNECT_USERNAME, getUsername());
     }
+
+
 }
