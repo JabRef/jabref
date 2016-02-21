@@ -3,6 +3,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.model.entry.MonthUtil;
 
+import java.util.Objects;
+
 public class MonthFormatter implements Formatter {
 
     @Override
@@ -17,6 +19,7 @@ public class MonthFormatter implements Formatter {
 
     @Override
     public String format(String value) {
+        Objects.requireNonNull(value);
         MonthUtil.Month month = MonthUtil.getMonth(value);
         if (month.isValid()) {
             return month.bibtexFormat;
