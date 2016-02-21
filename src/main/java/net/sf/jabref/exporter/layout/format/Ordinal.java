@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 /**
- * Converts numbers to ordinals
+ * Converts number to ordinal
  */
 public class Ordinal implements LayoutFormatter {
 
@@ -38,7 +38,7 @@ public class Ordinal implements LayoutFormatter {
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String result = m.group(1);
-            int value = Integer.valueOf(result);
+            int value = Integer.parseInt(result);
             String ordinalString;
             switch (value) {
             case 1:
@@ -52,6 +52,7 @@ public class Ordinal implements LayoutFormatter {
                 break;
             default:
                 ordinalString = "th";
+                break;
             }
             m.appendReplacement(sb, result + ordinalString);
         }

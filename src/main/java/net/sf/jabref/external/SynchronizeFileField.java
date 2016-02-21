@@ -49,7 +49,7 @@ public class SynchronizeFileField extends AbstractWorker {
     private List<BibEntry> sel;
     private SynchronizeFileField.OptionsDialog optDiag;
 
-    private int entriesChangedCount = 0;
+    private int entriesChangedCount;
 
     private final Object[] brokenLinkOptions = {
             Localization.lang("Ignore"),

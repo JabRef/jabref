@@ -1992,7 +1992,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         private final Matcher<E> active;
         private final Matcher<E> inactive;
 
-        private boolean isActive = false;
+        private boolean isActive;
 
         private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
             this.list = list;
