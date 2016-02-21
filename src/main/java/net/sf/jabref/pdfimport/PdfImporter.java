@@ -53,7 +53,7 @@ import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
