@@ -18,16 +18,16 @@ import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
-    private final CopyAction copyAct;
-    private final PasteAction pasteAct;
+    private final CopyAction copyAction;
+    private final PasteAction pasteAction;
 
     private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
 
 
     public FieldTextMenu(FieldEditor fieldComponent) {
         field = fieldComponent;
-        copyAct = new CopyAction((JTextComponent) field);
-        pasteAct = new PasteAction((JTextComponent) field);
+        copyAction = new CopyAction((JTextComponent) field);
+        pasteAction = new PasteAction((JTextComponent) field);
         initMenu();
     }
 
@@ -61,31 +61,31 @@ public class FieldTextMenu implements MouseListener {
                 // enable/disable copy to clipboard if selected text available
                 String txt = field.getSelectedText();
                 String allTxt = field.getText();
-                boolean cStat = false;
+                boolean copyStatus = false;
                 if (((txt != null) && (!txt.isEmpty())) || ((allTxt != null) && !allTxt.isEmpty())) {
-                    cStat = true;
+                    copyStatus = true;
                 }
 
-                copyAct.setEnabled(cStat);
+                copyAction.setEnabled(copyStatus);
 
                 String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
-                boolean pStat = false;
+                boolean pasteStatus = false;
                 if (!data.isEmpty()) {
-                    pStat = true;
-                    pasteAct.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
+                    pasteStatus = true;
+                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
                             + StringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
                 } else {
-                    pasteAct.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
+                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
                 }
-                pasteAct.setEnabled(pStat);
+                pasteAction.setEnabled(pasteStatus);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
 
     private void initMenu() {
-        inputMenu.add(pasteAct);
-        inputMenu.add(copyAct);
+        inputMenu.add(pasteAction);
+        inputMenu.add(copyAction);
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
 

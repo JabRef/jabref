@@ -245,7 +245,7 @@ public class StringUtilTest {
 
     @Test
     public void testQuoteNullString() {
-        assertNull(StringUtil.quote(null, ";", ':'));
+        assertEquals("", StringUtil.quote(null, ";", ':'));
     }
 
     @Test
@@ -271,7 +271,7 @@ public class StringUtilTest {
 
     @Test
     public void testLimitStringLengthNullInput() {
-        assertNull(StringUtil.limitStringLength(null, 10));
+        assertEquals("", StringUtil.limitStringLength(null, 10));
     }
 
 }
