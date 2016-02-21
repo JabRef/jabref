@@ -84,7 +84,8 @@ public class FormatterTest {
                 new Object[]{new TrimFormatter()},
                 new Object[]{new HTMLConverter()},
                 new Object[]{new SuperscriptFormatter()},
-                new Object[]{new UnitFormatter()}
+                new Object[]{new UnitFormatter()},
+                new Object[]{new RemoveBracesFormatter()}
         );
     }
 }
