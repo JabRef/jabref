@@ -254,7 +254,7 @@ public class SearchBar extends JPanel {
         searchField.setText("");
         searchField.setBackground(Color.WHITE);
 
-        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.reset();
 
         this.currentResults.setText("");
 
@@ -294,7 +294,7 @@ public class SearchBar extends JPanel {
     private void informUserAboutInvalidSearchQuery() {
         searchField.setBackground(NO_RESULTS_COLOR);
 
-        searchQueryHighlightObservable.fireSearchlistenerEvent(null);
+        searchQueryHighlightObservable.reset();
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);

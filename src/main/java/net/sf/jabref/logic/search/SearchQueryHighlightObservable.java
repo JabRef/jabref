@@ -74,6 +74,11 @@ public class SearchQueryHighlightObservable {
         update();
     }
 
+    public void reset() {
+        pattern = Optional.empty();
+        update();
+    }
+
     private void update() {
         // Fire an event for every listener
         for (SearchQueryHighlightListener s : listeners) {
