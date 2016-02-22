@@ -1,12 +1,18 @@
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +21,12 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class CleanupWorkerTest {
+
+    @Before
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+        Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+    }
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

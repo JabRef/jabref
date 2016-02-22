@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 /**
  * Helper class to get a Layout object.
@@ -58,7 +58,7 @@ public class LayoutHelper {
         this.in = new PushbackReader(Objects.requireNonNull(in));
     }
 
-    public Layout getLayoutFromText() throws IOException {
+    public Layout getLayoutFromText(JournalAbbreviationRepository repository) throws IOException {
         parse();
 
         for (StringInt parsedEntry : parsedEntries) {
@@ -69,7 +69,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, Globals.journalAbbreviationLoader.getRepository());
+        return new Layout(parsedEntries, repository);
     }
 
     public static String getCurrentGroup() {

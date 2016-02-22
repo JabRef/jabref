@@ -330,7 +330,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString)).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString)).getLayoutFromText(this.repository);
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

@@ -201,7 +201,7 @@ public class Util {
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr).getLayoutFromText();
+            layout = new LayoutHelper(sr).getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }
