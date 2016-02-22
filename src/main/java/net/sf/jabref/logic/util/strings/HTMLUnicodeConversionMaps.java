@@ -783,6 +783,7 @@ public class HTMLUnicodeConversionMaps {
 
         // Manual corrections
         LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
+        LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
     }
 
     private static String cleanLaTeX(String escapedString) {

@@ -54,11 +54,11 @@ public class OOPreFormatter implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = OOPreFormatter.CHARS.get(command);
+                    String result = OOPreFormatter.CHARS.get(command);
                     if (result == null) {
                         sb.append(command);
                     } else {
-                        sb.append((String) result);
+                        sb.append(result);
                     }
                 }
                 escaped = true;
@@ -95,10 +95,10 @@ public class OOPreFormatter implements LayoutFormatter {
                             combody = field.substring(i, i + 1);
                             // System.out.println("... "+combody);
                         }
-                        Object result = OOPreFormatter.CHARS.get(command + combody);
+                        String result = OOPreFormatter.CHARS.get(command + combody);
 
                         if (result != null) {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
 
                         incommand = false;
@@ -177,32 +177,32 @@ public class OOPreFormatter implements LayoutFormatter {
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command
-                        Object result = OOPreFormatter.CHARS.get(command + argument);
+                        String result = OOPreFormatter.CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
                         // the
                         // text of the parameter intact.
                         if (result == null) {
                             sb.append(argument);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = OOPreFormatter.CHARS.get(command);
+                        String result = OOPreFormatter.CHARS.get(command);
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                     } else {
-                        Object result = OOPreFormatter.CHARS.get(command);
+                        String result = OOPreFormatter.CHARS.get(command);
                         if (result == null) {
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                         sb.append(' ');
                     }

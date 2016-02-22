@@ -45,8 +45,6 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
-    private final HTMLConverter htmlConverter = new HTMLConverter();
-
 
     @Override
     public void stopFetching() {
@@ -107,8 +105,8 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.setField("title", title);
             });
 
-            entry.getFieldOptional("institution")
-                    .ifPresent(institution -> entry.setField("institution", htmlConverter.formatUnicode(institution)));
+            entry.getFieldOptional("institution").ifPresent(
+                    institution -> entry.setField("institution", new UnicodeConverter().format(institution)));
             // Do not use the provided key
             // entry.clearField(InternalBibtexFields.KEY_FIELD);
             inspector.addEntry(entry);

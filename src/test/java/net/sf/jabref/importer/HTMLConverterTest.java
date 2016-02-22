@@ -21,7 +21,6 @@ public class HTMLConverterTest {
     @Test
     public void testBasic() {
         assertEquals("aaa", conv.format("aaa"));
-        assertEquals("aaa", conv.formatUnicode("aaa"));
     }
 
     @Test
@@ -49,32 +48,4 @@ public class HTMLConverterTest {
         assertEquals("{\\\"{a}}b", conv.format("a&#776;b"));
         assertEquals("{\\\"{a}}b", conv.format("a&#x308;b"));
     }
-
-    @Test
-    public void testUnicodeCombiningAccents() {
-        assertEquals("{\\\"{a}}", conv.formatUnicode("a\u0308"));
-        assertEquals("{\\\"{a}}b", conv.formatUnicode("a\u0308b"));
-    }
-
-    @Test
-    public void testUnicode() {
-        assertEquals("{\\\"{a}}", conv.formatUnicode("ä"));
-        assertEquals("{$\\Epsilon$}", conv.formatUnicode("\u0395"));
-    }
-
-    @Test
-    public void testUnicodeSingle() {
-        assertEquals("a", conv.formatUnicode("a"));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testUnicodeNull() {
-        conv.formatUnicode(null);
-    }
-
-    @Test
-    public void testUnicodeEmpty() {
-        assertEquals("", conv.formatUnicode(""));
-    }
-
 }
