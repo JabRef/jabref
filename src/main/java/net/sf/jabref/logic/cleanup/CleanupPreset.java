@@ -20,6 +20,9 @@ import java.util.EnumSet;
 
 public class CleanupPreset {
 
+    public static final String SUFFIX_STANDARD = "";
+    public static final String SUFFIX_QUICK = "_Quick";
+
     private final EnumSet<CleanupStep> activeJobs;
 
     public CleanupPreset(EnumSet<CleanupStep> activeJobs) {
@@ -30,60 +33,68 @@ public class CleanupPreset {
         this(EnumSet.of(activeJob));
     }
 
-    public static CleanupPreset loadFromPreferences(JabRefPreferences preferences) {
+    public static CleanupPreset loadStandardPresetFromPreferences(JabRefPreferences preferences) {
+        return loadFromPreferences(preferences, SUFFIX_STANDARD);
+    }
+
+    private static CleanupPreset loadFromPreferences(JabRefPreferences preferences, String suffix) {
 
         EnumSet<CleanupStep> activeJobs = EnumSet.noneOf(CleanupStep.class);
 
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_SUPERSCRIPTS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_DOI);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MONTH)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MONTH + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_MONTH);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_PAGE_NUMBERS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_PAGE_NUMBERS + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_PAGE_NUMBERS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_DATE)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_DATE + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_DATE);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE + suffix)) {
             activeJobs.add(CleanupStep.MAKE_PATHS_RELATIVE);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF + suffix)) {
             activeJobs.add(CleanupStep.RENAME_PDF);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS + suffix)) {
             activeJobs.add(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS + suffix)) {
             activeJobs.add(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_HTML)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_HTML + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_HTML_TO_LATEX);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CASE)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CASE + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_CASE);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_LATEX)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_LATEX + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_LATEX);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UNITS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UNITS + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_UNITS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UNICODE)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UNICODE + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_UNICODE_TO_LATEX);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX + suffix)) {
             activeJobs.add(CleanupStep.CONVERT_TO_BIBLATEX);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS)) {
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS + suffix)) {
             activeJobs.add(CleanupStep.FIX_FILE_LINKS);
         }
 
         return new CleanupPreset(activeJobs);
+    }
+
+    public static CleanupPreset loadQuickPresetFromPreferences(JabRefPreferences preferences) {
+        return loadFromPreferences(preferences, SUFFIX_QUICK);
     }
 
     public boolean isCleanUpUpgradeExternalLinks() {
@@ -150,26 +161,39 @@ public class CleanupPreset {
         return isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
     }
 
-    public void storeInPreferences(JabRefPreferences preferences) {
+    public void storeInPreferencesAsStandard(JabRefPreferences preferences) {
+        storeInPreferences(preferences, SUFFIX_STANDARD);
+    }
 
-        preferences.putBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS, isActive(CleanupStep.CLEAN_UP_SUPERSCRIPTS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_DOI, isActive(CleanupStep.CLEAN_UP_DOI));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_MONTH, isActive(CleanupStep.CLEAN_UP_MONTH));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_PAGE_NUMBERS, isActive(CleanupStep.CLEAN_UP_PAGE_NUMBERS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_DATE, isActive(CleanupStep.CLEAN_UP_DATE));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, isActive(CleanupStep.MAKE_PATHS_RELATIVE));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, isActive(CleanupStep.RENAME_PDF));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
+    public void storeInPreferencesAsQuick(JabRefPreferences preferences) {
+        storeInPreferences(preferences, SUFFIX_QUICK);
+    }
+
+    public void storeInPreferences(JabRefPreferences preferences, String suffix) {
+
+        preferences.putBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS + suffix,
+                isActive(CleanupStep.CLEAN_UP_SUPERSCRIPTS));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_DOI + suffix, isActive(CleanupStep.CLEAN_UP_DOI));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_MONTH + suffix, isActive(CleanupStep.CLEAN_UP_MONTH));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_PAGE_NUMBERS + suffix,
+                isActive(CleanupStep.CLEAN_UP_PAGE_NUMBERS));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_DATE + suffix, isActive(CleanupStep.CLEAN_UP_DATE));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE + suffix,
+                isActive(CleanupStep.MAKE_PATHS_RELATIVE));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF + suffix, isActive(CleanupStep.RENAME_PDF));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS + suffix,
                 isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
+        preferences.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS + suffix,
                 isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_HTML, isActive(CleanupStep.CONVERT_HTML_TO_LATEX));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_CASE, isActive(CleanupStep.CONVERT_CASE));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_LATEX, isActive(CleanupStep.CONVERT_LATEX));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_UNITS, isActive(CleanupStep.CONVERT_UNITS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_UNICODE, isActive(CleanupStep.CONVERT_UNICODE_TO_LATEX));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_HTML + suffix, isActive(CleanupStep.CONVERT_HTML_TO_LATEX));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_CASE + suffix, isActive(CleanupStep.CONVERT_CASE));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_LATEX + suffix, isActive(CleanupStep.CONVERT_LATEX));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_UNITS + suffix, isActive(CleanupStep.CONVERT_UNITS));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_UNICODE + suffix,
+                isActive(CleanupStep.CONVERT_UNICODE_TO_LATEX));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX + suffix,
+                isActive(CleanupStep.CONVERT_TO_BIBLATEX));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS + suffix, isActive(CleanupStep.FIX_FILE_LINKS));
     }
 
     private Boolean isActive(CleanupStep step) {

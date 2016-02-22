@@ -330,12 +330,14 @@ public class JabRefPreferences {
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
     public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
+    public static final CleanupPreset CLEANUP_DEFAULT_QUICK_PRESET;
     static {
         EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs));
+        CLEANUP_DEFAULT_QUICK_PRESET = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     }
 
 
@@ -761,7 +763,8 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_USERNAME, "root");
 
         defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
-        insertCleanupPreset(defaults, CLEANUP_DEFAULT_PRESET);
+        insertCleanupPreset(defaults, CLEANUP_DEFAULT_PRESET, CleanupPreset.SUFFIX_STANDARD);
+        insertCleanupPreset(defaults, CLEANUP_DEFAULT_QUICK_PRESET, CleanupPreset.SUFFIX_QUICK);
 
         // defaults for DroppedFileHandler UI
         defaults.put(DroppedFileHandler.DFH_LEAVE, Boolean.FALSE);
@@ -1289,23 +1292,23 @@ public class JabRefPreferences {
         put(JabRefPreferences.DEFAULT_ENCODING, encoding.name());
     }
 
-    private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
+    private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset, String suffix) {
 
-        storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
-        storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
-        storage.put(CLEANUP_MONTH, preset.isCleanUpMonth());
-        storage.put(CLEANUP_PAGE_NUMBERS, preset.isCleanUpPageNumbers());
-        storage.put(CLEANUP_DATE, preset.isCleanUpDate());
-        storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
-        storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
-        storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
-        storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
-        storage.put(CLEANUP_HTML, preset.isConvertHTMLToLatex());
-        storage.put(CLEANUP_CASE, preset.isConvertCase());
-        storage.put(CLEANUP_LATEX, preset.isConvertLaTeX());
-        storage.put(CLEANUP_UNITS, preset.isConvertUnits());
-        storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
-        storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
-        storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
+        storage.put(CLEANUP_SUPERSCRIPTS + suffix, preset.isCleanUpSuperscripts());
+        storage.put(CLEANUP_DOI + suffix, preset.isCleanUpDOI());
+        storage.put(CLEANUP_MONTH + suffix, preset.isCleanUpMonth());
+        storage.put(CLEANUP_PAGE_NUMBERS + suffix, preset.isCleanUpPageNumbers());
+        storage.put(CLEANUP_DATE + suffix, preset.isCleanUpDate());
+        storage.put(CLEANUP_MAKE_PATHS_RELATIVE + suffix, preset.isMakePathsRelative());
+        storage.put(CLEANUP_RENAME_PDF + suffix, preset.isRenamePDF());
+        storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS + suffix, preset.isRenamePdfOnlyRelativePaths());
+        storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS + suffix, preset.isCleanUpUpgradeExternalLinks());
+        storage.put(CLEANUP_HTML + suffix, preset.isConvertHTMLToLatex());
+        storage.put(CLEANUP_CASE + suffix, preset.isConvertCase());
+        storage.put(CLEANUP_LATEX + suffix, preset.isConvertLaTeX());
+        storage.put(CLEANUP_UNITS + suffix, preset.isConvertUnits());
+        storage.put(CLEANUP_UNICODE + suffix, preset.isConvertUnicodeToLatex());
+        storage.put(CLEANUP_CONVERT_TO_BIBLATEX + suffix, preset.isConvertToBiblatex());
+        storage.put(CLEANUP_FIX_FILE_LINKS + suffix, preset.isFixFileLinks());
     }
 }

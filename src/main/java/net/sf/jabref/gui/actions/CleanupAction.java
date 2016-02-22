@@ -53,7 +53,7 @@ public class CleanupAction extends AbstractWorker {
         this.panel = panel;
         this.frame = panel.frame();
         this.preferences = Objects.requireNonNull(preferences);
-        this.presetPanel = new CleanupPresetPanel(CleanupPreset.loadFromPreferences(preferences));
+        this.presetPanel = new CleanupPresetPanel(CleanupPreset.loadStandardPresetFromPreferences(preferences));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CleanupAction extends AbstractWorker {
             return;
         }
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
-        cleanupPreset.storeInPreferences(preferences);
+        cleanupPreset.storeInPreferencesAsStandard(preferences);
 
         if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN)) {
             CheckBoxMessage cbm = new CheckBoxMessage(

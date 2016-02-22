@@ -103,6 +103,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new FileSortTab(prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
+        tabs.add(new CleanupPreferencesTab(prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new AppearancePrefsTab(prefs));
         tabs.add(new ExternalTab(frame, this, prefs));
