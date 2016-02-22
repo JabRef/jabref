@@ -80,23 +80,23 @@ public class SaveActions {
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
-        formatterString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(formatterString).replaceAll(Globals.NEWLINE, "");
-
         String remainingString = formatterString;
+
+        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(Globals.NEWLINE, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name
-                int currentIndex = remainingString.indexOf("[");
-                String fieldKey = remainingString.substring(0, currentIndex);
-                int endIndex = remainingString.indexOf("]");
+                int currentIndex = remainingString.indexOf('[');
+                        String fieldKey = remainingString.substring(0, currentIndex);
+                int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
                 //read each formatter
-                int tokenIndex = remainingString.indexOf(",");
+                int tokenIndex = remainingString.indexOf(',');
                 do {
                     boolean doBreak = false;
                     if (tokenIndex == -1 || tokenIndex > endIndex) {
-                        tokenIndex = remainingString.indexOf("]");
+                        tokenIndex = remainingString.indexOf(']');
                         doBreak = true;
                     }
 
@@ -107,7 +107,7 @@ public class SaveActions {
                     if (remainingString.startsWith("]") || doBreak) {
                         break;
                     }
-                    tokenIndex = remainingString.indexOf(",");
+                    tokenIndex = remainingString.indexOf(',');
 
                     currentIndex = -1;
                 } while (true);

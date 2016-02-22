@@ -101,17 +101,6 @@ public class SaveActionsPanel extends JPanel {
 
         keyField = new JTextFieldWithUnfocusedText(Localization.lang("Enter field name (e.g., title, author)"));
         keyField.setColumns(25);
-        keyField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                keyField.setText("");
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-
-            }
-        });
         builder.add(keyField).xy(1, 1);
 
         List<String> formatterNames = saveActions.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
@@ -128,7 +117,7 @@ public class SaveActionsPanel extends JPanel {
     public void storeSettings(MetaData metaData) {
         Objects.requireNonNull(metaData);
 
-        java.util.List<String> actions = new ArrayList<>();
+        List<String> actions = new ArrayList<>();
 
         if (enabled.isSelected()) {
             actions.add("enabled");
