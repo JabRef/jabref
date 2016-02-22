@@ -94,10 +94,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 }
             }
         }
-        String name = group.getName();
-        if (name.length() > GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS) {
-            name = name.substring(0, GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS - 2) + "...";
-        }
+        String name = StringUtil.limitStringLength(group.getName(), GroupTreeCellRenderer.MAX_DISPLAYED_LETTERS);
         StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
         if (red) {
