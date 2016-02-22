@@ -152,8 +152,8 @@ public class BibDatabaseWriter {
         exceptionCause = null;
         // Get our data stream. This stream writes only to a temporary file until committed.
         try (VerifyingWriter writer = session.getWriter()) {
-            List<FieldChange> undoableChanges = writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
-            session.addUndoableFieldChanges(undoableChanges);
+            List<FieldChange> saveActionChanges = writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
+            session.addFieldChanges(saveActionChanges);
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
             session.cancel();
@@ -185,7 +185,7 @@ public class BibDatabaseWriter {
         // Write database entries.
         List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
                 entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
-        List<FieldChange> undoableChanges = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        List<FieldChange> saveActionChanges = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
         for (BibEntry entry : sortedEntries) {
             exceptionCause = entry;
@@ -215,7 +215,7 @@ public class BibDatabaseWriter {
         //finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(writer, bibDatabaseContext.getDatabase());
 
-        return undoableChanges;
+        return saveActionChanges;
     }
 
     /**

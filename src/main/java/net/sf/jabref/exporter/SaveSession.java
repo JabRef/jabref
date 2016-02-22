@@ -190,11 +190,11 @@ public class SaveSession {
         return tmp;
     }
 
-    public List<FieldChange> getUndoableFieldChanges() {
+    public List<FieldChange> getFieldChanges() {
         return undoableFieldChanges;
     }
 
-    public void addUndoableFieldChanges(List<FieldChange> undoableFieldChanges) {
+    public void addFieldChanges(List<FieldChange> undoableFieldChanges) {
         this.undoableFieldChanges.addAll(undoableFieldChanges);
     }
 }

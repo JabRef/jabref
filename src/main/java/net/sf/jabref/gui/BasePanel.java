@@ -1276,7 +1276,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void registerUndoableChanges(SaveSession session) {
         NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
-        for (FieldChange change : session.getUndoableFieldChanges()) {
+        for (FieldChange change : session.getFieldChanges()) {
             ce.addEdit(new UndoableFieldChange(change));
         }
         ce.end();
