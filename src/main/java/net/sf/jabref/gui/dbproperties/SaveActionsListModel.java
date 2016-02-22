@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.databaseProperties;
+package net.sf.jabref.gui.dbproperties;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;

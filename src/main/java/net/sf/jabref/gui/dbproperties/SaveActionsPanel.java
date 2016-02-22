@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.databaseProperties;
+package net.sf.jabref.gui.dbproperties;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
