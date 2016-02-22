@@ -191,7 +191,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else {
             String ours = ((String) f1).toLowerCase();
             String theirs = ((String) f2).toLowerCase();
-            result = FieldComparator.collator.compare(ours, theirs);//ours.compareTo(theirs);
+            result = FieldComparator.collator.compare(ours, theirs);
         }
 
         return result * localMultiplier;

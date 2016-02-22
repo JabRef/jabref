@@ -238,10 +238,8 @@ public class DownloadExternalFile {
             }
         } else {
             // Cancelled. Just delete the temp file:
-            if (downloadFinished) {
-                if (!tmp.delete()) {
-                    LOGGER.info("Cannot delete temporary file");
-                }
+            if (downloadFinished && !tmp.delete()) {
+                LOGGER.info("Cannot delete temporary file");
             }
         }
 

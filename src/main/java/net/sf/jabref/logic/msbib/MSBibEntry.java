@@ -318,8 +318,8 @@ class MSBibEntry {
 
         sourceType = getMSBibSourceType(bibtex);
 
-        if (bibtex.hasField("bibtexkey")) {
-            tag = bibtex.getField("bibtexkey");
+        if (bibtex.hasField(BibEntry.KEY_FIELD)) {
+            tag = bibtex.getField(BibEntry.KEY_FIELD);
         }
 
         if (bibtex.hasField("language")) {
@@ -941,7 +941,7 @@ class MSBibEntry {
         HashMap<String, String> hm = new HashMap<>();
 
         if (tag != null) {
-            hm.put("bibtexkey", tag);
+            hm.put(BibEntry.KEY_FIELD, tag);
         }
 
         if (LCID >= 0) {

@@ -41,7 +41,12 @@ import net.sf.jabref.logic.util.OS;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
+    private static final String SOFFICE = "soffice";
+
+    private static final String SOFFICE_BIN = "soffice.bin";
+
     private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
+
 
     private boolean foundPaths;
     private boolean fileSearchCancelled;
@@ -172,24 +177,24 @@ public class AutoDetectPaths extends AbstractWorker {
                     }
                 }
             }
-            File sOffice = findFileDir(rootDir, "soffice.bin");
+            File sOffice = findFileDir(rootDir, SOFFICE_BIN);
             if (fileSearchCancelled) {
                 return false;
             }
             if (sOffice == null) {
                 return false;
             } else {
-                return setupPreferencesForOO(rootDir, sOffice, "soffice.bin");
+                return setupPreferencesForOO(rootDir, sOffice, SOFFICE_BIN);
             }
         } else {
             // Linux:
             String usrRoot = "/usr/lib";
-            File inUsr = findFileDir(new File(usrRoot), "soffice");
+            File inUsr = findFileDir(new File(usrRoot), SOFFICE);
             if (fileSearchCancelled) {
                 return false;
             }
             if (inUsr == null) {
-                inUsr = findFileDir(new File("/usr/lib64"), "soffice");
+                inUsr = findFileDir(new File("/usr/lib64"), SOFFICE);
                 if (inUsr != null) {
                     usrRoot = "/usr/lib64";
                 }
@@ -198,15 +203,15 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            File inOpt = findFileDir(new File("/opt"), "soffice");
+            File inOpt = findFileDir(new File("/opt"), SOFFICE);
             if (fileSearchCancelled) {
                 return false;
             }
             if ((inUsr != null) && (inOpt == null)) {
-                return setupPreferencesForOO(usrRoot, inUsr, "soffice.bin");
+                return setupPreferencesForOO(usrRoot, inUsr, SOFFICE_BIN);
             } else if (inOpt != null) {
                 if (inUsr == null) {
-                    return setupPreferencesForOO("/opt", inOpt, "soffice.bin");
+                    return setupPreferencesForOO("/opt", inOpt, SOFFICE_BIN);
                 } else { // Found both
                     JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
                     JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
@@ -227,9 +232,9 @@ public class AutoDetectPaths extends AbstractWorker {
                         return false;
                     }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt, "soffice.bin");
+                        return setupPreferencesForOO("/opt", inOpt, SOFFICE_BIN);
                     } else {
-                        return setupPreferencesForOO(usrRoot, inUsr, "soffice.bin");
+                        return setupPreferencesForOO(usrRoot, inUsr, SOFFICE_BIN);
                     }
                 }
             }
@@ -351,12 +356,8 @@ public class AutoDetectPaths extends AbstractWorker {
         progressDialog.add(new JLabel(message), BorderLayout.NORTH);
         progressDialog.add(bar, BorderLayout.CENTER);
         progressDialog.pack();
-        progressDialog.setLocationRelativeTo(null);//parent);
-        //SwingUtilities.invokeLater(new Runnable() {
-        //    public void run() {
+        progressDialog.setLocationRelativeTo(null);
         progressDialog.setVisible(true);
-        //    }
-        //});
         return progressDialog;
     }
 }

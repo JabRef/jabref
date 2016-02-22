@@ -20,9 +20,9 @@ import java.util.*;
 
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.migrations.VersionHandling;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
-import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBStrings;
 

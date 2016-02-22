@@ -1417,7 +1417,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
                 tlb.addAction(toggleRelevance);
@@ -1426,13 +1429,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.addAction(toggleQualityAssured);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
                 tlb.addAction(togglePrinted);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             tlb.addSeparator();
         }
@@ -1470,28 +1479,32 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    private List<Object> openDatabaseOnlyActions = new LinkedList<>();
-    private List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+
+    private final List<Object> specialFieldButtons = new LinkedList<>();
+    private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
+    private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
 
     private void initActions() {
-        openDatabaseOnlyActions = new LinkedList<>();
+        openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, unmark,
                 unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
-                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
-                findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
-                openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
-                newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
-                databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
-                importCurrent, saveAll, dbConnect, dbExport, focusTable));
+                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                sendAsEmail, downloadFullText, writeXmpAction, findUnlinkedFiles, addToGroup, removeFromGroup,
+                moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
+                dupliCheck, autoSetFile, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                pushExternalButton.getMenuAction(), closeDatabaseAction, switchPreview, checkIntegrity,
+                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline,
+                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
+                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
         openDatabaseOnlyActions.addAll(fetcherActions);
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
-        severalDatabasesOnlyActions = new LinkedList<>();
+        openDatabaseOnlyActions.addAll(specialFieldButtons);
+
+        severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
@@ -2196,7 +2209,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
             Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
+            if (obj instanceof IconTheme.FontBasedIcon) {
                 b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(b);
@@ -2208,7 +2221,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 button.setMargin(marg);
             }
             Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
+            if (obj instanceof IconTheme.FontBasedIcon) {
                 button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
             }
             add(button);

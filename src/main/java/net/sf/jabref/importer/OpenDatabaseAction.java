@@ -404,7 +404,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if (encoding.isPresent()) {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 LOGGER.warn("Problem getting reader", ex);
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
@@ -438,8 +438,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Signature line, so keep reading and skip to next line
                 } else if (line.startsWith(Globals.encPrefix)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    // Except if there is already a @ symbol signalising the starting of a BibEntry
-                    Integer atSymbolIndex = line.indexOf("@");
+                    // Except if there is already a @ symbol signaling the starting of a BibEntry
+                    Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
                         encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);

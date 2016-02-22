@@ -84,7 +84,7 @@ class MODSEntry {
         this();
         handledExtensions.add(MODSEntry.BIBTEX + "publisher");
         handledExtensions.add(MODSEntry.BIBTEX + "title");
-        handledExtensions.add(MODSEntry.BIBTEX + "bibtexkey");
+        handledExtensions.add(MODSEntry.BIBTEX + BibEntry.KEY_FIELD);
         handledExtensions.add(MODSEntry.BIBTEX + "author");
         populateFromBibtex(bibtex);
     }
@@ -106,8 +106,8 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.hasField("bibtexkey")) {
-            id = bibtex.getField("bibtexkey");
+        if (bibtex.hasField(BibEntry.KEY_FIELD)) {
+            id = bibtex.getField(BibEntry.KEY_FIELD);
         }
         if (bibtex.hasField("place")) {
             if (CHARFORMAT) {

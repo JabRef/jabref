@@ -40,7 +40,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
-import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
@@ -60,7 +60,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -325,7 +325,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
             if ((bes != null) && (!bes.isEmpty())) {
                 // Create a CompoundEdit to make the action undoable.
@@ -348,7 +348,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             if ((bes != null) && (!bes.isEmpty())) {
 
                 boolean goOn = showDeleteConfirmationDialog(bes.size());
@@ -2006,7 +2006,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         private final Matcher<E> active;
         private final Matcher<E> inactive;
 
-        private boolean isActive = false;
+        private boolean isActive;
 
         private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
             this.list = list;

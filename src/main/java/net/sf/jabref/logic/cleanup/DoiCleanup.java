@@ -30,7 +30,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    String[] fields = {"note", "url", "ee"};
+    private final String[] fields = {"note", "url", "ee"};
 
 
     public DoiCleanup() {
@@ -85,7 +85,7 @@ public class DoiCleanup implements CleanupJob {
         return changes;
     }
 
-    private void removeFieldValue(BibEntry entry, String field, ArrayList<FieldChange> changes) {
+    private void removeFieldValue(BibEntry entry, String field, List<FieldChange> changes) {
         RemoveFieldCleanup cleaner = new RemoveFieldCleanup(field);
         changes.addAll(cleaner.cleanup(entry));
     }

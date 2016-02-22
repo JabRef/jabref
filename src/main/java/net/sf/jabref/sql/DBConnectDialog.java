@@ -18,10 +18,7 @@ package net.sf.jabref.sql;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -54,13 +51,12 @@ public class DBConnectDialog extends JDialog {
 
     /** Creates a new instance of DBConnectDialog */
     public DBConnectDialog(JFrame parent, DBStrings dbs) {
-
-        super(parent, Localization.lang("Connect to SQL database"), true);
+        super(Objects.requireNonNull(parent), Localization.lang("Connect to SQL database"), true);
 
         this.setResizable(false);
         this.setLocationRelativeTo(parent);
 
-        dbStrings = dbs;
+        dbStrings = Objects.requireNonNull(dbs);
 
         // build collections of components
         ArrayList<JLabel> lhs = new ArrayList<>();

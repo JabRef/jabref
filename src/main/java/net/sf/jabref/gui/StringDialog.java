@@ -39,20 +39,26 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class StringDialog extends JDialog {
 
     // A reference to the entry this object works on.
     private final BibDatabase base;
     private final BasePanel panel;
-    private Object[] strings;
+    private List<BibtexString> strings;
 
     private final StringTable table;
     private final HelpAction helpAction;
 
     private final PositionWindow pw;
 
+    private final SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
+
+    // The action concerned with closing the window.
+    private final CloseAction closeAction = new CloseAction();
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
         super(frame);
@@ -187,11 +193,11 @@ class StringDialog extends JDialog {
 
     private void sortStrings() {
         // Rebuild our sorted set of strings:
-        TreeSet<BibtexString> stringsSet = new TreeSet<>(new BibtexStringComparator(false));
+        strings = new ArrayList<>();
         for (String s : base.getStringKeySet()) {
-            stringsSet.add(base.getString(s));
+            strings.add(base.getString(s));
         }
-        strings = stringsSet.toArray();
+        Collections.sort(strings, new BibtexStringComparator(false));
     }
 
     public void refreshTable() {
@@ -219,14 +225,14 @@ class StringDialog extends JDialog {
 
         @Override
         public Object getValueAt(int row, int col) {
-            return col == 0 ? ((BibtexString) strings[row]).getName() : ((BibtexString) strings[row]).getContent();
+            return col == 0 ? strings.get(row).getName() : strings.get(row).getContent();
         }
 
         @Override
         public void setValueAt(Object value, int row, int col) {
             if (col == 0) {
                 // Change name of string.
-                if (!value.equals(((BibtexString) strings[row]).getName())) {
+                if (!value.equals(strings.get(row).getName())) {
                     if (tbase.hasStringLabel((String) value)) {
                         JOptionPane.showMessageDialog(parent, Localization.lang("A string with that label already exists"),
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
@@ -241,7 +247,7 @@ class StringDialog extends JDialog {
                                 Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
                     } else {
                         // Store undo information.
-                        BibtexString subject = (BibtexString) strings[row];
+                        BibtexString subject = strings.get(row);
                         panel.undoManager.addEdit(
                                 new UndoableStringChange(panel, subject, true, subject.getName(), (String) value));
                         subject.setName((String) value);
@@ -251,7 +257,7 @@ class StringDialog extends JDialog {
                 }
             } else {
                 // Change content of string.
-                BibtexString subject = (BibtexString) strings[row];
+                BibtexString subject = strings.get(row);
 
                 if (!value.equals(subject.getContent())) {
                     try {
@@ -276,7 +282,7 @@ class StringDialog extends JDialog {
 
         @Override
         public int getRowCount() {
-            return strings.length;
+            return strings.size();
         }
 
         @Override
@@ -304,7 +310,7 @@ class StringDialog extends JDialog {
 
     }
 
-    void assureNotEditing() {
+    public void assureNotEditing() {
         if (table.isEditing()) {
             int col = table.getEditingColumn();
             int row = table.getEditingRow();
@@ -313,8 +319,6 @@ class StringDialog extends JDialog {
     }
 
 
-    // The action concerned with closing the window.
-    private final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {
@@ -372,7 +376,6 @@ class StringDialog extends JDialog {
 
                 base.addString(bs);
                 refreshTable();
-                //		table.revalidate();
                 panel.markBaseChanged();
             } catch (KeyCollisionException ex) {
                 JOptionPane.showMessageDialog(parent,
@@ -382,8 +385,6 @@ class StringDialog extends JDialog {
         }
     }
 
-
-    private final SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
 
     static class SaveDatabaseAction extends AbstractAction {
@@ -433,7 +434,7 @@ class StringDialog extends JDialog {
                     for (int i = sel.length - 1; i >= 0; i--) {
                         // Delete the strings backwards to avoid moving indexes.
 
-                        BibtexString subject = (BibtexString) strings[sel[i]];
+                        BibtexString subject = strings.get(sel[i]);
 
                         // Store undo information:
                         ce.addEdit(new UndoableRemoveString(panel, base, subject));
@@ -443,7 +444,6 @@ class StringDialog extends JDialog {
                     ce.end();
                     panel.undoManager.addEdit(ce);
 
-                    //table.revalidate();
                     refreshTable();
                     if (base.getStringCount() > 0) {
                         table.setRowSelectionInterval(0, 0);

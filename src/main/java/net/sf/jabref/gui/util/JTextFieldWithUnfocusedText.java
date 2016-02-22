@@ -1,7 +1,5 @@
 package net.sf.jabref.gui.util;
 
-import net.sf.jabref.logic.l10n.Localization;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;

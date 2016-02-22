@@ -25,11 +25,6 @@ public class HTMLConverterTest {
     }
 
     @Test
-    public void testHTMLNull() {
-        assertEquals(null, conv.format(null));
-    }
-
-    @Test
     public void testHTMLEmpty() {
         assertEquals("", conv.format(""));
     }
@@ -72,9 +67,9 @@ public class HTMLConverterTest {
         assertEquals("a", conv.formatUnicode("a"));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testUnicodeNull() {
-        assertEquals(null, conv.formatUnicode(null));
+        conv.formatUnicode(null);
     }
 
     @Test

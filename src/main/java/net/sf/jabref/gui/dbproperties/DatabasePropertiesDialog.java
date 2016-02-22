@@ -19,11 +19,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
-
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
@@ -274,28 +285,22 @@ public class DatabasePropertiesDialog extends JDialog {
         Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.setEncoding(newEncoding);
 
-        List<String> dir = new ArrayList<>(1);
         String text = fileDir.getText().trim();
         if (text.isEmpty()) {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
         } else {
-            dir.add(text);
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), new Vector<>(dir));
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), Arrays.asList(text));
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        dir = new ArrayList<>(1);
         text = fileDirIndv.getText().trim();
         if (text.isEmpty()) {
             metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
         } else {
-            dir.add(text);
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), new Vector<>(dir));
+            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), Arrays.asList(text));
         }
 
         if (protect.isSelected()) {
-            dir = new ArrayList<>(1);
-            dir.add("true");
-            metaData.putData(Globals.PROTECTED_FLAG_META, new Vector<>(dir));
+            metaData.putData(Globals.PROTECTED_FLAG_META, Arrays.asList("true"));
         } else {
             metaData.remove(Globals.PROTECTED_FLAG_META);
         }

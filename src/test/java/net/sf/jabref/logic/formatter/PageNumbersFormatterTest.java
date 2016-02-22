@@ -53,7 +53,6 @@ public class PageNumbersFormatterTest {
     @Test
     public void formatPageNumbersEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     @Test
