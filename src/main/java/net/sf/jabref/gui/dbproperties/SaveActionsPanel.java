@@ -46,17 +46,12 @@ public class SaveActionsPanel extends JPanel {
         Objects.requireNonNull(metaData);
 
         List<String> saveActionsMetaList = metaData.getData(SaveActions.META_KEY);
-        boolean enablementStatus = false;
-        String formatterString = "";
-        if (saveActionsMetaList != null && saveActionsMetaList.size() >= 2) {
-            enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
-            formatterString = saveActionsMetaList.get(1);
-        }
+
+        initializeSaveActions(saveActionsMetaList);
 
         // first clear existing content
         this.removeAll();
 
-        saveActions = new SaveActions(enablementStatus, formatterString);
         List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
 
         enabled.setSelected(saveActions.isEnabled());
@@ -83,6 +78,19 @@ public class SaveActionsPanel extends JPanel {
 
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
+    }
+
+    private void initializeSaveActions(List<String> saveActionsMetaList) {
+
+        if (saveActionsMetaList != null && saveActionsMetaList.size() >= 2) {
+            boolean enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
+            String formatterString = saveActionsMetaList.get(1);
+            saveActions = new SaveActions(enablementStatus, formatterString);
+        } else {
+            // apply default actions
+            saveActions = SaveActions.DEFAULT_ACTIONS;
+        }
+
     }
 
     private JPanel getSelectorPanel() {
@@ -146,6 +154,14 @@ public class SaveActionsPanel extends JPanel {
         boolean hasChanged = !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
 
         return hasChanged;
+    }
+
+    public boolean isDefaultSaveActions () {
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        String formatterString = SaveActions.getMetaDataString(newActions);
+        boolean isDefault = SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
+
+        return isDefault;
     }
 
     class AddButtonListener implements ActionListener {

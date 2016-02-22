@@ -22,6 +22,13 @@ public class SaveActions {
 
     private boolean enabled;
 
+    public static final SaveActions DEFAULT_ACTIONS;
+
+    static {
+        String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
+        DEFAULT_ACTIONS = new SaveActions(false, defaultFormatterString);
+    }
+
     public SaveActions(boolean enabled, String formatterString) {
 
         actions = new ArrayList<>();

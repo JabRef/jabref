@@ -36,6 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -320,18 +321,22 @@ public class DatabasePropertiesDialog extends JDialog {
             saveOrderConfigChanged = true;
         }
 
-        if(saveOrderConfigChanged) {
+        if (saveOrderConfigChanged) {
             List<String> serialized = newSaveOrderConfig.getConfigurationList();
-            if(newSaveOrderConfig.equals(defaultSaveOrderConfig)){
+            if (newSaveOrderConfig.equals(defaultSaveOrderConfig)) {
                 metaData.remove(MetaData.SAVE_ORDER_CONFIG);
-            }  else {
+            } else {
                 metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
             }
         }
 
         boolean saveActionsChanged = saveActionsPanel.hasChanged();
-        if(saveActionsChanged) {
-            saveActionsPanel.storeSettings(metaData);
+        if (saveActionsChanged) {
+            if (saveActionsPanel.isDefaultSaveActions()) {
+                metaData.remove(SaveActions.META_KEY);
+            } else {
+                saveActionsPanel.storeSettings(metaData);
+            }
         }
 
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
