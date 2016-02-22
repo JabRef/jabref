@@ -70,7 +70,7 @@ public class SaveActionsPanel extends JPanel {
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         builder.add(actionsList).xyw(3, 5, 2);
 
-        deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE.getSmallIcon());
+        deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         deleteButton.addActionListener(new DeleteButtonListener());
         builder.add(deleteButton).xy(3, 7);
 
@@ -107,7 +107,7 @@ public class SaveActionsPanel extends JPanel {
         formatters = new JComboBox(formatterNames.toArray());
         builder.add(formatters).xy(3, 1);
 
-        addButton = new JButton(IconTheme.JabRefIcon.ADD.getSmallIcon());
+        addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         addButton.addActionListener(new AddButtonListener());
         builder.add(addButton).xy(5, 1);
 
