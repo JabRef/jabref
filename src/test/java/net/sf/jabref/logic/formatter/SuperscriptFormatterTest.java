@@ -38,7 +38,6 @@ public class SuperscriptFormatterTest {
     @Test
     public void replaceSuperscriptsEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     @Test

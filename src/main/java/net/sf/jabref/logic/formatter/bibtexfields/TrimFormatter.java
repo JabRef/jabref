@@ -5,26 +5,21 @@ import net.sf.jabref.model.entry.MonthUtil;
 
 import java.util.Objects;
 
-public class MonthFormatter implements Formatter {
+public class TrimFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Month";
+        return "Trim whitespace";
     }
 
     @Override
     public String getKey() {
-        return "MonthFormatter";
+        return "TrimFormatter";
     }
 
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-        MonthUtil.Month month = MonthUtil.getMonth(value);
-        if (month.isValid()) {
-            return month.bibtexFormat;
-        } else {
-            return value;
-        }
+        return value.trim();
     }
 }
