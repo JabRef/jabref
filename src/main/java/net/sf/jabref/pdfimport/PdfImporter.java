@@ -70,34 +70,6 @@ public class PdfImporter {
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
     /**
-     * Used nowhere else, will be removed at the JavaFX migration
-     */
-    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
-        int x;
-        int y;
-
-        Point topLeft = win.getLocationOnScreen();
-        Dimension parentSize = win.getSize();
-
-        Dimension mySize = diag.getSize();
-
-        if (parentSize.width > mySize.width) {
-            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
-        } else {
-            x = topLeft.x;
-        }
-
-        if (parentSize.height > mySize.height) {
-            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
-        } else {
-            y = topLeft.y;
-        }
-
-        diag.setLocation(x, y);
-    }
-
-
-    /**
      * Creates the PdfImporter
      *
      * @param frame the JabRef frame
@@ -199,7 +171,9 @@ public class PdfImporter {
                         LOGGER.warn("Cannot import entries", ex);
                     } finally {
                         try {
-                            in.close();
+                            if (in != null) {
+                                in.close();
+                            }
                         } catch (IOException ignored) {
                             // Ignored
                         }
@@ -398,4 +372,32 @@ public class PdfImporter {
     public void setDropRow(int dropRow) {
         this.dropRow = dropRow;
     }
+
+    /**
+     * Used nowhere else, will be removed at the JavaFX migration
+     */
+    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
+        int x;
+        int y;
+
+        Point topLeft = win.getLocationOnScreen();
+        Dimension parentSize = win.getSize();
+
+        Dimension mySize = diag.getSize();
+
+        if (parentSize.width > mySize.width) {
+            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
+        } else {
+            x = topLeft.x;
+        }
+
+        if (parentSize.height > mySize.height) {
+            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
+        } else {
+            y = topLeft.y;
+        }
+
+        diag.setLocation(x, y);
+    }
+
 }

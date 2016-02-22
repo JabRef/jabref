@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -80,8 +80,8 @@ public class LayoutHelper {
         LayoutHelper.currentGroup = newGroup;
     }
 
-    private String getBracketedField(final int field) throws IOException {
-        StringBuffer buffer = null;
+    private void doBracketedField(final int field) throws IOException {
+        StringBuilder buffer = null;
         int c;
         boolean start = false;
 
@@ -95,7 +95,7 @@ public class LayoutHelper {
                     parsedEntries.add(new StringInt(buffer.toString(), field));
                 }
 
-                return null;
+                return;
             }
 
             if ((c == '{') || (c == '}')) {
@@ -103,14 +103,14 @@ public class LayoutHelper {
                     if (buffer != null) {
                         parsedEntries.add(new StringInt(buffer.toString(), field));
 
-                        return null;
+                        return;
                     }
                 } else {
                     start = true;
                 }
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if (start && (c != '}')) {
@@ -118,15 +118,13 @@ public class LayoutHelper {
                 }
             }
         }
-
-        return null;
     }
 
     /**
      *
      */
-    private String getBracketedOptionField() throws IOException {
-        StringBuffer buffer = null;
+    private void doBracketedOptionField() throws IOException {
+        StringBuilder buffer = null;
         int c;
         boolean start = false;
         boolean inQuotes = false;
@@ -137,12 +135,10 @@ public class LayoutHelper {
         while (!endOfFile) {
             c = read();
 
-            //System.out.println((char)c);
             if (c == -1) {
                 endOfFile = true;
 
                 if (buffer != null) {
-                    //myStrings.add(buffer.toString());
                     if (option == null) {
                         tmp = buffer.toString();
                     } else {
@@ -150,11 +146,9 @@ public class LayoutHelper {
                     }
 
                     parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
-
-                    //System.out.println("\nbracketedOptionEOF: " + buffer.toString());
                 }
 
-                return null;
+                return;
             }
             if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))) {
                 if ((c == ']') || (doneWithOptions && (c == '}'))) {
@@ -180,7 +174,7 @@ public class LayoutHelper {
 
                         parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));
 
-                        return null;
+                        return;
                     }
                     // changed section end - arudert
                     // changed section start - arudert
@@ -193,12 +187,12 @@ public class LayoutHelper {
                 inQuotes = !inQuotes;
 
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
                 buffer.append('"');
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if (start) {
@@ -214,16 +208,14 @@ public class LayoutHelper {
                 }
             }
         }
-
-        return null;
     }
 
-    private Object parse() throws IOException, StringIndexOutOfBoundsException {
+    private void parse() throws IOException, StringIndexOutOfBoundsException {
         skipWhitespace();
 
         int c;
 
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         boolean escaped = false;
 
         while (!endOfFile) {
@@ -240,7 +232,7 @@ public class LayoutHelper {
                     parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
                 }
 
-                return null;
+                return;
             }
 
             if ((c == '\\') && (peek() != '\\') && !escaped) {
@@ -257,7 +249,7 @@ public class LayoutHelper {
                 escaped = false;
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 if ((c != '\\') || escaped)// (previous == '\\')))
@@ -268,19 +260,16 @@ public class LayoutHelper {
                 escaped = (c == '\\') && !escaped;
             }
         }
-
-        return null;
     }
 
     private void parseField() throws IOException, StringIndexOutOfBoundsException {
         int c;
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
         char firstLetter;
         String name;
 
         while (!endOfFile) {
             c = read();
-            // System.out.print((char)c);
             if (c == -1) {
                 endOfFile = true;
             }
@@ -288,7 +277,6 @@ public class LayoutHelper {
             if (!Character.isLetter((char) c) && (c != '_') && (c != '-')) {
                 unread(c);
 
-                //System.out.println("\n#" + (char) c);
                 name = buffer == null ? "" : buffer.toString();
 
                 try {
@@ -304,17 +292,15 @@ public class LayoutHelper {
                             + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
-                //System.out.println("NAME:" + name);
-
                 if (firstLetter == 'b') {
                     if ("begin".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_FIELD_START);
+                        doBracketedField(LayoutHelper.IS_FIELD_START);
 
                         return;
                     } else if ("begingroup".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_GROUP_START);
+                        doBracketedField(LayoutHelper.IS_GROUP_START);
                         return;
                     }
                 } else if (firstLetter == 'f') {
@@ -322,12 +308,12 @@ public class LayoutHelper {
                         if (c == '[') {
                             // get format parameter
                             // get field name
-                            getBracketedOptionField();
+                            doBracketedOptionField();
 
                             return;
                         } else {
                             // get field name
-                            getBracketedField(LayoutHelper.IS_OPTION_FIELD);
+                            doBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
                             return;
                         }
@@ -347,11 +333,11 @@ public class LayoutHelper {
                 } else if (firstLetter == 'e') {
                     if ("end".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_FIELD_END);
+                        doBracketedField(LayoutHelper.IS_FIELD_END);
                         return;
                     } else if ("endgroup".equalsIgnoreCase(name)) {
                         // get field name
-                        getBracketedField(LayoutHelper.IS_GROUP_END);
+                        doBracketedField(LayoutHelper.IS_GROUP_END);
                         return;
                     } else if ("encoding".equalsIgnoreCase(name)) {
                         // Print the name of the current encoding used for export.
@@ -365,11 +351,10 @@ public class LayoutHelper {
                 // for all other cases
                 parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_FIELD));
 
-                //System.out.println(name);
                 return;
             } else {
                 if (buffer == null) {
-                    buffer = new StringBuffer(100);
+                    buffer = new StringBuilder(100);
                 }
 
                 buffer.append((char) c);

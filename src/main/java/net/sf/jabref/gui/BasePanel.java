@@ -324,7 +324,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
             if ((bes != null) && (!bes.isEmpty())) {
                 // Create a CompoundEdit to make the action undoable.
@@ -347,7 +347,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             if ((bes != null) && (!bes.isEmpty())) {
 
                 boolean goOn = showDeleteConfirmationDialog(bes.size());

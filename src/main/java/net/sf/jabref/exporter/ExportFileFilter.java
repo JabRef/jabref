@@ -70,4 +70,9 @@ class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }
