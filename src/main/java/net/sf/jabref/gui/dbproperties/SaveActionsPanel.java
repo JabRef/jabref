@@ -54,8 +54,6 @@ public class SaveActionsPanel extends JPanel {
 
         List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
 
-        enabled.setSelected(saveActions.isEnabled());
-        enabled.addActionListener(new EnablementStatusListener());
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
@@ -78,6 +76,10 @@ public class SaveActionsPanel extends JPanel {
 
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
+
+        // make sure the layout is set according to the checkbox
+        enabled.addActionListener(new EnablementStatusListener(saveActions.isEnabled()));
+        enabled.setSelected(saveActions.isEnabled());
     }
 
     private void initializeSaveActions(List<String> saveActionsMetaList) {
@@ -137,7 +139,7 @@ public class SaveActionsPanel extends JPanel {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
 
         // if all actions have been removed, remove the save actions from the MetaData
-        if(newActions.isEmpty()){
+        if (newActions.isEmpty()) {
             metaData.remove(SaveActions.META_KEY);
             return;
         }
@@ -156,7 +158,7 @@ public class SaveActionsPanel extends JPanel {
         return hasChanged;
     }
 
-    public boolean isDefaultSaveActions () {
+    public boolean isDefaultSaveActions() {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
         String formatterString = SaveActions.getMetaDataString(newActions);
         boolean isDefault = SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
@@ -199,14 +201,23 @@ public class SaveActionsPanel extends JPanel {
 
     class EnablementStatusListener implements ActionListener {
 
+        public EnablementStatusListener(boolean initialStatus) {
+         setStatus(initialStatus);
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             boolean enablementStatus = enabled.isSelected();
-            actionsList.setEnabled(enablementStatus);
-            keyField.setEnabled(enablementStatus);
-            formatters.setEnabled(enablementStatus);
-            addButton.setEnabled(enablementStatus);
-            deleteButton.setEnabled(enablementStatus);
+            setStatus(enablementStatus);
+
+        }
+
+        private void setStatus(boolean status) {
+            actionsList.setEnabled(status);
+            keyField.setEnabled(status);
+            formatters.setEnabled(status);
+            addButton.setEnabled(status);
+            deleteButton.setEnabled(status);
         }
     }
 
