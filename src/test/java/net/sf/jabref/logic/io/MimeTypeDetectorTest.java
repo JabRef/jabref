@@ -3,16 +3,12 @@ package net.sf.jabref.logic.io;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Ignore;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
-import static org.junit.Assert.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MimeTypeDetectorTest {
     @Rule
