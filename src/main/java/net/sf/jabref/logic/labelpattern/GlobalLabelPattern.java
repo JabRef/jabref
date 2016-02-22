@@ -12,18 +12,16 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-package net.sf.jabref.logic.labelPattern;
+ */
+package net.sf.jabref.logic.labelpattern;
 
 import java.util.List;
 
-import net.sf.jabref.Globals;
-
-public class DatabaseLabelPattern extends AbstractLabelPattern {
+public class GlobalLabelPattern extends AbstractLabelPattern {
 
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return Globals.prefs.getKeyPattern().getValue(key);
+        return LabelPatternUtil.DEFAULT_LABELPATTERN;
     }
 
 }

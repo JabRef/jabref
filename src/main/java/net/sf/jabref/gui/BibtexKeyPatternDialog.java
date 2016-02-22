@@ -17,9 +17,9 @@ package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
+import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;

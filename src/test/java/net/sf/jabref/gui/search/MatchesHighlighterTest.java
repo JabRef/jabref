@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class MatchesHighlighterTest {
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 

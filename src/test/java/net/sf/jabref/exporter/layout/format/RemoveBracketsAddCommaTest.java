@@ -10,7 +10,7 @@ public class RemoveBracketsAddCommaTest {
     private LayoutFormatter formatter;
 
     @Before
-    public void setup() {
+    public void setUp() {
         formatter = new RemoveBracketsAddComma();
     }
 
