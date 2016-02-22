@@ -53,6 +53,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -1202,6 +1203,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
             }
 
+            registerUndoableChanges(session);
+
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
@@ -1269,6 +1272,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         return commit;
+    }
+
+    public void registerUndoableChanges(SaveSession session) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
+        for (FieldChange change : session.getFieldChanges()) {
+            ce.addEdit(new UndoableFieldChange(change));
+        }
+        ce.end();
+        if (ce.hasEdits()) {
+            undoManager.addEdit(ce);
+        }
     }
 
     /**

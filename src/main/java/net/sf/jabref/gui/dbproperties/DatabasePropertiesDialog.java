@@ -13,9 +13,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.dbproperties;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
@@ -36,6 +36,9 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
@@ -68,6 +71,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
     private SaveOrderConfig oldSaveOrderConfig;
+    private SaveOrderConfig defaultSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
@@ -76,6 +80,8 @@ public class DatabasePropertiesDialog extends JDialog {
     private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
+
+    private SaveActionsPanel saveActionsPanel;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
@@ -101,8 +107,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
         setupSortOrderConfiguration();
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, fill:pref",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref"));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 140dlu, pref,"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -110,7 +116,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
         builder.add(Localization.lang("General file directory")).xy(1, 5);
-        builder.add(fileDir).xy(3, 5);
+        builder.add(fileDir).xy(3, 1);
         builder.add(browseFile).xy(5, 5);
         builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
         builder.add(fileDirIndv).xy(3, 7);
@@ -125,6 +131,11 @@ public class DatabasePropertiesDialog extends JDialog {
 
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
+
+        saveActionsPanel = new SaveActionsPanel();
+        builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
+        builder.add(saveActionsPanel).xyw(1, 29, 5);
+
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addButton(ok);
@@ -197,6 +208,9 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
+        defaultSaveOrderConfig = new SaveOrderConfig();
+        defaultSaveOrderConfig.setSaveInOriginalOrder();
+
         List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
         boolean selected;
         if (storedSaveOrderConfig == null) {
@@ -211,7 +225,6 @@ public class DatabasePropertiesDialog extends JDialog {
                 saveInOriginalOrder.setSelected(true);
                 selected = false;
             } else {
-                assert (saveOrderConfig.saveInSpecifiedOrder);
                 saveInSpecifiedOrder.setSelected(true);
                 selected = true;
             }
@@ -262,17 +275,12 @@ public class DatabasePropertiesDialog extends JDialog {
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
         oldProtectVal = protect.isSelected();
+
+        //set save actions
+        saveActionsPanel.setValues(metaData);
     }
 
     private void storeSettings() {
-        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
-        if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig.setSaveInOriginalOrder();
-        } else {
-            newSaveOrderConfig.setSaveInSpecifiedOrder();
-        }
-        List<String> serialized = newSaveOrderConfig.getVector();
-        metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
 
         Charset oldEncoding = panel.getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();
@@ -298,21 +306,43 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.remove(Globals.PROTECTED_FLAG_META);
         }
 
+        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+        if (saveInOriginalOrder.isSelected()) {
+            newSaveOrderConfig.setSaveInOriginalOrder();
+        } else {
+            newSaveOrderConfig.setSaveInSpecifiedOrder();
+        }
+
         // See if any of the values have been modified:
         boolean saveOrderConfigChanged;
-        if (oldSaveOrderConfig == newSaveOrderConfig) {
+        if (newSaveOrderConfig.equals(oldSaveOrderConfig)) {
             saveOrderConfigChanged = false;
-        } else if ((oldSaveOrderConfig == null) || (newSaveOrderConfig == null)) {
-            saveOrderConfigChanged = true;
         } else {
-            // check on vector basis. This is slower than directly implementing equals, but faster to implement
-            saveOrderConfigChanged = !oldSaveOrderConfig.getVector().equals(newSaveOrderConfig.getVector());
+            saveOrderConfigChanged = true;
+        }
+
+        if (saveOrderConfigChanged) {
+            List<String> serialized = newSaveOrderConfig.getConfigurationList();
+            if (newSaveOrderConfig.equals(defaultSaveOrderConfig)) {
+                metaData.remove(MetaData.SAVE_ORDER_CONFIG);
+            } else {
+                metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+            }
+        }
+
+        boolean saveActionsChanged = saveActionsPanel.hasChanged();
+        if (saveActionsChanged) {
+            if (saveActionsPanel.isDefaultSaveActions()) {
+                metaData.remove(SaveActions.META_KEY);
+            } else {
+                saveActionsPanel.storeSettings(metaData);
+            }
         }
 
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
                 || !oldFileVal.equals(fileDir.getText())
                 || !oldFileIndvVal.equals(fileDirIndv.getText())
-                || (oldProtectVal != protect.isSelected());
+                || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:
         if (changed) {
