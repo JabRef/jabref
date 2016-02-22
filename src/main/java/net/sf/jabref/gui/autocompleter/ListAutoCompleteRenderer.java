@@ -21,24 +21,24 @@ import javax.swing.event.ListSelectionListener;
  */
 public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 
-    DefaultListModel<E> model = new DefaultListModel<>();
-    JList<E> list = new JList<>(model);
+    private final DefaultListModel<E> model = new DefaultListModel<>();
+    private final JList<E> list = new JList<>(model);
     ActionListener acceptAction;
 
     /**
      * Every selection change by the user is interpreted as accepting the new item as autocompletion. Thus we need this
-     * helper variable to prevent that also programmatical trigger an autocompletion.
+     * helper variable to prevent that also programmatically trigger an autocompletion.
      */
     Boolean interpretSelectionChangeAsAccept = true;
 
 
     @Override
     public void update(List<E> autoCompletions) {
-        if (autoCompletions != null) {
+        if (autoCompletions == null) {
+            model.removeAllElements();
+        } else {
             list.setListData(new Vector<>(autoCompletions));
             list.clearSelection();
-        } else {
-            model.removeAllElements();
         }
     }
 

@@ -62,8 +62,7 @@ public class RenamePdfCleanup implements CleanupJob {
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
-            newFilename.append(".");
-            newFilename.append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+            newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
             //get new Filename with path
             //Create new Path based on old Path and new filename

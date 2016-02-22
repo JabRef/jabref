@@ -36,13 +36,14 @@ public class FieldFormatterCleanup implements CleanupJob {
     private final String field;
     private final Formatter formatter;
 
-    public static CleanupJob PAGE_NUMBERS = new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS);
-    public static CleanupJob DATES = new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE);
-    public static CleanupJob MONTH = new FieldFormatterCleanup("month", new MonthFormatter());
-    public static CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
-    public static CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
-    public static CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
-    public static CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
+    public static final CleanupJob PAGE_NUMBERS = new FieldFormatterCleanup("pages",
+            BibtexFieldFormatters.PAGE_NUMBERS);
+    public static final CleanupJob DATES = new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE);
+    public static final CleanupJob MONTH = new FieldFormatterCleanup("month", new MonthFormatter());
+    public static final CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
+    public static final CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
+    public static final CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
+    public static final CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
 
 
     public FieldFormatterCleanup(String field, Formatter formatter) {

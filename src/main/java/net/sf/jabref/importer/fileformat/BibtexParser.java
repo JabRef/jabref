@@ -550,7 +550,7 @@ public class BibtexParser {
                     entry.setField(key, entry.getField(key) + " and " + content);
                 } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one
-                    entry.setField("keywords", entry.getField("keywords") + ", " + content);
+                    entry.addKeyword(content);
                 }
             }
         }
