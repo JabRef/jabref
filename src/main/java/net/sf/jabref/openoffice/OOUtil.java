@@ -26,7 +26,6 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.Layout;
 
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
@@ -40,6 +39,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
 
 /**
  * Utility methods for processing OO Writer documents.

@@ -19,9 +19,9 @@ package net.sf.jabref.logic.util.strings;
 
 import java.util.*;
 
-import net.sf.jabref.exporter.layout.format.FormatChars;
 import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+import net.sf.jabref.logic.layout.format.FormatChars;
 
 /**
  * Class with static methods for converting strings from HTML and Unicode to LaTeX encoding.

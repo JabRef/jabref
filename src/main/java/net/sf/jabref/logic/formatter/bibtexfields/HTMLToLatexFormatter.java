@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {

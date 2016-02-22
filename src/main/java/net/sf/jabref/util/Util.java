@@ -23,8 +23,6 @@ package net.sf.jabref.util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.RegExpFileSearch;
@@ -41,6 +39,8 @@ import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -76,81 +76,6 @@ public class Util {
 
     private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
 
-
-    public static List<String[]> parseMethodsCalls(String calls) throws RuntimeException {
-
-        List<String[]> result = new ArrayList<>();
-
-        char[] c = calls.toCharArray();
-
-        int i = 0;
-
-        while (i < c.length) {
-
-            int start = i;
-            if (Character.isJavaIdentifierStart(c[i])) {
-                i++;
-                while ((i < c.length) && (Character.isJavaIdentifierPart(c[i]) || (c[i] == '.'))) {
-                    i++;
-                }
-                if ((i < c.length) && (c[i] == '(')) {
-
-                    String method = calls.substring(start, i);
-
-                    // Skip the brace
-                    i++;
-
-                    if (i < c.length) {
-                        if (c[i] == '"') {
-                            // Parameter is in format "xxx"
-
-                            // Skip "
-                            i++;
-
-                            int startParam = i;
-                            i++;
-                            boolean escaped = false;
-                            while (((i + 1) < c.length) && !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
-                                if (c[i] == '\\') {
-                                    escaped = !escaped;
-                                } else {
-                                    escaped = false;
-                                }
-                                i++;
-
-                            }
-
-                            String param = calls.substring(startParam, i);
-
-                            result.add(new String[]{method, param});
-                        } else {
-                            // Parameter is in format xxx
-
-                            int startParam = i;
-
-                            while ((i < c.length) && (c[i] != ')')) {
-                                i++;
-                            }
-
-                            String param = calls.substring(startParam, i);
-
-                            result.add(new String[]{method, param});
-
-                        }
-                    } else {
-                        // Incorrectly terminated open brace
-                        result.add(new String[]{method});
-                    }
-                } else {
-                    String method = calls.substring(start, i);
-                    result.add(new String[]{method});
-                }
-            }
-            i++;
-        }
-
-        return result;
-    }
 
     /**
      * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.

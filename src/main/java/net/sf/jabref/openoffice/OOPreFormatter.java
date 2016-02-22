@@ -16,9 +16,10 @@
 package net.sf.jabref.openoffice;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
+
 import java.util.Map;
 
 /**

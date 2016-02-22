@@ -20,8 +20,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
