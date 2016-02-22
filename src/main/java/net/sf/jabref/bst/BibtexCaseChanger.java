@@ -54,13 +54,14 @@ public final class BibtexCaseChanger {
 
         private final char asChar;
 
+        FORMAT_MODE(char asChar) {
+            this.asChar = asChar;
+        }
+
         public char asChar() {
             return asChar;
         }
 
-        FORMAT_MODE(char asChar) {
-            this.asChar = asChar;
-        }
 
         /**
          * Convert bstFormat char into ENUM
@@ -94,7 +95,7 @@ public final class BibtexCaseChanger {
     private String doChangeCase(String s, FORMAT_MODE format) {
         char[] c = s.toCharArray();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         int i = 0;
         int n = s.length();
@@ -109,7 +110,6 @@ public final class BibtexCaseChanger {
                     continue;
                 }
                 if ((format == FORMAT_MODE.TITLE_LOWERS) && ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1])))) {
-                    assert(c[i] == '{');
                     sb.append('{');
                     i++;
                     prevColon = false;
@@ -157,8 +157,8 @@ public final class BibtexCaseChanger {
      * @param format
      * @return
      */
-    private int convertSpecialChar(StringBuffer sb, char[] c, int i, FORMAT_MODE format) {
-        assert(c[i] == '{');
+    private int convertSpecialChar(StringBuilder sb, char[] c, int start, FORMAT_MODE format) {
+        int i = start;
 
         sb.append(c[i]);
         i++; // skip over open brace
@@ -191,13 +191,14 @@ public final class BibtexCaseChanger {
      * position.
      *
      * @param c
-     * @param pos
+     * @param start
      * @param s
      * @param sb
      * @param format
      * @return the new position
      */
-    private int convertAccented(char[] c, int pos, String s, StringBuffer sb, FORMAT_MODE format) {
+    private int convertAccented(char[] c, int start, String s, StringBuilder sb, FORMAT_MODE format) {
+        int pos = start;
         pos += s.length();
 
         switch (format) {
@@ -229,7 +230,8 @@ public final class BibtexCaseChanger {
         return pos;
     }
 
-    private int convertNonControl(char[] c, int pos, StringBuffer sb, FORMAT_MODE format) {
+    private int convertNonControl(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
+        int pos = start;
         switch (format) {
         case TITLE_LOWERS:
         case ALL_LOWERS:
@@ -247,12 +249,11 @@ public final class BibtexCaseChanger {
         return pos;
     }
 
-    private int convertCharIfBraceLevelIsZero(char[] c, int i, StringBuffer sb, FORMAT_MODE format) {
+    private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
+        int i = start;
         switch (format) {
         case TITLE_LOWERS:
-            if (i == 0) {
-                sb.append(c[i]);
-            } else if (prevColon && Character.isWhitespace(c[i - 1])) {
+            if ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))) {
                 sb.append(c[i]);
             } else {
                 sb.append(Character.toLowerCase(c[i]));

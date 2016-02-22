@@ -48,7 +48,7 @@ import net.sf.jabref.model.entry.BibtexString;
 
 public class ChangeScanner implements Runnable {
 
-    private final String[] sortBy = new String[] {"year", "author", "title"};
+    private static final String[] SORT_BY = new String[] {"year", "author", "title"};
 
     private final File f;
 
@@ -69,12 +69,11 @@ public class ChangeScanner implements Runnable {
      * of UndoEdit objects. We instantiate these so that the changes found in the file on disk
      * can be reproduced in memory by calling redo() on them. REDO, not UNDO!
      */
-    //ArrayList changes = new ArrayList();
     private final DefaultMutableTreeNode changes = new DefaultMutableTreeNode(Localization.lang("External changes"));
 
     //  NamedCompound edit = new NamedCompound("Merged external changes")
 
-    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) { //, BibDatabase inMem, MetaData mdInMem) {
+    public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
         this.panel = bp;
         this.frame = frame;
         this.inMem = bp.database();
@@ -98,17 +97,17 @@ public class ChangeScanner implements Runnable {
             MetaData mdOnDisk = pr.getMetaData();
 
             // Sort both databases according to a common sort key.
-            EntryComparator comp = new EntryComparator(false, true, sortBy[2]);
-            comp = new EntryComparator(false, true, sortBy[1], comp);
-            comp = new EntryComparator(false, true, sortBy[0], comp);
+            EntryComparator comp = new EntryComparator(false, true, SORT_BY[2]);
+            comp = new EntryComparator(false, true, SORT_BY[1], comp);
+            comp = new EntryComparator(false, true, SORT_BY[0], comp);
             EntrySorter sInTemp = inTemp.getSorter(comp);
-            comp = new EntryComparator(false, true, sortBy[2]);
-            comp = new EntryComparator(false, true, sortBy[1], comp);
-            comp = new EntryComparator(false, true, sortBy[0], comp);
+            comp = new EntryComparator(false, true, SORT_BY[2]);
+            comp = new EntryComparator(false, true, SORT_BY[1], comp);
+            comp = new EntryComparator(false, true, SORT_BY[0], comp);
             EntrySorter sOnDisk = onDisk.getSorter(comp);
-            comp = new EntryComparator(false, true, sortBy[2]);
-            comp = new EntryComparator(false, true, sortBy[1], comp);
-            comp = new EntryComparator(false, true, sortBy[0], comp);
+            comp = new EntryComparator(false, true, SORT_BY[2]);
+            comp = new EntryComparator(false, true, SORT_BY[1], comp);
+            comp = new EntryComparator(false, true, SORT_BY[0], comp);
             EntrySorter sInMem = inMem.getSorter(comp);
 
             // Start looking at changes.
@@ -401,12 +400,10 @@ public class ChangeScanner implements Runnable {
         HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
 
         // First try to match by string names.
-        //int piv2 = -1;
         mainLoop:
         for (String key : onTmp.getStringKeySet()) {
             BibtexString tmp = onTmp.getString(key);
 
-            //      for (int j=piv2+1; j<nDisk; j++)
             for (String diskId : onDisk.getStringKeySet()) {
                 if (!used.contains(diskId)) {
                     BibtexString disk = onDisk.getString(diskId);
@@ -423,8 +420,6 @@ public class ChangeScanner implements Runnable {
                             }
                         }
                         used.add(diskId);
-                        //if (j==piv2)
-                        //  piv2++;
                         continue mainLoop;
                     }
 
@@ -492,7 +487,6 @@ public class ChangeScanner implements Runnable {
         for (String diskId : onDisk.getStringKeySet()) {
             if (!used.contains(diskId)) {
                 BibtexString disk = onDisk.getString(diskId);
-                //System.out.println(disk.getName());
                 used.add(diskId);
                 changes.add(new StringAddChange(disk));
             }

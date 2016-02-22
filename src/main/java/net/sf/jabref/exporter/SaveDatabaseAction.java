@@ -184,13 +184,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // Save the database:
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getEncoding());
 
-                try {
-                    Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
-                } catch (IllegalArgumentException ex) {
-                    // This means the file has not yet been registered, which is the case
-                    // when doing a "Save as". Maybe we should change the monitor so no
-                    // exception is cast.
-                }
+                Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
             } else {
                 // No file lock
                 success = false;

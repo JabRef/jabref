@@ -55,7 +55,7 @@ public class EntryComparator implements Comparator<BibEntry> {
     }
 
     @Override
-    public int compare(BibEntry e1, BibEntry e2) throws ClassCastException {
+    public int compare(BibEntry e1, BibEntry e2) {
 
         if (e1 == e2) {
             return 0;
@@ -78,11 +78,9 @@ public class EntryComparator implements Comparator<BibEntry> {
         if ("author".equals(sortField) || "editor".equals(sortField)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
-                //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
             }
             if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase();
-                //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
         } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
