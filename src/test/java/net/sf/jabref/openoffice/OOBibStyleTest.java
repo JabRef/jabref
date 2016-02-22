@@ -53,7 +53,7 @@ public class OOBibStyleTest {
         try {
             URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
             OOBibStyle style = new OOBibStyle(new File(defPath.getFile()),
-                    Globals.journalAbbreviationLoader.getRepository());
+                    Globals.journalAbbreviationLoader.getRepository(), Globals.prefs.getDefaultEncoding());
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());
             assertFalse(style.isBoldCitations());
