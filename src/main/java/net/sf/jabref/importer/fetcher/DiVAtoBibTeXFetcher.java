@@ -33,6 +33,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
@@ -106,7 +107,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             });
 
             entry.getFieldOptional("institution").ifPresent(
-                    institution -> entry.setField("institution", new UnicodeConverter().format(institution)));
+                    institution -> entry.setField("institution", new UnicodeToLatexFormatter().format(institution)));
             // Do not use the provided key
             // entry.clearField(InternalBibtexFields.KEY_FIELD);
             inspector.addEntry(entry);

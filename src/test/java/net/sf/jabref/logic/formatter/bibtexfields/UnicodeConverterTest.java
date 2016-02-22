@@ -1,4 +1,4 @@
-package net.sf.jabref.importer;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import static org.junit.Assert.*;
 
@@ -7,11 +7,12 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 
 
 public class UnicodeConverterTest {
 
-    UnicodeConverter conv = new UnicodeConverter();
+    UnicodeToLatexFormatter conv = new UnicodeToLatexFormatter();
 
     @Before
     public void setUp() throws Exception {

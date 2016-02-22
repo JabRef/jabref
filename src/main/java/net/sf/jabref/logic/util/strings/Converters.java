@@ -20,8 +20,8 @@ package net.sf.jabref.logic.util.strings;
 import java.util.*;
 
 import net.sf.jabref.exporter.layout.format.FormatChars;
-import net.sf.jabref.importer.HTMLConverter;
-import net.sf.jabref.importer.UnicodeConverter;
+import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 
 /**
  * Class with static methods for converting strings from HTML and Unicode to LaTeX encoding.
@@ -30,8 +30,8 @@ import net.sf.jabref.importer.UnicodeConverter;
  */
 public class Converters {
 
-    private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
-    private static final UnicodeConverter UNICODE_CONVERTER = new UnicodeConverter();
+    private static final HTMLToLatexFormatter HTML_CONVERTER = new HTMLToLatexFormatter();
+    private static final UnicodeToLatexFormatter UNICODE_CONVERTER = new UnicodeToLatexFormatter();
 
     public static final LatexToUnicodeConverter LATEX_TO_UNICODE = new LatexToUnicodeConverter();
     public static final UnicodeToLatexConverter UNICODE_TO_LATEX = new UnicodeToLatexConverter();

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.importer;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 import java.util.Set;
@@ -29,9 +29,9 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
-public class HTMLConverter implements LayoutFormatter, Formatter {
+public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(HTMLConverter.class);
+    private static final Log LOGGER = LogFactory.getLog(HTMLToLatexFormatter.class);
 
     private static final int MAX_TAG_LENGTH = 100;
 
@@ -41,7 +41,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
 
-    public HTMLConverter() {
+    public HTMLToLatexFormatter() {
         super();
     }
 

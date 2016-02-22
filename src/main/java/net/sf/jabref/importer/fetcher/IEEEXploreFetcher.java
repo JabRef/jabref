@@ -45,6 +45,7 @@ import org.json.JSONObject;
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -68,7 +69,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
-    private final HTMLConverter htmlConverter = new HTMLConverter();
+    private final HTMLToLatexFormatter htmlConverter = new HTMLToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;

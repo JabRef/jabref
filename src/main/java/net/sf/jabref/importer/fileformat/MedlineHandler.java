@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.UnicodeConverter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -32,7 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
 class MedlineHandler extends DefaultHandler
 {
 
-    private static final UnicodeConverter UNICODE_CONVERTER = new UnicodeConverter();
+    private static final UnicodeToLatexFormatter UNICODE_CONVERTER = new UnicodeToLatexFormatter();
     private final List<BibEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
