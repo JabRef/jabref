@@ -54,6 +54,14 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        if ("all".equals(field)) {
+            return cleanupAllFields(entry);
+        } else {
+            return cleanupSingleField(entry);
+        }
+    }
+
+    private List<FieldChange> cleanupSingleField(BibEntry entry) {
         if (!entry.hasField(field)) {
             // Not set -> nothing to do
             return new ArrayList<>();
@@ -70,6 +78,23 @@ public class FieldFormatterCleanup implements CleanupJob {
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
         }
+    }
+
+    private List<FieldChange> cleanupAllFields(BibEntry entry) {
+        ArrayList<FieldChange> fieldChanges = new ArrayList<>();
+
+        for (String fieldKey : entry.getFieldNames()) {
+            String oldValue = entry.getField(fieldKey);
+            String newValue = formatter.format(oldValue);
+
+            if (!oldValue.equals(newValue)) {
+                entry.setField(fieldKey, newValue);
+                FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
+                fieldChanges.add(change);
+            }
+        }
+
+        return fieldChanges;
     }
 
     public String getField() {
