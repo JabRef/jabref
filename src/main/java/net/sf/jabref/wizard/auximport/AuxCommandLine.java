@@ -52,7 +52,7 @@ public class AuxCommandLine {
     public BibDatabase perform() {
         BibDatabase back = null;
         if (!auxName.isEmpty() && (bib != null)) {
-            AuxSubGenerator auxParser = new AuxSubGenerator(bib);
+            AuxSubGenerator auxParser = new AuxSubGenerator();
             auxParser.generate(auxName, bib);
             back = auxParser.getGeneratedDatabase();
 
