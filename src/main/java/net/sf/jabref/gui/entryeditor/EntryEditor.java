@@ -1044,7 +1044,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Make sure the key is legal:
-                String cleaned = net.sf.jabref.util.Util.checkLegalKey(newValue);
+                String cleaned = net.sf.jabref.logic.labelpattern.LabelPatternUtil.checkLegalKey(newValue);
                 if ((cleaned != null) && !cleaned.equals(newValue)) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
                             Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);

@@ -40,7 +40,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 /**
  *
@@ -241,7 +241,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             return;
         }
 
-        String testString = Util.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "

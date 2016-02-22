@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.util.Util;
 
 /**
  * This is the utility class of the LabelPattern package.
@@ -465,7 +464,7 @@ public class LabelPatternUtil {
         }
 
         // Remove all illegal characters from the key.
-        key = Util.checkLegalKey(stringBuilder.toString());
+        key = LabelPatternUtil.checkLegalKey(stringBuilder.toString());
 
         // Remove Regular Expressions while generating Keys
         String regex = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
@@ -1362,6 +1361,63 @@ public class LabelPatternUtil {
         }
         parts.add(current.toString());
         return parts.toArray(new String[parts.size()]);
+    }
+
+    /**
+     * This method returns a String similar to the one passed in, except that it is molded into a form that is
+     * acceptable for bibtex.
+     * <p>
+     * Watch-out that the returned string might be of length 0 afterwards.
+     *
+     * @param key mayBeNull
+     */
+    public static String checkLegalKey(String key) {
+        if (key == null) {
+            return null;
+        }
+        return checkLegalKey(key,
+                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+    }
+
+    /**
+     * This method returns a String similar to the one passed in, except that it is molded into a form that is
+     * acceptable for bibtex.
+     * <p>
+     * Watch-out that the returned string might be of length 0 afterwards.
+     *
+     * @param key             mayBeNull
+     * @param enforceLegalKey make sure that the key is legal in all respects
+     */
+    public static String checkLegalKey(String key, boolean enforceLegalKey) {
+        if (key == null) {
+            return null;
+        }
+        if (!enforceLegalKey) {
+            // User doesn't want us to enforce legal characters. We must still look
+            // for whitespace and some characters such as commas, since these would
+            // interfere with parsing:
+            StringBuilder newKey = new StringBuilder();
+            for (int i = 0; i < key.length(); i++) {
+                char c = key.charAt(i);
+                if (!Character.isWhitespace(c) && ("{}(),\\\"".indexOf(c) == -1)) {
+                    newKey.append(c);
+                }
+            }
+            return newKey.toString();
+        }
+
+        StringBuilder newKey = new StringBuilder();
+        for (int i = 0; i < key.length(); i++) {
+            char c = key.charAt(i);
+            if (!Character.isWhitespace(c) && ("{}(),\\\"#~^'".indexOf(c) == -1)) {
+                newKey.append(c);
+            }
+        }
+
+        // Replace non-English characters like umlauts etc. with a sensible
+        // letter or letter combination that bibtex can accept.
+
+        return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
 }
