@@ -46,6 +46,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
 - Merge from DOI now honors removed fields
 - Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
+- Fixed [#824](https://github.com/JabRef/jabref/issues/824): MimeTypeDetector can now also handle local file links
 - Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
 - Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
 - Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
