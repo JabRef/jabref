@@ -809,6 +809,24 @@ public class JabRefPreferences {
         }
     }
 
+    public List<String> getCustomTabFieldNames() {
+        List<String> customFields = new ArrayList<>();
+
+        int defNumber = 0;
+        while(true) {
+            // saved as CUSTOMTABNAME_def{number} and ; separated
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            if(fields == null || fields.isEmpty()) {
+                break;
+            }
+
+            customFields.addAll(Arrays.asList(fields.split(";")));
+            defNumber++;
+        }
+        return customFields;
+    }
+
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));

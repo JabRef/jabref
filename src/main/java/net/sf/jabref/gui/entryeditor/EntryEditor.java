@@ -287,6 +287,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
         List<String> otherFields = this.entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
         otherFields.remove("bibtexkey");
+        otherFields.removeAll(prefs.getCustomTabFieldNames());
 
         if(!otherFields.isEmpty()) {
             EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,

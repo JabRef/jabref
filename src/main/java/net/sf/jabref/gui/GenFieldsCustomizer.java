@@ -136,11 +136,6 @@ public class GenFieldsCustomizer extends JDialog {
         Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
         Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
         Globals.prefs.updateEntryEditorTabList();
-        /*
-        String delimStr = fieldsArea.getText().replaceAll("\\s+","")
-          .replaceAll("\\n+","").trim();
-        parent.prefs.putStringArray(JabRefPreferences.GENERAL_FIELDS, Util.split(delimStr, ";"));
-        */
 
         parentFrame.removeCachedEntryEditors();
         dispose();
@@ -219,8 +214,8 @@ class GenFieldsCustomizerRevertActionAdapter implements ActionListener {
     private final GenFieldsCustomizer adaptee;
 
 
-    GenFieldsCustomizerRevertActionAdapter(GenFieldsCustomizer adaptee) {
-        this.adaptee = adaptee;
+    GenFieldsCustomizerRevertActionAdapter(GenFieldsCustomizer adapter) {
+        this.adaptee = adapter;
     }
 
     @Override
