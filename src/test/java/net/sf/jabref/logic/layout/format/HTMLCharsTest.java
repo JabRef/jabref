@@ -27,6 +27,12 @@ public class HTMLCharsTest {
         Assert.assertEquals("&imath;", layout.format("\\{i}"));
         Assert.assertEquals("&imath;&imath;", layout.format("\\i\\i"));
 
+        Assert.assertEquals("&auml;", layout.format("{\\\"{a}}"));
+        Assert.assertEquals("&auml;", layout.format("{\\\"a}"));
+        Assert.assertEquals("&auml;", layout.format("\\\"a"));
+
+        Assert.assertEquals("&Ccedil;", layout.format("{\\c{C}}"));
+
         Assert.assertEquals("&Lmidot;&imath;", layout.format("\\Lmidot\\i"));
 
         Assert.assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
@@ -51,6 +57,10 @@ public class HTMLCharsTest {
 
         Assert.assertEquals("<sup>hallo</sup>", layout.format("\\textsuperscript{hallo}"));
         Assert.assertEquals("<sub>hallo</sub>", layout.format("\\textsubscript{hallo}"));
+
+        Assert.assertEquals("<u>hallo</u>", layout.format("\\underline{hallo}"));
+        Assert.assertEquals("<s>hallo</s>", layout.format("\\sout{hallo}"));
+        Assert.assertEquals("<tt>hallo</tt>", layout.format("\\texttt{hallo}"));
 
     }
 
