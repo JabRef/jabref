@@ -36,6 +36,7 @@ public class OOPreFormatterTest {
     public void testPlainFormat() {
         assertEquals("aaa", new OOPreFormatter().format("aaa"));
         assertEquals("$", new OOPreFormatter().format("\\$"));
+        assertEquals("%", new OOPreFormatter().format("\\%"));
         assertEquals("\\", new OOPreFormatter().format("\\\\"));
     }
 
@@ -77,7 +78,8 @@ public class OOPreFormatterTest {
     @Test
     public void testFormatting() {
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\textit{kkk}"));
-        assertEquals("<em>kkk</em>", new OOPreFormatter().format("\\emph{kkk}"));
+        assertEquals("<i>kkk</i>", new OOPreFormatter().format("{\\it kkk}"));
+        assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\emph{kkk}"));
         assertEquals("<b>kkk</b>", new OOPreFormatter().format("\\textbf{kkk}"));
         assertEquals("<smallcaps>kkk</smallcaps>", new OOPreFormatter().format("\\textsc{kkk}"));
         assertEquals("<s>kkk</s>", new OOPreFormatter().format("\\sout{kkk}"));

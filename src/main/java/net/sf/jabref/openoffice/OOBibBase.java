@@ -293,7 +293,6 @@ class OOBibBase {
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
-                    //XTextContent content = insertBookMark(bName, xViewCursor);
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -323,10 +322,8 @@ class OOBibBase {
                 databaseMap.put(entry, database);
             }
             String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, databaseMap,
-                    inParenthesis,
-                    null, null);
+                    inParenthesis, null, null);
             insertReferenceMark(bName, citeText, xViewCursor, withText, style);
-            //xViewCursor.collapseToEnd();
 
             xViewCursor.collapseToEnd();
             xViewCursor.goRight((short) 1, false);
@@ -400,8 +397,6 @@ class OOBibBase {
         List<String> names;
         if (style.isSortByPosition()) {
             // We need to sort the reference marks according to their order of appearance:
-            /*if (sortedReferenceMarks == null)
-                updateSortedReferenceMarks();*/
             names = sortedReferenceMarks;
         } else if (style.isNumberEntries()) {
             // We need to sort the reference marks according to the sorting of the bibliographic
@@ -418,8 +413,6 @@ class OOBibBase {
             }
             names = Arrays.asList(nameAccess.getElementNames());
         } else {
-            /*if (sortedReferenceMarks == null)
-                updateSortedReferenceMarks();*/
             names = sortedReferenceMarks;
         }
 
@@ -936,8 +929,8 @@ class OOBibBase {
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
-                        style.getNumCitationMarker(Arrays.asList(number++), minGroupingCount, true), false, false,
-                        false, false, false, false, false, false);
+                        style.getNumCitationMarker(Arrays.asList(number++), minGroupingCount, true),
+                        new BitSet(OOUtil.TOTAL_FORMAT_COUNT));
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);

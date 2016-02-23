@@ -16,6 +16,7 @@
 package net.sf.jabref.openoffice;
 
 import java.util.List;
+import java.util.BitSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,17 +47,25 @@ import net.sf.jabref.logic.layout.Layout;
  */
 class OOUtil {
 
+    private static final String CHAR_STRIKEOUT = "CharStrikeout";
+    private static final String CHAR_UNDERLINE = "CharUnderline";
     private static final String PARA_STYLE_NAME = "ParaStyleName";
-
     private static final String CHAR_CASE_MAP = "CharCaseMap";
-
     private static final String CHAR_POSTURE = "CharPosture";
-
     private static final String CHAR_WEIGHT = "CharWeight";
-
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
-
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
+
+    public static final int TOTAL_FORMAT_COUNT = 8;
+
+    private static final int FORMAT_BOLD = 0;
+    private static final int FORMAT_ITALIC = 1;
+    private static final int FORMAT_SMALLCAPS = 2;
+    private static final int FORMAT_SUPERSCRIPT = 3;
+    private static final int FORMAT_SUBSCRIPT = 4;
+    private static final int FORMAT_UNDERLINE = 5;
+    private static final int FORMAT_STRIKEOUT = 6;
+    private static final int FORMAT_MONOSPACE = 7;
 
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
@@ -132,60 +141,49 @@ class OOUtil {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 
+        BitSet formatting = new BitSet(TOTAL_FORMAT_COUNT);
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        int italic = 0;
-        int bold = 0;
-        int sup = 0;
-        int sub = 0;
-        int mono = 0;
-        int smallCaps = 0;
-        int underline = 0;
-        int strikeout = 0;
-        //insertTextAtCurrentLocation(text, cursor, "_",
-        //    false, false, false, false, false, false);
-        //cursor.goLeft((short)1, true);
         Matcher m = OOUtil.HTML_TAG.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0, mono > 0,
-                        smallCaps > 0, sup > 0, sub > 0, underline > 0, strikeout > 0);
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, formatting);
             }
             String tag = m.group();
             // Handle tags:
             if ("<b>".equals(tag)) {
-                bold++;
+                formatting.set(FORMAT_BOLD);
             } else if ("</b>".equals(tag)) {
-                bold--;
+                formatting.clear(FORMAT_BOLD);
             } else if ("<i>".equals(tag) || "<em>".equals(tag)) {
-                italic++;
+                formatting.set(FORMAT_ITALIC);
             } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
-                italic--;
-            } else if ("</tt>".equals(tag)) {
-                mono = 0;
+                formatting.clear(FORMAT_ITALIC);
             } else if ("<tt>".equals(tag)) {
-                mono = 1;
-            } else if ("</smallcaps>".equals(tag)) {
-                smallCaps = 0;
+                formatting.set(FORMAT_MONOSPACE);
+            } else if ("</tt>".equals(tag)) {
+                formatting.clear(FORMAT_MONOSPACE);
             } else if ("<smallcaps>".equals(tag)) {
-                smallCaps = 1;
-            } else if ("</sup>".equals(tag)) {
-                sup = 0;
+                formatting.set(FORMAT_SMALLCAPS);
+            } else if ("</smallcaps>".equals(tag)) {
+                formatting.clear(FORMAT_SMALLCAPS);
             } else if ("<sup>".equals(tag)) {
-                sup = 1;
-            } else if ("</sub>".equals(tag)) {
-                sub = 0;
+                formatting.set(FORMAT_SUPERSCRIPT);
+            } else if ("</sup>".equals(tag)) {
+                formatting.clear(FORMAT_SUPERSCRIPT);
             } else if ("<sub>".equals(tag)) {
-                sub = 1;
-            } else if ("</u>".equals(tag)) {
-                underline = 0;
+                formatting.set(FORMAT_SUBSCRIPT);
+            } else if ("</sub>".equals(tag)) {
+                formatting.clear(FORMAT_SUBSCRIPT);
             } else if ("<u>".equals(tag)) {
-                underline = 1;
-            } else if ("</s>".equals(tag)) {
-                strikeout = 0;
+                formatting.set(FORMAT_UNDERLINE);
+            } else if ("</u>".equals(tag)) {
+                formatting.clear(FORMAT_UNDERLINE);
             } else if ("<s>".equals(tag)) {
-                strikeout = 1;
+                formatting.set(FORMAT_STRIKEOUT);
+            } else if ("</s>".equals(tag)) {
+                formatting.clear(FORMAT_STRIKEOUT);
             }
 
             piv = m.end();
@@ -193,8 +191,7 @@ class OOUtil {
         }
 
         if (piv < lText.length()) {
-            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv), (bold % 2) > 0, (italic % 2) > 0,
-                    mono > 0, smallCaps > 0, sup > 0, sub > 0, underline > 0, strikeout > 0);
+            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv), formatting);
         }
 
         cursor.collapseToEnd();
@@ -205,9 +202,7 @@ class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, boolean bold,
-            boolean italic, boolean monospace, boolean smallCaps, boolean superscript, boolean subscript,
-            boolean underline, boolean strikeout)
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, BitSet formatting)
                     throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
                     IllegalArgumentException {
         text.insertString(cursor, string, true);
@@ -215,7 +210,7 @@ class OOUtil {
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
                 XPropertySet.class, cursor);
-        if (bold) {
+        if (formatting.get(FORMAT_BOLD)) {
             xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.BOLD);
         } else {
@@ -223,7 +218,7 @@ class OOUtil {
                     com.sun.star.awt.FontWeight.NORMAL);
         }
 
-        if (italic) {
+        if (formatting.get(FORMAT_ITALIC)) {
             xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.ITALIC);
         } else {
@@ -231,7 +226,7 @@ class OOUtil {
                     com.sun.star.awt.FontSlant.NONE);
         }
 
-        if (smallCaps) {
+        if (formatting.get(FORMAT_SMALLCAPS)) {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
         }        else {
@@ -241,7 +236,7 @@ class OOUtil {
 
         // TODO: the <monospace> tag doesn't work
         /*
-        if (monospace) {
+        if (formatting.get(FORMAT_MONOSPACE)) {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.FIXED);
         }
@@ -249,12 +244,12 @@ class OOUtil {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.VARIABLE);
         } */
-        if (subscript) {
+        if (formatting.get(FORMAT_SUBSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) -101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        } else if (superscript) {
+        } else if (formatting.get(FORMAT_SUPERSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
@@ -265,15 +260,17 @@ class OOUtil {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 100);
         }
-        if (underline) {
-            xCursorProps.setPropertyValue("CharUnderline", com.sun.star.awt.FontUnderline.SINGLE);
+
+        if (formatting.get(FORMAT_UNDERLINE)) {
+            xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.SINGLE);
         } else {
-            xCursorProps.setPropertyValue("CharUnderline", com.sun.star.awt.FontUnderline.NONE);
+            xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.NONE);
         }
-        if (strikeout) {
-            xCursorProps.setPropertyValue("CharStrikeout", com.sun.star.awt.FontStrikeout.SINGLE);
+
+        if (formatting.get(FORMAT_STRIKEOUT)) {
+            xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.SINGLE);
         } else {
-            xCursorProps.setPropertyValue("CharStrikeout", com.sun.star.awt.FontStrikeout.NONE);
+            xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.NONE);
         }
         cursor.collapseToEnd();
 
