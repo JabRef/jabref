@@ -205,8 +205,8 @@ public class ExportFormat implements IExportFormat {
 
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader);
-                beginLayout = layoutHelper.getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
+                LayoutHelper layoutHelper = new LayoutHelper(reader, Globals.journalAbbreviationLoader.getRepository());
+                beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
                 // file.
@@ -234,8 +234,8 @@ public class ExportFormat implements IExportFormat {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader);
-                defLayout = layoutHelper.getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
+                layoutHelper = new LayoutHelper(reader, Globals.journalAbbreviationLoader.getRepository());
+                defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
@@ -256,8 +256,8 @@ public class ExportFormat implements IExportFormat {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader);
-                        layout = layoutHelper.getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
+                        layoutHelper = new LayoutHelper(reader, Globals.journalAbbreviationLoader.getRepository());
+                        layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
                             missingFormatters.addAll(layout.getMissingFormatters());
@@ -280,8 +280,8 @@ public class ExportFormat implements IExportFormat {
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + ".end.layout")) {
-                layoutHelper = new LayoutHelper(reader);
-                endLayout = layoutHelper.getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
+                layoutHelper = new LayoutHelper(reader, Globals.journalAbbreviationLoader.getRepository());
+                endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
                 // file.

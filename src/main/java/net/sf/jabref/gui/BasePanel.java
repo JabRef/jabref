@@ -801,8 +801,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
                     Layout layout;
                     try {
-                        layout = new LayoutHelper(sr)
-                                .getLayoutFromText(Globals.journalAbbreviationLoader.getRepository());
+                        layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
+                                .getLayoutFromText();
                     } catch (IOException e) {
                         LOGGER.info("Could not get layout", e);
                         return;

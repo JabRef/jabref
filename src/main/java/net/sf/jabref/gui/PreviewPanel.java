@@ -255,8 +255,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private void updateLayout() {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(
-new LayoutHelper(sr).getLayoutFromText(Globals.journalAbbreviationLoader.getRepository()));
+            layout = Optional
+                    .of(new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository()).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);

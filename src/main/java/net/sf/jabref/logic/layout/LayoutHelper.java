@@ -50,15 +50,16 @@ public class LayoutHelper {
 
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
-
+    private final JournalAbbreviationRepository repository;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in) {
+    public LayoutHelper(Reader in, JournalAbbreviationRepository repository) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
+        this.repository = Objects.requireNonNull(repository);
     }
 
-    public Layout getLayoutFromText(JournalAbbreviationRepository repository) throws IOException {
+    public Layout getLayoutFromText() throws IOException {
         parse();
 
         for (StringInt parsedEntry : parsedEntries) {
