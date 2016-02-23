@@ -168,7 +168,25 @@ When adding a new preference, following steps have to be taken:
 When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used. 
 
 ## Test Cases
+Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
+- *Placing:* all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`. 
+- *Naming:* the name should be descriptive enough to describe the whole test. Use the format `methodUnderTest_ expectedBehavior_context` (without the dashes). So for example `formatRemovesDoubleBracesAtBeginning`. Try to avoid naming the tests with a `test` prefix since this information is already contained in the class name. Moreover, starting the name with `test` leads often to inferior test names (see also the [Stackoverflow discussion about naming](http://stackoverflow.com/questions/155436/unit-test-naming-best-practices)).
+- *Test only one thing per test:* tests should be short and test only one small part of the method. So instead of 
+````
+testFormat() {
+   assertEqual("test", format("test"));
+   assertEqual("{test", format("{test"));
+   assertEqual("test", format("{{test"));
+   assertEqual("test", format("test}}"));
+   assertEqual("test", format("{{test}}"));
+}
+````
+we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, `formatRemovesDoubleBracesAtBeginning`, etc.). See [JUnit AntiPattern](http://www.exubero.com/junit/antipatterns.html#Multiple_Assertions) for background.
+- Do *not just test happy paths*, but also wrong/weird input.
+- It is recommend to write tests *before* you actually implement the functionality (test driven development). 
+- *Bug fixing:* write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 
+### Lists in tests
 * Use `Assert.assertEquals(Collections.emptyList(), actualList);` instead of `Assert.assertEquals(0, actualList.size());` to test whether a list is empty.
 * Similarly, use `Assert.assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
 ```` java
@@ -176,6 +194,7 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
          Assert.assertEquals("a", actualList.get(0));
          Assert.assertEquals("b", actualList.get(1));
 ````
+### Files and folders in tests
 * If you need a temporary file in tests, then add 
 ```` java
          @Rule
@@ -193,7 +212,7 @@ public static void setUp() {
 }
 ```
 
-If you modify preference, use following pattern:
+If you modify preference, use following pattern to ensure that the stored preferences of a developer are not affected:
 
 ```java
 private JabRefPreferences backup;
@@ -210,6 +229,21 @@ public void tearDown() {
     prefs.overwritePreferences(backup);
 }
 ```
+
+Or even better, try to mock the preferences and insert them via dependency injection.
+````java
+@Test
+public void getTypeReturnsBibLatexArticleInBibLatexMode() {
+     // Mock preferences
+     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);        
+     // Switch to BibLatex mode
+     when(mockedPrefs.getBoolean("BiblatexMode")).thenReturn(true);
+
+     // Now test
+     EntryTypes biblatexentrytypes = new EntryTypes(mockedPrefs);
+     assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
+}
+````
 
 ## UI
 
