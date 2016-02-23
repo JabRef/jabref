@@ -34,6 +34,8 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -199,15 +201,19 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
-        List<String> fieldList = type.getRequiredFieldsFlat();
+        // required fields
+        List<String> requiredFields = type.getRequiredFieldsFlat();
 
-        EntryEditorTab reqPan = new EntryEditorTab(frame, panel, fieldList, this, true, false, Localization.lang("Required fields"));
-        if (reqPan.fileListEditor != null) {
-            fileListEditor = reqPan.fileListEditor;
+        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false, Localization.lang("Required fields"));
+        if (requiredPanel.fileListEditor != null) {
+            fileListEditor = requiredPanel.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), reqPan
+        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
-        tabs.add(reqPan);
+        tabs.add(requiredPanel);
+
+        // optional fields
+        List<String> displayedOptionalFields = new ArrayList<>();
 
         if ((type.getOptionalFields() != null) && (type.getOptionalFields().size() >= 1)) {
             EntryEditorTab optPan;
@@ -221,6 +227,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         .getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan);
             } else {
+                displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
+                displayedOptionalFields.addAll(type.getSecondaryOptionalFields());
+
                 optPan = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                         false, true, Localization.lang("Optional fields"));
                 if (optPan.fileListEditor != null) {
@@ -272,6 +281,22 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     tabs.add(optPan3);
                 }
             }
+        }
+
+        // other fields
+        List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
+        List<String> otherFields = this.entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        otherFields.remove("bibtexkey");
+
+        if(!otherFields.isEmpty()) {
+            EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
+                    false, false, Localization.lang("Other fields"));
+            if (otherPanel.fileListEditor != null) {
+                fileListEditor = otherPanel.fileListEditor;
+            }
+            tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
+                    .getPane(), Localization.lang("Show remaining fields"));
+            tabs.add(otherPanel);
         }
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
