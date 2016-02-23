@@ -270,7 +270,6 @@ public class InternalBibtexFields {
         PUBLIC_FIELDS = pFields.toArray(new String[pFields.size()]);
         // sort the entries
         Arrays.sort(PUBLIC_FIELDS);
-
     }
 
     /**
@@ -474,8 +473,6 @@ public class InternalBibtexFields {
         // todo: add the handling in a key=value manner
         // private HashMap props = new HashMap() ;
 
-        // some constructors ;-)
-
         public BibtexSingleField(String fieldName, boolean pStandard) {
             name = fieldName;
             setFlag(pStandard, BibtexSingleField.STANDARD);
@@ -582,7 +579,9 @@ public class InternalBibtexFields {
             return this.weight;
         }
 
-        // -----------------------------------------------------------------------
+        /**
+         * @return The maximum (expected) length of the field value; <em>not</em> the length of the field name
+         */
         public int getLength() {
             return this.length;
         }
@@ -594,7 +593,7 @@ public class InternalBibtexFields {
         }
 
         /**
-         * Set this field's numeric propery
+         * Set this field's numeric property
          *
          * @param numeric true to indicate that this is a numeric field.
          * @return this BibtexSingleField instance. Makes it easier to call this

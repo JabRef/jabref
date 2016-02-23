@@ -283,7 +283,7 @@ public class RepecNepImporter extends ImportFormat {
      */
     private void parseAuthors(BibEntry be) throws IOException {
         // read authors and institutions
-        String authors = "";
+        List<String> authors = new ArrayList<>();
         StringBuffer institutions = new StringBuffer();
         while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
 
@@ -313,17 +313,16 @@ public class RepecNepImporter extends ImportFormat {
                 readLine();
             }
 
-            if (author != null) {
-                authors += "".equals(authors) ? author : " and " + author;
-            }
+            authors.add(author);
+
             if (institution.length() > 0) {
                 institutions.append(
                         (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());
             }
         }
 
-        if (!"".equals(authors)) {
-            be.setField("author", authors);
+        if (!authors.isEmpty()) {
+            be.setField("author", String.join(" and ", authors));
         }
         if (institutions.length() > 0) {
             be.setField("institution", institutions.toString());

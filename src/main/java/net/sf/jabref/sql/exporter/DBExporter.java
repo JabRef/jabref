@@ -41,7 +41,7 @@ import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.model.entry.EntryType;

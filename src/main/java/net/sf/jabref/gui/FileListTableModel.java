@@ -124,7 +124,8 @@ public class FileListTableModel extends AbstractTableModel {
         setContent(value, false, false);
     }
 
-    private FileListEntry setContent(String value, boolean firstOnly, boolean deduceUnknownTypes) {
+    private FileListEntry setContent(String val, boolean firstOnly, boolean deduceUnknownTypes) {
+        String value = val;
         if (value == null) {
             value = "";
         }
@@ -200,13 +201,15 @@ public class FileListTableModel extends AbstractTableModel {
      * @return String representation.
      */
     public String getStringRepresentation() {
-        String[][] array = new String[list.size()][];
-        int i = 0;
-        for (FileListEntry entry : list) {
-            array[i] = entry.getStringArrayRepresentation();
-            i++;
+        synchronized (list) {
+            String[][] array = new String[list.size()][];
+            int i = 0;
+            for (FileListEntry entry : list) {
+                array[i] = entry.getStringArrayRepresentation();
+                i++;
+            }
+            return FileField.encodeStringArray(array);
         }
-        return FileField.encodeStringArray(array);
     }
 
     /**
@@ -217,8 +220,10 @@ public class FileListTableModel extends AbstractTableModel {
     public String getToolTipHTMLRepresentation() {
         StringJoiner sb = new StringJoiner("<br>", "<html>", "</html>");
 
-        for(FileListEntry entry : list) {
-            sb.add(String.format("%s (%s)", entry.description, entry.link));
+        synchronized (list) {
+            for (FileListEntry entry : list) {
+                sb.add(String.format("%s (%s)", entry.description, entry.link));
+            }
         }
 
         return sb.toString();

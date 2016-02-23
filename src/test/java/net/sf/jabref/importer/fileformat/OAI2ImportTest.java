@@ -23,9 +23,9 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class OAI2ImportTest {
 
-    OAI2Handler handler;
+    protected OAI2Handler handler;
 
-    BibEntry be;
+    protected BibEntry be;
 
     protected SAXParserFactory parserFactory;
 

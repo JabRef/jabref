@@ -17,7 +17,6 @@ package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -80,15 +79,6 @@ public class StringUtil {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
-    }
-
-    public static String join(Collection<String> strings, String separator) {
-        String[] arr = strings.toArray(new String[strings.size()]);
-        return join(arr, separator, 0, arr.length);
-    }
-
-    public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
     }
 
     /**
@@ -227,35 +217,6 @@ public class StringUtil {
     }
 
     /**
-     * Quote special characters.
-     *
-     * @param toQuote         The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting
-     *                  character itself, which is automatically quoted.
-     * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting
-     * character itself) quoted.
-     */
-    public static String quote(String toQuote, String specials, char quoteChar) {
-        StringBuilder result = new StringBuilder();
-        char c;
-        boolean isSpecial;
-        for (int i = 0; i < toQuote.length(); ++i) {
-            c = toQuote.charAt(i);
-
-            isSpecial = (c == quoteChar);
-            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
-            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
-
-            if (isSpecial) {
-                result.append(quoteChar);
-            }
-            result.append(c);
-        }
-        return result.toString();
-    }
-
-    /**
      * Unquote special characters.
      *
      * @param toUnquote         The String which may contain quoted special characters.
@@ -295,9 +256,9 @@ public class StringUtil {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<>();
+        List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        List<String> thisEntry = new ArrayList<>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -558,5 +519,50 @@ public class StringUtil {
         }
 
         return list;
+    }
+
+    /**
+     * Quote special characters.
+     *
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @return A String with every special character (including the quoting
+     * character itself) quoted.
+     */
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        if (toQuote == null) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        char c;
+        boolean isSpecial;
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
+
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+
+            if (isSpecial) {
+                result.append(quoteChar);
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
+
+    public static String limitStringLength(String s, int maxLength) {
+        if (s == null) {
+            return "";
+        }
+
+        if (s.length() <= maxLength) {
+            return s;
+        }
+
+        return s.substring(0, maxLength - 3) + "...";
     }
 }

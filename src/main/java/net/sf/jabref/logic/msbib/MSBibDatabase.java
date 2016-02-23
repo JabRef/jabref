@@ -75,7 +75,7 @@ public class MSBibDatabase {
             inputDocument = documentBuilder.parse(stream);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
-            return null;
+            return Collections.emptyList();
         }
         String bcol = "b:";
         NodeList rootList = inputDocument.getElementsByTagName("b:Sources");

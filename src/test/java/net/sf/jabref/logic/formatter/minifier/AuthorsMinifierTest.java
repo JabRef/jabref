@@ -36,7 +36,6 @@ public class AuthorsMinifierTest {
     @Test
     public void formatEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     private void expectCorrect(String input, String expected) {

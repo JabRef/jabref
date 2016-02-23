@@ -27,8 +27,7 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
@@ -435,7 +434,7 @@ class GroupDialog extends JDialog {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
+                setDescription(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription());
 
                 if (isRegex()) {
                     try {

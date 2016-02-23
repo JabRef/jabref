@@ -23,13 +23,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -151,7 +152,8 @@ public class BibDatabaseWriter {
         exceptionCause = null;
         // Get our data stream. This stream writes only to a temporary file until committed.
         try (VerifyingWriter writer = session.getWriter()) {
-            writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
+            List<FieldChange> saveActionChanges = writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
+            session.addFieldChanges(saveActionChanges);
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
             session.cancel();
@@ -162,7 +164,7 @@ public class BibDatabaseWriter {
 
     }
 
-    public void writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
+    public List<FieldChange> writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
             SavePreferences preferences) throws IOException {
         Objects.requireNonNull(writer);
 
@@ -183,7 +185,7 @@ public class BibDatabaseWriter {
         // Write database entries.
         List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
                 entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
-        sortedEntries = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        List<FieldChange> saveActionChanges = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
         for (BibEntry entry : sortedEntries) {
             exceptionCause = entry;
@@ -212,6 +214,8 @@ public class BibDatabaseWriter {
 
         //finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(writer, bibDatabaseContext.getDatabase());
+
+        return saveActionChanges;
     }
 
     /**
@@ -224,22 +228,20 @@ public class BibDatabaseWriter {
         return savePartOfDatabase(bibDatabaseContext, entries, preferences);
     }
 
-    private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
-        if (metaData.getData(SaveActions.META_KEY) == null) {
-            // save actions defined -> apply for every entry
-            List<BibEntry> result = new ArrayList<>(toChange.size());
+    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+        List<FieldChange> changes = new ArrayList<>();
 
-            SaveActions saveActions = new SaveActions(metaData);
+        if (metaData.getData(SaveActions.META_KEY) != null) {
+            // save actions defined -> apply for every entry
+            SaveActions saveActions = metaData.getSaveActions();
 
             for (BibEntry entry : toChange) {
-                result.add(saveActions.applySaveActions(entry));
+                changes.addAll(saveActions.applySaveActions(entry));
             }
 
-            return result;
-        } else {
-            // no save actions defined -> do nothing
-            return toChange;
         }
+
+        return changes;
     }
 
     /**
@@ -278,8 +280,14 @@ public class BibDatabaseWriter {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
             stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
+
             for (String metaItem : metaData.getData(key)) {
                 stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
+
+                //in case of save actions, add an additional newline after the enabled flag
+                if (key.equals(SaveActions.META_KEY) && "enabled".equals(metaItem)) {
+                    stringBuilder.append(Globals.NEWLINE);
+                }
             }
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);

@@ -2,12 +2,12 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
-import net.sf.jabref.model.entry.FileField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.entry.FileField;
 
 public class StringUtilTest {
     @BeforeClass
@@ -87,8 +87,6 @@ public class StringUtilTest {
         assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
         assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
-
-        assertEquals("a:b", StringUtil.join(stringArray1[0], ":"));
     }
 
     @Test
@@ -128,14 +126,6 @@ public class StringUtilTest {
                 StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
         assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
                 + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
-    }
-
-    @Test
-    public void testQuote() {
-        assertEquals("a::", StringUtil.quote("a:", "", ':'));
-        assertEquals("a::", StringUtil.quote("a:", null, ':'));
-        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
-        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
     @Test
@@ -242,4 +232,46 @@ public class StringUtilTest {
     public void testIntValueOfExceptionfIfStringEmpty() {
             StringUtil.intValueOf("");
     }
+
+    @Test
+    public void testQuoteSimple() {
+        assertEquals("a::", StringUtil.quote("a:", "", ':'));
+    }
+
+    @Test
+    public void testQuoteNullQuotation() {
+        assertEquals("a::", StringUtil.quote("a:", null, ':'));
+    }
+
+    @Test
+    public void testQuoteNullString() {
+        assertEquals("", StringUtil.quote(null, ";", ':'));
+    }
+
+    @Test
+    public void testQuoteQuotationCharacter() {
+        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
+    }
+
+    @Test
+    public void testQuoteMoreComplicated() {
+        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
+    }
+
+    @Test
+    public void testLimitStringLengthShort() {
+        assertEquals("Test", StringUtil.limitStringLength("Test", 20));
+    }
+
+    @Test
+    public void testLimitStringLengthLimiting() {
+        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
+        assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
+    }
+
+    @Test
+    public void testLimitStringLengthNullInput() {
+        assertEquals("", StringUtil.limitStringLength(null, 10));
+    }
+
 }

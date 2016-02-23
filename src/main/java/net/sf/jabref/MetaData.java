@@ -18,10 +18,11 @@ package net.sf.jabref;
 import java.io.*;
 import java.util.*;
 
+import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.migrations.VersionHandling;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
-import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.sql.DBStrings;
 
@@ -166,7 +167,7 @@ public class MetaData implements Iterable<String> {
      * There can be up to three directory definitions for these files:
      * the database's metadata can specify a general directory and/or a user-specific directory
      * or the preferences can specify one.
-     *
+     * <p>
      * The settings are prioritized in the following order and the first defined setting is used:
      * 1. metadata user-specific directory
      * 2. metadata general directory
@@ -371,6 +372,16 @@ public class MetaData implements Iterable<String> {
         }
 
         this.labelPattern = labelPattern;
+    }
+
+    public SaveActions getSaveActions() {
+        if (this.getData(SaveActions.META_KEY) == null) {
+            return new SaveActions(false, "");
+        } else {
+            boolean enablementStatus = this.getData(SaveActions.META_KEY).get(0).equals("enabled");
+            String formatterString = this.getData(SaveActions.META_KEY).get(1);
+            return new SaveActions(enablementStatus, formatterString);
+        }
     }
 
 }

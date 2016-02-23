@@ -15,11 +15,8 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This is an immutable class representing information of either <CODE>author</CODE>
@@ -252,6 +249,8 @@ public class AuthorList {
      * @return An AuthorList object representing the given authors.
      */
     public static AuthorList getAuthorList(String authors) {
+        Objects.requireNonNull(authors);
+
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
             authorList = new AuthorList(authors);
@@ -656,6 +655,15 @@ public class AuthorList {
     }
 
     /**
+     * Returns the a list of <CODE>Author</CODE> objects.
+     *
+     * @return the <CODE>List<Author></CODE> object.
+     */
+    public List<Author> getAuthorList() {
+        return authors;
+    }
+
+    /**
      * Returns the list of authors in "natbib" format.
      * <p>
      * <ul>
@@ -810,16 +818,9 @@ public class AuthorList {
             return authorLastFirstAnds[abbrInt];
         }
 
-        StringBuilder result = new StringBuilder();
-        if (size() > 0) {
-            result.append(getAuthor(0).getLastFirst(abbreviate));
-            for (int i = 1; i < size(); i++) {
-                result.append(" and ");
-                result.append(getAuthor(i).getLastFirst(abbreviate));
-            }
-        }
 
-        authorLastFirstAnds[abbrInt] = result.toString();
+        authorLastFirstAnds[abbrInt] = getAuthorList().stream().map(author -> author.getLastFirst(abbreviate))
+                .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
     }
 
@@ -831,7 +832,7 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
             for (int i = 1; i < size(); i++) {
                 result.append(" and ");
@@ -939,15 +940,8 @@ public class AuthorList {
             return authorsFirstFirstAnds;
         }
 
-        StringBuilder result = new StringBuilder();
-        if (size() > 0) {
-            result.append(getAuthor(0).getFirstLast(false));
-            for (int i = 1; i < size(); i++) {
-                result.append(" and ");
-                result.append(getAuthor(i).getFirstLast(false));
-            }
-        }
-        authorsFirstFirstAnds = result.toString();
+        authorsFirstFirstAnds = getAuthorList().stream().map(author -> author.getFirstLast(false))
+                .collect(Collectors.joining(" and "));
         return authorsFirstFirstAnds;
     }
 
@@ -969,15 +963,8 @@ public class AuthorList {
             return authorsAlph;
         }
 
-        StringBuilder result = new StringBuilder();
-        if (size() > 0) {
-            result.append(getAuthor(0).getNameForAlphabetization());
-            for (int i = 1; i < size(); i++) {
-                result.append(" and ");
-                result.append(getAuthor(i).getNameForAlphabetization());
-            }
-        }
-        authorsAlph = result.toString();
+        authorsAlph = getAuthorList().stream().map(author -> author.getNameForAlphabetization())
+                .collect(Collectors.joining(" and "));
         return authorsAlph;
     }
 
@@ -1233,7 +1220,7 @@ public class AuthorList {
          * 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
          */
         public String getLastFirst(boolean abbr) {
-            StringBuffer res = new StringBuffer(getLastOnly());
+            StringBuilder res = new StringBuilder(getLastOnly());
             if (jrPart != null) {
                 res.append(", ").append(jrPart);
             }
@@ -1259,7 +1246,7 @@ public class AuthorList {
          * von Last, Jr.' (if <CODE>abbr==true</CODE>)
          */
         public String getFirstLast(boolean abbr) {
-            StringBuffer res = new StringBuffer();
+            StringBuilder res = new StringBuilder();
             if (abbr) {
                 res.append(firstAbbr == null ? "" : firstAbbr + ' ').append(getLastOnly());
             } else {

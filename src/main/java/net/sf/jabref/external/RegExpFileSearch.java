@@ -76,14 +76,7 @@ public class RegExpFileSearch {
     private static List<File> findFiles(BibEntry entry, Collection<String> extensions,
             Collection<File> directories, String regularExpression) {
 
-        StringBuilder sb = new StringBuilder();
-        for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
-            sb.append(i.next());
-            if (i.hasNext()) {
-                sb.append('|');
-            }
-        }
-        String extensionRegExp = '(' + sb.toString() + ')';
+        String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
         return RegExpFileSearch.findFile(entry, directories, regularExpression, extensionRegExp);
     }

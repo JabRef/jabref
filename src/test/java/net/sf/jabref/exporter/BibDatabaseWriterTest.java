@@ -2,13 +2,13 @@ package net.sf.jabref.exporter;
 
 import com.google.common.base.Charsets;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.labelPattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;

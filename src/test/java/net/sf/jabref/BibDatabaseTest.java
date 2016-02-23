@@ -16,12 +16,12 @@ import java.io.IOException;
 public class BibDatabaseTest {
 
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         Globals.prefs = null;
     }
 

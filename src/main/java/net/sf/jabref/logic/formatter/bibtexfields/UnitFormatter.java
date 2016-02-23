@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -129,7 +130,8 @@ public class UnitFormatter implements Formatter {
 
     @Override
     public String format(String text) {
-        if ((text == null) || text.isEmpty()) {
+        Objects.requireNonNull(text);
+        if (text.isEmpty()) {
             return text;
         }
         return format(text, UnitFormatter.UNIT_COMBINATIONS);

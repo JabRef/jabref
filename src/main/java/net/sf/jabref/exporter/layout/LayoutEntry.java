@@ -236,9 +236,6 @@ class LayoutEntry {
                                 sb.append(fieldText.substring(eol));
                             }
                         } else {
-                            //System.out.println("ENTRY-BLOCK: " +
-                            //layoutEntries[i].doLayout(bibtex));
-
                             /*
                              * if fieldText is not null and the bibtexentry is marked
                              * as a searchhit, try to highlight the searched words
@@ -280,7 +277,6 @@ class LayoutEntry {
                 }
             }
 
-            //System.out.println("OPTION: "+option);
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     fieldEntry = anOption.format(fieldEntry);
@@ -359,7 +355,7 @@ class LayoutEntry {
             return null;
         }
 
-        if (className.equals("JournalAbbreviator")) {
+        if ("JournalAbbreviator".equals(className)) {
             return new JournalAbbreviator(repostiory);
         }
 

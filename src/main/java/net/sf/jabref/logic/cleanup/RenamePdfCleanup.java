@@ -62,18 +62,17 @@ public class RenamePdfCleanup implements CleanupJob {
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
-            newFilename.append(".");
-            newFilename.append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+            newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
-            File expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
-            if ((expandedOldFile == null) || (expandedOldFile.getParent() == null)) {
+            Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
+            if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 continue;
             }
-            String newPath = expandedOldFile.getParent().concat(System.getProperty("file.separator")).concat(
-                    newFilename.toString());
+            String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
+                    .concat(newFilename.toString());
 
             if (new File(newPath).exists()) {
                 // we do not overwrite files
@@ -82,7 +81,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFile.toString(), newPath);
+            boolean renameSuccessful = FileUtil.renameFile(expandedOldFile.get().toString(), newPath);
 
             if (renameSuccessful) {
                 changed = true;
@@ -94,7 +93,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
                 File parent = (new File(realOldFilename)).getParentFile();
                 String newFileEntryFileName;
-                if (parent == null || paths.contains(parent.getAbsolutePath())) {
+                if ((parent == null) || paths.contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
                     newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(

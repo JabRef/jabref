@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 import org.junit.Test;
 
 import java.util.Arrays;

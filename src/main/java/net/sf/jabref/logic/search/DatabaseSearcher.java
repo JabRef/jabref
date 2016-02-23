@@ -39,10 +39,10 @@ public class DatabaseSearcher {
         this.database = Objects.requireNonNull(database);
     }
 
-    public BibDatabase getDatabasefromMatches() {
+    public BibDatabase getDatabaseFromMatches() {
         LOGGER.debug("Search term: " + query);
 
-        if (!query.isValidQuery()) {
+        if (!query.isValid()) {
             LOGGER.warn("Search failed: illegal search expression");
             return BibDatabases.createDatabase(Collections.emptyList());
         }

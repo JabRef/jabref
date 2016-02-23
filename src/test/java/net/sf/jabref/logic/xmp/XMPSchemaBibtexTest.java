@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.xmp;
 
-import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.BibtexTestData;
 import net.sf.jabref.Globals;

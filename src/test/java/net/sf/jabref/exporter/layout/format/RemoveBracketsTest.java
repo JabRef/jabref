@@ -1,7 +1,6 @@
 package net.sf.jabref.exporter.layout.format;
 
 import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,7 +10,7 @@ public class RemoveBracketsTest {
     private LayoutFormatter formatter;
 
     @Before
-    public void setup() {
+    public void setUp() {
         formatter = new RemoveBrackets();
     }
 

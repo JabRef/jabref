@@ -71,6 +71,8 @@ public class FileBasedTestHelper {
                 }
             }
         }
-        file.delete();
+        if (!file.delete()) {
+            System.err.println("Cannot delete file");
+        }
     }
 }

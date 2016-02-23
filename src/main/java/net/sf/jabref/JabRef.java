@@ -27,7 +27,7 @@ import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
@@ -246,7 +246,7 @@ public class JabRef {
 
                 SearchQuery query = new SearchQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabasefromMatches(); //newBase contains only match entries
+                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {
@@ -449,7 +449,7 @@ public class JabRef {
         return Optional.of(loaded);
     }
 
-    private void automaticallySetFileLinks(Vector<ParserResult> loaded) {
+    private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
@@ -462,7 +462,7 @@ public class JabRef {
         }
     }
 
-    private void regenerateBibtexKeys(Vector<ParserResult> loaded) {
+    private void regenerateBibtexKeys(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
@@ -593,7 +593,7 @@ public class JabRef {
         }
     }
 
-    private void openWindow(Vector<ParserResult> loaded) {
+    private void openWindow(List<ParserResult> loaded) {
         // Perform checks and changes for users with a preference set from an older
         // JabRef version.
         PreferencesMigrations.replaceAbstractField();
@@ -633,7 +633,7 @@ public class JabRef {
                 File fileToOpen = new File(name);
 
                 for (int j = 0; j < loaded.size(); j++) {
-                    ParserResult pr = loaded.elementAt(j);
+                    ParserResult pr = loaded.get(j);
 
                     if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
                         continue lastEdLoop;
@@ -731,7 +731,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf, i);
+                ParserResultWarningDialog.showParserResultWarningDialog(loaded.get(i), JabRef.jrf, i);
             }
         }
 
@@ -744,7 +744,7 @@ public class JabRef {
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to getBasePanelCount()
         for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.getBasePanelCount()); i++) {
-            ParserResult pr = loaded.elementAt(i);
+            ParserResult pr = loaded.get(i);
             BasePanel panel = JabRef.jrf.getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }

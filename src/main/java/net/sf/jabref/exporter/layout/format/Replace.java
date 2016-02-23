@@ -67,8 +67,7 @@ public class Replace extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        if (regex == null)
-         {
+        if ((fieldText == null) || (regex == null)) {
             return fieldText; // TODO: argument missing or invalid. Print an error message here?
         }
         return fieldText.replaceAll(regex, replaceWith);

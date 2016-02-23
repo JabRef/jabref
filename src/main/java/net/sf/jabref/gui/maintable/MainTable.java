@@ -48,9 +48,9 @@ import net.sf.jabref.gui.util.FirstColumnComparator;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.search.matchers.SearchMatcher;
+import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.TypedBibEntry;
@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.logic.search.HitOrMissComparator;
+import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -430,7 +430,7 @@ public class MainTable extends JTable {
      * @return the return value is never null
      */
     public List<BibEntry> getSelectedEntries() {
-        return getSelected();
+        return new ArrayList<>(getSelected());
     }
 
     private List<Boolean> getCurrentSortOrder() {

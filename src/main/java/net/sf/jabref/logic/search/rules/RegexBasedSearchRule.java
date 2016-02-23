@@ -17,8 +17,6 @@ package net.sf.jabref.logic.search.rules;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;

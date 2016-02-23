@@ -42,7 +42,9 @@ public class URLDownloadTest {
             Assert.assertTrue("file must exist", destination.exists());
         } finally {
             // cleanup
-            destination.delete();
+            if (!destination.delete()) {
+                System.err.println("Cannot delete downloaded file");
+            }
         }
     }
 

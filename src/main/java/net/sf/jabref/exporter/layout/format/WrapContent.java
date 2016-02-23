@@ -44,8 +44,11 @@ public class WrapContent extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String fieldText) {
+        if (fieldText == null) {
+            return null;
+        }
         if (before == null) {
-            return "";
+            return fieldText;
         }
         if (fieldText.isEmpty()) {
             return "";

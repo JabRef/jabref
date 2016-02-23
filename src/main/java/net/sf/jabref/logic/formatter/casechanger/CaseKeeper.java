@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -35,7 +36,9 @@ public class CaseKeeper implements Formatter {
 
     @Override
     public String format(String text) {
-        if ((text == null) || text.isEmpty()) {
+        Objects.requireNonNull(text);
+
+        if (text.isEmpty()) {
             return text;
         }
         final CaseKeeperList list = new CaseKeeperList();

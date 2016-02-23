@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -43,8 +44,9 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
+import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
@@ -944,17 +946,7 @@ public class JabRefPreferences {
             return;
         }
 
-        if (value.isEmpty()) {
-            put(key, "");
-        } else {
-            StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.size() - 1); i++) {
-                linked.append(makeEscape(value.get(i)));
-                linked.append(';');
-            }
-            linked.append(makeEscape(value.get(value.size() - 1)));
-            put(key, linked.toString());
-        }
+        put(key, value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
     }
 
 
@@ -1166,19 +1158,6 @@ public class JabRefPreferences {
         } else {
             return "";
         }
-    }
-
-    private static String makeEscape(String s) {
-        StringBuilder sb = new StringBuilder();
-        int c;
-        for (int i = 0; i < s.length(); i++) {
-            c = s.charAt(i);
-            if ((c == '\\') || (c == ';')) {
-                sb.append('\\');
-            }
-            sb.append((char) c);
-        }
-        return sb.toString();
     }
 
     /**

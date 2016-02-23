@@ -26,7 +26,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
+- Added Ordinal formatter (1 -> 1st etc)
 
+- [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
 
 ### Fixed
 - Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
@@ -45,7 +47,11 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Merge from DOI now honors removed fields
 - Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
 - Fixed [#824](https://github.com/JabRef/jabref/issues/824): MimeTypeDetector can now also handle local file links
+- Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
+- Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
+- Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
 
+- Fixed [#685](https://github.com/JabRef/jabref/issues/685): Fixed MySQL exporting for more than one entry
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field

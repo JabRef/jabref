@@ -169,7 +169,7 @@ public class FileUtil {
      * @param metaData The MetaData for the database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static File expandFilename(final MetaData metaData, String name) {
+    public static Optional<File> expandFilename(final MetaData metaData, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
         List<String> directories = metaData.getFileDirectory(extension.orElse(null));
@@ -198,32 +198,32 @@ public class FileUtil {
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
      */
-    public static File expandFilename(String name, List<String> directories) {
+    public static Optional<File> expandFilename(String name, List<String> directories) {
         for (String dir : directories) {
             if (dir != null) {
-                File result = expandFilename(name, dir);
-                if (result != null) {
+                Optional<File> result = expandFilename(name, dir);
+                if (result.isPresent()) {
                     return result;
                 }
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
      */
-    public static File expandFilename(String name, String dir) {
+    public static Optional<File> expandFilename(String name, String dir) {
 
         if ((name == null) || name.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
         File file = new File(name);
         if (file.exists() || (dir == null)) {
-            return file;
+            return Optional.of(file);
         }
 
         if (dir.endsWith(FILE_SEPARATOR)) {
@@ -241,9 +241,9 @@ public class FileUtil {
 
         File fileInDir = new File(name);
         if (fileInDir.exists()) {
-            return fileInDir;
+            return Optional.of(fileInDir);
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -363,10 +363,7 @@ public class FileUtil {
         for (BibEntry entry : bes) {
             List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
             for (FileField.ParsedFileField file : fileList) {
-                File f = expandFilename(file.link, fileDirs);
-                if (f != null) {
-                    result.add(f);
-                }
+                expandFilename(file.link, fileDirs).ifPresent(f -> result.add(f));
             }
         }
 

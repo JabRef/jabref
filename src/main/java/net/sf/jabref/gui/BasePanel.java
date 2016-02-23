@@ -40,7 +40,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
-import net.sf.jabref.gui.labelPattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
@@ -53,15 +53,16 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.matchers.EverythingMatcher;
-import net.sf.jabref.logic.search.matchers.SearchMatcher;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.gui.search.matchers.EverythingMatcher;
+import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.*;
@@ -223,24 +224,24 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public String getTabTitle() {
-        String title;
+        StringBuilder title = new StringBuilder();
 
         if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title = GUIGlobals.untitledTitle;
+            title.append(GUIGlobals.untitledTitle);
 
             if (!database().getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
                 // This also happens internally at basepanel to ensure consistency line 224
-                title = title + '*';
+                title.append('*');
             }
         } else {
             // check if file is modified
             String changeFlag = isModified() ? "*" : "";
-            title = getBibDatabaseContext().getDatabaseFile().getName() + changeFlag;
+            title.append(getBibDatabaseContext().getDatabaseFile().getName()).append(changeFlag);
         }
-        return title;
+        return title.toString();
     }
 
     public boolean isModified() {
@@ -324,7 +325,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             //int row0 = mainTable.getSelectedRow();
             if ((bes != null) && (!bes.isEmpty())) {
                 // Create a CompoundEdit to make the action undoable.
@@ -347,7 +348,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = new ArrayList<>(mainTable.getSelectedEntries());
+            List<BibEntry> bes = mainTable.getSelectedEntries();
             if ((bes != null) && (!bes.isEmpty())) {
 
                 boolean goOn = showDeleteConfirmationDialog(bes.size());
@@ -1202,6 +1203,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
             }
 
+            registerUndoableChanges(session);
+
         } catch (UnsupportedCharsetException ex2) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
@@ -1269,6 +1272,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         return commit;
+    }
+
+    public void registerUndoableChanges(SaveSession session) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
+        for (FieldChange change : session.getFieldChanges()) {
+            ce.addEdit(new UndoableFieldChange(change));
+        }
+        ce.end();
+        if (ce.hasEdits()) {
+            undoManager.addEdit(ce);
+        }
     }
 
     /**
@@ -1643,7 +1657,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);
         }
 
         // restore floating search result
@@ -1992,7 +2006,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         private final Matcher<E> active;
         private final Matcher<E> inactive;
 
-        private boolean isActive = false;
+        private boolean isActive;
 
         private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
             this.list = list;

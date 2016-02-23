@@ -2,6 +2,8 @@ package net.sf.jabref.logic.formatter.minifier;
 
 import net.sf.jabref.logic.formatter.Formatter;
 
+import java.util.Objects;
+
 /**
  * Replaces three or more authors with and others
  */
@@ -24,8 +26,10 @@ public class AuthorsMinifier implements Formatter {
      */
     @Override
     public String format(String value) {
-        // nothing to do
-        if ((value == null) || value.isEmpty()) {
+        Objects.requireNonNull(value);
+
+        if (value.isEmpty()) {
+            // nothing to do
             return value;
         }
 

@@ -68,7 +68,7 @@ public class ImportFormatReader {
             try {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
-            } catch (Exception e) {
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Could not instantiate " + importer.getName()
                         + " importer, will ignore it. Please check if the class is still available.", e);
             }
@@ -350,15 +350,6 @@ public class ImportFormatReader {
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
 
-        // we don't use a provided OutputPrinter (such as the JabRef frame),
-        // as we don't want to see any outputs from failed importers:
-        // we expect failures and do not want to report them to the user
-        OutputPrinterToNull nullOutput = new OutputPrinterToNull();
-
-        // stores ref to best result, gets updated at the next loop
-        List<BibEntry> bestResult = null;
-        int bestResultCount = 0;
-        String bestFormatName = null;
 
         // First, see if it is a BibTeX file:
         try {
@@ -369,8 +360,19 @@ public class ImportFormatReader {
                 pr.setFile(new File(filename));
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }
-        } catch (Throwable ignore) {
+        } catch (IOException ignore) {
+            // Ignored
         }
+
+        // we don't use a provided OutputPrinter (such as the JabRef frame),
+        // as we don't want to see any outputs from failed importers:
+        // we expect failures and do not want to report them to the user
+        OutputPrinterToNull nullOutput = new OutputPrinterToNull();
+
+        // stores ref to best result, gets updated at the next loop
+        List<BibEntry> bestResult = null;
+        int bestResultCount = 0;
+        String bestFormatName = null;
 
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
