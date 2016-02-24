@@ -26,7 +26,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
-
+- Add dialog to show all preferences in their raw form plus some filtering
 
 ### Fixed
 - Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
