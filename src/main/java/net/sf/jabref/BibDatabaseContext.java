@@ -20,6 +20,10 @@ public class BibDatabaseContext {
     private final MetaData metaData;
     private final Defaults defaults;
 
+    public BibDatabaseContext() {
+        this(new Defaults());
+    }
+
     public BibDatabaseContext(Defaults defaults) {
         this(new BibDatabase(), defaults);
     }

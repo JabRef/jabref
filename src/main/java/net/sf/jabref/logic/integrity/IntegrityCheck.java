@@ -1,11 +1,17 @@
 package net.sf.jabref.logic.integrity;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FileField;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,18 +24,18 @@ public class IntegrityCheck {
     public static final Checker BRACKET_CHECKER = new BracketChecker();
     public static final Checker PAGES_CHECKER = new PagesChecker();
     public static final Checker URL_CHECKER = new UrlChecker();
-    private boolean isBiblatexMode;
+    public static final Checker FILE_CHECKER = new FileChecker();
 
-    public List<IntegrityMessage> checkBibtexDatabase(BibDatabase database, boolean isBiblatexMode) {
+    private final BibDatabaseContext bibDatabaseContext;
+
+    public IntegrityCheck(BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+    }
+
+    public List<IntegrityMessage> checkBibtexDatabase() {
         List<IntegrityMessage> result = new ArrayList<>();
 
-        if (database == null) {
-            return result;
-        }
-
-        this.isBiblatexMode = isBiblatexMode;
-
-        for (BibEntry entry : database.getEntries()) {
+        for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
             result.addAll(checkBibtexEntry(entry));
         }
 
@@ -43,36 +49,58 @@ public class IntegrityCheck {
             return result;
         }
 
-        entry.getFieldOptional("author").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "author", entry, result));
+        entry.getFieldOptional("author").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "author", entry, result, bibDatabaseContext));
 
-        entry.getFieldOptional("editor").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "editor", entry, result));
+        entry.getFieldOptional("editor").ifPresent(data -> AUTHOR_NAME_CHECKER.check(data, "editor", entry, result, bibDatabaseContext));
 
         entry.getFieldOptional("title").ifPresent(data -> {
-            if(!isBiblatexMode) {
-                TITLE_CHECKER.check(data, "title", entry, result);
+            if (!bibDatabaseContext.isBiblatexMode()) {
+                TITLE_CHECKER.check(data, "title", entry, result, bibDatabaseContext);
             }
-            BRACKET_CHECKER.check(data, "title", entry, result);
+            BRACKET_CHECKER.check(data, "title", entry, result, bibDatabaseContext);
         });
 
-        entry.getFieldOptional("year").ifPresent(data -> YEAR_CHECKER.check(data, "year", entry, result));
+        entry.getFieldOptional("year").ifPresent(data -> YEAR_CHECKER.check(data, "year", entry, result, bibDatabaseContext));
 
-        entry.getFieldOptional("pages").ifPresent(data -> PAGES_CHECKER.check(data.toString(), "pages", entry, result));
+        entry.getFieldOptional("pages").ifPresent(data -> PAGES_CHECKER.check(data.toString(), "pages", entry, result, bibDatabaseContext));
 
-        entry.getFieldOptional("url").ifPresent(data -> URL_CHECKER.check(data, "url", entry, result));
+        entry.getFieldOptional("url").ifPresent(data -> URL_CHECKER.check(data, "url", entry, result, bibDatabaseContext));
+
+        entry.getFieldOptional("file").ifPresent(data -> FILE_CHECKER.check(data, "file", entry, result, bibDatabaseContext));
 
         return result;
     }
 
     public interface Checker {
+        void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext);
+    }
 
-        void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector);
+    private static class FileChecker implements Checker {
+
+        @Override
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
+
+            FileField.parse(value).stream().filter(p -> !(p.link.startsWith("http://") || p.link.startsWith("https://"))).forEach(p -> {
+
+                List<String> fileDirectories = bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD);
+
+                for (String fileDirectory : fileDirectories) {
+                    Optional<File> file = FileUtil.expandFilename(p.link, fileDirectory);
+                    if ((!file.isPresent()) || !file.get().exists()) {
+                        collector.add(new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry, fieldName));
+                        return;
+                    }
+                }
+
+            });
+        }
     }
 
     private static class UrlChecker implements Checker {
 
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
-            if(!value.contains("://")) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
+            if (!value.contains("://")) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, fieldName));
             }
         }
@@ -81,11 +109,11 @@ public class IntegrityCheck {
     private static class AuthorNameChecker implements Checker {
 
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
             String valueTrimmedAndLowerCase = value.trim().toLowerCase();
-            if(valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
+            if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
                 collector.add(new IntegrityMessage(Localization.lang("should start with a name"), entry, fieldName));
-            } else if(valueTrimmedAndLowerCase.endsWith(" and")  || valueTrimmedAndLowerCase.endsWith(",")) {
+            } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
                 collector.add(new IntegrityMessage(Localization.lang("should end with a name"), entry, fieldName));
             }
         }
@@ -95,7 +123,7 @@ public class IntegrityCheck {
     private static class BracketChecker implements Checker {
 
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
             // metaphor: integer-based stack (push + / pop -)
             int counter = 0;
             for (char a : value.trim().toCharArray()) {
@@ -123,7 +151,7 @@ public class IntegrityCheck {
         private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
             /*
              * Algorithm:
              * - remove trailing whitespaces
@@ -134,9 +162,9 @@ public class IntegrityCheck {
             String valueTrimmed = value.trim();
             String valueIgnoringFirstLetter = valueTrimmed.startsWith("{") ? valueTrimmed : valueTrimmed.substring(1);
             String valueOnlySpacesWithinCurlyBraces = valueIgnoringFirstLetter;
-            while(true) {
+            while (true) {
                 Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
-                if(!matcher.find()) {
+                if (!matcher.find()) {
                     break;
                 }
                 valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
@@ -158,7 +186,7 @@ public class IntegrityCheck {
          * Checks, if the number String contains a four digit year
          */
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
             if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, fieldName));
             }
@@ -173,6 +201,7 @@ public class IntegrityCheck {
      * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
      */
     private static class PagesChecker implements Checker {
+
         private static final String PAGES_EXP = ""
                 + "\\A"                       // begin String
                 + "\\d+"                      // number
@@ -191,7 +220,7 @@ public class IntegrityCheck {
          * Checks, if the page numbers String conforms to the BibTex manual
          */
         @Override
-        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
             if (!VALID_PAGE_NUMBER.test(value.trim())) {
                 collector.add(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, fieldName));
             }

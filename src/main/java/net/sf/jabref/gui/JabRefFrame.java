@@ -109,9 +109,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            IntegrityCheck check = new IntegrityCheck();
-            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database(),
-                    getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode());
+            IntegrityCheck check = new IntegrityCheck(getCurrentBasePanel().getBibDatabaseContext());
+            List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
             if (messages.isEmpty()) {
                 JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));

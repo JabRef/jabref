@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
@@ -90,7 +92,7 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new LinkedList<>();
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages);
+        yearChecker.check(value, "field", entry, messages, new BibDatabaseContext());
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
@@ -98,7 +100,7 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new LinkedList<>();
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages);
+        yearChecker.check(value, "field", entry, messages, new BibDatabaseContext());
         assertEquals(Collections.emptyList(), messages);
     }
 
