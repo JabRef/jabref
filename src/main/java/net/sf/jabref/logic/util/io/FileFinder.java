@@ -31,8 +31,7 @@ public class FileFinder {
         Set<File> result = new HashSet<>();
 
         File[] children = directory.listFiles();
-        if (children == null)
-         {
+        if (children == null) {
             return result; // No permission?
         }
 
@@ -61,13 +60,13 @@ public class FileFinder {
      *
      */
     public static String findPdf(BibEntry entry, String extension, String directory) {
-        return FileFinder.findPdf(entry, extension, new String[]{directory});
+        return FileFinder.findPdf(entry, extension, Arrays.asList(directory));
     }
 
     /**
      * Convenience method for findPDF. Can search multiple PDF directories.
      */
-    public static String findPdf(BibEntry entry, String extension, String[] directories) {
+    public static String findPdf(BibEntry entry, String extension, List<String> directories) {
 
         String regularExpression;
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
@@ -107,8 +106,8 @@ public class FileFinder {
      *            non-null
      * @param database
      *            non-null
-     * @param directory
-     *            A set of root directories to start the search from. Paths are
+     * @param directories
+     *            A list of root directories to start the search from. Paths are
      *            returned relative to these directories if relative is set to
      *            true. These directories will not be expanded or anything. Use
      *            the file attribute for this.
@@ -121,10 +120,10 @@ public class FileFinder {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static String findFile(BibEntry entry, BibDatabase database, String[] directory,
+    private static String findFile(BibEntry entry, BibDatabase database, List<String> directories,
                                    String file, boolean relative) {
 
-        for (String aDirectory : directory) {
+        for (String aDirectory : directories) {
             String result = FileFinder.findFile(entry, database, aDirectory, file, relative);
             if (result != null) {
                 return result;

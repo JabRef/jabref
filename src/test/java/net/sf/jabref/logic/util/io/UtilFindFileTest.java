@@ -101,62 +101,60 @@ public class UtilFindFileTest extends FileBasedTestCase {
     public void testFindPdfInMultiple() {
 
         {
-            String[] dirsToSearch = new String[]{root.getAbsolutePath(),
-                    root.getAbsolutePath() + "/pdfs/"};
+            List<String> dirsToSearch = Arrays.asList(root.getAbsolutePath(), root.getAbsolutePath() + "/pdfs/");
             String pdf = FileFinder.findPdf(entry, "pdf", dirsToSearch);
             AssertUtil.assertEqualPaths("HipKro03 - Hello.pdf", pdf);
 
-            Optional<File> fullPath = FileUtil.expandFilename(pdf, Arrays.asList(dirsToSearch));
+            Optional<File> fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
             Assert.assertTrue(fullPath.isPresent());
             Assert.assertTrue(fullPath.get().exists());
             AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf",
                     fullPath.get().getAbsolutePath());
 
-            String tmp = dirsToSearch[1];
-            dirsToSearch[1] = dirsToSearch[0];
-            dirsToSearch[0] = tmp;
+            String tmp = dirsToSearch.get(1);
+            dirsToSearch.set(1, dirsToSearch.get(0));
+            dirsToSearch.set(0, tmp);
 
-            fullPath = FileUtil.expandFilename(pdf, Arrays.asList(dirsToSearch));
+            fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
             Assert.assertTrue(fullPath.isPresent());
             Assert.assertTrue(fullPath.get().exists());
             AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf",
                     fullPath.get().getAbsolutePath());
 
-            fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch[0]));
+            fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch.get(0)));
             Assert.assertFalse(fullPath.isPresent());
 
-            fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch[1]));
+            fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch.get(1)));
             Assert.assertTrue(fullPath.isPresent());
             Assert.assertTrue(fullPath.get().exists());
             AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/HipKro03 - Hello.pdf",
                     fullPath.get().getAbsolutePath());
         }
 
-        String[] dirsToSearch = new String[]{root.getAbsolutePath() + "/pdfs/",
-                root.getAbsolutePath()};
+        List<String> dirsToSearch = Arrays.asList(root.getAbsolutePath() + "/pdfs/", root.getAbsolutePath());
         String pdf = FileFinder.findPdf(entry, "pdf", dirsToSearch);
         AssertUtil.assertEqualPaths("sub/HipKro03-sub.pdf", pdf);
 
-        Optional<File> fullPath = FileUtil.expandFilename(pdf, Arrays.asList(dirsToSearch));
+        Optional<File> fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
         Assert.assertTrue(fullPath.isPresent());
         Assert.assertTrue(fullPath.get().exists());
         AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf",
                 fullPath.get().getAbsolutePath());
 
-        String tmp = dirsToSearch[1];
-        dirsToSearch[1] = dirsToSearch[0];
-        dirsToSearch[0] = tmp;
+        String tmp = dirsToSearch.get(1);
+        dirsToSearch.set(1, dirsToSearch.get(0));
+        dirsToSearch.set(0, tmp);
 
-        fullPath = FileUtil.expandFilename(pdf, Arrays.asList(dirsToSearch));
+        fullPath = FileUtil.expandFilename(pdf, dirsToSearch);
         Assert.assertTrue(fullPath.isPresent());
         Assert.assertTrue(fullPath.get().exists());
         AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf",
                 fullPath.get().getAbsolutePath());
 
-        fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch[0]));
+        fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch.get(0)));
         Assert.assertFalse(fullPath.isPresent());
 
-        fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch[1]));
+        fullPath = FileUtil.expandFilename(pdf, Collections.singletonList(dirsToSearch.get(1)));
         Assert.assertTrue(fullPath.isPresent());
         Assert.assertTrue(fullPath.get().exists());
         AssertUtil.assertEqualPaths(root.getAbsolutePath() + "/pdfs/sub/HipKro03-sub.pdf",

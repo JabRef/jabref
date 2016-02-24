@@ -100,7 +100,6 @@ public class ExternalFilePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 browseFile(fieldName, editor);
-                // editor.setText(chosenValue);
                 entryEditor.storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
             }
         });
@@ -179,7 +178,7 @@ public class ExternalFilePanel extends JPanel {
                 // Find the default directory for this field type, if any:
                 List<String> dirs = metaData.getFileDirectory(fieldName);
                 File file = null;
-                if (dirs.size() > 0) {
+                if (!dirs.isEmpty()) {
                     Optional<File> tmp = FileUtil.expandFilename(editor.getText(), dirs);
                     if (tmp.isPresent()) {
                         file = tmp.get();
@@ -462,8 +461,7 @@ public class ExternalFilePanel extends JPanel {
              */
             List<String> dirs = metaData.getFileDirectory(fieldName);
 
-            String found = FileFinder.findPdf(getEntry(), fieldName, dirs
-                    .toArray(new String[dirs.size()]));// , off);
+            String found = FileFinder.findPdf(getEntry(), fieldName, dirs);
 
             // To activate findFile:
             // String found = Util.findFile(getEntry(), null, dir,
