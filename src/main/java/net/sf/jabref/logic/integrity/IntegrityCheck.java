@@ -83,7 +83,7 @@ public class IntegrityCheck {
 
         @Override
         public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
-            if("proceedings".equalsIgnoreCase(entry.getType()) && entry.getFieldOptional("pages").isPresent()) {
+            if("proceedings".equalsIgnoreCase(entry.getType())) {
                 collector.add(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, fieldName));
             }
         }

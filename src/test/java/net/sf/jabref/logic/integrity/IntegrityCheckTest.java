@@ -2,9 +2,13 @@ package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -74,6 +78,33 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testAbbreviationChecks() {
+        assertCorrect("Proceedings of the", IntegrityCheck.ABBREVIATION_CHECKER);
+        assertWrong("Proc. of the", IntegrityCheck.ABBREVIATION_CHECKER);
+    }
+
+    @Test
+    public void testFileChecks() {
+        MetaData metaData = Mockito.mock(MetaData.class);
+        Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+
+        assertCorrect(":build.gradle:gradle", IntegrityCheck.FILE_CHECKER, context);
+        assertWrong(":asflakjfwofja:PDF", IntegrityCheck.FILE_CHECKER, context);
+    }
+
+    @Test
+    public void testTypeChecks() {
+        LinkedList<IntegrityMessage> messages = new LinkedList<>();
+        IntegrityCheck.TYPE_CHECKER.check("11--15","pages",new BibEntry("asdfasdf", "inproceedings"), messages, new BibDatabaseContext());
+        assertEquals(Collections.emptyList(), messages);
+
+        messages = new LinkedList<>();
+        IntegrityCheck.TYPE_CHECKER.check("11--15","pages",new BibEntry("asdfasdf", "proceedings"), messages, new BibDatabaseContext());
+        assertFalse(messages.toString(), messages.isEmpty());
+    }
+
+    @Test
     public void testPageNumbersChecks() {
         assertCorrect("1--2", IntegrityCheck.PAGES_CHECKER);
         assertCorrect("12", IntegrityCheck.PAGES_CHECKER);
@@ -88,19 +119,27 @@ public class IntegrityCheckTest {
         assertCorrect("7+,41--43,73", IntegrityCheck.PAGES_CHECKER);
     }
 
-    private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {
+    private void assertWrong(String value, IntegrityCheck.Checker checker, BibDatabaseContext context) {
         List<IntegrityMessage> messages = new LinkedList<>();
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages, new BibDatabaseContext());
+        checker.check(value, "field", entry, messages, context);
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
-    private void assertCorrect(String value, IntegrityCheck.Checker yearChecker) {
+    private void assertWrong(String value, IntegrityCheck.Checker checker) {
+        assertWrong(value, checker, new BibDatabaseContext());
+    }
+
+    private void assertCorrect(String value, IntegrityCheck.Checker checker) {
+        assertCorrect(value, checker, new BibDatabaseContext());
+    }
+
+    private void assertCorrect(String value, IntegrityCheck.Checker checker, BibDatabaseContext context) {
         List<IntegrityMessage> messages = new LinkedList<>();
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages, new BibDatabaseContext());
+        checker.check(value, "field", entry, messages, context);
         assertEquals(Collections.emptyList(), messages);
     }
 
