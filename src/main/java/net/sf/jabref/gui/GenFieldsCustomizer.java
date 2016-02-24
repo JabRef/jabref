@@ -29,7 +29,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 /**
  * <p>Title: </p>
@@ -130,7 +130,7 @@ public class GenFieldsCustomizer extends JDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = Util.checkLegalKey(parts[1]);
+            String testString = LabelPatternUtil.checkLegalKey(parts[1]);
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
                 JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "

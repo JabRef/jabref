@@ -2,6 +2,7 @@ package net.sf.jabref.logic.util.strings;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -272,6 +273,12 @@ public class StringUtilTest {
     @Test
     public void testLimitStringLengthNullInput() {
         assertEquals("", StringUtil.limitStringLength(null, 10));
+    }
+
+    @Test
+    public void testReplaceSpecialCharacters() {
+        Assert.assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
+        Assert.assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
     }
 
 }
