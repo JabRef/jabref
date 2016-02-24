@@ -881,9 +881,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        } else if (o instanceof OOBibStyle) {
+        if (o instanceof OOBibStyle) {
             return styleFile.equals(((OOBibStyle) o).styleFile);
         }
         return false;
@@ -891,8 +889,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        return Objects.hash(styleFile);
     }
 
     private String createAuthorList(String author, int maxAuthors, String authorSep, String andString,
