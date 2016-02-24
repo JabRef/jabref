@@ -45,11 +45,7 @@ public class Cache {
 
     private void ensureCacheIsFresh() {
         if (cacheRefreshNeeded) {
-            StringBuilder sb = new StringBuilder();
-            for (String line : queue) {
-                sb.append(line);
-            }
-            cache = sb.toString();
+            cache = String.join("", queue);
         }
     }
 

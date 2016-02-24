@@ -22,6 +22,9 @@ import java.io.IOException;
 
 import javax.swing.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -34,6 +37,8 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
  * to process the request if the user clicks this menu item.
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
+
+    private static final Log LOGGER = LogFactory.getLog(ExternalFileMenuItem.class);
 
     private final BibEntry entry;
     private final String link;
@@ -75,11 +80,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
-                if (this.fieldName != null) {
-                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().metaData(), link, fieldName);
-                    return true;
-                }
-                else {
+                if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
                     File file = new File(link);
                     // We try to check the extension for the file:
@@ -90,6 +91,9 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     // Now we know the extension, check if it is one we know about:
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;
+                } else {
+                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), link, fieldName);
+                    return true;
                 }
             }
 
@@ -116,7 +120,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 return false;
             }
 
-            e1.printStackTrace();
+            LOGGER.warn("Unable to open link", e1);
         }
         return false;
     }

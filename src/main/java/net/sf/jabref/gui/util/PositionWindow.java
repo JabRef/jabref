@@ -110,6 +110,8 @@ public class PositionWindow {
      * the screen on the left and the top.
      */
     public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-        diag.setLocationRelativeTo(win);
+        if (diag != null) {
+            diag.setLocationRelativeTo(win);
+        }
     }
 }

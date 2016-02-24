@@ -6,8 +6,10 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.specialfields.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -27,8 +29,8 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
-            new String[] {SpecialFieldsUtils.FIELDNAME_RANKING},
-            new JLabel(EntryUtil.capitalizeFirst(SpecialFieldsUtils.FIELDNAME_RANKING))) {
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_RANKING),
+            new JLabel(SpecialFieldsUtils.FIELDNAME_RANKING)) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -42,7 +44,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_PRIORITY,
-            new String[] {SpecialFieldsUtils.FIELDNAME_PRIORITY},
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRIORITY),
             new JLabel(Priority.getInstance().getRepresentingIcon())) {
 
         @Override
@@ -59,7 +61,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_READ,
-            new String[] {SpecialFieldsUtils.FIELDNAME_READ},
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_READ),
             new JLabel(ReadStatus.getInstance().getRepresentingIcon())) {
 
         @Override
@@ -76,20 +78,20 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_RELEVANCE,
-            new String[] {SpecialFieldsUtils.FIELDNAME_RELEVANCE},
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_RELEVANCE),
             new JLabel(Relevance.getInstance().getRepresentingIcon()));
 
     public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_PRINTED,
-            new String[] {SpecialFieldsUtils.FIELDNAME_PRINTED},
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRINTED),
             new JLabel(Printed.getInstance().getRepresentingIcon()));
 
     public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_QUALITY,
-            new String[] {SpecialFieldsUtils.FIELDNAME_QUALITY},
+            Arrays.asList(SpecialFieldsUtils.FIELDNAME_QUALITY),
             new JLabel(Quality.getInstance().getRepresentingIcon()));
 
 
     public static final MainTableColumn FILE_COLUMN = new MainTableColumn(Globals.FILE_FIELD,
-            new String[] {Globals.FILE_FIELD}, new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
+            Arrays.asList(Globals.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -116,7 +118,7 @@ public class SpecialMainTableColumns {
      * @param fields     the entry fields which should be shown
      * @return the crated MainTableColumn
      */
-    public static MainTableColumn createIconColumn(String columnName, String[] fields, JLabel iconLabel) {
+    public static MainTableColumn createIconColumn(String columnName, List<String> fields, JLabel iconLabel) {
         return new MainTableColumn(columnName, fields, iconLabel) {
 
             @Override
@@ -154,7 +156,7 @@ public class SpecialMainTableColumns {
 
 
 
-        return new MainTableColumn(externalFileTypeName, new String[] {Globals.FILE_FIELD}, new JLabel()) {
+        return new MainTableColumn(externalFileTypeName, Arrays.asList(Globals.FILE_FIELD), new JLabel()) {
 
             @Override
             public boolean isFileFilter() {

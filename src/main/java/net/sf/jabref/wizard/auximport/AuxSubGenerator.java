@@ -86,10 +86,7 @@ public class AuxSubGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(AuxSubGenerator.class);
 
-
-    public AuxSubGenerator(BibDatabase refDBase) {
-        db = refDBase;
-    }
+    private static final Pattern TAG_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
 
     /**
      * parseAuxFile read the Aux file and fill up some intern data structures. Nested aux files (latex \\include)
@@ -129,7 +126,6 @@ public class AuxSubGenerator {
     //   x is a label for an item and y is the index in bibliography
     private boolean parseAuxFile(String filename) {
         // regular expressions
-        Pattern pattern;
         Matcher matcher;
 
         // while condition
@@ -138,8 +134,6 @@ public class AuxSubGenerator {
         // return value -> default: no error
         boolean back = true;
 
-        // the important tag
-        pattern = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
 
         // file list, used for nested aux files
         List<String> fileList = new ArrayList<>(5);
@@ -174,7 +168,7 @@ public class AuxSubGenerator {
 
                     if (maybeLine.isPresent()) {
                         String line = maybeLine.get();
-                        matcher = pattern.matcher(line);
+                        matcher = TAG_PATTERN.matcher(line);
 
                         while (matcher.find()) {
                             // extract the bibtex-key(s) XXX from \citation{XXX} string
@@ -183,13 +177,9 @@ public class AuxSubGenerator {
                                 String str = matcher.group(2);
                                 // could be an comma separated list of keys
                                 String[] keys = str.split(",");
-                                if (keys != null) {
-                                    for (String dummyStr : keys) {
-                                        if (dummyStr != null) {
-                                            // delete all unnecessary blanks and save key into an set
-                                            mySet.add(dummyStr.trim());
-                                        }
-                                    }
+                                for (String dummyStr : keys) {
+                                    // delete all unnecessary blanks and save key into an set
+                                    mySet.add(dummyStr.trim());
                                 }
                             }
                         }
@@ -344,7 +334,9 @@ public class AuxSubGenerator {
         mySet.clear();
         notFoundList.clear();
         crossreferencedEntriesCount = 0;
-        // db = null ;  ???
+        nestedAuxCounter = 0;
+        db = null;
+        auxDB = null;
     }
 
     /**
@@ -355,14 +347,14 @@ public class AuxSubGenerator {
     }
 
     public String getInformation(boolean includeMissingEntries) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         // print statistics
         result.append(Localization.lang("keys_in_database")).append(' ').append(db.getEntryCount()).append('\n')
                 .append(Localization.lang("found_in_aux_file")).append(' ').append(getFoundKeysInAux()).append('\n')
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
                 .append(Localization.lang("not_found")).append(' ').append(getNotResolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
-                .append(getCrossreferencedEntriesCount());
+                .append(getCrossreferencedEntriesCount()).append('\n');
 
         if (includeMissingEntries && (getNotResolvedKeysCount() > 0)) {
             for (String entry : notFoundList) {

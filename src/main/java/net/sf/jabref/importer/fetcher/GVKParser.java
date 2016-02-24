@@ -12,7 +12,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -56,8 +55,12 @@ public class GVKParser {
         List<Element> records = getChildren("zs:record", srwrecords);
         for (Element record : records) {
             Element e = getChild("zs:recordData", record);
-            e = getChild("record", e);
-            result.add(parseEntry(e));
+            if (e != null) {
+                e = getChild("record", e);
+                if (e != null) {
+                    result.add(parseEntry(e));
+                }
+            }
         }
         return result;
     }
@@ -99,6 +102,9 @@ public class GVKParser {
             // mak
             if ("002@".equals(tag)) {
                 mak = getSubfield("0", datafield);
+                if (mak == null) {
+                    mak = "";
+                }
             }
 
             //ppn
@@ -232,7 +238,9 @@ public class GVKParser {
             if ("037C".equals(tag)) {
                 if (address == null) {
                     address = getSubfield("b", datafield);
-                    address = removeSortCharacters(address);
+                    if (address != null) {
+                        address = removeSortCharacters(address);
+                    }
                 }
 
                 String st = getSubfield("a", datafield);
@@ -266,8 +274,10 @@ public class GVKParser {
             if ("034D".equals(tag)) {
                 pagetotal = getSubfield("a", datafield);
 
-                // S, S. etc. entfernen
-                pagetotal = pagetotal.replaceAll(" S\\.?$", "");
+                if (pagetotal != null) {
+                    // S, S. etc. entfernen
+                    pagetotal = pagetotal.replaceAll(" S\\.?$", "");
+                }
             }
 
             // Behandlung von Konferenzen
@@ -360,7 +370,7 @@ public class GVKParser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibEntry result = new BibEntry(IdGenerator.next(), EntryTypes.getType(entryType));
+        BibEntry result = new BibEntry(IdGenerator.next(), entryType);
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {

@@ -29,9 +29,9 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.ProxyPreferences;
-import net.sf.jabref.logic.ProxyRegisterer;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.ProxyPreferences;
+import net.sf.jabref.logic.net.ProxyRegisterer;
 
 public class NetworkTab extends JPanel implements PrefsTab {
 
@@ -97,9 +97,9 @@ public class NetworkTab extends JPanel implements PrefsTab {
         builder.add(Localization.lang("Port") + ':').xy(2, 7);
         builder.add(portTextField).xyw(4, 7, 3);
         builder.add(useAuthenticationCheckBox).xyw(4, 9, 3);
-        builder.add(Localization.lang("Username:")).xy(4, 11);
+        builder.add(Localization.lang("Username") + ':').xy(4, 11);
         builder.add(usernameTextField).xy(6, 11);
-        builder.add(Localization.lang("Password:")).xy(4, 13);
+        builder.add(Localization.lang("Password") + ':').xy(4, 13);
         builder.add(passwordTextField).xy(6, 13);
         builder.add(passwordWarningLabel).xy(6, 14);
 

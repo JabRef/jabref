@@ -1,63 +1,11 @@
 package net.sf.jabref.model.entry;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileField {
 
     private static final FileField.ParsedFileField NULL_OBJECT = new FileField.ParsedFileField("", "", "");
-
-    /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
-    }
-
-    private static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
 
     public static class ParsedFileField {
 
@@ -73,26 +21,29 @@ public class FileField {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || this.getClass() != o.getClass())
+            }
+            if ((o == null) || (this.getClass() != o.getClass())) {
                 return false;
+            }
 
             FileField.ParsedFileField that = (FileField.ParsedFileField) o;
 
-            if (this.description != null ? !this.description.equals(that.description) : that.description != null)
+            if (!this.description.equals(that.description)) {
                 return false;
-            if (this.link != null ? !this.link.equals(that.link) : that.link != null)
+            }
+            if (!this.link.equals(that.link)) {
                 return false;
-            return this.fileType != null ? this.fileType.equals(that.fileType) : that.fileType == null;
-
+            }
+            return this.fileType.equals(that.fileType);
         }
 
         @Override
         public int hashCode() {
-            int result = this.description != null ? this.description.hashCode() : 0;
-            result = 31 * result + (this.link != null ? this.link.hashCode() : 0);
-            result = 31 * result + (this.fileType != null ? this.fileType.hashCode() : 0);
+            int result = this.description.hashCode();
+            result = (31 * result) + this.link.hashCode();
+            result = (31 * result) + this.fileType.hashCode();
             return result;
         }
 
@@ -111,7 +62,7 @@ public class FileField {
     }
 
     public static List<FileField.ParsedFileField> parse(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if ((value == null) || value.trim().isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -182,10 +133,49 @@ public class FileField {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (ParsedFileField entry : fields) {
-            String type = entry.fileType != null ? entry.fileType : "";
-            array[i] = new String[] {entry.description, entry.link, type};
+            array[i] = new String[] {entry.description, entry.link, entry.fileType};
             i++;
         }
         return encodeStringArray(array);
     }
+
+    public static String getStringRepresentation(ParsedFileField field) {
+        return getStringRepresentation(Collections.singletonList(field));
+    }
+
+    /**
+     * Encodes a two-dimensional String array into a single string, using ':' and
+     * ';' as separators. The characters ':' and ';' are escaped with '\'.
+     * @param values The String array.
+     * @return The encoded String.
+     */
+    public static String encodeStringArray(String[][] values) {
+        return Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.joining(";"));
+    }
+
+    /**
+     * Encodes a String array into a single string, using ':' as separator.
+     * The characters ':' and ';' are escaped with '\'.
+     * @param entry The String array.
+     * @return The encoded String.
+     */
+    private static String encodeStringArray(String[] entry) {
+        return Arrays.asList(entry).stream().map(string -> quote(string)).collect(Collectors.joining(":"));
+    }
+
+    public static String quote(String s) {
+        if (s == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ((c == ';') || (c == ':') || (c == '\\')) {
+                sb.append('\\');
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+    }
+
 }

@@ -37,10 +37,11 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 
@@ -169,17 +170,12 @@ class ManageJournalsPanel extends JPanel {
         builder2.add(abbrTf).xy(3, 3);
         journalEditPanel = builder2.getPanel();
 
-        viewBuiltin.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                abbr.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
-                JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Abbreviations.journalAbbrev));
-                JScrollPane pane = new JScrollPane(table);
-                JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
+        viewBuiltin.addActionListener(e -> {
+            JTable table = new JTable(JournalAbbreviationsUtil
+                    .getTableModel(Globals.journalAbbreviationLoader.getRepository().getAbbreviations()));
+            JScrollPane pane = new JScrollPane(table);
+            JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
+                    JOptionPane.INFORMATION_MESSAGE);
         });
 
         browseNew.addActionListener(new ActionListener() {
@@ -215,19 +211,15 @@ class ManageJournalsPanel extends JPanel {
             }
         });
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (readyToClose()) {
-                    try {
-                        storeSettings();
-                        dialog.dispose();
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(null,
-                                Localization.lang("Error opening file") + ": " + ex.getMessage(),
-                                Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
-                    }
+        ok.addActionListener(e -> {
+            if (readyToClose()) {
+                try {
+                    storeSettings();
+                    dialog.dispose();
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Error opening file") + ": " + ex.getMessage(),
+                            Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -271,8 +263,12 @@ class ManageJournalsPanel extends JPanel {
         personalFile.setText(Globals.prefs.get(JabRefPreferences.PERSONAL_JOURNAL_LIST));
         if (personalFile.getText().isEmpty()) {
             newFile.setSelected(true);
+            newFile.setEnabled(true);
+            oldFile.setSelected(false);
             oldFile.setEnabled(false);
         } else {
+            newFile.setSelected(false);
+            newFile.setEnabled(false);
             oldFile.setSelected(true);
             oldFile.setEnabled(true);
         }
@@ -323,17 +319,17 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupUserTable() {
-        JournalAbbreviationRepository userAbbr = new JournalAbbreviationRepository();
+        List<Abbreviation> userAbbreviations = new ArrayList<>();
         String filename = personalFile.getText();
-        if (!"".equals(filename) && new File(filename).exists()) {
+        if ((!filename.isEmpty()) && new File(filename).exists()) {
             try {
-                userAbbr.readJournalListFromFile(new File(filename));
+                userAbbreviations = JournalAbbreviationLoader.readJournalListFromFile(new File(filename));
             } catch (FileNotFoundException e) {
                 LOGGER.warn("Problem reading abbreviation file", e);
             }
         }
 
-        tableModel.setJournals(userAbbr.getAbbreviations());
+        tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
@@ -404,12 +400,10 @@ class ManageJournalsPanel extends JPanel {
         }
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
-        Abbreviations.initializeJournalNames(Globals.prefs);
-
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
-        for (int i = 0; i < frame.getBasePanelCount(); i++) {
-            frame.getBasePanelAt(i).getAutoCompleters().addJournalListToAutoCompleter();
+        for (BasePanel basePanel : frame.getBasePanelList()) {
+            basePanel.getAutoCompleters().addJournalListToAutoCompleter();
         }
 
     }
@@ -444,7 +438,7 @@ class ManageJournalsPanel extends JPanel {
                 URL url = new URL(chosen);
                 MonitoredURLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, Localization.lang("Error downloading file '%0'", chosen),
                         Localization.lang("Download failed"), JOptionPane.ERROR_MESSAGE);
             }
@@ -491,9 +485,9 @@ class ManageJournalsPanel extends JPanel {
 
         }
 
-        public void setJournals(SortedSet<Abbreviation> journals) {
+        public void setJournals(List<Abbreviation> abbreviations) {
             this.journals = new ArrayList<>();
-            for (Abbreviation abbreviation : journals) {
+            for (Abbreviation abbreviation : abbreviations) {
                 this.journals.add(new JournalEntry(abbreviation.getName(), abbreviation.getIsoAbbreviation()));
             }
             fireTableDataChanged();
@@ -631,31 +625,24 @@ class ManageJournalsPanel extends JPanel {
 
             pan = builder.getPanel();
 
-            view.addActionListener(new ActionListener() {
+            view.addActionListener(e -> {
+                try {
+                    JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
+                    List<Abbreviation> abbreviations = JournalAbbreviationLoader
+                            .readJournalListFromFile(new File(tf.getText()));
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        JournalAbbreviationRepository abbr = new JournalAbbreviationRepository();
-                        abbr.readJournalListFromFile(new File(tf.getText()));
-
-                        JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbr));
-                        JScrollPane pane = new JScrollPane(table);
-                        JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } catch (FileNotFoundException ex) {
-                        JOptionPane.showMessageDialog(null, Localization.lang("File '%0' not found", tf.getText()),
-                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                    }
+                    JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
+                    JScrollPane pane = new JScrollPane(table);
+                    JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
+                            JOptionPane.INFORMATION_MESSAGE);
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null, Localization.lang("File '%0' not found", tf.getText()),
+                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
             });
-            clear.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    externals.remove(ExternalFileEntry.this);
-                    buildExternalsPanel();
-                }
+            clear.addActionListener(e -> {
+                externals.remove(ExternalFileEntry.this);
+                buildExternalsPanel();
             });
             clear.setToolTipText(Localization.lang("Remove"));
         }

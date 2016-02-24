@@ -47,8 +47,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern
             .compile("<a href=\"" + ScienceDirectFetcher.LINK_PREFIX.replaceAll("\\?", "\\\\?") + "([^\"]+)\"\"");
 
-    protected static final Pattern NEXT_PAGE_PATTERN = Pattern.compile("<a href=\"(.*)\">Next &gt;");
-
     private boolean stopFetching;
 
 
@@ -134,7 +132,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
-        //String entirePage = cont;
         Matcher m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
         if (m.find()) {
             while (m.find()) {
@@ -147,12 +144,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
         else {
             return null;
         }
-        /*m = nextPagePattern.matcher(entirePage);
-        if (m.find()) {
-            String newQuery = WEBSITE_URL +m.group(1);
-            return newQuery;
-        }
-        else*/
         return null;
     }
 

@@ -3,7 +3,7 @@ package net.sf.jabref.gui.actions;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -59,7 +59,7 @@ public class NewEntryAction extends MnemonicAwareAction {
 
         if (jabRefFrame.tabbedPane.getTabCount() > 0) {
             ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
-                    .newEntry(EntryTypes.getType(thisType));
+                    .newEntry(EntryTypes.getType(thisType, jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getMode()).get());
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }

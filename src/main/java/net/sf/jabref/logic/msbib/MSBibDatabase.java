@@ -67,7 +67,7 @@ public class MSBibDatabase {
 
     public List<BibEntry> importEntries(InputStream stream) {
         entries = new HashSet<>();
-        Document inputDocument = null;
+        Document inputDocument;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().
@@ -75,7 +75,7 @@ public class MSBibDatabase {
             inputDocument = documentBuilder.parse(stream);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
-            return null;
+            return Collections.emptyList();
         }
         String bcol = "b:";
         NodeList rootList = inputDocument.getElementsByTagName("b:Sources");

@@ -158,10 +158,10 @@ public class ExternalFileTypeEntryEditor {
             title = newFileTitle;
         }
 
-        if (dParent != null) {
-            diag = new JDialog(dParent, title, true);
-        } else {
+        if (dParent == null) {
             diag = new JDialog(fParent, title, true);
+        } else {
+            diag = new JDialog(dParent, title, true);
         }
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -170,10 +170,10 @@ public class ExternalFileTypeEntryEditor {
         BrowseListener browse = new BrowseListener(application);
         browseBut.addActionListener(browse);
 
-        if (dParent != null) {
-            diag.setLocationRelativeTo(dParent);
-        } else {
+        if (dParent == null) {
             diag.setLocationRelativeTo(fParent);
+        } else {
+            diag.setLocationRelativeTo(dParent);
         }
 
         setValues(entry);
@@ -220,9 +220,7 @@ public class ExternalFileTypeEntryEditor {
             fileTypeEntry.setExtension(ext);
         }
 
-        if (!OS.WINDOWS) {
-            fileTypeEntry.setOpenWith(application.getText().trim());
-        } else {
+        if (OS.WINDOWS) {
             // On Windows, store application as empty if the "Default" option is selected,
             // or if the application name is empty:
             if (useDefault.isSelected() || application.getText().trim().isEmpty()) {
@@ -230,6 +228,8 @@ public class ExternalFileTypeEntryEditor {
             } else {
                 fileTypeEntry.setOpenWith(application.getText().trim());
             }
+        } else {
+            fileTypeEntry.setOpenWith(application.getText().trim());
         }
     }
 

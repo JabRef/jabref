@@ -187,7 +187,7 @@ class CustomExportDialog extends JDialog {
         getContentPane().add(buttons, BorderLayout.SOUTH);
 
         //pack();
-        setSize(600, 170);
+        setSize(700, 200);
 
         PositionWindow.placeDialog(this, parent);
     }

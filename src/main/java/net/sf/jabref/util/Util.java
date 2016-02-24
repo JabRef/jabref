@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     Copyright (C) 2015 Oliver Kopp
 
     This program is free software; you can redistribute it and/or modify
@@ -40,29 +40,23 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
 import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoableEdit;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.List;
 import java.util.Map.Entry;
@@ -76,82 +70,12 @@ public class Util {
 
     private static final Log LOGGER = LogFactory.getLog(Util.class);
 
-    public static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
-    private static final EasyDateFormat dateFormatter = new EasyDateFormat();
+    private static final EasyDateFormat DATE_FORMATTER = new EasyDateFormat();
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
 
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key mayBeNull
-     */
-    public static String checkLegalKey(String key) {
-        if (key == null) {
-            return null;
-        }
-        return checkLegalKey(key,
-                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-    }
-
-    /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
-     */
-    public static String replaceSpecialCharacters(String s) {
-        for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
-            s = s.replaceAll(chrAndReplace.getKey(), chrAndReplace.getValue());
-        }
-        return s;
-    }
-
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key             mayBeNull
-     * @param enforceLegalKey make sure that the key is legal in all respects
-     */
-    public static String checkLegalKey(String key, boolean enforceLegalKey) {
-        if (key == null) {
-            return null;
-        }
-        if (!enforceLegalKey) {
-            // User doesn't want us to enforce legal characters. We must still look
-            // for whitespace and some characters such as commas, since these would
-            // interfere with parsing:
-            StringBuilder newKey = new StringBuilder();
-            for (int i = 0; i < key.length(); i++) {
-                char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && (c != '{') && (c != '\\') && (c != '"') && (c != '}') && (c != ',') && (c != '(') && (c != ')')) {
-                    newKey.append(c);
-                }
-            }
-            return newKey.toString();
-
-        }
-        StringBuilder newKey = new StringBuilder();
-        for (int i = 0; i < key.length(); i++) {
-            char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && (c != '#') && (c != '{') && (c != '\\') && (c != '"') && (c != '}')
-                    && (c != '~') && (c != ',') && (c != '^') && (c != '\'')  && (c != '(') && (c != ')')) {
-                newKey.append(c);
-            }
-        }
-
-        // Replace non-English characters like umlauts etc. with a sensible
-        // letter or letter combination that bibtex can accept.
-
-        return net.sf.jabref.util.Util.replaceSpecialCharacters(newKey.toString());
-    }
 
     public static List<String[]> parseMethodsCalls(String calls) throws RuntimeException {
 
@@ -238,13 +162,11 @@ public class Util {
      * @param database
      * @return
      */
-    private static final Pattern squareBracketsPattern = Pattern.compile("\\[.*?\\]");
-
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
-        Matcher m = Util.squareBracketsPattern.matcher(bracketString);
+        Matcher m = Util.SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = Optional.ofNullable(getFieldAndFormat(m.group(), entry, database)).orElse("");
+            String replacement = getFieldAndFormat(m.group(), entry, database);
             m.appendReplacement(s, replacement);
         }
         m.appendTail(s);
@@ -270,13 +192,13 @@ public class Util {
 
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(BibtexFields.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalBibtexFields.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
-            net.sf.jabref.util.Util.setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
             if (markEntries) {
                 EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
             }
@@ -293,84 +215,26 @@ public class Util {
      */
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
         String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(BibtexFields.OWNER)));
+                && (overwriteOwner || (!entry.hasField(InternalBibtexFields.OWNER)));
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
                 && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
-        net.sf.jabref.util.Util.setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
 
         // Set owner field if this option is enabled:
         if (setOwner) {
-            // No or empty owner field?
-            // if (entry.getField(Globals.OWNER) == null
-            // || ((String) entry.getField(Globals.OWNER)).isEmpty()) {
             // Set owner field to default value
-            entry.setField(BibtexFields.OWNER, owner);
-            // }
+            entry.setField(InternalBibtexFields.OWNER, owner);
         }
 
         if (setTimeStamp) {
             entry.setField(timeStampField, timeStamp);
-        }
-    }
-
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param database The database to modify.
-     * @param fields   The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
-
-        for (BibEntry entry : database.getEntryMap().values()) {
-            upgradePdfPsToFile(entry, fields, ce);
-        }
-
-        ce.end();
-        return ce;
-    }
-
-    /**
-     * TODO: Move this to cleanup class. Collect file links from the given set of fields, and add them to the list
-     * contained in the field GUIGlobals.FILE_FIELD.
-     * <p>
-     * @param entry   The entry to modify.
-     *                >>>>>>> origin/master
-     * @param fields  The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    public static void upgradePdfPsToFile(BibEntry entry, String[] fields, NamedCompound ce) {
-        // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(Globals.FILE_FIELD);
-        List<FileField.ParsedFileField> fileList = FileField.parse(oldFileContent);
-        int oldItemCount = fileList.size();
-        for (String field : fields) {
-            entry.getFieldOptional(field).ifPresent(o -> {
-                if (o.trim().isEmpty()) {
-                    return;
-                }
-                File f = new File(o);
-                FileField.ParsedFileField flEntry = new FileField.ParsedFileField(f.getName(), o,
-                        ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
-                fileList.add(flEntry);
-
-                entry.clearField(field);
-                ce.addEdit(new UndoableFieldChange(entry, field, o, null));
-            });
-        }
-        if (fileList.size() != oldItemCount) {
-            String newValue = FileField.getStringRepresentation(fileList);
-            entry.setField(Globals.FILE_FIELD, newValue);
-            ce.addEdit(new UndoableFieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
         }
     }
 
@@ -382,81 +246,15 @@ public class Util {
      * @return The file filter.
      */
     public static OpenFileFilter getFileFilterForField(String fieldName) {
-        String s = BibtexFields.getFieldExtras(fieldName);
+        String s = InternalBibtexFields.getFieldExtras(fieldName);
         final String ext = "." + fieldName.toLowerCase();
         OpenFileFilter off;
-        if (BibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
+        if (InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
             off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
         } else {
             off = new OpenFileFilter(new String[]{ext});
         }
         return off;
-    }
-
-    /**
-     * Set a given field to a given value for all entries in a Collection. This method DOES NOT update any UndoManager,
-     * but returns a relevant CompoundEdit that should be registered by the caller.
-     *
-     * @param entries         The entries to set the field for.
-     * @param field           The name of the field to set.
-     * @param text            The value to set. This value can be null, indicating that the field should be cleared.
-     * @param overwriteValues Indicate whether the value should be set even if an entry already has the field set.
-     * @return A CompoundEdit for the entire operation.
-     */
-    public static UndoableEdit massSetField(Collection<BibEntry> entries, String field, String text, boolean overwriteValues) {
-
-        NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
-        for (BibEntry entry : entries) {
-            String oldVal = entry.getField(field);
-            // If we are not allowed to overwrite values, check if there is a
-            // nonempty
-            // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && !oldVal.isEmpty()) {
-                continue;
-            }
-            if (text == null) {
-                entry.clearField(field);
-            } else {
-                entry.setField(field, text);
-            }
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
-        }
-        ce.end();
-        return ce;
-    }
-
-    /**
-     * Move contents from one field to another for a Collection of entries.
-     *
-     * @param entries         The entries to do this operation for.
-     * @param field           The field to move contents from.
-     * @param newField        The field to move contents into.
-     * @param overwriteValues If true, overwrites any existing values in the new field. If false, makes no change for
-     *                        entries with existing value in the new field.
-     * @return A CompoundEdit for the entire operation.
-     */
-    public static UndoableEdit massRenameField(Collection<BibEntry> entries, String field, String newField, boolean overwriteValues) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
-        for (BibEntry entry : entries) {
-            String valToMove = entry.getField(field);
-            // If there is no value, do nothing:
-            if ((valToMove == null) || valToMove.isEmpty()) {
-                continue;
-            }
-            // If we are not allowed to overwrite values, check if there is a
-            // non-empty value already for this entry for the new field:
-            String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
-                continue;
-            }
-
-            entry.setField(newField, valToMove);
-            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField, valToMove));
-            entry.clearField(field);
-            ce.addEdit(new UndoableFieldChange(entry, field, valToMove, null));
-        }
-        ce.end();
-        return ce;
     }
 
     /**
@@ -497,9 +295,9 @@ public class Util {
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr).getLayoutFromText(Globals.FORMATTER_PACKAGE);
-        } catch (Exception e) {
-            net.sf.jabref.util.Util.LOGGER.info("Wrong format " + e.getMessage(), e);
+            layout = new LayoutHelper(sr).getLayoutFromText();
+        } catch (IOException e) {
+            LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
@@ -568,139 +366,6 @@ public class Util {
     }
 
     /**
-     * Download the URL and return contents as a String.
-     *
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    public static String getResults(URL source) throws IOException {
-
-        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), null);
-    }
-
-    /**
-     * Download the URL and return contents as a String.
-     *
-     * @param source
-     * @return
-     * @throws IOException
-     */
-    public static String getResults(URLConnection source) throws IOException {
-        return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
-    }
-
-    /**
-     * Download the URL using specified encoding and return contents as a String.
-     *
-     * @param source encoding
-     * @return
-     * @throws IOException
-     */
-    public static String getResultsWithEncoding(URL source, Charset encoding) throws IOException {
-        return net.sf.jabref.util.Util.getResultsWithEncoding(source.openConnection(), encoding);
-    }
-
-    /**
-     * Download the URL using specified encoding and return contents as a String.
-     *
-     * @param source encoding
-     * @return
-     * @throws IOException
-     */
-    public static String getResultsWithEncoding(URLConnection source, Charset encoding) throws IOException {
-
-        // set user-agent to avoid being blocked as a crawler
-        source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-
-        InputStreamReader in;
-        if (encoding == null) {
-            in = new InputStreamReader(source.getInputStream());
-        } else {
-            in = new InputStreamReader(source.getInputStream(), encoding);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            int byteRead = in.read();
-            if (byteRead == -1) {
-                break;
-            }
-            sb.append((char) byteRead);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Get the results of HTTP post on a URL and return contents as a String.
-     *
-     * @param source postData encoding
-     * @return
-     * @throws IOException
-     */
-    public static String getPostResults(URL source, String postData, Charset encoding) throws IOException {
-        HttpURLConnection con = (HttpURLConnection) source.openConnection();
-        return getPostResults(con, postData, encoding);
-    }
-
-    /**
-     * Get the results of HTTP post on a URL and return contents as a String.
-     *
-     * @param source postData encoding
-     * @return
-     * @throws IOException
-     */
-    public static String getPostResults(HttpURLConnection source, String postData, Charset encoding)
-            throws IOException {
-
-        //add a default request header
-        source.setRequestMethod("POST");
-        source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-        source.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-        // Send post request
-        source.setDoOutput(true);
-        try (DataOutputStream wr = new DataOutputStream(source.getOutputStream());) {
-            wr.writeBytes(postData);
-        }
-
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-        }
-
-        return response.toString();
-    }
-
-    /**
-     * Read results from a file instead of an URL. Just for faster debugging.
-     *
-     * @param f
-     * @return
-     * @throws IOException
-     */
-    public String getResultsFromFile(File f) throws IOException {
-        try (InputStream in = new BufferedInputStream(new FileInputStream(f))) {
-            StringBuilder sb = new StringBuilder();
-            byte[] buffer = new byte[256];
-            while (true) {
-                int bytesRead = in.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                for (int i = 0; i < bytesRead; i++) {
-                    sb.append((char) buffer[i]);
-                }
-            }
-            return sb.toString();
-        }
-    }
-
-    /**
      * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
      * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
      * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
@@ -710,7 +375,7 @@ public class Util {
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
      * otherwise (this indicates that the user has aborted the assignment).
      */
-    public static boolean warnAssignmentSideEffects(AbstractGroup[] groups, BibEntry[] entries, BibDatabase db, Component parent) {
+    public static boolean warnAssignmentSideEffects(List<AbstractGroup> groups, Component parent) {
         List<String> affectedFields = new ArrayList<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
@@ -719,8 +384,9 @@ public class Util {
                 if ("keywords".equals(field)) {
                     continue; // this is not undesired
                 }
-                for (int i = 0, len = BibtexFields.numberOfPublicFields(); i < len; ++i) {
-                    if (field.equals(BibtexFields.getFieldName(i))) {
+                int len = InternalBibtexFields.numberOfPublicFields();
+                for (int i = 0; i < len; ++i) {
+                    if (field.equals(InternalBibtexFields.getFieldName(i))) {
                         affectedFields.add(field);
                         break;
                     }
@@ -779,7 +445,7 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = net.sf.jabref.util.Util.dateFormatter.getCurrentDate();
+        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
         net.sf.jabref.util.Util.updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
@@ -838,9 +504,9 @@ public class Util {
      * @return the thread performing the autosetting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
-        final ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+        final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
-            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.length - 1);
+            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.size() - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -857,7 +523,7 @@ public class Util {
             @Override
             public void run() {
                 // determine directories to search in
-                ArrayList<File> dirs = new ArrayList<>();
+                List<File> dirs = new ArrayList<>();
                 List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
@@ -870,7 +536,7 @@ public class Util {
                 }
 
                 // Run the search operation:
-                Map<BibEntry, java.util.List<File>> result;
+                Map<BibEntry, List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
@@ -989,7 +655,7 @@ public class Util {
         final Collection<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        return net.sf.jabref.util.Util.autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
     }
 
     /**
@@ -1003,23 +669,23 @@ public class Util {
      */
     public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
 
-        fieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
+        String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
-        int colon = fieldAndFormat.indexOf(':');
+        int colon = strippedFieldAndFormat.indexOf(':');
 
         String beforeColon;
         String afterColon;
         if (colon == -1) {
-            beforeColon = fieldAndFormat;
+            beforeColon = strippedFieldAndFormat;
             afterColon = null;
         } else {
-            beforeColon = fieldAndFormat.substring(0, colon);
-            afterColon = fieldAndFormat.substring(colon + 1);
+            beforeColon = strippedFieldAndFormat.substring(0, colon);
+            afterColon = strippedFieldAndFormat.substring(colon + 1);
         }
         beforeColon = beforeColon.trim();
 
         if (beforeColon.isEmpty()) {
-            return null;
+            return "";
         }
 
         String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
@@ -1030,7 +696,7 @@ public class Util {
         }
 
         if (fieldValue == null) {
-            return null;
+            return "";
         }
 
         if ((afterColon == null) || afterColon.isEmpty()) {

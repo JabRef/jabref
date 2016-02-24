@@ -24,12 +24,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -40,16 +44,16 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<String> dir = metaData.getFileDirectory(fieldName);
 
-            File file = FileUtil.expandFilename(link, dir);
+            Optional<File> file = FileUtil.expandFilename(link, dir);
 
             // Check that the file exists:
-            if ((file == null) || !file.exists()) {
+            if (!file.isPresent() || !file.get().exists()) {
                 throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
-            link = file.getCanonicalPath();
+            link = file.get().getCanonicalPath();
 
             // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.getName().split("\\.");
+            String[] split = file.get().getName().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = "pdf";
@@ -188,7 +192,7 @@ public class JabRefDesktop {
 
         boolean httpLink = false;
 
-        if (Util.REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
             httpLink = true;
         }
         /*if (link.toLowerCase().startsWith("file://")) {
@@ -212,9 +216,9 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            File tmp = FileUtil.expandFilename(metaData, link);
-            if (tmp != null) {
-                file = tmp;
+            Optional<File> tmp = FileUtil.expandFilename(metaData, link);
+            if (tmp.isPresent()) {
+                file = tmp.get();
             }
         }
 
@@ -280,18 +284,20 @@ public class JabRefDesktop {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        final String ln = temp.getPath();
-        SwingUtilities.invokeLater(new Runnable() {
+        if (temp != null) {
+            final String ln = temp.getPath();
+            SwingUtilities.invokeLater(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    openExternalFileAnyFormat(metaData, ln, fileType);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                @Override
+                public void run() {
+                    try {
+                        openExternalFileAnyFormat(metaData, ln, fileType);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
@@ -317,9 +323,8 @@ public class JabRefDesktop {
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<>();
-                ExternalFileType[] oldTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-                Collections.addAll(fileTypes, oldTypes);
+                List<ExternalFileType> fileTypes = new ArrayList<>(
+                        ExternalFileTypes.getInstance().getExternalFileTypeSelection());
                 fileTypes.add(newType);
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);

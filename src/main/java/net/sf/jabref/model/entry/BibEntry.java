@@ -39,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Strings;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibEntry {
@@ -47,12 +46,11 @@ public class BibEntry {
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
-    private static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "id";
+    public static final String DEFAULT_TYPE = "misc";
 
     private String id;
-
     private String type;
-
     private Map<String, String> fields = new HashMap<>();
 
     private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
@@ -69,17 +67,12 @@ public class BibEntry {
      */
     private boolean changed;
 
-
     public BibEntry() {
         this(IdGenerator.next());
     }
 
     public BibEntry(String id) {
-        this(id, EntryTypes.getTypeOrDefault("misc"));
-    }
-
-    public BibEntry(String id, EntryType type) {
-        this(id, type.getName());
+        this(id, DEFAULT_TYPE);
     }
 
     public BibEntry(String id, String type) {
@@ -111,7 +104,9 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(String type) {
-        Objects.requireNonNull(type, "Every BibEntry must have a type.");
+        if(type == null) {
+            type = DEFAULT_TYPE;
+        }
 
         String oldType = this.type;
         type = type.toLowerCase();
@@ -498,7 +493,6 @@ public class BibEntry {
     /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
-     * @param entry
      * @return will return the publication date of the entry or null if no year was found.
      */
     public String getPublicationDate() {
@@ -561,7 +555,7 @@ public class BibEntry {
     public void addKeyword(String keyword) {
         Objects.requireNonNull(keyword, "keyword must not be empty");
 
-        if ((keyword == null) || (keyword.isEmpty())) {
+        if (keyword.isEmpty()) {
             return;
         }
 
@@ -587,10 +581,10 @@ public class BibEntry {
      * @param keywords Keywords to add
      */
     public void addKeywords(List<String> keywords) {
-        if (keywords != null) {
-            for (String keyword : keywords) {
-                this.addKeyword(keyword);
-            }
+        Objects.requireNonNull(keywords);
+
+        for (String keyword : keywords) {
+            this.addKeyword(keyword);
         }
     }
 

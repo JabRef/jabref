@@ -19,8 +19,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 
 import javax.swing.*;
+
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
@@ -70,10 +72,10 @@ public class MergeEntriesDialog extends JDialog {
      *
      * @param selected Selected BibtexEntries
      */
-    private void init(BibEntry[] selected) {
+    private void init(List<BibEntry> selected) {
 
         // Check if there are two entries selected
-        if (selected.length != 2) { // None selected. Inform the user to select entries first.
+        if (selected.size() != 2) { // None selected. Inform the user to select entries first.
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("You have to choose exactly two entries to merge."),
                     MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
@@ -82,10 +84,10 @@ public class MergeEntriesDialog extends JDialog {
         }
 
         // Store the two entries
-        one = selected[0];
-        two = selected[1];
+        one = selected.get(0);
+        two = selected.get(1);
 
-        mergeEntries = new MergeEntries(one, two);
+        mergeEntries = new MergeEntries(one, two, panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
         ce = new NamedCompound(MERGE_ENTRIES);

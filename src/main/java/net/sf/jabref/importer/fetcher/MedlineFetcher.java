@@ -40,25 +40,15 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class MedlineFetcher implements EntryFetcher {
 
-    static class SearchResult {
+    private static final Pattern PART1_PATTERN = Pattern.compile(", ");
+    private static final Pattern PART2_PATTERN = Pattern.compile(",");
+    private static final Pattern PART3_PATTERN = Pattern.compile(" ");
 
-        public int count;
+    private static final Pattern ID_PATTERN = Pattern.compile("<Id>(\\d+)</Id>");
+    private static final Pattern COUNT_PATTERN = Pattern.compile("<Count>(\\d+)<\\/Count>");
+    private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
+    private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
-        public int retmax;
-
-        public int retstart;
-
-        public String ids = "";
-
-
-        public void addID(String id) {
-            if (ids.isEmpty()) {
-                ids = id;
-            } else {
-                ids += "," + id;
-            }
-        }
-    }
 
 
     /**
@@ -74,15 +64,13 @@ public class MedlineFetcher implements EntryFetcher {
 
 
     private static String toSearchTerm(String in) {
-        Pattern part1 = Pattern.compile(", ");
-        Pattern part2 = Pattern.compile(",");
-        Pattern part3 = Pattern.compile(" ");
+        // This can probably be simplified using simple String.replace()...
         Matcher matcher;
-        matcher = part1.matcher(in);
+        matcher = PART1_PATTERN.matcher(in);
         in = matcher.replaceAll("\\+AND\\+");
-        matcher = part2.matcher(in);
+        matcher = PART2_PATTERN.matcher(in);
         in = matcher.replaceAll("\\+AND\\+");
-        matcher = part3.matcher(in);
+        matcher = PART3_PATTERN.matcher(in);
         in = matcher.replaceAll("+");
 
         return in;
@@ -97,10 +85,6 @@ public class MedlineFetcher implements EntryFetcher {
         String medlineUrl = baseUrl + "/esearch.fcgi?db=pubmed&retmax=" + Integer.toString(pacing) +
                 "&retstart=" + Integer.toString(start) + "&term=";
 
-        Pattern idPattern = Pattern.compile("<Id>(\\d+)</Id>");
-        Pattern countPattern = Pattern.compile("<Count>(\\d+)<\\/Count>");
-        Pattern retMaxPattern = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
-        Pattern retStartPattern = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
         boolean doCount = true;
         SearchResult result = new SearchResult();
@@ -112,19 +96,19 @@ public class MedlineFetcher implements EntryFetcher {
             while ((inLine = in.readLine()) != null) {
 
                 // get the count
-                Matcher idMatcher = idPattern.matcher(inLine);
+                Matcher idMatcher = ID_PATTERN.matcher(inLine);
                 if (idMatcher.find()) {
                     result.addID(idMatcher.group(1));
                 }
-                Matcher retMaxMatcher = retMaxPattern.matcher(inLine);
+                Matcher retMaxMatcher = RET_MAX_PATTERN.matcher(inLine);
                 if (retMaxMatcher.find()) {
                     result.retmax = Integer.parseInt(retMaxMatcher.group(1));
                 }
-                Matcher retStartMatcher = retStartPattern.matcher(inLine);
+                Matcher retStartMatcher = RET_START_PATTERN.matcher(inLine);
                 if (retStartMatcher.find()) {
                     result.retstart = Integer.parseInt(retStartMatcher.group(1));
                 }
-                Matcher countMatcher = countPattern.matcher(inLine);
+                Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
                 if (doCount && countMatcher.find()) {
                     result.count = Integer.parseInt(countMatcher.group(1));
                     doCount = false;
@@ -243,4 +227,26 @@ public class MedlineFetcher implements EntryFetcher {
                 Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }
+
+
+    static class SearchResult {
+
+        public int count;
+
+        public int retmax;
+
+        public int retstart;
+
+        public String ids = "";
+
+
+        public void addID(String id) {
+            if (ids.isEmpty()) {
+                ids = id;
+            } else {
+                ids += "," + id;
+            }
+        }
+    }
+
 }

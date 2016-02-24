@@ -23,7 +23,6 @@ import java.util.*;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -85,7 +84,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 String address = null;
                 String titleST = null;
                 String titleTI = null;
-                Vector<String> comments = new Vector<>();
+                List<String> comments = new ArrayList<>();
                 // add item
                 for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {
@@ -273,14 +272,9 @@ public class BiblioscapeImporter extends ImportFormat {
                 }
 
                 if (!comments.isEmpty()) { // set comment if present
-                    StringBuilder s = new StringBuilder();
-                    for (int i = 0; i < comments.size(); ++i) {
-                        s.append(i > 0 ? "; " : "").append(comments.elementAt(i));
-                    }
-                    hm.put("comment", s.toString());
+                    hm.put("comment", String.join(";", comments));
                 }
-                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID,
-                        EntryTypes.getTypeOrDefault(bibtexType));
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, bibtexType);
                 b.setField(hm);
                 bibItems.add(b);
 

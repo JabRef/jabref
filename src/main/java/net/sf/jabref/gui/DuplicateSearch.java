@@ -171,7 +171,7 @@ public class DuplicateSearch implements Runnable {
         public void run() {
             for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.length) && !finished; j++) {
-                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
+                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j], panel.getBibDatabaseContext().getMode());
 
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {

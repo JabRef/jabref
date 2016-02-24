@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -39,8 +38,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 
@@ -108,19 +107,11 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        URLConnection conn;
+        String bibtexString = "";
         try {
-            conn = url.openConnection();
-        } catch (IOException e) {
-            LOGGER.warn("Could not open URL connection", e);
-            return null;
-        }
-
-        conn.setRequestProperty("Accept", "application/x-bibtex");
-
-        String bibtexString;
-        try {
-            bibtexString = Util.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
+            URLDownload dl = new URLDownload(url);
+            dl.addParameters("Accept", "application/x-bibtex");
+            bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
 
             if (status != null) {

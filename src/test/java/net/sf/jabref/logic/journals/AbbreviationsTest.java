@@ -1,44 +1,55 @@
 package net.sf.jabref.logic.journals;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 public class AbbreviationsTest {
 
-    @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
+    @Test
+    public void getNextAbbreviationAbbreviatesIEEEJournalTitle() {
+        JabRefPreferences prefs = mock(JabRefPreferences.class);
+        when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
+
+        JournalAbbreviationLoader abbreviations = new JournalAbbreviationLoader(prefs);
+        assertEquals("#IEEE_J_PROC#",
+                abbreviations.getRepository().getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
-    public void testInitializeJournalNames() {
-        Abbreviations.initializeJournalNames(Globals.prefs);
+    public void getNextAbbreviationExpandsIEEEAbbreviation() {
+        JabRefPreferences prefs = mock(JabRefPreferences.class);
+        when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
+
+        JournalAbbreviationLoader abbreviations = new JournalAbbreviationLoader(prefs);
+        assertEquals("Proceedings of the IEEE",
+                abbreviations.getRepository().getNextAbbreviation("#IEEE_J_PROC#").get());
     }
 
     @Test
-    public void testIEEEabrv() {
-        Boolean oldIEEEsetting = Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV);
-        Globals.prefs.putBoolean(JabRefPreferences.USE_IEEE_ABRV, true);
-        Abbreviations.initializeJournalNames(Globals.prefs);
-        String textAbrv = "#IEEE_J_PROC#";
-        String textFull = "Proceedings of the IEEE";
-        assertEquals(textAbrv, Abbreviations.toggleAbbreviation(textFull));
-        assertEquals(textFull, Abbreviations.toggleAbbreviation(textAbrv));
+    public void getNextAbbreviationAbbreviatesJournalTitle() {
+        JabRefPreferences prefs = mock(JabRefPreferences.class);
+        JournalAbbreviationLoader abbreviations = new JournalAbbreviationLoader(prefs);
+        assertEquals("Proc. IEEE",
+                abbreviations.getRepository().getNextAbbreviation("Proceedings of the IEEE").get());
+    }
 
-        Globals.prefs.putBoolean(JabRefPreferences.USE_IEEE_ABRV, false);
-        Abbreviations.initializeJournalNames(Globals.prefs);
-        textAbrv = "Proc. IEEE";
-        String textAbrv2 = "Proc IEEE";
-        assertEquals(textAbrv, Abbreviations.toggleAbbreviation(textFull));
-        assertEquals(textAbrv2, Abbreviations.toggleAbbreviation(textAbrv));
-        assertEquals(textFull, Abbreviations.toggleAbbreviation(textAbrv2));
+    @Test
+    public void getNextAbbreviationRemovesPoint() {
+        JabRefPreferences prefs = mock(JabRefPreferences.class);
+        JournalAbbreviationLoader abbreviations = new JournalAbbreviationLoader(prefs);
+        assertEquals("Proc IEEE", abbreviations.getRepository().getNextAbbreviation("Proc. IEEE").get());
+    }
 
-        Globals.prefs.putBoolean(JabRefPreferences.USE_IEEE_ABRV, oldIEEEsetting);
+    @Test
+    public void getNextAbbreviationExpandsAbbreviation() {
+        JabRefPreferences prefs = mock(JabRefPreferences.class);
+        JournalAbbreviationLoader abbreviations = new JournalAbbreviationLoader(prefs);
+        assertEquals("Proceedings of the IEEE",
+                abbreviations.getRepository().getNextAbbreviation("Proc IEEE").get());
     }
 
 }

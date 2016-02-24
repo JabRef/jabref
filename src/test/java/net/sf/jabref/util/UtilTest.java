@@ -17,41 +17,10 @@ import java.util.*;
 
 public class UtilTest {
 
-    @Test
-    public void testCheckLegalKey() {
-        // Enforce legal keys
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", true));
-        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", true));
-
-        // Do not enforce legal keys
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", false));
-        Assert.assertEquals("SPECIALCHARS#~^", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", false));
-
-        // Check null input
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null));
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, true));
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, false));
-
-        // Use preferences setting
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA"));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r"));
-    }
-
-    @Test
-    @Ignore
-    public void testReplaceSpecialCharacters() {
-        Assert.assertEquals("Hallo Arger", net.sf.jabref.util.Util.replaceSpecialCharacters("Hallo Arger"));
-        // Shouldn't German ï¿½ be resolved to Ae
-        Assert.assertEquals("AeaeaAAA", net.sf.jabref.util.Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
-    }
 
 
-
-
-    BibDatabase database;
-    BibEntry entry;
+    private BibDatabase database;
+    private BibEntry entry;
 
 
     @Before
@@ -125,11 +94,11 @@ public class UtilTest {
 
         Assert.assertEquals("Eric von Hippel and Georg von Krogh", net.sf.jabref.util.Util.getFieldAndFormat("author", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[unknownkey]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[unknownkey]", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[:]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[:]", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[:lower]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[:lower]", entry, database));
 
         Assert.assertEquals("eric von hippel and georg von krogh", net.sf.jabref.util.Util.getFieldAndFormat("[author:lower]", entry, database));
 

@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.migrations;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.*;
@@ -23,16 +24,18 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 /**
  * This class defines the warning that can be offered when opening a pre-2.3
@@ -184,7 +187,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
-            NamedCompound ce = Util.upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
+            NamedCompound ce = upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
             panel.undoManager.addEdit(ce);
             panel.markBaseChanged();
         }
@@ -203,7 +206,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 String gfs = Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "0");
                 StringBuilder sb = new StringBuilder(gfs);
                 if (!gfs.isEmpty()) {
-                    sb.append(";");
+                    sb.append(';');
                 }
                 sb.append(Globals.FILE_FIELD);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
@@ -229,4 +232,27 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         return found;
     }
 
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained in the field
+     * GUIGlobals.FILE_FIELD.
+     *
+     * @param database The database to modify.
+     * @param fields   The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    private static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+
+        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup(Arrays.asList(fields));
+        for (BibEntry entry : database.getEntryMap().values()) {
+            List<FieldChange> changes = cleanupJob.cleanup(entry);
+
+            for (FieldChange change : changes) {
+                ce.addEdit(new UndoableFieldChange(change));
+            }
+        }
+
+        ce.end();
+        return ce;
+    }
 }

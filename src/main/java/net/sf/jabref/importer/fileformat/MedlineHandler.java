@@ -24,7 +24,6 @@ import java.util.TreeSet;
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.xml.sax.Attributes;
@@ -234,8 +233,7 @@ class MedlineHandler extends DefaultHandler
             }
             String keywords = sb.toString();
 
-            BibEntry b = new BibEntry(IdGenerator.next(),//Globals.DEFAULT_BIBTEXENTRY_ID,
-            EntryTypes.getTypeOrDefault("article")); // id assumes an existing database so don't create one here
+            BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
                 b.setField("author", MedlineHandler.HTML_CONVERTER.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
@@ -491,12 +489,10 @@ class MedlineHandler extends DefaultHandler
             page += new String(data, start, length);
         }
         else if (inMedlineID) {
-            String medlineID = "";
-            medlineID += new String(data, start, length);
+            String medlineID = new String(data, start, length);
         }
         else if (inURL) {
-            String url = "";
-            url += new String(data, start, length);
+            String url = new String(data, start, length);
         }
         else if (inPubMedID) {
             pubmedid = new String(data, start, length);

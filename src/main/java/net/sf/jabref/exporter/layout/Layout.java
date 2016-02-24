@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -32,14 +33,14 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class Layout {
 
-    private final LayoutEntry[] layoutEntries;
+    private final List<LayoutEntry> layoutEntries;
 
     private final List<String> missingFormatters = new ArrayList<>();
 
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
-    public Layout(List<StringInt> parsedEntries, String classPrefix) {
+    public Layout(List<StringInt> parsedEntries, JournalAbbreviationRepository repository) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;
@@ -57,7 +58,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -73,7 +74,7 @@ public class Layout {
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -86,20 +87,17 @@ public class Layout {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, repository));
             } else {
                 blockEntries.add(parsedEntry);
             }
         }
 
-        layoutEntries = new LayoutEntry[tmpEntries.size()];
+        layoutEntries = new ArrayList<>(tmpEntries);
 
-        for (int i = 0; i < tmpEntries.size(); i++)
-        {
-            layoutEntries[i] = tmpEntries.get(i);
-            // Note if one of the entries has an invalid formatter:
-            if (layoutEntries[i].isInvalidFormatter()) {
-                missingFormatters.addAll(layoutEntries[i].getInvalidFormatters());
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            if (layoutEntry.isInvalidFormatter()) {
+                missingFormatters.addAll(layoutEntry.getInvalidFormatters());
             }
         }
     }
@@ -148,34 +146,17 @@ public class Layout {
      */
     public String doLayout(BibDatabase database, Charset encoding)
     {
-        //System.out.println("LAYOUT: " + bibtex.getId());
         StringBuilder sb = new StringBuilder(100);
         String fieldText;
-        boolean previousSkipped = false;
 
         for (LayoutEntry layoutEntry : layoutEntries) {
             fieldText = layoutEntry.doLayout(database, encoding);
 
             if (fieldText == null) {
                 fieldText = "";
-                if (previousSkipped) {
-                    int eol = 0;
-
-                    while ((eol < fieldText.length()) &&
-                            ((fieldText.charAt(eol) == '\n') ||
-                                    (fieldText.charAt(eol) == '\r'))) {
-                        eol++;
-                    }
-
-                    if (eol < fieldText.length()) {
-                        sb.append(fieldText.substring(eol));
-                    }
-                }
-            } else {
-                sb.append(fieldText);
             }
 
-            previousSkipped = false;
+            sb.append(fieldText);
         }
 
         return sb.toString();

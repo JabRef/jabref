@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -25,10 +26,16 @@ public class TypedBibEntry {
 
     private final BibEntry entry;
     private final Optional<BibDatabase> database;
+    private final BibDatabaseMode mode;
 
-    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database) {
+    public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
+        this(entry, Optional.empty(), mode);
+    }
+
+    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
         this.database = Objects.requireNonNull(database);
+        this.mode = mode;
     }
 
     /**
@@ -36,17 +43,21 @@ public class TypedBibEntry {
      * complete.
      */
     public boolean hasAllRequiredFields() {
-        EntryType type = EntryTypes.getType(entry.getType());
-        return entry.allFieldsPresent(type.getRequiredFields(), database.orElse(null));
+        Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
+        if(type.isPresent()) {
+            return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
+        } else {
+            return true;
+        }
     }
 
     /**
      * Gets the display name for the type of the entry.
      */
     public String getTypeForDisplay() {
-        EntryType entryType = EntryTypes.getType(entry.getType());
-        if (entryType != null) {
-            return entryType.getName();
+        Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), mode);
+        if (entryType.isPresent()) {
+            return entryType.get().getName();
         } else {
             return EntryUtil.capitalizeFirst(entry.getType());
         }

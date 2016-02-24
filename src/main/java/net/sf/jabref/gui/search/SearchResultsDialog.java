@@ -45,7 +45,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -121,8 +121,9 @@ public class SearchResultsDialog {
         diag = new JDialog(frame, title, false);
 
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
+        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
+                .get(JabRefPreferences.PREVIEW_1);
+        preview = new PreviewPanel(null, new MetaData(), layoutFile);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -165,13 +166,12 @@ public class SearchResultsDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    BibEntry[] bes = selectionModel.getSelected().toArray
-                            (new BibEntry[selectionModel.getSelected().size()]);
+                    List<BibEntry> bes = selectionModel.getSelected();
                     TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.getCurrentBasePanel());
-                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
                 }
@@ -265,7 +265,7 @@ public class SearchResultsDialog {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            int width = BibtexFields.getFieldLength(fields[i]);
+            int width = InternalBibtexFields.getFieldLength(fields[i]);
             cm.getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -349,12 +349,12 @@ public class SearchResultsDialog {
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                p.metaData(), fl.type)).actionPerformed(null);
+                                p.getBibDatabaseContext().getMetaData(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
                     entry.getFieldOptional("url").ifPresent(link -> { try {
-                            JabRefDesktop.openExternalViewer(p.metaData(), link, "url");
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext().getMetaData(), link, "url");
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
@@ -391,7 +391,7 @@ public class SearchResultsDialog {
                         description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.getIcon(), p.metaData(),
+                            flEntry.link, flEntry.type.getIcon(), p.getBibDatabaseContext().getMetaData(),
                             flEntry.type));
                     count++;
                 }
@@ -417,7 +417,7 @@ public class SearchResultsDialog {
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
                 // Update the preview's metadata reference:
-                preview.setMetaData(p.metaData());
+                preview.setMetaData(p.getBibDatabaseContext().getMetaData());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.*;
@@ -230,7 +229,7 @@ public class OvidImporter extends ImportFormat {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
+            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "misc";
             h.remove("entrytype");
             if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.
@@ -238,7 +237,7 @@ public class OvidImporter extends ImportFormat {
                 // Move the "chaptertitle" to just "title":
                 h.put("title", h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
+            BibEntry b = new BibEntry(IdGenerator.next(), entryType);
             b.setField(h);
 
             bibitems.add(b);

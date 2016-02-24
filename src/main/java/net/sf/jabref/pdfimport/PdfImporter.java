@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -67,34 +68,6 @@ public class PdfImporter {
     private int dropRow;
 
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
-
-    /**
-     * Used nowhere else, will be removed at the JavaFX migration
-     */
-    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
-        int x;
-        int y;
-
-        Point topLeft = win.getLocationOnScreen();
-        Dimension parentSize = win.getSize();
-
-        Dimension mySize = diag.getSize();
-
-        if (parentSize.width > mySize.width) {
-            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
-        } else {
-            x = topLeft.x;
-        }
-
-        if (parentSize.height > mySize.height) {
-            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
-        } else {
-            y = topLeft.y;
-        }
-
-        diag.setLocation(x, y);
-    }
-
 
     /**
      * Creates the PdfImporter
@@ -167,7 +140,7 @@ public class PdfImporter {
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
         // Get a list of file directories:
-        List<String> dirsS = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibEntry> res = new ArrayList<>();
 
@@ -180,7 +153,7 @@ public class PdfImporter {
                 }
                 centerRelativeToWindow(importDialog, frame);
                 importDialog.showDialog();
-                doNotShowAgain = importDialog.getDoNotShowAgain();
+                doNotShowAgain = importDialog.isDoNotShowAgain();
             }
             if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
                 int choice = neverShow ? globalChoice : importDialog.getChoice();
@@ -195,11 +168,13 @@ public class PdfImporter {
                         in = new FileInputStream(fileName);
                         localRes = importer.importEntries(in, frame);
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Cannot import entries", ex);
                     } finally {
                         try {
-                            in.close();
-                        } catch (Exception ignored) {
+                            if (in != null) {
+                                in.close();
+                            }
+                        } catch (IOException ignored) {
                             // Ignored
                         }
                     }
@@ -234,27 +209,25 @@ public class PdfImporter {
 
                     try {
                         in = new FileInputStream(file);
-                    } catch (Exception e) {
+                    } catch (FileNotFoundException e) {
                         // import failed -> generate default entry
                         LOGGER.info("Import failed", e);
-                        e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
                     }
                     try {
                         localRes = contentImporter.importEntries(in, status);
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         // import failed -> generate default entry
                         LOGGER.info("Import failed", e);
-                        e.printStackTrace();
                         entry = createNewBlankEntry(fileName);
                         res.add(entry);
                         continue fileNameLoop;
                     } finally {
                         try {
                             in.close();
-                        } catch (Exception ignored) {
+                        } catch (IOException ignored) {
                             // Ignored
                         }
                     }
@@ -273,9 +246,9 @@ public class PdfImporter {
 
                     panel.database().insertEntry(entry);
                     panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(panel.metaData(), panel.database(), entry);
+                    LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
                     dfh = new DroppedFileHandler(frame, panel);
-                    dfh.linkPdfToEntry(fileName, entryTable, entry);
+                    dfh.linkPdfToEntry(fileName, entry);
                     panel.highlightEntry(entry);
                     if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                         EntryEditor editor = panel.getEntryEditor(entry);
@@ -303,7 +276,7 @@ public class PdfImporter {
         BibEntry newEntry = createNewEntry();
         if (newEntry != null) {
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-            dfh.linkPdfToEntry(fileName, entryTable, newEntry);
+            dfh.linkPdfToEntry(fileName, newEntry);
         }
         return newEntry;
     }
@@ -319,7 +292,7 @@ public class PdfImporter {
 
         if (type != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type);
+            final BibEntry be = new BibEntry(id, type.getName());
             try {
                 panel.database().insertEntry(be);
 
@@ -374,8 +347,8 @@ public class PdfImporter {
         List<BibEntry> xmpEntriesInFile = null;
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName);
-        } catch (Exception e) {
-            // Todo Logging
+        } catch (IOException e) {
+            LOGGER.error("XMPUtil.readXMP failed", e);
         }
         return xmpEntriesInFile;
     }
@@ -399,4 +372,32 @@ public class PdfImporter {
     public void setDropRow(int dropRow) {
         this.dropRow = dropRow;
     }
+
+    /**
+     * Used nowhere else, will be removed at the JavaFX migration
+     */
+    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
+        int x;
+        int y;
+
+        Point topLeft = win.getLocationOnScreen();
+        Dimension parentSize = win.getSize();
+
+        Dimension mySize = diag.getSize();
+
+        if (parentSize.width > mySize.width) {
+            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
+        } else {
+            x = topLeft.x;
+        }
+
+        if (parentSize.height > mySize.height) {
+            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
+        } else {
+            y = topLeft.y;
+        }
+
+        diag.setLocation(x, y);
+    }
+
 }

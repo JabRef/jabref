@@ -58,7 +58,6 @@ import net.sf.jabref.logic.l10n.Localization;
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     private final EventList<TableEntry> entries = new BasicEventList<>();
-    //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
     private boolean okPressed;
     private final JabRefFrame frame;

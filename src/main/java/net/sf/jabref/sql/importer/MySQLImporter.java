@@ -56,9 +56,9 @@ final public class MySQLImporter extends DBImporter {
 
     @Override
     protected List<String> readColumnNames(Connection conn) throws SQLException {
-        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, "SHOW columns FROM entries;")) {
-            ArrayList<String> colNames = new ArrayList<>();
-            ResultSet rsColumns = statement.getResultSet();
+        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, "SHOW columns FROM entries;");
+                ResultSet rsColumns = statement.getResultSet()) {
+            List<String> colNames = new ArrayList<>();
             while (rsColumns.next()) {
                     colNames.add(rsColumns.getString(1));
             }

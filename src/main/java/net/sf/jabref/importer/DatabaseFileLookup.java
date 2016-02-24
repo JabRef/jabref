@@ -48,7 +48,7 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
-        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
 
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));
@@ -88,8 +88,7 @@ class DatabaseFileLookup {
                 continue;
             }
 
-            File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            fileLinks.add(expandedFilename);
+            FileUtil.expandFilename(link, possibleFilePaths).ifPresent(fileLinks::add);
         }
 
         return fileLinks;

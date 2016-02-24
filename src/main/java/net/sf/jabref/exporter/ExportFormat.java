@@ -15,27 +15,28 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.exporter.layout.LayoutHelper;
-import javax.swing.filechooser.FileFilter;
-
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 
 /**
  * Base class for export formats based on templates.
- *
  */
 public class ExportFormat implements IExportFormat {
 
@@ -53,24 +54,17 @@ public class ExportFormat implements IExportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
 
-
     /**
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.
      *
-     * @param displayName
-     *            Name to display to the user.
-     * @param consoleName
-     *            Name to call this format in the console.
-     * @param lfFileName
-     *            Name of the main layout file.
-     * @param directory
-     *            Directory in which to find the layout file.
-     * @param extension
-     *            Should contain the . (for instance .txt).
+     * @param displayName Name to display to the user.
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
      */
-    public ExportFormat(String displayName, String consoleName,
-            String lfFileName, String directory, String extension) {
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension) {
         this.displayName = displayName;
         this.consoleName = consoleName;
         this.lfFileName = lfFileName;
@@ -78,7 +72,9 @@ public class ExportFormat implements IExportFormat {
         this.extension = extension;
     }
 
-    /** Empty default constructor for subclasses */
+    /**
+     * Empty default constructor for subclasses
+     */
     ExportFormat() {
         // intentionally empty
     }
@@ -88,8 +84,7 @@ public class ExportFormat implements IExportFormat {
      * layout files using a normal file path, while a built-in export looks in
      * the classpath.
      *
-     * @param custom
-     *            true to indicate a custom export format.
+     * @param custom true to indicate a custom export format.
      */
     public void setCustomExport(boolean custom) {
         this.customExport = custom;
@@ -114,6 +109,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * Set an encoding which will be used in preference to the default value
      * obtained from the basepanel.
+     *
      * @param encoding The name of the encoding to use.
      */
     public void setEncoding(Charset encoding) {
@@ -123,19 +119,14 @@ public class ExportFormat implements IExportFormat {
     /**
      * This method should return a reader from which the given layout file can
      * be read.
-     *
-     * This standard implementation of this method will use the
-     * {@link FileActions#getReader(String)} method.
-     *
+     * <p>
+     * <p>
      * Subclasses of ExportFormat are free to override and provide their own
      * implementation.
      *
-     * @param filename
-     *            the filename
-     * @throws IOException
-     *             if the reader could not be created
-     *
+     * @param filename the filename
      * @return a newly created reader
+     * @throws IOException if the reader could not be created
      */
     private Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given filename:
@@ -143,46 +134,55 @@ public class ExportFormat implements IExportFormat {
         if (customExport) {
             dir = "";
         } else {
-            dir = LAYOUT_PREFIX
-                    + (directory == null ? "" : directory + '/');
+            dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
         }
-        return FileActions.getReader(dir + filename);
+
+        // Attempt to get a Reader for the file path given, either by
+        // loading it as a resource (from within jar), or as a normal file. If
+        // unsuccessful (e.g. file not found), an IOException is thrown.
+        String name = dir + filename;
+        Reader reader;
+        // Try loading as a resource first. This works for files inside the jar:
+        URL reso = Globals.class.getResource(name);
+
+        // If that didn't work, try loading as a normal file URL:
+        try {
+            if (reso == null) {
+                File f = new File(name);
+                reader = new FileReader(f);
+            } else {
+                reader = new InputStreamReader(reso.openStream());
+            }
+        } catch (FileNotFoundException ex) {
+            throw new IOException("Cannot find layout file: '" + name + "'.");
+        }
+
+        return reader;
     }
 
     /**
      * Perform the export of {@code database}.
      *
-     * @param database
-     *            The database to export from.
-     * @param metaData
-     *            The database's meta data.
-     * @param file
-     *            the file to write the resulting export to
-     * @param encoding
-     *            The encoding of the database
-     * @param entryIds
-     *            Contains the IDs of all entries that should be exported. If
-     *            <code>null</code>, all entries will be exported.
-     *
-     * @throws IOException
-     *             if a problem occurred while trying to write to {@code writer}
-     *             or read from required resources.
-     * @throws Exception
-     *             if any other error occurred during export.
-     *
-     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase,
-     *      net.sf.jabref.MetaData, java.lang.String, java.lang.String, java.util.Set)
+     * @param database   The database to export from.
+     * @param metaData   The database's meta data.
+     * @param file       the file to write the resulting export to
+     * @param encoding   The encoding of the database
+     * @param entryIds   Contains the IDs of all entries that should be exported. If
+     *                   <code>null</code>, all entries will be exported.
+     * @throws IOException if a problem occurred while trying to write to {@code writer}
+     *                     or read from required resources.
+     * @throws Exception   if any other error occurred during export.
+     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase, MetaData, String, Charset, Set)
      */
     @Override
-    public void performExport(final BibDatabase database,
-            final MetaData metaData, final String file,
-            final Charset enc, Set<String> entryIds) throws Exception {
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+            final Charset encoding, Set<String> entryIds) throws Exception {
 
         File outFile = new File(file);
         SaveSession ss = null;
         if (this.encoding != null) {
             try {
-                ss = getSaveSession(this.encoding, outFile);
+                ss = new SaveSession(this.encoding, false);
             } catch (IOException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
@@ -190,7 +190,7 @@ public class ExportFormat implements IExportFormat {
             }
         }
         if (ss == null) {
-            ss = getSaveSession(enc, outFile);
+            ss = new SaveSession(encoding, false);
         }
 
         try (VerifyingWriter ps = ss.getWriter()) {
@@ -206,14 +206,14 @@ public class ExportFormat implements IExportFormat {
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
                 LayoutHelper layoutHelper = new LayoutHelper(reader);
-                beginLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
                 // file.
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(database, enc));
+                ps.write(beginLayout.doLayout(database, encoding));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -224,14 +224,18 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            List<BibEntry> sorted = FileActions.getSortedEntries(database, metaData, entryIds, false);
+            Defaults defaults = new Defaults(
+                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+            SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
+                    new BibDatabaseContext(database, metaData, defaults), entryIds, savePrefs);
 
             // Load default layout
-            Layout defLayout = null;
-            LayoutHelper layoutHelper = null;
+            Layout defLayout;
+            LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
                 layoutHelper = new LayoutHelper(reader);
-                defLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
@@ -253,7 +257,7 @@ public class ExportFormat implements IExportFormat {
                     try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
                         // We try to get a type-specific layout for this entry.
                         layoutHelper = new LayoutHelper(reader);
-                        layout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                        layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
                             missingFormatters.addAll(layout.getMissingFormatters());
@@ -277,15 +281,15 @@ public class ExportFormat implements IExportFormat {
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + ".end.layout")) {
                 layoutHelper = new LayoutHelper(reader);
-                endLayout = layoutHelper.getLayoutFromText(Globals.FORMATTER_PACKAGE);
+                endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
                 // file.
             }
 
             // Write footer
-            if (endLayout != null) {
-                ps.write(endLayout.doLayout(database, encoding));
+            if ((endLayout != null) && (this.encoding != null)) {
+                ps.write(endLayout.doLayout(database, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 
@@ -294,15 +298,10 @@ public class ExportFormat implements IExportFormat {
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
-                for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
-                    sb.append(i.next());
-                    if (i.hasNext()) {
-                        sb.append(", ");
-                    }
-                }
+                sb.append(String.join(", ", missingFormatters));
                 LOGGER.warn(sb);
             }
-            finalizeSaveSession(ss);
+            finalizeSaveSession(ss, outFile);
         }
 
     }
@@ -310,6 +309,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.
+     *
      * @param lfFileName The layout filename.
      */
     private static Map<String, String> readFormatterFile(String lfFileName) {
@@ -347,11 +347,6 @@ public class ExportFormat implements IExportFormat {
         return formatters;
     }
 
-    public SaveSession getSaveSession(final Charset enc,
-                               final File outFile) throws IOException {
-        return new SaveSession(outFile, enc, false);
-    }
-
     /**
      * @see net.sf.jabref.exporter.IExportFormat#getFileFilter()
      */
@@ -363,13 +358,13 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss) throws Exception {
+    public void finalizeSaveSession(final SaveSession ss, File file) throws SaveException, IOException {
         ss.getWriter().flush();
         ss.getWriter().close();
 
         if (!ss.getWriter().couldEncodeAll()) {
             LOGGER.warn("Could not encode...");
         }
-        ss.commit();
+        ss.commit(file);
     }
 }

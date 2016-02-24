@@ -21,14 +21,14 @@ public final class TitleParser {
 
         int index = 0;
         for (char c : title.toCharArray()) {
-            if (!Character.isWhitespace(c)) {
+            if (Character.isWhitespace(c)) {
+                createWord(isProtected).ifPresent(words::add);
+            } else {
                 if (wordStart == -1) {
                     wordStart = index;
                 }
 
                 buffer.append(c);
-            } else {
-                createWord(isProtected).ifPresent(words::add);
             }
 
             index++;

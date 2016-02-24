@@ -30,7 +30,7 @@ public class BibtexEntryTests {
 
     @Test
     public void allFieldsPresentDefault() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -46,7 +46,7 @@ public class BibtexEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -62,7 +62,7 @@ public class BibtexEntryTests {
 
     @Test
     public void isNullOrEmptyCiteKey() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         Assert.assertFalse(e.hasCiteKey());
 
         e.setField(BibEntry.KEY_FIELD, "");

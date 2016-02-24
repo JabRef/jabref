@@ -17,10 +17,7 @@ package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.CheckBoxMessage;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.logic.l10n.Localization;
@@ -73,7 +70,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -88,7 +85,7 @@ public class MoveFileAction extends AbstractAction {
         }
         File file = new File(ln);
         if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs);
+            file = FileUtil.expandFilename(ln, dirs).orElse(null);
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
@@ -104,8 +101,9 @@ public class MoveFileAction extends AbstractAction {
                 String chosenFile;
                 if (toFileDir) {
                     // Determine which name to suggest:
-                    String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry()).concat(".")
-                            .concat(flEntry.type.getExtension());
+                    String suggName = Util
+                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry())
+                            .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));
@@ -161,7 +159,9 @@ public class MoveFileAction extends AbstractAction {
                     }
                     if (success) {
                         // Remove the original file:
-                        file.delete();
+                        if (!file.delete()) {
+                            LOGGER.info("Cannot delete original file");
+                        }
                         // Relativise path, if possible.
                         String canPath = new File(dirs.get(found)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {

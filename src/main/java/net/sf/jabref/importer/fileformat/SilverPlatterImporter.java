@@ -29,13 +29,14 @@ import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
 
-import net.sf.jabref.bibtex.EntryTypes;
-
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
  * so it currently doesn't handle everything correctly.
  */
 public class SilverPlatterImporter extends ImportFormat {
+
+    private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
+
 
     /**
      * Return the name of this import format.
@@ -65,11 +66,10 @@ public class SilverPlatterImporter extends ImportFormat {
         // If we see the flag signalling that it is an inspec file, return false.
         // This flag should appear above the first entry and prevent us from
         // accepting the Inspec format. Then we look for the title entry.
-        Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
         String str;
         while ((str = in.readLine()) != null) {
 
-            if (pat1.matcher(str).find())
+            if (START_PATTERN.matcher(str).find())
             {
                 return false; // This is an inspec file, so return false.
             }
@@ -212,8 +212,7 @@ public class SilverPlatterImporter extends ImportFormat {
 
                 }
 
-                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                        .getTypeOrDefault(type)); // id assumes an existing database so don't
+                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
                 // create one here
                 b.setField(h);
 

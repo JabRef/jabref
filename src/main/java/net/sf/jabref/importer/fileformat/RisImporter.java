@@ -36,6 +36,9 @@ import net.sf.jabref.model.entry.*;
  */
 public class RisImporter extends ImportFormat {
 
+    private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
+
+
     /**
      * Return the name of this import format.
      */
@@ -61,11 +64,10 @@ public class RisImporter extends ImportFormat {
 
         // Our strategy is to look for the "AU  - *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("TY  - .*");
 
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find()) {
+            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
                 return true;
             }
         }

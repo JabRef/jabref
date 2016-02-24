@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class StringLengthComparatorTest {
 
-    StringLengthComparator slc;
+    private StringLengthComparator slc;
 
 
     @Before

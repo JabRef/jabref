@@ -23,7 +23,9 @@ import net.sf.jabref.logic.mods.MODSDatabase;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.OutputKeys;
 import java.util.Set;
 import java.io.IOException;
@@ -41,10 +43,9 @@ class ModsExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData,
- final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws IOException {
-        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
+        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
             MODSDatabase md = new MODSDatabase(database, keySet);
 
@@ -54,11 +55,11 @@ class ModsExportFormat extends ExportFormat {
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
-            } catch (Exception e) {
+            } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(ss);
-        } catch (Exception ex) {
+            finalizeSaveSession(ss, new File(file));
+        } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
         }
     }

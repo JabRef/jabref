@@ -15,7 +15,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -174,7 +173,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(EntryTypes.getType("article"));
+            expectedEntry.setType("article");
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }

@@ -24,6 +24,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -37,6 +41,9 @@ import java.util.zip.ZipOutputStream;
  * @author alver
  */
 public class OpenDocumentSpreadsheetCreator extends ExportFormat {
+
+    private static final Log LOGGER = LogFactory.getLog(OpenDocumentSpreadsheetCreator.class);
+
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
@@ -98,7 +105,9 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
-        tmpFile.delete();
+        if (!tmpFile.delete()) {
+            LOGGER.info("Cannot delete temporary export file");
+        }
     }
 
     private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {
@@ -137,7 +146,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot get resource", e);
         }
     }
 }

@@ -57,7 +57,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
-        List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
+        List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];
@@ -241,7 +241,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                             dialog.setVisible(true);
                             if (dialog.isOkPressed()) {
                                 final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                                        BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                                        InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
                                 d2.addCallBack(activeFetcher);
                                 PositionWindow.placeDialog(d2, frame);
                                 d2.setVisible(true);
@@ -265,7 +265,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                    BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
             PositionWindow.placeDialog(dialog, frame);
             dialog.setVisible(true);

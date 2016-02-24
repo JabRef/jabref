@@ -26,11 +26,11 @@ import javax.swing.*;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.*;
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -44,9 +44,11 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private final boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
+    private final BibDatabaseContext bibDatabaseContext;
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
-        final EntryType type;
+
+        private final EntryType type;
 
 
         public TypeButton(String label, EntryType type) {
@@ -58,13 +60,19 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         public int compareTo(TypeButton o) {
             return type.getName().compareTo(o.type.getName());
         }
+
+        public EntryType getType() {
+            return type;
+        }
     }
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
         super(frame, true);
 
-        biblatexMode = Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE);
+        bibDatabaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
+        biblatexMode = bibDatabaseContext.isBiblatexMode();
+
 
         setTitle(Localization.lang("Select entry type"));
 
@@ -88,7 +96,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         panel.setLayout(new VerticalLayout());
 
         if(biblatexMode) {
-            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues()));
+            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(bibDatabaseContext.getMode())));
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
@@ -147,7 +155,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TypeButton) {
-            type = ((TypeButton) e.getSource()).type;
+            type = ((TypeButton) e.getSource()).getType();
         }
         dispose();
     }

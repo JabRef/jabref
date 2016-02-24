@@ -52,10 +52,11 @@ final public class PostgreSQLExporter extends DBExporter {
 
         Class.forName(drv).newInstance();
         try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword());
-             Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-                     "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDatabase()
-                             + '\'')) {
-            ResultSet rs = statement.getResultSet();
+                Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
+                        "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDatabase()
+                                + '\'');
+                ResultSet rs = statement.getResultSet()) {
+
             rs.next();
             if (rs.getInt("alreadyThere") == 0) {
                 SQLUtil.processQuery(conn, "CREATE DATABASE " + dbStrings.getDatabase());

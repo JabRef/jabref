@@ -21,14 +21,14 @@ import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.BstFunction;
 
 /**
- * 
+ *
  * The |built_in| function {\.{purify\$}} pops the top (string) literal, removes
  * nonalphanumeric characters except for |white_space| and |sep_char| characters
  * (these get converted to a |space|) and removes certain alphabetic characters
  * contained in the control sequences associated with a special character, and
  * pushes the resulting string. If the literal isn't a string, it complains and
  * pushes the null string.
- * 
+ *
  */
 public class PurifyFunction implements BstFunction {
 
@@ -43,7 +43,7 @@ public class PurifyFunction implements BstFunction {
     public void execute(BstEntry context) {
         Stack<Object> stack = vm.getStack();
 
-        if (stack.size() < 1) {
+        if (stack.isEmpty()) {
             throw new VMException("Not enough operands on stack for operation purify$");
         }
         Object o1 = stack.pop();

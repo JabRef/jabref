@@ -17,6 +17,7 @@ package net.sf.jabref.exporter;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -26,23 +27,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Class used to handle safe storage to disk.
- *
+ * <p>
  * Usage: create a SaveSession giving the file to save to, the encoding, and whether to make a backup. The SaveSession
  * will provide a Writer to store to, which actually goes to a temporary file. The Writer keeps track of whether all
  * characters could be saved, and if not, which characters were not encodable.
- *
+ * <p>
  * After saving is finished, the client should close the Writer. If the save should be put into effect, call commit(),
  * otherwise call cancel(). When cancelling, the temporary file is simply deleted and the target file remains unchanged.
  * When committing, the temporary file is copied to the target file after making a backup if requested and if the target
  * file already existed, and finally the temporary file is deleted.
- *
+ * <p>
  * If committing fails, the temporary file will not be deleted.
  */
 public class SaveSession {
@@ -55,7 +57,6 @@ public class SaveSession {
     private static final String TEMP_PREFIX = "jabref";
 
     private static final String TEMP_SUFFIX = "save.bib";
-    private final File file;
     private final File tmp;
     private final Charset encoding;
     private boolean backup;
@@ -63,14 +64,15 @@ public class SaveSession {
 
     private final VerifyingWriter writer;
 
+    private final List<FieldChange> undoableFieldChanges = new ArrayList<>();
 
-    public SaveSession(File file, Charset encoding, boolean backup) throws IOException, UnsupportedCharsetException {
-        this.file = file;
+
+    public SaveSession(Charset encoding, boolean backup) throws IOException {
         tmp = File.createTempFile(SaveSession.TEMP_PREFIX, SaveSession.TEMP_SUFFIX);
         useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
         this.backup = backup;
         this.encoding = encoding;
-	/* Using
+    /* Using
 	   try (FileOutputStream fos = new FileOutputStream(tmp)) {
 	       writer = new VerifyingWriter(fos, encoding);
 	   }
@@ -92,7 +94,7 @@ public class SaveSession {
         this.backup = useBackup;
     }
 
-    public void commit() throws SaveException {
+    public void commit(File file) throws SaveException {
         if (file == null) {
             return;
         }
@@ -110,7 +112,7 @@ public class SaveSession {
         try {
             if (useLockFile) {
                 try {
-                    if (createLockFile()) {
+                    if (createLockFile(file)) {
                         // Oops, the lock file already existed. Try to wait it out:
                         if (!FileBasedLock.waitForFileLock(file, 10)) {
                             throw SaveException.FILE_LOCKED;
@@ -132,15 +134,18 @@ public class SaveSession {
                     Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
         } finally {
             if (useLockFile) {
-                deleteLockFile();
+                deleteLockFile(file);
             }
         }
-
-        tmp.delete();
+        if (!tmp.delete()) {
+            LOGGER.info("Cannot delete temporary file");
+        }
     }
 
     public void cancel() {
-        tmp.delete();
+        if (!tmp.delete()) {
+            LOGGER.info("Cannot delete temporary file");
+        }
     }
 
     /**
@@ -149,14 +154,13 @@ public class SaveSession {
      * @return true if the lock file already existed
      * @throws IOException if something happens during creation.
      */
-    private boolean createLockFile() throws IOException {
+    private boolean createLockFile(File file) throws IOException {
         File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (lock.exists()) {
             return true;
         }
-        FileOutputStream out = new FileOutputStream(lock);
-        out.write(0);
-        try {
+        try (FileOutputStream out = new FileOutputStream(lock)) {
+            out.write(0);
             out.close();
         } catch (IOException ex) {
             LOGGER.error("Error when creating lock file.", ex);
@@ -171,16 +175,26 @@ public class SaveSession {
      * @return true if the lock file existed, false otherwise.
      * @throws IOException if something goes wrong.
      */
-    private boolean deleteLockFile() {
+    private boolean deleteLockFile(File file) {
         File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;
         }
-        lock.delete();
+        if (!lock.delete()) {
+            LOGGER.info("Cannot delete lock file");
+        }
         return true;
     }
 
     public File getTemporaryFile() {
         return tmp;
+    }
+
+    public List<FieldChange> getFieldChanges() {
+        return undoableFieldChanges;
+    }
+
+    public void addFieldChanges(List<FieldChange> undoableFieldChanges) {
+        this.undoableFieldChanges.addAll(undoableFieldChanges);
     }
 }

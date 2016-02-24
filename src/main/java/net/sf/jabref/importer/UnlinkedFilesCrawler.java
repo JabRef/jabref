@@ -2,6 +2,9 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.ChangeEvent;
@@ -18,7 +21,7 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directories only.
      */
-    private final static FileFilter DIRECTORY_FILTER = pathname -> pathname != null && pathname.isDirectory();
+    private final static FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
 
     private final BibDatabase database;
 
@@ -58,12 +61,24 @@ public class UnlinkedFilesCrawler {
             return null;
         }
 
-        File[] files = directory.listFiles(ff);
+        File[] filesArray = directory.listFiles(ff);
+        List<File> files;
+        if (filesArray == null) {
+            files = Collections.emptyList();
+        } else {
+            files = Arrays.asList(filesArray);
+        }
         CheckableTreeNode root = new CheckableTreeNode(null);
 
         int filesCount = 0;
 
-        File[] subDirectories = directory.listFiles(DIRECTORY_FILTER);
+        filesArray = directory.listFiles(DIRECTORY_FILTER);
+        List<File> subDirectories;
+        if (filesArray == null) {
+            subDirectories = Collections.emptyList();
+        } else {
+            subDirectories = Arrays.asList(filesArray);
+        }
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
             if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
@@ -72,7 +87,7 @@ public class UnlinkedFilesCrawler {
             }
         }
 
-        root.setUserObject(new FileNodeWrapper(directory, files.length + filesCount));
+        root.setUserObject(new FileNodeWrapper(directory, files.size() + filesCount));
 
         for (File file : files) {
             root.add(new CheckableTreeNode(new FileNodeWrapper(file)));

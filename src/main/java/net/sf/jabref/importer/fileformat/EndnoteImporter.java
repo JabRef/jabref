@@ -25,10 +25,9 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.util.Util;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -41,6 +40,9 @@ import net.sf.jabref.util.Util;
 public class EndnoteImporter extends ImportFormat {
 
     private static final String ENDOFRECORD = "__EOREOR__";
+
+    private static final Pattern A_PATTERN = Pattern.compile("%A .*");
+    private static final Pattern E_PATTERN = Pattern.compile("%E .*");
 
 
     /**
@@ -68,11 +70,9 @@ public class EndnoteImporter extends ImportFormat {
 
         // Our strategy is to look for the "%A *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("%A .*");
-        Pattern pat2 = Pattern.compile("%E .*");
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).matches() || pat2.matcher(str).matches()) {
+            if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
                 return true;
             }
         }
@@ -116,7 +116,7 @@ public class EndnoteImporter extends ImportFormat {
         for (String entry : entries) {
             hm.clear();
             author = "";
-            type = "";
+            type = "misc";
             editor = "";
             artnum = "";
 
@@ -251,7 +251,7 @@ public class EndnoteImporter extends ImportFormat {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, Util
+                    hm.put(BibEntry.KEY_FIELD, LabelPatternUtil
                             .checkLegalKey(val));
                 }
             }
@@ -275,8 +275,7 @@ public class EndnoteImporter extends ImportFormat {
                 hm.put("pages", artnum);
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
             //if (hm.isEmpty())

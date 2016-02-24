@@ -30,8 +30,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -63,6 +61,8 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.search.SearchMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -70,10 +70,8 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.rules.InvertSearchRule;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
+import net.sf.jabref.logic.search.matchers.NotMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.gui.undo.NamedCompound;
 
 import org.apache.commons.logging.Log;
@@ -195,13 +193,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
             }
         });
-        grayOut.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
-            }
-        });
+        grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
@@ -274,10 +266,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (settings.isVisible()) {
-                    // System.out.println("oee");
-                    // settings.setVisible(false);
-                } else {
+                if (!settings.isVisible()) {
                     JButton src = (JButton) e.getSource();
                     showNumberOfElements
                             .setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
@@ -621,8 +610,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeLeftPopupAction.setNode(node);
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
-            BibEntry[] selection = frame.getCurrentBasePanel().getSelectedEntries();
-            if (selection.length > 0) {
+            List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
+            if (selection.size() > 0) {
                 if (node.getGroup().supportsAdd() && !node.getGroup().containsAll(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
@@ -672,7 +661,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * @param node deletion != addition
      */
     private void updateGroupContent(GroupTreeNode node) {
-        BibEntry[] entries = panel.getSelectedEntries();
+        List<BibEntry> entries = panel.getSelectedEntries();
         AbstractGroup group = node.getGroup();
         AbstractUndoableEdit undoRemove = null;
         AbstractUndoableEdit undoAdd = null;
@@ -680,8 +669,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // Sort entries into current members and non-members of the group
         // Current members will be removed
         // Current non-members will be added
-        ArrayList<BibEntry> toRemove = new ArrayList<>(entries.length);
-        ArrayList<BibEntry> toAdd = new ArrayList<>(entries.length);
+        List<BibEntry> toRemove = new ArrayList<>(entries.size());
+        List<BibEntry> toAdd = new ArrayList<>(entries.size());
 
         for (BibEntry entry : entries) {
             // Sort according to current state of the entries
@@ -696,11 +685,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // If there are entries to remove
         if (!toRemove.isEmpty()) {
-            undoRemove = node.removeFromGroup(toRemove.toArray(new BibEntry[toRemove.size()]));
+            undoRemove = node.removeFromGroup(toRemove);
         }
         // If there are entries to add
         if (!toAdd.isEmpty()) {
-            undoAdd = node.addToGroup(toAdd.toArray(new BibEntry[toAdd.size()]));
+            undoAdd = node.addToGroup(toAdd);
         }
 
         // Remember undo information
@@ -752,46 +741,39 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     private void updateSelections() {
-        final SearchRuleSet searchRules = SearchRuleSets
-                .build(andCb.isSelected() ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
+        final MatcherSet searchRules = MatcherSets
+                .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
         TreePath[] selection = groupsTree.getSelectionPaths();
+        if(selection == null) {
+            selection = new TreePath[0];
+        }
 
         for (TreePath aSelection : selection) {
-            SearchRule searchRule = ((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule();
+            SearchMatcher searchRule = ((GroupTreeNode) aSelection.getLastPathComponent()).getSearchRule();
             searchRules.addRule(searchRule);
         }
-        SearchRule searchRule = invCb.isSelected() ? new InvertSearchRule(searchRules) : searchRules;
-        GroupingWorker worker = new GroupingWorker(searchRule, SearchRule.DUMMY_QUERY);
+        SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
+        GroupingWorker worker = new GroupingWorker(searchRule);
         worker.getWorker().run();
         worker.getCallBack().update();
-        /*panel.setGroupMatcher(new SearchMatcher(searchRules, searchOptions));
-        DatabaseSearch search = new DatabaseSearch(this, searchOptions, searchRules,
-                panel, Globals.GROUPSEARCH, floatCb.isSelected(), Globals.prefs
-                        .getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS),
-                //true,
-                select.isSelected());
-        search.start();*/
     }
 
 
     class GroupingWorker extends AbstractWorker {
 
-        private final SearchRule rules;
-        private final String searchTerm;
+        private final SearchMatcher matcher;
         private final List<BibEntry> matches = new ArrayList<>();
         private final boolean showOverlappingGroupsP;
 
-
-        public GroupingWorker(SearchRule rules, String searchTerm) {
-            this.rules = rules;
-            this.searchTerm = searchTerm;
+        public GroupingWorker(SearchMatcher matcher) {
+            this.matcher = matcher;
             showOverlappingGroupsP = showOverlappingGroups.isSelected();
         }
 
         @Override
         public void run() {
             for (BibEntry entry : panel.getDatabase().getEntries()) {
-                boolean hit = rules.applyRule(searchTerm, entry);
+                boolean hit = matcher.isMatch(entry);
                 entry.setGroupHit(hit);
                 if (hit && showOverlappingGroupsP) {
                     matches.add(entry);
@@ -1419,7 +1401,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.sidePaneManager.hide("groups");
             return;
         }
-        MetaData metaData = panel.metaData();
+        MetaData metaData = panel.getBibDatabaseContext().getMetaData();
         if (metaData.getGroups() == null) {
             GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
@@ -1447,39 +1429,40 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * Highlight all groups that contain any/all of the specified entries. If entries is null or has zero length,
      * highlight is cleared.
      */
-    public void showMatchingGroups(BibEntry[] entries, boolean requireAll) {
-        if ((entries == null) || (entries.length == 0)) { // nothing selected
+    public void showMatchingGroups(List<BibEntry> list, boolean requireAll) {
+        if ((list == null) || (list.isEmpty())) { // nothing selected
             groupsTree.setHighlight3Cells(null);
             groupsTree.revalidate();
             return;
         }
-        Vector<GroupTreeNode> vec = new Vector<>();
+        List<GroupTreeNode> nodeList = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.preorderEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
             AbstractGroup group = node.getGroup();
-            int i;
-            for (i = 0; i < entries.length; ++i) {
+            boolean breakFromLoop = false;
+            for (BibEntry entry : list) {
                 if (requireAll) {
-                    if (!group.contains(entries[i])) {
+                    if (!group.contains(entry)) {
+                        breakFromLoop = true;
                         break;
                     }
                 } else {
-                    if (group.contains(entries[i])) {
-                        vec.add(node);
+                    if (group.contains(entry)) {
+                        nodeList.add(node);
                     }
                 }
             }
-            if (requireAll && (i >= entries.length)) // did not break from loop
+            if (requireAll && (!breakFromLoop)) // did not break from loop
             {
-                vec.add(node);
+                nodeList.add(node);
             }
         }
-        groupsTree.setHighlight3Cells(vec.toArray());
+        groupsTree.setHighlight3Cells(nodeList.toArray());
         // ensure that all highlighted nodes are visible
-        for (int i = 0; i < vec.size(); ++i) {
-            GroupTreeNode node = (GroupTreeNode) vec.elementAt(i).getParent();
-            if (node != null) {
-                groupsTree.expandPath(new TreePath(node.getPath()));
+        for (GroupTreeNode node : nodeList) {
+            GroupTreeNode parentNode = (GroupTreeNode) node.getParent();
+            if (parentNode != null) {
+                groupsTree.expandPath(new TreePath(parentNode.getPath()));
             }
         }
         groupsTree.revalidate();
@@ -1492,9 +1475,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         List<GroupTreeNode> nodes = new ArrayList<>();
         for (Enumeration<GroupTreeNode> e = groupsRoot.depthFirstEnumeration(); e.hasMoreElements();) {
             GroupTreeNode node = e.nextElement();
-            SearchRule rule = node.getSearchRule();
+            SearchMatcher matcher = node.getSearchRule();
             for (BibEntry match : matches) {
-                if (rule.applyRule(SearchRule.DUMMY_QUERY, match)) {
+                if (matcher.isMatch(match)) {
                     nodes.add(node);
                     break;
                 }

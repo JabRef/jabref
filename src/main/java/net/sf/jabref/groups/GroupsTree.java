@@ -24,7 +24,9 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.InputEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JTree;
@@ -90,8 +92,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
                 .createDefaultDragGestureRecognizer(this,
                         DnDConstants.ACTION_MOVE, this);
-        // Eliminates right mouse clicks as valid actions
-        dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
+        if (dgr != null) {
+            // Eliminates right mouse clicks as valid actions
+            dgr.setSourceActions(dgr.getSourceActions() & ~InputEvent.BUTTON3_MASK);
+        }
         new DropTarget(this, this);
         setCellRenderer(localCellRenderer);
         setFocusable(false);
@@ -112,19 +116,20 @@ public class GroupsTree extends JTree implements DragSourceListener,
     @Override
     public void dragOver(DragSourceDragEvent dsde) {
         final Point p = dsde.getLocation(); // screen coordinates!
-        SwingUtilities.convertPointFromScreen(p, this);
-        final TreePath path = getPathForLocation(p.x, p.y);
-        if (path == null) {
-            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-            return;
+        if (p != null) {
+            SwingUtilities.convertPointFromScreen(p, this);
+            final TreePath path = getPathForLocation(p.x, p.y);
+            if (path == null) {
+                dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+                return;
+            }
+            final GroupTreeNode target = (GroupTreeNode) path.getLastPathComponent();
+            if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
+                dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
+                return;
+            }
+            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
         }
-        final GroupTreeNode target = (GroupTreeNode) path
-                .getLastPathComponent();
-        if ((target == null) || dragNode.isNodeDescendant(target) || (dragNode.equals(target))) {
-            dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveNoDrop);
-            return;
-        }
-        dsde.getDragSourceContext().setCursor(DragSource.DefaultMoveDrop);
     }
 
     @Override
@@ -274,7 +279,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 }
                 final TransferableEntrySelection selection = (TransferableEntrySelection) transferable
                         .getTransferData(TransferableEntrySelection.FLAVOR_INTERNAL);
-                final BibEntry[] entries = selection.getSelection();
+                final List<BibEntry> entries = selection.getSelection();
                 int assignedEntries = 0;
                 for (BibEntry entry : entries) {
                     if (!target.getGroup().contains(entry)) {
@@ -284,11 +289,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(
-                        new AbstractGroup[] {group},
-                        selection.getSelection(), groupSelector
-                                .getActiveBasePanel().getDatabase(),
-                        groupSelector.frame))
+                if (!Util.warnAssignmentSideEffects(Arrays.asList(group), groupSelector.frame))
                  {
                     return; // user aborted operation
                 }

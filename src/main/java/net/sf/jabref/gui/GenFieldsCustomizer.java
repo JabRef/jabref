@@ -17,7 +17,7 @@ package net.sf.jabref.gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Iterator;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import net.sf.jabref.*;
@@ -29,7 +29,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 /**
  * <p>Title: </p>
@@ -45,7 +45,7 @@ public class GenFieldsCustomizer extends JDialog {
     private final JPanel buttons = new JPanel();
     private final JButton ok = new JButton();
     private final JButton cancel = new JButton();
-    private JButton helpBut = new JButton();
+    private final JButton helpBut;
     private final JLabel jLabel1 = new JLabel();
     private final JPanel jPanel3 = new JPanel();
     private final JPanel jPanel4 = new JPanel();
@@ -54,40 +54,33 @@ public class GenFieldsCustomizer extends JDialog {
     private final JLabel jLabel2 = new JLabel();
     private final JTextArea fieldsArea = new JTextArea();
     private final GridBagLayout gridBagLayout2 = new GridBagLayout();
-    private final JabRefFrame parent;
+    private final JabRefFrame parentFrame;
     private final JButton revert = new JButton();
 
 
     public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
         super(frame, Localization.lang("Set general fields"), false);
-        parent = frame;
+        parentFrame = frame;
         helpBut = new HelpAction(HelpFiles.generalFieldsHelp).getHelpButton();
-        try {
-            jbInit();
-            setSize(new Dimension(650, 300));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        jbInit();
+        setSize(new Dimension(650, 300));
     }
 
     private void jbInit() {
         ok.setText(Localization.lang("OK"));
-        ok.addActionListener(new GenFieldsCustomizer_ok_actionAdapter(this));
+        ok.addActionListener(new GenFieldsCustomizerOKActionAdapter(this));
         cancel.setText(Localization.lang("Cancel"));
-        cancel.addActionListener(new GenFieldsCustomizer_cancel_actionAdapter(this));
-        //buttons.setBackground(GUIGlobals.lightGray);
+        cancel.addActionListener(new GenFieldsCustomizerCancelActionAdapter(this));
         jLabel1.setText(Localization.lang("Delimit fields with semicolon, ex.") + ": url;pdf;note");
         jPanel3.setLayout(gridBagLayout2);
         jPanel4.setBorder(BorderFactory.createEtchedBorder());
         jPanel4.setLayout(gridBagLayout1);
         jLabel2.setText(Localization.lang("General fields"));
 
-        //    fieldsArea.setText(parent.prefs.get(JabRefPreferences.GENERAL_FIELDS));
         setFieldsText();
 
-        //jPanel3.setBackground(GUIGlobals.lightGray);
         revert.setText(Localization.lang("Default"));
-        revert.addActionListener(new GenFieldsCustomizer_revert_actionAdapter(this));
+        revert.addActionListener(new GenFieldsCustomizerRevertActionAdapter(this));
         this.getContentPane().add(buttons, BorderLayout.SOUTH);
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -119,13 +112,12 @@ public class GenFieldsCustomizer extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                //diag.requestFocus();
             }
         });
 
     }
 
-    void ok_actionPerformed(ActionEvent e) {
+    void okActionPerformed() {
         String[] lines = fieldsArea.getText().split("\n");
         int i = 0;
         for (; i < lines.length; i++) {
@@ -138,7 +130,7 @@ public class GenFieldsCustomizer extends JDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = Util.checkLegalKey(parts[1]);
+            String testString = LabelPatternUtil.checkLegalKey(parts[1]);
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
                 JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
@@ -160,39 +152,30 @@ public class GenFieldsCustomizer extends JDialog {
         parent.prefs.putStringArray(JabRefPreferences.GENERAL_FIELDS, Util.split(delimStr, ";"));
         */
 
-        parent.removeCachedEntryEditors();
+        parentFrame.removeCachedEntryEditors();
         dispose();
-        //diag.requestFocus();
     }
 
-    void cancel_actionPerformed(ActionEvent e) {
+    void cancelActionPerformed() {
         dispose();
-        //diag.requestFocus();
     }
 
     private void setFieldsText() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
             sb.append(tabList.getTabName(i));
             sb.append(':');
-            for (Iterator<String> j = tabList.getTabFields(i).iterator(); j
-                    .hasNext();) {
-                String field = j.next();
-                sb.append(field);
-                if (j.hasNext()) {
-                    sb.append(';');
-                }
-            }
+            sb.append(String.join(";", tabList.getTabFields(i)));
             sb.append('\n');
         }
 
         fieldsArea.setText(sb.toString());
     }
 
-    void revert_actionPerformed(ActionEvent e) {
-        StringBuffer sb = new StringBuffer();
+    void revertActionPerformed() {
+        StringBuilder sb = new StringBuilder();
         String name;
         String fields;
         int i = 0;
@@ -211,47 +194,47 @@ public class GenFieldsCustomizer extends JDialog {
     }
 }
 
-class GenFieldsCustomizer_ok_actionAdapter implements java.awt.event.ActionListener {
+class GenFieldsCustomizerOKActionAdapter implements ActionListener {
 
     private final GenFieldsCustomizer adaptee;
 
 
-    GenFieldsCustomizer_ok_actionAdapter(GenFieldsCustomizer adaptee) {
+    GenFieldsCustomizerOKActionAdapter(GenFieldsCustomizer adaptee) {
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.ok_actionPerformed(e);
+        adaptee.okActionPerformed();
     }
 }
 
-class GenFieldsCustomizer_cancel_actionAdapter implements java.awt.event.ActionListener {
+class GenFieldsCustomizerCancelActionAdapter implements ActionListener {
 
     private final GenFieldsCustomizer adaptee;
 
 
-    GenFieldsCustomizer_cancel_actionAdapter(GenFieldsCustomizer adaptee) {
+    GenFieldsCustomizerCancelActionAdapter(GenFieldsCustomizer adaptee) {
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.cancel_actionPerformed(e);
+        adaptee.cancelActionPerformed();
     }
 }
 
-class GenFieldsCustomizer_revert_actionAdapter implements java.awt.event.ActionListener {
+class GenFieldsCustomizerRevertActionAdapter implements ActionListener {
 
     private final GenFieldsCustomizer adaptee;
 
 
-    GenFieldsCustomizer_revert_actionAdapter(GenFieldsCustomizer adaptee) {
+    GenFieldsCustomizerRevertActionAdapter(GenFieldsCustomizer adaptee) {
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.revert_actionPerformed(e);
+        adaptee.revertActionPerformed();
     }
 }

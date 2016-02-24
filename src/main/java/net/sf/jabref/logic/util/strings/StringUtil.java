@@ -17,7 +17,9 @@ package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,10 @@ public class StringUtil {
 
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
+
+    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+
+    public static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
@@ -75,15 +81,6 @@ public class StringUtil {
             stringBuilder.append(strings[i]).append(separator);
         }
         return stringBuilder.append(strings[to - 1]).toString();
-    }
-
-    public static String join(Collection<String> strings, String separator) {
-        String[] arr = strings.toArray(new String[strings.size()]);
-        return join(arr, separator, 0, arr.length);
-    }
-
-    public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
     }
 
     /**
@@ -222,35 +219,6 @@ public class StringUtil {
     }
 
     /**
-     * Quote special characters.
-     *
-     * @param toQuote         The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting
-     *                  character itself, which is automatically quoted.
-     * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting
-     * character itself) quoted.
-     */
-    public static String quote(String toQuote, String specials, char quoteChar) {
-        StringBuilder result = new StringBuilder();
-        char c;
-        boolean isSpecial;
-        for (int i = 0; i < toQuote.length(); ++i) {
-            c = toQuote.charAt(i);
-
-            isSpecial = (c == quoteChar);
-            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
-            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
-
-            if (isSpecial) {
-                result.append(quoteChar);
-            }
-            result.append(c);
-        }
-        return result.toString();
-    }
-
-    /**
      * Unquote special characters.
      *
      * @param toUnquote         The String which may contain quoted special characters.
@@ -290,9 +258,9 @@ public class StringUtil {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<>();
+        List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        List<String> thisEntry = new ArrayList<>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -424,7 +392,6 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
-        final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
@@ -486,16 +453,16 @@ public class StringUtil {
      * @return the int value of str
      */
     public static int intValueOf(String str) {
-        int ival = 0;
         int idx = 0;
         int end;
         boolean sign = false;
         char ch;
-    
+
         if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
             throw new NumberFormatException(str);
         }
-    
+
+        int ival = 0;
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
@@ -506,4 +473,111 @@ public class StringUtil {
             }
         }
     }
+
+    /**
+     * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * <p>
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public static String stripNonValidXMLCharacters(String in) {
+        if ((in == null) || in.isEmpty()) {
+            return ""; // vacancy test.
+        }
+        StringBuilder out = new StringBuilder(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+                out.append(current);
+            }
+        }
+        return out.toString();
+    }
+
+    /*
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
+    public static List<String> tokenizeToList(String buf, String delimstr)
+    {
+        List<String> list = new ArrayList<>();
+        buf = buf + '\n';
+
+        StringTokenizer st = new StringTokenizer(buf, delimstr);
+
+        while (st.hasMoreTokens()) {
+            list.add(st.nextToken());
+        }
+
+        return list;
+    }
+
+    /**
+     * Quote special characters.
+     *
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @return A String with every special character (including the quoting
+     * character itself) quoted.
+     */
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        if (toQuote == null) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        char c;
+        boolean isSpecial;
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
+
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+
+            if (isSpecial) {
+                result.append(quoteChar);
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
+
+    public static String limitStringLength(String s, int maxLength) {
+        if (s == null) {
+            return "";
+        }
+
+        if (s.length() <= maxLength) {
+            return s;
+        }
+
+        return s.substring(0, maxLength - 3) + "...";
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        String result = s;
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
+            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return result;
+    }
+
 }

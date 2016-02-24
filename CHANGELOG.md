@@ -13,6 +13,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
+- Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
 - Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
 - Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
@@ -20,8 +22,16 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
 - Improved layout for OSX: Toolbar buttons and search field
 - Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
+- BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
+- Moved all quality-related database actions inside a new quality menu
+- [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
+- Moved default bibliography mode to general preferences tab
+- Added Ordinal formatter (1 -> 1st etc)
+
+- [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
 
 ### Fixed
+- Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
 - Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
@@ -34,7 +44,14 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
 - IEEEXplore fetcher replaces keyword separator with the preferred
 - Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
+- Merge from DOI now honors removed fields
+- Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
+- Fixed [#824](https://github.com/JabRef/jabref/issues/824): MimeTypeDetector can now also handle local file links
+- Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
+- Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
+- Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
 
+- Fixed [#685](https://github.com/JabRef/jabref/issues/685): Fixed MySQL exporting for more than one entry
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
@@ -42,8 +59,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed save session functionality as it just saved the last opened tabs which is done by default
 - Removed CLI option -l to load a session
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
-
-
+- Removed PDF preview functionality
+- Removed Sixpackimporter it is not used in the wild anymore
 
 
 

@@ -21,6 +21,10 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.FileField;
 
 import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -88,10 +92,34 @@ import java.io.IOException;
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
+    private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
+
     private String fileType;
     private List<FormatEntry> format;
     private final Map<String, String> replacements = new HashMap<>();
 
+
+    // Define codes for the various escape sequences that can be inserted:
+    private static final int STRING = 0;
+    private static final int ITERATION_COUNT = 1;
+    private static final int FILE_PATH = 2;
+    private static final int FILE_TYPE = 3;
+    private static final int FILE_EXTENSION = 4;
+    private static final int FILE_DESCRIPTION = 5;
+    private static final int RELATIVE_FILE_PATH = 6;
+
+    // Define which escape sequences give what results:
+    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
+
+
+    static {
+        WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
+        WrapFileLinks.ESCAPE_SEQ.put('p', WrapFileLinks.FILE_PATH);
+        WrapFileLinks.ESCAPE_SEQ.put('r', WrapFileLinks.RELATIVE_FILE_PATH);
+        WrapFileLinks.ESCAPE_SEQ.put('f', WrapFileLinks.FILE_TYPE);
+        WrapFileLinks.ESCAPE_SEQ.put('x', WrapFileLinks.FILE_EXTENSION);
+        WrapFileLinks.ESCAPE_SEQ.put('d', WrapFileLinks.FILE_DESCRIPTION);
+    }
 
     @Override
     public void setArgument(String arg) {
@@ -109,11 +137,12 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     @Override
     public String format(String field) {
-        StringBuilder sb = new StringBuilder();
 
         if (field == null) {
             return "";
         }
+
+        StringBuilder sb = new StringBuilder();
         // Build the list containing the links:
         List<FileField.ParsedFileField> fileList = FileField.parse(field);
 
@@ -136,25 +165,25 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         // but that is not available from a formatter. Therefore, as an
                         // ugly hack, the export routine has set a global variable before
                         // starting the export, which contains the database's file directory:
-                        if (Globals.prefs.fileDirForDatabase != null) {
-                            dirs = Globals.prefs.fileDirForDatabase;
-                        } else {
+                        if (Globals.prefs.fileDirForDatabase == null) {
                             dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
+                        } else {
+                            dirs = Globals.prefs.fileDirForDatabase;
                         }
 
-                        File f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
+                        Optional<File> f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
 
                         /*
                          * Stumbled over this while investigating
                          *
                          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
                          */
-                        if (f != null) {
+                        if (f.isPresent()) {
                             try {
-                                sb.append(replaceStrings(f.getCanonicalPath()));//f.toURI().toString();
+                                sb.append(replaceStrings(f.get().getCanonicalPath()));//f.toURI().toString();
                             } catch (IOException ex) {
-                                ex.printStackTrace();
-                                sb.append(replaceStrings(f.getPath()));
+                                LOGGER.warn("Problem getting path", ex);
+                                sb.append(replaceStrings(f.get().getPath()));
                             }
                         } else {
                             sb.append(replaceStrings(flEntry.link));
@@ -198,28 +227,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         }
         return text;
 
-    }
-
-
-    // Define codes for the various escape sequences that can be inserted:
-    private static final int STRING = 0;
-    private static final int ITERATION_COUNT = 1;
-    private static final int FILE_PATH = 2;
-    private static final int FILE_TYPE = 3;
-    private static final int FILE_EXTENSION = 4;
-    private static final int FILE_DESCRIPTION = 5;
-    private static final int RELATIVE_FILE_PATH = 6;
-
-    // Define which escape sequences give what results:
-    private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
-
-    static {
-        WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
-        WrapFileLinks.ESCAPE_SEQ.put('p', WrapFileLinks.FILE_PATH);
-        WrapFileLinks.ESCAPE_SEQ.put('r', WrapFileLinks.RELATIVE_FILE_PATH);
-        WrapFileLinks.ESCAPE_SEQ.put('f', WrapFileLinks.FILE_TYPE);
-        WrapFileLinks.ESCAPE_SEQ.put('x', WrapFileLinks.FILE_EXTENSION);
-        WrapFileLinks.ESCAPE_SEQ.put('d', WrapFileLinks.FILE_DESCRIPTION);
     }
 
 

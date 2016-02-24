@@ -16,18 +16,18 @@
 package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 
+import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 public class JournalAbbreviationsUtil {
 
-    public static TableModel getTableModel(JournalAbbreviationRepository journalAbbreviationRepository) {
-        Object[][] cells = new Object[journalAbbreviationRepository.size()][2];
+    public static TableModel getTableModel(Collection<Abbreviation> abbreviations) {
+        Object[][] cells = new Object[abbreviations.size()][2];
         int row = 0;
-        for (Abbreviation abbreviation : journalAbbreviationRepository.getAbbreviations()) {
+        for (Abbreviation abbreviation : abbreviations) {
             cells[row][0] = abbreviation.getName();
             cells[row][1] = abbreviation.getIsoAbbreviation();
             row++;

@@ -26,9 +26,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,10 +47,10 @@ import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -63,6 +63,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private static final Pattern PUBLICATION_PATTERN = Pattern.compile("(.*), \\d*\\.*\\s?(.*)");
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
+    private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
+
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -70,9 +72,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
+    private final JournalAbbreviationLoader abbreviationLoader;
 
-    public IEEEXploreFetcher() {
+
+    public IEEEXploreFetcher(JournalAbbreviationLoader abbreviationLoader) {
         super();
+        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
         CookieHandler.setDefault(new CookieManager());
     }
 
@@ -99,14 +104,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
         try {
             //open the search URL
             URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            URLDownload dl = new URLDownload(url);
 
             //add request header
-            con.setRequestProperty("Accept", "application/json");
-            con.setRequestProperty("Content-type", "application/json");
+            dl.addParameters("Accept", "application/json");
+            dl.addParameters("Content-Type", "application/json");
+
+            // set post data
+            dl.setPostData(postData);
 
             //retrieve the search results
-            String page = Util.getPostResults(con, postData, StandardCharsets.UTF_8);
+            String page = dl.downloadToString(StandardCharsets.UTF_8);
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
@@ -137,7 +146,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //fetch the raw Bibtex results from IEEEXplore
             URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
-            String bibtexPage = Util.getResults(bibtexURL);
+            String bibtexPage = new URLDownload(bibtexURL).downloadToString();
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
@@ -320,8 +329,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             month = month.replace(".", "");
             month = month.toLowerCase();
 
-            Pattern monthPattern = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
-            Matcher mm = monthPattern.matcher(month);
+            Matcher mm = MONTH_PATTERN.matcher(month);
             String date = month;
             if (mm.find()) {
                 if (mm.group(3).isEmpty()) {
@@ -432,7 +440,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = Abbreviations.journalAbbrev.getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = abbreviationLoader.getRepository().getMedlineAbbreviation(fullName).orElse(fullName);
                 }
             }
             if ("inproceedings".equals(type)) {

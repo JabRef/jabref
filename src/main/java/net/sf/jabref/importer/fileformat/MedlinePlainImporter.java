@@ -30,7 +30,6 @@ import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.bibtex.EntryTypes;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -41,6 +40,11 @@ import net.sf.jabref.bibtex.EntryTypes;
  * @author vegeziel
  */
 public class MedlinePlainImporter extends ImportFormat {
+
+    private static final Pattern PMID_PATTERN = Pattern.compile("PMID.*-.*");
+    private static final Pattern PMC_PATTERN = Pattern.compile("PMC.*-.*");
+    private static final Pattern PMCR_PATTERN = Pattern.compile("PMCR.*-.*");
+
 
     /**
      * Return the name of this import format.
@@ -68,13 +72,11 @@ public class MedlinePlainImporter extends ImportFormat {
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("PMID.*-.*");
-        Pattern pat2 = Pattern.compile("PMC.*-.*");
-        Pattern pat3 = Pattern.compile("PMCR.*-.*");
 
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find() || pat2.matcher(str).find() || pat3.matcher(str).find()) {
+            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
+                    || PMCR_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
@@ -105,7 +107,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 continue;
             }
 
-            String type = "";
+            String type = "misc";
             String author = "";
             String editor = "";
             String comment = "";
@@ -261,8 +263,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put("comment", comment);
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

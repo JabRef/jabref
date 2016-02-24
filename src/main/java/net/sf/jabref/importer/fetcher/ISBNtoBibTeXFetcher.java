@@ -103,7 +103,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
-            status.showMessage(Localization.lang("Invalid ISBN"));
+            status.showMessage(Localization.lang("No entry found for IBSN %0 at www.ebook.de", query));
             return false;
         } catch (java.net.UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host

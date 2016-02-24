@@ -42,6 +42,7 @@ import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -86,13 +87,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-            String[] chosenStrings = FileDialogs.getMultipleFiles(frame,
+            List<String> chosenStrings = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
-            if (chosenStrings != null) {
-                for (String chosen : chosenStrings) {
-                    if (chosen != null) {
-                        filesToOpen.add(new File(chosen));
-                    }
+            for (String chosen : chosenStrings) {
+                if (chosen != null) {
+                    filesToOpen.add(new File(chosen));
                 }
             }
         } else {
@@ -156,7 +155,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getDatabaseFile() != null) && basePanel.getDatabaseFile().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null) && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -190,7 +189,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getDatabaseFile().getPath()));
+            frame.output(Localization.lang("File '%0' is already open.", toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
@@ -336,15 +335,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-                }
-            });
+            JabRefExecutorService.INSTANCE.execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
-        BasePanel basePanel = new BasePanel(frame, database, file, meta, result.getEncoding());
+
+        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
@@ -409,7 +404,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if (encoding.isPresent()) {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
-            } catch (Exception ex) {
+            } catch (IOException ex) {
                 LOGGER.warn("Problem getting reader", ex);
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
@@ -443,8 +438,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     // Signature line, so keep reading and skip to next line
                 } else if (line.startsWith(Globals.encPrefix)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    // Except if there is already a @ symbol signalising the starting of a BibEntry
-                    Integer atSymbolIndex = line.indexOf("@");
+                    // Except if there is already a @ symbol signaling the starting of a BibEntry
+                    Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
                         encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);

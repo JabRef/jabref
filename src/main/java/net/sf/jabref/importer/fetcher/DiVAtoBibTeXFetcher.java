@@ -36,7 +36,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.net.URLDownload;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
@@ -78,7 +78,9 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
         String bibtexString;
         try {
-            bibtexString = Util.getResultsWithEncoding(url, StandardCharsets.UTF_8);
+            URLDownload dl = new URLDownload(url);
+
+            bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             status.showMessage(Localization.lang("Unknown DiVA entry: '%0'.",
                             query),
@@ -108,7 +110,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             entry.getFieldOptional("institution")
                     .ifPresent(institution -> entry.setField("institution", htmlConverter.formatUnicode(institution)));
             // Do not use the provided key
-            // entry.clearField(BibtexFields.KEY_FIELD);
+            // entry.clearField(InternalBibtexFields.KEY_FIELD);
             inspector.addEntry(entry);
 
             return true;

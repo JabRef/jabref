@@ -41,6 +41,8 @@ public class BibteXMLImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(BibteXMLImporter.class);
 
+    private static final Pattern START_PATTERN = Pattern.compile("<bibtex:file .*");
+
 
     /**
      * Return the name of this import format.
@@ -68,10 +70,9 @@ public class BibteXMLImporter extends ImportFormat {
 
         // Our strategy is to look for the "<bibtex:file *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("<bibtex:file .*");
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find()) {
+            if (START_PATTERN.matcher(str).find()) {
                 return true;
             }
         }

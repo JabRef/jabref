@@ -22,6 +22,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.*;
 
@@ -104,11 +105,7 @@ public class ImportDialog extends JDialog {
             this.radioButtononlyAttachPDF.setEnabled(false);
         }
         String name = new File(fileName).getName();
-        if (name.length() < 34) {
-            labelFileName.setText(name);
-        } else {
-            labelFileName.setText(new File(fileName).getName().substring(0, 33) + "...");
-        }
+        labelFileName.setText(StringUtil.limitStringLength(name, 34));
         this.setTitle(Localization.lang("Import_Metadata_From_PDF"));
 
         setModal(true);
@@ -210,7 +207,7 @@ public class ImportDialog extends JDialog {
         }
     }
 
-    public boolean getDoNotShowAgain() {
+    public boolean isDoNotShowAgain() {
         return this.checkBoxDoNotShowAgain.isSelected();
     }
 

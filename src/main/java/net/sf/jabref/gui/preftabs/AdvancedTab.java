@@ -29,13 +29,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import net.sf.jabref.*;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.logic.journals.Abbreviations;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
@@ -60,7 +58,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final RemotePreferences remotePreferences;
 
 
-    public AdvancedTab(JabRefPreferences prefs, AboutDialog diag, JabRef jabRef) {
+    public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
         this.jabRef = jabRef;
         preferences = prefs;
         this.remotePreferences = new RemotePreferences(preferences);
@@ -150,6 +148,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);
+
         builder.nextLine();
         builder.appendSeparator(Localization.lang("Import conversions"));
         builder.nextLine();
@@ -191,7 +190,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-            Abbreviations.initializeJournalNames(preferences);
+            Globals.journalAbbreviationLoader.update(preferences);
         }
         storeRemoteSettings();
 

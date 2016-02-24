@@ -26,8 +26,9 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,6 +41,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -124,7 +126,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         try {
             URL url = new URL(address);
 
-            String page = Util.getResults(url);
+            URLDownload dl = new URLDownload(url);
+
+            String page = dl.downloadToString();
 
             String resultsFound = "<div id=\"resfound\">";
             int hits = getNumberOfHits(page, resultsFound, ACMPortalFetcher.HITS_PATTERN);
@@ -323,7 +327,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             // set user-agent to avoid being blocked as a crawler
             connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
             Collection<BibEntry> items = null;
-            try(BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")))) {
                 items = BibtexParser.parse(in).getDatabase().getEntries();
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
@@ -337,7 +342,10 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             // get abstract
             if (downloadAbstract) {
                 url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
-                String page = Util.getResults(url);
+                URLDownload dl = new URLDownload(url);
+
+                String page = dl.downloadToString();
+
                 Matcher absM = ACMPortalFetcher.ABSTRACT_PATTERN.matcher(page);
                 if (absM.find()) {
                     entry.setField("abstract", absM.group(1).trim());

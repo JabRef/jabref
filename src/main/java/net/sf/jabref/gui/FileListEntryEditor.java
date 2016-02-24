@@ -40,6 +40,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -73,7 +74,7 @@ public class FileListEntryEditor {
     private boolean openBrowseWhenShown;
     private boolean dontOpenBrowseUntilDisposed;
 
-    private static final Pattern remoteLinkPattern = Pattern.compile("[a-z]+://.*");
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
@@ -217,7 +218,7 @@ public class FileListEntryEditor {
         if ((types.getSelectedIndex() == -1) && (!link.getText().trim().isEmpty())) {
 
             // Check if this looks like a remote link:
-            if (FileListEntryEditor.remoteLinkPattern.matcher(link.getText()).matches()) {
+            if (FileListEntryEditor.REMOTE_LINK_PATTERN.matcher(link.getText()).matches()) {
                 ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
                 if (type != null) {
                     types.setSelectedItem(type);
@@ -284,7 +285,9 @@ public class FileListEntryEditor {
         link.setText(entry.link);
         //if (link.getText().length() > 0)
         //    checkExtension();
-        types.setModel(new DefaultComboBoxModel<>(ExternalFileTypes.getInstance().getExternalFileTypeSelection()));
+        Collection<ExternalFileType> list = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+
+        types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
         if ((entry.type != null) && !(entry.type instanceof UnknownExternalFileType)) {

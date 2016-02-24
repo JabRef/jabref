@@ -65,24 +65,18 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         // First check the (legacy) "pdf" field:
         String pdf = entry.getField("pdf");
-        List<String> dirs = panel.metaData().getFileDirectory("pdf");
-        File f = FileUtil.expandFilename(pdf, dirs);
-        if (f != null) {
-            files.add(f);
-        }
+        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
+        FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
         // Then check the "file" field:
-        dirs = panel.metaData().getFileDirectory(Globals.FILE_FIELD);
+        dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
         if (entry.hasField(Globals.FILE_FIELD)) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField(Globals.FILE_FIELD));
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.type != null) && "pdf".equals(flEntry.type.getName().toLowerCase())) {
-                    f = FileUtil.expandFilename(flEntry.link, dirs);
-                    if (f != null) {
-                        files.add(f);
-                    }
+                    FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
                 }
             }
         }

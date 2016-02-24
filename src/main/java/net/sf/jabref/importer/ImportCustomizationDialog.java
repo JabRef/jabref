@@ -87,11 +87,13 @@ public class ImportCustomizationDialog extends JDialog {
             className = path.getName() + (className == null ? "" : "." + className);
             path = path.getParentFile();
         }
-        int lastDot = className.lastIndexOf('.');
-        if (lastDot < 0) {
-            return className;
+        if (className != null) {
+            int lastDot = className.lastIndexOf('.');
+            if (lastDot < 0) {
+                return className;
+            }
+            className = className.substring(0, lastDot);
         }
-        className = className.substring(0, lastDot);
         return className;
     }
 
@@ -191,7 +193,8 @@ public class ImportCustomizationDialog extends JDialog {
                     try {
                         ImportFormat importFormat = importer.getInstance();
                         JOptionPane.showMessageDialog(frame, importFormat.getDescription());
-                    } catch (Exception exc) {
+                    } catch (IOException | ClassNotFoundException | InstantiationException |
+                            IllegalAccessException exc) {
                         LOGGER.warn("Could not instantiate importer " + importer.getName(), exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }

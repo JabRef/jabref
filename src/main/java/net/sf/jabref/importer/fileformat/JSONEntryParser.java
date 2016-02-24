@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -168,11 +167,11 @@ public class JSONEntryParser {
         String isbn = springerJsonEntry.optString("isbn");
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
-            entry.setType(EntryTypes.getType("article"));
+            entry.setType("article");
             nametype = "journal";
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType(EntryTypes.getType("incollection"));
+            entry.setType("incollection");
             nametype = "booktitle";
             entry.setField("isbn", isbn);
         }

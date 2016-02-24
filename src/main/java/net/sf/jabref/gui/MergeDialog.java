@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,8 +24,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>Title: MergeDialog</p>
@@ -36,13 +40,14 @@ import javax.swing.*;
 
 public class MergeDialog extends JDialog {
 
+    private static final Log LOGGER = LogFactory.getLog(MergeDialog.class);
+
     private final JPanel panel1 = new JPanel();
     private final BorderLayout borderLayout1 = new BorderLayout();
     private final JPanel jPanel1 = new JPanel();
     private final JPanel jPanel2 = new JPanel();
     private final JButton ok = new JButton();
-    private final JButton Cancel = new JButton();
-    //TitledBorder titledBorder1;
+    private final JButton cancel = new JButton();
     private final JCheckBox entries = new JCheckBox();
     private final JCheckBox strings = new JCheckBox();
     private final GridBagLayout gridBagLayout1 = new GridBagLayout();
@@ -51,28 +56,22 @@ public class MergeDialog extends JDialog {
 
     private boolean okPressed;
 
+    public MergeDialog(JabRefFrame frame, String title, boolean modal) {
+        super(frame, title, modal);
+        jbInit();
+        pack();
+    }
 
     public boolean isOkPressed() {
         return okPressed;
     }
 
-    public MergeDialog(JabRefFrame frame, String title, boolean modal) {
-        super(frame, title, modal);
-        try {
-            jbInit(frame);
-            pack();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private void jbInit(JabRefFrame parent) {
-        //  titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153),2),Globals.lang("Options"));
+    private void jbInit() {
         panel1.setLayout(borderLayout1);
         ok.setText(Localization.lang("OK"));
-        ok.addActionListener(new MergeDialog_ok_actionAdapter(this));
-        Cancel.setText(Localization.lang("Cancel"));
-        Cancel.addActionListener(new MergeDialog_Cancel_actionAdapter(this));
+        ok.addActionListener(new MergeDialogOKActionAdapter(this));
+        cancel.setText(Localization.lang("Cancel"));
+        cancel.addActionListener(new MergeDialogCancelActionAdapter(this));
         jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel1.setLayout(gridBagLayout1);
         entries.setSelected(true);
@@ -86,7 +85,7 @@ public class MergeDialog extends JDialog {
         getContentPane().add(panel1);
         panel1.add(jPanel2, BorderLayout.SOUTH);
         jPanel2.add(ok, null);
-        jPanel2.add(Cancel, null);
+        jPanel2.add(cancel, null);
         panel1.add(jPanel1, BorderLayout.CENTER);
         jPanel1.add(entries, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
                 , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
@@ -111,12 +110,12 @@ public class MergeDialog extends JDialog {
 
     }
 
-    void ok_actionPerformed(ActionEvent e) {
+    void okActionPerformed() {
         okPressed = true;
         dispose();
     }
 
-    void Cancel_actionPerformed(ActionEvent e) {
+    void cancelActionPerformed() {
         dispose();
     }
 
@@ -141,32 +140,32 @@ public class MergeDialog extends JDialog {
     }
 }
 
-class MergeDialog_ok_actionAdapter implements java.awt.event.ActionListener {
+class MergeDialogOKActionAdapter implements ActionListener {
 
     private final MergeDialog adaptee;
 
 
-    MergeDialog_ok_actionAdapter(MergeDialog adaptee) {
+    MergeDialogOKActionAdapter(MergeDialog adaptee) {
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.ok_actionPerformed(e);
+        adaptee.okActionPerformed();
     }
 }
 
-class MergeDialog_Cancel_actionAdapter implements java.awt.event.ActionListener {
+class MergeDialogCancelActionAdapter implements ActionListener {
 
     private final MergeDialog adaptee;
 
 
-    MergeDialog_Cancel_actionAdapter(MergeDialog adaptee) {
+    MergeDialogCancelActionAdapter(MergeDialog adaptee) {
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        adaptee.Cancel_actionPerformed(e);
+        adaptee.cancelActionPerformed();
     }
 }

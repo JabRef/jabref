@@ -48,9 +48,9 @@ import net.sf.jabref.gui.util.FirstColumnComparator;
 import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.IsMarkedComparator;
 import net.sf.jabref.gui.util.RankingFieldComparator;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.search.matchers.SearchMatcher;
+import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.TypedBibEntry;
@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.logic.search.HitOrMissComparator;
+import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -114,14 +114,14 @@ public class MainTable extends JTable {
     private static GeneralRenderer grayedOutRenderer;
     private static GeneralRenderer veryGrayedOutRenderer;
 
-    private static GeneralRenderer[] markedRenderers;
+    private static List<GeneralRenderer> markedRenderers;
 
     private static IncompleteRenderer incRenderer;
     private static CompleteRenderer compRenderer;
     private static CompleteRenderer grayedOutNumberRenderer;
     private static CompleteRenderer veryGrayedOutNumberRenderer;
 
-    private static CompleteRenderer[] markedNumberRenderers;
+    private static List<CompleteRenderer> markedNumberRenderers;
 
 
     static {
@@ -307,7 +307,8 @@ public class MainTable extends JTable {
 
         Rectangle bounds = getCellRect(row, col, false);
 
-        if ((comp.getPreferredSize().width > bounds.width) && (getValueAt(row, col) != null)) {
+        Dimension d = comp.getPreferredSize();
+        if ((d != null) && (d.width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }
         return toolTipText;
@@ -353,8 +354,8 @@ public class MainTable extends JTable {
                 int marking = isMarked(row);
                 if (marking > 0) {
                     marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-                    renderer = MainTable.markedNumberRenderers[marking - 1];
-                    MainTable.markedNumberRenderers[marking - 1].setNumber(row);
+                    renderer = MainTable.markedNumberRenderers.get(marking - 1);
+                    MainTable.markedNumberRenderers.get(marking - 1).setNumber(row);
                 } else {
                     renderer = MainTable.compRenderer;
                 }
@@ -379,7 +380,7 @@ public class MainTable extends JTable {
         int marking = isMarked(row);
         if ((column != 0) && (marking > 0)) {
             marking = Math.min(marking, EntryMarker.MARK_COLOR_LEVELS);
-            renderer = MainTable.markedRenderers[marking - 1];
+            renderer = MainTable.markedRenderers.get(marking - 1);
         }
 
         return renderer;
@@ -428,9 +429,8 @@ public class MainTable extends JTable {
     /**
      * @return the return value is never null
      */
-    public BibEntry[] getSelectedEntries() {
-        final BibEntry[] BE_ARRAY = new BibEntry[0];
-        return getSelected().toArray(BE_ARRAY);
+    public List<BibEntry> getSelectedEntries() {
+        return new ArrayList<>(getSelected());
     }
 
     private List<Boolean> getCurrentSortOrder() {
@@ -467,7 +467,7 @@ public class MainTable extends JTable {
         // First column:
         List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
-        comparators.add(new FirstColumnComparator(panel.database()));
+        comparators.add(new FirstColumnComparator(panel.getBibDatabaseContext()));
 
         for (int i = 1; i < tableFormat.getColumnCount(); i++) {
             MainTableColumn tableColumn = tableFormat.getTableColumn(i);
@@ -564,13 +564,15 @@ public class MainTable extends JTable {
     private int getCellStatus(int row, int col) {
         try {
             BibEntry be = sortedForGrouping.get(row);
-            EntryType type = EntryTypes.getType(be.getType());
-            String columnName = getColumnName(col).toLowerCase();
-            if (columnName.equals(BibEntry.KEY_FIELD) || type.getRequiredFieldsFlat().contains(columnName)) {
-                return MainTable.REQUIRED;
-            }
-            if (type.getOptionalFields().contains(columnName)) {
-                return MainTable.OPTIONAL;
+            Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
+            if(type.isPresent()) {
+                String columnName = getColumnName(col).toLowerCase();
+                if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
+                    return MainTable.REQUIRED;
+                }
+                if (type.get().getOptionalFields().contains(columnName)) {
+                    return MainTable.OPTIONAL;
+                }
             }
             return MainTable.OTHER;
         } catch (NullPointerException ex) {
@@ -629,7 +631,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry entry = sortedForGrouping.get(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()));
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()), panel.getBibDatabaseContext().getMode());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
@@ -728,13 +730,13 @@ public class MainTable extends JTable {
                 Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.VERY_GRAYED_OUT_BACKGROUND),
                         sel));
 
-        MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
-        MainTable.markedNumberRenderers = new CompleteRenderer[EntryMarker.MARK_COLOR_LEVELS];
+        MainTable.markedRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
+        MainTable.markedNumberRenderers = new ArrayList<>(EntryMarker.MARK_COLOR_LEVELS);
         for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
             Color c = Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i);
-            MainTable.markedRenderers[i] = new GeneralRenderer(c,
-                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel));
-            MainTable.markedNumberRenderers[i] = new CompleteRenderer(c);
+            MainTable.markedRenderers.add(new GeneralRenderer(c, Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT),
+                    MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel)));
+            MainTable.markedNumberRenderers.add(new CompleteRenderer(c));
         }
 
     }

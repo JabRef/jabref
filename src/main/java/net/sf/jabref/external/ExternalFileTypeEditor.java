@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,9 +76,8 @@ public class ExternalFileTypeEditor extends JDialog {
      */
     private void setValues() {
         fileTypes.clear();
-        ExternalFileType[] types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+        Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         for (ExternalFileType type : types) {
-
             fileTypes.add(type.copy());
         }
         Collections.sort(fileTypes);
@@ -117,7 +117,7 @@ public class ExternalFileTypeEditor extends JDialog {
                         Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);*/
                 //if (reply == JOptionPane.YES_OPTION) {
-                java.util.List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
+                List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
                 fileTypes.clear();
                 fileTypes.addAll(list);
                 Collections.sort(fileTypes);

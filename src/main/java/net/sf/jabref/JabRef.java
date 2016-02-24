@@ -17,61 +17,48 @@ package net.sf.jabref;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
+import net.sf.jabref.exporter.*;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.fetcher.EntryFetcher;
+import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.net.ProxyAuthenticator;
+import net.sf.jabref.logic.net.ProxyPreferences;
+import net.sf.jabref.logic.net.ProxyRegisterer;
+import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.remote.RemotePreferences;
+import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.logic.search.DatabaseSearcher;
+import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.migrations.PreferencesMigrations;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.wizard.auximport.AuxCommandLine;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import java.awt.Font;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
 import java.util.prefs.BackingStoreException;
-
-import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-
-import net.sf.jabref.gui.*;
-import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.importer.fetcher.EntryFetchers;
-import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.ProxyPreferences;
-import net.sf.jabref.logic.ProxyRegisterer;
-import net.sf.jabref.logic.journals.Abbreviations;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.logging.JabRefLogger;
-import net.sf.jabref.logic.search.DatabaseSearcher;
-import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.migrations.PreferencesMigrations;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-
-import net.sf.jabref.util.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.FileActions;
-import net.sf.jabref.exporter.IExportFormat;
-import net.sf.jabref.exporter.SaveException;
-import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.logic.remote.RemotePreferences;
-import net.sf.jabref.logic.remote.client.RemoteListenerClient;
-import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
-import net.sf.jabref.wizard.auximport.AuxCommandLine;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -83,7 +70,6 @@ public class JabRef {
     public static JabRefFrame jrf;
 
     private JabRefCLI cli;
-
 
     public void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
@@ -100,15 +86,15 @@ public class JabRef {
         Globals.prefs.setLanguageDependentDefaultValues();
 
         // Update which fields should be treated as numeric, based on preferences:
-        BibtexFields.setNumericFieldsFromPrefs();
+        InternalBibtexFields.setNumericFieldsFromPrefs();
 
         /* Build list of Import and Export formats */
         Globals.importFormatReader.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports();
 
-        // Read list(s) of journal names and abbreviations:
-        Abbreviations.initializeJournalNames(Globals.prefs);
+        // Read list(s) of journal names and abbreviations
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -260,26 +246,26 @@ public class JabRef {
 
                 SearchQuery query = new SearchQuery(searchTerm, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
                         Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabasefromMatches(); //newBase contains only match entries
+                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {
-                    String formatName = null;
+                    String formatName;
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
-                        case 3:
-                            formatName = data[2];
-                            break;
-                        case 2:
-                            //default ExportFormat: HTML table (with Abstract & BibTeX)
-                            formatName = "tablerefsabsbib";
-                            break;
-                        default:
-                            System.err.println(
-                                    Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                            + JabRefCLI.getExportMatchesSyntax());
-                            return Optional.empty();
+                    case 3:
+                        formatName = data[2];
+                        break;
+                    case 2:
+                        //default ExportFormat: HTML table (with Abstract & BibTeX)
+                        formatName = "tablerefsabsbib";
+                        break;
+                    default:
+                        System.err.println(
+                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
+                                        + JabRefCLI.getExportMatchesSyntax());
+                        return Optional.empty();
                     } //end switch
 
                     //export new database
@@ -308,7 +294,7 @@ public class JabRef {
             regenerateBibtexKeys(loaded);
         }
 
-        if(cli.isAutomaticallySetFileLinks()) {
+        if (cli.isAutomaticallySetFileLinks()) {
             automaticallySetFileLinks(loaded);
         }
 
@@ -324,9 +310,13 @@ public class JabRef {
                         if (!pr.isInvalid()) {
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                                SaveSession session = FileActions.saveDatabase(pr.getDatabase(), pr.getMetaData(),
-                                        new File(data[0]), Globals.prefs, false, false,
-                                        Globals.prefs.getDefaultEncoding(), false);
+                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                                Defaults defaults = new Defaults(BibDatabaseMode
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                                SaveSession session = databaseWriter.saveDatabase(
+                                        new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
+
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -336,7 +326,7 @@ public class JabRef {
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
-                                session.commit();
+                                session.commit(new File(data[0]));
                             } catch (SaveException ex) {
                                 System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
@@ -412,9 +402,14 @@ public class JabRef {
 
                             try {
                                 System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SaveSession session = FileActions.saveDatabase(newBase, new MetaData(), // no Metadata
-                                        new File(subName), Globals.prefs, false, false,
-                                        Globals.prefs.getDefaultEncoding(), false);
+                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                                Defaults defaults = new Defaults(BibDatabaseMode
+                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                                SaveSession session = databaseWriter.saveDatabase(
+                                        new BibDatabaseContext(newBase, defaults), prefs);
+
+
                                 // Show just a warning message if encoding didn't work for all characters:
                                 if (!session.getWriter().couldEncodeAll()) {
                                     System.err.println(Localization.lang("Warning") + ": "
@@ -424,7 +419,7 @@ public class JabRef {
                                             + " "
                                             + session.getWriter().getProblemCharacters());
                                 }
-                                session.commit();
+                                session.commit(new File(subName));
                             } catch (SaveException ex) {
                                 System.err.println(Localization.lang("Could not save file.") + "\n"
                                         + ex.getLocalizedMessage());
@@ -454,20 +449,20 @@ public class JabRef {
         return Optional.of(loaded);
     }
 
-    private void automaticallySetFileLinks(Vector<ParserResult> loaded) {
-        for(ParserResult parserResult: loaded) {
+    private void automaticallySetFileLinks(List<ParserResult> loaded) {
+        for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
             MetaData metaData = parserResult.getMetaData();
 
-            if( metaData != null){
+            if (metaData != null) {
                 LOGGER.info(Localization.lang("Automatically setting file links"));
                 Util.autoSetLinks(database.getEntries(), metaData);
             }
         }
     }
 
-    private void regenerateBibtexKeys(Vector<ParserResult> loaded) {
+    private void regenerateBibtexKeys(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
@@ -504,8 +499,9 @@ public class JabRef {
         String[] split = fetchCommand.split(":");
         String engine = split[0];
 
+        EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
         EntryFetcher fetcher = null;
-        for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+        for (EntryFetcher e : fetchers.getEntryFetchers()) {
             if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
                 fetcher = e;
             }
@@ -515,7 +511,7 @@ public class JabRef {
             System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
             System.out.println(Localization.lang("The following fetchers are available:"));
 
-            for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
+            for (EntryFetcher e : fetchers.getEntryFetchers()) {
                 System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
             }
             return Optional.empty();
@@ -597,7 +593,7 @@ public class JabRef {
         }
     }
 
-    private void openWindow(Vector<ParserResult> loaded) {
+    private void openWindow(List<ParserResult> loaded) {
         // Perform checks and changes for users with a preference set from an older
         // JabRef version.
         PreferencesMigrations.replaceAbstractField();
@@ -637,7 +633,7 @@ public class JabRef {
                 File fileToOpen = new File(name);
 
                 for (int j = 0; j < loaded.size(); j++) {
-                    ParserResult pr = loaded.elementAt(j);
+                    ParserResult pr = loaded.get(j);
 
                     if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
                         continue lastEdLoop;
@@ -735,7 +731,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf, i);
+                ParserResultWarningDialog.showParserResultWarningDialog(loaded.get(i), JabRef.jrf, i);
             }
         }
 
@@ -748,7 +744,7 @@ public class JabRef {
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to getBasePanelCount()
         for (int i = 0; (i < loaded.size()) && (i < JabRef.jrf.getBasePanelCount()); i++) {
-            ParserResult pr = loaded.elementAt(i);
+            ParserResult pr = loaded.get(i);
             BasePanel panel = JabRef.jrf.getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }

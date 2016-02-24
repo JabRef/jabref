@@ -8,7 +8,7 @@ public class AbbreviationParserTest {
     @Test
     public void testReadJournalListFromResource() throws Exception {
         AbbreviationParser ap = new AbbreviationParser();
-        ap.readJournalListFromResource(Abbreviations.JOURNALS_FILE_BUILTIN);
+        ap.readJournalListFromResource("/journals/journalList.txt");
          assertFalse(ap.getAbbreviations().isEmpty());
     }
 }

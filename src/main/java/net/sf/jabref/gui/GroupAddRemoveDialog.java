@@ -16,10 +16,14 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +37,7 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final BasePanel panel;
     private final boolean add;
     private final boolean move;
-    private BibEntry[] selection;
+    private List<BibEntry> selection;
     private JTree tree;
     private JButton ok;
 
@@ -46,7 +50,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     @Override
     public void action() throws Throwable {
-        GroupTreeNode groups = panel.metaData().getGroups();
+        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
         if (groups == null) {
             return;
         }
@@ -189,24 +193,27 @@ public class GroupAddRemoveDialog implements BaseAction {
 
 
     private boolean doAddOrRemove() {
-        GroupTreeNode node = (GroupTreeNode) tree.getSelectionPath().getLastPathComponent();
-        AbstractGroup group = node.getGroup();
-        if (checkGroupEnable(group)) {
-
-            if (add) {
-                AddToGroupAction action = new AddToGroupAction(node, move, panel);
-                action.actionPerformed(new ActionEvent(node, 0, "add"));
-            } else {
-                RemoveFromGroupAction action = new RemoveFromGroupAction(node, panel);
-                action.actionPerformed(new ActionEvent(node, 0, "remove"));
-            }
-
-            return true;
-        }
-        else {
+        TreePath path = tree.getSelectionPath();
+        if (path == null) {
             return false;
-        }
+        } else {
+            GroupTreeNode node = (GroupTreeNode) path.getLastPathComponent();
+            AbstractGroup group = node.getGroup();
+            if (checkGroupEnable(group)) {
 
+                if (add) {
+                    AddToGroupAction action = new AddToGroupAction(node, move, panel);
+                    action.actionPerformed(new ActionEvent(node, 0, "add"));
+                } else {
+                    RemoveFromGroupAction action = new RemoveFromGroupAction(node, panel);
+                    action.actionPerformed(new ActionEvent(node, 0, "remove"));
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     /**
@@ -217,8 +224,8 @@ public class GroupAddRemoveDialog implements BaseAction {
      * @return true if this dialog's action can be performed on the group
      */
     private boolean checkGroupEnable(AbstractGroup group) {
-        return (add ? group.supportsAdd() && !group.containsAll(selection)
-                : group.supportsRemove() && group.containsAny(selection));
+        return (add ? group.supportsAdd() && !group.containsAll(selection) : group.supportsRemove()
+                && group.containsAny(selection));
     }
 
 

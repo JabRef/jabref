@@ -2,8 +2,7 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,15 +33,15 @@ public class AutoLinkFilesAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        ArrayList<BibEntry> entries = new ArrayList<>();
-        Collections.addAll(entries, JabRef.jrf.getCurrentBasePanel().getSelectedEntries());
+        List<BibEntry> entries = JabRef.jrf.getCurrentBasePanel().getSelectedEntries();
         if (entries.isEmpty()) {
             JabRef.jrf.getCurrentBasePanel().output(Localization.lang("No entries selected."));
             return;
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        Runnable runnable = Util.autoSetLinks(entries, nc, null, null, JabRef.jrf.getCurrentBasePanel().metaData(), new ActionListener() {
+        Runnable runnable = Util.autoSetLinks(entries, nc, null, null,
+                JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -61,5 +61,18 @@ class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter
     @Override
     public int compareTo(ExportFileFilter o) {
         return name.compareTo(o.name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if ((o != null) && (o instanceof ExportFileFilter)) {
+            return name.equals(((ExportFileFilter) o).name);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

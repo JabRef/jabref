@@ -35,11 +35,14 @@ package net.sf.jabref.wizard.text;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.swing.text.StyledDocument;
 
 public class TagToMarkedTextStore
 {
+
+    private final Map<String, LinkedList<TMarkedStoreItem>> tagMap;
 
     private static class TMarkedStoreItem
     {
@@ -49,7 +52,6 @@ public class TagToMarkedTextStore
     }
 
 
-    private final HashMap<String, LinkedList<TMarkedStoreItem>> tagMap;
 
 
     public TagToMarkedTextStore()
@@ -71,7 +73,7 @@ public class TagToMarkedTextStore
         item.start = start;
     }
 
-    /** insert selection propertie for tag, old entries were deleted */
+    /** insert selection properties for tag, old entries were deleted */
     public void insertPosition(String tag, int start, int end) {
         LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
 

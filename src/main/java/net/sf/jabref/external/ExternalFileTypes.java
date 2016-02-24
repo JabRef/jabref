@@ -1,6 +1,7 @@
 package net.sf.jabref.external;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -12,7 +13,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FileField;
 
-public class ExternalFileTypes {
+public final class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
@@ -102,8 +103,8 @@ public class ExternalFileTypes {
         return list;
     }
 
-    public ExternalFileType[] getExternalFileTypeSelection() {
-        return externalFileTypes.toArray(new ExternalFileType[externalFileTypes.size()]);
+    public Collection<ExternalFileType> getExternalFileTypeSelection() {
+        return externalFileTypes;
     }
 
     /**

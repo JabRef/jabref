@@ -19,7 +19,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
@@ -27,6 +26,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
@@ -44,6 +46,8 @@ import net.sf.jabref.logic.l10n.Localization;
  * To change this template use File | Settings | File Templates.
  */
 public class ExportToClipboardAction extends AbstractWorker {
+
+    private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
     private final BibDatabase database;
@@ -64,7 +68,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         if (panel == null) {
             return;
         }
-        if (panel.getSelectedEntries().length == 0) {
+        if (panel.getSelectedEntries().isEmpty()) {
             message = Localization.lang("No entries selected.");
             getCallBack().update();
             return;
@@ -96,33 +100,33 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
                 .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
         // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
+        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
 
         File tmp = null;
-        Reader reader = null;
         try {
             // To simplify the exporter API we simply do a normal export to a temporary
             // file, and read the contents afterwards:
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
-            BibEntry[] bes = panel.getSelectedEntries();
-            HashSet<String> entries = new HashSet<>(bes.length);
+            List<BibEntry> bes = panel.getSelectedEntries();
+            Set<String> entries = new HashSet<>(bes.size());
             for (BibEntry be : bes) {
                 entries.add(be.getId());
             }
 
             // Write to file:
-            format.performExport(database, panel.metaData(),
+            format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
                     tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
-            reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding());
-            int s;
-            while ((s = reader.read()) != -1) {
-                sb.append((char) s);
+            try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {
+                int s;
+                while ((s = reader.read()) != -1) {
+                    sb.append((char) s);
+                }
             }
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
@@ -131,25 +135,19 @@ public class ExportToClipboardAction extends AbstractWorker {
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
-            message = Localization.lang("Entries exported to clipboard") + ": " + bes.length;
+            message = Localization.lang("Entries exported to clipboard") + ": " + bes.size();
 
         } catch (Exception e) {
-            e.printStackTrace(); //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if (tmp != null) {
-                tmp.delete();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                if (!tmp.delete()) {
+                    LOGGER.info("Cannot delete temporary clipboard file");
                 }
             }
         }
-
     }
 
     @Override

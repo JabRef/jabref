@@ -31,6 +31,7 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +149,8 @@ class ZipFileChooser extends JDialog {
                         importer.setCliId(importFormat.getCLIId());
                         importCustomizationDialog.addOrReplaceImporter(importer);
                         dispose();
-                    } catch (Exception exc) {
+                    } catch (IOException | ClassNotFoundException | InstantiationException |
+                            IllegalAccessException exc) {
                         LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
                         JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }

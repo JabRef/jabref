@@ -51,7 +51,8 @@ public class BibtexNameFormatterTest {
         assertNameFormatC("Ulrich {\\\"{U}}nderwood", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
         assertNameFormatA("Victor, P.~{\\'E}?", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
         assertNameFormatB("P.~{\\'E}. Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
-        assertNameFormatC("Paul~{\\'E}mile Victor", "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
+        assertNameFormatC("Paul~{\\'E}mile Victor",
+                "Paul {\\'E}mile Victor and and de la Cierva y Codorn{\\’\\i}u, Juan");
 
     }
 
@@ -76,18 +77,18 @@ public class BibtexNameFormatterTest {
     @Test
     public void testConsumeToMatchingBrace() {
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             Assert.assertEquals(6, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HELLO} {WORLD}"
                     .toCharArray(), 0));
             Assert.assertEquals("{HELLO}", sb.toString());
         }
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             Assert.assertEquals(18, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
                     .toCharArray(), 12));
             Assert.assertEquals("{WORLD}", sb.toString());
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Assert.assertEquals(10, BibtexNameFormatter.consumeToMatchingBrace(sb, "{HE{L{}L}O} {WORLD}"
                 .toCharArray(), 0));
         Assert.assertEquals("{HE{L{}L}O}", sb.toString());

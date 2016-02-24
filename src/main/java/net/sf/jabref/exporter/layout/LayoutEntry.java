@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,10 +21,14 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.util.strings.StringUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
+import net.sf.jabref.exporter.layout.format.JournalAbbreviator;
 import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.exporter.layout.format.NotFoundFormatter;
 import net.sf.jabref.gui.preftabs.NameFormatterTab;
@@ -34,27 +38,24 @@ import net.sf.jabref.util.Util;
 
 class LayoutEntry {
 
-    private LayoutFormatter[] option;
+    private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:
     private LayoutFormatter postFormatter;
 
     private String text;
 
-    private LayoutEntry[] layoutEntries;
+    private List<LayoutEntry> layoutEntries;
 
     private final int type;
-
-    private final String classPrefix;
 
     private List<String> invalidFormatter;
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, final String classPrefix_) {
+    public LayoutEntry(StringInt si, JournalAbbreviationRepository repository) {
         type = si.i;
-        classPrefix = classPrefix_;
 
         if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             text = si.s;
@@ -63,15 +64,14 @@ class LayoutEntry {
         } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            List<String> v = new ArrayList<>();
-            WSITools.tokenize(v, si.s, "\n");
+            List<String> v = StringUtil.tokenizeToList(si.s, "\n");
 
             if (v.size() == 1) {
                 text = v.get(0);
             } else {
                 text = v.get(0).trim();
 
-                option = LayoutEntry.getOptionalLayout(v.get(1), classPrefix);
+                option = LayoutEntry.getOptionalLayout(v.get(1), repository);
                 // See if there was an undefined formatter:
                 for (LayoutFormatter anOption : option) {
                     if (anOption instanceof NotFoundFormatter) {
@@ -88,8 +88,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
-        classPrefix = classPrefix_;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationRepository repository) {
         List<StringInt> blockEntries = null;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         LayoutEntry le;
@@ -113,9 +112,9 @@ class LayoutEntry {
                 if (blockStart.equals(parsedEntry.s)) {
                     blockEntries.add(parsedEntry);
                     if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
                     } else {
-                        le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
+                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
                     }
                     tmpEntries.add(le);
                     blockEntries = null;
@@ -127,23 +126,20 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, repository));
             } else {
                 blockEntries.add(parsedEntry);
             }
         }
 
-        layoutEntries = new LayoutEntry[tmpEntries.size()];
+        layoutEntries = new ArrayList<>(tmpEntries);
 
-        for (int i = 0; i < tmpEntries.size(); i++) {
-            layoutEntries[i] = tmpEntries.get(i);
-
-            // Note if one of the entries has an invalid formatter:
-            if (layoutEntries[i].isInvalidFormatter()) {
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            if (layoutEntry.isInvalidFormatter()) {
                 if (invalidFormatter == null) {
                     invalidFormatter = new ArrayList<>(1);
                 }
-                invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
+                invalidFormatter.addAll(layoutEntry.getInvalidFormatters());
             }
 
         }
@@ -213,12 +209,12 @@ class LayoutEntry {
                 String fieldText;
                 boolean previousSkipped = false;
 
-                for (int i = 0; i < layoutEntries.length; i++) {
-                    fieldText = layoutEntries[i].doLayout(bibtex, database);
+                for (int i = 0; i < layoutEntries.size(); i++) {
+                    fieldText = layoutEntries.get(i).doLayout(bibtex, database);
 
                     if (fieldText == null) {
-                        if ((i + 1) < layoutEntries.length) {
-                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
+                        if ((i + 1) < layoutEntries.size()) {
+                            if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
                                 continue;
@@ -240,9 +236,6 @@ class LayoutEntry {
                                 sb.append(fieldText.substring(eol));
                             }
                         } else {
-                            //System.out.println("ENTRY-BLOCK: " +
-                            //layoutEntries[i].doLayout(bibtex));
-
                             /*
                              * if fieldText is not null and the bibtexentry is marked
                              * as a searchhit, try to highlight the searched words
@@ -284,7 +277,6 @@ class LayoutEntry {
                 }
             }
 
-            //System.out.println("OPTION: "+option);
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     fieldEntry = anOption.format(fieldEntry);
@@ -355,33 +347,38 @@ class LayoutEntry {
 
     // added section - end (arudert)
 
-    private static LayoutFormatter getLayoutFormatterByClassName(String className, String classPrefix)
+    private static LayoutFormatter getLayoutFormatterByClassName(String className,
+            JournalAbbreviationRepository repostiory)
             throws Exception {
 
-        if (!className.isEmpty()) {
-            try {
-                try {
-                    return (LayoutFormatter) Class.forName(classPrefix + className).newInstance();
-                } catch (Throwable ex2) {
-                    return (LayoutFormatter) Class.forName(className).newInstance();
-                }
-            } catch (ClassNotFoundException ex) {
-                throw new Exception("Formatter not found: " + className);
-            } catch (InstantiationException ex) {
-                throw new Exception(className + " cannot be instantiated.");
-            } catch (IllegalAccessException ex) {
-                throw new Exception(className + " cannot be accessed.");
-            }
+        if (className.isEmpty()) {
+            return null;
         }
-        return null;
+
+        if ("JournalAbbreviator".equals(className)) {
+            return new JournalAbbreviator(repostiory);
+        }
+
+        try {
+            String prefix = "net.sf.jabref.exporter.layout.format.";
+            return (LayoutFormatter) Class.forName(prefix + className).newInstance();
+        } catch (ClassNotFoundException ex) {
+            throw new Exception("Formatter not found: " + className);
+        } catch (InstantiationException ex) {
+            throw new Exception(className + " cannot be instantiated.");
+        } catch (IllegalAccessException ex) {
+            throw new Exception(className + " cannot be accessed.");
+        }
     }
 
     /**
      * Return an array of LayoutFormatters found in the given formatterName
      * string (in order of appearance).
+     * @param repository
      *
      */
-    private static LayoutFormatter[] getOptionalLayout(String formatterName, String classPrefix) {
+    private static List<LayoutFormatter> getOptionalLayout(String formatterName,
+            JournalAbbreviationRepository repository) {
 
         List<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
@@ -406,7 +403,7 @@ class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
+                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, repository);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {
@@ -434,7 +431,7 @@ class LayoutEntry {
             //throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
         }
 
-        return results.toArray(new LayoutFormatter[results.size()]);
+        return results;
     }
 
     public boolean isInvalidFormatter() {
