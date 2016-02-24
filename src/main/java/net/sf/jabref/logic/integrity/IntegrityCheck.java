@@ -8,10 +8,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +22,8 @@ public class IntegrityCheck {
     public static final Checker PAGES_CHECKER = new PagesChecker();
     public static final Checker URL_CHECKER = new UrlChecker();
     public static final Checker FILE_CHECKER = new FileChecker();
+    public static final Checker ABBREVIATION_CHECKER = new AbbreviationChecker();
+    public static final Checker TYPE_CHECKER = new TypeChecker();
 
     private final BibDatabaseContext bibDatabaseContext;
 
@@ -68,11 +67,36 @@ public class IntegrityCheck {
 
         entry.getFieldOptional("file").ifPresent(data -> FILE_CHECKER.check(data, "file", entry, result, bibDatabaseContext));
 
+        entry.getFieldOptional("pages").ifPresent(data -> TYPE_CHECKER.check(data, "pages", entry, result, bibDatabaseContext));
+
+        entry.getFieldOptional("journal").ifPresent(data -> ABBREVIATION_CHECKER.check(data, "journal", entry, result, bibDatabaseContext));
+        entry.getFieldOptional("booktitle").ifPresent(data -> ABBREVIATION_CHECKER.check(data, "booktitle", entry, result, bibDatabaseContext));
+
         return result;
     }
 
     public interface Checker {
         void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext);
+    }
+
+    private static class TypeChecker implements Checker {
+
+        @Override
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
+            if("proceedings".equalsIgnoreCase(entry.getType()) && entry.getFieldOptional("pages").isPresent()) {
+                collector.add(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, fieldName));
+            }
+        }
+    }
+
+    private static class AbbreviationChecker implements Checker {
+
+        @Override
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector, BibDatabaseContext bibDatabaseContext) {
+            if(value.contains(".")) {
+                collector.add(new IntegrityMessage(Localization.lang("abbreviation detected"), entry, fieldName));
+            }
+        }
     }
 
     private static class FileChecker implements Checker {
