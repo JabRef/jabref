@@ -36,12 +36,10 @@ import javax.swing.JTextArea;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -52,7 +50,6 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.util.Util;
 
 public class FieldExtraComponents {
 
@@ -147,23 +144,6 @@ public class FieldExtraComponents {
         });
 
         return Optional.of(but);
-    }
-
-    /**
-     *
-     * @param frame
-     * @param panel
-     * @param fieldEditor
-     * @param entryEditor
-     * @param isZip
-     * @return
-     */
-    public static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel,
-            FieldEditor fieldEditor, EntryEditor entryEditor, String fieldName, Boolean isZip) {
-
-        OpenFileFilter off = Util.getFileFilterForField(fieldName, isZip);
-        return Optional.of(new ExternalFilePanel(frame, panel.getBibDatabaseContext().getMetaData(), entryEditor,
-                fieldName, off, fieldEditor));
     }
 
     /**
