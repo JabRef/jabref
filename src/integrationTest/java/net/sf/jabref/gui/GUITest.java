@@ -4,6 +4,7 @@ import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
+import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.timing.Pause;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
@@ -80,7 +81,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
         mainFrame.menuItemWithPath("Options", "Preferences").click();
 
-        testPanelFixture.robot.waitForIdle();
+        robot().waitForIdle();
 
         findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
 
