@@ -1104,8 +1104,8 @@ public class JabRefPreferences {
                 Object value = getObject(key);
                 prefs.put(key, value);
             }
-        } catch (BackingStoreException ignore) {
-            // could not handle this
+        } catch (BackingStoreException e) {
+            LOGGER.info("could not retrieve preference keys", e);
         }
         return prefs;
     }

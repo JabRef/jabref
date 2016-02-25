@@ -61,8 +61,6 @@ public class PreferencesDialog extends JDialog {
 
     private final JabRefFrame frame;
 
-    private final JList<String> chooser;
-
     private final JabRefPreferences prefs;
 
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
@@ -111,7 +109,7 @@ public class PreferencesDialog extends JDialog {
         mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
         String[] tabNames = tabs.stream().map(PrefsTab::getTabName).toArray(String[]::new);
-        chooser = new JList<>(tabNames);
+        JList<String> chooser = new JList<>(tabNames);
         chooser.setBorder(BorderFactory.createEtchedBorder());
         // Set a prototype value to control the width of the list:
         chooser.setPrototypeCellValue("This should be wide enough");

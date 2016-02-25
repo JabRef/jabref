@@ -12,6 +12,28 @@ import java.util.stream.Collectors;
 
 public class JabRefPreferencesFilter {
 
+    private final JabRefPreferences preferences;
+
+    public JabRefPreferencesFilter(JabRefPreferences preferences) {
+        this.preferences = preferences;
+    }
+
+    public List<PreferenceOption> getPreferenceOptions() {
+        Map<String, Object> defaults = new HashMap<>(preferences.defaults);
+        Map<String, Object> prefs = preferences.getPreferences();
+
+        return prefs.entrySet().stream()
+                .map(entry -> new PreferenceOption(entry.getKey(), entry.getValue(), defaults.get(entry.getKey())))
+                .collect(Collectors.toList());
+    }
+
+    public List<PreferenceOption> getDeviatingPreferences() {
+        return getPreferenceOptions().stream()
+                .filter(PreferenceOption::isChanged)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     public static class PreferencesTableModel extends AbstractTableModel {
 
         private final List<PreferenceOption> preferences;
@@ -165,28 +187,6 @@ public class JabRefPreferencesFilter {
         public int compareTo(PreferenceOption o) {
             return Objects.compare(this.key, o.key, String::compareTo);
         }
-    }
-
-    private final JabRefPreferences preferences;
-
-    public JabRefPreferencesFilter(JabRefPreferences preferences) {
-        this.preferences = preferences;
-    }
-
-    public List<PreferenceOption> getPreferenceOptions() {
-        Map<String, Object> defaults = new HashMap<>(preferences.defaults);
-        Map<String, Object> prefs = preferences.getPreferences();
-
-        return prefs.entrySet().stream()
-                .map(entry -> new PreferenceOption(entry.getKey(), entry.getValue(), defaults.get(entry.getKey())))
-                .collect(Collectors.toList());
-    }
-
-    public List<PreferenceOption> getDeviatingPreferences() {
-        return getPreferenceOptions().stream()
-                .filter(PreferenceOption::isChanged)
-                .sorted()
-                .collect(Collectors.toList());
     }
 
 }
