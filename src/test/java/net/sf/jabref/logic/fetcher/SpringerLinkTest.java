@@ -10,11 +10,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class SpringerLinkTest {
-    SpringerLink finder;
-    BibEntry entry;
+
+    private SpringerLink finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new SpringerLink();
         entry = new BibEntry();
     }
@@ -22,6 +23,7 @@ public class SpringerLinkTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test
