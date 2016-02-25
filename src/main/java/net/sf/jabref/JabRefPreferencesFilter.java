@@ -1,13 +1,6 @@
 package net.sf.jabref;
 
-import net.sf.jabref.gui.WrapLayout;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class JabRefPreferencesFilter {

@@ -6,8 +6,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.Objects;
 
 public class JabRefPreferencesFilterDialog extends JDialog {
 
@@ -48,7 +48,7 @@ public class JabRefPreferencesFilterDialog extends JDialog {
     private void updateModel() {
         java.util.List<JabRefPreferencesFilter.PreferenceOption> preferenceOptions;
 
-        if(showOnlyDeviatingPreferenceOptions.isSelected()) {
+        if (showOnlyDeviatingPreferenceOptions.isSelected()) {
             preferenceOptions = preferencesFilter.getDeviatingPreferences();
         } else {
             preferenceOptions = preferencesFilter.getPreferenceOptions();
