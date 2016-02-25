@@ -71,17 +71,21 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
+        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy special"));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
+        copySpecialMenu
+                .add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
+        copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
+                IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
+
         add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon()));
+        add(copySpecialMenu);
         add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon()));
         addSeparator();
 
-        add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
-        add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
-        add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
-
-        add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
         add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();
 

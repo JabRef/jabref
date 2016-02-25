@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class LocalizationConsistencyTest {
 
                 List<String> missing = new LinkedList<>(englishKeys);
                 missing.removeAll(nonEnglishKeys);
-                Assert.assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
+                assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
             }
         }
     }
@@ -33,7 +32,7 @@ public class LocalizationConsistencyTest {
         for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
             String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
             String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("&", ""));
-            Assert.assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
+            assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
 
@@ -43,7 +42,7 @@ public class LocalizationConsistencyTest {
         for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
             String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
             String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue());
-            Assert.assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
+            assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
 
