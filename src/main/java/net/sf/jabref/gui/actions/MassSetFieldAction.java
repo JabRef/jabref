@@ -18,8 +18,8 @@ package net.sf.jabref.gui.actions;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -208,13 +208,13 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (bp == null) {
             return;
         }
-        BibEntry[] entries = bp.getSelectedEntries();
+        List<BibEntry> entries = bp.getSelectedEntries();
         // Lazy creation of the dialog:
         if (diag == null) {
             createDialog();
         }
         cancelled = true;
-        prepareDialog(entries.length > 0);
+        prepareDialog(!entries.isEmpty());
         if (diag != null) {
             PositionWindow.placeDialog(diag, frame);
             diag.setVisible(true);
@@ -228,7 +228,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (all.isSelected()) {
             entryList = bp.database().getEntries();
         } else {
-            entryList = Arrays.asList(entries);
+            entryList = entries;
         }
         String toSet = text.getText();
         if (toSet.isEmpty()) {

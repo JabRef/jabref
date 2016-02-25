@@ -2,6 +2,7 @@ package net.sf.jabref.bibtex;
 
 import static org.junit.Assert.*;
 
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import org.junit.After;
 import org.junit.Before;
@@ -34,22 +35,21 @@ public class EntryTypesTestBibLatex {
     @Ignore
     public void testBibLatexMode() {
         // BibLatex mode
-        EntryTypes biblatexentrytypes = new EntryTypes();
-        assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article", BibDatabaseMode.BIBLATEX).get());
-        assertEquals(Optional.empty(), biblatexentrytypes.getType("aaaaarticle", BibDatabaseMode.BIBLATEX));
-        assertEquals(Optional.empty(), biblatexentrytypes.getStandardType("aaaaarticle", BibDatabaseMode.BIBLATEX));
-        assertEquals(34, biblatexentrytypes.getAllValues(BibDatabaseMode.BIBLATEX).size());
-        assertEquals(34, biblatexentrytypes.getAllTypes(BibDatabaseMode.BIBLATEX).size());
+        assertEquals(BibLatexEntryTypes.ARTICLE, EntryTypes.getType("article", BibDatabaseMode.BIBLATEX).get());
+        assertEquals(Optional.empty(), EntryTypes.getType("aaaaarticle", BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), EntryTypes.getStandardType("aaaaarticle", BibDatabaseMode.BIBLATEX));
+        assertEquals(34, EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX).size());
+        assertEquals(34, EntryTypes.getAllTypes(BibDatabaseMode.BIBLATEX).size());
 
-        biblatexentrytypes.removeType("article", BibDatabaseMode.BIBLATEX);
+        EntryTypes.removeType("article", BibDatabaseMode.BIBLATEX);
         // Should not be possible to remove a standard type
-        assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article", BibDatabaseMode.BIBLATEX).get());
+        assertEquals(BibLatexEntryTypes.ARTICLE, EntryTypes.getType("article", BibDatabaseMode.BIBLATEX).get());
     }
 
     @Test
     public void defaultType() {
         EntryTypes types = new EntryTypes();
-        assertEquals(BibLatexEntryTypes.MISC, types.getTypeOrDefault("unknowntype", BibDatabaseMode.BIBLATEX));
+        assertEquals(BibLatexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype", BibDatabaseMode.BIBLATEX));
     }
 
 

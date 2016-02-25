@@ -5,9 +5,6 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
-import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
-import net.sf.jabref.logic.xmp.XMPSchemaBibtex;
-import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
@@ -40,7 +37,18 @@ import java.util.*;
  */
 public class XMPUtilTest {
 
-    public static final String SRC_TEST_ESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
+    public static final String SRC_TEST_RESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
+
+    /**
+     * The PDF file that basically all operations are done upon.
+     */
+    private File pdfFile;
+
+    private JabRefPreferences prefs;
+
+    private boolean use;
+
+    private List<String> privacyFilters;
 
 
     /**
@@ -64,16 +72,10 @@ public class XMPUtilTest {
 
         StringBuffer xmp = new StringBuffer();
 
-        xmp.append("<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>\n");
-        xmp.append("  <x:xmpmeta xmlns:x='adobe:ns:meta/'>\n");
-        xmp.append(
-                "    <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/' xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'>\n");
-
-        xmp.append(bibtexDescriptions);
-
-        xmp.append("    </rdf:RDF>\n");
-        xmp.append("  </x:xmpmeta>\n");
-        xmp.append("<?xpacket end='r'?>");
+        xmp.append("<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>\n" + "  <x:xmpmeta xmlns:x='adobe:ns:meta/'>\n"
+                +
+ "    <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/' xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'>\n")
+                .append(bibtexDescriptions).append("    </rdf:RDF>\n" + "  </x:xmpmeta>\n" + "<?xpacket end='r'?>");
 
         return xmp.toString();
     }
@@ -194,11 +196,6 @@ public class XMPUtilTest {
     }
 
 
-    /**
-     * The PDF file that basically all operations are done upon.
-     */
-    File pdfFile;
-
 
     /**
      * Create a temporary PDF-file with a single empty page.
@@ -229,12 +226,6 @@ public class XMPUtilTest {
     }
 
 
-    JabRefPreferences prefs;
-
-    boolean use;
-
-    List<String> privacyFilters;
-
 
     /**
      * Delete the temporary file.
@@ -242,7 +233,8 @@ public class XMPUtilTest {
     @After
     public void tearDown() {
         if (!pdfFile.delete()) {
-            System.err.println("Error: Cannot delete temporary file (already deleted).");
+            System.err
+                    .println("Note: Cannot delete temporary file (already deleted so the corresponding test passed).");
         }
 
         prefs.putBoolean("useXmpPrivacyFilter", use);
@@ -531,12 +523,12 @@ public class XMPUtilTest {
                 + "  <xmp:CreatorTool>Acrobat PDFMaker 7.0.7</xmp:CreatorTool>"
                 + "  <xmp:ModifyDate>2006-08-07T18:50:24+02:00</xmp:ModifyDate>"
                 + "  <xmp:CreateDate>2006-08-07T14:44:24+02:00</xmp:CreateDate>"
-                + "  <xmp:MetadataDate>2006-08-07T18:50:24+02:00</xmp:MetadataDate>" + " </rdf:Description>" + ""
+                + "  <xmp:MetadataDate>2006-08-07T18:50:24+02:00</xmp:MetadataDate>" + " </rdf:Description>"
                 + " <rdf:Description rdf:about=''" + "  xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/'>"
                 + "  <xapMM:DocumentID>uuid:843cd67d-495e-4c1e-a4cd-64178f6b3299</xapMM:DocumentID>"
                 + "  <xapMM:InstanceID>uuid:1e56b4c0-6782-440d-ba76-d2b3d87547d1</xapMM:InstanceID>"
                 + "  <xapMM:VersionID>" + "   <rdf:Seq>" + "    <rdf:li>17</rdf:li>" + "   </rdf:Seq>"
-                + "  </xapMM:VersionID>" + " </rdf:Description>" + "" + " <rdf:Description rdf:about=''"
+                + "  </xapMM:VersionID>" + " </rdf:Description>" + " <rdf:Description rdf:about=''"
                 + "  xmlns:dc='http://purl.org/dc/elements/1.1/'>" + "  <dc:format>application/pdf</dc:format>"
                 + "</rdf:Description>";
 
@@ -549,15 +541,15 @@ public class XMPUtilTest {
                 + "  <xmp:CreatorTool>Acrobat PDFMaker 7.0.7</xmp:CreatorTool>"
                 + "  <xmp:ModifyDate>2006-08-07T18:50:24+02:00</xmp:ModifyDate>"
                 + "  <xmp:CreateDate>2006-08-07T14:44:24+02:00</xmp:CreateDate>"
-                + "  <xmp:MetadataDate>2006-08-07T18:50:24+02:00</xmp:MetadataDate>" + " </rdf:Description>" + ""
+                + "  <xmp:MetadataDate>2006-08-07T18:50:24+02:00</xmp:MetadataDate>" + " </rdf:Description>"
                 + " <rdf:Description rdf:about=''" + "  xmlns:xapMM='http://ns.adobe.com/xap/1.0/mm/'>"
                 + "  <xapMM:DocumentID>uuid:843cd67d-495e-4c1e-a4cd-64178f6b3299</xapMM:DocumentID>"
                 + "  <xapMM:InstanceID>uuid:1e56b4c0-6782-440d-ba76-d2b3d87547d1</xapMM:InstanceID>"
                 + "  <xapMM:VersionID>" + "   <rdf:Seq>" + "    <rdf:li>17</rdf:li>" + "   </rdf:Seq>"
-                + "  </xapMM:VersionID>" + " </rdf:Description>" + "" + " <rdf:Description rdf:about=''"
+                + "  </xapMM:VersionID>" + " </rdf:Description>" + " <rdf:Description rdf:about=''"
                 + "  xmlns:dc='http://purl.org/dc/elements/1.1/'>" + "  <dc:format>application/pdf</dc:format>"
                 + "  <dc:title>" + "   <rdf:Alt>" + "    <rdf:li xml:lang='x-default'>Questionnaire.pdf</rdf:li>"
-                + "   </rdf:Alt>" + "  </dc:title>" + "" + "</rdf:Description>";
+                + "   </rdf:Alt>" + "  </dc:title>" + "</rdf:Description>";
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(s));
 
@@ -587,10 +579,10 @@ public class XMPUtilTest {
                 PDMetadata metaRaw = catalog.getMetadata();
 
                 XMPMetadata meta;
-                if (metaRaw != null) {
-                    meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-                } else {
+                if (metaRaw == null) {
                     meta = new XMPMetadata();
+                } else {
+                    meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
                 }
                 meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
 
@@ -663,10 +655,10 @@ public class XMPUtilTest {
             PDMetadata metaRaw = catalog.getMetadata();
 
             XMPMetadata meta;
-            if (metaRaw != null) {
-                meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-            } else {
+            if (metaRaw == null) {
                 meta = new XMPMetadata();
+            } else {
+                meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
             }
             meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
 
@@ -744,12 +736,14 @@ public class XMPUtilTest {
     }
 
     public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
+        Assert.assertNotNull(expected);
+        Assert.assertNotNull(actual);
         Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
         Assert.assertEquals(expected.getType(), actual.getType());
 
         for (String field : expected.getFieldNames()) {
 
-            if (field.toLowerCase().equals("author") || field.toLowerCase().equals("editor")) {
+            if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
 
                 AuthorList expectedAuthors = AuthorList.getAuthorList(expected.getField(field));
                 AuthorList actualAuthors = AuthorList.getAuthorList(actual.getField(field));
@@ -898,7 +892,7 @@ public class XMPUtilTest {
             Assert.assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
-                    XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()));
+                    XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata metaRaw = catalog.getMetadata();
@@ -936,7 +930,7 @@ public class XMPUtilTest {
              */
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
+            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
 
         }
 
@@ -964,7 +958,7 @@ public class XMPUtilTest {
             Assert.assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
-                    XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()));
+                    XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata metaRaw = catalog.getMetadata();
@@ -1002,7 +996,7 @@ public class XMPUtilTest {
              */
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema));
+            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
 
         }
     }
@@ -1300,14 +1294,14 @@ public class XMPUtilTest {
         //
 
         try {
-            XMPUtil.readXMP(XMPUtilTest.SRC_TEST_ESOURCES_ENCRYPTED_PDF);
+            XMPUtil.readXMP(XMPUtilTest.SRC_TEST_RESOURCES_ENCRYPTED_PDF);
             Assert.fail();
         } catch (EncryptionNotSupportedException ignored) {
             // Ignored
         }
 
         try {
-            XMPUtil.writeXMP(XMPUtilTest.SRC_TEST_ESOURCES_ENCRYPTED_PDF, t1BibtexEntry(), null);
+            XMPUtil.writeXMP(XMPUtilTest.SRC_TEST_RESOURCES_ENCRYPTED_PDF, t1BibtexEntry(), null);
             Assert.fail();
         } catch (EncryptionNotSupportedException ignored) {
             // Ignored
@@ -1348,7 +1342,7 @@ public class XMPUtilTest {
                     Assert.assertEquals(originalAuthors,
                             AuthorList.getAuthorList(document.getDocumentInformation().getAuthor()));
 
-                    b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation());
+                    b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get();
                     Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
 
                     // Now check from Dublin Core
@@ -1373,7 +1367,7 @@ public class XMPUtilTest {
                     Assert.assertEquals("Arvind", dcSchema.getCreators().get(1));
                     Assert.assertEquals("Krste Asanov\\'\\i{}c", dcSchema.getCreators().get(2));
 
-                    b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema);
+                    b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get();
                     Assert.assertNotNull(b);
                     Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
                 }

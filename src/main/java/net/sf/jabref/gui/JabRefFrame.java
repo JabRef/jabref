@@ -25,6 +25,7 @@ import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.actions.*;
+import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.AboutDialog;
@@ -162,34 +163,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     };
 
-    class ToolBar extends OSXCompatibleToolbar {
-
-        void addAction(Action a) {
-            JButton b = new JButton(a);
-            b.setText(null);
-            if (!OS.OS_X) {
-                b.setMargin(marg);
-            }
-            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
-            Object obj = a.getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
-                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(b);
-        }
-
-        void addJToogleButton(JToggleButton button) {
-            button.setText(null);
-            if (!OS.OS_X) {
-                button.setMargin(marg);
-            }
-            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
-            if ((obj instanceof IconTheme.FontBasedIcon)) {
-                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
-            }
-            add(button);
-        }
-    }
 
     private final ToolBar tlb = new ToolBar();
 
@@ -207,7 +180,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
-    public final AboutDialog helpDiag = new AboutDialog(this);
+    private final AboutDialog aboutDiag = new AboutDialog(this);
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -269,7 +242,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
             HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), helpDiag,
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
             Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
@@ -716,7 +689,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         GUIGlobals.sidePaneManager = this.sidePaneManager;
-        GUIGlobals.helpDiag = this.helpDiag;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
 
@@ -1397,7 +1369,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setRollover(true);
 
         tlb.setFloatable(false);
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
+        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             tlb.addAction(newBiblatexDatabaseAction);
         } else {
             tlb.addAction(newBibtexDatabaseAction);
@@ -1432,7 +1404,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
                 tlb.addAction(toggleRelevance);
@@ -1441,13 +1416,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.addAction(toggleQualityAssured);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
                 tlb.addAction(togglePrinted);
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                tlb.add(net.sf.jabref.specialfields.SpecialFieldDropDown.generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this));
+                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                        .generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this);
+                tlb.add(button);
+                specialFieldButtons.add(button);
             }
             tlb.addSeparator();
         }
@@ -1481,28 +1462,32 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    private List<Object> openDatabaseOnlyActions = new LinkedList<>();
-    private List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+
+    private final List<Object> specialFieldButtons = new LinkedList<>();
+    private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
+    private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
 
     private void initActions() {
-        openDatabaseOnlyActions = new LinkedList<>();
+        openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, unmark,
                 unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
-                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard,
-                replaceAll, sendAsEmail, downloadFullText, writeXmpAction,
-                findUnlinkedFiles, addToGroup, removeFromGroup, moveToGroup, autoLinkFile, resolveDuplicateKeys,
-                openUrl, openFolder, openFile, togglePreview, dupliCheck, autoSetFile,
-                newEntryAction, plainTextImport, massSetField, manageKeywords, pushExternalButton.getMenuAction(),
-                closeDatabaseAction, switchPreview, checkIntegrity, toggleHighlightAny, toggleHighlightAll,
-                databaseProperties, abbreviateIso, abbreviateMedline, unabbreviate, exportAll, exportSelected,
-                importCurrent, saveAll, dbConnect, dbExport, focusTable));
+                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                sendAsEmail, downloadFullText, writeXmpAction, findUnlinkedFiles, addToGroup, removeFromGroup,
+                moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
+                dupliCheck, autoSetFile, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                pushExternalButton.getMenuAction(), closeDatabaseAction, switchPreview, checkIntegrity,
+                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline,
+                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
+                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
         openDatabaseOnlyActions.addAll(fetcherActions);
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
-        severalDatabasesOnlyActions = new LinkedList<>();
+        openDatabaseOnlyActions.addAll(specialFieldButtons);
+
+        severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
@@ -1579,7 +1564,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             encoding = Globals.prefs.getDefaultEncoding();
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
+        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
         addTab(bp, file, raisePanel);
         return bp;
@@ -1897,10 +1882,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             LOGGER.debug(Globals.focusListener.getFocused().toString());
             JComponent source = Globals.focusListener.getFocused();
-            try {
-                source.getActionMap().get(command).actionPerformed(new ActionEvent(source, 0, command));
-            } catch (NullPointerException ex) {
-                // No component is focused, so we do nothing.
+            Action action = source.getActionMap().get(command);
+            if (action != null) {
+                action.actionPerformed(new ActionEvent(source, 0, command));
             }
         }
     }
@@ -2197,4 +2181,34 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
     }
+
+    class ToolBar extends OSXCompatibleToolbar {
+
+        void addAction(Action a) {
+            JButton b = new JButton(a);
+            b.setText(null);
+            if (!OS.OS_X) {
+                b.setMargin(marg);
+            }
+            // create a disabled Icon for FontBasedIcons as Swing does not automatically create one
+            Object obj = a.getValue(Action.LARGE_ICON_KEY);
+            if (obj instanceof IconTheme.FontBasedIcon) {
+                b.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
+            add(b);
+        }
+
+        void addJToogleButton(JToggleButton button) {
+            button.setText(null);
+            if (!OS.OS_X) {
+                button.setMargin(marg);
+            }
+            Object obj = button.getAction().getValue(Action.LARGE_ICON_KEY);
+            if (obj instanceof IconTheme.FontBasedIcon) {
+                button.setDisabledIcon(((IconTheme.FontBasedIcon) obj).createDisabledIcon());
+            }
+            add(button);
+        }
+    }
+
 }

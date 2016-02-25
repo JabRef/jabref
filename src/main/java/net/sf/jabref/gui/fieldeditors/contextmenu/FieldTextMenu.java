@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.fieldeditors.contextmenu;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -8,20 +7,27 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
-    private final CopyAction copyAct;
+    private final CopyAction copyAction;
+    private final PasteAction pasteAction;
+
+    private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
+
 
     public FieldTextMenu(FieldEditor fieldComponent) {
         field = fieldComponent;
-        copyAct = new CopyAction((JTextComponent) field);
+        copyAction = new CopyAction((JTextComponent) field);
+        pasteAction = new PasteAction((JTextComponent) field);
         initMenu();
     }
 
@@ -54,19 +60,32 @@ public class FieldTextMenu implements MouseListener {
 
                 // enable/disable copy to clipboard if selected text available
                 String txt = field.getSelectedText();
-                boolean cStat = false;
-                if ((txt != null) && !txt.isEmpty()) {
-                    cStat = true;
+                String allTxt = field.getText();
+                boolean copyStatus = false;
+                if (((txt != null) && (!txt.isEmpty())) || ((allTxt != null) && !allTxt.isEmpty())) {
+                    copyStatus = true;
                 }
-                copyAct.setEnabled(cStat);
+
+                copyAction.setEnabled(copyStatus);
+
+                String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+                boolean pasteStatus = false;
+                if (!data.isEmpty()) {
+                    pasteStatus = true;
+                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
+                            + StringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
+                } else {
+                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
+                }
+                pasteAction.setEnabled(pasteStatus);
                 inputMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
 
     private void initMenu() {
-        inputMenu.add(new PasteAction((Component) field));
-        inputMenu.add(copyAct);
+        inputMenu.add(pasteAction);
+        inputMenu.add(copyAction);
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
 

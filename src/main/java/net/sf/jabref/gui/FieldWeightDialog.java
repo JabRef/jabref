@@ -29,6 +29,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Created by IntelliJ IDEA.
@@ -69,7 +70,7 @@ public class FieldWeightDialog extends JDialog {
         {
             fields.add(InternalBibtexFields.getFieldName(i));
         }
-        fields.remove("bibtexkey"); // bibtex key doesn't need weight.
+        fields.remove(BibEntry.KEY_FIELD); // bibtex key doesn't need weight.
         // Here is the place to add other fields:
 
         // --------------

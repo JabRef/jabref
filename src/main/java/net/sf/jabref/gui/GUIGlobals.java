@@ -31,7 +31,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -81,7 +80,6 @@ public class GUIGlobals {
     // further below.
     public static final Color activeEditor = new Color(230, 230, 255);
     public static SidePaneManager sidePaneManager;
-    public static AboutDialog helpDiag;
 
     //	Colors.
     public static final Color entryEditorLabelColor = new Color(100, 100, 150); // Empty field, blue.

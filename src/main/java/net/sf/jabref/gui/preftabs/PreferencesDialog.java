@@ -46,7 +46,6 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.maintable.MainTable;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 import org.apache.commons.logging.Log;
@@ -99,22 +98,22 @@ public class PreferencesDialog extends JDialog {
         // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
         // ----------------------------------------------------------------
         List<PrefsTab> tabs = new ArrayList<>();
-        tabs.add(new GeneralTab(frame, prefs));
+        tabs.add(new GeneralTab(prefs));
         tabs.add(new NetworkTab(prefs));
         tabs.add(new FileTab(frame, prefs));
         tabs.add(new FileSortTab(prefs));
         tabs.add(new EntryEditorPrefsTab(frame, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
         tabs.add(new AppearancePrefsTab(prefs));
-        tabs.add(new ExternalTab(frame, this, prefs, parent.helpDiag));
+        tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new LabelPatternPrefTab(prefs, parent.helpDiag, parent.getCurrentBasePanel()));
+        tabs.add(new LabelPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new PreviewPrefsTab(prefs));
-        tabs.add(new NameFormatterTab(parent.helpDiag));
+        tabs.add(new NameFormatterTab());
         tabs.add(new ImportSettingsTab());
         tabs.add(new XmpPrefsTab());
-        tabs.add(new AdvancedTab(prefs, parent.helpDiag, jabRef));
+        tabs.add(new AdvancedTab(prefs, jabRef));
 
         Iterator<PrefsTab> prefTabs = tabs.iterator();
         String[] names = new String[tabs.size()];

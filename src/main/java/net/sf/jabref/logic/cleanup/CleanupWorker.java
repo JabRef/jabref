@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -53,9 +53,9 @@ public class CleanupWorker {
     public List<FieldChange> cleanup(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        ArrayList<CleanupJob> jobs = determineCleanupActions();
+        List<CleanupJob> jobs = determineCleanupActions();
 
-        ArrayList<FieldChange> changes = new ArrayList<>();
+        List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
         }
@@ -63,8 +63,8 @@ public class CleanupWorker {
         return changes;
     }
 
-    private ArrayList<CleanupJob> determineCleanupActions() {
-        ArrayList<CleanupJob> jobs = new ArrayList<>();
+    private List<CleanupJob> determineCleanupActions() {
+        List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
             jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));

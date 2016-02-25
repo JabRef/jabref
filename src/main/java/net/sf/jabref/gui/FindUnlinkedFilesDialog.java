@@ -27,8 +27,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -76,7 +74,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -525,7 +523,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * The import itself will run in a seperate thread, whilst this dialog will
      * be showing a progress bar, until the thread has finished its work. <br>
      * <br>
-     * When the import has finished, the {@link #importFinishedHandler(int, java.util.List)} is
+     * When the import has finished, the {@link #importFinishedHandler(java.util.List)} is
      * invoked.
      */
     private void startImport() {
@@ -756,13 +754,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         checkboxCreateKeywords = new JCheckBox(Localization.lang("Create directory based keywords"));
         checkboxCreateKeywords.setToolTipText(Localization.lang("Creates keywords in created entrys with directory pathnames"));
         checkboxCreateKeywords.setSelected(checkBoxWhyIsThereNoGetSelectedStupidSwing);
-        checkboxCreateKeywords.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing;
-            }
-        });
+        checkboxCreateKeywords.addItemListener(e -> checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing);
 
         textfieldDirectoryPath = new JTextField();
         textfieldDirectoryPath.setText(lastSelectedDirectory == null ? "" : lastSelectedDirectory.getAbsolutePath());

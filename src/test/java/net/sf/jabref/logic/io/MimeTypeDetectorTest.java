@@ -1,14 +1,34 @@
 package net.sf.jabref.logic.io;
 
-import net.sf.jabref.support.DevEnvironment;
-import org.junit.Assume;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.Rule;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.net.URISyntaxException;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class MimeTypeDetectorTest {
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule();
+
+    @Test
+    public void handlePermanentRedirections() {
+        String redirectedUrl = "http://localhost:8080/redirection";
+
+        stubFor(get(urlEqualTo("/redirection"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(301)
+                                .withHeader("Location", "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(redirectedUrl));
+    }
+
     @Test
     public void beFalseForInvalidUrl() {
         String invalidUrl = "thisisnourl";
@@ -23,23 +43,26 @@ public class MimeTypeDetectorTest {
 
     @Test
     public void beTrueForPdfMimeType() {
-        String pdfUrl = "https://www.uni-bamberg.de/fileadmin/uni/fakultaeten/wiai_lehrstuehle/praktische_informatik/Dateien/Publikationen/cloud15-application-migration-effort-in-the-cloud.pdf";
+        String pdfUrl = "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf";
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 
     @Test
-    public void acceptPDFMimeTypeVariations() {
-        // application/pdf;charset=ISO-8859-1
-        String pdfUrl = "http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf";
-        assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
+    public void beTrueForLocalPdfUri() throws URISyntaxException {
+        String localPath = MimeTypeDetectorTest.class.getResource("empty.pdf").toURI().toASCIIString();
+        assertTrue(MimeTypeDetector.isPdfContentType(localPath));
     }
 
     @Test
-    public void useGetRequestIfHeadRequestHasNoContentType() {
-        // FIXME: Fails on CI server
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+    public void beTrueForPDFMimeTypeVariations() {
+        String mimeTypeVariation = "http://localhost:8080/mimevariation";
 
-        String pdfUrl = "http://iopscience.iop.org/article/10.1088/0004-637X/815/1/23/pdf";
-        assertEquals("application/pdf", MimeTypeDetector.getMimeType(pdfUrl));
+        stubFor(get(urlEqualTo("/mimevariation"))
+                .willReturn(
+                        aResponse().withHeader("Content-Type", "application/pdf;charset=ISO-8859-1")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(mimeTypeVariation));
     }
 }

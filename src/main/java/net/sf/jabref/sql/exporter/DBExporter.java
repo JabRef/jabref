@@ -40,9 +40,10 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.exporter.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
@@ -77,13 +78,17 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
                                String dbName) throws Exception {
-        List<BibEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
+        Defaults defaults = new Defaults(
+                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
+
+        SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, keySet, savePrefs);
         GroupTreeNode gtn = metaData.getGroups();
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)));
-        populateEntryTypesTable(out, new BibDatabaseContext(database, metaData, defaults).getMode());
+        populateEntryTypesTable(out, bibDatabaseContext.getMode());
         populateEntriesTable(database_id, entries, out);
         populateStringTable(database, out, database_id);
         populateGroupTypesTable(out);
@@ -117,7 +122,7 @@ public abstract class DBExporter extends DBImporterExporter {
                      * The condition below is there since PostgreSQL automatically escapes the backslashes, so the entry
                      * would double the number of slashes after storing/retrieving.
                      **/
-                    if ("MySQL".equals(dbStrings.getServerType())) {
+                    if ((out instanceof Connection) && "MySQL".equals(dbStrings.getServerType())) {
                         val = val.replace("\\", "\\\\");
                         val = val.replace("\"", "\\\"");
                         val = val.replace("\'", "''");

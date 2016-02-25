@@ -20,18 +20,20 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.List;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.search.SearchMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSets;
-import net.sf.jabref.logic.search.rules.sets.SearchRuleSet;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -176,17 +178,17 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
      *
      * @return A SearchRule that finds the desired elements.
      */
-    public SearchRule getSearchRule() {
+    public SearchMatcher getSearchRule() {
         return getSearchRule(getGroup().getHierarchicalContext());
     }
 
-    private SearchRule getSearchRule(GroupHierarchyType originalContext) {
+    private SearchMatcher getSearchRule(GroupHierarchyType originalContext) {
         final GroupHierarchyType context = getGroup().getHierarchicalContext();
         if (context == GroupHierarchyType.INDEPENDENT) {
-            return getGroup().getSearchRule();
+            return getGroup();
         }
-        SearchRuleSet searchRule = SearchRuleSets.build(context == GroupHierarchyType.REFINING ? SearchRuleSets.RuleSetType.AND : SearchRuleSets.RuleSetType.OR);
-        searchRule.addRule(getGroup().getSearchRule());
+        MatcherSet searchRule = MatcherSets.build(context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+        searchRule.addRule(getGroup());
         if ((context == GroupHierarchyType.INCLUDING)
                 && (originalContext != GroupHierarchyType.REFINING)) {
             for (int i = 0; i < getChildCount(); ++i) {
@@ -291,7 +293,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Adds the selected entries to this node's group.
      */
-    public AbstractUndoableEdit addToGroup(BibEntry[] entries) {
+    public AbstractUndoableEdit addToGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }
@@ -305,7 +307,7 @@ public class GroupTreeNode extends DefaultMutableTreeNode implements Transferabl
     /**
      * Removes the selected entries from this node's group.
      */
-    public AbstractUndoableEdit removeFromGroup(BibEntry[] entries) {
+    public AbstractUndoableEdit removeFromGroup(List<BibEntry> entries) {
         if (getGroup() == null) {
             return null; // paranoia
         }

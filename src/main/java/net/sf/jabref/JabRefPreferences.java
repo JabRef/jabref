@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -43,8 +44,9 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
+import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
@@ -60,7 +62,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -83,7 +84,7 @@ public class JabRefPreferences {
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
     public static final String NAMES_NATBIB = "namesNatbib";
     public static final String NAMES_FIRST_LAST = "namesFf";
-    public static final String BIBLATEX_MODE = "biblatexMode";
+    public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
     public static final String NAMES_AS_IS = "namesAsIs";
     public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeight";
@@ -110,6 +111,7 @@ public class JabRefPreferences {
     public static final String TABLE_SECONDARY_SORT_DESCENDING = "secDescending";
     public static final String TABLE_TERTIARY_SORT_FIELD = "terSort";
     public static final String TABLE_TERTIARY_SORT_DESCENDING = "terDescending";
+    public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
     public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
@@ -431,7 +433,7 @@ public class JabRefPreferences {
         defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
 
-        defaults.put(BIBLATEX_MODE, false);
+        defaults.put(BIBLATEX_DEFAULT_MODE, false);
 
         if (OS.OS_X) {
             //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");
@@ -504,6 +506,8 @@ public class JabRefPreferences {
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
         defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
+
+        defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
 
         // export order
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.FALSE);
@@ -942,17 +946,7 @@ public class JabRefPreferences {
             return;
         }
 
-        if (value.isEmpty()) {
-            put(key, "");
-        } else {
-            StringBuilder linked = new StringBuilder();
-            for (int i = 0; i < (value.size() - 1); i++) {
-                linked.append(makeEscape(value.get(i)));
-                linked.append(';');
-            }
-            linked.append(makeEscape(value.get(value.size() - 1)));
-            put(key, linked.toString());
-        }
+        put(key, value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
     }
 
 
@@ -1164,19 +1158,6 @@ public class JabRefPreferences {
         } else {
             return "";
         }
-    }
-
-    private static String makeEscape(String s) {
-        StringBuilder sb = new StringBuilder();
-        int c;
-        for (int i = 0; i < s.length(); i++) {
-            c = s.charAt(i);
-            if ((c == '\\') || (c == ';')) {
-                sb.append('\\');
-            }
-            sb.append((char) c);
-        }
-        return sb.toString();
     }
 
     /**

@@ -17,10 +17,7 @@ package net.sf.jabref.gui.preftabs;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -40,8 +37,6 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
-
-    private final JButton help = new HelpAction(Localization.lang("Help on Preview Settings"), HelpFiles.previewHelp).getHelpButton();
 
     private final JButton testButton = new JButton(Localization.lang("Test"));
     private final JButton defaultButton = new JButton(Localization.lang("Default"));

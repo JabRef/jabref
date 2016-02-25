@@ -44,16 +44,16 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<String> dir = metaData.getFileDirectory(fieldName);
 
-            File file = FileUtil.expandFilename(link, dir);
+            Optional<File> file = FileUtil.expandFilename(link, dir);
 
             // Check that the file exists:
-            if ((file == null) || !file.exists()) {
+            if (!file.isPresent() || !file.get().exists()) {
                 throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
-            link = file.getCanonicalPath();
+            link = file.get().getCanonicalPath();
 
             // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.getName().split("\\.");
+            String[] split = file.get().getName().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = "pdf";
@@ -216,9 +216,9 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            File tmp = FileUtil.expandFilename(metaData, link);
-            if (tmp != null) {
-                file = tmp;
+            Optional<File> tmp = FileUtil.expandFilename(metaData, link);
+            if (tmp.isPresent()) {
+                file = tmp.get();
             }
         }
 
@@ -323,9 +323,8 @@ public class JabRefDesktop {
             editor.setVisible(true);
             if (editor.okPressed()) {
                 // Get the old list of types, add this one, and update the list in prefs:
-                List<ExternalFileType> fileTypes = new ArrayList<>();
-                ExternalFileType[] oldTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-                Collections.addAll(fileTypes, oldTypes);
+                List<ExternalFileType> fileTypes = new ArrayList<>(
+                        ExternalFileTypes.getInstance().getExternalFileTypeSelection());
                 fileTypes.add(newType);
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);

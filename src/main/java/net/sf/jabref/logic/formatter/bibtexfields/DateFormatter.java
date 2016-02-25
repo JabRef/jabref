@@ -5,6 +5,7 @@ import net.sf.jabref.logic.formatter.Formatter;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
@@ -30,13 +31,13 @@ public class DateFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        TemporalAccessor parsedDate = tryParseDate(value);
-        if (parsedDate == null) {
+        Optional<TemporalAccessor> parsedDate = tryParseDate(value);
+        if (!parsedDate.isPresent()) {
             return value;
         }
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM[-dd]");
-        return dateFormatter.format(parsedDate);
+        return dateFormatter.format(parsedDate.get());
     }
 
     /*
@@ -47,7 +48,7 @@ public class DateFormatter implements Formatter {
      *  "d.M.uuuu" (covers 15.1.2015)
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
-    private TemporalAccessor tryParseDate(String dateString) {
+    private Optional<TemporalAccessor> tryParseDate(String dateString) {
         String[] formatStrings = {
                 "uuuu-M-d", "uuuu-M",
                 "M/uu", "M/uuuu",
@@ -55,11 +56,12 @@ public class DateFormatter implements Formatter {
                 "d.M.uuuu"};
         for (String formatString : formatStrings) {
             try {
-                return DateTimeFormatter.ofPattern(formatString).parse(dateString);
+                return Optional.of(DateTimeFormatter.ofPattern(formatString).parse(dateString));
             } catch (DateTimeParseException ignored) {
+                // Ignored
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,12 +16,12 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.util.Util;
 
@@ -52,17 +52,12 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()},
-                mPanel.getSelectedEntries(),
-                mPanel.getDatabase(),
-                mPanel.frame()))
-         {
+        if (!Util.warnAssignmentSideEffects(Arrays.asList(mNode.getGroup()), mPanel.frame())) {
             return; // user aborted operation
         }
 
         AbstractUndoableEdit undo = mNode.removeFromGroup(mPanel.getSelectedEntries());
-        if (undo == null)
-         {
+        if (undo == null) {
             return; // no changed made
         }
 

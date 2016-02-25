@@ -15,14 +15,10 @@
  */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.database.BibDatabaseMode;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -96,9 +92,13 @@ public class AutoSaveManager {
         File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
         File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
         try {
-            SaveSession ss = FileActions.saveDatabase(panel.getBibDatabaseContext(),
-                    backupFile, Globals.prefs, false, false, panel.getEncoding(), true);
-            ss.commit();
+            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
+                    .withMakeBackup(false)
+                    .withEncoding(panel.getEncoding());
+
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+            SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
+
         } catch (SaveException e) {
             LOGGER.error("Problem with automatic save", e);
             return false;

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,14 +38,14 @@ import net.sf.jabref.util.Util;
 
 class LayoutEntry {
 
-    private LayoutFormatter[] option;
+    private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:
     private LayoutFormatter postFormatter;
 
     private String text;
 
-    private LayoutEntry[] layoutEntries;
+    private List<LayoutEntry> layoutEntries;
 
     private final int type;
 
@@ -63,8 +64,7 @@ class LayoutEntry {
         } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
         } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            List<String> v = new ArrayList<>();
-            WSITools.tokenize(v, si.s, "\n");
+            List<String> v = StringUtil.tokenizeToList(si.s, "\n");
 
             if (v.size() == 1) {
                 text = v.get(0);
@@ -132,17 +132,14 @@ class LayoutEntry {
             }
         }
 
-        layoutEntries = new LayoutEntry[tmpEntries.size()];
+        layoutEntries = new ArrayList<>(tmpEntries);
 
-        for (int i = 0; i < tmpEntries.size(); i++) {
-            layoutEntries[i] = tmpEntries.get(i);
-
-            // Note if one of the entries has an invalid formatter:
-            if (layoutEntries[i].isInvalidFormatter()) {
+        for (LayoutEntry layoutEntry : layoutEntries) {
+            if (layoutEntry.isInvalidFormatter()) {
                 if (invalidFormatter == null) {
                     invalidFormatter = new ArrayList<>(1);
                 }
-                invalidFormatter.addAll(layoutEntries[i].getInvalidFormatters());
+                invalidFormatter.addAll(layoutEntry.getInvalidFormatters());
             }
 
         }
@@ -212,12 +209,12 @@ class LayoutEntry {
                 String fieldText;
                 boolean previousSkipped = false;
 
-                for (int i = 0; i < layoutEntries.length; i++) {
-                    fieldText = layoutEntries[i].doLayout(bibtex, database);
+                for (int i = 0; i < layoutEntries.size(); i++) {
+                    fieldText = layoutEntries.get(i).doLayout(bibtex, database);
 
                     if (fieldText == null) {
-                        if ((i + 1) < layoutEntries.length) {
-                            if (layoutEntries[i + 1].doLayout(bibtex, database).trim().isEmpty()) {
+                        if ((i + 1) < layoutEntries.size()) {
+                            if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
                                 i++;
                                 previousSkipped = true;
                                 continue;
@@ -239,9 +236,6 @@ class LayoutEntry {
                                 sb.append(fieldText.substring(eol));
                             }
                         } else {
-                            //System.out.println("ENTRY-BLOCK: " +
-                            //layoutEntries[i].doLayout(bibtex));
-
                             /*
                              * if fieldText is not null and the bibtexentry is marked
                              * as a searchhit, try to highlight the searched words
@@ -283,7 +277,6 @@ class LayoutEntry {
                 }
             }
 
-            //System.out.println("OPTION: "+option);
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     fieldEntry = anOption.format(fieldEntry);
@@ -362,7 +355,7 @@ class LayoutEntry {
             return null;
         }
 
-        if (className.equals("JournalAbbreviator")) {
+        if ("JournalAbbreviator".equals(className)) {
             return new JournalAbbreviator(repostiory);
         }
 
@@ -384,7 +377,8 @@ class LayoutEntry {
      * @param repository
      *
      */
-    private static LayoutFormatter[] getOptionalLayout(String formatterName, JournalAbbreviationRepository repository) {
+    private static List<LayoutFormatter> getOptionalLayout(String formatterName,
+            JournalAbbreviationRepository repository) {
 
         List<String[]> formatterStrings = Util.parseMethodsCalls(formatterName);
 
@@ -437,7 +431,7 @@ class LayoutEntry {
             //throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
         }
 
-        return results.toArray(new LayoutFormatter[results.size()]);
+        return results;
     }
 
     public boolean isInvalidFormatter() {

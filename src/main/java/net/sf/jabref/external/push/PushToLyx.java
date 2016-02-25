@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -69,7 +70,8 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     }
 
     @Override
-    public void pushEntries(BibDatabase database, final BibEntry[] entries, final String keyString, MetaData metaData) {
+    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
+            MetaData metaData) {
 
         couldNotConnect = false;
         couldNotCall = false;

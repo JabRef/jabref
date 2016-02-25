@@ -3,7 +3,6 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Assert;
@@ -24,9 +23,9 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class OAI2ImportTest {
 
-    OAI2Handler handler;
+    protected OAI2Handler handler;
 
-    BibEntry be;
+    protected BibEntry be;
 
     protected SAXParserFactory parserFactory;
 

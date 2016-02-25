@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,6 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -42,7 +41,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -56,7 +55,7 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -235,8 +234,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
-                List<String> temp = EntryUtil.getRemainder((secondaryOptionalFields), new ArrayList<>(deprecatedFields));
-                String[] optionalFieldsNotPrimaryOrDeprecated = temp.toArray(new String[temp.size()]);
+                List<String> optionalFieldsNotPrimaryOrDeprecated = EntryUtil.getRemainder((secondaryOptionalFields),
+                        new ArrayList<>(deprecatedFields));
 
                 // Get list of all optional fields of this entry and their aliases
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
@@ -252,8 +251,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
-                EntryEditorTab optPan2 = new EntryEditorTab(frame, panel,
-                        java.util.Arrays.asList(optionalFieldsNotPrimaryOrDeprecated), this,
+                EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
                         false, true, Localization.lang("Optional fields 2"));
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
@@ -264,8 +262,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
                     EntryEditorTab optPan3;
-                    optPan3 = new EntryEditorTab(frame, panel,
-                            java.util.Arrays.asList(usedOptionalFieldsDeprecated.toArray(new String[usedOptionalFieldsDeprecated.size()])), this,
+                    optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
                             false, true, Localization.lang("Deprecated fields"));
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
@@ -435,10 +432,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
             return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
-        } else if (InternalBibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
-                || InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
-            return FieldExtraComponents.getBrowseDocExtraComponent(frame, panel, editor, this,
-                    InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
         } else if (InternalBibtexFields.EXTRA_URL.equals(fieldExtras)) {
             return FieldExtraComponents.getURLExtraComponent(editor, storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {
@@ -797,15 +790,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
             // TODO: does updating work properly after source stored?
             panel.markBaseChanged();
-            ///////////////////////////////////////////////////////
-            SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    final int row = panel.mainTable.findEntry(entry);
-                    if (row >= 0) {
-                        panel.mainTable.ensureVisible(row);
-                    }
+            SwingUtilities.invokeLater(() -> {
+                final int row = panel.mainTable.findEntry(entry);
+                if (row >= 0) {
+                    panel.mainTable.ensureVisible(row);
                 }
             });
 
@@ -897,13 +886,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public TypeButton() {
             super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
-            addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    showChangeEntryTypePopupMenu();
-                }
-            });
+            addActionListener(e -> showChangeEntryTypePopupMenu());
         }
     }
 
@@ -978,14 +961,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             //  This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                    if (activeTab instanceof EntryEditorTab) {
-                        ((EntryEditorTab) activeTab).updateAll();
-                    }
+            SwingUtilities.invokeLater(() -> {
+                Object activeTab = tabs.get(tabbed.getSelectedIndex());
+                if (activeTab instanceof EntryEditorTab) {
+                    ((EntryEditorTab) activeTab).updateAll();
                 }
             });
 
@@ -1061,7 +1040,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Make sure the key is legal:
-                String cleaned = net.sf.jabref.util.Util.checkLegalKey(newValue);
+                String cleaned = net.sf.jabref.logic.labelpattern.LabelPatternUtil.checkLegalKey(newValue);
                 if ((cleaned != null) && !cleaned.equals(newValue)) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
                             Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
@@ -1177,14 +1156,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             if (!movingAway && isShowing()) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final int row = panel.mainTable.findEntry(entry);
-                        if (row >= 0) {
-                            panel.mainTable.ensureVisible(row);
-                        }
+                SwingUtilities.invokeLater(() -> {
+                    final int row = panel.mainTable.findEntry(entry);
+                    if (row >= 0) {
+                        panel.mainTable.ensureVisible(row);
                     }
                 });
             }
@@ -1325,8 +1300,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // here we update the field
             String bibtexKeyData = entry.getCiteKey();
-
-            // set the field named for "bibtexkey"
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();

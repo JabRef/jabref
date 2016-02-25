@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,18 +15,21 @@
 */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Internally, it consists of a search pattern.
@@ -37,22 +40,18 @@ public class SearchGroup extends AbstractGroup {
 
     public static final String ID = "SearchGroup:";
 
-    private final String searchExpression;
-    private final boolean caseSensitive;
-    private final boolean regExp;
+    private final SearchQuery query;
 
-    private final SearchRule searchRule;
+    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
+
 
     /**
      * Creates a SearchGroup with the specified properties.
      */
     public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp, GroupHierarchyType context) {
         super(name, context);
-        this.searchExpression = searchExpression;
-        this.caseSensitive = caseSensitive;
-        this.regExp = regExp;
 
-        this.searchRule = SearchRules.getSearchRuleByQuery(searchExpression, caseSensitive, regExp);
+        this.query = new SearchQuery(searchExpression, caseSensitive, regExp);
     }
 
     /**
@@ -108,28 +107,20 @@ public class SearchGroup extends AbstractGroup {
     }
 
     /**
-     * @see AbstractGroup#getSearchRule()
-     */
-    @Override
-    public SearchRule getSearchRule() {
-        return this.searchRule;
-    }
-
-    /**
      * Returns a String representation of this object that can be used to
      * reconstruct it.
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + context.ordinal() + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
-                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
+        return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + context.ordinal() + AbstractGroup.SEPARATOR
+                + StringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive())
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {
-        return searchExpression;
+        return this.query.getQuery();
     }
 
     @Override
@@ -143,13 +134,13 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibEntry[] entries) {
+    public AbstractUndoableEdit add(List<BibEntry> entries) {
         // nothing to do, add is not supported
         return null;
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibEntry[] entries) {
+    public AbstractUndoableEdit remove(List<BibEntry> entries) {
         // nothing to do, remove is not supported
         return null;
     }
@@ -161,49 +152,37 @@ public class SearchGroup extends AbstractGroup {
         }
         SearchGroup other = (SearchGroup) o;
         return name.equals(other.name)
-                && searchExpression.equals(other.searchExpression)
-                && (caseSensitive == other.caseSensitive)
-                && (regExp == other.regExp)
+                && this.getSearchExpression().equals(other.getSearchExpression())
+                && (this.isCaseSensitive() == other.isCaseSensitive())
+                && (isRegExp() == other.isRegExp())
                 && (getHierarchicalContext() == other.getHierarchicalContext());
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.groups.structure.AbstractGroup#contains(java.util.Map,
-     *      net.sf.jabref.BibEntry)
-     */
-    @Override
-    public boolean contains(String searchOptions, BibEntry entry) {
-        return getSearchRule().applyRule(searchOptions, entry);
     }
 
     @Override
     public boolean contains(BibEntry entry) {
-        return contains(SearchRule.DUMMY_QUERY, entry);
+        return this.query.isMatch(entry);
     }
 
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(name, searchExpression, caseSensitive,
-                    regExp, context);
+            return new SearchGroup(getName(), getSearchExpression(), isCaseSensitive(),
+                    isRegExp(), getHierarchicalContext());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            System.err.println("Internal error: Exception " + t
-                    + " in SearchGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            LOGGER.error("Internal error in SearchGroup.deepCopy(). "
+                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }
     }
 
     public boolean isCaseSensitive() {
-        return caseSensitive;
+        return this.query.isCaseSensitive();
     }
 
     public boolean isRegExp() {
-        return regExp;
+        return this.query.isRegularExpression();
     }
 
     @Override
@@ -213,7 +192,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public String getDescription() {
-        return SearchDescribers.getSearchDescriberFor(searchRule, searchExpression).getDescription();
+        return this.query.getDescription();
     }
 
     @Override
@@ -230,7 +209,7 @@ public class SearchGroup extends AbstractGroup {
         sb.append(" (");
         sb.append(Localization.lang("search expression"));
         sb.append(" <b>").
-                append(StringUtil.quoteForHTML(searchExpression)).append("</b>)");
+                append(StringUtil.quoteForHTML(getSearchExpression())).append("</b>)");
         switch (getHierarchicalContext()) {
         case INCLUDING:
             sb.append(", ").append(Localization.lang("includes subgroups"));

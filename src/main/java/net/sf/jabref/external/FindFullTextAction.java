@@ -21,6 +21,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.logic.fetcher.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -58,7 +59,7 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void run() {
         // TODO: just download for all entries and save files without dialog
-        entry = basePanel.getSelectedEntries()[0];
+        entry = basePanel.getSelectedEntries().get(0);
         FindFullText fft = new FindFullText();
         result = fft.findFullTextPDF(entry);
     }

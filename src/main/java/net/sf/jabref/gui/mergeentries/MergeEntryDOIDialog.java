@@ -22,7 +22,6 @@ import java.util.TreeSet;
 
 import javax.swing.*;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
@@ -62,14 +61,14 @@ public class MergeEntryDOIDialog extends JDialog {
 
         this.panel = panel;
 
-        if (panel.getSelectedEntries().length != 1) {
+        if (panel.getSelectedEntries().size() != 1) {
             JOptionPane.showMessageDialog(panel.frame(), Localization.lang("Select one entry."),
                     Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
 
-        this.originalEntry = panel.getSelectedEntries()[0];
+        this.originalEntry = panel.getSelectedEntries().get(0);
         panel.output(Localization.lang("Fetching info based on DOI"));
         this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi"), null);
 

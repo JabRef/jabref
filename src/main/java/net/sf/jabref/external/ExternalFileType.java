@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.external;
 
+import java.util.Objects;
+
 import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
@@ -56,7 +58,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @param val arguments.
      */
     public static ExternalFileType buildFromArgs(String[] val) {
-        if ((val == null) || (val.length < 4) || val.length > 5) {
+        if ((val == null) || (val.length < 4) || (val.length > 5)) {
             throw new IllegalArgumentException("Cannot construct ExternalFileType without four elements in String[] argument.");
         }
         String name = val[0];
@@ -194,7 +196,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, extension, mimeType, openWith, iconName);
     }
 
     /**
@@ -206,17 +208,18 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     @Override
     public boolean equals(Object object) {
-        if (object == null) {
-            return false;
+        if (this == object) {
+            return true;
         }
-        if (!(object instanceof ExternalFileType)) {
-            return false;
+
+        if (object instanceof ExternalFileType) {
+            ExternalFileType other = (ExternalFileType) object;
+            return (name == null ? other.name == null : name.equals(other.name))
+                    && (extension == null ? other.extension == null : extension.equals(other.extension))
+                    && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
+                    && (openWith == null ? other.openWith == null : openWith.equals(other.openWith))
+                    && (iconName == null ? other.iconName == null : iconName.equals(other.iconName));
         }
-        ExternalFileType other = (ExternalFileType) object;
-        return (name == null ? other.name == null : name.equals(other.name))
-                && (extension == null ? other.extension == null : extension.equals(other.extension))
-                && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
-                && (openWith == null ? other.openWith == null : openWith.equals(other.openWith))
-                && (iconName == null ? other.iconName == null : iconName.equals(other.iconName));
+        return false;
     }
 }

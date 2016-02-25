@@ -182,6 +182,20 @@ class CitationManager {
             return this.refMarkName.compareTo(other.refMarkName);
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof CitEntry) {
+                CitEntry other = (CitEntry) o;
+                return this.refMarkName.equals(other.refMarkName);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.refMarkName.hashCode();
+        }
+
         public String getContext() {
             return context;
         }
@@ -239,11 +253,11 @@ class CitationManager {
         private final JLabel title;
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        private final CitEntry _entry;
+        private final CitEntry entry;
 
 
-        public SingleCitDialog(CitEntry entry) {
-            this._entry = entry;
+        public SingleCitDialog(CitEntry citEntry) {
+            this.entry = citEntry;
             title = new JLabel(entry.getContext());
             pageInfo.setText(entry.getPageInfo().orElse(""));
 
@@ -271,9 +285,9 @@ class CitationManager {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     if (pageInfo.getText().trim().isEmpty()) {
-                        _entry.setPageInfo(null);
+                        entry.setPageInfo(null);
                     } else {
-                        _entry.setPageInfo(pageInfo.getText().trim());
+                        entry.setPageInfo(pageInfo.getText().trim());
                     }
                     tableModel.fireTableDataChanged();
                     singleCiteDialog.dispose();

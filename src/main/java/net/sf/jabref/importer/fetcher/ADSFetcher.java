@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -104,7 +105,8 @@ public class ADSFetcher implements EntryFetcher {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
             HttpURLConnection ADSConnection = (HttpURLConnection) ADSUrl.openConnection();
             ADSConnection.setRequestProperty("User-Agent", "JabRef");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(ADSConnection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(ADSConnection.getInputStream(), Charset.forName("ISO-8859-1")))) {
                 ParserResult pr = BibtexParser.parse(reader);
                 return pr.getDatabase();
             }

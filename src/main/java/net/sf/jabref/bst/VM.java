@@ -126,14 +126,6 @@ public class VM implements Warn {
         this(new ANTLRStringStream(s));
     }
 
-    private static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
-        BstLexer lex = new BstLexer(bst);
-        CommonTokenStream tokens = new CommonTokenStream(lex);
-        BstParser parser = new BstParser(tokens);
-        BstParser.program_return r = parser.program();
-        return (CommonTree) r.getTree();
-    }
-
     private VM(CharStream bst) throws RecognitionException {
         this(VM.charStream2CommonTree(bst));
     }
@@ -305,7 +297,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation add.period$");
                 }
                 Object o1 = stack.pop();
@@ -366,7 +358,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation chr.to.int$");
                 }
                 Object o1 = stack.pop();
@@ -403,7 +395,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation duplicate$");
                 }
                 Object o1 = stack.pop();
@@ -422,7 +414,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation empty$");
                 }
                 Object o1 = stack.pop();
@@ -485,7 +477,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation int.to.chr$");
                 }
                 Object o1 = stack.pop();
@@ -508,7 +500,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation int.to.str$");
                 }
                 Object o1 = stack.pop();
@@ -530,7 +522,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation missing$");
                 }
                 Object o1 = stack.pop();
@@ -575,7 +567,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation num.names$");
                 }
                 Object o1 = stack.pop();
@@ -756,7 +748,7 @@ public class VM implements Warn {
              */
             @Override
             public void execute(BstEntry context) {
-                if (stack.size() < 1) {
+                if (stack.isEmpty()) {
                     throw new VMException("Not enough operands on stack for operation text.length$");
                 }
                 Object o1 = stack.pop();
@@ -950,6 +942,14 @@ public class VM implements Warn {
 
     }
 
+    private static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {
+        BstLexer lex = new BstLexer(bst);
+        CommonTokenStream tokens = new CommonTokenStream(lex);
+        BstParser parser = new BstParser(tokens);
+        BstParser.program_return r = parser.program();
+        return (CommonTree) r.getTree();
+    }
+
     private boolean assign(BstEntry context, Object o1, Object o2) {
 
         if (!(o1 instanceof Identifier) || !((o2 instanceof String) || (o2 instanceof Integer))) {
@@ -1014,8 +1014,6 @@ public class VM implements Warn {
                 i.add(new BstEntry(entry));
             }
         }
-
-        // assert tree.getType() == Bst.COMMANDS;
 
         // Go
         for (int i = 0; i < tree.getChildCount(); i++) {
@@ -1133,7 +1131,6 @@ public class VM implements Warn {
     private void entry(Tree child) {
         // Fields first
         Tree t = child.getChild(0);
-        // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();
@@ -1145,7 +1142,6 @@ public class VM implements Warn {
 
         // Integers
         t = child.getChild(1);
-        // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();
@@ -1156,7 +1152,6 @@ public class VM implements Warn {
         }
         // Strings
         t = child.getChild(2);
-        // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();
@@ -1225,7 +1220,6 @@ public class VM implements Warn {
         }
 
         public StackFunction(Tree stack) {
-            // assert stack.getType() == Bst.STACK;
             localTree = stack;
         }
 
@@ -1326,7 +1320,6 @@ public class VM implements Warn {
      */
     private void integers(Tree child) {
         Tree t = child.getChild(0);
-        // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();
@@ -1343,7 +1336,6 @@ public class VM implements Warn {
      */
     private void strings(Tree child) {
         Tree t = child.getChild(0);
-        // assert t.getType() == Bst.IDLIST;
 
         for (int i = 0; i < t.getChildCount(); i++) {
             String name = t.getChild(i).getText();

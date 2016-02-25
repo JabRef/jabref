@@ -17,9 +17,9 @@ package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
+import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;
@@ -37,14 +37,14 @@ public class BibtexKeyPatternDialog extends JDialog {
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
         super(parent, Localization.lang("BibTeX key patterns"), true);
-        this.labelPatternPanel = new LabelPatternPanel(parent.helpDiag, panel);
+        this.labelPatternPanel = new LabelPatternPanel(panel);
         setPanel(panel);
         init();
     }
 
     /**
      * Used for updating an existing Dialog
-     * 
+     *
      * @param panel the panel to read the data from
      */
     public void setPanel(BasePanel panel) {

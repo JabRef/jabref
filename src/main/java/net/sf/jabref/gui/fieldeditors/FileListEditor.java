@@ -26,9 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -46,6 +46,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.jabref.*;
 import net.sf.jabref.external.*;
+
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.gui.*;
@@ -259,18 +260,18 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                File file = FileUtil.expandFilename(metaData, entry.link);
+                Optional<File> file = FileUtil.expandFilename(metaData, entry.link);
 
                 // transactional delete and unlink
                 try {
-                    if (file != null) {
-                        Files.delete(file.toPath());
+                    if (file.isPresent()) {
+                        Files.delete(file.get().toPath());
                     }
                     removeEntries();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
                             Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn("File permission error while deleting: " + file.toPath(), ex);
+                    LOGGER.warn("File permission error while deleting: " + entry.link, ex);
                 }
             }
         });
@@ -431,7 +432,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         auto.setEnabled(false);
 
         Collection<BibEntry> entries = new ArrayList<>();
-        entries.addAll(Arrays.asList(frame.getCurrentBasePanel().getSelectedEntries()));
+        entries.addAll(frame.getCurrentBasePanel().getSelectedEntries());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);

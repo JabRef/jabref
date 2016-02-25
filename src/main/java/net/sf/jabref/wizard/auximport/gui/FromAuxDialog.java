@@ -59,9 +59,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -98,9 +95,7 @@ public class FromAuxDialog extends JDialog {
 
     private final AuxSubGenerator auxParser;
 
-    private static final Log LOGGER = LogFactory.getLog(FromAuxDialog.class);
-
-    private final JabRefFrame parent;
+    private final JabRefFrame parentFrame;
 
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
@@ -108,9 +103,9 @@ public class FromAuxDialog extends JDialog {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
-        parent = frame;
+        parentFrame = frame;
 
-        auxParser = new AuxSubGenerator(null);
+        auxParser = new AuxSubGenerator();
 
         jbInit();
         pack();
@@ -124,19 +119,35 @@ public class FromAuxDialog extends JDialog {
         selectInDBButton.setText(Localization.lang("Select"));
         selectInDBButton.setEnabled(false);
         selectInDBButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                FromAuxDialog.this.select_actionPerformed();
+                selectActionPerformed();
             }
         });
         generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
-        generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                generateActionPerformed();
+            }
+        });
         cancelButton.setText(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new FromAuxDialog_Cancel_actionAdapter(this));
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                cancelActionPerformed();
+            }
+        });
         parseButton.setText(Localization.lang("Parse"));
-        parseButton.addActionListener(new FromAuxDialog_parse_actionAdapter(this));
+        parseButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                parseActionPerformed();
+            }
+        });
 
         initPanels();
 
@@ -190,7 +201,7 @@ public class FromAuxDialog extends JDialog {
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.getBasePanelAt(i) == parent.getCurrentBasePanel()) {
+            if (parentFrame.getBasePanelAt(i) == parentFrame.getCurrentBasePanel()) {
                 toSelect = i;
             }
         }
@@ -200,14 +211,11 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
+        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parentFrame));
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
-        //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
-        //statusScrollPane.setPreferredSize(new Dimension(250, 120));
-        //statusInfos.setBorder(BorderFactory.createEtchedBorder());
         statusInfos.setEditable(false);
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
@@ -232,19 +240,19 @@ public class FromAuxDialog extends JDialog {
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    void generate_actionPerformed() {
+    private void generateActionPerformed() {
         generatePressed = true;
         dispose();
     }
 
-    void cancel_actionPerformed() {
+    private void cancelActionPerformed() {
         dispose();
     }
 
-    private void select_actionPerformed() {
+    private void selectActionPerformed() {
         BibDatabase db = getGenerateDB();
-        MainTable mainTable = parent.getCurrentBasePanel().mainTable;
-        BibDatabase database = parent.getCurrentBasePanel().getDatabase();
+        MainTable mainTable = parentFrame.getCurrentBasePanel().mainTable;
+        BibDatabase database = parentFrame.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
         for (BibEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database
@@ -256,7 +264,7 @@ public class FromAuxDialog extends JDialog {
         }
     }
 
-    void parse_actionPerformed() {
+    private void parseActionPerformed() {
         parseButton.setEnabled(false);
         BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
                 dbChooser.getSelectedIndex());
@@ -297,18 +305,18 @@ public class FromAuxDialog extends JDialog {
      */
     static class BrowseAction extends AbstractAction {
         private final JTextField comp;
-        private final JabRefFrame _frame;
+        private final JabRefFrame frame;
 
 
         public BrowseAction(JTextField tc, JabRefFrame frame) {
             super(Localization.lang("Browse"));
-            _frame = frame;
+            this.frame = frame;
             comp = tc;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(_frame,
+            String chosen = FileDialogs.getNewFile(frame,
                     new File(comp.getText()),
                     ".aux",
                     JFileChooser.OPEN_DIALOG, false);
@@ -317,52 +325,5 @@ public class FromAuxDialog extends JDialog {
                 comp.setText(newFile.getPath());
             }
         }
-    }
-
-}
-
-// ----------- helper class -------------------
-class FromAuxDialog_generate_actionAdapter implements ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_generate_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.generate_actionPerformed();
-    }
-}
-
-class FromAuxDialog_Cancel_actionAdapter implements ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_Cancel_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.cancel_actionPerformed();
-    }
-}
-
-class FromAuxDialog_parse_actionAdapter implements ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_parse_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.parse_actionPerformed();
     }
 }

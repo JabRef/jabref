@@ -9,11 +9,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class DoiResolutionTest {
-    DoiResolution finder;
-    BibEntry entry;
+
+    private DoiResolution finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new DoiResolution();
         entry = new BibEntry();
     }
@@ -21,6 +22,7 @@ public class DoiResolutionTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test

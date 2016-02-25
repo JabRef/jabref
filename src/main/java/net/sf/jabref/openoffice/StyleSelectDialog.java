@@ -27,7 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -213,7 +215,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
-        preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
+        preview.setEntry(prevEntry);
 
         tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
@@ -439,11 +441,17 @@ class StyleSelectDialog {
     private void addStyles(String dir, boolean recurse) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
-            List<File> files = Arrays.asList(dirF.listFiles());
+            File[] fileArray = dirF.listFiles();
+            List<File> files;
+            if (fileArray == null) {
+                files = Collections.emptyList();
+            } else {
+                files = Arrays.asList(fileArray);
+            }
             for (File file : files) {
                 // If the file looks like a style file, parse it:
                 if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file);
+                    addSingleFile(file, Globals.prefs.getDefaultEncoding());
                 } else if (file.isDirectory() && recurse) {
                     // If the file is a directory, and we should recurse, do:
                     addStyles(file.getPath(), recurse);
@@ -451,7 +459,7 @@ class StyleSelectDialog {
             }
         } else {
             // The file wasn't a directory, so we simply parse it:
-            addSingleFile(dirF);
+            addSingleFile(dirF, Globals.prefs.getDefaultEncoding());
         }
     }
 
@@ -459,9 +467,9 @@ class StyleSelectDialog {
      * Parse a single file, and add it to the list of styles if parse was successful.
      * @param file the file to parse.
      */
-    private void addSingleFile(File file) {
+    private void addSingleFile(File file, Charset encoding) {
         try {
-            OOBibStyle style = new OOBibStyle(file, Globals.journalAbbreviationLoader.getRepository());
+            OOBibStyle style = new OOBibStyle(file, Globals.journalAbbreviationLoader.getRepository(), encoding);
             // Check if the parse was successful before adding it:
             if (style.isValid() && !styles.contains(style)) {
                 styles.add(style);

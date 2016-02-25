@@ -32,8 +32,6 @@ public class BibDatabaseContext {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
-
-        this.setMode(getMode());
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {

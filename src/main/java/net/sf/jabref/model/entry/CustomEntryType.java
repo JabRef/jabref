@@ -99,16 +99,7 @@ public class CustomEntryType implements EntryType {
      * @return Description of required field set for storage in preferences or bib file.
      */
     public String getRequiredFieldsString() {
-        StringBuilder serialization = new StringBuilder();
-
-        for (int i = 0; i < required.size(); i++) {
-            serialization.append(required.get(i));
-
-            if (i < (required.size() - 1)) {
-                serialization.append(';');
-            }
-        }
-        return serialization.toString();
+        return String.join(";", required);
     }
 
     @Override

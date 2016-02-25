@@ -88,7 +88,9 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
 
         // Delete the temporary file:
-        tmpFile.delete();
+        if (!tmpFile.delete()) {
+            LOGGER.info("Cannot delete temporary export file");
+        }
     }
 
     private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, Set<String> keySet) {

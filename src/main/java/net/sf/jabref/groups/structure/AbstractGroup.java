@@ -15,16 +15,18 @@
 */
 package net.sf.jabref.groups.structure;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.SearchRule;
 
 /**
  * A group of BibtexEntries.
  */
-public abstract class AbstractGroup {
+public abstract class AbstractGroup implements SearchMatcher {
 
     /**
      * The group's name (every type of group has one).
@@ -57,12 +59,6 @@ public abstract class AbstractGroup {
      * representation
      */
     static final String SEPARATOR = ";";
-
-
-    /**
-     * @return A search rule that will identify this group's entries.
-     */
-    public abstract SearchRule getSearchRule();
 
     /**
      * Re-create a group instance from a textual representation.
@@ -121,7 +117,7 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit add(BibEntry[] entries);
+    public abstract AbstractUndoableEdit add(List<BibEntry> entries);
 
     /**
      * Removes the specified entries from this group.
@@ -130,24 +126,22 @@ public abstract class AbstractGroup {
      * result of this operation, an object is returned that allows to
      * undo this change. null is returned otherwise.
      */
-    public abstract AbstractUndoableEdit remove(BibEntry[] entries);
-
-    /**
-     * @param query The search option to apply.
-     * @return true if this group contains the specified entry, false otherwise.
-     */
-    public abstract boolean contains(String query, BibEntry entry);
+    public abstract AbstractUndoableEdit remove(List<BibEntry> entries);
 
     /**
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(BibEntry entry);
 
+    public boolean isMatch(BibEntry entry) {
+        return contains(entry);
+    }
+
     /**
      * @return true if this group contains any of the specified entries, false
      * otherwise.
      */
-    public boolean containsAny(BibEntry[] entries) {
+    public boolean containsAny(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (contains(entry)) {
                 return true;
@@ -160,7 +154,7 @@ public abstract class AbstractGroup {
      * @return true if this group contains all of the specified entries, false
      * otherwise.
      */
-    public boolean containsAll(BibEntry[] entries) {
+    public boolean containsAll(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
             if (!contains(entry)) {
                 return false;

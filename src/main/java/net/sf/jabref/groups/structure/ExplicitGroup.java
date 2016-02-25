@@ -15,17 +15,18 @@
  */
 package net.sf.jabref.groups.structure;
 
+import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRule;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -86,22 +87,6 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public SearchRule getSearchRule() {
-        return new SearchRule() {
-
-            @Override
-            public boolean applyRule(String query, BibEntry bibEntry) {
-                return contains(query, bibEntry);
-            }
-
-            @Override
-            public boolean validateSearchStrings(String query) {
-                return true;
-            }
-        };
-    }
-
-    @Override
     public boolean supportsAdd() {
         return true;
     }
@@ -112,13 +97,13 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit add(BibEntry[] entries) {
-        if (entries.length == 0) {
+    public AbstractUndoableEdit add(List<BibEntry> entries) {
+        if (entries.isEmpty()) {
             return null; // nothing to do
         }
 
         HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        Collections.addAll(this.entries, entries);
+        this.entries.addAll(entries);
 
         return new UndoableChangeAssignment(entriesBeforeEdit, this.entries);
     }
@@ -128,8 +113,8 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     @Override
-    public AbstractUndoableEdit remove(BibEntry[] entries) {
-        if (entries.length == 0) {
+    public AbstractUndoableEdit remove(List<BibEntry> entries) {
+        if (entries.isEmpty()) {
             return null; // nothing to do
         }
 
@@ -148,11 +133,6 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         return entries.contains(entry);
-    }
-
-    @Override
-    public boolean contains(String query, BibEntry entry) {
-        return contains(entry);
     }
 
     @Override
@@ -190,11 +170,7 @@ public class ExplicitGroup extends AbstractGroup {
                 return false;
             }
         }
-        if (!keys.isEmpty()) {
-            return false;
-        }
-        return other.name.equals(name)
-                && (other.getHierarchicalContext() == getHierarchicalContext());
+        return keys.isEmpty() && other.name.equals(name) && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**

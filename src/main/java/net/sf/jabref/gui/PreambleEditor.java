@@ -37,6 +37,12 @@ class PreambleEditor extends JDialog {
 
     private final FieldEditor ed;
 
+    private final UndoAction undoAction = new UndoAction();
+    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
+    private final RedoAction redoAction = new RedoAction();
+    // The action concerned with closing the window.
+    private final CloseAction closeAction = new CloseAction();
+
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
         super(baseFrame);
@@ -131,8 +137,6 @@ class PreambleEditor extends JDialog {
     }
 
 
-    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
-
 
     class StoreFieldAction extends AbstractAction {
 
@@ -177,8 +181,6 @@ class PreambleEditor extends JDialog {
     }
 
 
-    private final UndoAction undoAction = new UndoAction();
-
 
     class UndoAction extends AbstractAction {
 
@@ -198,8 +200,6 @@ class PreambleEditor extends JDialog {
     }
 
 
-    private final RedoAction redoAction = new RedoAction();
-
 
     class RedoAction extends AbstractAction {
 
@@ -218,9 +218,6 @@ class PreambleEditor extends JDialog {
         }
     }
 
-
-    // The action concerned with closing the window.
-    private final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {

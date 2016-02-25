@@ -1,13 +1,10 @@
 package net.sf.jabref.model.entry;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
 
 public class IEEETranEntryTypesTest {
 

@@ -228,7 +228,7 @@ final public class SQLUtil {
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
         String url;
         url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://" + dbStrings.getServerHostname()
-                + (withDBName ? '/' + dbStrings.getDatabase() : "");
+                + (withDBName ? '/' + dbStrings.getDatabase() : "") + dbStrings.getDbParameters();
         return url;
     }
 

@@ -1,5 +1,7 @@
 package net.sf.jabref.logic;
 
+import java.util.Objects;
+
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -38,13 +40,7 @@ public class FieldChange {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = (prime * result) + ((entry == null) ? 0 : entry.hashCode());
-        result = (prime * result) + ((field == null) ? 0 : field.hashCode());
-        result = (prime * result) + ((newValue == null) ? 0 : newValue.hashCode());
-        result = (prime * result) + ((oldValue == null) ? 0 : oldValue.hashCode());
-        return result;
+        return Objects.hash(entry, field, newValue, oldValue);
     }
 
     @Override
@@ -52,42 +48,39 @@ public class FieldChange {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        FieldChange other = (FieldChange) obj;
-        if (entry == null) {
-            if (other.entry != null) {
+        if (obj instanceof FieldChange) {
+            FieldChange other = (FieldChange) obj;
+            if (entry == null) {
+                if (other.entry != null) {
+                    return false;
+                }
+            } else if (!entry.equals(other.entry)) {
                 return false;
             }
-        } else if (!entry.equals(other.entry)) {
-            return false;
-        }
-        if (field == null) {
-            if (other.field != null) {
+            if (field == null) {
+                if (other.field != null) {
+                    return false;
+                }
+            } else if (!field.equals(other.field)) {
                 return false;
             }
-        } else if (!field.equals(other.field)) {
-            return false;
-        }
-        if (newValue == null) {
-            if (other.newValue != null) {
+            if (newValue == null) {
+                if (other.newValue != null) {
+                    return false;
+                }
+            } else if (!newValue.equals(other.newValue)) {
                 return false;
             }
-        } else if (!newValue.equals(other.newValue)) {
-            return false;
-        }
-        if (oldValue == null) {
-            if (other.oldValue != null) {
+            if (oldValue == null) {
+                if (other.oldValue != null) {
+                    return false;
+                }
+            } else if (!oldValue.equals(other.oldValue)) {
                 return false;
             }
-        } else if (!oldValue.equals(other.oldValue)) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

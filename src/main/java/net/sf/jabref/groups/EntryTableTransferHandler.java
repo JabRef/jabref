@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -237,7 +238,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
         ImportMenuItem importer = new ImportMenuItem(frame, false);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
 
         return true;
     }
@@ -368,16 +369,10 @@ public class EntryTableTransferHandler extends TransferHandler {
             if ((fileType != null) && (dropRow >= 0)) {
 
                 /*
-                 * TODO: need to signal if this is a local or autodownloaded
-                 * file
-                 */
-                boolean local = true;
-
-                /*
                  * TODO: make this an instance variable?
                  */
                 DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                dfh.handleDroppedfile(fileName, fileType, local, entryTable, dropRow);
+                dfh.handleDroppedfile(fileName, fileType, entryTable, dropRow);
 
                 continue;
             }
@@ -387,13 +382,10 @@ public class EntryTableTransferHandler extends TransferHandler {
         openAction.openFilesAsStringList(bibFiles, true);
 
         if (!notBibFiles.isEmpty()) {
-            String[] toImport = new String[notBibFiles.size()];
-            notBibFiles.toArray(toImport);
-
             // Import into new if entryTable==null, otherwise into current
             // database:
             ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-            importer.automatedImport(toImport);
+            importer.automatedImport(notBibFiles);
         }
     }
 
@@ -408,7 +400,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-        importer.automatedImport(new String[] {tmpfile.getAbsolutePath()});
+        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
 
         return true;
     }
