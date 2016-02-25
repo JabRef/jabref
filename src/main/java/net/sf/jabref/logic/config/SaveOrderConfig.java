@@ -33,8 +33,12 @@ public class SaveOrderConfig {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if ((o == null) || (getClass() != o.getClass())) {
+                return false;
+            }
             SortCriterion that = (SortCriterion) o;
             return Objects.equals(descending, that.descending) &&
                     Objects.equals(field, that.field);
@@ -49,15 +53,17 @@ public class SaveOrderConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SaveOrderConfig that = (SaveOrderConfig) o;
-        boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0]) &&
-                sortCriteria[1].equals(that.sortCriteria[1]) &&
-                sortCriteria[2].equals(that.sortCriteria[2]);
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof SaveOrderConfig) {
+            SaveOrderConfig that = (SaveOrderConfig) o;
+            boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0])
+                    && sortCriteria[1].equals(that.sortCriteria[1]) && sortCriteria[2].equals(that.sortCriteria[2]);
 
-        return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
-                sortCriteriaEquals;
+            return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) && sortCriteriaEquals;
+        }
+        return false;
     }
 
     @Override

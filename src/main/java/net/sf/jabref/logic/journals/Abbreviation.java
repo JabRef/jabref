@@ -57,11 +57,11 @@ public class Abbreviation implements Comparable<Abbreviation> {
         if (this == o) {
             return true;
         }
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
+        if (o instanceof Abbreviation) {
+            Abbreviation that = (Abbreviation) o;
+            return Objects.equal(name, that.name);
         }
-        Abbreviation that = (Abbreviation) o;
-        return Objects.equal(name, that.name);
+        return false;
     }
 
     @Override

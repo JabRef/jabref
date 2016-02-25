@@ -913,10 +913,7 @@ public class AuthorList {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = (prime * result) + (authors == null ? 0 : authors.hashCode());
-        return result;
+        return Objects.hash(authors);
     }
 
 
@@ -993,19 +990,7 @@ public class AuthorList {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = (prime * result)
-                    + (firstAbbr == null ? 0 : firstAbbr.hashCode());
-            result = (prime * result)
-                    + (firstPart == null ? 0 : firstPart.hashCode());
-            result = (prime * result)
-                    + (jrPart == null ? 0 : jrPart.hashCode());
-            result = (prime * result)
-                    + (lastPart == null ? 0 : lastPart.hashCode());
-            result = (prime * result)
-                    + (vonPart == null ? 0 : vonPart.hashCode());
-            return result;
+            return Objects.hash(firstAbbr, firstPart, jrPart, lastPart, vonPart);
         }
 
         /**
@@ -1015,15 +1000,17 @@ public class AuthorList {
          */
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Author)) {
-                return false;
+            if (this == o) {
+                return true;
             }
-            Author a = (Author) o;
-            return EntryUtil.equals(firstPart, a.firstPart)
-                    && EntryUtil.equals(firstAbbr, a.firstAbbr)
-                    && EntryUtil.equals(vonPart, a.vonPart)
-                    && EntryUtil.equals(lastPart, a.lastPart)
-                    && EntryUtil.equals(jrPart, a.jrPart);
+
+            if (o instanceof Author) {
+                Author a = (Author) o;
+                return EntryUtil.equals(firstPart, a.firstPart) && EntryUtil.equals(firstAbbr, a.firstAbbr)
+                        && EntryUtil.equals(vonPart, a.vonPart) && EntryUtil.equals(lastPart, a.lastPart)
+                        && EntryUtil.equals(jrPart, a.jrPart);
+            }
+            return false;
         }
 
 
