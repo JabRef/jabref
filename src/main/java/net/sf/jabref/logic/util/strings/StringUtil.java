@@ -18,6 +18,7 @@ package net.sf.jabref.logic.util.strings;
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +32,7 @@ public class StringUtil {
 
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
+    public static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
@@ -533,19 +535,19 @@ public class StringUtil {
      */
     public static String quote(String toQuote, String specials, char quoteChar) {
         if (toQuote == null) {
-            return null;
+            return "";
         }
-    
+
         StringBuilder result = new StringBuilder();
         char c;
         boolean isSpecial;
         for (int i = 0; i < toQuote.length(); ++i) {
             c = toQuote.charAt(i);
-    
+
             isSpecial = (c == quoteChar);
             // If non-null specials performs logic-or with specials.indexOf(c) >= 0
             isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
-    
+
             if (isSpecial) {
                 result.append(quoteChar);
             }
@@ -553,4 +555,29 @@ public class StringUtil {
         }
         return result.toString();
     }
+
+    public static String limitStringLength(String s, int maxLength) {
+        if (s == null) {
+            return "";
+        }
+
+        if (s.length() <= maxLength) {
+            return s;
+        }
+
+        return s.substring(0, maxLength - 3) + "...";
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        String result = s;
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
+            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return result;
+    }
+
 }

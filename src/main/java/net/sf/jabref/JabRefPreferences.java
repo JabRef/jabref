@@ -44,7 +44,7 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
+import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;

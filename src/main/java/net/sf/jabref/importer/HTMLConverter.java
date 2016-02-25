@@ -15,6 +15,7 @@
  */
 package net.sf.jabref.importer;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,9 +46,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
     }
 
     public String formatUnicode(String text) {
-        if (text == null) {
-            return null;
-        }
+        Objects.requireNonNull(text);
 
         if (text.isEmpty()) {
             return text;
@@ -94,9 +93,7 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String text) {
-        if (text == null) {
-            return null;
-        }
+        Objects.requireNonNull(text);
 
         if (text.isEmpty()) {
             return text;

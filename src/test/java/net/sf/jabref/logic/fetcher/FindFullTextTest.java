@@ -3,6 +3,7 @@ package net.sf.jabref.logic.fetcher;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URL;
@@ -15,15 +16,16 @@ public class FindFullTextTest {
     private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         entry = new BibEntry();
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         entry = null;
     }
 
+    @Ignore
     @Test
     public void acceptPdfUrls() throws Exception {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");

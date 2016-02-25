@@ -46,7 +46,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -91,14 +93,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static OpenOfficePanel instance;
 
-
-    public static OpenOfficePanel getInstance() {
-        if (OpenOfficePanel.instance == null) {
-            OpenOfficePanel.instance = new OpenOfficePanel();
-        }
-        return OpenOfficePanel.instance;
-    }
-
     private OpenOfficePanel() {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
@@ -136,6 +130,13 @@ public class OpenOfficePanel extends AbstractWorker {
         Globals.prefs.putDefaultValue(JabRefPreferences.OO_STYLE_DIRECTORY, "");
         styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
 
+    }
+
+    public static OpenOfficePanel getInstance() {
+        if (OpenOfficePanel.instance == null) {
+            OpenOfficePanel.instance = new OpenOfficePanel();
+        }
+        return OpenOfficePanel.instance;
     }
 
     public SidePaneComponent getSidePaneComponent() {
@@ -263,25 +264,17 @@ public class OpenOfficePanel extends AbstractWorker {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    try {
-                        if (style == null) {
-                            readStyleFile();
-                        } else {
-                            style.ensureUpToDate();
-                        }
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
-                                Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                        return;
+                    if (style == null) {
+                        readStyleFile();
+                    } else {
+                        style.ensureUpToDate();
                     }
 
                     ooBase.updateSortedReferenceMarks();
 
-                    java.util.List<BibDatabase> databases = getBaseList();
-                    java.util.List<String> unresolvedKeys = ooBase.refreshCiteMarkers
-                            (databases, style);
+                    List<BibDatabase> databases = getBaseList();
+                    List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
                     ooBase.rebuildBibTextSection(databases, style);
-                    //ooBase.sync(frame.getCurrentBasePanel().database(), style);
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                 unresolvedKeys.get(0)), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
@@ -292,11 +285,15 @@ public class OpenOfficePanel extends AbstractWorker {
                     reportUndefinedParagraphFormat(ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
+                } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
+                                Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Problem with style file", ex);
+                        return;
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                             ex.getBibtexKey()), Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
-                }
-                catch (Exception e1) {
+                } catch (Exception e1) {
                     LOGGER.warn("Could not update bibliography", e1);
                 }
             }
@@ -384,8 +381,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
     }
 
-    private java.util.List<BibDatabase> getBaseList() {
-        java.util.List<BibDatabase> databases = new ArrayList<>();
+    private List<BibDatabase> getBaseList() {
+        List<BibDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.database());
@@ -417,8 +414,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
             ooBaseDirectory = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
             sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
-        }
-        else { // Manual connect
+        } else { // Manual connect
 
             showConnectDialog();
             if (!dialogOkPressed) {
@@ -432,12 +428,10 @@ public class OpenOfficePanel extends AbstractWorker {
             if (OS.WINDOWS) {
                 ooBaseDirectory = ooPath + "\\program\\classes";
                 sOffice = ooPath + "\\program\\soffice.exe";
-            }
-            else if (OS.OS_X) {
+            } else if (OS.OS_X) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
                 ooBaseDirectory = ooPath + "/Contents/Resources/java";
-            }
-            else {
+            } else {
                 // Linux:
                 ooBaseDirectory = ooJars + "/program/classes";
             }
@@ -445,14 +439,15 @@ public class OpenOfficePanel extends AbstractWorker {
 
         // Add OO jars to the classpath:
         try {
-            File[] jarFiles = new File[] {new File(ooBaseDirectory, "unoil.jar"), new File(ooBaseDirectory, "jurt.jar"),
-                    new File(ooBaseDirectory, "juh.jar"), new File(ooBaseDirectory, "ridl.jar")};
-            URL[] jarList = new URL[jarFiles.length];
-            for (int i = 0; i < jarList.length; i++) {
-                if (!jarFiles[i].exists()) {
-                    throw new IOException("File not found: " + jarFiles[i].getPath());
+            List<File> jarFiles = Arrays.asList(new File(ooBaseDirectory, "unoil.jar"),
+                    new File(ooBaseDirectory, "jurt.jar"), new File(ooBaseDirectory, "juh.jar"),
+                    new File(ooBaseDirectory, "ridl.jar"));
+            List<URL> jarList = new ArrayList<>(jarFiles.size());
+            for (File jarFile : jarFiles) {
+                if (!jarFile.exists()) {
+                    throw new IOException("File not found: " + jarFile.getPath());
                 }
-                jarList[i] = jarFiles[i].toURI().toURL();
+                jarList.add(jarFile.toURI().toURL());
             }
             addURL(jarList);
 
@@ -518,16 +513,15 @@ public class OpenOfficePanel extends AbstractWorker {
     private void readStyleFile() throws IOException {
         if (useDefaultAuthoryearStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_AUTHORYEAR_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
             style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
-        }
-        else if (useDefaultNumericalStyle) {
+        } else if (useDefaultNumericalStyle) {
             URL defPath = JabRef.class.getResource(DEFAULT_NUMERICAL_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
             style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
-        }
-        else {
-            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository());
+        } else {
+            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository(),
+                    Globals.prefs.getDefaultEncoding());
         }
     }
 
@@ -537,14 +531,14 @@ public class OpenOfficePanel extends AbstractWorker {
     private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
 
 
-    private static void addURL(URL[] u) throws IOException {
+    private static void addURL(List<URL> jarList) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
 
         try {
             Method method = sysclass.getDeclaredMethod("addURL", CLASS_PARAMETERS);
             method.setAccessible(true);
-            for (URL anU : u) {
+            for (URL anU : jarList) {
                 method.invoke(sysloader, anU);
             }
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
@@ -580,8 +574,7 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.append(ooPath);
             builder.append(browseOOPath);
             builder.nextLine();
-        }
-        else {
+        } else {
             builder.append(Localization.lang("Path to OpenOffice executable"));
             builder.append(ooExec);
             builder.append(browseOOExec);
@@ -639,7 +632,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     }
 
-    private void pushEntries(boolean inParenthesis, boolean withText, boolean addPageInfo) {
+    private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
         if (!ooBase.isConnectedToDocument()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Not connected to any Writer document. Please"
                             + " make sure a document is open, and use the 'Select Writer document' button to connect to it."),
@@ -647,6 +640,7 @@ public class OpenOfficePanel extends AbstractWorker {
             return;
         }
 
+        Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
             AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
@@ -675,6 +669,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("You must select either a valid style file, or use one of the default styles."),
                             Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.warn("Problem with style file", ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
@@ -782,15 +777,15 @@ public class OpenOfficePanel extends AbstractWorker {
 
     class OOPanel extends SidePaneComponent {
 
-        private final OpenOfficePanel ooPanel;
+        private final OpenOfficePanel openOfficePanel;
         public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
             super(sidePaneManager, url, s);
-            ooPanel = panel;
+            openOfficePanel = panel;
         }
 
         @Override
         public String getName() {
-            return ooPanel.getName();
+            return openOfficePanel.getName();
         }
 
         @Override

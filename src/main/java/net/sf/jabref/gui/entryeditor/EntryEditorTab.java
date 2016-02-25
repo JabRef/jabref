@@ -194,7 +194,7 @@ class EntryEditorTab {
             final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true);
             setupJTextComponent(textField, null);
 
-            editors.put("bibtexkey", textField);
+            editors.put(BibEntry.KEY_FIELD, textField);
             /*
              * If the key field is the only field, we should have only one
              * editor, and this one should be set as active initially:

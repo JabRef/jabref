@@ -2,6 +2,7 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,9 +49,10 @@ public class PageNumbersFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
+        Objects.requireNonNull(value);
 
-        // nothing to do
-        if ((value == null) || value.isEmpty()) {
+        if (value.isEmpty()) {
+            // nothing to do
             return value;
         }
 

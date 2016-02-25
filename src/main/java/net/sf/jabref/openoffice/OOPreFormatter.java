@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,8 +36,8 @@ public class OOPreFormatter implements LayoutFormatter {
         int i;
         field = field.replaceAll("&|\\\\&", "&");
 
-        StringBuffer sb = new StringBuffer();
-        StringBuffer currentCommand = null;
+        StringBuilder sb = new StringBuilder();
+        StringBuilder currentCommand = null;
 
         char c;
         boolean escaped = false;
@@ -61,7 +61,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 }
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
@@ -147,17 +147,15 @@ public class OOPreFormatter implements LayoutFormatter {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         argument = part;
-                        if (argument != null) {
-                            // handle common case of general latex command
-                            Object result = OOPreFormatter.CHARS.get(command + argument);
-                            // If found, then use translated version. If not, then keep
-                            // the
-                            // text of the parameter intact.
-                            if (result == null) {
-                                sb.append(argument);
-                            } else {
-                                sb.append((String) result);
-                            }
+                        // handle common case of general latex command
+                        Object result = OOPreFormatter.CHARS.get(command + argument);
+                        // If found, then use translated version. If not, then keep
+                        // the
+                        // text of the parameter intact.
+                        if (result == null) {
+                            sb.append(argument);
+                        } else {
+                            sb.append((String) result);
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in

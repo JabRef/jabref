@@ -36,7 +36,7 @@ public class EntryMarker {
 
 
     /**
-     * @param increment whether the given increment should be added to the current one. Currently never used in JabRef
+     * @param increment whether the given increment should be added to the current one. Currently never used in JabRef. Could be used to increase marking color ("Mark in specific color").
      */
     public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         int prevMarkLevel;

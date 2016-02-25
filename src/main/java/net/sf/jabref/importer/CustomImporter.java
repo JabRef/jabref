@@ -113,7 +113,7 @@ public class CustomImporter implements Comparable<CustomImporter> {
 
     @Override
     public boolean equals(Object o) {
-        return (o != null) && (o instanceof CustomImporter) && this.getName().equals(((CustomImporter) o).getName());
+        return (o instanceof CustomImporter) && this.getName().equals(((CustomImporter) o).getName());
     }
 
     @Override

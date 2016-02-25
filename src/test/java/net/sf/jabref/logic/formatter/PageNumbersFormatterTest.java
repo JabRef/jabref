@@ -15,7 +15,7 @@ public class PageNumbersFormatterTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 
@@ -53,7 +53,6 @@ public class PageNumbersFormatterTest {
     @Test
     public void formatPageNumbersEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     @Test

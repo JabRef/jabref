@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -36,12 +36,10 @@ import javax.swing.JTextArea;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -146,31 +144,6 @@ public class FieldExtraComponents {
         });
 
         return Optional.of(but);
-    }
-
-    /**
-     *
-     * @param frame
-     * @param panel
-     * @param fieldEditor
-     * @param entryEditor
-     * @param isZip
-     * @return
-     */
-    public static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel,
-            FieldEditor fieldEditor,
-            EntryEditor entryEditor, Boolean isZip) {
-
-        final String ext = '.' + fieldEditor.getFieldName().toLowerCase();
-        OpenFileFilter off;
-        if (isZip) {
-            off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
-        } else {
-            off = new OpenFileFilter(new String[] {ext});
-        }
-
-        return Optional.of(new ExternalFilePanel(frame, panel.getBibDatabaseContext().getMetaData(), entryEditor, fieldEditor.getFieldName(), off,
-                fieldEditor));
     }
 
     /**

@@ -86,7 +86,7 @@ public class SidePaneManager {
         return components.get(name) != null;
     }
 
-    public boolean isComponentVisible(String name) {
+    public synchronized boolean isComponentVisible(String name) {
         Object o = components.get(name);
         if (o == null) {
             return false;
@@ -103,7 +103,7 @@ public class SidePaneManager {
         }
     }
 
-    public void show(String name) {
+    public synchronized void show(String name) {
         Object o = components.get(name);
         if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
@@ -112,7 +112,7 @@ public class SidePaneManager {
         }
     }
 
-    public void hide(String name) {
+    public synchronized void hide(String name) {
         Object o = components.get(name);
         if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
@@ -139,11 +139,11 @@ public class SidePaneManager {
         }
     }
 
-    public SidePaneComponent getComponent(String name) {
+    public synchronized SidePaneComponent getComponent(String name) {
         return components.get(name);
     }
 
-    private String getComponentName(SidePaneComponent comp) {
+    private synchronized String getComponentName(SidePaneComponent comp) {
         return componentNames.get(comp);
     }
 
@@ -264,13 +264,14 @@ public class SidePaneManager {
      *
      * @param panel
      */
-    private void setActiveBasePanel(BasePanel panel) {
+
+    private synchronized void setActiveBasePanel(BasePanel panel) {
         for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
             stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
         }
     }
 
-    public void updateView() {
+    public synchronized void updateView() {
         sidep.setComponents(visible);
         if (visible.isEmpty()) {
             if (sidep.isVisible()) {

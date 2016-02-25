@@ -84,7 +84,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 String address = null;
                 String titleST = null;
                 String titleTI = null;
-                Vector<String> comments = new Vector<>();
+                List<String> comments = new ArrayList<>();
                 // add item
                 for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {

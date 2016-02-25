@@ -430,7 +430,7 @@ public class MainTable extends JTable {
      * @return the return value is never null
      */
     public List<BibEntry> getSelectedEntries() {
-        return getSelected();
+        return new ArrayList<>(getSelected());
     }
 
     private List<Boolean> getCurrentSortOrder() {

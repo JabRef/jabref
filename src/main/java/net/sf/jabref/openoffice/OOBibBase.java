@@ -44,12 +44,11 @@ import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.exporter.layout.Layout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.openoffice.sorting.AuthorYearTitleComparator;
-import net.sf.jabref.openoffice.sorting.YearAuthorTitleComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,8 +91,14 @@ class OOBibBase {
     private XPropertyContainer userProperties;
 
     private final boolean atEnd;
-    private final AuthorYearTitleComparator entryComparator = new AuthorYearTitleComparator();
-    private final YearAuthorTitleComparator yearAuthorTitleComparator = new YearAuthorTitleComparator();
+    private final Comparator<BibEntry> entryComparator;
+    private final Comparator<BibEntry> yearAuthorTitleComparator;
+    private final FieldComparator authComp = new FieldComparator("author");
+    private final FieldComparator yearComp = new FieldComparator("year");
+    private final FieldComparator titleComp = new FieldComparator("title");
+
+    private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+    private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
 
     private final Map<String, String> uniquefiers = new HashMap<>();
 
@@ -103,6 +108,17 @@ class OOBibBase {
 
 
     public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
+        authorYearTitleList.add(authComp);
+        authorYearTitleList.add(yearComp);
+        authorYearTitleList.add(titleComp);
+
+        yearAuthorTitleList.add(yearComp);
+        yearAuthorTitleList.add(authComp);
+        yearAuthorTitleList.add(titleComp);
+
+        entryComparator = new FieldComparatorStack<>(authorYearTitleList);
+        yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
+
         this.atEnd = atEnd;
         xDesktop = simpleBootstrap(pathToOO);
         selectDocument();
@@ -302,7 +318,12 @@ class OOBibBase {
                 }
             }
             xViewCursor.goLeft((short) 1, false);
-            String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, database, inParenthesis,
+            Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
+            for (BibEntry entry : entries) {
+                databaseMap.put(entry, database);
+            }
+            String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, databaseMap,
+                    inParenthesis,
                     null, null);
             insertReferenceMark(bName, citeText, xViewCursor, withText, style);
             //xViewCursor.collapseToEnd();
@@ -511,11 +532,12 @@ class OOBibBase {
                         }
                     }
 
-                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
+                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries,
                             type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(cEntries[j], entries.get(cEntries), true, null, -1);
+                        normCitMarker[j] = style.getCitationMarker(Arrays.asList(cEntries[j]), entries, true, null,
+                                new int[] {-1});
                     }
                 }
                 citMarkers[i] = citationMarker;
@@ -607,7 +629,7 @@ class OOBibBase {
                     }
                 }
                 if (needsChange) {
-                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries.get(cEntries),
+                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries,
                             types[j] == OOBibBase.AUTHORYEAR_PAR, uniquif, firstLimAuthors);
                 }
             }

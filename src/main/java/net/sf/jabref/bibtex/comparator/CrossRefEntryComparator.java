@@ -31,8 +31,7 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
 
 
     @Override
-    public int compare(BibEntry e1, BibEntry e2)
-            throws ClassCastException {
+    public int compare(BibEntry e1, BibEntry e2) {
 
         Boolean b1 = e1.hasField(CrossRefEntryComparator.CROSS_REF_FIELD);
         Boolean b2 = e2.hasField(CrossRefEntryComparator.CROSS_REF_FIELD);

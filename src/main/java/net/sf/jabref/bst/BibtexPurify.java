@@ -57,7 +57,7 @@ public class BibtexPurify {
                     i++; // skip brace
                     while ((i < n) && (braceLevel > 0)) {
                         i++; // skip backslash
-                        BibtexCaseChanger.findSpecialChar(cs, i).ifPresent(specialStart -> sb.append(specialStart));
+                        BibtexCaseChanger.findSpecialChar(cs, i).ifPresent(sb::append);
 
                         while ((i < n) && Character.isLetter(cs[i])) {
                             i++;

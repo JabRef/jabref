@@ -17,6 +17,7 @@ package net.sf.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.FieldChange;
@@ -36,13 +37,14 @@ public class FieldFormatterCleanup implements CleanupJob {
     private final String field;
     private final Formatter formatter;
 
-    public static CleanupJob PAGE_NUMBERS = new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS);
-    public static CleanupJob DATES = new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE);
-    public static CleanupJob MONTH = new FieldFormatterCleanup("month", new MonthFormatter());
-    public static CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
-    public static CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
-    public static CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
-    public static CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
+    public static final CleanupJob PAGE_NUMBERS = new FieldFormatterCleanup("pages",
+            BibtexFieldFormatters.PAGE_NUMBERS);
+    public static final CleanupJob DATES = new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE);
+    public static final CleanupJob MONTH = new FieldFormatterCleanup("month", new MonthFormatter());
+    public static final CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
+    public static final CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
+    public static final CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
+    public static final CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
 
 
     public FieldFormatterCleanup(String field, Formatter formatter) {
@@ -52,6 +54,14 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        if ("all".equals(field)) {
+            return cleanupAllFields(entry);
+        } else {
+            return cleanupSingleField(entry);
+        }
+    }
+
+    private List<FieldChange> cleanupSingleField(BibEntry entry) {
         if (!entry.hasField(field)) {
             // Not set -> nothing to do
             return new ArrayList<>();
@@ -68,5 +78,52 @@ public class FieldFormatterCleanup implements CleanupJob {
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
         }
+    }
+
+    private List<FieldChange> cleanupAllFields(BibEntry entry) {
+        ArrayList<FieldChange> fieldChanges = new ArrayList<>();
+
+        for (String fieldKey : entry.getFieldNames()) {
+            String oldValue = entry.getField(fieldKey);
+            String newValue = formatter.format(oldValue);
+
+            if (!oldValue.equals(newValue)) {
+                entry.setField(fieldKey, newValue);
+                FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
+                fieldChanges.add(change);
+            }
+        }
+
+        return fieldChanges;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public Formatter getFormatter() {
+        return formatter;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof FieldFormatterCleanup) {
+            FieldFormatterCleanup that = (FieldFormatterCleanup) o;
+            return Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, formatter);
+    }
+
+    @Override
+    public String toString() {
+        return field + ": " + formatter.getKey();
     }
 }
