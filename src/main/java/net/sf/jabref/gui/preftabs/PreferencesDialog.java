@@ -211,7 +211,7 @@ public class PreferencesDialog extends JDialog {
 
         });
 
-        showPreferences.addActionListener(e -> new JabRefPreferencesFilter.JabRefPreferencesDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
+        showPreferences.addActionListener(e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
 
         setValues();
 
