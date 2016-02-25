@@ -13,10 +13,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.menus;
 
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileHistory;
 
@@ -108,7 +109,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
             @Override
             public void run() {
-                frame.open.openFile(fileToOpen, true);
+                frame.getOpenDatabaseAction().openFile(fileToOpen, true);
             }
         });
 

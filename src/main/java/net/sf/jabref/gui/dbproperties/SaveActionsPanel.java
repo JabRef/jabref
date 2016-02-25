@@ -5,7 +5,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
+import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;

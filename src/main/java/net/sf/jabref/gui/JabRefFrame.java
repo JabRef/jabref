@@ -36,6 +36,8 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
+import net.sf.jabref.gui.menus.FileHistoryMenu;
+import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
@@ -231,7 +233,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
-    final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
+    private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
@@ -461,8 +463,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
             Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
 
-    final MassSetFieldAction massSetField = new MassSetFieldAction(this);
-    final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
+    private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
+    private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
@@ -703,7 +705,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void openAction(String filePath) {
         File file = new File(filePath);
         // all the logic is done in openIt. Even raising an existing panel
-        open.openFile(file, true);
+        getOpenDatabaseAction().openFile(file, true);
     }
 
     // General info dialog.  The MacAdapter calls this method when "About"
@@ -1145,7 +1147,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         file.add(newBibtexDatabaseAction);
         file.add(newBiblatexDatabaseAction);
-        file.add(open); //opendatabaseaction
+        file.add(getOpenDatabaseAction()); //opendatabaseaction
         file.add(mergeDatabaseAction);
         file.add(save);
         file.add(saveAs);
@@ -1229,14 +1231,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             edit.addSeparator();
         }
 
-        edit.add(manageKeywords);
+        edit.add(getManageKeywords());
         edit.addSeparator();
         edit.add(selectAll);
         mb.add(edit);
 
         search.add(normalSearch);
         search.add(replaceAll);
-        search.add(massSetField);
+        search.add(getMassSetField());
         search.addSeparator();
         search.add(generalFetcher.getAction());
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
@@ -1387,7 +1389,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             tlb.addAction(newBibtexDatabaseAction);
         }
-        tlb.addAction(open);
+        tlb.addAction(getOpenDatabaseAction());
         tlb.addAction(save);
         tlb.addAction(saveAll);
 
@@ -1492,7 +1494,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, writeXmpAction, findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
-                dupliCheck, autoSetFile, newEntryAction, plainTextImport, massSetField, manageKeywords,
+                dupliCheck, autoSetFile, newEntryAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, switchPreview, checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
@@ -2155,6 +2157,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         output(Localization.lang("Closed database") + '.');
         // update tab titles
         updateAllTabTitles();
+    }
+
+    public ManageKeywordsAction getManageKeywords() {
+        return manageKeywords;
+    }
+
+    public MassSetFieldAction getMassSetField() {
+        return massSetField;
+    }
+
+    public OpenDatabaseAction getOpenDatabaseAction() {
+        return open;
     }
 
     public class CloseDatabaseAction extends MnemonicAwareAction {
