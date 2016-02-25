@@ -239,25 +239,6 @@ public class Util {
     }
 
     /**
-     * This method looks up what kind of external binding is used for the given field, and constructs on OpenFileFilter
-     * suitable for browsing for an external file.
-     *
-     * @param fieldName The BibTeX field in question.
-     * @return The file filter.
-     */
-    public static OpenFileFilter getFileFilterForField(String fieldName) {
-        String s = InternalBibtexFields.getFieldExtras(fieldName);
-        final String ext = "." + fieldName.toLowerCase();
-        OpenFileFilter off;
-        if (InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(s)) {
-            off = new OpenFileFilter(new String[]{ext, ext + ".gz", ext + ".bz2"});
-        } else {
-            off = new OpenFileFilter(new String[]{ext});
-        }
-        return off;
-    }
-
-    /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
      *
      * @param worker The worker to run.

@@ -432,10 +432,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
             return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
-        } else if (InternalBibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
-                || InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
-            return FieldExtraComponents.getBrowseDocExtraComponent(frame, panel, editor, this,
-                    InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
         } else if (InternalBibtexFields.EXTRA_URL.equals(fieldExtras)) {
             return FieldExtraComponents.getURLExtraComponent(editor, storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {

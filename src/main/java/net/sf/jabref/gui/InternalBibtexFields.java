@@ -59,8 +59,6 @@ public class InternalBibtexFields {
     public static final String EXTRA_JOURNAL_NAMES = "journalNames"; // Journal abbreviation button
     public static final String EXTRA_EXTERNAL = "external"; // Open external viewer on double-click
     public static final String EXTRA_BROWSE = "browse"; // Browse button, file dialog
-    public static final String EXTRA_BROWSE_DOC = "browseDoc"; // Browse button, file dialog with extension .fieldname
-    public static final String EXTRA_BROWSE_DOC_ZIP = "browseDocZip"; // Browse button, file dialog with extension .fieldname, .fieldname.bz2, .filedname.gz
     public static final String EXTRA_SET_OWNER = "setOwner"; // Button to set owner to current used
     public static final String EXTRA_MONTH = "month"; // Button to show the months and set abbreviation
 
@@ -190,13 +188,6 @@ public class InternalBibtexFields {
         dummy.setExtras(EXTRA_EXTERNAL);
         add(dummy);
 
-        dummy = new BibtexSingleField("pdf", false, GUIGlobals.SMALL_W);
-        dummy.setExtras(EXTRA_BROWSE_DOC);
-        add(dummy);
-
-        dummy = new BibtexSingleField("ps", false, GUIGlobals.SMALL_W);
-        dummy.setExtras(EXTRA_BROWSE_DOC_ZIP);
-        add(dummy);
         add(new BibtexSingleField("comment", false, GUIGlobals.MEDIUM_W));
         add(new BibtexSingleField("keywords", false, GUIGlobals.SMALL_W));
         //FIELD_EXTRAS.put("keywords", "selector");
