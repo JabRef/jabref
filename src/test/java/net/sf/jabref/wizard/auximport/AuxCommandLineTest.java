@@ -31,6 +31,7 @@ public class AuxCommandLineTest {
 
             AuxCommandLine auxCommandLine = new AuxCommandLine(auxFile.getAbsolutePath(), result.getDatabase());
             BibDatabase newDB = auxCommandLine.perform();
+            assertNotNull(newDB);
             assertEquals(2, newDB.getEntries().size());
         } catch (IOException ex) {
             fail("Cannot open file");

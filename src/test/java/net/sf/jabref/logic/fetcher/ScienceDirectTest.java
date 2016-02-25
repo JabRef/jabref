@@ -12,11 +12,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class ScienceDirectTest {
-    ScienceDirect finder;
-    BibEntry entry;
+
+    private ScienceDirect finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new ScienceDirect();
         entry = new BibEntry();
     }
@@ -24,6 +25,7 @@ public class ScienceDirectTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test

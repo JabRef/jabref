@@ -16,12 +16,12 @@ public class FindFullTextTest {
     private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         entry = new BibEntry();
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         entry = null;
     }
 

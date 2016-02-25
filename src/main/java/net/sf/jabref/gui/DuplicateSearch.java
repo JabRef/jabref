@@ -150,9 +150,10 @@ public class DuplicateSearch implements Runnable {
                     panel.markBaseChanged();
                 }
 
-                panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
-
+                synchronized (duplicates) {
+                    panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size() + ' '
+                            + Localization.lang("pairs processed") + ": " + dupliC);
+                }
                 ce.end();
                 panel.undoManager.addEdit(ce);
 
