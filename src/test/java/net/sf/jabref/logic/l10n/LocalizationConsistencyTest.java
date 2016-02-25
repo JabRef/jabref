@@ -67,6 +67,31 @@ public class LocalizationConsistencyTest {
                 "", resultString);
     }
 
+    @Test
+    public void findObsoleteLocalizationKeys() throws IOException {
+        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
+
+        if (!obsoleteKeys.isEmpty()) {
+            System.out.println();
+            System.out.println("Obsolete keys found:");
+            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            System.out.println();
+
+        }
+    }
+
+    @Test
+    public void findObsoleteMenuLocalizationKeys() throws IOException {
+        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
+
+        if (!obsoleteKeys.isEmpty()) {
+            System.out.println();
+            System.out.println("Obsolete menu keys found:");
+            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            System.out.println();
+        }
+    }
+
     private void printInfos(List<LocalizationEntry> missingKeys) {
         if (!missingKeys.isEmpty()) {
             System.out.println(convertToEnglishPropertiesFile(missingKeys));

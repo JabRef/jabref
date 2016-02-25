@@ -35,6 +35,23 @@ public class LocalizationParser {
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
     }
 
+    public static List<String> findObsolete(LocalizationBundle type) throws IOException {
+        List<LocalizationEntry> entries = findLocalizationEntriesInJavaFiles(type);
+
+        List<String> keysInJavaFiles = entries.stream().map(LocalizationEntry::getKey).distinct().sorted()
+                .collect(Collectors.toList());
+
+        List<String> englishKeys;
+        if (type == LocalizationBundle.LANG) {
+            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
+        } else {
+            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
+        }
+        englishKeys.removeAll(keysInJavaFiles);
+
+        return englishKeys;
+    }
+
     private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
@@ -130,7 +147,7 @@ public class LocalizationParser {
                 StringBuilder b = new StringBuilder();
                 int quotations = 0;
                 for (char c : parsedContentsOfLangMethod.toCharArray()) {
-                    if (c == '"' && quotations > 0) {
+                    if ((c == '"') && (quotations > 0)) {
                         quotations--;
                     } else if (c == '"') {
                         quotations++;
