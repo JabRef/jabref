@@ -471,8 +471,6 @@ public class JabRefPreferences {
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
         defaults.put(RECENT_FILES, "");
-        defaults.put(LAST_EDITED, "");
-        defaults.put(LAST_FOCUSED, "");
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
