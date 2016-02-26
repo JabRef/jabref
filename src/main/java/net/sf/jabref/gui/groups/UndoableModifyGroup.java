@@ -17,7 +17,6 @@ package net.sf.jabref.gui.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
@@ -45,7 +44,7 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
         groupSelector = gs;
         m_oldGroupBackup = node.getNode().getGroup().deepCopy();
         m_newGroupBackup = newGroup.deepCopy();
-        m_pathToNode = node.getNode().getIndexedPath();
+        m_pathToNode = node.getNode().getIndexedPathFromRoot();
         m_groupsRootHandle = groupsRoot.getNode();
     }
 
@@ -64,7 +63,8 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
     @Override
     public void undo() {
         super.undo();
-        m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(
+        //TODO: NULL
+        m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_oldGroupBackup.deepCopy());
         groupSelector.revalidateGroups();
     }
@@ -72,7 +72,7 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
     @Override
     public void redo() {
         super.redo();
-        m_groupsRootHandle.getDescendant(m_pathToNode).setGroup(
+        m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_newGroupBackup.deepCopy());
         groupSelector.revalidateGroups();
     }

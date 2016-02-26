@@ -28,7 +28,7 @@ import net.sf.jabref.logic.search.matchers.MatcherSets;
  *
  * @author jzieren
  */
-public class GroupTreeNode extends TreeNode {
+public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     private AbstractGroup group;
 
@@ -36,7 +36,7 @@ public class GroupTreeNode extends TreeNode {
      * Creates this node and associates the specified group with it.
      */
     public GroupTreeNode(AbstractGroup group) {
-        super();
+        super(GroupTreeNode.class);
         setGroup(group);
     }
 
@@ -67,7 +67,7 @@ public class GroupTreeNode extends TreeNode {
         sb.append(this.getLevel()).append(' ').append(this.getGroup().toString()).append('\n');
 
         // Append children
-        for(GroupTreeNode child : children()) {
+        for(GroupTreeNode child : getChildren()) {
             sb.append(child.getTreeAsString());
         }
 
@@ -82,8 +82,8 @@ public class GroupTreeNode extends TreeNode {
      */
     public GroupTreeNode deepCopy() {
         GroupTreeNode copy = new GroupTreeNode(group);
-        for (int i = 0; i < getChildCount(); ++i) {
-            copy.add(getChildAt(i).deepCopy());
+        for (GroupTreeNode child : getChildren()) {
+            child.deepCopy().moveTo(copy);
         }
         return copy;
     }
@@ -96,8 +96,7 @@ public class GroupTreeNode extends TreeNode {
      * @param db The database to refresh for.
      */
     public void refreshGroupsForNewDatabase(BibDatabase db) {
-        for (int i = 0; i < getChildCount(); ++i) {
-            GroupTreeNode node = getChildAt(i);
+        for (GroupTreeNode node : getChildren()) {
             node.getGroup().refreshForNewDatabase(db);
             node.refreshGroupsForNewDatabase(db);
         }
@@ -125,13 +124,13 @@ public class GroupTreeNode extends TreeNode {
         searchRule.addRule(group);
         if ((context == GroupHierarchyType.INCLUDING)
                 && (originalContext != GroupHierarchyType.REFINING)) {
-            for (int i = 0; i < getChildCount(); ++i) {
-                searchRule.addRule(getChildAt(i)
-                        .getSearchRule(originalContext));
+            for (GroupTreeNode child : getChildren()) {
+                searchRule.addRule(child.getSearchRule(originalContext));
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot()
                 && (originalContext != GroupHierarchyType.INCLUDING)) {
-            searchRule.addRule(getParent()
+            // TODO: Null!
+            searchRule.addRule(getParent().get()
                     .getSearchRule(originalContext));
         }
         return searchRule;
@@ -149,7 +148,8 @@ public class GroupTreeNode extends TreeNode {
 
     public boolean canMoveLeft() {
         return !(getGroup() instanceof AllEntriesGroup)
-                && !(getParent().getGroup() instanceof AllEntriesGroup);
+                // TODO: Null!
+                && !(getParent().get().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveRight() {
@@ -158,49 +158,51 @@ public class GroupTreeNode extends TreeNode {
     }
 
     public Optional<MoveGroupChange> moveUp() {
-        final GroupTreeNode parent = getParent();
-        final int index = parent.getIndex(this);
+        final GroupTreeNode parent = getParent().get();
+        // TODO: Null!
+        final int index = parent.getIndexOfChild(this).get();
         if (index > 0) {
-            parent.insert(this, index - 1);
+            this.moveTo(parent, index - 1);
             return Optional.of(new MoveGroupChange(parent, index, parent, index - 1));
         }
         return Optional.empty();
     }
 
     public Optional<MoveGroupChange> moveDown() {
-        final GroupTreeNode parent = getParent();
-        final int index = parent.getIndex(this);
-        if (index < (parent.getChildCount() - 1)) {
-            parent.insert(this, index + 1);
+        final GroupTreeNode parent = getParent().get();
+        // TODO: Null!
+        final int index = parent.getIndexOfChild(this).get();
+        if (index < (parent.getNumberOfChildren() - 1)) {
+            this.moveTo(parent, index + 1);
             return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
         }
         return Optional.empty();
     }
 
     public Optional<MoveGroupChange> moveLeft() {
-        final GroupTreeNode parent = getParent();
-        final GroupTreeNode grandParent = parent.getParent();
+        final GroupTreeNode parent = getParent().get(); // TODO: Null!
+        final Optional<GroupTreeNode> grandParent = parent.getParent();
         final int index = this.getPositionInParent();
 
-        if (grandParent == null) {
+        if (! grandParent.isPresent()) {
             return Optional.empty();
         }
-        final int indexOfParent = grandParent.getIndex(parent);
-        grandParent.insert(this, indexOfParent + 1);
-        return Optional.of(new MoveGroupChange(parent, index, grandParent, indexOfParent + 1));
+        final int indexOfParent = grandParent.get().getIndexOfChild(parent).get();
+        this.moveTo(grandParent.get(), indexOfParent + 1);
+        return Optional.of(new MoveGroupChange(parent, index, grandParent.get(), indexOfParent + 1));
     }
 
     public Optional<MoveGroupChange> moveRight() {
-        final GroupTreeNode previousSibling = getPreviousSibling();
-        final GroupTreeNode parent = getParent();
+        final GroupTreeNode previousSibling = getPreviousSibling().get(); // TODO: Null
+        final GroupTreeNode parent = getParent().get(); // TODO: Null!
         final int index = this.getPositionInParent();
 
         if (previousSibling == null) {
             return Optional.empty();
         }
 
-        previousSibling.add(this);
-        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getChildCount()));
+        this.moveTo(previousSibling);
+        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getNumberOfChildren()));
     }
 
     /**
@@ -236,7 +238,7 @@ public class GroupTreeNode extends TreeNode {
             return false;
         }
         final GroupTreeNode otherNode = (GroupTreeNode) other;
-        if (getChildCount() != otherNode.getChildCount()) {
+        if (getNumberOfChildren() != otherNode.getNumberOfChildren()) {
             return false;
         }
         AbstractGroup g1 = group;
@@ -247,7 +249,7 @@ public class GroupTreeNode extends TreeNode {
         if ((g1 != null) && (g2 != null) && !g1.equals(g2)) {
             return false;
         }
-        for (int i = 0; i < getChildCount(); ++i) {
+        for (int i = 0; i < getNumberOfChildren(); ++i) {
             if (!getChildAt(i).equals(otherNode.getChildAt(i))) {
                 return false;
             }
@@ -272,7 +274,7 @@ public class GroupTreeNode extends TreeNode {
         }
 
         // Traverse children
-        for(GroupTreeNode child : children()) {
+        for(GroupTreeNode child : getChildren()) {
             groups.addAll(child.getContainingGroupsSupportingRemoval(entries));
         }
 
@@ -294,7 +296,7 @@ public class GroupTreeNode extends TreeNode {
         }
 
         // Traverse children
-        for(GroupTreeNode child : children()) {
+        for(GroupTreeNode child : getChildren()) {
             groups.addAll(child.getContainingGroups(entries, requireAll));
         }
 
@@ -314,7 +316,7 @@ public class GroupTreeNode extends TreeNode {
         }
 
         // Traverse children
-        for(GroupTreeNode child : children()) {
+        for(GroupTreeNode child : getChildren()) {
             groups.addAll(child.getMatchingGroups(entries));
         }
 
@@ -338,7 +340,7 @@ public class GroupTreeNode extends TreeNode {
         }
 
         // Traverse children
-        for(GroupTreeNode child : children()) {
+        for(GroupTreeNode child : getChildren()) {
             child.replaceEntriesInExplicitGroup(originalEntries, newEntries);
         }
     }

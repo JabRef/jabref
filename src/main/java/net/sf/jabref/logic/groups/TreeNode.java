@@ -2,97 +2,133 @@ package net.sf.jabref.logic.groups;
 
 import java.util.*;
 
-public abstract class TreeNode {
+/**
+ * Represents a node in a tree.
+ * <p>
+ * Usually, tree nodes have a value property which allows access to the value stored in the node.
+ * In contrast to this approach, the TreeNode<T> class is designed to be used as a base class which provides the
+ * tree traversing functionality via inheritance.
+ * <p>
+ * Example usage:
+ * private class BasicTreeNode extends TreeNode<BasicTreeNode> {
+ * public BasicTreeNode() {
+ * super(BasicTreeNode.class);
+ * }
+ * }
+ * <p>
+ * This class started out as a copy of javax.swing.tree.DefaultMutableTreeNode.
+ *
+ * @param <T> the type of the class
+ */
+// We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
+@SuppressWarnings("unchecked") public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
-     * this node's parent, or null if this node has no parent
+     * This node's parent, or null if this node has no parent
      */
-    private GroupTreeNode parent;
+    private T parent;
     /**
-     * array of children, may be empty if this node has no children (but never null)
+     * Array of children, may be empty if this node has no children (but never null)
      */
-    private List<GroupTreeNode> children;
+    private List<T> children;
 
-    public TreeNode() {
+    /**
+     * Constructs a tree node without parent and no children.
+     *
+     * @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
+     *                      We need this parameter since it is hard to get this information by other means.
+     */
+    public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = new ArrayList<>();
 
-        if (!(this instanceof GroupTreeNode)) {
-            throw new UnsupportedOperationException("The class extending TreeNode has to derive from GroupTreeNode");
+        if (!derivingClass.isInstance(this)) {
+            throw new UnsupportedOperationException("The class extending TreeNode<T> has to derive from T");
         }
     }
 
     /**
-     * @return An indexed path from the root node to this node. The elements in
-     * the returned array represent the child index of each node in the
-     * path. If this node is the root node, the returned array has zero
-     * elements.
+     * Get the path from the root node to this node.
+     * <p>
+     * The elements in the returned list represent the child index of each node in the path, starting at the root.
+     * If this node is the root node, the returned list has zero elements.
+     *
+     * @return a list of numbers which represent an indexed path from the root node to this node
      */
-    public List<Integer> getIndexedPath() {
+    public List<Integer> getIndexedPathFromRoot() {
         if (parent == null) {
-            List<Integer> pathToMe = new ArrayList<>();
-            pathToMe.add(0);
-            return pathToMe;
+            return new ArrayList<>();
         }
 
-        List<Integer> path = parent.getIndexedPath();
+        List<Integer> path = parent.getIndexedPathFromRoot();
         path.add(getPositionInParent());
         return path;
     }
 
     /**
-     * Returns the node indicated by the specified indexedPath, which contains
-     * child indices obtained e.g. by getIndexedPath().
-     */
-    public GroupTreeNode getNode(List<Integer> indexedPath) {
-        GroupTreeNode cursor = (GroupTreeNode) this;
-        for (int anIndexedPath : indexedPath) {
-            cursor = cursor.getChildAt(anIndexedPath);
-        }
-        return cursor;
-    }
-
-    /**
-     * @param indexedPath A sequence of child indices that describe a path from this
-     *                    node to one of its desendants. Be aware that if <b>indexedPath
-     *                    </b> was obtained by getIndexedPath(), this node should
+     * Get the descendant of this node as indicated by the indexedPath.
+     * <p>
+     * If the path could not be traversed completely (i.e. one of the child indices did not exist),
+     * an empty Optional will be returned.
+     *
+     * @param indexedPath sequence of child indices that describe a path from this node to one of its descendants.
+     *                    Be aware that if indexedPath was obtained by getIndexedPathFromRoot(), this node should
      *                    usually be the root node.
-     * @return The descendant found by evaluating <b>indexedPath </b>. If the
-     * path could not be traversed completely (i.e. one of the child
-     * indices did not exist), null will be returned.
+     * @return descendant found by evaluating indexedPath
      */
-    public GroupTreeNode getDescendant(List<Integer> indexedPath) {
-        GroupTreeNode cursor = (GroupTreeNode) this;
-        for (int i = 0; (i < indexedPath.size()) && (cursor != null); ++i) {
-            cursor = cursor.getChildAt(indexedPath.get(i));
+    public Optional<T> getDescendant(List<Integer> indexedPath) {
+        T cursor = (T) this;
+        for (int index : indexedPath) {
+            Optional<T> child = cursor.getChildAt(index);
+            if (child.isPresent()) {
+                cursor = child.get();
+            } else {
+                return Optional.empty();
+            }
         }
-        return cursor;
-    }
-
-    public int getPositionInParent() {
-        return getParent().getIndex((GroupTreeNode) this);
+        return Optional.of(cursor);
     }
 
     /**
-     * Returns the index of the specified child in this node's child list.
-     * If the specified node is not a child of this node, returns <code>-1</code>.
+     * Get the child index of this node in its parent.
+     * <p>
+     * If this node is a root, then an UnsupportedOperationException is thrown.
+     * Use the isRoot method to check for this case.
+     *
+     * @return the child index of this node in its parent
+     */
+    public int getPositionInParent() {
+        return getParent().orElseThrow(() -> new UnsupportedOperationException("Roots have no position in parent"))
+                .getIndexOfChild((T) this).get();
+    }
+
+    /**
+     * Gets the index of the specified child in this node's child list.
+     * <p>
+     * If the specified node is not a child of this node, returns an empty Optional.
      * This method performs a linear search and is O(n) where n is the number of children.
      *
-     * @param childNode the GroupTreeNode to search for among this node's children
-     * @return an int giving the index of the node in this node's child list,
-     * or <code>-1</code> if the specified node is a not a child of this node
-     * @throws NullPointerException if <code>aChild</code> is null
+     * @param childNode the node to search for among this node's children
+     * @return an integer giving the index of the node in this node's child list
+     * or an empty Optional if the specified node is a not a child of this node
+     * @throws NullPointerException if childNode is null
      */
-    public int getIndex(GroupTreeNode childNode) {
+    public Optional<Integer> getIndexOfChild(T childNode) {
         Objects.requireNonNull(childNode);
-        return children.indexOf(childNode);
+        int index = children.indexOf(childNode);
+        if (index == -1) {
+            return Optional.empty();
+        } else {
+            return Optional.of(index);
+        }
     }
 
     /**
-     * Returns the number of levels above this node -- the distance from the root to this node.
+     * Gets the number of levels above this node, i.e. the distance from the root to this node.
+     * <p>
      * If this node is the root, returns 0.
      *
-     * @return the number of levels above this node
+     * @return an int giving the number of levels above this node
      */
     public int getLevel() {
         if (parent == null) {
@@ -106,183 +142,179 @@ public abstract class TreeNode {
      *
      * @return an int giving the number of children of this node
      */
-    public int getChildCount() {
+    public int getNumberOfChildren() {
         return children.size();
     }
 
     /**
-     * Removes <code>newChild</code> from its parent and makes it a child of this node
-     * by adding it to the end of this node's child array.
+     * Removes this node from its parent and makes it a child of the specified node
+     * by adding it to the end of children list.
+     * In this way the whole subtree based at this node is moved to the given node.
      *
-     * @param newChild node to add as a child of this node
-     * @throws NullPointerException if <code>newChild</code> is null
-     * @see #insert
+     * @param target the new parent
+     * @throws NullPointerException           if target is null
+     * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+     * @throws UnsupportedOperationException  if target is an descendant of this node
      */
-    public void add(GroupTreeNode newChild) {
-        Objects.requireNonNull(newChild);
+    public void moveTo(T target) {
+        Objects.requireNonNull(target);
 
-        if (newChild.getParent() == this) {
-            insert(newChild, getChildCount() - 1);
+        Optional<T> oldParent = getParent();
+        if (oldParent.isPresent() && oldParent.get() == target) {
+            this.moveTo(target, target.getNumberOfChildren() - 1);
         } else {
-            insert(newChild, getChildCount());
+            this.moveTo(target, target.getNumberOfChildren());
         }
     }
 
     /**
      * Returns the path from the root, to get to this node. The last element in the path is this node.
      *
-     * @return an array of TreeNode objects giving the path, where the first element in the path is the root
+     * @return a list of nodes giving the path, where the first element in the path is the root
      * and the last element is this node.
      */
-    public List<GroupTreeNode> getPath() {
+    public List<T> getPathFromRoot() {
         if (parent == null) {
-            List<GroupTreeNode> pathToMe = new ArrayList<>();
-            pathToMe.add((GroupTreeNode) this);
+            List<T> pathToMe = new ArrayList<>();
+            pathToMe.add((T) this);
             return pathToMe;
         }
 
-        List<GroupTreeNode> path = parent.getPath();
-        path.add((GroupTreeNode) this);
+        List<T> path = parent.getPathFromRoot();
+        path.add((T) this);
         return path;
     }
 
     /**
      * Returns the next sibling of this node in the parent's children list.
-     * Returns null if this node has no parent or if it is the parent's last child.
+     * Returns an empty Optional if this node has no parent or if it is the parent's last child.
      * <p>
-     * This method performs a linear search that is O(n) where n is the number of children;
-     * to traverse the entire array, use the parent's child enumeration instead.
+     * This method performs a linear search that is O(n) where n is the number of children.
+     * To traverse the entire children collection, use the parent's getChildren() instead.
      *
      * @return the sibling of this node that immediately follows this node
-     * @see #children
+     * @see #getChildren
      */
-    protected GroupTreeNode getNextSibling() {
+    public Optional<T> getNextSibling() {
         return getRelativeSibling(+1);
     }
 
-    private GroupTreeNode getRelativeSibling(int shiftIndex) {
+    /**
+     * Returns the previous sibling of this node in the parent's children list.
+     * Returns an empty Optional if this node has no parent or is the parent's first child.
+     * <p>
+     * This method performs a linear search that is O(n) where n is the number of children.
+     *
+     * @return the sibling of this node that immediately precedes this node
+     * @see #getChildren
+     */
+    public Optional<T> getPreviousSibling() {
+        return getRelativeSibling(-1);
+    }
+
+    /**
+     * Returns the sibling which is shiftIndex away from this node.
+     */
+    private Optional<T> getRelativeSibling(int shiftIndex) {
         if (parent == null) {
-            return null;
+            return Optional.empty();
         } else {
             int indexInParent = getPositionInParent();
             int indexTarget = indexInParent + shiftIndex;
-            if (indexTarget >= 0 && indexTarget < parent.getChildCount()) {
+            if (parent.childIndexExists(indexTarget)) {
                 return parent.getChildAt(indexTarget);
             } else {
-                return null;
+                return Optional.empty();
             }
         }
     }
 
     /**
-     * Returns the previous sibling of this node in the parent's children list.
-     * Returns null if this node has no parent or is the parent's first child.
-     * <p>
-     * This method performs a linear search that is O(n) where n is the number of children.
+     * Returns this node's parent or an empty Optional if this node has no parent.
      *
-     * @return the sibling of this node that immediately precedes this node
+     * @return this node's parent T, or an empty Optional if this node has no parent
      */
-    protected GroupTreeNode getPreviousSibling() {
-        return getRelativeSibling(-1);
+    public Optional<T> getParent() {
+        return Optional.ofNullable(parent);
     }
 
     /**
-     * Returns this node's parent or null if this node has no parent.
+     * Sets the parent node of this node.
+     * <p>
+     * This method does not add this node to the children collection of the new parent nor does it remove this node
+     * from the old parent. You should probably call moveTo or remove to change the tree.
      *
-     * @return this node's parent GroupTreeNode, or null if this node has no parent
+     * @param parent the new parent
      */
-    public GroupTreeNode getParent() {
-        return parent;
-    }
-
-    protected void setParent(GroupTreeNode parent) {
+    protected void setParent(T parent) {
         this.parent = parent;
     }
 
     /**
-     * Returns the child at the specified index in this node's child array.
+     * Returns the child at the specified index in this node's children collection.
      *
-     * @param index an index into this node's child array
-     * @return the GroupTreeNode in this node's child array at the specified index
-     * @throws ArrayIndexOutOfBoundsException if <code>index</code> is out of bounds
+     * @param index an index into this node's children collection
+     * @return the node in this node's children collection at the specified index,
+     * or an empty Optional if the index does not point to a child
      */
-    public GroupTreeNode getChildAt(int index) {
-        return children.get(index);
+    public Optional<T> getChildAt(int index) {
+        return childIndexExists(index) ? Optional.of(children.get(index)) : Optional.empty();
+    }
+
+    /**
+     * Returns whether the specified index is a valid index for a child.
+     *
+     * @param index the index to be tested
+     * @return returns true when index is at least 0 and less then the count of children
+     */
+    protected boolean childIndexExists(int index) {
+        return index >= 0 && index < children.size();
     }
 
     /**
      * Returns true if this node is the root of the tree.
-     * The root is the only node in the tree with a null parent; every tree has exactl one root.
+     * The root is the only node in the tree with an empty parent; every tree has exactly one root.
      *
      * @return true if this node is the root of its tree
      */
     public boolean isRoot() {
-        return getParent() == null;
+        return parent == null;
     }
 
     /**
-     * Removes <code>newChild</code> from its present parent (if it has a
-     * parent), sets the child's parent to this node, and then adds the child
-     * to this node's child array at index <code>childIndex</code>.
-     * <code>newChild</code> must not be null and must not be an ancestor of
-     * this node.
+     * Returns true if this node is an ancestor of the given node.
+     * <p>
+     * A node is considered an ancestor of itself.
      *
-     * @param child      the GroupTreeNode to insert under this node
-     * @param childIndex the index in this node's child array where this node is to be inserted
-     * @throws ArrayIndexOutOfBoundsException if <code>childIndex</code> is out of bounds
-     * @throws IllegalArgumentException       if <code>newChild</code> is null or is an ancestor of this node
+     * @param anotherNode node to test
+     * @return true if anotherNode is a descendant of this node
+     * @throws NullPointerException if anotherNode is null
      * @see #isNodeDescendant
      */
-    public void insert(GroupTreeNode child, int childIndex) {
-        Objects.requireNonNull(child);
-
-        if (isNodeAncestor(child)) {
-            throw new IllegalArgumentException("new child is an ancestor");
-        }
-
-        // Remove from previous parent
-        GroupTreeNode oldParent = child.getParent();
-        if (oldParent != null) {
-            oldParent.remove(child);
-        }
-
-        // Add as child
-        child.setParent((GroupTreeNode) this);
-        children.add(childIndex, child);
-    }
-
-    /**
-     * Returns true if <code>anotherNode</code> is an ancestor of this node
-     * -- if it is this node, this node's parent, or an ancestor of this node's parent.
-     * (Note that a node is considered an ancestor of itself.)
-     * If <code>anotherNode</code> is null, this method returns false.
-     * This operation is at worst O(h) where h is the distance from the root to this node.
-     *
-     * @param anotherNode node to test as an ancestor of this node
-     * @return true if this node is a descendant of <code>anotherNode</code>
-     * @see #isNodeDescendant
-     */
-    public boolean isNodeAncestor(GroupTreeNode anotherNode) {
-        if (anotherNode == null) {
-            return false;
-        }
+    public boolean isAncestorOf(T anotherNode) {
+        Objects.requireNonNull(anotherNode);
 
         if (anotherNode == this) {
             return true;
         } else {
-            return parent != null && parent.isNodeAncestor(anotherNode);
+            for (T child : children) {
+                if (child.isAncestorOf(anotherNode)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
     /**
-     * Returns the root of the tree that contains this node. The root is the ancestor with a null parent.
+     * Returns the root of the tree that contains this node. The root is the ancestor with an empty parent.
+     * Thus a node without a parent is considered its own root.
      *
      * @return the root of the tree that contains this node
-     * @see #isNodeAncestor
      */
-    public GroupTreeNode getRoot() {
+    public T getRoot() {
         if (parent == null) {
-            return (GroupTreeNode) this;
+            return (T) this;
         } else {
             return parent.getRoot();
         }
@@ -294,101 +326,214 @@ public abstract class TreeNode {
      * @return true if this node has no children
      */
     public boolean isLeaf() {
-        return (getChildCount() == 0);
+        return (getNumberOfChildren() == 0);
     }
 
     /**
-     * Removes the subtree rooted at this node from the tree, giving this node a null parent.
+     * Removes the subtree rooted at this node from the tree, giving this node an empty parent.
      * Does nothing if this node is the root of it tree.
      */
     public void removeFromParent() {
         if (parent != null) {
-            parent.remove((GroupTreeNode) this);
+            parent.remove((T) this);
         }
     }
 
     /**
-     * Removes all of this node's children, setting their parents to null.
+     * Removes all of this node's children, setting their parents to empty.
      * If this node has no children, this method does nothing.
      */
     public void removeAllChildren() {
-        for (GroupTreeNode child : children) {
-            remove(child);
+        while (getNumberOfChildren() > 0) {
+            remove(0);
         }
     }
 
     /**
-     * Returns this node's first child.
+     * Returns this node's first child if it exists (otherwise returns an empty Optional).
      *
      * @return the first child of this node
      */
-    public GroupTreeNode getFirstChild() {
-        if (children.size() == 0) {
-            throw new NoSuchElementException("node has no children");
-        }
+    public Optional<T> getFirstChild() {
         return getChildAt(0);
     }
 
     /**
-     * Returns true if <code>anotherNode</code> is a descendant of this node
+     * Returns this node's last child if it exists (otherwise returns an empty Optional).
+     *
+     * @return the last child of this node
+     */
+    public Optional<T> getLastChild() {
+        return getChildAt(children.size() - 1);
+    }
+
+    /**
+     * Returns true if anotherNode is a descendant of this node
      * -- if it is this node, one of this node's children, or a descendant of one of this node's children.
      * Note that a node is considered a descendant of itself.
      * <p>
-     * If <code>anotherNode</code> is null, returns false.
-     * This operation is at worst O(h) where h is the distance from the root to <code>anotherNode</code>.
+     * If anotherNode is null, an exception is thrown.
      *
      * @param anotherNode node to test as descendant of this node
-     * @return true if this node is an ancestor of <code>anotherNode</code>
-     * @see #isNodeAncestor
+     * @return true if this node is an ancestor of anotherNode
+     * @see #isAncestorOf
      */
-    public boolean isNodeDescendant(GroupTreeNode anotherNode) {
-        return anotherNode != null && anotherNode.isNodeAncestor((GroupTreeNode) this);
+    public boolean isNodeDescendant(T anotherNode) {
+        Objects.requireNonNull(anotherNode);
+
+        return this.isAncestorOf(anotherNode);
     }
 
     /**
-     * Creates and returns a forward-order Iterable of this node's children.
-     * Modifying this node's child array invalidates any child iterables created before the modification.
+     * Gets a forward-order list of this node's children.
+     * <p>
+     * The returned list is unmodifiable - use the add and remove methods to modify the nodes children.
+     * However, changing the nodes children (for example by calling moveTo) is reflected in a change of
+     * the list returned by getChildren. In other words, getChildren provides a read-only view on the children but
+     * not a copy.
      *
-     * @return an Iterable of this node's children
+     * @return a list of this node's children
      */
-    public Iterable<GroupTreeNode> children() {
-        return children;
+    public List<T> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     /**
-     * Removes <code>child</code> from this node's child array, giving it a null parent.
+     * Removes the given child from this node's child list, giving it an empty parent.
      *
      * @param child a child of this node to remove
      */
-    public void remove(GroupTreeNode child) {
+    public void remove(T child) {
         Objects.requireNonNull(child);
 
-        remove(getIndex(child));       // linear search
-    }
-
-    /**
-     * Removes the child at the specified index from this node's children and sets that node's parent to null.
-     *
-     * @param childIndex the index in this node's child array of the child to remove
-     * @throws ArrayIndexOutOfBoundsException if <code>childIndex</code> is out of bounds
-     */
-    public void remove(int childIndex) {
-        GroupTreeNode child = getChildAt(childIndex);
-        children.remove(childIndex);
+        children.remove(child);
         child.setParent(null);
     }
 
     /**
-     * @param path A sequence of child indices that designate a node relative to
-     *             this node.
-     * @return The node designated by the specified path, or null if one or more
-     * indices in the path could not be resolved.
+     * Removes the child at the specified index from this node's children and sets that node's parent to empty.
+     * <p>
+     * Does nothing if the index does not point to a child.
+     *
+     * @param childIndex the index in this node's child array of the child to remove
      */
-    public GroupTreeNode getChildAt(List<Integer> path) {
-        GroupTreeNode cursor = (GroupTreeNode) this;
-        for (int i = 0; (i < path.size()) && (cursor != null); ++i) {
-            cursor = cursor.getChildAt(path.get(i));
+    public void remove(int childIndex) {
+        Optional<T> child = getChildAt(childIndex);
+        if (child.isPresent()) {
+            children.remove(childIndex);
+            child.get().setParent(null);
         }
-        return cursor;
+    }
+
+    /**
+     * Adds the node at the end the children collection. Also sets the parent of the given node to this node.
+     * The given node is not allowed to already be in a tree (i.e. it has to have no parent).
+     *
+     * @param child the node to add
+     */
+    public void addChild(T child) {
+        addChild(child, children.size());
+    }
+
+    /**
+     * Adds the node at the given position in the children collection. Also sets the parent of the given node to this node.
+     * The given node is not allowed to already be in a tree (i.e. it has to have no parent).
+     *
+     * @param child the node to add
+     * @param index the position where the node should be added
+     * @throws IndexOutOfBoundsException if the index is out of range
+     */
+    public void addChild(T child, int index) {
+        Objects.requireNonNull(child);
+        if (child.getParent().isPresent()) {
+            throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
+        }
+
+        child.setParent((T) this);
+        children.add(index, child);
+    }
+
+    /**
+     * Removes all children from this node and makes them a child of the specified node
+     * by adding it to the specified position in the children list.
+     *
+     * @param target      the new parent
+     * @param targetIndex the position where the children should be inserted
+     * @throws NullPointerException           if target is null
+     * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+     * @throws UnsupportedOperationException  if target is an descendant of one of the children of this node
+     */
+    public void moveAllChildrenTo(T target, int targetIndex) {
+        while (getNumberOfChildren() > 0) {
+            getLastChild().get().moveTo(target, targetIndex);
+        }
+    }
+
+    /**
+     * Sorts the list of children according to the order induced by the specified {@link Comparator}.
+     * <p>
+     * All children must be mutually comparable using the specified comparator
+     * (that is, {@code c.compare(e1, e2)} must not throw a {@code ClassCastException}
+     * for any children {@code e1} and {@code e2} in the list).
+     *
+     * @param comparator the comparator used to compare the child nodes
+     * @param recursive  if true the whole subtree is sorted
+     * @throws NullPointerException if the comparator is null
+     */
+    public void sortChildren(Comparator<? super T> comparator, boolean recursive) {
+        Objects.requireNonNull(comparator);
+
+        if (this.isLeaf()) {
+            return; // nothing to sort
+        }
+
+        int j = getNumberOfChildren() - 1;
+        int lastModified;
+        while (j > 0) {
+            lastModified = j + 1;
+            j = -1;
+            for (int i = 1; i < lastModified; ++i) {
+                T child1 = getChildAt(i - 1).get();
+                T child2 = getChildAt(i).get();
+                if (comparator.compare(child1, child2) > 0) {
+                    child1.moveTo((T) this, i);
+                    j = i;
+                }
+            }
+        }
+        if (recursive) {
+            for (T child : getChildren()) {
+                child.sortChildren(comparator, true);
+            }
+        }
+    }
+
+    /**
+     * Removes this node from its parent and makes it a child of the specified node
+     * by adding it to the specified position in the children list.
+     * In this way the whole subtree based at this node is moved to the given node.
+     *
+     * @param target      the new parent
+     * @param targetIndex the position where the children should be inserted
+     * @throws NullPointerException           if target is null
+     * @throws ArrayIndexOutOfBoundsException if targetIndex is out of bounds
+     * @throws UnsupportedOperationException  if target is an descendant of this node
+     */
+    public void moveTo(T target, int targetIndex) {
+        Objects.requireNonNull(target);
+
+        // Check that the target node is not an ancestor of this node, because this would create loops in the tree
+        if (this.isAncestorOf(target)) {
+            throw new UnsupportedOperationException("the target cannot be a descendant of this node");
+        }
+
+        // Remove from previous parent
+        Optional<T> oldParent = getParent();
+        if (oldParent.isPresent()) {
+            oldParent.get().remove((T) this);
+        }
+
+        // Add as child
+        target.addChild((T) this, targetIndex);
     }
 }

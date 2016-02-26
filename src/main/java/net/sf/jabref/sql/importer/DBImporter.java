@@ -224,7 +224,7 @@ public abstract class DBImporter extends DBImporterExporter {
                     if (parent == null) {
                         // TODO: missing parent
                     } else {
-                        parent.add(groupTreeNodeStringEntry.getKey());
+                        groupTreeNodeStringEntry.getKey().moveTo(parent);
                     }
                 }
 

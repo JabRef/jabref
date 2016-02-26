@@ -78,7 +78,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.
-        m_pathToNode = editedNode.getNode().getIndexedPath();
+        m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();
     }
 
     @Override
@@ -122,7 +122,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         final int childIndex = m_pathToNode.get(m_pathToNode.size() - 1);
         // traverse path up to but last element
         for (int i = 0; i < (m_pathToNode.size() - 1); ++i) {
-            cursor = cursor.getChildAt(m_pathToNode.get(i));
+            cursor = cursor.getChildAt(m_pathToNode.get(i)).get();
         }
         if (undo) {
             switch (m_editType) {
@@ -134,12 +134,12 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 GroupTreeNode newNode = m_subtreeBackup.deepCopy();
                 for (int i = childIndex; i < (childIndex
                         + m_subtreeRootChildCount); ++i) {
-                    newNode.add(cursor.getChildAt(childIndex));
+                    cursor.getChildAt(childIndex).get().moveTo(newNode);
                 }
-                cursor.insert(newNode, childIndex);
+                newNode.moveTo(cursor, childIndex);
                 break;
             case REMOVE_NODE_AND_CHILDREN:
-                cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
+                m_subtreeBackup.deepCopy().moveTo(cursor, childIndex);
                 break;
             default:
                 break;
@@ -147,16 +147,15 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         } else { // redo
             switch (m_editType) {
             case ADD_NODE:
-                cursor.insert(m_subtreeBackup.deepCopy(), childIndex);
+                m_subtreeBackup.deepCopy().moveTo(cursor, childIndex);
                 break;
             case REMOVE_NODE_KEEP_CHILDREN:
                 // remove node, then insert all children
                 GroupTreeNode removedNode = cursor
-                        .getChildAt(childIndex);
+                        .getChildAt(childIndex).get();
                 cursor.remove(childIndex);
-                while (removedNode.getChildCount() > 0) {
-                    cursor.insert(removedNode.getFirstChild(),
-                            childIndex);
+                while (removedNode.getNumberOfChildren() > 0) {
+                    removedNode.getFirstChild().get().moveTo(cursor, childIndex);
                 }
                 break;
             case REMOVE_NODE_AND_CHILDREN:

@@ -548,7 +548,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private void insertNodes(JMenu menu, GroupTreeNode node) {
         final AbstractAction action = getAction(node);
 
-        if (node.getChildCount() == 0) {
+        if (node.getNumberOfChildren() == 0) {
             menu.add(action);
             if (action.isEnabled()) {
                 menu.setEnabled(true);
@@ -558,8 +558,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         JMenu submenu;
         if (node.getGroup() instanceof AllEntriesGroup) {
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(menu, child);
             }
         } else {
             submenu = new JMenu('[' + node.getGroup().getName() + ']');
@@ -568,8 +568,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             submenu.setEnabled(action.isEnabled());
             submenu.add(action);
             submenu.add(new JPopupMenu.Separator());
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(submenu, child);
             }
             menu.add(submenu);
             if (submenu.isEnabled()) {

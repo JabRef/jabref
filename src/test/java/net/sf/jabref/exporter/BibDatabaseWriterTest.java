@@ -198,7 +198,7 @@ public class BibDatabaseWriterTest {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         MetaData metaData = new MetaData();
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addChild(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 
@@ -222,7 +222,7 @@ public class BibDatabaseWriterTest {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         MetaData metaData = new MetaData();
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addChild(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 

@@ -17,6 +17,7 @@ package net.sf.jabref.gui.groups;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -50,7 +51,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         this.previousAssignments = new HashSet<>(previousAssignments);
         this.newAssignments = new HashSet<>(newAssignments);
         this.root = node.getNode().getRoot();
-        this.pathToNode = node.getNode().getIndexedPath();
+        this.pathToNode = node.getNode().getIndexedPathFromRoot();
     }
 
     @Override
@@ -67,9 +68,9 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     public void undo() {
         super.undo();
 
-        GroupTreeNode node = root.getChildAt(pathToNode);
-        if (node != null) {
-            ExplicitGroup group = (ExplicitGroup) node.getGroup();
+        Optional<GroupTreeNode> node = root.getDescendant(pathToNode);
+        if (node.isPresent()) {
+            ExplicitGroup group = (ExplicitGroup) node.get().getGroup();
             group.clearAssignments();
             for (final BibEntry entry : previousAssignments) {
                 group.addEntry(entry);
@@ -81,9 +82,9 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
     public void redo() {
         super.redo();
 
-        GroupTreeNode node = root.getChildAt(pathToNode);
-        if (node != null) {
-            ExplicitGroup group = (ExplicitGroup) node.getGroup();
+        Optional<GroupTreeNode> node = root.getDescendant(pathToNode);
+        if (node.isPresent()) {
+            ExplicitGroup group = (ExplicitGroup) node.get().getGroup();
             group.clearAssignments();
             for (final BibEntry entry : newAssignments) {
                 group.addEntry(entry);

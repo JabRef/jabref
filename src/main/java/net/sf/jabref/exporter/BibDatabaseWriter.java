@@ -289,7 +289,7 @@ public class BibDatabaseWriter {
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
         GroupTreeNode groupsRoot = metaData.getGroups();
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
+        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
             StringBuilder sb = new StringBuilder();
             // write version first
             sb.append(Globals.NEWLINE);

@@ -53,7 +53,7 @@ public class VersionHandling {
             field = groups.get(3 * i);
             name = groups.get((3 * i) + 1);
             regexp = groups.get((3 * i) + 2);
-            root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
+            root.addChild(new GroupTreeNode(new KeywordGroup(name, field, regexp,
                     false, true, GroupHierarchyType.INDEPENDENT)));
         }
         return root;
@@ -118,7 +118,7 @@ public class VersionHandling {
                 if (root == null) {
                     root = newNode;
                 } else {
-                    root.add(newNode);
+                    root.addChild(newNode);
                 }
             }
             return root;
@@ -216,9 +216,9 @@ public class VersionHandling {
                 } else {
                     // insert at desired location
                     while (level <= cursor.getLevel()) {
-                        cursor = cursor.getParent();
+                        cursor = cursor.getParent().get();
                     }
-                    cursor.add(newNode);
+                    cursor.addChild(newNode);
                     cursor = newNode;
                 }
             }

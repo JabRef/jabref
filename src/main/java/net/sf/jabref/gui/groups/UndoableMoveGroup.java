@@ -17,7 +17,6 @@ package net.sf.jabref.gui.groups;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
@@ -44,8 +43,8 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
 
         Objects.requireNonNull(moveChange);
         root = groupSelector.getGroupTreeRoot();
-        pathToOldParent = moveChange.getOldParent().getIndexedPath();
-        pathToNewParent = moveChange.getNewParent().getIndexedPath();
+        pathToOldParent = moveChange.getOldParent().getIndexedPathFromRoot();
+        pathToNewParent = moveChange.getNewParent().getIndexedPathFromRoot();
         oldChildIndex = moveChange.getOldChildIndex();
         newChildIndex = moveChange.getNewChildIndex();
     }
@@ -64,9 +63,10 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     public void undo() {
         super.undo();
 
-        GroupTreeNode newParent = root.getNode().getDescendant(pathToNewParent);
-        GroupTreeNode node = newParent.getChildAt(newChildIndex);
-        root.getNode().getDescendant(pathToOldParent).insert(node, oldChildIndex);
+        GroupTreeNode newParent = root.getNode().getDescendant(pathToNewParent).get(); //TODO: NULL
+        GroupTreeNode node = newParent.getChildAt(newChildIndex).get(); //TODO: Null
+        //TODO: NULL
+        node.moveTo(root.getNode().getDescendant(pathToOldParent).get(), oldChildIndex);
         groupSelector.revalidateGroups();
     }
 
@@ -74,9 +74,10 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     public void redo() {
         super.redo();
 
-        GroupTreeNode oldParent = root.getNode().getDescendant(pathToOldParent);
-        GroupTreeNode node = oldParent.getChildAt(oldChildIndex);
-        root.getNode().getDescendant(pathToNewParent).insert(node, newChildIndex);
+        GroupTreeNode oldParent = root.getNode().getDescendant(pathToOldParent).get(); //TODO: NULL
+        GroupTreeNode node = oldParent.getChildAt(oldChildIndex).get(); //TODO:Null
+        //TODO: NULL
+        node.moveTo(root.getNode().getDescendant(pathToNewParent).get(), newChildIndex);
         groupSelector.revalidateGroups();
     }
 }

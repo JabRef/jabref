@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
@@ -84,17 +85,18 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     @Override
     public TreeNode getChildAt(int childIndex) {
-        return new GroupTreeNodeViewModel(node.getChildAt(childIndex));
+        return node.getChildAt(childIndex).map(node -> new GroupTreeNodeViewModel(node)).orElse(null);
     }
 
     @Override
     public int getChildCount() {
-        return node.getChildCount();
+        return node.getNumberOfChildren();
     }
 
     @Override
     public TreeNode getParent() {
-        return new GroupTreeNodeViewModel(node.getParent());
+        Optional<GroupTreeNode> parent = node.getParent();
+        return parent.map(node -> new GroupTreeNodeViewModel(node)).orElse(null);
     }
 
     @Override
@@ -104,7 +106,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
 
         GroupTreeNodeViewModel childViewModel = (GroupTreeNodeViewModel)child;
-        return node.getIndex(childViewModel.getNode());
+        return node.getIndexOfChild(childViewModel.getNode()).orElse(-1);
     }
 
     @Override
@@ -119,7 +121,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     @Override
     public Enumeration children() {
-        Iterable<GroupTreeNode> children = node.children();
+        Iterable<GroupTreeNode> children = node.getChildren();
         return new Enumeration() {
 
             @Override
@@ -158,7 +160,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public List<GroupTreeNodeViewModel> getChildren() {
         List<GroupTreeNodeViewModel> children = new ArrayList<>();
-        for(GroupTreeNode child : node.children()) {
+        for(GroupTreeNode child : node.getChildren()) {
             children.add(new GroupTreeNodeViewModel(child));
         }
         return children;
@@ -214,7 +216,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public TreePath getTreePath() {
-        List<GroupTreeNode> pathToNode = node.getPath();
+        List<GroupTreeNode> pathToNode = node.getPathFromRoot();
         return new TreePath(pathToNode.stream().map(node -> new GroupTreeNodeViewModel(node)).toArray());
     }
 }

@@ -863,7 +863,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
                 GroupTreeNode newNode = new GroupTreeNode(newGroup);
-                groupsRoot.getNode().add(newNode);
+                groupsRoot.getNode().addChild(newNode);
                 revalidateGroups();
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot,
                         new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -921,7 +921,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (newGroups.getGroup() instanceof AllEntriesGroup) {
             return; // this should be impossible anyway
         }
-        groupsRoot.getNode().add(newGroups);
+        newGroups.moveTo(groupsRoot.getNode());
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this, groupsRoot,
                 new GroupTreeNodeViewModel(newGroups), UndoableAddOrRemoveGroup.ADD_NODE);
         ce.addEdit(undo);
@@ -1010,9 +1010,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             final GroupTreeNode newNode = new GroupTreeNode(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
             if (node == null) {
-                groupsRoot.getNode().add(newNode);
+                groupsRoot.getNode().addChild(newNode);
             } else {
-                ((GroupTreeNodeViewModel)node.getParent()).getNode().insert(newNode, node.getParent().getIndex(node) + 1);
+                ((GroupTreeNodeViewModel)node.getParent()).getNode().addChild(newNode, node.getNode().getPositionInParent() + 1);
             }
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -1041,7 +1041,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             final AbstractGroup newGroup = gd.getResultingGroup();
             final GroupTreeNode newNode = new GroupTreeNode(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
-            node.getNode().add(newNode);
+            node.getNode().addChild(newNode);
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
             revalidateGroups();
@@ -1121,11 +1121,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
                 final GroupTreeNodeViewModel parent = (GroupTreeNodeViewModel)node.getParent();
-                final int childIndex = parent.getIndex(node);
                 node.getNode().removeFromParent();
-                while (node.getChildCount() > 0) {
-                    parent.getNode().insert(node.getNode().getFirstChild(), childIndex);
-                }
+                node.getNode().moveAllChildrenTo(parent.getNode(), parent.getIndex(node));
+
                 revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
@@ -1435,10 +1433,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsTree.setHighlight3Cells(nodeList.toArray());
         // ensure that all highlighted nodes are visible
         for (GroupTreeNode node : nodeList) {
-            GroupTreeNode parentNode = node.getParent();
-            if (parentNode != null) {
-                groupsTree.expandPath(new GroupTreeNodeViewModel(parentNode).getTreePath());
-            }
+            node.getParent().ifPresent(
+                    parentNode -> groupsTree.expandPath(new GroupTreeNodeViewModel(parentNode).getTreePath()));
         }
         groupsTree.revalidate();
     }

@@ -179,7 +179,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
 
-            for (GroupTreeNode child : cursor.children()) {
+            for (GroupTreeNode child : cursor.getChildren()) {
                 currentID = populateEntryGroupsTable(child, myID, currentID, out, database_id);
             }
             //Unfortunatley, AutoCloseable throws only Exception
@@ -300,7 +300,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     ((Statement) response).close();
                 }
             }
-            for (GroupTreeNode child : cursor.children()) {
+            for (GroupTreeNode child : cursor.getChildren()) {
                 ++currentID;
                 currentID = populateGroupsTable(child, myID, currentID, out, database_id);
             }

@@ -29,13 +29,10 @@ import java.util.*;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
@@ -260,7 +257,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 Enumeration<TreePath> expandedPaths = groupSelector.getExpandedPaths();
                 MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
                         source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
-                target.getNode().add(source.getNode());
+                source.getNode().moveTo(target.getNode());
                 dtde.getDropTargetContext().dropComplete(true);
                 // update selection/expansion state
                 groupSelector.revalidateGroups(new TreePath[] {source.getTreePath()},
@@ -405,35 +402,13 @@ public class GroupsTree extends JTree implements DragSourceListener,
         groupSelector.revalidateGroups();
     }
 
-    /** This sorts without revalidation of groups */
+    /**
+     * This sorts without revalidation of groups
+     */
     private void sortWithoutRevalidate(GroupTreeNodeViewModel node, boolean recursive) {
-        if (node.isLeaf())
-         {
-            return; // nothing to sort
-        }
-        GroupTreeNodeViewModel child1;
-        GroupTreeNodeViewModel child2;
-        int j = node.getChildCount() - 1;
-        int lastModified;
-        while (j > 0) {
-            lastModified = j + 1;
-            j = -1;
-            for (int i = 1; i < lastModified; ++i) {
-                child1 = (GroupTreeNodeViewModel)node.getChildAt(i - 1);
-                child2 = (GroupTreeNodeViewModel)node.getChildAt(i);
-                if (child2.getNode().getGroup().getName().compareToIgnoreCase(
-                        child1.getNode().getGroup().getName()) < 0) {
-                    node.getNode().remove(child1.getNode());
-                    node.getNode().insert(child1.getNode(), i);
-                    j = i;
-                }
-            }
-        }
-        if (recursive) {
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                sortWithoutRevalidate((GroupTreeNodeViewModel)node.getChildAt(i), true);
-            }
-        }
+        node.getNode().sortChildren(
+                (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
+                recursive);
     }
 
     /**

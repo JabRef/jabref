@@ -107,10 +107,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 for (String keyword : hs) {
                     KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
                             GroupHierarchyType.INDEPENDENT);
-                    autoGroupsRoot.add(new GroupTreeNode(group));
+                    autoGroupsRoot.addChild(new GroupTreeNode(group));
                 }
 
-                m_groupsRoot.getNode().add(autoGroupsRoot);
+                autoGroupsRoot.moveTo(m_groupsRoot.getNode());
                 NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot,
                         new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);

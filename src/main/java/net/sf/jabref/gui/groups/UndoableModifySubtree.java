@@ -20,7 +20,6 @@ import java.util.Vector;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -48,7 +47,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
             GroupTreeNodeViewModel subtree, String name) {
         m_subtreeBackup = subtree.getNode().deepCopy();
         m_groupRoot = groupRoot.getNode();
-        m_subtreeRootPath = subtree.getNode().getIndexedPath();
+        m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();
         m_groupSelector = groupSelector;
         m_name = name;
     }
@@ -70,16 +69,14 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         // remember modified children for redo
         m_modifiedSubtree.clear();
         // get node to edit
-        final GroupTreeNode subtreeRoot = m_groupRoot
-                .getNode(m_subtreeRootPath);
-        for (int i = 0; i < subtreeRoot.getChildCount(); ++i) {
-            m_modifiedSubtree.add(subtreeRoot.getChildAt(i));
+        final GroupTreeNode subtreeRoot = m_groupRoot.getDescendant(m_subtreeRootPath).get(); //TODO: NULL
+        for (GroupTreeNode child : subtreeRoot.getChildren()) {
+            m_modifiedSubtree.add(child);
         }
         // keep subtree handle, but restore everything else from backup
         subtreeRoot.removeAllChildren();
-        for (int i = 0; i < m_subtreeBackup.getChildCount(); ++i) {
-            subtreeRoot.add(m_subtreeBackup.getChildAt(i)
-                    .deepCopy());
+        for (GroupTreeNode child : m_subtreeBackup.getChildren()) {
+            child.deepCopy().moveTo(subtreeRoot);
         }
         if (mRevalidate) {
             m_groupSelector.revalidateGroups();
@@ -89,11 +86,10 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     @Override
     public void redo() {
         super.redo();
-        final GroupTreeNode subtreeRoot = m_groupRoot
-                .getNode(m_subtreeRootPath);
+        final GroupTreeNode subtreeRoot = m_groupRoot.getDescendant(m_subtreeRootPath).get(); //TODO: NULL
         subtreeRoot.removeAllChildren();
-        for (int i = 0; i < m_modifiedSubtree.size(); ++i) {
-            subtreeRoot.add(m_modifiedSubtree.get(i));
+        for (GroupTreeNode modifiedNode : m_modifiedSubtree) {
+            modifiedNode.moveTo(subtreeRoot);
         }
         if (mRevalidate) {
             m_groupSelector.revalidateGroups();
