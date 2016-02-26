@@ -16,7 +16,6 @@
 package net.sf.jabref.logic.groups;
 
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -59,8 +58,7 @@ public class SearchGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s, BibDatabase db,
-            int version) throws Exception {
+    public static AbstractGroup fromString(String s, int version) throws Exception {
         if (!s.startsWith(SearchGroup.ID)) {
             throw new Exception(
                     "Internal error: SearchGroup cannot be created from \"" + s
@@ -111,8 +109,8 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + context.ordinal() + AbstractGroup.SEPARATOR
+        return SearchGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + getContext().ordinal() + AbstractGroup.SEPARATOR
                 + StringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive())
                 + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
@@ -148,7 +146,7 @@ public class SearchGroup extends AbstractGroup {
             return false;
         }
         SearchGroup other = (SearchGroup) o;
-        return name.equals(other.name)
+        return getName().equals(other.getName())
                 && this.getSearchExpression().equals(other.getSearchExpression())
                 && (this.isCaseSensitive() == other.isCaseSensitive())
                 && (isRegExp() == other.isRegExp())

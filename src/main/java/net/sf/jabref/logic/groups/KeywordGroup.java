@@ -26,10 +26,8 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.*;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -75,8 +73,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, BibDatabase db,
-                                           int version) throws Exception {
+    public static AbstractGroup fromString(String s, int version) throws Exception {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
@@ -130,9 +127,9 @@ public class KeywordGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
+        return KeywordGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
                 AbstractGroup.SEPARATOR
-                + context.ordinal() + AbstractGroup.SEPARATOR
+                + getContext().ordinal() + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
                 + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
@@ -212,7 +209,7 @@ public class KeywordGroup extends AbstractGroup {
             return false;
         }
         KeywordGroup other = (KeywordGroup) o;
-        return name.equals(other.name)
+        return getName().equals(other.getName())
                 && searchField.equals(other.searchField)
                 && searchExpression.equals(other.searchExpression)
                 && (caseSensitive == other.caseSensitive)
@@ -307,8 +304,8 @@ public class KeywordGroup extends AbstractGroup {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new KeywordGroup(name, searchField, searchExpression,
-                    caseSensitive, regExp, context);
+            return new KeywordGroup(getName(), searchField, searchExpression,
+                    caseSensitive, regExp, getContext());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!

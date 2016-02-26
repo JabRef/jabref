@@ -20,13 +20,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.groups.*;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
@@ -46,11 +39,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
             int row, boolean tmpHasFocus) {
-        if (value == highlight1Cell) {
-            selected = true; // show as selected
-        } else {
-            selected = sel;
-        }
+        // show as selected
+        selected = (highlight1Cell != null && highlight1Cell.equals(value)) || sel;
         Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, tmpHasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
@@ -102,7 +92,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         label.setToolTipText(viewModel.getDescription());
 
         Icon icon = viewModel.getIcon();
-        if(label.getIcon() != icon) {
+        if (label.getIcon() != icon) {
             label.setIcon(icon);
         }
         return c;
@@ -111,7 +101,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private boolean printInRed(Object value) {
         if (highlight2Cells != null) {
             for (Object highlight2Cell : highlight2Cells) {
-                if (highlight2Cell == value) {
+                if (highlight2Cell.equals(value)) {
                     return true;
                 }
             }
@@ -122,7 +112,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private boolean printUnderlined(Object value) {
         if (highlight3Cells != null) {
             for (Object highlight3Cell : highlight3Cells) {
-                if (highlight3Cell == value) {
+                if (highlight3Cell.equals(value)) {
                     return true;
                 }
             }

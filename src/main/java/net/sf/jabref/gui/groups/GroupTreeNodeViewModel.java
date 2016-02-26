@@ -85,7 +85,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     @Override
     public TreeNode getChildAt(int childIndex) {
-        return node.getChildAt(childIndex).map(node -> new GroupTreeNodeViewModel(node)).orElse(null);
+        return node.getChildAt(childIndex).map(GroupTreeNodeViewModel::new).orElse(null);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     @Override
     public TreeNode getParent() {
         Optional<GroupTreeNode> parent = node.getParent();
-        return parent.map(node -> new GroupTreeNodeViewModel(node)).orElse(null);
+        return parent.map(GroupTreeNodeViewModel::new).orElse(null);
     }
 
     @Override
@@ -166,7 +166,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return children;
     }
 
-    boolean printInItalics() {
+    protected boolean printInItalics() {
         return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
     }
 
@@ -217,6 +217,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public TreePath getTreePath() {
         List<GroupTreeNode> pathToNode = node.getPathFromRoot();
-        return new TreePath(pathToNode.stream().map(node -> new GroupTreeNodeViewModel(node)).toArray());
+        return new TreePath(pathToNode.stream().map(GroupTreeNodeViewModel::new).toArray());
     }
 }

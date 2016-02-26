@@ -33,7 +33,6 @@ import net.sf.jabref.gui.groups.GroupAddRemoveDialog;
 import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;

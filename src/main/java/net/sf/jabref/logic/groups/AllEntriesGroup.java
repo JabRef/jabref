@@ -18,8 +18,6 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.search.SearchMatcher;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -34,7 +32,7 @@ public class AllEntriesGroup extends AbstractGroup {
         super(Localization.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
     }
 
-    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
+    public static AbstractGroup fromString(String s, int version) throws Exception {
         if (!s.startsWith(AllEntriesGroup.ID)) {
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""

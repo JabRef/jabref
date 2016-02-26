@@ -246,7 +246,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             if (transferable.isDataFlavorSupported(GroupTreeNodeViewModel.FLAVOR)) {
                 GroupTreeNodeViewModel source = (GroupTreeNodeViewModel) transferable
                         .getTransferData(GroupTreeNodeViewModel.FLAVOR);
-                if (source == target) {
+                if (source.equals(target)) {
                     dtde.rejectDrop(); // ignore this
                     return;
                 }
@@ -304,9 +304,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else {
                 dtde.rejectDrop();
             }
-        } catch (IOException ioe) {
-            // ignore
-        } catch (UnsupportedFlavorException e) {
+        } catch (IOException | UnsupportedFlavorException ioe) {
             // ignore
         }
     }

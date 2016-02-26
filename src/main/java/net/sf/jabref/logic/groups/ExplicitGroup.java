@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.logic.groups;
 
-import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
@@ -131,7 +130,7 @@ public class ExplicitGroup extends AbstractGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(name, context);
+        ExplicitGroup copy = new ExplicitGroup(getName(), getContext());
         copy.entries.addAll(entries);
         return copy;
     }
@@ -164,7 +163,7 @@ public class ExplicitGroup extends AbstractGroup {
                 return false;
             }
         }
-        return keys.isEmpty() && other.name.equals(name) && (other.getHierarchicalContext() == getHierarchicalContext());
+        return keys.isEmpty() && other.getName().equals(getName()) && (other.getHierarchicalContext() == getHierarchicalContext());
     }
 
     /**
@@ -176,8 +175,8 @@ public class ExplicitGroup extends AbstractGroup {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(StringUtil.quote(name, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
-        append(AbstractGroup.SEPARATOR).append(context.ordinal()).append(AbstractGroup.SEPARATOR);
+        sb.append(ExplicitGroup.ID).append(StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+        append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
         String s;
         // write entries in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<>();

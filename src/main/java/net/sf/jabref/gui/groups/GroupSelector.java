@@ -91,7 +91,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final GroupsTree groupsTree;
     private DefaultTreeModel groupsTreeModel;
     private GroupTreeNodeViewModel groupsRoot;
-    final JabRefFrame frame;
+    protected final JabRefFrame frame;
     private final JPopupMenu groupsContextMenu = new JPopupMenu();
     private final JPopupMenu settings = new JPopupMenu();
     private final JRadioButtonMenuItem hideNonHits;

@@ -28,36 +28,29 @@ import net.sf.jabref.model.entry.BibEntry;
 public abstract class AbstractGroup implements SearchMatcher {
 
     /**
+     * Character used for quoting in the string representation.
+     */
+    public static final char QUOTE_CHAR = '\\';
+    /**
+     * For separating units (e.g. name, which every group has) in the string
+     * representation
+     */
+    public static final String SEPARATOR = ";";
+    /**
      * The group's name (every type of group has one).
      */
-    String name;
-
+    private String name;
     /**
      * The hierarchical context of the group (INDEPENDENT, REFINING, or
      * INCLUDING). Defaults to INDEPENDENT, which will be used if and
      * only if the context specified in the constructor is invalid.
      */
-    GroupHierarchyType context = GroupHierarchyType.INDEPENDENT;
-
-
-    public abstract String getTypeId();
+    private GroupHierarchyType context = GroupHierarchyType.INDEPENDENT;
 
     AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;
         setHierarchicalContext(context);
     }
-
-
-    /**
-     * Character used for quoting in the string representation.
-     */
-    static final char QUOTE_CHAR = '\\';
-
-    /**
-     * For separating units (e.g. name, which every group has) in the string
-     * representation
-     */
-    static final String SEPARATOR = ";";
 
     /**
      * Re-create a group instance from a textual representation.
@@ -69,19 +62,25 @@ public abstract class AbstractGroup implements SearchMatcher {
      */
     public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
         if (s.startsWith(KeywordGroup.ID)) {
-            return KeywordGroup.fromString(s, db, version);
+            return KeywordGroup.fromString(s, version);
         }
         if (s.startsWith(AllEntriesGroup.ID)) {
-            return AllEntriesGroup.fromString(s, db, version);
+            return AllEntriesGroup.fromString(s, version);
         }
         if (s.startsWith(SearchGroup.ID)) {
-            return SearchGroup.fromString(s, db, version);
+            return SearchGroup.fromString(s, version);
         }
         if (s.startsWith(ExplicitGroup.ID)) {
             return ExplicitGroup.fromString(s, db, version);
         }
         return null; // unknown group
     }
+
+    public GroupHierarchyType getContext() {
+        return context;
+    }
+
+    public abstract String getTypeId();
 
     /**
      * Returns this group's name, e.g. for display in a list/tree.
@@ -171,6 +170,13 @@ public abstract class AbstractGroup implements SearchMatcher {
     public abstract boolean isDynamic();
 
     /**
+     * Returns the group's hierarchical context.
+     */
+    public GroupHierarchyType getHierarchicalContext() {
+        return context;
+    }
+
+    /**
      * Sets the groups's hierarchical context. If context is not a valid
      * value, the call is ignored.
      */
@@ -179,13 +185,6 @@ public abstract class AbstractGroup implements SearchMatcher {
             return;
         }
         this.context = context;
-    }
-
-    /**
-     * Returns the group's hierarchical context.
-     */
-    public GroupHierarchyType getHierarchicalContext() {
-        return context;
     }
 
     /**

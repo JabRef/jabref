@@ -3,10 +3,6 @@ package net.sf.jabref.gui.groups;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.groups.AddToGroupAction;
-import net.sf.jabref.gui.groups.GroupTreeCellRenderer;
-import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
-import net.sf.jabref.gui.groups.RemoveFromGroupAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -26,7 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -81,23 +76,10 @@ public class GroupAddRemoveDialog implements BaseAction {
         //STA add expand and collapse all buttons
         JButton jbExpandAll = new JButton("Expand All");
 
-        jbExpandAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                expandAll(tree, true);
-            }
-
-        });
+        jbExpandAll.addActionListener(e -> expandAll(tree, true));
 
         JButton jbCollapseAll = new JButton("Collapse All");
-        jbCollapseAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                expandAll(tree, false);
-            }
-        });
+        jbCollapseAll.addActionListener(e -> expandAll(tree, false));
         //END add expand and collapse all buttons
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -111,22 +93,12 @@ public class GroupAddRemoveDialog implements BaseAction {
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (doAddOrRemove()) {
-                    diag.dispose();
-                }
-            }
-        });
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ok.addActionListener(actionEvent -> {
+            if (doAddOrRemove()) {
                 diag.dispose();
             }
         });
+        cancel.addActionListener(actionEvent -> diag.dispose());
         ok.setEnabled(false);
 
         JScrollPane sp = new JScrollPane(tree);
@@ -155,15 +127,11 @@ public class GroupAddRemoveDialog implements BaseAction {
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
     private void expandAll(final JTree tree, final boolean expand) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                TreeNode root = ((TreeNode) tree.getModel().getRoot());
-                // walk through the tree, beginning at the root:
-                expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
-                tree.requestFocusInWindow();
-            }
+        SwingUtilities.invokeLater(() -> {
+            TreeNode root = ((TreeNode) tree.getModel().getRoot());
+            // walk through the tree, beginning at the root:
+            expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
+            tree.requestFocusInWindow();
         });
     }
 
