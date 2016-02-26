@@ -15,15 +15,15 @@ import java.util.regex.Pattern;
 
 public class IntegrityCheck {
 
-    public static final Checker AUTHOR_NAME_CHECKER = new AuthorNameChecker();
-    public static final Checker YEAR_CHECKER = new YearChecker();
-    public static final Checker TITLE_CHECKER = new TitleChecker();
-    public static final Checker BRACKET_CHECKER = new BracketChecker();
-    public static final Checker PAGES_CHECKER = new PagesChecker();
-    public static final Checker URL_CHECKER = new UrlChecker();
-    public static final Checker FILE_CHECKER = new FileChecker();
-    public static final Checker ABBREVIATION_CHECKER = new AbbreviationChecker();
-    public static final Checker TYPE_CHECKER = new TypeChecker();
+    private static final Checker AUTHOR_NAME_CHECKER = new AuthorNameChecker();
+    private static final Checker YEAR_CHECKER = new YearChecker();
+    private static final Checker TITLE_CHECKER = new TitleChecker();
+    private static final Checker BRACKET_CHECKER = new BracketChecker();
+    private static final Checker PAGES_CHECKER = new PagesChecker();
+    private static final Checker URL_CHECKER = new UrlChecker();
+    private static final Checker FILE_CHECKER = new FileChecker();
+    private static final Checker ABBREVIATION_CHECKER = new AbbreviationChecker();
+    private static final Checker TYPE_CHECKER = new TypeChecker();
 
     private final BibDatabaseContext bibDatabaseContext;
 
@@ -41,7 +41,7 @@ public class IntegrityCheck {
         return result;
     }
 
-    public List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
+    private List<IntegrityMessage> checkBibtexEntry(BibEntry entry) {
         List<IntegrityMessage> result = new ArrayList<>();
 
         if (entry == null) {
