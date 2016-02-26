@@ -37,6 +37,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.Layout;
@@ -194,14 +195,16 @@ public class Util {
      *
      * @param database the database, where the entry is located
      * @param entry    the entry to which the file should be linked to
+     * @param repository
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibDatabase database, BibEntry entry) {
+    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
+            JournalAbbreviationRepository repository) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository()).getLayoutFromText();
+            layout = new LayoutHelper(sr, repository).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

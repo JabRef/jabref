@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.layout;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -84,7 +84,7 @@ public class LayoutEntryTest {
 
     public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationLoader.class).getRepository()).getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(entry, null, highlightPattern);
     }
@@ -190,33 +190,23 @@ public class LayoutEntryTest {
         Assert.assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,").get(0))[0]);
 
         Assert.assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size());
-        Assert.assertEquals("_bla.bla.blub",
- (LayoutEntry.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
+        Assert.assertEquals("_bla.bla.blub", (LayoutEntry.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
 
         Assert.assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size());
         Assert.assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,foo").get(0))[0]);
         Assert.assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla,foo").get(1))[0]);
 
-        Assert.assertEquals(2,
- LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        Assert.assertEquals("bla",
- (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
-        Assert.assertEquals("foo",
- (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
-        Assert.assertEquals("test",
- (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
-        Assert.assertEquals("fark",
- (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
+        Assert.assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
+        Assert.assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
+        Assert.assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
+        Assert.assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
+        Assert.assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
 
         Assert.assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size());
-        Assert.assertEquals("bla",
- (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
-        Assert.assertEquals("foo",
- (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
-        Assert.assertEquals("test",
- (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
-        Assert.assertEquals("fark",
- (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
+        Assert.assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
+        Assert.assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
+        Assert.assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
+        Assert.assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
     }
 
 }

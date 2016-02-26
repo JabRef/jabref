@@ -4,7 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,9 +26,6 @@ public class LayoutTest {
     public void setUp() throws Exception {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
-        }
-        if (Globals.journalAbbreviationLoader == null) {
-            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
     }
 
@@ -56,7 +53,7 @@ public class LayoutTest {
 
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationLoader.class).getRepository()).getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(be, null);
     }

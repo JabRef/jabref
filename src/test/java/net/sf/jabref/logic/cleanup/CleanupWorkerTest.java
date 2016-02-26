@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import org.junit.Assert;
@@ -206,7 +207,8 @@ public class CleanupWorkerTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         CleanupWorker worker = new CleanupWorker(preset,
-                Collections.singletonList(testFolder.getRoot().getAbsolutePath()));
+                Collections.singletonList(testFolder.getRoot().getAbsolutePath()), null,
+                mock(JournalAbbreviationRepository.class));
         worker.cleanup(entry);
         FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", "Toot.tmp", "");
         Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));

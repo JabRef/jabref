@@ -56,7 +56,7 @@ public class LayoutHelper {
 
     public LayoutHelper(Reader in, JournalAbbreviationRepository repository) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
-        this.repository = repository;
+        this.repository = Objects.requireNonNull(repository);
     }
 
     public Layout getLayoutFromText() throws IOException {
