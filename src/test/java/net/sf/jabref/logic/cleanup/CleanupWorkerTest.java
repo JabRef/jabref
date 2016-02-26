@@ -11,8 +11,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import static org.mockito.Mockito.*;
 
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +24,12 @@ public class CleanupWorkerTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        if (Globals.prefs == null) {
+            Globals.prefs = JabRefPreferences.getInstance();
+        }
+        if (Globals.journalAbbreviationLoader == null) {
+            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        }
     }
 
     @Rule

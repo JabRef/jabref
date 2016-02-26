@@ -29,7 +29,9 @@ public class LayoutTest {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
-        Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        if (Globals.journalAbbreviationLoader == null) {
+            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        }
     }
 
     /**

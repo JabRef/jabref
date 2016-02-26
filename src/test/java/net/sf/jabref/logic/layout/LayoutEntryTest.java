@@ -19,13 +19,13 @@ import static org.mockito.Mockito.*;
 
 /**
  * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
- * Indirectly the net.sf.jabref.export.layout.Layout is testet too.
+ * Indirectly the net.sf.jabref.export.layout.Layout is tested too.
  * <p/>
- * The LayoutEntry creates a human readable String assinged with html formaters.
- * To test the Highlighting Feature, an instance of LayoutEntry will be instatiated via Layout and LayoutHelper.
+ * The LayoutEntry creates a human readable String assigned with HTML formatters.
+ * To test the Highlighting Feature, an instance of LayoutEntry will be instantiated via Layout and LayoutHelper.
  * With these instance the doLayout() Method is called several times for each test case.
- * To simulate a search, a BibEntry will be created, wich will be used by LayoutEntry.
- * The definiton of the search is set by
+ * To simulate a search, a BibEntry will be created, which will be used by LayoutEntry.
+ * The definition of the search is set by
  * <p/>
  * LayoutEntry.setWordsToHighlight(words); and
  * Globals.prefs.putBoolean("caseSensitiveSearch", false);
@@ -54,7 +54,6 @@ public class LayoutEntryTest {
             Globals.prefs = JabRefPreferences.getInstance();
             Globals.prefs.putBoolean("highLightWords", Boolean.TRUE);
         }
-        Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
 
         // create Bibtext Entry
 
