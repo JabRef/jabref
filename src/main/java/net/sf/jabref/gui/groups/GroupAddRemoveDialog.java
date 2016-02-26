@@ -265,8 +265,8 @@ public class GroupAddRemoveDialog implements BaseAction {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
-            GroupTreeNode node = (GroupTreeNode) value;
-            AbstractGroup group = node.getGroup();
+            GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) value;
+            AbstractGroup group = node.getNode().getGroup();
             if (checkGroupEnable(group)) {
                 c.setForeground(Color.black);
             } else {
