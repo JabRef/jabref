@@ -4,6 +4,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -63,13 +64,21 @@ public class IntegrityCheckTest {
 
     @Test
     public void testTitleChecks() {
-        assertCorrect(createContext("title", "This is a title"));
-        assertWrong(createContext("title", "This is a Title"));
-        assertCorrect(createContext("title", "This is a {T}itle"));
-        assertCorrect(createContext("title", "{This is a Title}"));
-        assertCorrect(createContext("title", "This is a {Title}"));
-        assertCorrect(createContext("title", "{C}urrent {C}hronicle"));
-        assertCorrect(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"));
+        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+
+        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -140,6 +149,11 @@ public class IntegrityCheckTest {
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
+    }
+
+    private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
+        context.setMode(mode);
+        return context;
     }
 
 }
