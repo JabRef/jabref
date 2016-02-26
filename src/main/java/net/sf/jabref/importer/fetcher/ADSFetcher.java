@@ -36,6 +36,10 @@ import javax.swing.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -50,6 +54,9 @@ import java.nio.charset.Charset;
  * @author Ryo IGARASHI
  */
 public class ADSFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(ADSFetcher.class);
+
 
     @Override
     public JPanel getOptionsPanel() {
@@ -89,7 +96,7 @@ public class ADSFetcher implements EntryFetcher {
             }
         } catch (Exception e) {
             status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.warn("Error while fetching from ADS", e);
         }
         return true;
     }
@@ -115,13 +122,16 @@ public class ADSFetcher implements EntryFetcher {
                     Localization.lang("'%0' is not a valid ADS bibcode.", key) + "\n\n" + Localization
                             .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("File not found", e);
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("Problem accessing URL", e);
         } catch (RuntimeException e) {
             status.showMessage(
                     Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.warn("Problem fetching from ADS", e);
         }
         return null;
     }

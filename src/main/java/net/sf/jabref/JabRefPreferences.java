@@ -470,6 +470,11 @@ public class JabRefPreferences {
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
+        defaults.put(RECENT_FILES, "");
+        defaults.put(EXTERNAL_FILE_TYPES, "");
+        defaults.put(KEY_PATTERN_REGEX, "");
+        defaults.put(KEY_PATTERN_REPLACEMENT, "");
+
         // Proxy
         defaults.put(PROXY_USE, Boolean.FALSE);
         defaults.put(PROXY_HOSTNAME, "");
@@ -543,8 +548,8 @@ public class JabRefPreferences {
         defaults.put(ENTRY_TYPE_FORM_WIDTH, 1);
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
-        defaults.put(LAST_EDITED, null);
-        defaults.put(LAST_FOCUSED, null);
+        defaults.put(LAST_EDITED, "");
+        defaults.put(LAST_FOCUSED, "");
         defaults.put(STRINGS_POS_X, 0);
         defaults.put(STRINGS_POS_Y, 0);
         defaults.put(STRINGS_SIZE_X, 600);
@@ -722,12 +727,12 @@ public class JabRefPreferences {
         defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
 
-        defaults.put(PERSONAL_JOURNAL_LIST, null);
-        defaults.put(EXTERNAL_JOURNAL_LISTS, null);
+        defaults.put(PERSONAL_JOURNAL_LIST, "");
+        defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
         defaults.put(FLOAT_MARKED_ENTRIES, Boolean.TRUE);
 
-        defaults.put(LAST_USED_EXPORT, null);
+        defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, -1);
 
         defaults.put(IMPORT_INSPECTION_DIALOG_WIDTH, 650);
@@ -888,28 +893,12 @@ public class JabRefPreferences {
         return (Boolean) defaults.get(key);
     }
 
-    public double getDouble(String key) {
-        return prefs.getDouble(key, getDoubleDefault(key));
-    }
-
-    private double getDoubleDefault(String key) {
-        return (Double) defaults.get(key);
-    }
-
     public int getInt(String key) {
         return prefs.getInt(key, getIntDefault(key));
     }
 
     public int getIntDefault(String key) {
         return (Integer) defaults.get(key);
-    }
-
-    public byte[] getByteArray(String key) {
-        return prefs.getByteArray(key, getByteArrayDefault(key));
-    }
-
-    private byte[] getByteArrayDefault(String key) {
-        return (byte[]) defaults.get(key);
     }
 
     public void put(String key, String value) {
@@ -920,16 +909,8 @@ public class JabRefPreferences {
         prefs.putBoolean(key, value);
     }
 
-    public void putDouble(String key, double value) {
-        prefs.putDouble(key, value);
-    }
-
     public void putInt(String key, int value) {
         prefs.putInt(key, value);
-    }
-
-    public void putByteArray(String key, byte[] value) {
-        prefs.putByteArray(key, value);
     }
 
     public void remove(String key) {
@@ -1114,6 +1095,30 @@ public class JabRefPreferences {
         }
     }
 
+    public Map<String, Object> getPreferences() {
+        Map<String, Object> prefs = new HashMap<>();
+        try {
+            for(String key : this.prefs.keys()){
+                Object value = getObject(key);
+                prefs.put(key, value);
+            }
+        } catch (BackingStoreException e) {
+            LOGGER.info("could not retrieve preference keys", e);
+        }
+        return prefs;
+    }
+
+    private Object getObject(String key) {
+        try {
+            return this.get(key);
+        } catch (ClassCastException e) {
+            try {
+                return this.getBoolean(key);
+            } catch (ClassCastException e2) {
+                return this.getInt(key);
+            }
+        }
+    }
 
 
     private static String getNextUnit(Reader data) throws IOException {

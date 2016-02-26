@@ -534,9 +534,7 @@ public class BibtexParser {
             content = StringUtil.removeBracesAroundCapitals(content);
         }
         if (!content.isEmpty()) {
-            if (!entry.hasField(key)) {
-                entry.setField(key, content);
-            } else {
+            if (entry.hasField(key)) {
                 // The following hack enables the parser to deal with multiple
                 // author or
                 // editor lines, stringing them together instead of getting just
@@ -552,6 +550,8 @@ public class BibtexParser {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content);
                 }
+            } else {
+                entry.setField(key, content);
             }
         }
     }
@@ -605,7 +605,6 @@ public class BibtexParser {
 
         while (true) {
             int character = read();
-            // Util.pr(".. "+c);
             if (character == -1) {
                 eof = true;
 

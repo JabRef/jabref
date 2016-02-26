@@ -134,7 +134,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
-        //System.out.println(cont);
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));

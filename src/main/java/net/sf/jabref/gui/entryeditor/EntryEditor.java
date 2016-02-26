@@ -67,6 +67,8 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
+import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -432,10 +434,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_BROWSE.equals(fieldExtras)) {
             return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
-        } else if (InternalBibtexFields.EXTRA_BROWSE_DOC.equals(fieldExtras)
-                || InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras)) {
-            return FieldExtraComponents.getBrowseDocExtraComponent(frame, panel, editor, this,
-                    InternalBibtexFields.EXTRA_BROWSE_DOC_ZIP.equals(fieldExtras));
         } else if (InternalBibtexFields.EXTRA_URL.equals(fieldExtras)) {
             return FieldExtraComponents.getURLExtraComponent(editor, storeFieldAction);
         } else if (InternalBibtexFields.EXTRA_SET_OWNER.equals(fieldExtras)) {

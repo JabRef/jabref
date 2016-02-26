@@ -24,27 +24,24 @@ public class FileField {
             if (this == o) {
                 return true;
             }
-            if ((o == null) || (this.getClass() != o.getClass())) {
-                return false;
-            }
+            if (o instanceof FileField.ParsedFileField) {
 
-            FileField.ParsedFileField that = (FileField.ParsedFileField) o;
+                FileField.ParsedFileField that = (FileField.ParsedFileField) o;
 
-            if (!this.description.equals(that.description)) {
-                return false;
+                if (!this.description.equals(that.description)) {
+                    return false;
+                }
+                if (!this.link.equals(that.link)) {
+                    return false;
+                }
+                return this.fileType.equals(that.fileType);
             }
-            if (!this.link.equals(that.link)) {
-                return false;
-            }
-            return this.fileType.equals(that.fileType);
+            return false;
         }
 
         @Override
         public int hashCode() {
-            int result = this.description.hashCode();
-            result = (31 * result) + this.link.hashCode();
-            result = (31 * result) + this.fileType.hashCode();
-            return result;
+            return Objects.hash(description, link, fileType);
         }
 
         @Override

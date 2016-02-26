@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,8 +24,13 @@ import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.groups.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
-import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -52,7 +57,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
 
-    public RightClickMenu(BasePanel panel) {
+    public RightClickMenu(JabRefFrame frame, BasePanel panel) {
         this.panel = panel;
         JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
@@ -66,22 +71,25 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
+        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy special"));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
+        copySpecialMenu
+                .add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
+        copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
+                IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
+
         add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon()));
+        add(copySpecialMenu);
         add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon()));
         addSeparator();
 
-        add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
-        add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
-        add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
-
-        add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"), IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
         add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu("Mark specific color");
-        JabRefFrame frame = JabRef.jrf;
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
         }
@@ -107,7 +115,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
                 JMenu rankingMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), JabRef.jrf);
+                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), frame);
                 add(rankingMenu);
             }
 
@@ -115,24 +123,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
-                add(Relevance.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
+                add(Relevance.getInstance().getValues().get(0).getMenuAction(frame));
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
-                add(Quality.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
+                add(Quality.getInstance().getValues().get(0).getMenuAction(frame));
             }
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
-                add(Printed.getInstance().getValues().get(0).getMenuAction(JabRef.jrf));
+                add(Printed.getInstance().getValues().get(0).getMenuAction(frame));
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
                 JMenu priorityMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), JabRef.jrf);
+                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), frame);
                 add(priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
                 JMenu readStatusMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), JabRef.jrf);
+                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), frame);
                 add(readStatusMenu);
             }
 
@@ -178,8 +186,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(typeMenu);
         add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
 
-        add(JabRef.jrf.massSetField);
-        add(JabRef.jrf.manageKeywords);
+        add(frame.getMassSetField());
+        add(frame.getManageKeywords());
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
@@ -209,7 +217,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      * Then cycle through all available values, and add them.
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
-        //menu.removeAll();
         menu.setText(field.getMenuString());
         menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
         for (SpecialFieldValue val : field.getValues()) {

@@ -44,8 +44,9 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.IconComparator;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.comparator.IconComparator;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -1269,41 +1270,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
             entries.getReadWriteLock().writeLock().unlock();
             glTable.repaint();
-        }
-    }
-
-    class AttachFile extends JMenuItem implements ActionListener {
-
-        private final String fileType;
-
-        public AttachFile(String fileType) {
-            super(Localization.lang("Attach %0 file", new String[] {fileType.toUpperCase()}));
-            this.fileType = fileType;
-            addActionListener(this);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-
-            if (selectionModel.getSelected().size() != 1) {
-                return;
-            }
-            BibEntry entry = selectionModel.getSelected().get(0);
-            // Call up a dialog box that provides Browse, Download and auto
-            // buttons:
-            AttachFileDialog diag = new AttachFileDialog(ImportInspectionDialog.this, metaData,
-                    entry, fileType);
-            PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
-            diag.setVisible(true);
-            // After the dialog has closed, if it wasn't cancelled, list the
-            // field:
-            if (!diag.cancelled()) {
-                entries.getReadWriteLock().writeLock().lock();
-                entry.setField(fileType, diag.getValue());
-                entries.getReadWriteLock().writeLock().unlock();
-                glTable.repaint();
-            }
-
         }
     }
 

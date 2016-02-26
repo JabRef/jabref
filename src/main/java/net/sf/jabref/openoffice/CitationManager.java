@@ -184,9 +184,6 @@ class CitationManager {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null) {
-                return false;
-            }
             if (o instanceof CitEntry) {
                 CitEntry other = (CitEntry) o;
                 return this.refMarkName.equals(other.refMarkName);
