@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class LocalizationConsistencyTest {
 
@@ -76,7 +76,7 @@ public class LocalizationConsistencyTest {
             System.out.println("Obsolete keys found:");
             System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
             System.out.println();
-
+            fail("Obsolete keys found in properties file which should be removed");
         }
     }
 
@@ -89,6 +89,7 @@ public class LocalizationConsistencyTest {
             System.out.println("Obsolete menu keys found:");
             System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
             System.out.println();
+            fail("Obsolete keys found in menu properties file which should be removed");
         }
     }
 
