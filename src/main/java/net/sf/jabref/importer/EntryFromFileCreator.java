@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -40,9 +41,9 @@ import net.sf.jabref.gui.FileListTableModel;
  * @version 25.11.2008 | 23:39:03
  *
  */
-public abstract class EntryFromFileCreator implements java.io.FileFilter {
+public abstract class EntryFromFileCreator implements FileFilter {
 
-    final ExternalFileType externalFileType;
+    protected final ExternalFileType externalFileType;
 
     private static final int MIN_PATH_TOKEN_LENGTH = 4;
 
@@ -164,7 +165,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
     }
 
-    void appendToField(BibEntry entry, String field, String value) {
+    protected void appendToField(BibEntry entry, String field, String value) {
         if ((value == null) || value.isEmpty()) {
             return;
         }
@@ -180,7 +181,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
-    void addEntrysToEntry(BibEntry entry, List<BibEntry> entrys) {
+    protected void addEntrysToEntry(BibEntry entry, List<BibEntry> entrys) {
         if (entrys != null) {
             for (BibEntry e : entrys) {
                 addEntryDataToEntry(entry, e);
@@ -188,7 +189,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
-    void addEntryDataToEntry(BibEntry entry, BibEntry e) {
+    protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
             appendToField(entry, field, e.getField(field));
         }
