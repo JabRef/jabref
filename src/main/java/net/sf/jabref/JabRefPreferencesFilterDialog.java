@@ -46,7 +46,7 @@ public class JabRefPreferencesFilterDialog extends JDialog {
     }
 
     private void updateModel() {
-        java.util.List<JabRefPreferencesFilter.PreferenceOption> preferenceOptions;
+        List<JabRefPreferencesFilter.PreferenceOption> preferenceOptions;
 
         if (showOnlyDeviatingPreferenceOptions.isSelected()) {
             preferenceOptions = preferencesFilter.getDeviatingPreferences();
