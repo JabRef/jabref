@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
 
 
 public class HTMLConverterTest {

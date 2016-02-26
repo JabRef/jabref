@@ -23,6 +23,10 @@ import java.util.List;
 
 public class CleanupWorkerTest {
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+
     @Before
     public void setUp() {
         if (Globals.prefs == null) {
@@ -32,9 +36,6 @@ public class CleanupWorkerTest {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
     }
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
 
     @SuppressWarnings("unused")

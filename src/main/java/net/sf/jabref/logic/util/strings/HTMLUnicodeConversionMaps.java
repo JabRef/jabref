@@ -653,7 +653,7 @@ public class HTMLUnicodeConversionMaps {
 
     };
     // List of combining accents
-    private static final String[][] accentList = new String[][] {{"768", "`"}, // Grave
+    private static final String[][] ACCENT_LIST = new String[][] {{"768", "`"}, // Grave
             {"769", "'"}, // Acute
             {"770", "\\^"}, // Circumflex
             {"771", "~"}, // Tilde
@@ -757,10 +757,8 @@ public class HTMLUnicodeConversionMaps {
                     if (!strippedLaTeX.isEmpty()) {
                         LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&" + aConversionList[1] + ";");
                     }
-                } else if (!(aConversionList[0].isEmpty())) {
-                    if (!strippedLaTeX.isEmpty()) {
-                        LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
-                    }
+                } else if (!(aConversionList[0].isEmpty()) && !strippedLaTeX.isEmpty()) {
+                    LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
                 }
                 if (!(aConversionList[0].isEmpty())) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
@@ -774,7 +772,7 @@ public class HTMLUnicodeConversionMaps {
                 }
             }
         }
-        for (String[] anAccentList : accentList) {
+        for (String[] anAccentList : ACCENT_LIST) {
             ESCAPED_ACCENTS.put(Integer.decode(anAccentList[0]), anAccentList[1]);
         }
         // Manually added values which are killed by cleanLaTeX
@@ -788,8 +786,7 @@ public class HTMLUnicodeConversionMaps {
 
     private static String cleanLaTeX(String escapedString) {
         // Get rid of \{}$ from the LaTeX-string
-        String result = escapedString.replaceAll("[\\\\\\{\\}\\$]", "");
-        return result;
+        return escapedString.replaceAll("[\\\\\\{\\}\\$]", "");
     }
 
 }
