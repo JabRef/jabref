@@ -63,7 +63,7 @@ public class FreeCiteImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        try(Scanner scan = new Scanner(in)) {
+        try (Scanner scan = new Scanner(in)) {
             String text = scan.useDelimiter("\\A").next();
             return importEntries(text, status);
         }
@@ -75,7 +75,7 @@ public class FreeCiteImporter extends ImportFormat {
         try {
             urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            // e.printStackTrace();
+            LOGGER.warn("Unsupported encoding", e);
         }
 
         // Send the request

@@ -18,7 +18,6 @@ package net.sf.jabref.importer.fetcher;
 import java.awt.BorderLayout;
 
 import java.io.IOException;
-//import java.lang.reflect.Array;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -26,8 +25,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -214,7 +215,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private String createBibtexQueryURL(JSONObject searchResultsJson) {
 
         //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
-        StringBuffer bibtexQueryURLStringBuf = new StringBuffer(45);
+        StringBuilder bibtexQueryURLStringBuf = new StringBuilder();
         bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
 
         //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
@@ -247,16 +248,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
         //add the ampersands back in before passing to the HTML formatter so they can be properly converted
         //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
         //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
-        bibtexPage = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+        String result = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
 
         //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
         //TODO: Maybe find a better spot for this if it applies more universally
-        bibtexPage = bibtexPage.replaceAll("(?<!\\\\)%", "\\\\%");
+        result = result.replaceAll("(?<!\\\\)%", "\\\\%");
 
         //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
-        bibtexPage = htmlConverter.format(bibtexPage);
+        result = htmlConverter.format(result);
 
-        return bibtexPage;
+        return result;
     }
 
     private BibEntry cleanup(BibEntry entry) {
@@ -311,10 +312,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //reorder the "Jr." "Sr." etc to the correct ordering
             String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
-            for (int n = 0; n < authorSplit.length; n++) {
-                authorSplit[n] = authorSplit[n].replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2");
+            List<String> authorResult = new ArrayList<>();
+            for (String authorSplitPart : authorSplit) {
+                authorResult.add(authorSplitPart.replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2"));
             }
-            author = String.join(" and ", authorSplit);
+            author = String.join(" and ", authorResult);
 
             author = author.replace(".", ". ").replace("  ", " ").replace(". -", ".-").replace("; ", " and ")
                     .replace(" ,", ",").replace("  ", " ");
@@ -330,32 +332,31 @@ public class IEEEXploreFetcher implements EntryFetcher {
             month = month.toLowerCase();
 
             Matcher mm = MONTH_PATTERN.matcher(month);
-            String date = month;
+            StringBuilder date = new StringBuilder(month);
             if (mm.find()) {
                 if (mm.group(3).isEmpty()) {
-                    if (!mm.group(2).isEmpty()) {
-                        date = "#" + mm.group(2).substring(0, 3) + "#";
-                        if (!mm.group(1).isEmpty()) {
-                            date += " " + mm.group(1) + ",";
-                        }
+                    if (mm.group(2).isEmpty()) {
+                        date = new StringBuilder().append(mm.group(1)).append(',');
                     } else {
-                        date = mm.group(1) + ",";
+                        date = new StringBuilder().append('#').append(mm.group(2).substring(0, 3)).append('#');
+                        if (!mm.group(1).isEmpty()) {
+                            date.append(' ').append(mm.group(1)).append(',');
+                        }
                     }
                 } else if (mm.group(2).isEmpty()) {
-                    if (!mm.group(4).isEmpty()) {
-                        date = "#" + mm.group(4).substring(0, 3) + "# " + mm.group(1) + "--" + mm.group(3) + ",";
+                    if (mm.group(4).isEmpty()) {
+                        date.append(',');
                     } else {
-                        date += ",";
+                        date = new StringBuilder().append('#').append(mm.group(4).substring(0, 3)).append('#')
+                                .append(mm.group(1)).append("--").append(mm.group(3)).append(',');
                     }
                 } else {
-                    date = "#" + mm.group(2).substring(0, 3) + "# " + mm.group(1) + "--#" + mm.group(4).substring(0, 3)
-                            + "# " + mm.group(3) + ",";
+                    date = new StringBuilder().append('#').append(mm.group(2).substring(0, 3)).append('#')
+                            .append(mm.group(1)).append("--#").append(mm.group(4).substring(0, 3)).append('#')
+                            .append(mm.group(3)).append(',');
                 }
             }
-            //date = date.trim();
-            //if (!date.isEmpty()) {
-            entry.setField("month", date);
-            //}
+            entry.setField("month", date.toString());
         }
 
         // clean up pages
@@ -448,7 +449,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (m2.find()) {
                     String prefix = m2.group(2);
                     String postfix = m2.group(1).replaceAll("\\.$", "");
-                    if (!prefix.matches(abrvPattern)) {
+                    if (prefix.matches(abrvPattern)) {
+                        fullName = postfix.trim() + " " + prefix.trim();
+                    } else {
                         String abrv = "";
 
                         String[] parts = postfix.split("\\. ", 2);
@@ -463,8 +466,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         }
                         fullName = prefix.trim() + " " + postfix.trim() + " " + abrv;
 
-                    } else {
-                        fullName = postfix.trim() + " " + prefix.trim();
                     }
 
                 }
