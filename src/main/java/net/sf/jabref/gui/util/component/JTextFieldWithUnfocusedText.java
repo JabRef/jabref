@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.util;
+package net.sf.jabref.gui.util.component;
 
 import javax.swing.*;
 import java.awt.*;
