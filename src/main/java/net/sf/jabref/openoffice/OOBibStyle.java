@@ -18,10 +18,10 @@ package net.sf.jabref.openoffice;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.LayoutHelper;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -330,7 +330,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString)).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), this.repository).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

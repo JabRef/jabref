@@ -26,8 +26,6 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.exporter.*;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.groups.GroupSelector;
@@ -63,6 +61,8 @@ import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -803,7 +803,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
                     Layout layout;
                     try {
-                        layout = new LayoutHelper(sr).getLayoutFromText();
+                        layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
+                                .getLayoutFromText();
                     } catch (IOException e) {
                         LOGGER.info("Could not get layout", e);
                         return;

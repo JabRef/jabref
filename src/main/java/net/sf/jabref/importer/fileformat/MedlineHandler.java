@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -32,7 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
 class MedlineHandler extends DefaultHandler
 {
 
-    private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
+    private static final UnicodeToLatexFormatter UNICODE_CONVERTER = new UnicodeToLatexFormatter();
     private final List<BibEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
@@ -235,12 +235,13 @@ class MedlineHandler extends DefaultHandler
 
             BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
-                b.setField("author", MedlineHandler.HTML_CONVERTER.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+                b.setField("author",
+                        MedlineHandler.UNICODE_CONVERTER.format(ImportFormatReader.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
             if (!"".equals(title)) {
-                b.setField("title", MedlineHandler.HTML_CONVERTER.formatUnicode(title));
+                b.setField("title", MedlineHandler.UNICODE_CONVERTER.format(title));
             }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
             if (!"".equals(journal)) {
