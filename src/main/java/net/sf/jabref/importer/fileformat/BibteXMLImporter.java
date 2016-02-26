@@ -69,14 +69,15 @@ public class BibteXMLImporter extends ImportFormat {
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "<bibtex:file *" line.
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        while ((str = in.readLine()) != null) {
-            if (START_PATTERN.matcher(str).find()) {
-                return true;
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (START_PATTERN.matcher(str).find()) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     /**

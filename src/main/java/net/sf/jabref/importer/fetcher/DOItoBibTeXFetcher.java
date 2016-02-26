@@ -88,6 +88,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             status.showMessage(Localization.lang("Invalid DOI: '%0'.", doiStr),
                     Localization.lang("Get BibTeX entry from DOI"),
                     JOptionPane.INFORMATION_MESSAGE);
+            LOGGER.warn("Invalid DOI", e);
             return null;
         }
 
@@ -113,12 +114,12 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             dl.addParameters("Accept", "application/x-bibtex");
             bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
-
             if (status != null) {
                 status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
                         Localization.lang("Get BibTeX entry from DOI"),
                         JOptionPane.INFORMATION_MESSAGE);
             }
+            LOGGER.debug("Unknown DOI", e);
             return null;
         } catch (IOException e) {
             LOGGER.warn("Communication problems", e);

@@ -53,7 +53,6 @@ package net.sf.jabref.wizard.text.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -440,13 +439,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
         if (importedEntries == null) {
             return false;
         } else {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibEntry e : importedEntries) {
-                JabRef.jrf.getCurrentBasePanel().insertEntry(e);
+                frame.getCurrentBasePanel().insertEntry(e);
             }
             return true;
         }

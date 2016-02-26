@@ -250,8 +250,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         hm.put("title", titleTI);
                     }
                 } else {
-                    if (titleST != null)
-                    {
+                    if (titleST != null) {
                         hm.put("booktitle", titleST); // should not
                     }
                     // happen, I
