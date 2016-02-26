@@ -28,32 +28,28 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 
     private static final Log LOGGER = LogFactory.getLog(UnicodeToLatexFormatter.class);
 
-
-    public UnicodeToLatexFormatter() {
-        super();
-    }
-
     @Override
     public String format(String text) {
-        Objects.requireNonNull(text);
+        String result = Objects.requireNonNull(text);
 
-        if (text.isEmpty()) {
-            return text;
+        if (result.isEmpty()) {
+            return result;
         }
 
         // Standard symbols
         Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.keySet();
         for (Character character : chars) {
-            text = text.replaceAll(character.toString(), HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(character));
+            result = result.replaceAll(character.toString(),
+                    HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(character));
         }
 
         // Combining accents
         StringBuilder sb = new StringBuilder();
         boolean consumed = false;
-        for (int i = 0; i <= (text.length() - 2); i++) {
-            if (!consumed && (i < (text.length() - 1))) {
-                int cpCurrent = text.codePointAt(i);
-                Integer cpNext = text.codePointAt(i + 1);
+        for (int i = 0; i <= (result.length() - 2); i++) {
+            if (!consumed && (i < (result.length() - 1))) {
+                int cpCurrent = result.codePointAt(i);
+                Integer cpNext = result.codePointAt(i + 1);
                 String code = HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(cpNext);
                 if (code == null) {
                     sb.append((char) cpCurrent);
@@ -66,18 +62,18 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
             }
         }
         if (!consumed) {
-            sb.append((char) text.codePointAt(text.length() - 1));
+            sb.append((char) result.codePointAt(result.length() - 1));
         }
-        text = sb.toString();
+        result = sb.toString();
 
         // Check if any symbols is not converted
-        for (int i = 0; i <= (text.length() - 1); i++) {
-            int cp = text.codePointAt(i);
+        for (int i = 0; i <= (result.length() - 1); i++) {
+            int cp = result.codePointAt(i);
             if (cp >= 129) {
                 LOGGER.warn("Unicode character not converted: " + cp);
             }
         }
-        return text;
+        return result;
     }
 
     @Override

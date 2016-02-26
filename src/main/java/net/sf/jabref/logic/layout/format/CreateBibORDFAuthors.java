@@ -73,9 +73,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
             }
         }
 
-        fieldText = sb.toString();
-
-        return fieldText;
+        return sb.toString();
     }
 
     /**

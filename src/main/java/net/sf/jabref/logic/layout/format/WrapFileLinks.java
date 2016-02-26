@@ -210,6 +210,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                     case FILE_DESCRIPTION:
                         sb.append(replaceStrings(flEntry.description));
                         break;
+                    default:
+                        break;
                     }
                 }
 
@@ -221,11 +223,12 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     }
 
     private String replaceStrings(String text) {
+        String result = text;
         for (Map.Entry<String, String> stringStringEntry : replacements.entrySet()) {
             String to = stringStringEntry.getValue();
-            text = text.replaceAll(stringStringEntry.getKey(), to);
+            result = result.replaceAll(stringStringEntry.getKey(), to);
         }
-        return text;
+        return result;
 
     }
 
@@ -271,7 +274,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                     // Unknown escape sequence.
                     sb.append('\\');
                     sb.append(c);
-                    //System.out.println("Error: unknown escape sequence: \\"+String.valueOf(c));
                 }
             }
         }

@@ -49,8 +49,8 @@ public class RTFChars implements LayoutFormatter {
     @Override
     public String format(String field) {
 
-        StringBuffer sb = new StringBuffer("");
-        StringBuffer currentCommand = null;
+        StringBuilder sb = new StringBuilder("");
+        StringBuilder currentCommand = null;
         boolean escaped = false;
         boolean incommand = false;
         for (int i = 0; i < field.length(); i++) {
@@ -65,7 +65,7 @@ public class RTFChars implements LayoutFormatter {
             else if (c == '\\') {
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
@@ -109,7 +109,6 @@ public class RTFChars implements LayoutFormatter {
                 }
 
             } else {
-                // if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
                 testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
                     sb.append(c);
                 } else {
@@ -142,11 +141,12 @@ public class RTFChars implements LayoutFormatter {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
-                        if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)) {
+                        if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)
+                                || "it".equals(command)) {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\i ").append(part.s).append('}');
-                        } else if ("textbf".equals(command)) {
+                        } else if ("textbf".equals(command) || "bf".equals(command)) {
                             StringInt part = getPart(field, i, c == '{');
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
@@ -168,7 +168,7 @@ public class RTFChars implements LayoutFormatter {
         }
 
         char[] chars = sb.toString().toCharArray();
-        sb = new StringBuffer();
+        sb = new StringBuilder();
 
         for (char c : chars) {
             if (c < 128) {
@@ -191,10 +191,11 @@ public class RTFChars implements LayoutFormatter {
     private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
+        int icount = i;
         StringBuilder part = new StringBuilder();
-        loop: while ((count >= 0) && (i < text.length())) {
-            i++;
-            c = text.charAt(i);
+        loop: while ((count >= 0) && (icount < text.length())) {
+            icount++;
+            c = text.charAt(icount);
             switch (c) {
             case '}':
                 count--;

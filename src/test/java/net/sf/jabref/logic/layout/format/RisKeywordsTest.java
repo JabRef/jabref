@@ -3,7 +3,6 @@ package net.sf.jabref.logic.layout.format;
 import static org.junit.Assert.*;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.layout.format.RisKeywords;
 
 import org.junit.Test;
 
@@ -30,4 +29,9 @@ public class RisKeywordsTest {
         assertEquals("KW  - abcd" + Globals.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
     }
 
+    @Test
+    public void testMultipleKeywords() {
+        assertEquals("KW  - abcd" + Globals.NEWLINE + "KW  - efg" + Globals.NEWLINE + "KW  - hij" + Globals.NEWLINE
+                + "KW  - klm", new RisKeywords().format("abcd, efg, hij, klm"));
+    }
 }

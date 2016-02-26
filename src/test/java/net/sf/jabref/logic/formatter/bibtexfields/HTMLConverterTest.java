@@ -12,7 +12,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
 
 public class HTMLConverterTest {
 
-    HTMLToLatexFormatter conv = new HTMLToLatexFormatter();
+    private final HTMLToLatexFormatter conv = new HTMLToLatexFormatter();
 
     @Before
     public void setUp() throws Exception {

@@ -29,9 +29,10 @@ public class DOICheck implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         }
-        if (fieldText.startsWith("/")) {
-            fieldText = fieldText.substring(1);
+        String result = fieldText;
+        if (result.startsWith("/")) {
+            result = result.substring(1);
         }
-        return DOI.build(fieldText).map(DOI::getURLAsASCIIString).orElse(fieldText);
+        return DOI.build(result).map(DOI::getURLAsASCIIString).orElse(result);
     }
 }

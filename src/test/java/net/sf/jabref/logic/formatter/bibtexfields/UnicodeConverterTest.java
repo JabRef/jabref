@@ -12,7 +12,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 
 public class UnicodeConverterTest {
 
-    UnicodeToLatexFormatter conv = new UnicodeToLatexFormatter();
+    private final UnicodeToLatexFormatter conv = new UnicodeToLatexFormatter();
 
     @Before
     public void setUp() throws Exception {

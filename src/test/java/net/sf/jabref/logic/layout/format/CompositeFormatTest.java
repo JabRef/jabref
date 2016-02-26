@@ -1,9 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.layout.format.AuthorOrgSci;
-import net.sf.jabref.logic.layout.format.CompositeFormat;
-import net.sf.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 
 import org.junit.Assert;
 import org.junit.Test;

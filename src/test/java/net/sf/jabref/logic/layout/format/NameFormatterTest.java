@@ -3,8 +3,6 @@ package net.sf.jabref.logic.layout.format;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.format.NameFormatter;
-
 public class NameFormatterTest {
 
     @Test

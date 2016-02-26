@@ -8,7 +8,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
-import net.sf.jabref.logic.layout.format.FileLink;
 
 
 public class FileLinkTest {

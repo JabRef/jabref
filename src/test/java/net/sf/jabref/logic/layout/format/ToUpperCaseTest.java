@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.format.ToUpperCase;
-
 
 public class ToUpperCaseTest {
 

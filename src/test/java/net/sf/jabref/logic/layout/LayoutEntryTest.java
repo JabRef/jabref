@@ -1,8 +1,6 @@
 package net.sf.jabref.logic.layout;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

@@ -27,8 +27,6 @@ package net.sf.jabref.logic.layout.format;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.format.AuthorLF_FF;
-
 public class AuthorLF_FFTest {
 
     /**

@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.format.AuthorLastFirstAbbreviator;
-
 /**
  * Test case  that verifies the functionalities of the
  * formater AuthorLastFirstAbbreviator.

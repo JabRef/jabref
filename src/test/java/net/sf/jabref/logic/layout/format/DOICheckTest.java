@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.layout.format.DOICheck;
 
 import org.junit.Assert;
 import org.junit.Test;

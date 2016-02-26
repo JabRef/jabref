@@ -2,10 +2,6 @@ package net.sf.jabref.logic.layout.format;
 
 import static org.junit.Assert.*;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.layout.format.RisKeywords;
-import net.sf.jabref.logic.layout.format.RisMonth;
-
 import org.junit.Test;
 
 
@@ -29,11 +25,5 @@ public class RisMonthTest {
     @Test
     public void testInvalidMonth() {
         assertEquals("abcd", new RisMonth().format("abcd"));
-    }
-
-    @Test
-    public void testMultipleKeywords() {
-        assertEquals("KW  - abcd" + Globals.NEWLINE +"KW  - efg" + Globals.NEWLINE + "KW  - hij" + Globals.NEWLINE + "KW  - klm",
-                new RisKeywords().format("abcd, efg, hij, klm"));
     }
 }

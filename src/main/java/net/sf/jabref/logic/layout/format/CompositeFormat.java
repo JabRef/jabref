@@ -47,12 +47,13 @@ public class CompositeFormat implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
+        String result = fieldText;
         if (formatters != null) {
             for (LayoutFormatter formatter : formatters) {
-                fieldText = formatter.format(fieldText);
+                result = formatter.format(result);
             }
         }
-        return fieldText;
+        return result;
     }
 
 }

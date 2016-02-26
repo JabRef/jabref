@@ -94,7 +94,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
         return fieldText;*/
     }
 
-    void addBody(StringBuilder sb, AuthorList al, String tagName) {
+    public void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.size(); i++) {
             sb.append('<').append(tagName).append('>');
             AuthorList.Author a = al.getAuthor(i);

@@ -30,16 +30,16 @@ public class HTMLChars implements LayoutFormatter {
     private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
 
     @Override
-    public String format(String field) {
+    public String format(String inField) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
+        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
                 .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                 .replace("\n", "<br>") // Replace single line breaks with <br>
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
-        StringBuffer currentCommand = null;
+        StringBuilder currentCommand = null;
 
         char c;
         boolean escaped = false;
@@ -63,7 +63,7 @@ public class HTMLChars implements LayoutFormatter {
                 }
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
@@ -85,7 +85,6 @@ public class HTMLChars implements LayoutFormatter {
                         String command = currentCommand.toString();
                         i++;
                         c = field.charAt(i);
-                        // System.out.println("next: "+(char)c);
                         String combody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
@@ -93,7 +92,6 @@ public class HTMLChars implements LayoutFormatter {
                             combody = part;
                         } else {
                             combody = field.substring(i, i + 1);
-                            // System.out.println("... "+combody);
                         }
                         Object result = HTML_CHARS.get(command + combody);
 
@@ -144,8 +142,6 @@ public class HTMLChars implements LayoutFormatter {
                         if (argument != null) {
                             // handle common case of general latex command
                             Object result = HTML_CHARS.get(command + argument);
-                            // System.out.print("command: "+command+", arg: "+argument);
-                            // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.

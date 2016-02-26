@@ -31,13 +31,13 @@ public class FormatChars implements LayoutFormatter {
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
     @Override
-    public String format(String field) {
+    public String format(String inField) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
+        String field = inField.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
 
         StringBuilder sb = new StringBuilder();
-        StringBuffer currentCommand = null;
+        StringBuilder currentCommand = null;
 
         char c;
         boolean escaped = false;
@@ -61,7 +61,7 @@ public class FormatChars implements LayoutFormatter {
                 }
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
@@ -83,7 +83,6 @@ public class FormatChars implements LayoutFormatter {
                         String command = currentCommand.toString();
                         i++;
                         c = field.charAt(i);
-                        // System.out.println("next: "+(char)c);
                         String combody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
@@ -91,7 +90,6 @@ public class FormatChars implements LayoutFormatter {
                             combody = part;
                         } else {
                             combody = field.substring(i, i + 1);
-                            // System.out.println("... "+combody);
                         }
                         Object result = FormatChars.CHARS.get(command + combody);
 
@@ -138,8 +136,6 @@ public class FormatChars implements LayoutFormatter {
                         if (argument != null) {
                             // handle common case of general latex command
                             Object result = FormatChars.CHARS.get(command + argument);
-                            // System.out.print("command: "+command+", arg: "+argument);
-                            // System.out.print(", result: ");
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.

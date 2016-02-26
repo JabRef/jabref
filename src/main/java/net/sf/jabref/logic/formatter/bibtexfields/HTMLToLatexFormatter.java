@@ -41,98 +41,93 @@ public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
 
-    public HTMLToLatexFormatter() {
-        super();
-    }
-
-
     @Override
     public String format(String text) {
-        Objects.requireNonNull(text);
+        String result = Objects.requireNonNull(text);
 
-        if (text.isEmpty()) {
-            return text;
+        if (result.isEmpty()) {
+            return result;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         // If the result is in text or equation form can be controlled
         // From the "Advanced settings" tab
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-            text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
-            text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
+            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
+            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
         } else {
-            text = text.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
-            text = text.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
+            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
         }
 
         // TODO: maybe rewrite this based on regular expressions instead
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
         // remove tags for its image alt-tag to equation converter
-        for (int i = 0; i < text.length(); i++) {
+        for (int i = 0; i < result.length(); i++) {
 
-            int c = text.charAt(i);
+            int c = result.charAt(i);
 
             if (c == '<') {
-                i = readTag(text, i);
+                i = readTag(result, i);
             } else {
                 sb.append((char) c);
             }
 
         }
-        text = sb.toString();
+        result = sb.toString();
 
         // Handle text based HTML entities
         Set<String> patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
         for (String pattern : patterns) {
-            text = text.replaceAll(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));
+            result = result.replaceAll(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));
         }
 
         // Handle numerical HTML entities
-        Matcher m = ESCAPED_PATTERN.matcher(text);
+        Matcher m = ESCAPED_PATTERN.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
-                text = text.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
+                result = result.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
                         HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num));
             }
         }
 
         // Combining accents
-        m = ESCAPED_PATTERN2.matcher(text);
+        m = ESCAPED_PATTERN2.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if (HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.containsKey(num)) {
                 if ("i".equals(m.group(1))) {
-                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
                             "\\{\\\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{\\\\i\\}\\}");
                 } else if ("j".equals(m.group(1))) {
-                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
                             "\\{\\\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{\\\\j\\}\\}");
                 } else {
-                    text = text.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\"
+                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\"
                             + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{" + m.group(1) + "\\}\\}");
                 }
             }
         }
 
         // Find non-converted numerical characters
-        m = ESCAPED_PATTERN3.matcher(text);
+        m = ESCAPED_PATTERN3.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             LOGGER.warn("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
         }
 
         // Remove $$ in case of two adjacent conversions
-        text = text.replace("$$", "");
+        result = result.replace("$$", "");
 
         // Find non-covered special characters with alphabetic codes
-        m = ESCAPED_PATTERN4.matcher(text);
+        m = ESCAPED_PATTERN4.matcher(result);
         while (m.find()) {
             LOGGER.warn("HTML escaped char not converted: " + m.group(1));
         }
 
-        return text.trim();
+        return result.trim();
     }
 
 

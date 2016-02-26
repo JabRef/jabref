@@ -32,13 +32,17 @@ public class HTMLParagraphs implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
 
-        fieldText = fieldText.trim();
-
-        if (fieldText.isEmpty()) {
+        if (fieldText == null) {
             return fieldText;
         }
 
-        Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(fieldText);
+        String trimmedFieldText = fieldText.trim();
+
+        if (trimmedFieldText.isEmpty()) {
+            return trimmedFieldText;
+        }
+
+        Matcher m = HTMLParagraphs.BEFORE_NEW_LINES_PATTERN.matcher(trimmedFieldText);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             String middle = m.group(1).trim();

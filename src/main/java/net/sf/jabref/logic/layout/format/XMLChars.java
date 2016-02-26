@@ -64,16 +64,20 @@ public class XMLChars implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
 
-        fieldText = firstFormat(fieldText);
+        if (fieldText == null) {
+            return fieldText;
+        }
+
+        String formattedFieldText = firstFormat(fieldText);
 
         for (Map.Entry<String, String> entry : XML_CHARS.entrySet()) {
             String s = entry.getKey();
             String repl = entry.getValue();
             if (repl != null) {
-                fieldText = fieldText.replaceAll(s, repl);
+                formattedFieldText = formattedFieldText.replaceAll(s, repl);
             }
         }
-        return restFormat(fieldText);
+        return restFormat(formattedFieldText);
     }
 
     private static String firstFormat(String s) {

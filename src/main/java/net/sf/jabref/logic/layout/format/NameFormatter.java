@@ -143,12 +143,15 @@ public class NameFormatter implements LayoutFormatter {
 
     }
 
-    public String format(String toFormat, String parameters) {
+    public String format(String toFormat, String inParameters) {
 
         AuthorList al = AuthorList.getAuthorList(toFormat);
+        String parameters;
 
-        if ((parameters == null) || parameters.isEmpty()) {
+        if ((inParameters == null) || inParameters.isEmpty()) {
             parameters = "*:*:\"{ff}{vv}{ll}{,jj} \"";
+        } else {
+            parameters = inParameters;
         }
 
         String[] cases = parameters.split("@@");
@@ -183,12 +186,12 @@ public class NameFormatter implements LayoutFormatter {
     }
 
     public static Map<String, String> getNameFormatters() {
-    
+
         Map<String, String> result = new HashMap<>();
-    
+
         List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
         List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
-    
+
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
                 result.put(names.get(i), formats.get(i));
@@ -196,7 +199,7 @@ public class NameFormatter implements LayoutFormatter {
                 result.put(names.get(i), DEFAULT_FORMAT);
             }
         }
-    
+
         return result;
     }
 }

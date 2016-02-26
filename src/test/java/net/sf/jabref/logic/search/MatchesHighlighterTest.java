@@ -2,8 +2,6 @@ package net.sf.jabref.logic.search;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.search.MatchesHighlighter;
-import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

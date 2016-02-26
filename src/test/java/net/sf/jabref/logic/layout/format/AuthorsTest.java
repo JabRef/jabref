@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
-import net.sf.jabref.logic.layout.format.Authors;
 
 import org.junit.Assert;
 import org.junit.Test;

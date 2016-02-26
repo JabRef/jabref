@@ -4,9 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.format.Ordinal;
-
-
 public class OrdinalTest {
 
     @Test
