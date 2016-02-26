@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.util.*;
 
 import net.sf.jabref.*;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -263,7 +262,7 @@ public class BibtexParser {
                 .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
+            CustomEntryType typ = parseEntryType(comment);
             entryTypes.put(typ.getName(), typ);
 
             // custom entry types are always re-written by JabRef and not stored in the file
@@ -926,6 +925,28 @@ public class BibtexParser {
         if ((character != firstOption) && (character != secondOption)) {
             throw new IOException("Error in line " + line + ": Expected " + firstOption + " or "
                     + secondOption + " but received " + (char) character);
+        }
+    }
+
+    private CustomEntryType parseEntryType(String comment) {
+        try {
+            String rest = comment.substring(CustomEntryType.ENTRYTYPE_FLAG.length());
+            int indexEndOfName = rest.indexOf(':');
+            String fieldsDescription = rest.substring(indexEndOfName + 2);
+
+            int indexEndOfRequiredFields = fieldsDescription.indexOf(']');
+            int indexEndOfOptionalFields = fieldsDescription.indexOf(']', indexEndOfRequiredFields + 1);
+            if (indexEndOfRequiredFields < 4 || indexEndOfOptionalFields < indexEndOfRequiredFields + 6) {
+                throw new IndexOutOfBoundsException();
+            }
+            String name = rest.substring(0, indexEndOfName);
+            String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
+            String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
+            return new CustomEntryType(name, reqFields, optFields);
+        } catch (IndexOutOfBoundsException ex) {
+            parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
+                    comment);
+            return null;
         }
     }
 }
