@@ -8,6 +8,7 @@ import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.timing.Pause;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.swing.*;
@@ -76,6 +77,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         exitJabRef(mainFrame);
     }
 
+    @Ignore
     @Test
     public void testOpenAndSavePreferences() {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
