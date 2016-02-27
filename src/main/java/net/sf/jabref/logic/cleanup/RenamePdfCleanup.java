@@ -79,14 +79,19 @@ public class RenamePdfCleanup implements CleanupJob {
             String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
                     .concat(newFilename.toString());
 
-            if (new File(newPath).exists()) {
+            String expandedOldFilePath = expandedOldFile.get().toString();
+            Boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
+                    expandedOldFilePath);
+            if (new File(newPath).exists() && ! pathsDifferOnlyByCase) {
                 // we do not overwrite files
+                // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+                // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
                 continue;
             }
 
             //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFile.get().toString(), newPath);
+            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
 
             if (renameSuccessful) {
                 changed = true;
