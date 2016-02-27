@@ -15,16 +15,8 @@
  */
 package net.sf.jabref.gui.util.component;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 
@@ -43,21 +35,11 @@ import javax.swing.plaf.basic.BasicLabelUI;
  */
 public class VerticalLabelUI extends BasicLabelUI {
 
-    private boolean clockwise;
+    private final boolean clockwise;
     // see comment in BasicLabelUI
     private Rectangle verticalViewR = new Rectangle();
     private Rectangle verticalIconR = new Rectangle();
     private Rectangle verticalTextR = new Rectangle();
-    private static final VerticalLabelUI VERTICAL_LABEL_UI = new VerticalLabelUI();
-    private static final VerticalLabelUI SAFE_VERTICAL_LABEL_UI = new VerticalLabelUI();
-
-
-    /**
-     * Constructs a <code>VerticalLabelUI</code> with the default anticlockwise
-     * rotation
-     */
-    private VerticalLabelUI() {
-    }
 
     /**
      * Constructs a <code>VerticalLabelUI</code> with the desired rotation.
@@ -66,17 +48,6 @@ public class VerticalLabelUI extends BasicLabelUI {
      */
     public VerticalLabelUI(boolean clockwise) {
         this.clockwise = clockwise;
-    }
-
-    /**
-     * @see ComponentUI#createUI(javax.swing.JComponent)
-     */
-    public static ComponentUI createUI(JComponent c) {
-        if (System.getSecurityManager() == null) {
-            return VerticalLabelUI.VERTICAL_LABEL_UI;
-        } else {
-            return VerticalLabelUI.SAFE_VERTICAL_LABEL_UI;
-        }
     }
 
     /**
@@ -115,17 +86,18 @@ public class VerticalLabelUI extends BasicLabelUI {
             String text, Icon icon, Rectangle viewR, Rectangle iconR,
             Rectangle textR) {
 
+        String result = text;
         verticalViewR = transposeRectangle(viewR, verticalViewR);
         verticalIconR = transposeRectangle(iconR, verticalIconR);
         verticalTextR = transposeRectangle(textR, verticalTextR);
 
-        text = super.layoutCL(label, fontMetrics, text, icon,
+        result = super.layoutCL(label, fontMetrics, result, icon,
                 verticalViewR, verticalIconR, verticalTextR);
 
         copyRectangle(verticalViewR, viewR);
         copyRectangle(verticalIconR, iconR);
         copyRectangle(verticalTextR, textR);
-        return text;
+        return result;
     }
 
     /**
@@ -136,9 +108,9 @@ public class VerticalLabelUI extends BasicLabelUI {
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2 = (Graphics2D) g.create();
         if (clockwise) {
-            g2.rotate(Math.PI / 2, c.getSize().width / 2, c.getSize().width / 2);
+            g2.rotate(Math.PI / 2, c.getSize().width / 2.0, c.getSize().width / 2.0);
         } else {
-            g2.rotate(-Math.PI / 2, c.getSize().height / 2, c.getSize().height / 2);
+            g2.rotate(-Math.PI / 2, c.getSize().height / 2.0, c.getSize().height / 2.0);
         }
         super.paint(g2, c);
     }
@@ -178,14 +150,15 @@ public class VerticalLabelUI extends BasicLabelUI {
     }
 
     private static Rectangle transposeRectangle(Rectangle from, Rectangle to) {
-        if (to == null) {
-            to = new Rectangle();
+        Rectangle destination = to;
+        if (destination == null) {
+            destination = new Rectangle();
         }
-        to.x = from.y;
-        to.y = from.x;
-        to.width = from.height;
-        to.height = from.width;
-        return to;
+        destination.x = from.y;
+        destination.y = from.x;
+        destination.width = from.height;
+        destination.height = from.width;
+        return destination;
     }
 
     private static void copyRectangle(Rectangle from, Rectangle to) {
