@@ -523,7 +523,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             super(string, image);
         }
 
-        void swap(int i, int j) {
+        public void swap(int i, int j) {
             if ((i < 0) || (i >= tableRows.size())) {
                 return;
             }

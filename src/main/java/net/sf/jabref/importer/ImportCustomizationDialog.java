@@ -102,7 +102,7 @@ public class ImportCustomizationDialog extends JDialog {
      *
      * @param importer  importer
      */
-    void addOrReplaceImporter(CustomImporter importer) {
+    public void addOrReplaceImporter(CustomImporter importer) {
         prefs.customImports.replaceImporter(importer);
         Globals.importFormatReader.resetImportFormats();
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();

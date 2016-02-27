@@ -469,7 +469,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.OK_OPTION) {
-                ActionListener l = entryEditor.generateKeyAction;
+                ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
                 bibtexKey = entryEditor.getEntry().getCiteKey();
             }

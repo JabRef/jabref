@@ -12,8 +12,8 @@ import net.sf.jabref.JabRefPreferences;
 
 public class FileHistoryTest {
 
-    JabRefPreferences prefs;
-    List<String> oldFileNames;
+    private JabRefPreferences prefs;
+    private List<String> oldFileNames;
 
     @Before
     public void setUp() throws Exception {
