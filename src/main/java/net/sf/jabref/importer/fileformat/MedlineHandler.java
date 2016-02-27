@@ -29,8 +29,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-class MedlineHandler extends DefaultHandler
-{
+class MedlineHandler extends DefaultHandler {
 
     private static final UnicodeToLatexFormatter UNICODE_CONVERTER = new UnicodeToLatexFormatter();
     private final List<BibEntry> bibitems = new ArrayList<>();
@@ -76,7 +75,7 @@ class MedlineHandler extends DefaultHandler
     private String initials = "";
     private String number = "";
     private String page = "";
-    private String MedlineDate = "";
+    private String medlineDate = "";
     private final String series = "";
     private final String editor = "";
     private final String booktitle = "";
@@ -101,14 +100,8 @@ class MedlineHandler extends DefaultHandler
         return bibitems;
     }
 
-    public MedlineHandler() {
-        super();
-
-    }
-
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) {
-        //		public void startElement(String localName, Attributes atts) {
         // Get the number of attribute
         if ("PubmedArticle".equals(localName)) {
             // Do nothing
@@ -213,10 +206,10 @@ class MedlineHandler extends DefaultHandler
         if ("PubmedArticle".equals(localName)) {
             //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
             // check if year ="" then give medline date instead
-            if ("".equals(year) && !"".equals(MedlineDate)) {
+            if ("".equals(year) && !"".equals(medlineDate)) {
                     // multi-year date format
                     //System.out.println(MedlineDate);
-                    year = MedlineDate.substring(0, 4);
+                    year = medlineDate.substring(0, 4);
                     //Matcher m = Pattern.compile("\\b[0-9]{4}\\b").matcher(MedlineDate);
                     //if(m.matches())
                     //year = m.group();
@@ -329,7 +322,7 @@ class MedlineHandler extends DefaultHandler
             page = "";
             String medlineID = "";
             String url = "";
-            MedlineDate = "";
+            medlineDate = "";
             descriptors.clear();
         }
 
@@ -517,7 +510,7 @@ class MedlineHandler extends DefaultHandler
             abstractText += new String(data, start, length);
         }
         else if (inMedlineDate) {
-            MedlineDate += new String(data, start, length);
+            medlineDate += new String(data, start, length);
         }
         else if (inDoi) {
             doi = new String(data, start, length);

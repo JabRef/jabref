@@ -207,6 +207,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             break;
         default:
             firstNameModeBoth.setSelected(true);
+            break;
         }
         // one field less than the option is enough. If one filed changes, another one also changes.
         oldAutoCompFModeAbbr = firstNameModeAbbr.isSelected();

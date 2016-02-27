@@ -1574,6 +1574,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         frame.prevTab.actionPerformed(null);
                         e.consume();
                         break;
+                    default:
+                        break;
                     }
                 } else if (keyCode == KeyEvent.VK_ENTER) {
                     e.consume();
@@ -1588,7 +1590,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void setupMainPanel() {
-        //System.out.println("setupMainPanel");
         //splitPane = new com.jgoodies.uif_lite.component.UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);

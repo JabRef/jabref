@@ -110,6 +110,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
                             default:
                                 addItemToIndex(author.getLastFirst(true));
                                 addItemToIndex(author.getLastFirst(false));
+                                break;
                             }
                         }
                         if (autoCompFF) {

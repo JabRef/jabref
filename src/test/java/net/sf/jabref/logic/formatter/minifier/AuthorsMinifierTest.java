@@ -14,7 +14,7 @@ public class AuthorsMinifierTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 

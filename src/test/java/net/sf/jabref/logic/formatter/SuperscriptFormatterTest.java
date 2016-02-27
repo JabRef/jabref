@@ -16,7 +16,7 @@ public class SuperscriptFormatterTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 

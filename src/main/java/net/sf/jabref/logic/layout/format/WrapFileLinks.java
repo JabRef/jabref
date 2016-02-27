@@ -180,7 +180,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                          */
                         if (f.isPresent()) {
                             try {
-                                sb.append(replaceStrings(f.get().getCanonicalPath()));//f.toURI().toString();
+                                sb.append(replaceStrings(f.get().getCanonicalPath()));
                             } catch (IOException ex) {
                                 LOGGER.warn("Problem getting path", ex);
                                 sb.append(replaceStrings(f.get().getPath()));
@@ -248,14 +248,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         boolean escaped = false;
         for (int i = 0; i < format.length(); i++) {
             char c = format.charAt(i);
-            if (!escaped) {
-                // Check if we are at the start of an escape sequence:
-                if (c == '\\') {
-                    escaped = true;
-                } else {
-                    sb.append(c);
-                }
-            } else {
+            if (escaped) {
                 escaped = false; // we know we'll be out of escape mode after this
                 // Check if this escape sequence is meaningful:
                 if (c == '\\') {
@@ -273,6 +266,13 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                 } else {
                     // Unknown escape sequence.
                     sb.append('\\');
+                    sb.append(c);
+                }
+            } else {
+                // Check if we are at the start of an escape sequence:
+                if (c == '\\') {
+                    escaped = true;
+                } else {
                     sb.append(c);
                 }
             }

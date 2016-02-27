@@ -44,10 +44,6 @@ public class DOAJFetcher implements EntryFetcher {
 
     private final JSONEntryParser jsonConverter = new JSONEntryParser();
 
-    public DOAJFetcher() {
-        super();
-    }
-
     @Override
     public void stopFetching() {
         shouldContinue = false;
