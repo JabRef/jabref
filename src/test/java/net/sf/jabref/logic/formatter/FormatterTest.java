@@ -86,6 +86,8 @@ public class FormatterTest {
                 new Object[]{new SuperscriptFormatter()},
                 new Object[]{new UnitFormatter()},
                 new Object[]{new RemoveBracesFormatter()}
+                // The EraseFormatter is special since it always returns null to indicate that the field should be deleted.
+                // new Object[]{new EraseFormatter()}
         );
     }
 }

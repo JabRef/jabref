@@ -57,11 +57,11 @@ public class FieldFormatterCleanup implements CleanupJob {
         if ("all".equals(field)) {
             return cleanupAllFields(entry);
         } else {
-            return cleanupSingleField(entry);
+            return cleanupSingleField(field, entry);
         }
     }
 
-    private List<FieldChange> cleanupSingleField(BibEntry entry) {
+    private List<FieldChange> cleanupSingleField(String field, BibEntry entry) {
         if (!entry.hasField(field)) {
             // Not set -> nothing to do
             return new ArrayList<>();
@@ -74,7 +74,11 @@ public class FieldFormatterCleanup implements CleanupJob {
         if (oldValue.equals(newValue)) {
             return new ArrayList<>();
         } else {
-            entry.setField(field, newValue);
+            if(newValue == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, newValue);
+            }
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
         }
@@ -84,14 +88,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         ArrayList<FieldChange> fieldChanges = new ArrayList<>();
 
         for (String fieldKey : entry.getFieldNames()) {
-            String oldValue = entry.getField(fieldKey);
-            String newValue = formatter.format(oldValue);
-
-            if (!oldValue.equals(newValue)) {
-                entry.setField(fieldKey, newValue);
-                FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
-                fieldChanges.add(change);
-            }
+            fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
         }
 
         return fieldChanges;
