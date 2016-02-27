@@ -149,8 +149,6 @@ public class FontSelectorDialog extends JDialog {
     private final JTextField styleField = new JTextField();
     private final JList<String> styleList = new JList<>(styles);
     private final JLabel preview;
-    private final JButton ok;
-    private final JButton cancel;
 
     /**
      * For some reason the default Java fonts show up in the
@@ -226,7 +224,7 @@ public class FontSelectorDialog extends JDialog {
         buttons.setBorder(new EmptyBorder(12, 0, 0, 0));
         buttons.add(Box.createGlue());
 
-        ok = new JButton(Localization.lang("OK"));
+        JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(new ActionListener() {
 
             @Override
@@ -241,7 +239,7 @@ public class FontSelectorDialog extends JDialog {
 
         buttons.add(Box.createHorizontalStrut(6));
 
-        cancel = new JButton(Localization.lang("Cancel"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.addActionListener(new ActionListener() {
 
             @Override
