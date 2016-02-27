@@ -22,6 +22,10 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +35,7 @@ import java.util.stream.Collectors;
  */
 class MetaDataChange extends Change {
 
-    private static final int
-            ADD = 1;
+    private static final int ADD = 1;
     private static final int REMOVE = 2;
     private static final int MODIFY = 3;
 
@@ -41,6 +44,8 @@ class MetaDataChange extends Change {
     private final MetaData md;
     private final MetaData mdSecondary;
     private final List<MetaDataChangeUnit> changes = new ArrayList<>();
+
+    private static final Log LOGGER = LogFactory.getLog(MetaDataChange.class);
 
 
     public MetaDataChange(MetaData md, MetaData mdSecondary) {
@@ -93,6 +98,9 @@ class MetaDataChange extends Change {
             case MODIFY:
                 md.putData(unit.getKey(), unit.getValue());
                 mdSecondary.putData(unit.getKey(), unit.getValue());
+                break;
+            default:
+                LOGGER.error("Undefined meta data change unit type");
                 break;
             }
         }
