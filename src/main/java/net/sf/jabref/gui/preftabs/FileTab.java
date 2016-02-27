@@ -197,6 +197,7 @@ class FileTab extends JPanel implements PrefsTab {
             break;
         default:
             newline = "\r\n";
+            break;
         }
         prefs.put(JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
