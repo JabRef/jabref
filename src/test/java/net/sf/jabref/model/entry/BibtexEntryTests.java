@@ -15,7 +15,7 @@ import java.util.List;
 public class BibtexEntryTests {
 
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 

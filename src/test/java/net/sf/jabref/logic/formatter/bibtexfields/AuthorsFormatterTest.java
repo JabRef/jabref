@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +14,7 @@ public class AuthorsFormatterTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 
