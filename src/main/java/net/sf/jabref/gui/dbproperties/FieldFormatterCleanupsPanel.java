@@ -35,9 +35,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private JButton deleteButton;
 
-    public FieldFormatterCleanupsPanel() {
+    public FieldFormatterCleanupsPanel(String description) {
 
-        enabled = new JCheckBox(Localization.lang("Enable save actions"));
+        enabled = new JCheckBox(description);
     }
 
     public void setValues(MetaData metaData) {
@@ -45,13 +45,16 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<String> saveActionsMetaList = metaData.getData(MetaData.SAVE_ACTIONS);
 
-        initializeSaveActions(saveActionsMetaList);
+        setValues(FieldFormatterCleanups.parseFromString(saveActionsMetaList));
+    }
+
+    public void setValues(FieldFormatterCleanups formatterCleanups) {
+        fieldFormatterCleanups = formatterCleanups;
 
         // first clear existing content
         this.removeAll();
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
-
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
@@ -80,19 +83,6 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         enabled.setSelected(fieldFormatterCleanups.isEnabled());
     }
 
-    private void initializeSaveActions(List<String> saveActionsMetaList) {
-
-        if ((saveActionsMetaList != null) && (saveActionsMetaList.size() >= 2)) {
-            boolean enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
-            String formatterString = saveActionsMetaList.get(1);
-            fieldFormatterCleanups = new FieldFormatterCleanups(enablementStatus, formatterString);
-        } else {
-            // apply default actions
-            fieldFormatterCleanups = FieldFormatterCleanups.DEFAULT_ACTIONS;
-        }
-
-    }
-
     private JPanel getSelectorPanel() {
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu,"));
@@ -115,42 +105,28 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     public void storeSettings(MetaData metaData) {
         Objects.requireNonNull(metaData);
 
-        List<String> actions = new ArrayList<>();
-
-        if (enabled.isSelected()) {
-            actions.add("enabled");
-        } else {
-            actions.add("disabled");
-        }
-
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        FieldFormatterCleanups formatterCleanups = getFormatterCleanups();
 
         // if all actions have been removed, remove the save actions from the MetaData
-        if (newActions.isEmpty()) {
+        if (formatterCleanups.getConfiguredActions().isEmpty()) {
             metaData.remove(MetaData.SAVE_ACTIONS);
             return;
         }
 
-        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
-        actions.add(formatterString);
+        metaData.putData(MetaData.SAVE_ACTIONS, formatterCleanups.convertToString());
+    }
 
-        metaData.putData(MetaData.SAVE_ACTIONS, actions);
+    public FieldFormatterCleanups getFormatterCleanups() {
+        List<FieldFormatterCleanup> actions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        return new FieldFormatterCleanups(enabled.isSelected(), actions);
     }
 
     public boolean hasChanged() {
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
-        boolean hasChanged = !fieldFormatterCleanups.equals(new FieldFormatterCleanups(enabled.isSelected(), formatterString));
-
-        return hasChanged;
+        return !fieldFormatterCleanups.equals(getFormatterCleanups());
     }
 
     public boolean isDefaultSaveActions() {
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
-        boolean isDefault = FieldFormatterCleanups.DEFAULT_ACTIONS.equals(new FieldFormatterCleanups(enabled.isSelected(), formatterString));
-
-        return isDefault;
+        return FieldFormatterCleanups.DEFAULT_ACTIONS.equals(getFormatterCleanups());
     }
 
     class AddButtonListener implements ActionListener {

@@ -16,30 +16,28 @@ public class FieldFormatterCleanups {
 
     private final List<FieldFormatterCleanup> actions;
 
-    private List<Formatter> availableFormatters;
+    private static List<Formatter> availableFormatters;
 
     private boolean enabled;
 
     public static final FieldFormatterCleanups DEFAULT_ACTIONS;
 
     static {
+        availableFormatters = new ArrayList<>();
+        availableFormatters.addAll(BibtexFieldFormatters.ALL);
+        availableFormatters.addAll(CaseChangers.ALL);
+
         String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
         DEFAULT_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
     }
 
     public FieldFormatterCleanups(boolean enabled, String formatterString) {
+        this(enabled, parse(formatterString));
+    }
 
-        actions = new ArrayList<>();
-        setAvailableFormatters();
+    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
-
-        if ((formatterString == null) || "".equals(formatterString)) {
-            // no save actions defined in the meta data
-            return;
-        } else {
-            parse(formatterString);
-        }
-
+        this.actions = Objects.requireNonNull(actions);
     }
 
     public boolean isEnabled() {
@@ -77,7 +75,15 @@ public class FieldFormatterCleanups {
         return Objects.hash(actions, enabled);
     }
 
-    private void parse(String formatterString) {
+    private static List<FieldFormatterCleanup> parse(String formatterString) {
+
+        if ((formatterString == null) || formatterString.isEmpty()) {
+            // no save actions defined in the meta data
+            return new ArrayList<>();
+        }
+
+        List<FieldFormatterCleanup> actions = new ArrayList<>();
+
         //read concrete actions
         int startIndex = 0;
 
@@ -119,15 +125,9 @@ public class FieldFormatterCleanups {
         } catch (StringIndexOutOfBoundsException ignore) {
             // if this exception occurs, the remaining part of the save actions string is invalid.
             // Thus we stop parsing and take what we have parsed until now
-            return;
+            return actions;
         }
-    }
-
-    private void setAvailableFormatters() {
-        availableFormatters = new ArrayList<>();
-
-        availableFormatters.addAll(BibtexFieldFormatters.ALL);
-        availableFormatters.addAll(CaseChangers.ALL);
+        return actions;
     }
 
     public List<FieldChange> applySaveActions(BibEntry entry) {
@@ -148,7 +148,7 @@ public class FieldFormatterCleanups {
         return result;
     }
 
-    private Formatter getFormatterFromString(String formatterName) {
+    private static Formatter getFormatterFromString(String formatterName) {
         for (Formatter formatter : availableFormatters) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
@@ -157,7 +157,7 @@ public class FieldFormatterCleanups {
         return new IdentityFormatter();
     }
 
-    public static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
+    private static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
         //first, group all formatters by the field for which they apply
         Map<String, List<String>> groupedByField = new HashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
@@ -188,5 +188,30 @@ public class FieldFormatterCleanups {
         return result.toString();
     }
 
+    public List<String> convertToString() {
+        List<String> stringRepresentation = new ArrayList<>();
 
+        if (enabled) {
+            stringRepresentation.add("enabled");
+        } else {
+            stringRepresentation.add("disabled");
+        }
+
+        String formatterString = FieldFormatterCleanups.getMetaDataString(actions);
+        stringRepresentation.add(formatterString);
+        return stringRepresentation;
+    }
+
+    public static FieldFormatterCleanups parseFromString(List<String> formatterMetaList) {
+
+        if (formatterMetaList != null && formatterMetaList.size() >= 2) {
+            boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));
+            String formatterString = formatterMetaList.get(1);
+            return new FieldFormatterCleanups(enablementStatus, formatterString);
+        } else {
+            // return default actions
+            return FieldFormatterCleanups.DEFAULT_ACTIONS;
+        }
+
+    }
 }

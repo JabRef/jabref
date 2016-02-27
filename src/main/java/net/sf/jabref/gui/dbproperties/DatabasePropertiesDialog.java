@@ -131,7 +131,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
-        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel();
+        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"));
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
         builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
 

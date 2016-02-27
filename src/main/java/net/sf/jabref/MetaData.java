@@ -389,7 +389,7 @@ public class MetaData implements Iterable<String> {
 
     public FieldFormatterCleanups getSaveActions() {
         if (this.getData(SAVE_ACTIONS) == null) {
-            return new FieldFormatterCleanups(false, "");
+            return new FieldFormatterCleanups(false, new ArrayList<>());
         } else {
             boolean enablementStatus = this.getData(SAVE_ACTIONS).get(0).equals("enabled");
             String formatterString = this.getData(SAVE_ACTIONS).get(1);
