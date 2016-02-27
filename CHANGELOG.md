@@ -32,6 +32,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Ability to convert from LaTeX to Unicode in right-click field menu
 
 - [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
+- Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 
 ### Fixed
 - Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
