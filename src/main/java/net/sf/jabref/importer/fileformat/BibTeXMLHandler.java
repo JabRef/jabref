@@ -38,11 +38,6 @@ class BibTeXMLHandler extends DefaultHandler {
     // XML parsing stuff
     private String currentChars;
 
-
-    public BibTeXMLHandler() {
-        super();
-    }
-
     public List<BibEntry> getItems() {
         return bibitems;
     }
