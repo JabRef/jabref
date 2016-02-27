@@ -36,7 +36,6 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -81,7 +80,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
 
-    private SaveActionsPanel saveActionsPanel;
+    private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
@@ -132,9 +131,9 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
-        saveActionsPanel = new SaveActionsPanel();
+        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel();
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
-        builder.add(saveActionsPanel).xyw(1, 29, 5);
+        builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -262,7 +261,7 @@ public class DatabasePropertiesDialog extends JDialog {
         oldProtectVal = protect.isSelected();
 
         //set save actions
-        saveActionsPanel.setValues(metaData);
+        fieldFormatterCleanupsPanel.setValues(metaData);
     }
 
     private void storeSettings() {
@@ -315,12 +314,12 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         }
 
-        boolean saveActionsChanged = saveActionsPanel.hasChanged();
+        boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
         if (saveActionsChanged) {
-            if (saveActionsPanel.isDefaultSaveActions()) {
-                metaData.remove(SaveActions.META_KEY);
+            if (fieldFormatterCleanupsPanel.isDefaultSaveActions()) {
+                metaData.remove(MetaData.SAVE_ACTIONS);
             } else {
-                saveActionsPanel.storeSettings(metaData);
+                fieldFormatterCleanupsPanel.storeSettings(metaData);
             }
         }
 

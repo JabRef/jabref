@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class SaveActionsTest {
+public class FieldFormatterCleanupsTest {
 
     private BibEntry entry;
 
@@ -44,7 +44,7 @@ public class SaveActionsTest {
     @Test
     public void checkSimpleUseCase() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "title[IdentityFormatter]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[IdentityFormatter]");
 
         actions.applySaveActions(entry);
 
@@ -54,7 +54,7 @@ public class SaveActionsTest {
     @Test
     public void invalidSaveActionSting() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "title");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title");
 
         actions.applySaveActions(entry);
 
@@ -64,7 +64,7 @@ public class SaveActionsTest {
     @Test
     public void checkLowerCaseSaveAction() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
 
         actions.applySaveActions(entry);
 
@@ -73,7 +73,7 @@ public class SaveActionsTest {
 
     @Test
     public void checkTwoSaveActionsForOneField() throws IOException {
-        SaveActions actions = new SaveActions(true, "title[LowerCaseChanger,IdentityFormatter]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter]");
 
         assertEquals(2, actions.getConfiguredActions().size());
 
@@ -85,7 +85,7 @@ public class SaveActionsTest {
     @Test
     public void checkThreeSaveActionsForOneField() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "title[LowerCaseChanger,IdentityFormatter,DateFormatter]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter,DateFormatter]");
 
         assertEquals(3, actions.getConfiguredActions().size());
 
@@ -98,7 +98,7 @@ public class SaveActionsTest {
     @Test
     public void checkMultipleSaveActions() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "pages[PageNumbersFormatter]title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter]title[LowerCaseChanger]");
 
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
@@ -121,7 +121,7 @@ public class SaveActionsTest {
     @Test
     public void checkMultipleSaveActionsWithMultipleFormatters() throws IOException {
 
-        SaveActions actions = new SaveActions(true, "pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]");
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         assertEquals(3, formatterCleanups.size());

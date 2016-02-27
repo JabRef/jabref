@@ -322,7 +322,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeSaveActions() throws Exception {
-        SaveActions saveActions = new SaveActions(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
         metaData.setSaveActions(saveActions);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -403,7 +403,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeNotEmptyContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Arrays.asList(""));
+        metaData.setContentSelectors("title", Collections.singletonList(""));
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 

@@ -18,7 +18,7 @@ package net.sf.jabref;
 import java.io.*;
 import java.util.*;
 
-import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
@@ -33,6 +33,7 @@ public class MetaData implements Iterable<String> {
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    public static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     static final String DATABASE_TYPE = "DATABASE_TYPE";
@@ -386,13 +387,13 @@ public class MetaData implements Iterable<String> {
         this.labelPattern = labelPattern;
     }
 
-    public SaveActions getSaveActions() {
-        if (this.getData(SaveActions.META_KEY) == null) {
-            return new SaveActions(false, "");
+    public FieldFormatterCleanups getSaveActions() {
+        if (this.getData(SAVE_ACTIONS) == null) {
+            return new FieldFormatterCleanups(false, "");
         } else {
-            boolean enablementStatus = this.getData(SaveActions.META_KEY).get(0).equals("enabled");
-            String formatterString = this.getData(SaveActions.META_KEY).get(1);
-            return new SaveActions(enablementStatus, formatterString);
+            boolean enablementStatus = this.getData(SAVE_ACTIONS).get(0).equals("enabled");
+            String formatterString = this.getData(SAVE_ACTIONS).get(1);
+            return new FieldFormatterCleanups(enablementStatus, formatterString);
         }
     }
 
@@ -450,7 +451,7 @@ public class MetaData implements Iterable<String> {
                 stringBuilder.append(StringUtil.quote(dataItem, ";", '\\')).append(";");
 
                 //in case of save actions, add an additional newline after the enabled flag
-                if (metaItem.getKey().equals(SaveActions.META_KEY) && "enabled".equals(dataItem)) {
+                if (metaItem.getKey().equals(SAVE_ACTIONS) && "enabled".equals(dataItem)) {
                     stringBuilder.append(Globals.NEWLINE);
                 }
             }
@@ -485,7 +486,7 @@ public class MetaData implements Iterable<String> {
         return serializedMetaData;
     }
 
-    public void setSaveActions(SaveActions saveActions) {
+    public void setSaveActions(FieldFormatterCleanups saveActions) {
         List<String> actionsSerialized = new ArrayList<>();
 
         if (saveActions.isEnabled()) {
@@ -494,10 +495,10 @@ public class MetaData implements Iterable<String> {
             actionsSerialized.add("disabled");
         }
 
-        String formatterString = SaveActions.getMetaDataString(saveActions.getConfiguredActions());
+        String formatterString = FieldFormatterCleanups.getMetaDataString(saveActions.getConfiguredActions());
         actionsSerialized.add(formatterString);
 
-        putData(SaveActions.META_KEY, actionsSerialized);
+        putData(SAVE_ACTIONS, actionsSerialized);
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {

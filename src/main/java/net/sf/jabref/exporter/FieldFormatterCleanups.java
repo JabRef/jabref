@@ -12,24 +12,22 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.*;
 
-public class SaveActions {
+public class FieldFormatterCleanups {
 
     private final List<FieldFormatterCleanup> actions;
 
     private List<Formatter> availableFormatters;
 
-    public static final String META_KEY = "saveActions";
-
     private boolean enabled;
 
-    public static final SaveActions DEFAULT_ACTIONS;
+    public static final FieldFormatterCleanups DEFAULT_ACTIONS;
 
     static {
         String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
-        DEFAULT_ACTIONS = new SaveActions(false, defaultFormatterString);
+        DEFAULT_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
     }
 
-    public SaveActions(boolean enabled, String formatterString) {
+    public FieldFormatterCleanups(boolean enabled, String formatterString) {
 
         actions = new ArrayList<>();
         setAvailableFormatters();
@@ -39,7 +37,7 @@ public class SaveActions {
             // no save actions defined in the meta data
             return;
         } else {
-            parseSaveActions(formatterString);
+            parse(formatterString);
         }
 
     }
@@ -65,7 +63,7 @@ public class SaveActions {
             return false;
         }
 
-        SaveActions that = (SaveActions) o;
+        FieldFormatterCleanups that = (FieldFormatterCleanups) o;
 
         if (enabled != that.enabled) {
             return false;
@@ -79,7 +77,7 @@ public class SaveActions {
         return Objects.hash(actions, enabled);
     }
 
-    private void parseSaveActions(String formatterString) {
+    private void parse(String formatterString) {
         //read concrete actions
         int startIndex = 0;
 

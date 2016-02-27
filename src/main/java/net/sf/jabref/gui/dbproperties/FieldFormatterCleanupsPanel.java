@@ -3,7 +3,7 @@ package net.sf.jabref.gui.dbproperties;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -19,11 +19,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.List;
 
-public class SaveActionsPanel extends JPanel {
+public class FieldFormatterCleanupsPanel extends JPanel {
 
     private final JCheckBox enabled;
 
-    private SaveActions saveActions;
+    private FieldFormatterCleanups fieldFormatterCleanups;
 
     private JList actionsList;
 
@@ -35,7 +35,7 @@ public class SaveActionsPanel extends JPanel {
 
     private JButton deleteButton;
 
-    public SaveActionsPanel() {
+    public FieldFormatterCleanupsPanel() {
 
         enabled = new JCheckBox(Localization.lang("Enable save actions"));
     }
@@ -43,14 +43,14 @@ public class SaveActionsPanel extends JPanel {
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
 
-        List<String> saveActionsMetaList = metaData.getData(SaveActions.META_KEY);
+        List<String> saveActionsMetaList = metaData.getData(MetaData.SAVE_ACTIONS);
 
         initializeSaveActions(saveActionsMetaList);
 
         // first clear existing content
         this.removeAll();
 
-        List<FieldFormatterCleanup> configuredActions = saveActions.getConfiguredActions();
+        List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
 
 
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
@@ -76,8 +76,8 @@ public class SaveActionsPanel extends JPanel {
         this.add(builder.getPanel(), BorderLayout.WEST);
 
         // make sure the layout is set according to the checkbox
-        enabled.addActionListener(new EnablementStatusListener(saveActions.isEnabled()));
-        enabled.setSelected(saveActions.isEnabled());
+        enabled.addActionListener(new EnablementStatusListener(fieldFormatterCleanups.isEnabled()));
+        enabled.setSelected(fieldFormatterCleanups.isEnabled());
     }
 
     private void initializeSaveActions(List<String> saveActionsMetaList) {
@@ -85,10 +85,10 @@ public class SaveActionsPanel extends JPanel {
         if ((saveActionsMetaList != null) && (saveActionsMetaList.size() >= 2)) {
             boolean enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
             String formatterString = saveActionsMetaList.get(1);
-            saveActions = new SaveActions(enablementStatus, formatterString);
+            fieldFormatterCleanups = new FieldFormatterCleanups(enablementStatus, formatterString);
         } else {
             // apply default actions
-            saveActions = SaveActions.DEFAULT_ACTIONS;
+            fieldFormatterCleanups = FieldFormatterCleanups.DEFAULT_ACTIONS;
         }
 
     }
@@ -101,7 +101,7 @@ public class SaveActionsPanel extends JPanel {
         keyField.setColumns(25);
         builder.add(keyField).xy(1, 1);
 
-        List<String> formatterNames = saveActions.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
+        List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
         formatters = new JComboBox(formatterNames.toArray());
         builder.add(formatters).xy(3, 1);
 
@@ -127,28 +127,30 @@ public class SaveActionsPanel extends JPanel {
 
         // if all actions have been removed, remove the save actions from the MetaData
         if (newActions.isEmpty()) {
-            metaData.remove(SaveActions.META_KEY);
+            metaData.remove(MetaData.SAVE_ACTIONS);
             return;
         }
 
-        String formatterString = SaveActions.getMetaDataString(newActions);
+        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
         actions.add(formatterString);
 
-        metaData.putData(SaveActions.META_KEY, actions);
+        metaData.putData(MetaData.SAVE_ACTIONS, actions);
     }
 
     public boolean hasChanged() {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        String formatterString = SaveActions.getMetaDataString(newActions);
+        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
+        boolean hasChanged = !fieldFormatterCleanups.equals(new FieldFormatterCleanups(enabled.isSelected(), formatterString));
 
-        return !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
+        return hasChanged;
     }
 
     public boolean isDefaultSaveActions() {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        String formatterString = SaveActions.getMetaDataString(newActions);
+        String formatterString = FieldFormatterCleanups.getMetaDataString(newActions);
+        boolean isDefault = FieldFormatterCleanups.DEFAULT_ACTIONS.equals(new FieldFormatterCleanups(enabled.isSelected(), formatterString));
 
-        return SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
+        return isDefault;
     }
 
     class AddButtonListener implements ActionListener {
@@ -157,7 +159,7 @@ public class SaveActionsPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             Formatter selectedFormatter = null;
             String selectedFormatterKey = formatters.getSelectedItem().toString();
-            for (Formatter formatter : saveActions.getAvailableFormatters()) {
+            for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
                 if (formatter.getKey().equals(selectedFormatterKey)) {
                     selectedFormatter = formatter;
                     break;
