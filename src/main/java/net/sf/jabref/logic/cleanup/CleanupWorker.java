@@ -34,11 +34,18 @@ public class CleanupWorker {
     private final JournalAbbreviationRepository repository;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(CleanupPreset preset) {
+
+    /**
+     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
+     */
+    CleanupWorker(CleanupPreset preset) {
         this(preset, Collections.emptyList());
     }
 
-    public CleanupWorker(CleanupPreset preset, List<String> paths) {
+    /**
+     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
+     */
+    CleanupWorker(CleanupPreset preset, List<String> paths) {
         this(preset, paths, null, null);
     }
 
