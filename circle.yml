@@ -1,4 +1,6 @@
 machine:
+  environment:
+    TERM: dumb
   java:
     version: oraclejdk8
 
@@ -8,23 +10,23 @@ dependencies:
     - install4j6/bin/install4jc --verbose --license=$INSTALL4J_KEY
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
-    - TERM=dumb ./gradlew getdeps
+    - ./gradlew getdeps
   cache_directories:
     - "~/.install4j6"
     - "~/downloads"
 
 test:
   override:
-    - TERM=dumb ./gradlew test
+    - ./gradlew test
   post:
-    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then TERM=dumb ./gradlew coverityCheck ; fi
+    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then ./gradlew coverityCheck ; fi
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-    - TERM=dumb ./gradlew jacocoTestReport coveralls
+    - ./gradlew jacocoTestReport coveralls
     - bash <(curl -s https://codecov.io/bash)
     # if you change something here, please also adapt deployment->release->commands
     # clean has to be done to ensure that the dev information is included in Help/About
-    - TERM=dumb ./gradlew -Pdev=true -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
+    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
     - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
 
 deployment:
@@ -33,7 +35,7 @@ deployment:
     tag: /v[0-9]+(\.[0-9]+)*(-.+)?/
     commands:
       # we have to do a clean build as changing gradle's "project.version" does not lead to a rebuild of resources (mirroring project.version)
-      - TERM=dumb ./gradlew -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
+      - ./gradlew -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
 
 general:
   artifacts:
