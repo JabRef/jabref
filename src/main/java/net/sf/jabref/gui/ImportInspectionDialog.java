@@ -170,25 +170,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private static final String URL_FIELD = "url";
 
-    public interface CallBack {
-
-        /**
-         * This method is called by the dialog when the user has cancelled or
-         * signalled a stop. It is expected that any long-running fetch
-         * operations will stop after this method is called.
-         */
-        void stopFetching();
-    }
-
-    /**
-     * The "defaultSelected" boolean value determines if new entries added are
-     * selected for import or not. This value is true by default.
-     *
-     * @param defaultSelected The desired value.
-     */
-    public void setDefaultSelected(boolean defaultSelected) {
-        this.defaultSelected = defaultSelected;
-    }
 
     /**
      * Creates a dialog that displays the given list of fields in the table. The
@@ -259,8 +240,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
         popup.add(new AutoSetLinks());
-        // popup.add(new AttachFile("pdf"));
-        // popup.add(new AttachFile("ps"));
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
@@ -455,11 +434,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 selected.add(entry);
             }
         }
-        /*
-         * for (int i = 0; i < table.getRowCount(); i++) { Boolean sel =
-         * (Boolean) table.getValueAt(i, 0); if (sel.booleanValue()) {
-         * selected.add(entries.get(i)); } }
-         */
+
         return selected;
     }
 
@@ -969,7 +944,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             JPopupMenu menu = new JPopupMenu();
             int count = 0;
             FileListTableModel fileList = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(file -> fileList.setContent(file));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
             // If there are one or more links, open the first one:
             for (int i = 0; i < fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
@@ -1175,7 +1150,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> localModel.setContent(oldVal));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
@@ -1209,7 +1184,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             }
             final FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> localModel.setContent(oldVal));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(localModel::setContent);
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
@@ -1251,7 +1226,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel localModel = new FileListTableModel();
-                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> localModel.setContent(oldVal));
+                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(localModel::setContent);
                 localModel.addEntry(localModel.getRowCount(), flEntry);
                 entries.getReadWriteLock().writeLock().lock();
                 entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
@@ -1264,7 +1239,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> localModel.setContent(oldVal));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
@@ -1314,6 +1289,30 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         sortedList.getReadWriteLock().writeLock().unlock();
 
     }
+
+
+    @FunctionalInterface
+    public interface CallBack {
+
+        /**
+         * This method is called by the dialog when the user has cancelled or
+         * signaled a stop. It is expected that any long-running fetch
+         * operations will stop after this method is called.
+         */
+        void stopFetching();
+    }
+
+
+    /**
+     * The "defaultSelected" boolean value determines if new entries added are
+     * selected for import or not. This value is true by default.
+     *
+     * @param defaultSelected The desired value.
+     */
+    public void setDefaultSelected(boolean defaultSelected) {
+        this.defaultSelected = defaultSelected;
+    }
+
 
     class EntryTable extends JTable {
 
@@ -1412,7 +1411,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             } else {
                 String field = fields[i - PAD];
                 if ("author".equals(field) || "editor".equals(field)) {
-                    return entry.getFieldOptional(field).map(contents -> AuthorList.fixAuthor_Natbib(contents))
+                    return entry.getFieldOptional(field).map(AuthorList::fixAuthor_Natbib)
                             .orElse("");
                 } else {
                     return entry.getField(field);

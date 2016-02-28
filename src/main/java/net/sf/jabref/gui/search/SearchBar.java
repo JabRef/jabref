@@ -118,13 +118,13 @@ public class SearchBar extends JPanel {
 
         JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
-        clearSearchButton.addActionListener((l) -> endSearch());
+        clearSearchButton.addActionListener(l -> endSearch());
 
         this.add(clearSearchButton);
 
         searchModeButton = new JButton();
         updateSearchModeButtonText();
-        searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
+        searchModeButton.addActionListener(l -> toggleSearchModeAndSearch());
 
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);

@@ -152,6 +152,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -525,7 +526,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                        try (FileInputStream fis = new FileInputStream(newFile)) {
                             eKit.read(fis, doc, 0);
                             doc.setLogicalStyle(0, doc.getStyle("regular"));
                         }
@@ -621,7 +622,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
             /* We additionally set the JLabels icon property here.
              */
             String s = value.toString();
-            //        setIcon((s.length > 10) ? longIcon : shortIcon);
             if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);

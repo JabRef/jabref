@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
     public String format(String field) {
 
         StringBuilder sb = new StringBuilder("");
-        StringBuffer currentCommand = null;
+        StringBuilder currentCommand = null;
         char c;
         boolean escaped = false;
         boolean incommand = false;
@@ -38,7 +38,7 @@ public class RemoveLatexCommands implements LayoutFormatter {
             } else if (c == '\\') {
                 escaped = true;
                 incommand = true;
-                currentCommand = new StringBuffer();
+                currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) ||
@@ -65,7 +65,6 @@ public class RemoveLatexCommands implements LayoutFormatter {
                     sb.append(c);
                 }
             } else {
-                //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
                 if (!incommand || (!Character.isWhitespace(c) && (c != '{'))) {
                     sb.append(c);
                 } else {

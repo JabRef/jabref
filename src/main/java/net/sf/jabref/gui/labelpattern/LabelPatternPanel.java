@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -30,8 +30,6 @@ import net.sf.jabref.model.entry.EntryType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,7 +80,6 @@ public class LabelPatternPanel extends JPanel {
         lblKeyPattern.setFont(f);
         con.gridx = 1;
         con.gridy = 0;
-        //con.gridwidth = 2;
         con.gridheight = 1;
         con.fill = GridBagConstraints.HORIZONTAL;
         con.anchor = GridBagConstraints.WEST;
@@ -100,13 +97,8 @@ public class LabelPatternPanel extends JPanel {
         pan.add(defaultPat);
         con.insets = new Insets(5, 5, 10, 5);
         JButton btnDefault = new JButton(Localization.lang("Default"));
-        btnDefault.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
-            }
-        });
+        btnDefault.addActionListener(
+                e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
         con.gridx = 2;
         int y = 2;
         gbl.setConstraints(btnDefault, con);
@@ -147,25 +139,19 @@ public class LabelPatternPanel extends JPanel {
         con.gridx = 2;
         con.gridy = 2;
 
-        //con.fill = GridBagConstraints.BOTH;
         con.weightx = 1;
         con.weighty = 0;
         con.anchor = GridBagConstraints.SOUTHEAST;
         con.insets = new Insets(20, 5, 0, 5);
         gbl.setConstraints(btnDefaultAll, con);
-        btnDefaultAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // reset all fields
-                for (String s : textFields.keySet()) {
-                    JTextField tf = textFields.get(s);
-                    tf.setText("");
-                }
-
-                // also reset the default pattern
-                defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+        btnDefaultAll.addActionListener(e -> {
+            // reset all fields
+            for (JTextField field : textFields.values()) {
+                field.setText("");
             }
+
+            // also reset the default pattern
+            defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
         });
         add(btnDefaultAll);
     }
@@ -183,7 +169,7 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(lab, con);
         c.add(lab);
 
-        JTextField tf = new JTextField();//_keypatterns.getValue(name).get(0).toString());
+        JTextField tf = new JTextField();
         tf.setColumns(15);
         con.gridx = 1;
         con.fill = GridBagConstraints.HORIZONTAL;
@@ -203,13 +189,9 @@ public class LabelPatternPanel extends JPanel {
         con.insets = new Insets(0, 5, 0, 5);
         gbl.setConstraints(but, con);
         but.setActionCommand(type.getName().toLowerCase());
-        but.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField tField = textFields.get(e.getActionCommand());
-                tField.setText("");
-            }
+        but.addActionListener(e -> {
+            JTextField tField = textFields.get(e.getActionCommand());
+            tField.setText("");
         });
         c.add(but);
 
@@ -221,16 +203,16 @@ public class LabelPatternPanel extends JPanel {
      */
     private void fillPatternUsingPanelData(AbstractLabelPattern keypatterns) {
         // each entry type
-        for (String s1 : textFields.keySet()) {
-            String text = textFields.get(s1).getText();
-            if (!"".equals(text.trim())) {
-                keypatterns.addLabelPattern(s1, text);
+        for (Map.Entry<String, JTextField> entry : textFields.entrySet()) {
+            String text = entry.getValue().getText();
+            if (!text.trim().isEmpty()) {
+                keypatterns.addLabelPattern(entry.getKey(), text);
             }
         }
 
         // default value
         String text = defaultPat.getText();
-        if (!"".equals(text.trim())) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
+        if (!text.trim().isEmpty()) { // we do not trim the value at the assignment to enable users to have spaces at the beginning and at the end of the pattern
             keypatterns.setDefaultValue(text);
         }
     }
@@ -253,9 +235,8 @@ public class LabelPatternPanel extends JPanel {
      * @param keypatterns the LabelPattern to use as initial value
      */
     public void setValues(AbstractLabelPattern keypatterns) {
-        for (String name : textFields.keySet()) {
-            JTextField tf = textFields.get(name);
-            setValue(tf, name, keypatterns);
+        for (Map.Entry<String, JTextField> entry : textFields.entrySet()) {
+            setValue(entry.getValue(), entry.getKey(), keypatterns);
         }
 
         if (keypatterns.getDefaultValue() == null) {

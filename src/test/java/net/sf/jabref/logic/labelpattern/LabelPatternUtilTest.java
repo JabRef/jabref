@@ -310,35 +310,35 @@ public class LabelPatternUtilTest {
     public void authN_M() {
         assertEquals(
                 "N",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
         assertEquals(
                 "Max",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2));
         assertEquals(
                 "New",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1));
         assertEquals(
                 "Bo",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4));
         assertEquals(
                 "Bohr",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4));
 
         assertEquals(
                 "Aal",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1));
         assertEquals(
                 "Less",
-                LabelPatternUtil.authN_M(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2));
+                LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2));
 
         assertEquals(
                 "",
-                LabelPatternUtil.authN_M("", 2, 4));
+                LabelPatternUtil.authNofMth("", 2, 4));
     }
 
     @Test(expected = NullPointerException.class)
     public void authN_MThrowsNPE() {
-        LabelPatternUtil.authN_M(null, 2, 4);
+        LabelPatternUtil.authNofMth(null, 2, 4);
     }
 
     /**
@@ -511,13 +511,13 @@ public class LabelPatternUtilTest {
     @Test
     public void testNAuthors1() {
         assertEquals("Newton",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
         assertEquals("NewtonEtAl",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
         assertEquals("NewtonEtAl",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
         assertEquals("NewtonEtAl",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
     }
 
     /**
@@ -527,16 +527,16 @@ public class LabelPatternUtilTest {
     public void testNAuthors3() {
         assertEquals(
                 "Newton",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
         assertEquals(
                 "NewtonMaxwell",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
         assertEquals(
                 "NewtonMaxwellEinstein",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
         assertEquals(
                 "NewtonMaxwellEinsteinEtAl",
-                LabelPatternUtil.NAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
+                LabelPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
     }
 
     @Test

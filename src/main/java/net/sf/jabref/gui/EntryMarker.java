@@ -148,7 +148,7 @@ public class EntryMarker {
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         TreeSet<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
-            entry.getFieldOptional(InternalBibtexFields.OWNER).ifPresent(owner -> owners.add(owner));
+            entry.getFieldOptional(InternalBibtexFields.OWNER).ifPresent(owners::add);
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();

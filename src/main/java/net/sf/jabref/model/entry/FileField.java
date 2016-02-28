@@ -147,7 +147,7 @@ public class FileField {
      * @return The encoded String.
      */
     public static String encodeStringArray(String[][] values) {
-        return Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.joining(";"));
+        return Arrays.asList(values).stream().map(FileField::encodeStringArray).collect(Collectors.joining(";"));
     }
 
     /**
@@ -157,7 +157,7 @@ public class FileField {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        return Arrays.asList(entry).stream().map(string -> quote(string)).collect(Collectors.joining(":"));
+        return Arrays.asList(entry).stream().map(FileField::quote).collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {

@@ -139,7 +139,8 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-        boolean validSetting, validAuthenticationSetting = false;
+        boolean validSetting;
+        boolean validAuthenticationSetting = false;
         if (useProxyCheckBox.isSelected()) {
             String host = hostnameTextField.getText();
             String port = portTextField.getText();

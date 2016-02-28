@@ -307,7 +307,8 @@ public class Util {
         }
 
         // show a warning, then return
-        StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        StringBuilder message = new StringBuilder(
+                "This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (String affectedField : affectedFields) {
             message.append(affectedField).append('\n');
         }
@@ -354,8 +355,8 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
-        net.sf.jabref.util.Util.updateField(entry, timeStampField, timestamp, ce);
+        String timestamp = DATE_FORMATTER.getCurrentDate();
+        updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
 
