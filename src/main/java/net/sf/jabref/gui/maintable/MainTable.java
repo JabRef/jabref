@@ -749,11 +749,11 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
         final TableComparatorChooser<BibEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-        result.addSortActionListener(e -> {
-            // We need to reset the stack of sorted list each time sorting order
-            // changes, or the sorting breaks down:
-            refreshSorting();
-        });
+
+        // We need to reset the stack of sorted list each time sorting order
+        // changes, or the sorting breaks down:
+        result.addSortActionListener(e -> refreshSorting());
+
         return result;
     }
 

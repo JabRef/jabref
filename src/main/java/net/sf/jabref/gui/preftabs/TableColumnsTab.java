@@ -150,14 +150,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             @Override
             public Object getValueAt(int row, int column) {
-                if (row == 0) {
+                int internalRow = row;
+                if (internalRow == 0) {
                     return column == 0 ? GUIGlobals.NUMBER_COL : String.valueOf(ncWidth);
                 }
-                row--;
-                if (row >= tableRows.size()) {
+                internalRow--;
+                if (internalRow >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.get(row);
+                Object rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
                 }
@@ -260,24 +261,12 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         preferUrlDoiGroup.add(preferUrl);
         preferUrlDoiGroup.add(preferDoi);
 
-        urlColumn.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                preferUrl.setEnabled(urlColumn.isSelected());
-                preferDoi.setEnabled(urlColumn.isSelected());
-            }
+        urlColumn.addChangeListener(arg0 -> {
+            preferUrl.setEnabled(urlColumn.isSelected());
+            preferDoi.setEnabled(urlColumn.isSelected());
         });
         arxivColumn = new JCheckBox(Localization.lang("Show ArXiv column"));
 
-        extraFileColumns = new JCheckBox(Localization.lang("Show Extra columns"));
-        extraFileColumns.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                listOfFileColumns.setEnabled(extraFileColumns.isSelected());
-            }
-        });
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         String[] fileTypeNames = new String[fileTypes.size()];
         int i = 0;
@@ -287,6 +276,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumns = new JList<>(fileTypeNames);
         JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
         listOfFileColumns.setVisibleRowCount(3);
+        extraFileColumns = new JCheckBox(Localization.lang("Show Extra columns"));
+        extraFileColumns.addChangeListener(arg0 -> listOfFileColumns.setEnabled(extraFileColumns.isSelected()));
 
         /*** begin: special table columns and special fields ***/
 

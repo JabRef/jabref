@@ -1953,13 +1953,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markBaseChanged() {
         baseChanged = true;
 
-        // Put an asterix behind the filename to indicate the database has changed.
+        // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         frame.updateAllTabTitles();
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.statusLine.getText().startsWith(Localization.lang("Saved database"))) {
+        if (frame.getStatusLineText().startsWith(Localization.lang("Saved database"))) {
             frame.output(" ");
         }
 
@@ -2487,8 +2487,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void setBackAndForwardEnabledState() {
-        frame.back.setEnabled(!previousEntries.isEmpty());
-        frame.forward.setEnabled(!nextEntries.isEmpty());
+        frame.getBackAction().setEnabled(!previousEntries.isEmpty());
+        frame.getForwardAction().setEnabled(!nextEntries.isEmpty());
     }
 
     private String formatOutputMessage(String start, int count) {

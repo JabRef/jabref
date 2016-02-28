@@ -865,7 +865,7 @@ class OOBibBase {
             }
             return res;
         } else {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

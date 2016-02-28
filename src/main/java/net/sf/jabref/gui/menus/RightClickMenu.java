@@ -16,8 +16,6 @@
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -199,13 +197,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
 
-        floatMarked.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
-                panel.mainTable.refreshSorting(); // Bad remote access
-            }
+        floatMarked.addActionListener(e -> {
+            Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
+            panel.mainTable.refreshSorting(); // Bad remote access
         });
 
         // create disabledIcons for all menu entries

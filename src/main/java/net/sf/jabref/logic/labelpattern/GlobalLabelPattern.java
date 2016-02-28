@@ -21,7 +21,7 @@ public class GlobalLabelPattern extends AbstractLabelPattern {
 
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return LabelPatternUtil.DEFAULT_LABELPATTERN;
+        return LabelPatternUtil.getDefaultLabelPattern();
     }
 
 }

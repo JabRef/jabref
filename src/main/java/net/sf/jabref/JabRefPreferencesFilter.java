@@ -44,7 +44,7 @@ public class JabRefPreferencesFilter {
             this.defaultValue = Optional.ofNullable(defaultValue);
             this.type = Objects.requireNonNull(getType(value));
 
-            if (defaultValue != null && !Objects.equals(this.type, getType(defaultValue))) {
+            if ((defaultValue != null) && !Objects.equals(this.type, getType(defaultValue))) {
                 throw new IllegalStateException("types must match between default value and value");
             }
         }
@@ -67,6 +67,7 @@ public class JabRefPreferencesFilter {
             return !isUnchanged();
         }
 
+        @Override
         public String toString() {
             return String.format("%s: %s=%s (%s)", type, key, value, defaultValue.orElse("NULL"));
         }

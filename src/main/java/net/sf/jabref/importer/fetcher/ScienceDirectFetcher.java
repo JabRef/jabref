@@ -91,7 +91,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibsonomyScraper.getEntry(cit).ifPresent(entry -> dialog.addEntry(entry));
+                BibsonomyScraper.getEntry(cit).ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }
 
