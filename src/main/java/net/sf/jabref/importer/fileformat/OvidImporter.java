@@ -266,7 +266,7 @@ public class OvidImporter extends ImportFormat {
         } else {
             names = content;
         }
-        return AuthorList.fixAuthor_lastNameFirst(names);
+        return AuthorList.fixAuthorLastNameFirst(names);
     }
 
 }

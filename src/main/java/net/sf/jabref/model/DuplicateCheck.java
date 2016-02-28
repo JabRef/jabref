@@ -144,8 +144,8 @@ public class DuplicateCheck {
         if ("author".equals(field) || "editor".equals(field)) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
-            String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
+            String auth1 = AuthorList.fixAuthorLastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
+            String auth2 = AuthorList.fixAuthorLastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(auth1, auth2);
             if (similarity > 0.8) {
                 return EQUAL;

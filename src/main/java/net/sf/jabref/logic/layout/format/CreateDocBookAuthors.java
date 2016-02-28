@@ -130,7 +130,7 @@ public class CreateDocBookAuthors implements LayoutFormatter
     {
         // TODO: replace special characters
 
-        String authorMod = AuthorList.fixAuthor_firstNameFirst(author);
+        String authorMod = AuthorList.fixAuthorFirstNameFirst(author);
 
         List<String> v = StringUtil.tokenizeToList(authorMod, " \n\r");
 

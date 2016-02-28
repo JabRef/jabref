@@ -28,6 +28,6 @@ public class AuthorNatBib implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return AuthorList.fixAuthor_Natbib(fieldText);
+        return AuthorList.fixAuthorNatbib(fieldText);
     }
 }

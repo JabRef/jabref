@@ -34,6 +34,6 @@ public class AuthorLastFirstOxfordCommas implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return AuthorList.fixAuthor_lastNameFirstCommas(fieldText, false, true);
+        return AuthorList.fixAuthorLastNameFirstCommas(fieldText, false, true);
     }
 }
