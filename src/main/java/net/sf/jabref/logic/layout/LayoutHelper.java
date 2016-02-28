@@ -263,10 +263,9 @@ public class LayoutHelper {
         }
     }
 
-    private void parseField() throws IOException, StringIndexOutOfBoundsException {
+    private void parseField() throws IOException {
         int c;
         StringBuilder buffer = null;
-        char firstLetter;
         String name;
 
         while (!endOfFile) {
@@ -280,73 +279,64 @@ public class LayoutHelper {
 
                 name = buffer == null ? "" : buffer.toString();
 
-                try {
-                    firstLetter = name.charAt(0);
-                } catch (StringIndexOutOfBoundsException ex) {
+                if (name.isEmpty()) {
                     StringBuilder lastFive = new StringBuilder(10);
                     for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),
                             parsedEntries.size() - 1)) {
                         lastFive.append(entry.s);
                     }
                     throw new StringIndexOutOfBoundsException(
-                            "Backslash parsing error near \'"
-                            + lastFive.toString().replace("\n", " ") + '\'');
+                            "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
-                if (firstLetter == 'b') {
-                    if ("begin".equalsIgnoreCase(name)) {
+                if ("begin".equalsIgnoreCase(name)) {
+                    // get field name
+                    doBracketedField(LayoutHelper.IS_FIELD_START);
+
+                    return;
+                } else if ("begingroup".equalsIgnoreCase(name)) {
+                    // get field name
+                    doBracketedField(LayoutHelper.IS_GROUP_START);
+                    return;
+                } else if ("format".equalsIgnoreCase(name)) {
+                    if (c == '[') {
+                        // get format parameter
                         // get field name
-                        doBracketedField(LayoutHelper.IS_FIELD_START);
+                        doBracketedOptionField();
 
                         return;
-                    } else if ("begingroup".equalsIgnoreCase(name)) {
+                    } else {
                         // get field name
-                        doBracketedField(LayoutHelper.IS_GROUP_START);
-                        return;
-                    }
-                } else if (firstLetter == 'f') {
-                    if ("format".equalsIgnoreCase(name)) {
-                        if (c == '[') {
-                            // get format parameter
-                            // get field name
-                            doBracketedOptionField();
+                        doBracketedField(LayoutHelper.IS_OPTION_FIELD);
 
-                            return;
-                        } else {
-                            // get field name
-                            doBracketedField(LayoutHelper.IS_OPTION_FIELD);
-
-                            return;
-                        }
-                    } else if ("filename".equalsIgnoreCase(name)) {
-                        // Print the name of the database bib file.
-                        // This is only supported in begin/end layouts, not in
-                        // entry layouts.
-                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
-                        return;
-                    } else if ("filepath".equalsIgnoreCase(name)) {
-                        // Print the full path of the database bib file.
-                        // This is only supported in begin/end layouts, not in
-                        // entry layouts.
-                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
                         return;
                     }
-                } else if (firstLetter == 'e') {
-                    if ("end".equalsIgnoreCase(name)) {
-                        // get field name
-                        doBracketedField(LayoutHelper.IS_FIELD_END);
-                        return;
-                    } else if ("endgroup".equalsIgnoreCase(name)) {
-                        // get field name
-                        doBracketedField(LayoutHelper.IS_GROUP_END);
-                        return;
-                    } else if ("encoding".equalsIgnoreCase(name)) {
-                        // Print the name of the current encoding used for export.
-                        // This is only supported in begin/end layouts, not in
-                        // entry layouts.
-                        parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
-                        return;
-                    }
+                } else if ("filename".equalsIgnoreCase(name)) {
+                    // Print the name of the database bib file.
+                    // This is only supported in begin/end layouts, not in
+                    // entry layouts.
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
+                    return;
+                } else if ("filepath".equalsIgnoreCase(name)) {
+                    // Print the full path of the database bib file.
+                    // This is only supported in begin/end layouts, not in
+                    // entry layouts.
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));
+                    return;
+                } else if ("end".equalsIgnoreCase(name)) {
+                    // get field name
+                    doBracketedField(LayoutHelper.IS_FIELD_END);
+                    return;
+                } else if ("endgroup".equalsIgnoreCase(name)) {
+                    // get field name
+                    doBracketedField(LayoutHelper.IS_GROUP_END);
+                    return;
+                } else if ("encoding".equalsIgnoreCase(name)) {
+                    // Print the name of the current encoding used for export.
+                    // This is only supported in begin/end layouts, not in
+                    // entry layouts.
+                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));
+                    return;
                 }
 
                 // for all other cases
@@ -386,13 +376,10 @@ public class LayoutHelper {
                 return;
             }
 
-            if (Character.isWhitespace((char) c)) {
-                continue;
-            } else {
+            if (!Character.isWhitespace((char) c)) {
                 unread(c);
+                break;
             }
-
-            break;
         }
     }
 

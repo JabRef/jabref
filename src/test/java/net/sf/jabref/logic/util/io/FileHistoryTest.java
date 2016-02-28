@@ -25,12 +25,7 @@ public class FileHistoryTest {
     public void restore() {
         prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
     }
-    @Test
-    public void testConstructor() {
-        new FileHistory(prefs);
-    }
-
-
+    
     @Test
     public void testFileHistory() {
         FileHistory fh = new FileHistory(prefs);

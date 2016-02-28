@@ -139,9 +139,4 @@ public class SpringerFetcher implements EntryFetcher {
         // No additional options available
         return null;
     }
-
-    public SpringerFetcher() {
-        super();
-    }
-
 }

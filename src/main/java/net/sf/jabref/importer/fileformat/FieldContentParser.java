@@ -43,27 +43,27 @@ public class FieldContentParser {
     /**
      * Performs the reformatting
      *
-     * @param content     StringBuffer containing the field to format. bibtexField contains field name according to field
+     * @param text2     StringBuffer containing the field to format. bibtexField contains field name according to field
      * @param bibtexField
      * @return The formatted field content. The StringBuffer returned may or may not be the same as the argument given.
      */
-    public StringBuffer format(StringBuffer content, String bibtexField) {
+    public StringBuilder format(StringBuilder text2, String bibtexField) {
 
         // Unify line breaks
-        String text = StringUtil.unifyLineBreaksToConfiguredLineBreaks(content.toString());
+        String text = StringUtil.unifyLineBreaksToConfiguredLineBreaks(text2.toString());
 
         // Do not format multiline fields
         if (multiLineFields.contains(bibtexField)) {
-            return new StringBuffer(text);
+            return new StringBuilder(text);
         }
 
         // 's' matches a space, tab, new line, carriage return.
         text = text.replaceAll("\\s+", " ");
 
-        return new StringBuffer(text);
+        return new StringBuilder(text);
     }
 
     public String format(String content, String bibtexField) {
-        return format(new StringBuffer(content), bibtexField).toString();
+        return format(new StringBuilder(content), bibtexField).toString();
     }
 }
