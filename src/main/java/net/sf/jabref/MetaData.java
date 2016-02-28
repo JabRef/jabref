@@ -36,7 +36,7 @@ public class MetaData implements Iterable<String> {
     public static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    static final String DATABASE_TYPE = "DATABASE_TYPE";
+    public static final String DATABASE_TYPE = "DATABASE_TYPE";
     public static final String GROUPSVERSION = "groupsversion";
     public static final String GROUPSTREE = "groupstree";
     public static final String GROUPS = "groups";

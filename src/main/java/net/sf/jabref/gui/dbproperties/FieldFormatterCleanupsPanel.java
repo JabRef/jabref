@@ -56,10 +56,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 13dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        builder.add(enabled).xy(3, 1);
+        builder.add(enabled).xyw(1, 1, 3);
         builder.add(getSelectorPanel()).xy(3, 3);
 
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
