@@ -110,7 +110,7 @@ public class ExternalFileTypeEditor extends JDialog {
                     Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE);*/
             //if (reply == JOptionPane.YES_OPTION) {
-            List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
+            List<ExternalFileType> list = ExternalFileTypes.getDefaultExternalFileTypes();
             fileTypes.clear();
             fileTypes.addAll(list);
             Collections.sort(fileTypes);

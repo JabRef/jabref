@@ -35,7 +35,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 
 ### Fixed
-- Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup 
+- Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
+- Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup
 - Fixed [#466](https://github.com/JabRef/jabref/issues/466): Rename PDF cleanup now also changes case of file name
 - Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
 - Make BibTex parser more robust against missing newlines

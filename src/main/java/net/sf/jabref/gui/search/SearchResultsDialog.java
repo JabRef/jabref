@@ -462,7 +462,11 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            if(tmpModel.getEntry(0).type!=null) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            } else {
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            }
                         }
                         return fileLabel;
                     } else {
