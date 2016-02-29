@@ -47,14 +47,10 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addGlue();
         bb.addButton(cancel);
         bb.addGlue();
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                cancelled = true;
-                t.stop();
-                diag.dispose();
-            }
+        cancel.addActionListener(e -> {
+            cancelled = true;
+            t.stop();
+            diag.dispose();
         });
 
         JLabel message = new JLabel(Localization.lang("Waiting for save operation to finish") + "...");

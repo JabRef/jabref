@@ -20,8 +20,6 @@ import org.jdesktop.swingx.painter.MattePainter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public abstract class SidePaneComponent extends JXTitledPanel {
 
@@ -43,17 +41,17 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
         close.setMargin(new Insets(0, 0, 0, 0));
         close.setBorder(null);
-        close.addActionListener(new CloseButtonListener());
+        close.addActionListener(e -> hideAway());
 
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
         up.setMargin(new Insets(0, 0, 0, 0));
         up.setBorder(null);
-        up.addActionListener(new UpButtonListener());
+        up.addActionListener(e -> moveUp());
 
         JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
         down.setMargin(new Insets(0, 0, 0, 0));
         down.setBorder(null);
-        down.addActionListener(new DownButtonListener());
+        down.addActionListener(e -> moveDown());
 
         JToolBar tlb = new OSXCompatibleToolbar();
         tlb.add(up);
@@ -103,30 +101,5 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
-    }
-
-
-    private class CloseButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            hideAway();
-        }
-    }
-
-    private class UpButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            moveUp();
-        }
-    }
-
-    private class DownButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            moveDown();
-        }
     }
 }

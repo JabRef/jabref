@@ -92,13 +92,9 @@ public class ExternalFileTypeEditor extends JDialog {
 
     private void init() {
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                storeSettings();
-                dispose();
-            }
+        ok.addActionListener(e -> {
+            storeSettings();
+            dispose();
         });
         AbstractAction cancelAction = new AbstractAction() {
             @Override
@@ -108,28 +104,49 @@ public class ExternalFileTypeEditor extends JDialog {
         };
         cancel.addActionListener(cancelAction);
         // The toDefaults resets the entire list to its default values.
-        toDefaults.addActionListener(new ActionListener() {
+        toDefaults.addActionListener(e -> {
+            /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
+                    Globals.lang("All custom file types will be lost. Proceed?"),
+                    Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);*/
+            //if (reply == JOptionPane.YES_OPTION) {
+            List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
+            fileTypes.clear();
+            fileTypes.addAll(list);
+            Collections.sort(fileTypes);
+            //Globals.prefs.resetExternalFileTypesToDefault();
+            //setValues();
+            tableModel.fireTableDataChanged();
+            //}
+        });
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                /*int reply = JOptionPane.showConfirmDialog(ExternalFileTypeEditor.this,
-                        Globals.lang("All custom file types will be lost. Proceed?"),
-                        Globals.lang("Reset file type definitions"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE);*/
-                //if (reply == JOptionPane.YES_OPTION) {
-                List<ExternalFileType> list = ExternalFileTypes.getInstance().getDefaultExternalFileTypes();
-                fileTypes.clear();
-                fileTypes.addAll(list);
-                Collections.sort(fileTypes);
-                //Globals.prefs.resetExternalFileTypesToDefault();
-                //setValues();
+        add.addActionListener(e ->  {
+            // Generate a new file type:
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+            // Show the file type editor:
+            getEditor(type).setVisible(true);
+            if (entryEditor.okPressed()) {
+                // Ok was pressed. Add the new file type and update the table:
+                fileTypes.add(type);
                 tableModel.fireTableDataChanged();
-                //}
             }
         });
 
-        add.addActionListener(new AddListener());
-        remove.addActionListener(new RemoveListener());
+        remove.addActionListener(e -> {
+            int[] rows = table.getSelectedRows();
+            if (rows.length == 0) {
+                return;
+            }
+            for (int i = rows.length - 1; i >= 0; i--) {
+                fileTypes.remove(rows[i]);
+            }
+            tableModel.fireTableDataChanged();
+            if (!fileTypes.isEmpty()) {
+                int row = Math.min(rows[0], fileTypes.size() - 1);
+                table.setRowSelectionInterval(row, row);
+            }
+        });
+
         edit.addActionListener(editListener);
         fileTypes = new ArrayList<>();
         setValues();
@@ -213,42 +230,6 @@ public class ExternalFileTypeEditor extends JDialog {
      */
     public static AbstractAction getAction(JDialog dialog) {
         return new EditExternalFileTypesAction(dialog);
-    }
-
-
-    private class AddListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
-            // Show the file type editor:
-            getEditor(type).setVisible(true);
-            if (entryEditor.okPressed()) {
-                // Ok was pressed. Add the new file type and update the table:
-                fileTypes.add(type);
-                tableModel.fireTableDataChanged();
-            }
-        }
-    }
-
-    private class RemoveListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = table.getSelectedRows();
-            if (rows.length == 0) {
-                return;
-            }
-            for (int i = rows.length - 1; i >= 0; i--) {
-                fileTypes.remove(rows[i]);
-            }
-            tableModel.fireTableDataChanged();
-            if (!fileTypes.isEmpty()) {
-                int row = Math.min(rows[0], fileTypes.size() - 1);
-                table.setRowSelectionInterval(row, row);
-            }
-        }
     }
 
     class EditListener implements ActionListener {

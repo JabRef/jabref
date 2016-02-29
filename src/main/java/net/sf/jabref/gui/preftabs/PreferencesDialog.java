@@ -17,7 +17,6 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +60,6 @@ public class PreferencesDialog extends JDialog {
 
     private final JabRefFrame frame;
 
-    private final JabRefPreferences prefs;
-
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
     private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
@@ -71,7 +68,7 @@ public class PreferencesDialog extends JDialog {
 
     public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Localization.lang("JabRef preferences"), false);
-        prefs = JabRefPreferences.getInstance();
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
         main = new JPanel();
@@ -158,44 +155,32 @@ public class PreferencesDialog extends JDialog {
 
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
-        exportPreferences.addActionListener(new ActionListener() {
+        exportPreferences.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
+                    JFileChooser.SAVE_DIALOG, false);
+            if (filename == null) {
+                return;
+            }
+            File file = new File(filename);
+            if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                    Localization.lang("'%0' exists. Overwrite file?", file.getName()),
+                    Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
-                if (filename == null) {
-                    return;
+                try {
+                    prefs.exportPreferences(filename);
+                } catch (JabRefException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
                 }
-                File file = new File(filename);
-                if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
-                        Localization.lang("'%0' exists. Overwrite file?", file.getName()),
-                        Localization.lang("Export preferences"),
-                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
-
-                    try {
-                        prefs.exportPreferences(filename);
-                    } catch (JabRefException ex) {
-                        LOGGER.warn(ex.getMessage(), ex);
-                        JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                                Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
             }
         });
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
-        importPreferences.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
-                if (filename == null) {
-                    return;
-                }
-
+        importPreferences.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
+                    JFileChooser.OPEN_DIALOG, false);
+            if (filename != null) {
                 try {
                     prefs.importPreferences(filename);
                     setValues();
@@ -208,7 +193,6 @@ public class PreferencesDialog extends JDialog {
                             Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
                 }
             }
-
         });
 
         showPreferences.addActionListener(e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));

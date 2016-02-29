@@ -22,9 +22,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -193,13 +190,7 @@ public class MergeEntries {
                 rb[k][0] = new JRadioButton();
                 rbg[0].add(rb[k][0]);
                 mergePanel.add(rb[k][0], cc.xy(5 + (k * 2), 1));
-                rb[k][0].addChangeListener(new ChangeListener() {
-
-                    @Override
-                    public void stateChanged(ChangeEvent e) {
-                        updateAll();
-                    }
-                });
+                rb[k][0].addChangeListener(e -> updateAll());
             }
             rb[0][0].setSelected(true);
         }
@@ -257,13 +248,7 @@ public class MergeEntries {
                     rb[k][row - 1] = new JRadioButton();
                     rbg[row - 1].add(rb[k][row - 1]);
                     mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), row));
-                    rb[k][row - 1].addChangeListener(new ChangeListener() {
-
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            updateAll();
-                        }
-                    });
+                    rb[k][row - 1].addChangeListener(e -> updateAll());
                 }
                 if (string1 == null) {
                     rb[0][row - 1].setEnabled(false);

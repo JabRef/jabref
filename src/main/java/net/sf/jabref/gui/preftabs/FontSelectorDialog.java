@@ -62,8 +62,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -225,14 +223,9 @@ public class FontSelectorDialog extends JDialog {
         buttons.add(Box.createGlue());
 
         JButton ok = new JButton(Localization.lang("OK"));
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                isOK = true;
-                dispose();
-            }
-
+        ok.addActionListener(e -> {
+            isOK = true;
+            dispose();
         });
         getRootPane().setDefaultButton(ok);
         buttons.add(ok);
@@ -240,13 +233,7 @@ public class FontSelectorDialog extends JDialog {
         buttons.add(Box.createHorizontalStrut(6));
 
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                dispose();
-            }
-        });
+        cancel.addActionListener(e -> dispose());
         buttons.add(cancel);
 
         buttons.add(Box.createGlue());
@@ -255,7 +242,7 @@ public class FontSelectorDialog extends JDialog {
 
         pack();
         setLocationRelativeTo(JOptionPane.getFrameForComponent(comp));
-        setVisible(true); // show(); -> deprecated since 1.5
+        setVisible(true);
     }
 
     public Optional<Font> getSelectedFont() {

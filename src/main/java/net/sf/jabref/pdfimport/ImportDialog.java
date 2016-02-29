@@ -37,7 +37,6 @@ public class ImportDialog extends JDialog {
     public static final int CONTENT = 2;
     public static final int ONLYATTACH = 4;
 
-    private final JPanel contentPane;
     private final JCheckBox checkBoxDoNotShowAgain;
     private final JCheckBox useDefaultPDFImportStyle;
     private final JRadioButton radioButtonXmp;
@@ -49,7 +48,7 @@ public class ImportDialog extends JDialog {
 
     public ImportDialog(boolean targetIsARow, String fileName) {
         Boolean targetIsARow1 = targetIsARow;
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
@@ -118,21 +117,8 @@ public class ImportDialog extends JDialog {
         bg.add(radioButtonPDFcontent);
         bg.add(radioButtononlyAttachPDF);
 
-        buttonOK.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -143,13 +129,8 @@ public class ImportDialog extends JDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         switch (Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
@@ -213,10 +194,6 @@ public class ImportDialog extends JDialog {
 
     public int getResult() {
         return result;
-    }
-
-    public JComponent $$$getRootComponent$$$() {
-        return contentPane;
     }
 
     public void disableXMPChoice() {
