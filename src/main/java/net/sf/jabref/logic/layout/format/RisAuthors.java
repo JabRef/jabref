@@ -30,7 +30,7 @@ public class RisAuthors implements ParamLayoutFormatter {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        String[] authors = AuthorList.fixAuthor_lastNameFirst(s).split(" and ");
+        String[] authors = AuthorList.fixAuthorLastNameFirst(s).split(" and ");
         for (int i = 0; i < authors.length; i++) {
             sb.append(arg);
             sb.append("  - ");

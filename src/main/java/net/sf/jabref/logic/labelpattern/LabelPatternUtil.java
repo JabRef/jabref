@@ -999,7 +999,7 @@ public class LabelPatternUtil {
     public static String authorsAlpha(String authorField) {
         String authors = "";
 
-        String fixedAuthors = AuthorList.fixAuthor_lastNameOnlyCommas(authorField, false);
+        String fixedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
 
         // drop the "and" before the last author
         // -> makes processing easier

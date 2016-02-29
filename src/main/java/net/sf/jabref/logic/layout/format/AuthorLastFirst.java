@@ -24,6 +24,6 @@ public class AuthorLastFirst implements LayoutFormatter
     @Override
     public String format(String fieldText)
     {
-        return AuthorList.fixAuthor_lastNameFirst(fieldText);
+        return AuthorList.fixAuthorLastNameFirst(fieldText);
     }
 }
