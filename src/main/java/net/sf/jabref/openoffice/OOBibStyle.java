@@ -22,6 +22,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -116,7 +117,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
     private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
-
 
     private final JournalAbbreviationRepository repository;
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
@@ -472,7 +472,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         return sb.toString();
     }
 
-
     /**
      * Format the marker for the in-text citation according to this bib style. Uniquefier letters are added as
      * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
@@ -488,7 +487,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The formatted citation.
      */
     public String getCitationMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database, boolean inParenthesis,
-                                    String[] uniquefiers, int[] unlimAuthors) {
+            String[] uniquefiers, int[] unlimAuthors) {
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
         int piv = -1;
@@ -504,8 +503,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     if (piv == -1) {
                         piv = i;
                         tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(entries.get(i)), tmpMap,
-                                authorField,
-                                (String) citProperties.get(YEAR_FIELD), maxAuthors,
+                                authorField, (String) citProperties.get(YEAR_FIELD), maxAuthors,
                                 (String) citProperties.get(AUTHOR_SEPARATOR),
                                 (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
                                 (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(YEAR_SEPARATOR),
@@ -514,13 +512,13 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     } else {
                         // See if this entry can go into a group with the previous one:
                         String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(entries.get(i)),
-                                tmpMap,
-                                authorField, (String) citProperties.get(YEAR_FIELD), maxAuthors,
+                                tmpMap, authorField, (String) citProperties.get(YEAR_FIELD), maxAuthors,
                                 (String) citProperties.get(AUTHOR_SEPARATOR),
                                 (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
                                 (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(YEAR_SEPARATOR),
                                 (String) citProperties.get(BRACKET_BEFORE), (String) citProperties.get(BRACKET_AFTER),
                                 (String) citProperties.get(CITATION_SEPARATOR), null, unlimAuthors);
+
 
                         String author = getCitationMarkerField(entries.get(i), database.get(entries.get(i)),
                                 authorField);
@@ -560,36 +558,25 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         }
 
         if (inParenthesis) {
-            return getAuthorYearParenthesisMarker(entries, database,
-                    (String) citProperties.get(AUTHOR_FIELD),
-                    (String) citProperties.get(YEAR_FIELD),
-                    (Integer) citProperties.get(MAX_AUTHORS),
-                    (String) citProperties.get(AUTHOR_SEPARATOR),
-                    (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
-                    (String) citProperties.get(ET_AL_STRING),
-                    (String) citProperties.get(YEAR_SEPARATOR),
-                    (String) citProperties.get(BRACKET_BEFORE),
-                    (String) citProperties.get(BRACKET_AFTER),
-                    (String) citProperties.get(CITATION_SEPARATOR),
-                    uniquefiers, unlimAuthors);
+            return getAuthorYearParenthesisMarker(entries, database, (String) citProperties.get(AUTHOR_FIELD),
+                    (String) citProperties.get(YEAR_FIELD), (Integer) citProperties.get(MAX_AUTHORS),
+                    (String) citProperties.get(AUTHOR_SEPARATOR), (String) citProperties.get(AUTHOR_LAST_SEPARATOR),
+                    (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(YEAR_SEPARATOR),
+                    (String) citProperties.get(BRACKET_BEFORE), (String) citProperties.get(BRACKET_AFTER),
+                    (String) citProperties.get(CITATION_SEPARATOR), uniquefiers, unlimAuthors);
         } else {
             String authorLastSeparator = (String) citProperties.get(AUTHOR_LAST_SEPARATOR);
             String alsInText = (String) citProperties.get(AUTHOR_LAST_SEPARATOR_IN_TEXT);
             if (alsInText != null) {
                 authorLastSeparator = alsInText;
             }
-            return getAuthorYearInTextMarker(entries, database,
-                    (String) citProperties.get(AUTHOR_FIELD),
-                    (String) citProperties.get(YEAR_FIELD),
-                    (Integer) citProperties.get(MAX_AUTHORS),
-                    (String) citProperties.get(AUTHOR_SEPARATOR),
-                    authorLastSeparator,
-                    (String) citProperties.get(ET_AL_STRING),
-                    (String) citProperties.get(IN_TEXT_YEAR_SEPARATOR),
-                    (String) citProperties.get(BRACKET_BEFORE),
-                    (String) citProperties.get(BRACKET_AFTER),
-                    (String) citProperties.get(CITATION_SEPARATOR),
- uniquefiers, unlimAuthors);
+
+            return getAuthorYearInTextMarker(entries, database, (String) citProperties.get(AUTHOR_FIELD),
+                    (String) citProperties.get(YEAR_FIELD), (Integer) citProperties.get(MAX_AUTHORS),
+                    (String) citProperties.get(AUTHOR_SEPARATOR), authorLastSeparator,
+                    (String) citProperties.get(ET_AL_STRING), (String) citProperties.get(IN_TEXT_YEAR_SEPARATOR),
+                    (String) citProperties.get(BRACKET_BEFORE), (String) citProperties.get(BRACKET_AFTER),
+                    (String) citProperties.get(CITATION_SEPARATOR), uniquefiers, unlimAuthors);
         }
     }
 
@@ -732,19 +719,29 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
+        String authorField = (String) citProperties.get(AUTHOR_FIELD);
         String[] fields = field.split("/");
         for (String s : fields) {
             String content = BibDatabase.getResolvedField(s, entry, database);
+
             if ((content != null) && !content.trim().isEmpty()) {
                 if (fieldFormatter != null) {
-                    content = fieldFormatter.format(content);
+
+                    if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
+                        content = fieldFormatter.format(content);
+                        content = "{" + content + "}";
+                        return content;
+                    }
+                    return fieldFormatter.format(content);
                 }
                 return content;
+
             }
         }
         // No luck? Return an empty string:
         return "";
     }
+
 
     /**
      * Look up the nth author and return the proper last name for citation markers.

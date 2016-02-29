@@ -39,6 +39,8 @@ public class OOPreFormatter implements LayoutFormatter {
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
+
+
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
 
@@ -66,7 +68,8 @@ public class OOPreFormatter implements LayoutFormatter {
                 incommand = true;
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
-                // Swallow the brace.
+                //Swallow braces, necessary for replacing encoded characters
+
             } else if (Character.isLetter(c) || (c == '%')
                     || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;

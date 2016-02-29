@@ -177,9 +177,13 @@ public class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets(null));
         assertTrue(StringUtil.isInCurlyBrackets("{}"));
         assertTrue(StringUtil.isInCurlyBrackets("{a}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{a{a}}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{{\\AA}sa {\\AA}Stor{\\aa}}"));
         assertFalse(StringUtil.isInCurlyBrackets("{"));
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
+        assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+
     }
 
     @Test
