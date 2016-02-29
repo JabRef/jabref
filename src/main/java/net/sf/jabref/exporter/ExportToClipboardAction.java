@@ -131,7 +131,6 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            //StringSelection ss = new StringSelection(sw.toString());
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
@@ -142,10 +141,8 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
-            if (tmp != null) {
-                if (!tmp.delete()) {
-                    LOGGER.info("Cannot delete temporary clipboard file");
-                }
+            if ((tmp != null) && !tmp.delete()) {
+                LOGGER.info("Cannot delete temporary clipboard file");
             }
         }
     }

@@ -33,14 +33,17 @@ public class FieldTextMenu implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        // Do nothing
     }
 
     @Override
@@ -54,32 +57,30 @@ public class FieldTextMenu implements MouseListener {
     }
 
     private void maybeShowPopup(MouseEvent e) {
-        if (e.isPopupTrigger()) {
-            if (field != null) {
-                field.requestFocus();
+        if (e.isPopupTrigger() && (field != null)) {
+            field.requestFocus();
 
-                // enable/disable copy to clipboard if selected text available
-                String txt = field.getSelectedText();
-                String allTxt = field.getText();
-                boolean copyStatus = false;
-                if (((txt != null) && (!txt.isEmpty())) || ((allTxt != null) && !allTxt.isEmpty())) {
-                    copyStatus = true;
-                }
-
-                copyAction.setEnabled(copyStatus);
-
-                String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
-                boolean pasteStatus = false;
-                if (!data.isEmpty()) {
-                    pasteStatus = true;
-                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
-                            + StringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
-                } else {
-                    pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
-                }
-                pasteAction.setEnabled(pasteStatus);
-                inputMenu.show(e.getComponent(), e.getX(), e.getY());
+            // enable/disable copy to clipboard if selected text available
+            String txt = field.getSelectedText();
+            String allTxt = field.getText();
+            boolean copyStatus = false;
+            if (((txt != null) && (!txt.isEmpty())) || ((allTxt != null) && !allTxt.isEmpty())) {
+                copyStatus = true;
             }
+
+            copyAction.setEnabled(copyStatus);
+
+            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+            boolean pasteStatus = false;
+            if (!data.isEmpty()) {
+                pasteStatus = true;
+                pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
+                        + StringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
+            } else {
+                pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
+            }
+            pasteAction.setEnabled(pasteStatus);
+            inputMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 

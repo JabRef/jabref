@@ -28,10 +28,8 @@ public class ProxyAuthenticator extends Authenticator {
             String port = System.getProperty(prot + ".proxyPort", "80");
             String user = System.getProperty(prot + ".proxyUser", "");
             String password = System.getProperty(prot + ".proxyPassword", "");
-            if (getRequestingHost().equalsIgnoreCase(host)) {
-                if (Integer.parseInt(port) == getRequestingPort()) {
-                    return new PasswordAuthentication(user, password.toCharArray());
-                }
+            if (getRequestingHost().equalsIgnoreCase(host) && (Integer.parseInt(port) == getRequestingPort())) {
+                return new PasswordAuthentication(user, password.toCharArray());
             }
         }
         return null;
