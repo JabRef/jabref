@@ -150,13 +150,7 @@ public class FileListEntryEditor {
         link.addActionListener(okAction);
         description.addActionListener(okAction);
 
-        open.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openFile();
-            }
-        });
+        open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
             @Override
@@ -298,7 +292,7 @@ public class FileListEntryEditor {
     }
 
     private void storeSettings(FileListEntry entry) {
-        String description = this.description.getText().trim();
+        String descriptionText = this.description.getText().trim();
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
@@ -331,7 +325,7 @@ public class FileListEntryEditor {
 
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
-        entry.description = description;
+        entry.description = descriptionText;
         entry.type = type;
         entry.link = link;
     }

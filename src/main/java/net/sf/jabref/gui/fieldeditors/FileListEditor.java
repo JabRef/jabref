@@ -107,49 +107,15 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
         down.setMargin(new Insets(0, 0, 0, 0));
-        add.addActionListener(new ActionListener() {
+        add.addActionListener(e -> addEntry());
+        remove.addActionListener(e -> removeEntries());
+        up.addActionListener(e -> moveEntry(-1));
+        down.addActionListener(e -> moveEntry(1));
+        auto.addActionListener(e -> autoSetLinks());
+        download.addActionListener(e -> downloadFile());
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addEntry();
-            }
-        });
-        remove.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeEntries();
-            }
-        });
-        up.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(-1);
-            }
-        });
-        down.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(1);
-            }
-        });
-        auto.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoSetLinks();
-            }
-        });
-        download.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                downloadFile();
-            }
-        });
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
@@ -213,28 +179,18 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
         menu.add(openLink);
-        openLink.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openSelectedFile();
-            }
-        });
+        openLink.addActionListener(e -> openSelectedFile());
 
         JMenuItem openFolder = new JMenuItem(Localization.lang("Open folder"));
         menu.add(openFolder);
-        openFolder.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = getSelectedRow();
-                if (row >= 0) {
-                    FileListEntry entry = tableModel.getEntry(row);
-                    try {
-                        JabRefDesktop.openFolderAndSelectFile(entry.link);
-                    } catch (IOException ex) {
-                        LOGGER.debug("Cannot open folder", ex);
-                    }
+        openFolder.addActionListener(e -> {
+            int row = getSelectedRow();
+            if (row >= 0) {
+                FileListEntry entry = tableModel.getEntry(row);
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(entry.link);
+                } catch (IOException ex) {
+                    LOGGER.debug("Cannot open folder", ex);
                 }
             }
         });
@@ -249,14 +205,10 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
         menu.add(deleteFile);
-        deleteFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = getSelectedRow();
-                // no selection
-                if (row == -1) {
-                    return;
-                }
+        deleteFile.addActionListener(e -> {
+            int row = getSelectedRow();
+            // no selection
+            if (row != -1) {
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
@@ -339,17 +291,17 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void append(String text) {
-
+        // Do nothing
     }
 
     @Override
     public void updateFont() {
-
+        // Do nothing
     }
 
     @Override
     public void paste(String textToInsert) {
-
+        // Do nothing
     }
 
     @Override
@@ -536,33 +488,41 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void undo() {
+        // Do nothing
     }
 
     @Override
     public void redo() {
+        // Do nothing
     }
 
     @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
+        // Do nothing
     }
 
     @Override
     public void clearAutoCompleteSuggestion() {
+        // Do nothing
     }
 
     @Override
     public void setActiveBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void setValidBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void setInvalidBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void updateFontColor() {
+        // Do nothing
     }
 }

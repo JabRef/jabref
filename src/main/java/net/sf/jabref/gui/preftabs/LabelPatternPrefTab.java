@@ -23,9 +23,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
@@ -147,14 +144,9 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         gbl.setConstraints(builder.getPanel(), con);
         add(builder.getPanel());
 
-        dontOverwrite.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                // Warning before overwriting is only relevant if overwriting can happen:
-                warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
-            }
-        });
+        dontOverwrite.addChangeListener(e ->
+        // Warning before overwriting is only relevant if overwriting can happen:
+        warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected()));
     }
 
     @Override

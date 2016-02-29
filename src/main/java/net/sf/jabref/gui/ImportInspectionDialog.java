@@ -274,12 +274,31 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         ok.setEnabled(false);
         generate.setEnabled(false);
         ok.addActionListener(new OkListener());
-        cancel.addActionListener(new CancelListener());
-        generate.addActionListener(new GenerateListener());
-        stop.addActionListener(new StopListener());
+        cancel.addActionListener(e -> {
+            signalStopFetching();
+            dispose();
+            frame.output(Localization.lang("Import canceled by user"));
+        });
+        generate.addActionListener(e -> {
+            generate.setEnabled(false);
+            generatedKeys = true; // To prevent the button from getting
+            // enabled again.
+            generateKeys(); // Generate the keys.
+        });
+        stop.addActionListener(e -> {
+            signalStopFetching();
+            entryListComplete();
+        });
         selectAll.addActionListener(new SelectionButton(true));
         deselectAll.addActionListener(new SelectionButton(false));
-        deselectAllDuplicates.addActionListener(new DeselectDuplicatesButtonListener());
+        deselectAllDuplicates.addActionListener(e -> {
+            for (int i = 0; i < glTable.getRowCount(); i++) {
+                if (glTable.getValueAt(i, DUPL_COL) != null) {
+                    glTable.setValueAt(false, i, 0);
+                }
+            }
+            glTable.repaint();
+        });
         deselectAllDuplicates.setEnabled(false);
         delete.addActionListener(deleteListener);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -735,30 +754,23 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
 
             dispose();
-            SwingUtilities.invokeLater(new Runnable() {
+            SwingUtilities.invokeLater(() -> {
+                if (newDatabase) {
+                    frame.addTab(panel, null, true);
+                }
+                panel.markBaseChanged();
 
-                @Override
-                public void run() {
-                    if (newDatabase) {
-                        frame.addTab(panel, null, true);
-                    }
-                    panel.markBaseChanged();
-
-                    if (selected.isEmpty()) {
-                        frame.output(Localization.lang("No entries imported."));
-                    } else {
-                        frame.output(Localization.lang("Number of entries successfully imported") +
-                                ": " + selected.size());
-                    }
+                if (selected.isEmpty()) {
+                    frame.output(Localization.lang("No entries imported."));
+                } else {
+                    frame.output(Localization.lang("Number of entries successfully imported") + ": " + selected.size());
                 }
             });
         }
     }
 
     private void signalStopFetching() {
-        for (CallBack c : callBacks) {
-            c.stopFetching();
-        }
+        callBacks.forEach(c -> c.stopFetching());
     }
 
     private void setWidths() {
@@ -779,37 +791,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    private class StopListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            signalStopFetching();
-            entryListComplete();
-        }
-    }
-
-    private class CancelListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            signalStopFetching();
-            dispose();
-            frame.output(Localization.lang("Import canceled by user"));
-        }
-    }
-
-    private class GenerateListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            generate.setEnabled(false);
-            generatedKeys = true; // To prevent the button from getting
-            // enabled again.
-            generateKeys(); // Generate the keys.
-        }
-    }
-
-    class DeleteListener extends AbstractAction {
+    private class DeleteListener extends AbstractAction {
 
         public DeleteListener() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon());
@@ -821,7 +803,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class SelectionButton implements ActionListener {
+    private class SelectionButton implements ActionListener {
 
         private final Boolean enable;
 
@@ -838,19 +820,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    private class DeselectDuplicatesButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            for (int i = 0; i < glTable.getRowCount(); i++) {
-                if (glTable.getValueAt(i, DUPL_COL) != null) {
-                    glTable.setValueAt(false, i, 0);
-                }
-            }
-            glTable.repaint();
-        }
-    }
-
     private class EntrySelectionListener implements ListEventListener<BibEntry> {
 
         @Override
@@ -858,13 +827,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (listEvent.getSourceList().size() == 1) {
                 preview.setEntry(listEvent.getSourceList().get(0));
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.scrollRectToVisible(toRect);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -873,7 +836,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * This class handles clicks on the table that should trigger specific
      * events, like opening the popup menu.
      */
-    class TableClickListener implements MouseListener {
+    private class TableClickListener implements MouseListener {
 
         private boolean isIconColumn(int col) {
             return (col == FILE_COL) || (col == URL_COL);
@@ -1159,7 +1122,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class AutoSetLinks extends JMenuItem implements ActionListener {
+    private class AutoSetLinks extends JMenuItem implements ActionListener {
 
         public AutoSetLinks() {
             super(Localization.lang("Autoset external links"));
@@ -1204,7 +1167,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    class LinkLocalFile extends JMenuItem implements ActionListener,
+    private class LinkLocalFile extends JMenuItem implements ActionListener,
             DownloadExternalFile.DownloadCallback {
 
         private BibEntry entry;
@@ -1327,11 +1290,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public TableCellRenderer getCellRenderer(int row, int column) {
             return column == 0 ? getDefaultRenderer(Boolean.class) : renderer;
         }
-
-        /*
-         * public TableCellEditor getCellEditor() { return
-         * getDefaultEditor(Boolean.class); }
-         */
 
         @Override
         public Class<?> getColumnClass(int col) {

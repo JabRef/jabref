@@ -158,23 +158,12 @@ public class DatabasePropertiesDialog extends JDialog {
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                storeSettings();
-                dispose();
-            }
+        ok.addActionListener(e -> {
+            storeSettings();
+            dispose();
         });
 
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
+        cancel.addActionListener(e -> dispose());
     }
 
     private void setupSortOrderConfiguration() {
@@ -184,13 +173,9 @@ public class DatabasePropertiesDialog extends JDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveInOriginalOrder);
         bg.add(saveInSpecifiedOrder);
-        ActionListener listener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean selected = e.getSource() == saveInSpecifiedOrder;
-                saveOrderPanel.setEnabled(selected);
-            }
+        ActionListener listener = e -> {
+            boolean selected = e.getSource() == saveInSpecifiedOrder;
+            saveOrderPanel.setEnabled(selected);
         };
 
         saveInOriginalOrder.addActionListener(listener);

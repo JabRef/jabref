@@ -74,11 +74,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private JDialog diag;
 
-    // keyword to add
-    private JTextField keyword;
 
     private DefaultListModel<String> keywordListModel;
-    private JList<String> keywordList;
 
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
@@ -94,10 +91,11 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private void createDialog() {
-        keyword = new JTextField();
+        // keyword to add
+        JTextField keyword = new JTextField();
 
         keywordListModel = new DefaultListModel<>();
-        keywordList = new JList<>(keywordListModel);
+        JList<String> keywordList = new JList<>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -115,13 +113,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         ButtonGroup group = new ButtonGroup();
         group.add(intersectKeywords);
         group.add(mergeKeywords);
-        ActionListener stateChanged = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                fillKeyWordList();
-            }
-        };
+        ActionListener stateChanged = e -> fillKeyWordList();
         intersectKeywords.addActionListener(stateChanged);
         mergeKeywords.addActionListener(stateChanged);
         intersectKeywords.setSelected(true);
@@ -145,13 +137,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelled = false;
-                diag.dispose();
-            }
+        ok.addActionListener(e -> {
+            cancelled = false;
+            diag.dispose();
         });
 
         AbstractAction cancelAction = new AbstractAction() {
@@ -163,22 +151,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         };
         cancel.addActionListener(cancelAction);
 
-        final ActionListener addActionListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                String text = keyword.getText().trim();
-                if (text.isEmpty()) {
-                    // no text to add, do nothing
-                    return;
-                }
+        final ActionListener addActionListener = arg0 -> {
+            String text = keyword.getText().trim();
+            if (!text.isEmpty()) {
                 if (keywordListModel.isEmpty()) {
                     keywordListModel.addElement(text);
                 } else {
                     int idx = 0;
                     String element = keywordListModel.getElementAt(idx);
-                    while ((idx < keywordListModel.size()) &&
-                            (element.compareTo(text) < 0)) {
+                    while ((idx < keywordListModel.size()) && (element.compareTo(text) < 0)) {
                         idx++;
                     }
                     if (idx == keywordListModel.size()) {
@@ -194,21 +175,20 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 keyword.requestFocusInWindow();
             }
         };
+
         add.addActionListener(addActionListener);
 
-        final ActionListener removeActionListenter = new ActionListener() {
+        final ActionListener removeActionListenter = arg0 -> {
+            // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
+            List<String> values = keywordList.getSelectedValuesList();
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                List<String> values = keywordList.getSelectedValuesList();
-
-                for (String val : values) {
-                    keywordListModel.removeElement(val);
-                }
+            for (String val : values) {
+                keywordListModel.removeElement(val);
             }
         };
+
         remove.addActionListener(removeActionListenter);
+
         keywordList.addKeyListener(new KeyListener() {
 
             @Override

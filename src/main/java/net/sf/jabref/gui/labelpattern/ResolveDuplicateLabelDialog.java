@@ -28,7 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,21 +95,11 @@ class ResolveDuplicateLabelDialog {
 
         diag.pack();
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ok.addActionListener(e -> {
                 okPressed = true;
                 diag.dispose();
-            }
         });
-        cancel.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                diag.dispose();
-            }
-        });
 
         AbstractAction closeAction = new AbstractAction() {
 
@@ -119,6 +108,9 @@ class ResolveDuplicateLabelDialog {
                 diag.dispose();
             }
         };
+
+        cancel.addActionListener(closeAction);
+
         ActionMap am = b.getPanel().getActionMap();
         InputMap im = b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");

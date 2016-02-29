@@ -16,8 +16,6 @@
 package net.sf.jabref.gui.maintable;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.List;
@@ -526,37 +524,30 @@ public class MainTable extends JTable {
         }
 
         // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                // Get the information about the current sort order:
-                List<String> fields = getCurrentSortFields();
-                List<Boolean> order = getCurrentSortOrder();
-                // Update preferences:
-                int count = Math.min(fields.size(), order.size());
-                if (count >= 1) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-                }
-                if (count >= 2) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-                }
-                if (count >= 3) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-                }
+        comparatorChooser.addSortActionListener(e -> {
+            // Get the information about the current sort order:
+            List<String> fields = getCurrentSortFields();
+            List<Boolean> order = getCurrentSortOrder();
+            // Update preferences:
+            int count = Math.min(fields.size(), order.size());
+            if (count >= 1) {
+                Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
             }
-
+            if (count >= 2) {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
+            }
+            if (count >= 3) {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
+            }
         });
 
     }
