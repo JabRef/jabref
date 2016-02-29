@@ -81,9 +81,7 @@ public class SearchQueryHighlightObservable {
 
     private void update() {
         // Fire an event for every listener
-        for (SearchQueryHighlightListener s : listeners) {
-            s.highlightPattern(pattern);
-        }
+        listeners.forEach(s -> s.highlightPattern(pattern));
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled

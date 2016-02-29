@@ -53,9 +53,7 @@ public class MainTableColumn {
         }
 
         StringJoiner joiner = new StringJoiner(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-        for (String field : bibtexFields) {
-            joiner.add(field);
-        }
+        bibtexFields.forEach(joiner::add);
         return joiner.toString();
     }
 

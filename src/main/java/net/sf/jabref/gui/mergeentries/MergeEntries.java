@@ -125,9 +125,7 @@ public class MergeEntries {
             }
         }
 
-        for (String field : toberemoved) {
-            joint.remove(field);
-        }
+        toberemoved.forEach(joint::remove);
 
         // Create storage arrays
         rb = new JRadioButton[3][joint.size() + 1];

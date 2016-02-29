@@ -101,18 +101,16 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton remove = new JButton(Localization.lang("Remove"));
         remove.addActionListener(e -> {
-                int[] rows = table.getSelectedRows();
-                if (rows.length == 0) {
-                    return;
-                }
-                List<List<String>> entries = new ArrayList<>();
-                for (int i = 0; i < rows.length; i++) {
-                    entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
-                }
-                for (List<String> list : entries) {
-                    Globals.prefs.customExports.remove(list);
-                }
-                Globals.prefs.customExports.store();
+            int[] rows = table.getSelectedRows();
+            if (rows.length == 0) {
+                return;
+            }
+            List<List<String>> entries = new ArrayList<>();
+            for (int i = 0; i < rows.length; i++) {
+                entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
+            }
+            entries.forEach(Globals.prefs.customExports::remove);
+            Globals.prefs.customExports.store();
         });
 
         AbstractAction closeAction = new AbstractAction() {

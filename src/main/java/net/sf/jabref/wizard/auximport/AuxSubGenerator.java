@@ -357,9 +357,7 @@ public class AuxSubGenerator {
                 .append(getCrossreferencedEntriesCount()).append('\n');
 
         if (includeMissingEntries && (getNotResolvedKeysCount() > 0)) {
-            for (String entry : notFoundList) {
-                result.append(entry).append('\n');
-            }
+            notFoundList.forEach(entry -> result.append(entry).append('\n'));
         }
         if (nestedAuxCounter > 0) {
             result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCounter);
