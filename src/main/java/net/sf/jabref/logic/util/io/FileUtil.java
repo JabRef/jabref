@@ -22,9 +22,6 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 
 import net.sf.jabref.model.entry.FileField;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -35,8 +32,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class FileUtil {
-    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
-
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
@@ -93,10 +88,8 @@ public class FileUtil {
 
                 if (tempString.isEmpty() && !stackList.get(i).isEmpty()) {
                     pathSubstrings.set(i, stackList.get(i).pop());
-                } else {
-                    if (!stackList.get(i).isEmpty()) {
-                        pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
-                    }
+                } else if (!stackList.get(i).isEmpty()) {
+                    pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
                 }
             }
 
@@ -215,11 +208,13 @@ public class FileUtil {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
      */
-    public static Optional<File> expandFilename(String name, String dir) {
+    public static Optional<File> expandFilename(String filename, String dir) {
 
-        if ((name == null) || name.isEmpty()) {
+        if ((filename == null) || filename.isEmpty()) {
             return Optional.empty();
         }
+
+        String name = filename;
 
         File file = new File(name);
         if (file.exists() || (dir == null)) {
@@ -273,11 +268,12 @@ public class FileUtil {
         return fileName;
     }
 
-    private static File shortenFileName(File fileName, String dir) {
-        if ((fileName == null) || !fileName.isAbsolute() || (dir == null)) {
+    private static File shortenFileName(File fileName, String directory) {
+        if ((fileName == null) || !fileName.isAbsolute() || (directory == null)) {
             return fileName;
         }
 
+        String dir = directory;
         String longName;
         if (OS.WINDOWS) {
             // case-insensitive matching on Windows
@@ -320,13 +316,9 @@ public class FileUtil {
             // First, look for exact matches:
             for (BibEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty()) {
-                    if (dot > 0) {
-                        if (name.substring(0, dot).equals(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
+                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                    result.get(entry).add(file);
+                    continue nextFile;
                 }
             }
             // If we get here, we didn't find any exact matches. If non-exact
@@ -334,11 +326,9 @@ public class FileUtil {
             if (!exactOnly) {
                 for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty()) {
-                        if (name.startsWith(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
+                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                        result.get(entry).add(file);
+                        continue nextFile;
                     }
                 }
             }
@@ -363,7 +353,7 @@ public class FileUtil {
         for (BibEntry entry : bes) {
             List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
             for (FileField.ParsedFileField file : fileList) {
-                expandFilename(file.link, fileDirs).ifPresent(f -> result.add(f));
+                expandFilename(file.link, fileDirs).ifPresent(result::add);
             }
         }
 

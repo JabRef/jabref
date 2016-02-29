@@ -38,7 +38,6 @@ package net.sf.jabref.wizard.auximport.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -118,36 +117,18 @@ public class FromAuxDialog extends JDialog {
         panel1.setLayout(new BorderLayout());
         selectInDBButton.setText(Localization.lang("Select"));
         selectInDBButton.setEnabled(false);
-        selectInDBButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                selectActionPerformed();
-            }
-        });
+        selectInDBButton.addActionListener(e -> selectActionPerformed());
         generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
-        generateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                generateActionPerformed();
-            }
+        generateButton.addActionListener(e -> {
+            generatePressed = true;
+            dispose();
         });
         cancelButton.setText(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(e -> dispose());
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                cancelActionPerformed();
-            }
-        });
         parseButton.setText(Localization.lang("Parse"));
-        parseButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                parseActionPerformed();
-            }
-        });
+        parseButton.addActionListener(e -> parseActionPerformed());
 
         initPanels();
 
@@ -238,15 +219,6 @@ public class FromAuxDialog extends JDialog {
         b.append(listScrollPane);
         b.append(statusScrollPane);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-    }
-
-    private void generateActionPerformed() {
-        generatePressed = true;
-        dispose();
-    }
-
-    private void cancelActionPerformed() {
-        dispose();
     }
 
     private void selectActionPerformed() {

@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -30,20 +31,30 @@ public class CleanupWorker {
     private final CleanupPreset preset;
     private final List<String> paths;
     private final BibDatabase database;
+    private final JournalAbbreviationRepository repository;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(CleanupPreset preset) {
+
+    /**
+     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
+     */
+    CleanupWorker(CleanupPreset preset) {
         this(preset, Collections.emptyList());
     }
 
-    public CleanupWorker(CleanupPreset preset, List<String> paths) {
-        this(preset, paths, null);
+    /**
+     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
+     */
+    CleanupWorker(CleanupPreset preset, List<String> paths) {
+        this(preset, paths, null, null);
     }
 
-    public CleanupWorker(CleanupPreset preset, List<String> paths, BibDatabase database) {
+    public CleanupWorker(CleanupPreset preset, List<String> paths, BibDatabase database,
+            JournalAbbreviationRepository repository) {
         this.preset = Objects.requireNonNull(preset);
         this.paths = Objects.requireNonNull(paths);
         this.database = database;
+        this.repository = repository;
     }
 
     public int getUnsuccessfulRenames() {
@@ -91,7 +102,8 @@ public class CleanupWorker {
             jobs.add(new RelativePathsCleanup(paths));
         }
         if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), database);
+            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), database,
+                    repository);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

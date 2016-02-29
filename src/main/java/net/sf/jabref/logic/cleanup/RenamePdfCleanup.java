@@ -15,6 +15,7 @@ package net.sf.jabref.logic.cleanup;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -33,11 +34,15 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabase database;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
+    private final JournalAbbreviationRepository repository;
 
-    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabase database) {
+
+    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabase database,
+            JournalAbbreviationRepository repository) {
         this.paths = paths;
         this.database = database;
         this.onlyRelativePaths = onlyRelativePaths;
+        this.repository = repository;
     }
 
     @Override
@@ -58,7 +63,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(Util.getLinkedFileName(database, entry));
+            StringBuilder newFilename = new StringBuilder(Util.getLinkedFileName(database, entry, repository));
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
@@ -74,14 +79,19 @@ public class RenamePdfCleanup implements CleanupJob {
             String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
                     .concat(newFilename.toString());
 
-            if (new File(newPath).exists()) {
+            String expandedOldFilePath = expandedOldFile.get().toString();
+            Boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
+                    expandedOldFilePath);
+            if (new File(newPath).exists() && ! pathsDifferOnlyByCase) {
                 // we do not overwrite files
+                // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+                // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
                 continue;
             }
 
             //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFile.get().toString(), newPath);
+            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
 
             if (renameSuccessful) {
                 changed = true;

@@ -38,11 +38,6 @@ class BibTeXMLHandler extends DefaultHandler {
     // XML parsing stuff
     private String currentChars;
 
-
-    public BibTeXMLHandler() {
-        super();
-    }
-
     public List<BibEntry> getItems() {
         return bibitems;
     }
@@ -102,7 +97,6 @@ class BibTeXMLHandler extends DefaultHandler {
             bibitems.add(b);
         } else if (raw.startsWith("bibtex:")) {
             b.setField(local, currentChars);
-            // Util.pr(local+ " "+currentChars);
         }
         currentChars = "";
     }

@@ -71,20 +71,17 @@ public class DBLPFetcher implements EntryFetcher {
         try {
 
             String address = makeSearchURL();
-            //System.out.println(address);
             URL url = new URL(address);
             URLDownload dl = new URLDownload(url);
 
             String page = dl.downloadToString();
 
-            //System.out.println(page);
             String[] lines = page.split("\n");
             List<String> bibtexUrlList = new ArrayList<>();
             for (final String line : lines) {
                 if (line.startsWith("\"url\"")) {
                     String addr = line.replace("\"url\":\"", "");
                     addr = addr.substring(0, addr.length() - 2);
-                    //System.out.println("key address: " + addr);
                     bibtexUrlList.add(addr);
                 }
             }
@@ -120,7 +117,6 @@ public class DBLPFetcher implements EntryFetcher {
                         bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
 
                         final URL bibFileURL = new URL(bibtexUrl);
-                        //System.out.println("URL:|"+bibtexUrl+"|");
                         final String bibtexPage = new URLDownload(bibFileURL).downloadToString();
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);

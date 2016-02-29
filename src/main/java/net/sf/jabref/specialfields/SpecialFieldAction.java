@@ -17,8 +17,10 @@ package net.sf.jabref.specialfields;
 
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -32,6 +34,8 @@ public class SpecialFieldAction implements BaseAction {
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
+
+    private static final Log LOGGER = LogFactory.getLog(SpecialFieldAction.class);
 
 
     /**
@@ -57,11 +61,11 @@ public class SpecialFieldAction implements BaseAction {
     @Override
     public void action() {
         try {
-            NamedCompound ce = new NamedCompound(undoText);
             List<BibEntry> bes = frame.getCurrentBasePanel().getSelectedEntries();
             if ((bes == null) || bes.isEmpty()) {
                 return;
             }
+            NamedCompound ce = new NamedCompound(undoText);
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
@@ -83,7 +87,7 @@ public class SpecialFieldAction implements BaseAction {
                 // even no output message
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();
+            LOGGER.error("Problem setting special fields", ex);
         }
     }
 

@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.net;
 
+import java.util.Objects;
+
 import net.sf.jabref.JabRefPreferences;
 
 public class ProxyPreferences {
@@ -66,15 +68,7 @@ public class ProxyPreferences {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = (prime * result) + ((hostname == null) ? 0 : hostname.hashCode());
-        result = (prime * result) + ((password == null) ? 0 : password.hashCode());
-        result = (prime * result) + ((port == null) ? 0 : port.hashCode());
-        result = (prime * result) + ((useAuthentication == null) ? 0 : useAuthentication.hashCode());
-        result = (prime * result) + ((useProxy == null) ? 0 : useProxy.hashCode());
-        result = (prime * result) + ((username == null) ? 0 : username.hashCode());
-        return result;
+        return Objects.hash(hostname, password, port, useAuthentication, useProxy, username);
     }
 
     @Override
@@ -82,55 +76,52 @@ public class ProxyPreferences {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        ProxyPreferences other = (ProxyPreferences) obj;
-        if (hostname == null) {
-            if (other.hostname != null) {
+        if (obj instanceof ProxyPreferences) {
+            ProxyPreferences other = (ProxyPreferences) obj;
+            if (hostname == null) {
+                if (other.hostname != null) {
+                    return false;
+                }
+            } else if (!hostname.equals(other.hostname)) {
                 return false;
             }
-        } else if (!hostname.equals(other.hostname)) {
-            return false;
-        }
-        if (password == null) {
-            if (other.password != null) {
+            if (password == null) {
+                if (other.password != null) {
+                    return false;
+                }
+            } else if (!password.equals(other.password)) {
                 return false;
             }
-        } else if (!password.equals(other.password)) {
-            return false;
-        }
-        if (port == null) {
-            if (other.port != null) {
+            if (port == null) {
+                if (other.port != null) {
+                    return false;
+                }
+            } else if (!port.equals(other.port)) {
                 return false;
             }
-        } else if (!port.equals(other.port)) {
-            return false;
-        }
-        if (useAuthentication == null) {
-            if (other.useAuthentication != null) {
+            if (useAuthentication == null) {
+                if (other.useAuthentication != null) {
+                    return false;
+                }
+            } else if (!useAuthentication.equals(other.useAuthentication)) {
                 return false;
             }
-        } else if (!useAuthentication.equals(other.useAuthentication)) {
-            return false;
-        }
-        if (useProxy == null) {
-            if (other.useProxy != null) {
+            if (useProxy == null) {
+                if (other.useProxy != null) {
+                    return false;
+                }
+            } else if (!useProxy.equals(other.useProxy)) {
                 return false;
             }
-        } else if (!useProxy.equals(other.useProxy)) {
-            return false;
-        }
-        if (username == null) {
-            if (other.username != null) {
+            if (username == null) {
+                if (other.username != null) {
+                    return false;
+                }
+            } else if (!username.equals(other.username)) {
                 return false;
             }
-        } else if (!username.equals(other.username)) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

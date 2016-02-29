@@ -16,8 +16,6 @@
 package net.sf.jabref.gui.maintable;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.List;
@@ -44,10 +42,10 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
-import net.sf.jabref.gui.util.FirstColumnComparator;
-import net.sf.jabref.gui.util.IconComparator;
-import net.sf.jabref.gui.util.IsMarkedComparator;
-import net.sf.jabref.gui.util.RankingFieldComparator;
+import net.sf.jabref.gui.util.comparator.FirstColumnComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
+import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
+import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
@@ -526,37 +524,30 @@ public class MainTable extends JTable {
         }
 
         // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                // Get the information about the current sort order:
-                List<String> fields = getCurrentSortFields();
-                List<Boolean> order = getCurrentSortOrder();
-                // Update preferences:
-                int count = Math.min(fields.size(), order.size());
-                if (count >= 1) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-                }
-                if (count >= 2) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-                }
-                if (count >= 3) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-                }
+        comparatorChooser.addSortActionListener(e -> {
+            // Get the information about the current sort order:
+            List<String> fields = getCurrentSortFields();
+            List<Boolean> order = getCurrentSortOrder();
+            // Update preferences:
+            int count = Math.min(fields.size(), order.size());
+            if (count >= 1) {
+                Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
             }
-
+            if (count >= 2) {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
+            }
+            if (count >= 3) {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
+            }
         });
 
     }
@@ -749,11 +740,11 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
         final TableComparatorChooser<BibEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-        result.addSortActionListener(e -> {
-            // We need to reset the stack of sorted list each time sorting order
-            // changes, or the sorting breaks down:
-            refreshSorting();
-        });
+
+        // We need to reset the stack of sorted list each time sorting order
+        // changes, or the sorting breaks down:
+        result.addSortActionListener(e -> refreshSorting());
+
         return result;
     }
 

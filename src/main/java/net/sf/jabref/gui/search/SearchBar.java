@@ -23,8 +23,8 @@ import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -118,13 +118,13 @@ public class SearchBar extends JPanel {
 
         JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
-        clearSearchButton.addActionListener((l) -> endSearch());
+        clearSearchButton.addActionListener(l -> endSearch());
 
         this.add(clearSearchButton);
 
         searchModeButton = new JButton();
         updateSearchModeButtonText();
-        searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
+        searchModeButton.addActionListener(l -> toggleSearchModeAndSearch());
 
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);

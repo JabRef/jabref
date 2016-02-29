@@ -123,10 +123,10 @@ public class SilverPlatterImporter extends ImportFormat {
                             String ed = frest.trim();
                             ed = ed.substring(0, ed.length() - 4);
                             h.put("editor",
-                                    AuthorList.fixAuthor_lastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
+                                    AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                         } else {
                             h.put("author", AuthorList
-                                    .fixAuthor_lastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                                    .fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                         }
                     } else if ("AB".equals(f3)) {
                         h.put("abstract", frest);

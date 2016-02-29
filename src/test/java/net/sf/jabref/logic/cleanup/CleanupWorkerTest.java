@@ -1,12 +1,19 @@
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +25,17 @@ public class CleanupWorkerTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+
+    @Before
+    public void setUp() {
+        if (Globals.prefs == null) {
+            Globals.prefs = JabRefPreferences.getInstance();
+        }
+        if (Globals.journalAbbreviationLoader == null) {
+            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        }
+    }
 
 
     @SuppressWarnings("unused")
@@ -190,7 +208,8 @@ public class CleanupWorkerTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         CleanupWorker worker = new CleanupWorker(preset,
-                Collections.singletonList(testFolder.getRoot().getAbsolutePath()));
+                Collections.singletonList(testFolder.getRoot().getAbsolutePath()), null,
+                mock(JournalAbbreviationRepository.class));
         worker.cleanup(entry);
         FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", "Toot.tmp", "");
         Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));

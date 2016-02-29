@@ -250,11 +250,11 @@ public class RisImporter extends ImportFormat {
                 }
                 // fix authors
                 if (!author.isEmpty()) {
-                    author = AuthorList.fixAuthor_lastNameFirst(author);
+                    author = AuthorList.fixAuthorLastNameFirst(author);
                     hm.put("author", author);
                 }
                 if (!editor.isEmpty()) {
-                    editor = AuthorList.fixAuthor_lastNameFirst(editor);
+                    editor = AuthorList.fixAuthorLastNameFirst(editor);
                     hm.put("editor", editor);
                 }
                 if (!comment.isEmpty()) {

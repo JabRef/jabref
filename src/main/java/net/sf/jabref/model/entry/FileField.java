@@ -24,27 +24,24 @@ public class FileField {
             if (this == o) {
                 return true;
             }
-            if ((o == null) || (this.getClass() != o.getClass())) {
-                return false;
-            }
+            if (o instanceof FileField.ParsedFileField) {
 
-            FileField.ParsedFileField that = (FileField.ParsedFileField) o;
+                FileField.ParsedFileField that = (FileField.ParsedFileField) o;
 
-            if (!this.description.equals(that.description)) {
-                return false;
+                if (!this.description.equals(that.description)) {
+                    return false;
+                }
+                if (!this.link.equals(that.link)) {
+                    return false;
+                }
+                return this.fileType.equals(that.fileType);
             }
-            if (!this.link.equals(that.link)) {
-                return false;
-            }
-            return this.fileType.equals(that.fileType);
+            return false;
         }
 
         @Override
         public int hashCode() {
-            int result = this.description.hashCode();
-            result = (31 * result) + this.link.hashCode();
-            result = (31 * result) + this.fileType.hashCode();
-            return result;
+            return Objects.hash(description, link, fileType);
         }
 
         @Override
@@ -150,7 +147,7 @@ public class FileField {
      * @return The encoded String.
      */
     public static String encodeStringArray(String[][] values) {
-        return Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.joining(";"));
+        return Arrays.asList(values).stream().map(FileField::encodeStringArray).collect(Collectors.joining(";"));
     }
 
     /**
@@ -160,7 +157,7 @@ public class FileField {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        return Arrays.asList(entry).stream().map(string -> quote(string)).collect(Collectors.joining(":"));
+        return Arrays.asList(entry).stream().map(FileField::quote).collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {

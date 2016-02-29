@@ -16,15 +16,20 @@
 
 package net.sf.jabref.logic.formatter.casechanger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Container class for lists with keywords where the case should be kept independent of bibstyle
  *
  */
 public class CaseKeeperList {
 
+
     // @formatter:off
     // Common words in IEEE Xplore that should always be in the given case
-    private final String[] wordListIEEEXplore = new String[] {
+    private static final String[] wordListIEEEXplore = new String[] {
             "1-D",
             "1D",
             "2-D",
@@ -667,7 +672,7 @@ public class CaseKeeperList {
     };
 
     // Weekdays and months
-    private final String[] wordListDayMonth = new String[] {
+    private static final String[] wordListDayMonth = new String[] {
             "Monday",
             "Tuesday",
             "Wednesday",
@@ -689,7 +694,7 @@ public class CaseKeeperList {
             "December"
     };
 
-    private final String[] wordListCountries = new String[] {
+    private static final String[] wordListCountries = new String[] {
             "Andorra",
             "United Arab Emirates",
             "UAE",
@@ -980,38 +985,35 @@ public class CaseKeeperList {
     };
 
     // List of all keyword lists
-    private final String[][] allLists = new String[][] {
+    private static final String[][] allLists = new String[][] {
             wordListIEEEXplore,
             wordListDayMonth,
             wordListCountries
     };
 
-    private final String[][] genericLists = new String[][] {
+    private static final String[][] genericLists = new String[][] {
             wordListDayMonth,
             wordListCountries
     };
     // @formatter:on
 
-    public CaseKeeperList() {
 
+    private CaseKeeperList() {
+        // Only static methods
     }
 
     /* Return all lists concatenated
      * Can be done faster once deciding on Java 6.0
      * see: http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
      */
-    public String[] getAll() {
-        int lengh = 0;
+    public static List<String> getAll() {
+        int length = 0;
         for (String[] array : allLists) {
-            lengh += array.length;
+            length += array.length;
         }
-        String[] result = new String[lengh];
-        int pos = 0;
+        List<String> result = new ArrayList<>(length);
         for (String[] array : allLists) {
-            for (String element : array) {
-                result[pos] = element;
-                pos++;
-            }
+            result.addAll(Arrays.asList(array));
         }
         return result;
     }

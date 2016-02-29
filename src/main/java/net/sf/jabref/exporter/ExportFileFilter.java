@@ -65,7 +65,11 @@ class ExportFileFilter extends FileFilter implements Comparable<ExportFileFilter
 
     @Override
     public boolean equals(Object o) {
-        if ((o != null) && (o instanceof ExportFileFilter)) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof ExportFileFilter) {
             return name.equals(((ExportFileFilter) o).name);
         }
         return false;

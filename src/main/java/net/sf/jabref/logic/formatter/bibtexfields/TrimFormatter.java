@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.MonthUtil;
 
 import java.util.Objects;
 

@@ -56,7 +56,7 @@ import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
-import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;

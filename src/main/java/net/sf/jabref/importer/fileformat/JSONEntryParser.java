@@ -31,11 +31,6 @@ public class JSONEntryParser {
 
     private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
 
-
-    public JSONEntryParser() {
-
-    }
-
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry
      *
@@ -231,7 +226,7 @@ public class JSONEntryParser {
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
             entry.setField("date", date); // For BibLatex
-            String dateparts[] = date.split("-");
+            String[] dateparts = date.split("-");
             entry.setField("year", dateparts[0]);
             entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }

@@ -19,10 +19,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.MonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
@@ -44,7 +44,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     public static final CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
     public static final CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
     public static final CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
-    public static final CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
+    public static final CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLToLatexFormatter());
 
 
     public FieldFormatterCleanup(String field, Formatter formatter) {
@@ -107,11 +107,14 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FieldFormatterCleanup that = (FieldFormatterCleanup) o;
-        return Objects.equals(field, that.field) &&
-                Objects.equals(formatter, that.formatter);
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof FieldFormatterCleanup) {
+            FieldFormatterCleanup that = (FieldFormatterCleanup) o;
+            return Objects.equals(field, that.field) && Objects.equals(formatter, that.formatter);
+        }
+        return false;
     }
 
     @Override

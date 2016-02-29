@@ -26,8 +26,6 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.exporter.*;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.*;
 import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.groups.GroupSelector;
@@ -44,12 +42,14 @@ import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
+import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -61,6 +61,8 @@ import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -801,7 +803,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
                     Layout layout;
                     try {
-                        layout = new LayoutHelper(sr).getLayoutFromText();
+                        layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
+                                .getLayoutFromText();
                     } catch (IOException e) {
                         LOGGER.info("Could not get layout", e);
                         return;
@@ -1571,6 +1574,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         frame.prevTab.actionPerformed(null);
                         e.consume();
                         break;
+                    default:
+                        break;
                     }
                 } else if (keyCode == KeyEvent.VK_ENTER) {
                     e.consume();
@@ -1585,7 +1590,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void setupMainPanel() {
-        //System.out.println("setupMainPanel");
         //splitPane = new com.jgoodies.uif_lite.component.UIFSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
@@ -1949,13 +1953,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markBaseChanged() {
         baseChanged = true;
 
-        // Put an asterix behind the filename to indicate the database has changed.
+        // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         frame.updateAllTabTitles();
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.statusLine.getText().startsWith(Localization.lang("Saved database"))) {
+        if (frame.getStatusLineText().startsWith(Localization.lang("Saved database"))) {
             frame.output(" ");
         }
 
@@ -2483,8 +2487,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void setBackAndForwardEnabledState() {
-        frame.back.setEnabled(!previousEntries.isEmpty());
-        frame.forward.setEnabled(!nextEntries.isEmpty());
+        frame.getBackAction().setEnabled(!previousEntries.isEmpty());
+        frame.getForwardAction().setEnabled(!nextEntries.isEmpty());
     }
 
     private String formatOutputMessage(String start, int count) {

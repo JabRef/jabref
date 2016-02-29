@@ -348,22 +348,22 @@ class EntryEditorTab {
 
     private void setupKeyBindings(final InputMap inputMap, final ActionMap actionMap) {
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
-        actionMap.put("prev", parent.prevEntryAction);
+        actionMap.put("prev", parent.getPrevEntryAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
-        actionMap.put("next", parent.nextEntryAction);
+        actionMap.put("next", parent.getNextEntryAction());
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", parent.storeFieldAction);
+        actionMap.put("store", parent.getStoreFieldAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("left", parent.switchLeftAction);
+        actionMap.put("left", parent.getSwitchLeftAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("right", parent.switchRightAction);
+        actionMap.put("right", parent.getSwitchRightAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", parent.helpAction);
+        actionMap.put("help", parent.getHelpAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", parent.saveDatabaseAction);
+        actionMap.put("save", parent.getSaveDatabaseAction());
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", this.frame.nextTab);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");

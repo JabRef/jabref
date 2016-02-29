@@ -1,7 +1,6 @@
 package net.sf.jabref.openoffice;
 
 import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,6 +22,7 @@ public class OOBibStyleTest {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
+
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
     }
 

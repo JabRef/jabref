@@ -24,12 +24,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>Title: MergeDialog</p>
@@ -39,8 +34,6 @@ import org.apache.commons.logging.LogFactory;
  */
 
 public class MergeDialog extends JDialog {
-
-    private static final Log LOGGER = LogFactory.getLog(MergeDialog.class);
 
     private final JPanel panel1 = new JPanel();
     private final BorderLayout borderLayout1 = new BorderLayout();
@@ -69,9 +62,12 @@ public class MergeDialog extends JDialog {
     private void jbInit() {
         panel1.setLayout(borderLayout1);
         ok.setText(Localization.lang("OK"));
-        ok.addActionListener(new MergeDialogOKActionAdapter(this));
+        ok.addActionListener(e -> {
+                okPressed = true;
+                dispose();
+        });
         cancel.setText(Localization.lang("Cancel"));
-        cancel.addActionListener(new MergeDialogCancelActionAdapter(this));
+        cancel.addActionListener(e -> dispose());
         jPanel1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         jPanel1.setLayout(gridBagLayout1);
         entries.setSelected(true);
@@ -110,14 +106,6 @@ public class MergeDialog extends JDialog {
 
     }
 
-    void okActionPerformed() {
-        okPressed = true;
-        dispose();
-    }
-
-    void cancelActionPerformed() {
-        dispose();
-    }
 
     public boolean okPressed() {
         return okPressed;
@@ -140,32 +128,3 @@ public class MergeDialog extends JDialog {
     }
 }
 
-class MergeDialogOKActionAdapter implements ActionListener {
-
-    private final MergeDialog adaptee;
-
-
-    MergeDialogOKActionAdapter(MergeDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.okActionPerformed();
-    }
-}
-
-class MergeDialogCancelActionAdapter implements ActionListener {
-
-    private final MergeDialog adaptee;
-
-
-    MergeDialogCancelActionAdapter(MergeDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.cancelActionPerformed();
-    }
-}

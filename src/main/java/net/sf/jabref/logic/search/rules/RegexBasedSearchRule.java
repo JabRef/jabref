@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.search.rules;
 
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
 
 import java.util.ArrayList;
 import java.util.List;

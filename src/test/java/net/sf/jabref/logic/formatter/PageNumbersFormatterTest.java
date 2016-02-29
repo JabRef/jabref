@@ -15,7 +15,7 @@ public class PageNumbersFormatterTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 
