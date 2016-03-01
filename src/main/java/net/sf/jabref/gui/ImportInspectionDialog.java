@@ -580,8 +580,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private AbstractAction getAction(GroupTreeNode node) {
         AbstractAction action = new AddToGroupAction(node);
-        AbstractGroup group = node.getGroup();
-        action.setEnabled(group.supportsAdd());
+        action.setEnabled(node.supportsAddingEntries());
         return action;
     }
 
@@ -736,7 +735,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         // If the key existed, or exists now, go ahead:
                         if (entry.getCiteKey() != null) {
                             for (GroupTreeNode node : groups) {
-                                if (node.getGroup().supportsAdd()) {
+                                if (node.supportsAddingEntries()) {
                                     // Add the entry:
 
                                     Optional<EntriesGroupChange> undo = node.addToGroup(

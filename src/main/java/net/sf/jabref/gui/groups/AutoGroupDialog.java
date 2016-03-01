@@ -114,7 +114,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot,
                         new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
-                undo.setRevalidate(true);
                 ce.addEdit(undo);
 
                 panel.markBaseChanged(); // a change always occurs

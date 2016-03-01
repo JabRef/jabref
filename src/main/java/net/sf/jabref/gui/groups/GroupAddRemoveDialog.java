@@ -7,7 +7,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
@@ -159,8 +158,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         @Override
         public void valueChanged(TreeSelectionEvent e) {
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) e.getNewLeadSelectionPath().getLastPathComponent();
-            AbstractGroup group = node.getNode().getGroup();
-            ok.setEnabled(checkGroupEnable(group));
+            ok.setEnabled(checkGroupEnable(node));
         }
     }
 
@@ -171,8 +169,7 @@ public class GroupAddRemoveDialog implements BaseAction {
             return false;
         } else {
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
-            AbstractGroup group = node.getNode().getGroup();
-            if (checkGroupEnable(group)) {
+            if (checkGroupEnable(node)) {
 
                 if (add) {
                     AddToGroupAction action = new AddToGroupAction(node, move, panel);
@@ -193,12 +190,11 @@ public class GroupAddRemoveDialog implements BaseAction {
      * Check if we can perform the action for this group. Determines whether
      * the group should be shown in an enabled state, and if selecting it should
      * leave the Ok button enabled.
-     * @param group The group to check
+     * @param node The group to check
      * @return true if this dialog's action can be performed on the group
      */
-    private boolean checkGroupEnable(AbstractGroup group) {
-        return (add ? group.supportsAdd() && !group.containsAll(selection) : group.supportsRemove()
-                && group.containsAny(selection));
+    private boolean checkGroupEnable(GroupTreeNodeViewModel node) {
+        return (add ? node.canAddEntries(selection) : node.canRemoveEntries(selection));
     }
 
 
@@ -234,8 +230,7 @@ public class GroupAddRemoveDialog implements BaseAction {
             Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) value;
-            AbstractGroup group = node.getNode().getGroup();
-            if (checkGroupEnable(group)) {
+            if (checkGroupEnable(node)) {
                 c.setForeground(Color.black);
             } else {
                 c.setForeground(Color.gray);

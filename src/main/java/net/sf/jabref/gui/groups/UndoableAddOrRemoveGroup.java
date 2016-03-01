@@ -41,7 +41,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      */
     private final int m_editType;
     private final GroupSelector m_groupSelector;
-    private boolean mRevalidate = true;
     /** Adding of a single node (group). */
     public static final int ADD_NODE = 0;
     /** Removal of a single node. Children, if any, are kept. */
@@ -165,19 +164,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 break;
             }
         }
-        if (mRevalidate) {
-            m_groupSelector.revalidateGroups();
-        }
-    }
 
-    /**
-     * Call this method to decide if the group list should be immediately
-     * revalidated by this operation. Default is true.
-     *
-     * @param val
-     *            a <code>boolean</code> value
-     */
-    public void setRevalidate(boolean val) {
-        mRevalidate = val;
+        m_groupSelector.revalidateGroups();
     }
 }

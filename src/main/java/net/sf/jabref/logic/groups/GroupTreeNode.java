@@ -64,7 +64,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         StringBuilder sb = new StringBuilder();
 
         // Append myself
-        sb.append(this.getLevel()).append(' ').append(this.getGroup().toString()).append('\n');
+        sb.append(this.getLevel()).append(' ').append(group.toString()).append('\n');
 
         // Append children
         for(GroupTreeNode child : getChildren()) {
@@ -97,7 +97,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (GroupTreeNode node : getChildren()) {
-            node.getGroup().refreshForNewDatabase(db);
+            node.group.refreshForNewDatabase(db);
             node.refreshGroupsForNewDatabase(db);
         }
     }
@@ -134,27 +134,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                     .getSearchRule(originalContext));
         }
         return searchRule;
-    }
-
-    public boolean canMoveUp() {
-        return (getPreviousSibling() != null)
-                && !(group instanceof AllEntriesGroup);
-    }
-
-    public boolean canMoveDown() {
-        return (getNextSibling() != null)
-                && !(group instanceof AllEntriesGroup);
-    }
-
-    public boolean canMoveLeft() {
-        return !(getGroup() instanceof AllEntriesGroup)
-                // TODO: Null!
-                && !(getParent().get().getGroup() instanceof AllEntriesGroup);
-    }
-
-    public boolean canMoveRight() {
-        return (getPreviousSibling() != null)
-                && !(group instanceof AllEntriesGroup);
     }
 
     public Optional<MoveGroupChange> moveUp() {
@@ -242,7 +221,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             return false;
         }
         AbstractGroup g1 = group;
-        AbstractGroup g2 = otherNode.getGroup();
+        AbstractGroup g2 = otherNode.group;
         if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
             return false;
         }
@@ -345,4 +324,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
     }
 
+
+    public boolean supportsAddingEntries() {
+        return group.supportsAdd();
+    }
 }

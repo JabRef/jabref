@@ -20,6 +20,7 @@ import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.logic.groups.*;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -27,6 +28,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.UndoManager;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -218,5 +221,103 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     public TreePath getTreePath() {
         List<GroupTreeNode> pathToNode = node.getPathFromRoot();
         return new TreePath(pathToNode.stream().map(GroupTreeNodeViewModel::new).toArray());
+    }
+
+    public boolean canAddEntries(List<BibEntry> entries) {
+        return getNode().getGroup().supportsAdd() && !getNode().getGroup().containsAll(entries);
+    }
+
+    public boolean canRemoveEntries(List<BibEntry> entries) {
+        return getNode().getGroup().supportsRemove() && getNode().getGroup().containsAny(entries);
+    }
+
+    public void sortChildrenByName(boolean recursive) {
+        getNode().sortChildren(
+                (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
+                recursive);
+    }
+
+    public String getName() {
+        return getNode().getGroup().getName();
+    }
+
+    public boolean canBeEdited() {
+        return getNode().getGroup() instanceof AllEntriesGroup;
+    }
+
+    public boolean canMoveUp() {
+        return (getNode().getPreviousSibling() != null)
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
+    }
+
+    public boolean canMoveDown() {
+        return (getNode().getNextSibling() != null)
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
+    }
+
+    public boolean canMoveLeft() {
+        return !(getNode().getGroup() instanceof AllEntriesGroup)
+                // TODO: Null!
+                && !(getNode().getParent().get().getGroup() instanceof AllEntriesGroup);
+    }
+
+    public boolean canMoveRight() {
+        return (getNode().getPreviousSibling() != null)
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
+    }
+
+    public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
+        AbstractGroup group = node.getGroup();
+        Optional<EntriesGroupChange> changesRemove = Optional.empty();
+        Optional<EntriesGroupChange> changesAdd = Optional.empty();
+
+        // Sort entries into current members and non-members of the group
+        // Current members will be removed
+        // Current non-members will be added
+        List<BibEntry> toRemove = new ArrayList<>(entries.size());
+        List<BibEntry> toAdd = new ArrayList<>(entries.size());
+
+        for (BibEntry entry : entries) {
+            // Sort according to current state of the entries
+            if (group.contains(entry)) {
+                toRemove.add(entry);
+            } else {
+                toAdd.add(entry);
+            }
+        }
+
+        // If there are entries to remove
+        if (!toRemove.isEmpty()) {
+            changesRemove = node.removeFromGroup(toRemove);
+        }
+        // If there are entries to add
+        if (!toAdd.isEmpty()) {
+            changesAdd = node.addToGroup(toAdd);
+        }
+
+        // Remember undo information
+        if (changesRemove.isPresent()) {
+            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove.get());
+            if (changesAdd.isPresent() && undoRemove != null) {
+                // we removed and added entries
+                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+            }
+            undoManager.addEdit(undoRemove);
+        } else if (changesAdd != null) {
+            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+        }
+    }
+
+    public boolean isAllEntriesGroup() {
+        return getNode().getGroup() instanceof AllEntriesGroup;
+    }
+
+    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager, GroupSelector groupSelector) {
+        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+        this.getNode().addChild(newNode);
+
+        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupSelector, this,
+                new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
+        undoManager.addEdit(undo);
     }
 }

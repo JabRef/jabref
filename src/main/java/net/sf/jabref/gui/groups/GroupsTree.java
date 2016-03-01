@@ -178,7 +178,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // worth the bother (DropTargetDragEvent does not provide
                 // access to the drag object)...
                 // it might even be irritating to the user.
-                if (target.getNode().getGroup().supportsAdd()) {
+                if (target.getNode().supportsAddingEntries()) {
                     // accept: assignment from EntryTable
                     dtde.acceptDrag(DnDConstants.ACTION_LINK);
                 } else {
@@ -266,7 +266,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
                 final AbstractGroup group = target.getNode().getGroup();
-                if (!group.supportsAdd()) {
+                if (!target.getNode().supportsAddingEntries()) {
                     // this should never happen, because the same condition
                     // is checked in dragOver already
                     dtde.rejectDrop();
@@ -396,17 +396,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     /** Sort immediate children of the specified node alphabetically. */
     public void sort(GroupTreeNodeViewModel node, boolean recursive) {
-        sortWithoutRevalidate(node, recursive);
+        node.sortChildrenByName(recursive);
         groupSelector.revalidateGroups();
-    }
-
-    /**
-     * This sorts without revalidation of groups
-     */
-    private void sortWithoutRevalidate(GroupTreeNodeViewModel node, boolean recursive) {
-        node.getNode().sortChildren(
-                (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
-                recursive);
     }
 
     /**
