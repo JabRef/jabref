@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,11 @@
 package net.sf.jabref.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -64,7 +67,7 @@ public class AddToGroupAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        final BibEntry[] entries = mPanel.getSelectedEntries();
+        final List<BibEntry> entries = mPanel.getSelectedEntries();
         final Vector<GroupTreeNode> removeGroupsNodes = new Vector<>(); // used only when moving
 
         if (m_move) {
@@ -82,18 +85,17 @@ public class AddToGroupAction extends AbstractAction {
             }
             // warning for all groups from which the entries are removed, and
             // for the one to which they are added! hence the magical +1
-            AbstractGroup[] groups = new AbstractGroup[removeGroupsNodes.size() + 1];
+            List<AbstractGroup> groups = new ArrayList<>(removeGroupsNodes.size() + 1);
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
-                groups[i] = removeGroupsNodes.elementAt(i).getGroup();
+                groups.add(removeGroupsNodes.elementAt(i).getGroup());
             }
-            groups[groups.length - 1] = mNode.getGroup();
-            if (!Util.warnAssignmentSideEffects(groups, entries, mPanel.getDatabase(), mPanel.frame())) {
+            groups.add(mNode.getGroup());
+            if (!Util.warnAssignmentSideEffects(groups, mPanel.frame())) {
                 return; // user aborted operation
             }
         } else {
             // warn if assignment has undesired side effects (modifies a field != keywords)
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mNode.getGroup()}, entries, mPanel.getDatabase(),
-                    mPanel.frame())) {
+            if (!Util.warnAssignmentSideEffects(Arrays.asList(mNode.getGroup()), mPanel.frame())) {
                 return; // user aborted operation
             }
         }
@@ -110,7 +112,10 @@ public class AddToGroupAction extends AbstractAction {
             for (int i = 0; i < removeGroupsNodes.size(); ++i) {
                 GroupTreeNode node = removeGroupsNodes.elementAt(i);
                 if (node.getGroup().containsAny(entries)) {
-                    undoAll.addEdit(node.removeFromGroup(entries));
+                    AbstractUndoableEdit undoRemove = node.removeFromGroup(entries);
+                    if (undoRemove != null) {
+                        undoAll.addEdit(undoRemove);
+                    }
                 }
             }
             // then add

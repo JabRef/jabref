@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.migrations;
 
-import java.util.Vector;
+import java.util.List;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -42,7 +42,7 @@ public class VersionHandling {
      *
      * @return the root of the generated tree.
      */
-    public static GroupTreeNode importFlatGroups(Vector<String> groups)
+    public static GroupTreeNode importFlatGroups(List<String> groups)
             throws IllegalArgumentException {
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
         final int number = groups.size() / 3;
@@ -59,12 +59,12 @@ public class VersionHandling {
         return root;
     }
 
-    public static GroupTreeNode importGroups(Vector<String> orderedData,
+    public static GroupTreeNode importGroups(List<String> orderedData,
             BibDatabase db, int version) throws Exception {
         switch (version) {
         case 0:
         case 1:
-            return Version0_1.fromString(orderedData.firstElement(),
+            return Version0_1.fromString(orderedData.get(0),
                     db, version);
         case 2:
         case 3:
@@ -182,7 +182,7 @@ public class VersionHandling {
 
     private static class Version2_3 {
 
-        private static GroupTreeNode fromString(Vector<String> data, BibDatabase db,
+        private static GroupTreeNode fromString(List<String> data, BibDatabase db,
                 int version) throws Exception {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;
@@ -192,7 +192,7 @@ public class VersionHandling {
             int level;
             String s;
             for (int i = 0; i < data.size(); ++i) {
-                s = data.elementAt(i);
+                s = data.get(i);
 
                 // This allows to read databases that have been modified by, e.g., BibDesk
                 s = s.trim();

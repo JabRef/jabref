@@ -22,8 +22,7 @@ public class CanonicalBibtexEntry {
 
         // generate first line: type and bibtex key
         String citeKey = Strings.nullToEmpty(e.getCiteKey());
-        sb.append(String.format("@%s{%s,", e.getType().getName().toLowerCase(Locale.US), citeKey));
-        sb.append("\n");
+        sb.append(String.format("@%s{%s,", e.getType().toLowerCase(Locale.US), citeKey)).append('\n');
 
         // we have to introduce a new Map as fields are stored case-sensitive in JabRef (see https://github.com/koppor/jabref/issues/45).
         Map<String, String> mapFieldToValue = new HashMap<>();
@@ -42,13 +41,13 @@ public class CanonicalBibtexEntry {
         // generate field entries
         StringJoiner sj = new StringJoiner(",\n", "", "\n");
         for (String fieldName : sortedFields) {
-            String line = String.format("  %s = {%s}", fieldName, mapFieldToValue.get(fieldName));
+            String line = String.format("  %s = {%s}", fieldName, String.valueOf(mapFieldToValue.get(fieldName)).replaceAll("\\r\\n","\n"));
             sj.add(line);
         }
         sb.append(sj);
 
         // append the closing entry bracket
-        sb.append("}");
+        sb.append('}');
         return sb.toString();
     }
 

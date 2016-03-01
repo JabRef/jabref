@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,13 +15,14 @@
 */
 package net.sf.jabref.exporter;
 
+import java.util.List;
 import java.util.Comparator;
 
-public class ExportComparator implements Comparator<String[]> {
+public class ExportComparator implements Comparator<List<String>> {
 
     @Override
-    public int compare(String[] s1, String[] s2) {
-        return s1[0].compareTo(s2[0]);
+    public int compare(List<String> s1, List<String> s2) {
+        return s1.get(0).compareTo(s2.get(0));
     }
 
 }

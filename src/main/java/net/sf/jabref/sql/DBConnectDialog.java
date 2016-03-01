@@ -18,8 +18,7 @@ package net.sf.jabref.sql;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 import javax.swing.*;
 
@@ -47,18 +46,17 @@ public class DBConnectDialog extends JDialog {
 
     private DBStrings dbStrings = new DBStrings();
 
-    private boolean connectToDB;
+    private boolean connectedToDB;
 
 
     /** Creates a new instance of DBConnectDialog */
     public DBConnectDialog(JFrame parent, DBStrings dbs) {
-
-        super(parent, Localization.lang("Connect to SQL database"), true);
+        super(Objects.requireNonNull(parent), Localization.lang("Connect to SQL database"), true);
 
         this.setResizable(false);
         this.setLocationRelativeTo(parent);
 
-        dbStrings = dbs;
+        dbStrings = Objects.requireNonNull(dbs);
 
         // build collections of components
         ArrayList<JLabel> lhs = new ArrayList<>();
@@ -81,11 +79,11 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Localization.lang("Server Type:"));
-        lblServerHostname.setText(Localization.lang("Server Hostname:"));
-        lblDatabase.setText(Localization.lang("Database:"));
-        lblUsername.setText(Localization.lang("Username:"));
-        lblPassword.setText(Localization.lang("Password:"));
+        lblServerType.setText(Localization.lang("Server type" + ':'));
+        lblServerHostname.setText(Localization.lang("Server hostname" + ':'));
+        lblDatabase.setText(Localization.lang("Database") + ':');
+        lblUsername.setText(Localization.lang("Username") + ':');
+        lblPassword.setText(Localization.lang("Password") + ':');
 
         // set label text alignment
         for (JLabel label : lhs) {
@@ -100,7 +98,7 @@ public class DBConnectDialog extends JDialog {
 
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
-        String[] srv = dbStrings.getServerTypes();
+        List<String> srv = dbStrings.getServerTypes();
         for (String aSrv : srv) {
             cmbServerType.addItem(aSrv);
         }
@@ -148,15 +146,15 @@ public class DBConnectDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String errorMessage = checkInput();
+                Optional<String> errorMessage = checkInput();
 
-                if (errorMessage == null) {
+                if (errorMessage.isPresent()) {
+                    JOptionPane.showMessageDialog(null, errorMessage.get(), Localization.lang("Input error"),
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
                     storeSettings();
                     setVisible(false);
                     setConnectToDB(true);
-                } else {
-                    JOptionPane.showMessageDialog(null, errorMessage,
-                            "Input Error", JOptionPane.ERROR_MESSAGE);
                 }
 
             }
@@ -191,9 +189,10 @@ public class DBConnectDialog extends JDialog {
      * @return
      *      Appropriate error message to be displayed to user
      */
-    private String checkInput() {
+    private Optional<String> checkInput() {
 
-        String[] fields = {"Server Hostname", "Database", "Username"};
+        String[] fields = {Localization.lang("Server hostname"), Localization.lang("Database"),
+                Localization.lang("Username")};
         String[] errors = new String[fields.length];
         int cnt = 0;
 
@@ -212,23 +211,28 @@ public class DBConnectDialog extends JDialog {
             cnt++;
         }
 
-        String errMsg = Localization.lang("Please specify the") + " ";
+        StringBuilder errMsg = new StringBuilder(Localization.lang("Please specify the")).append(' ');
 
         switch (cnt) {
         case 0:
-            errMsg = null;
+            errMsg = new StringBuilder();
             break;
         case 1:
-            errMsg = errMsg + errors[0] + '.';
+            errMsg.append(errors[0]).append('.');
             break;
         case 2:
-            errMsg = errMsg + errors[0] + " and " + errors[1] + '.';
+            errMsg.append(errors[0]).append(" and ").append(errors[1]).append('.');
             break;
         default: // Will be 3 at most
-            errMsg = errMsg + errors[0] + ", " + errors[1] + ", and " + errors[2] + '.';
+            errMsg.append(errors[0]).append(", ").append(errors[1]).append(", and ").append(errors[2]).append('.');
+            break;
         }
 
-        return errMsg;
+        if (errMsg.toString().isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(errMsg.toString());
+        }
     }
 
     /**
@@ -258,12 +262,12 @@ public class DBConnectDialog extends JDialog {
         this.dbStrings = dbStrings;
     }
 
-    public boolean getConnectToDB() {
-        return connectToDB;
+    public boolean isConnectedToDB() {
+        return connectedToDB;
     }
 
     private void setConnectToDB(boolean connectToDB) {
-        this.connectToDB = connectToDB;
+        this.connectedToDB = connectToDB;
     }
 
 }

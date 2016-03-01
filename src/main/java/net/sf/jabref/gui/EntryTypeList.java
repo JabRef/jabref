@@ -19,31 +19,34 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.util.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
- * list of entry types in EntryCustomizationDialog2.
+ * list of entry types in EntryCustomizationDialog.
  * @author alver
  */
 public class EntryTypeList extends FieldSetComponent implements ListSelectionListener {
 
     private final JButton def = new JButton(Localization.lang("Default"));
-
+    private final BibDatabaseMode mode;
 
     /** Creates a new instance of EntryTypeList */
-    public EntryTypeList(List<String> fields) {
+    public EntryTypeList(List<String> fields, BibDatabaseMode mode) {
         super(Localization.lang("Entry types"), fields, false, true);
+        this.mode = mode;
 
         con.gridx = 0;
         con.gridy = 2;
@@ -67,7 +70,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             return;
         }
 
-        String testString = Util.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Entry type names are not allowed to contain white space or the following "
@@ -93,12 +96,12 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         }
         for (int i = 0; i < selected.length; i++) {
             String typeName = listModel.get(selected[selected.length - 1 - i]);
-            EntryType type = EntryTypes.getType(typeName);
+            Optional<EntryType> type = EntryTypes.getType(typeName, this.mode);
 
             // If it is a custom entry type, we can remove it. If type == null, it means
             // the user must have added it and not yet applied it, so we can remove it
             // in this case as well. If it is a standard type it cannot be removed.
-            if ((type instanceof CustomEntryType)) {
+            if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
                 listModel.removeElementAt(selected[selected.length - 1 - i]);
             } else {
                 // This shouldn't happen, since the Remove button should be disabled.
@@ -116,18 +119,18 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     public void enable(String typeName, boolean isChanged) {
         //String s = (String)list.getSelectedValue();
 
-        if (EntryTypes.getStandardType(typeName) == null) {
-            def.setEnabled(false);
-            remove.setEnabled(true);
-        } else {
-
-            if (isChanged || (EntryTypes.getType(typeName) instanceof CustomEntryType)) {
+        if (EntryTypes.getStandardType(typeName, mode).isPresent()) {
+            Optional<EntryType> entryType = EntryTypes.getType(typeName, mode);
+            if (isChanged || (entryType.isPresent() && entryType.get() instanceof CustomEntryType)) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);
             }
 
             remove.setEnabled(false);
+        } else {
+            def.setEnabled(false);
+            remove.setEnabled(true);
         }
     }
 

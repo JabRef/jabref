@@ -32,7 +32,7 @@ import org.junit.Test;
  */
 public class BibtexWidthTest {
 
-    void assertBibtexWidth(final int i, final String string) {
+    private void assertBibtexWidth(final int i, final String string) {
         Assert.assertEquals(i, BibtexWidth.width(string));
     }
 

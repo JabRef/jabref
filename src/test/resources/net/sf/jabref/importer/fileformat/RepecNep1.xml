@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:SourceType>Report</b:SourceType>
+<b:BIBTEX_Entry>techreport</b:BIBTEX_Entry>
+<b:Tag>RePEc:boe:finsta:0001</b:Tag>
+<b:Title>Financial Stability Paper No 1: Costs of Sovereign Default</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>De Paoli</b:Last>
+<b:First>Biana</b:First>
+	<b:First>xDiana</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Hoggarth</b:Last>
+<b:First>Glenn</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Saporta</b:Last>
+<b:First>Victoria</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Issue>1</b:Issue>
+<b:Institution>Bank of England</b:Institution>
+<b:ThesisType>Bank of England Financial Stability Papers</b:ThesisType>
+<b:URL>http://EconPapers.repec.org/RePEc:boe:finsta:0001</b:URL>
+<b:BIBTEX_Abstract>Over the past quarter of a century, emerging market economies (EMEs) have defaulted on their sovereign debts frequently. This article assesses the size and types of costs that have been associated with these defaults. It emphasises that costs, measured by the fall in output, are particularly large when default is combined with banking and/or currency crises. Output losses also seem to increase the longer that countries stay in arrears or take to restructure their debts. The paper concludes with a number of policy suggestions to improve debt crisis prevention and management and the role played by the IMF.</b:BIBTEX_Abstract>
+<b:BIBTEX_KeyWords>EME; Sovereign; Default</b:BIBTEX_KeyWords>
+</b:Source>
+</b:Sources>

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +15,8 @@
 */
 package net.sf.jabref.logic.mods;
 
-import java.util.Vector;
-
-import net.sf.jabref.exporter.layout.WSITools;
-
+import java.util.List;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
@@ -52,18 +50,17 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        Vector<String> names = new Vector<>();
-        String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
+        String authorMod = AuthorList.fixAuthorLastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma
         //            XMLChars xmlChars = new XMLChars();
         //            authorMod = xmlChars.format(authorMod).replace("&#44;", ",");
 
-        int endOfLastName = authorMod.indexOf(",");
+        int endOfLastName = authorMod.indexOf(',');
 
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
-        WSITools.tokenize(names, authorMod.substring(endOfLastName + 1).trim(), " \n\r");
+        List<String> names = StringUtil.tokenizeToList(authorMod.substring(endOfLastName + 1).trim(), " \n\r");
         if (endOfLastName >= 0) {
             names.add(authorMod.substring(0, endOfLastName));
         }
@@ -79,7 +76,7 @@ public class PersonName {
         else {
             givenName = names.get(0);
             middleName = "";
-            for (int i = 1; i < amountOfNames - 1; i++) {
+            for (int i = 1; i < (amountOfNames - 1); i++) {
                 middleName += ' ' + names.get(i);
             }
             middleName = middleName.trim();
@@ -88,14 +85,14 @@ public class PersonName {
     }
 
     public String getGivenNames() {
-        String result = "";
+        StringBuffer result = new StringBuffer();
         if (givenName != null) {
-            result += givenName;
+            result.append(givenName);
         }
         if (middleName != null) {
-            result += ' ' + middleName;
+            result.append(' ').append(middleName);
         }
-        return result;
+        return result.toString();
     }
 
     public String getSurname()
@@ -123,25 +120,25 @@ public class PersonName {
         return middleName;
     }
 
-    public void setMiddlename(String _middleName)
+    public void setMiddlename(String middleName)
     {
-        middleName = _middleName;
+        this.middleName = middleName;
     }
 
     public String getFullname()
     {
-        String fullName = "";
-        if (givenName != null && !givenName.isEmpty()) {
-            fullName += givenName + ' ';
+        StringBuffer fullName = new StringBuffer();
+        if ((givenName != null) && !givenName.isEmpty()) {
+            fullName.append(givenName).append(' ');
         }
-        if (middleName != null && !middleName.isEmpty()) {
-            fullName += middleName + ' ';
+        if ((middleName != null) && !middleName.isEmpty()) {
+            fullName.append(middleName).append(' ');
         }
-        if (surname != null && !surname.isEmpty()) {
-            fullName += surname;
+        if ((surname != null) && !surname.isEmpty()) {
+            fullName.append(surname);
         }
 
-        return fullName.trim();
+        return fullName.toString().trim();
     }
 
     @Override

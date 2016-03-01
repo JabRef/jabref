@@ -23,12 +23,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 
+import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -77,17 +80,15 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
 
-    //private int lastCharPressed = -1;
-
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableRows();
         previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0), true),
-                new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1), true)};
+                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_0)),
+                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
+                        .get(JabRefPreferences.PREVIEW_1))};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
@@ -100,12 +101,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void updatePreviews() {
-        try {
-            previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-            previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
-        } catch (IOException e) {
-            LOGGER.debug("error while updating preview", e);
-        }
+        previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
     }
 
     @Override
@@ -124,7 +121,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 } else {
                     return; // More than one new selected. Do nothing.
                 }
-
             }
         }
 
@@ -156,16 +152,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
                 }
-
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {
                     updatePreview(toShow, false);
                 }
-
             }
         }
-
     }
 
     private void updatePreview(final BibEntry toShow, final boolean changedPreview) {
@@ -270,7 +263,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if(modelColumn.isIconColumn() && (SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null)) {
+        if (modelColumn.isIconColumn() && (SpecialFieldsUtils.isSpecialField(modelColumn.getColumnName()))) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -293,10 +286,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     // check for all field names whether a link is present
                     // (is relevant for combinations such as "url/doi")
                     for(String fieldName : fieldNames) {
-                        String link = entry.getField(fieldName);
-                        if (link == null) {
+                        if (!entry.hasField(fieldName)) {
                             continue; // There is no content for this field continue with the next one
                         }
+                        String link = entry.getField(fieldName);
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
@@ -310,7 +303,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             // If there are one or more links of the correct type, open the first one:
                             if (modelColumn.isFileFilter()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    if (fileList.getEntry(i).getType().toString().equals(modelColumn.getColumnName())) {
+                                    if (fileList.getEntry(i).type.toString().equals(modelColumn.getColumnName())) {
                                         flEntry = fileList.getEntry(i);
                                         break;
                                     }
@@ -321,8 +314,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                                        flEntry.getType());
+                                        flEntry.link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(),
+                                        flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
                                     panel.output(Localization.lang("Unable to open link."));
@@ -330,7 +323,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                         } else {
                             try {
-                                JabRefDesktop.openExternalViewer(panel.metaData(), link, fieldName);
+                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                             }
@@ -370,16 +363,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * Process general right-click events on the table. Show the table context menu at
      * the position where the user right-clicked.
      * @param e The mouse event defining the popup trigger.
-     * @param row The row where the event occured.
+     * @param row The row where the event occurred.
      */
     private void processPopupTrigger(MouseEvent e, int row) {
         int selRow = table.getSelectedRow();
-        if ((selRow == -1) || // (getSelectedRowCount() == 0))
-        !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
+        if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
-            //panel.updateViewToSelected();
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(panel, panel.metaData());
+        RightClickMenu rightClickMenu = new RightClickMenu(JabRef.jrf, panel);
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 
@@ -408,30 +399,36 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     fileList.setContent(fileFieldContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
-                        if(column.isFileFilter() && !flEntry.getType().toString().equals(column.getColumnName())) {
+                        if(column.isFileFilter() && !flEntry.type.toString().equals(column.getColumnName())) {
                             continue;
                         }
-                        String description = flEntry.getDescription();
+                        String description = flEntry.description;
                         if ((description == null) || (description.trim().isEmpty())) {
-                            description = flEntry.getLink();
+                            description = flEntry.link;
                         }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                                flEntry.getLink(), flEntry.getType().getIcon(), panel.metaData(),
-                                flEntry.getType()));
+                                flEntry.link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(),
+                                flEntry.type));
                         showDefaultPopup = false;
                     }
                 } else {
-                    SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
-                    if (specialField == null) {
-                        String content = entry.getField(field);
-                        if (content != null) {
-                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
-                                    GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
-                            showDefaultPopup = false;
-                        }
-                    } else {
+                    if (SpecialFieldsUtils.isSpecialField(column.getColumnName())) {
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
+                    } else {
+                        if (entry.hasField(field)) {
+                            String content = entry.getField(field);
+                            Icon icon;
+                            JLabel iconLabel = GUIGlobals.getTableIcon(field);
+                            if (iconLabel == null) {
+                                icon = IconTheme.JabRefIcon.FILE.getIcon();
+                            } else {
+                                icon = iconLabel.getIcon();
+                            }
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
+                                    panel.getBibDatabaseContext().getMetaData(), field));
+                            showDefaultPopup = false;
+                        }
                     }
                 }
             }
@@ -500,12 +497,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     @Override
     public void keyTyped(KeyEvent e) {
         if ((!e.isActionKey()) && Character.isLetterOrDigit(e.getKeyChar())
-                //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
             final long QUICK_JUMP_TIMEOUT = 2000;
-            if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT)
-             {
+            if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT) {
                 lastPressedCount = 0; // Reset last pressed character
             }
             // Update timestamp:
@@ -518,56 +513,35 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             }
 
             int sortingColumn = table.getSortingColumn(0);
-            if (sortingColumn == -1)
-             {
+            if (sortingColumn == -1) {
                 return; // No sorting? TODO: look up by author, etc.?
             }
             // TODO: the following lookup should be done by a faster algorithm,
             // such as binary search. But the table may not be sorted properly,
             // due to marked entries, search etc., which rules out the binary search.
-            int startRow = 0;
-            /*if ((c == lastPressed) && (lastQuickJumpRow >= 0)) {
-                if (lastQuickJumpRow < table.getRowCount()-1)
-                    startRow = lastQuickJumpRow+1;
-            }*/
 
-            boolean done = false;
-            while (!done) {
-                for (int i = startRow; i < table.getRowCount(); i++) {
-                    Object o = table.getValueAt(i, sortingColumn);
-                    if (o == null) {
-                        continue;
-                    }
-                    String s = o.toString().toLowerCase();
-                    if (s.length() >= lastPressedCount)
-                     {
-                        for (int j = 0; j < lastPressedCount; j++) {
-                            if (s.charAt(j) != lastPressed[j]) {
-                                break; // Escape the loop immediately when we find a mismatch
-                            } else if (j == (lastPressedCount - 1)) {
-                                // We found a match:
-                                table.setRowSelectionInterval(i, i);
-                                table.ensureVisible(i);
-                                return;
-                            }
+            for (int i = 0; i < table.getRowCount(); i++) {
+                Object o = table.getValueAt(i, sortingColumn);
+                if (o == null) {
+                    continue;
+                }
+                String s = o.toString().toLowerCase();
+                if (s.length() >= lastPressedCount) {
+                    for (int j = 0; j < lastPressedCount; j++) {
+                        if (s.charAt(j) != lastPressed[j]) {
+                            break; // Escape the loop immediately when we find a mismatch
+                        } else if (j == (lastPressedCount - 1)) {
+                            // We found a match:
+                            table.setRowSelectionInterval(i, i);
+                            table.ensureVisible(i);
+                            return;
                         }
-                    //if ((s.length() >= 1) && (s.charAt(0) == c)) {
-                    //}
                     }
                 }
-                // Finished, no result. If we didn't start at the beginning of
-                // the table, try that. Otherwise, exit the while loop.
-                if (startRow > 0) {
-                    startRow = 0;
-                } else {
-                    done = true;
-                }
-
             }
 
         } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
             lastPressedCount = 0;
-
         }
     }
 

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,8 +18,6 @@ package net.sf.jabref.importer.fileformat;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import org.xml.sax.Attributes;
@@ -39,11 +37,6 @@ class BibTeXMLHandler extends DefaultHandler {
 
     // XML parsing stuff
     private String currentChars;
-
-
-    public BibTeXMLHandler() {
-        super();
-    }
 
     public List<BibEntry> getItems() {
         return bibitems;
@@ -93,8 +86,7 @@ class BibTeXMLHandler extends DefaultHandler {
                 "bibtex:unpublished".equals(raw) ||
                 "bibtex:misc".equals(raw) ||
                 "bibtex:other".equals(raw)) {
-            EntryType tp = EntryTypes.getType(local);
-            b.setType(tp);
+            b.setType(local);
         }
         currentChars = "";
     }
@@ -105,7 +97,6 @@ class BibTeXMLHandler extends DefaultHandler {
             bibitems.add(b);
         } else if (raw.startsWith("bibtex:")) {
             b.setField(local, currentChars);
-            // Util.pr(local+ " "+currentChars);
         }
         currentChars = "";
     }

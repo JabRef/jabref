@@ -26,6 +26,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 public class SpecialFieldsUtils {
 
+    private static final String KEYWORDS_FIELD = "keywords";
     public static final String FIELDNAME_PRIORITY = "priority";
     public static final String FIELDNAME_RANKING = "ranking";
     public static final String FIELDNAME_RELEVANCE = "relevance";
@@ -111,13 +112,11 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
-        String oldValue = be.getField("keywords");
+        String oldValue = be.getField(KEYWORDS_FIELD);
         be.putKeywords(keywordList);
-        String updatedValue = be.getField("keywords");
-        if ((oldValue == null) || !oldValue.equals(updatedValue)) {
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(be, "keywords", oldValue, updatedValue));
-            }
+        String updatedValue = be.getField(KEYWORDS_FIELD);
+        if (((oldValue == null) || !oldValue.equals(updatedValue)) && (ce != null)) {
+            ce.addEdit(new UndoableFieldChange(be, KEYWORDS_FIELD, oldValue, updatedValue));
         }
 
     }
@@ -146,7 +145,7 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        Util.updateField(be, c.getFieldName(), newValue, nc);
+        Util.updateNonDisplayableField(be, c.getFieldName(), newValue, nc);
     }
 
     /**
@@ -155,11 +154,11 @@ public class SpecialFieldsUtils {
      * @param ce indicates the undo named compound. May be null
      */
     public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
-        if (be.getField("keywords") == null) {
+        if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
         List<String> keywordList = net.sf.jabref.model.entry.EntryUtil
-                .getSeparatedKeywords(be.getField("keywords"));
+                .getSeparatedKeywords(be.getField(KEYWORDS_FIELD));
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);

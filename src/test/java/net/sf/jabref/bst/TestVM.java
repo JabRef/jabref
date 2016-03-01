@@ -19,7 +19,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 public class TestVM {
 
@@ -32,7 +31,7 @@ public class TestVM {
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
         VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -43,14 +42,14 @@ public class TestVM {
     @Test
     public void testVMSimple() throws RecognitionException, IOException {
 
-        VM vm = new VM("" + "ENTRY  { " + "  address " + "  author " + "  title " + "  type "
+        VM vm = new VM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
                 + "}  {}  { label }" + "INTEGERS { output.state before.all"
                 + " mid.sentence after.sentence after.block }"
                 + "FUNCTION {init.state.consts}{ #0 'before.all := "
                 + " #1 'mid.sentence :=  #2 'after.sentence :=  #3 'after.block := } "
                 + "STRINGS { s t } " + "READ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
         vm.run(v);
@@ -66,11 +65,11 @@ public class TestVM {
     @Test
     public void testLabel() throws RecognitionException, IOException {
 
-        VM vm = new VM("" + "ENTRY  { title }  {}  { label } "
+        VM vm = new VM("ENTRY  { title }  {}  { label } "
                 + "FUNCTION { test } { label #0 = title 'label := #5 label #6 pop$ } " + "READ "
                 + "ITERATE { test }");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
         vm.run(v);
@@ -85,7 +84,7 @@ public class TestVM {
 
         VM vm = new VM("FUNCTION {a}{ quote$ quote$ * } EXECUTE {a}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals("\"\"", vm.getStack().pop());
@@ -96,7 +95,7 @@ public class TestVM {
 
         VM vm = new VM("FUNCTION {init.state.consts}{ #0 'before.all := } ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals(38, vm.getFunctions().size());
@@ -111,19 +110,19 @@ public class TestVM {
     public void testVMExecuteSimple() throws RecognitionException {
 
         {
-            VM vm = new VM("" + "INTEGERS { variable.a } "
+            VM vm = new VM("INTEGERS { variable.a } "
                     + "FUNCTION {init.state.consts}{ #5 'variable.a := } "
                     + "EXECUTE {init.state.consts}");
 
-            Vector<BibEntry> v = new Vector<>();
+            List<BibEntry> v = new ArrayList<>();
             vm.run(v);
-            Assert.assertEquals(new Integer(5), vm.getIntegers().get("variable.a"));
+            Assert.assertEquals(Integer.valueOf(5), vm.getIntegers().get("variable.a"));
         }
         VM vm = new VM("FUNCTION {a}{ #5 #5 = " + "#1 #2 = " + "#3 #4 < " + "#4 #3 < "
                 + "#4 #4 < " + "#3 #4 > " + "#4 #3 > " + "#4 #4 > " + "\"H\" \"H\" = "
                 + "\"H\" \"Ha\" = } " + "EXECUTE {a}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals(VM.FALSE, vm.getStack().pop());
@@ -147,7 +146,7 @@ public class TestVM {
                 + "#1 #1 and #0 #1 and #1 #0 and #0 #0 and " + "#0 not #1 not "
                 + "#1 #1 or #0 #1 or #1 #0 or #0 #0 or }" + "EXECUTE {test}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals(VM.FALSE, vm.getStack().pop());
         Assert.assertEquals(VM.TRUE, vm.getStack().pop());
@@ -167,7 +166,7 @@ public class TestVM {
         {
             VM vm = new VM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
 
-            Vector<BibEntry> v = new Vector<>();
+            List<BibEntry> v = new ArrayList<>();
             vm.run(v);
             Assert.assertEquals(3, vm.getStack().pop());
             Assert.assertEquals(2, vm.getStack().pop());
@@ -175,7 +174,7 @@ public class TestVM {
         }
         VM vm = new VM("FUNCTION {test} { " + "#1 \"HELLO\" + #5 #2 - }" + "EXECUTE {test}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
 
         try {
             vm.run(v);
@@ -191,7 +190,7 @@ public class TestVM {
             VM vm = new VM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }"
                     + "EXECUTE {test}");
 
-            Vector<BibEntry> v = new Vector<>();
+            List<BibEntry> v = new ArrayList<>();
             vm.run(v);
             Assert.assertEquals(2, vm.getStack().pop());
             Assert.assertEquals(0, vm.getStack().size());
@@ -199,7 +198,7 @@ public class TestVM {
         VM vm = new VM("FUNCTION {test} { \"Johnny Foo { and } Mary Bar\" num.names$ }"
                 + "EXECUTE {test}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals(1, vm.getStack().pop());
         Assert.assertEquals(0, vm.getStack().size());
@@ -214,7 +213,7 @@ public class TestVM {
                         + "EXECUTE {test}"
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals("Johnny.}", vm.getStack().pop());
         Assert.assertEquals("Johnny?}", vm.getStack().pop());
@@ -243,7 +242,7 @@ public class TestVM {
 
         "} EXECUTE {test} ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals("78", vm.getStack().pop());
         Assert.assertEquals("789", vm.getStack().pop());
@@ -266,7 +265,7 @@ public class TestVM {
         " title empty$ " + // FALSE
         " \" HALLO \" empty$ } ITERATE {test} ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
         vm.run(v);
         Assert.assertEquals(VM.FALSE, vm.getStack().pop());
@@ -283,7 +282,7 @@ public class TestVM {
                 + "  { \"{\\em \" swap$ * \"}\" * } " + "  if$ " + "} " + "FUNCTION {test} {"
                 + "  \"\" emphasize " + "  \"Hello\" emphasize " + "}" + "EXECUTE {test} ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals("{\\em Hello}", vm.getStack().pop());
         Assert.assertEquals("", vm.getStack().pop());
@@ -309,7 +308,7 @@ public class TestVM {
                         + "}" + "EXECUTE {test} "
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals(
                 "{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
@@ -330,7 +329,7 @@ public class TestVM {
                 + "  \"{\\And this too\" text.length$ " + "  \"These are {\\11}\" text.length$ " + "} "
                 + "EXECUTE {test} ");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals(11, vm.getStack().pop());
         Assert.assertEquals(1, vm.getStack().pop());
@@ -347,7 +346,7 @@ public class TestVM {
     public void testVMIntToStr() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { #3 int.to.str$ #9999 int.to.str$}" + "EXECUTE {test}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals("9999", vm.getStack().pop());
         Assert.assertEquals("3", vm.getStack().pop());
@@ -359,14 +358,14 @@ public class TestVM {
         {
             VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
 
-            Vector<BibEntry> v = new Vector<>();
+            List<BibEntry> v = new ArrayList<>();
             vm.run(v);
             Assert.assertEquals(72, vm.getStack().pop());
             Assert.assertEquals(0, vm.getStack().size());
         }
         VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ int.to.chr$ }" + "EXECUTE {test}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
         Assert.assertEquals("H", vm.getStack().pop());
         Assert.assertEquals(0, vm.getStack().size());
@@ -375,7 +374,7 @@ public class TestVM {
     @Test
     public void testSort() throws RecognitionException, IOException {
 
-        VM vm = new VM("" + "ENTRY  { title }  { }  { label }"
+        VM vm = new VM("ENTRY  { title }  { }  { label }"
                 + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT");
 
         List<BibEntry> v = new ArrayList<>();
@@ -396,7 +395,7 @@ public class TestVM {
     public void testBuildIn() throws RecognitionException {
         VM vm = new VM("EXECUTE {global.max$}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals(Integer.MAX_VALUE, vm.getStack().pop());
@@ -411,7 +410,7 @@ public class TestVM {
                 + " FUNCTION {n.dashify} { \"HELLO-WORLD\" 't := t empty$ not } "
                 + " EXECUTE {n.dashify}                    ");
 
-        vm.run(new Vector<>());
+        vm.run(new ArrayList<>());
 
         Assert.assertEquals(VM.TRUE, vm.getStack().pop());
     }
@@ -451,7 +450,7 @@ public class TestVM {
                         + " EXECUTE {n.dashify} "
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals(1, vm.getStack().size());
@@ -461,13 +460,11 @@ public class TestVM {
     @Test
     public void testType() throws RecognitionException, IOException {
 
-        VM vm = new VM(
-                ""
-                        + "ENTRY  { title }  { }  { label }"
+        VM vm = new VM("ENTRY  { title }  { }  { label }"
                         + "FUNCTION {presort} { cite$ 'sort.key$ := } ITERATE { presort } SORT FUNCTION {test} { type$ } ITERATE { test }"
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{a, author=\"AAA\"}"));
         v.add(TestVM.bibtexString2BibtexEntry("@book{b, author=\"BBB\"}"));
         v.add(TestVM.bibtexString2BibtexEntry("@misc{c, author=\"CCC\"}"));
@@ -475,10 +472,10 @@ public class TestVM {
         vm.run(v);
 
         Assert.assertEquals(4, vm.getStack().size());
-        Assert.assertEquals("InProceedings", vm.getStack().pop());
-        Assert.assertEquals("Misc", vm.getStack().pop());
-        Assert.assertEquals("Book", vm.getStack().pop());
-        Assert.assertEquals("Article", vm.getStack().pop());
+        Assert.assertEquals("inproceedings", vm.getStack().pop());
+        Assert.assertEquals("misc", vm.getStack().pop());
+        Assert.assertEquals("book", vm.getStack().pop());
+        Assert.assertEquals("article", vm.getStack().pop());
     }
 
     @Test
@@ -493,7 +490,7 @@ public class TestVM {
                 "ITERATE  { test }"
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
         v.add(TestVM.bibtexString2BibtexEntry("@article{test, author=\"No title\"}"));
         vm.run(v);
@@ -514,7 +511,7 @@ public class TestVM {
                             + "EXECUTE {format}"
                     );
 
-            Vector<BibEntry> v = new Vector<>();
+            List<BibEntry> v = new ArrayList<>();
             vm.run(v);
             Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
             Assert.assertEquals(0, vm.getStack().size());
@@ -524,7 +521,7 @@ public class TestVM {
                 + "SORT " + "FUNCTION {format}{ author #2 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
                 + "ITERATE {format}");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
         v
                 .add(TestVM.bibtexString2BibtexEntry("@book{test, author=\"Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\"}"));
@@ -543,7 +540,7 @@ public class TestVM {
                         + "FUNCTION {book}{ \"Book called on \" title * } " + " ITERATE { call.type$ }"
                 );
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
         v.add(TestVM.bibtexString2BibtexEntry("@book{test, title=\"Test\"}"));
         vm.run(v);
@@ -560,10 +557,10 @@ public class TestVM {
     @Test
     public void testIterate() throws RecognitionException, IOException {
 
-        VM vm = new VM("" + "ENTRY  { " + "  address " + "  author " + "  title " + "  type "
+        VM vm = new VM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
                 + "}  {}  { label } " + "FUNCTION {test}{ cite$ } " + "READ " + "ITERATE { test }");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
         v.add(TestVM.bibtexString2BibtexEntry("@article{test, title=\"BLA\"}"));
@@ -575,7 +572,7 @@ public class TestVM {
         String s1 = (String) vm.getStack().pop();
         String s2 = (String) vm.getStack().pop();
 
-        if (s1.equals("canh05")) {
+        if ("canh05".equals(s1)) {
             Assert.assertEquals("test", s2);
         } else {
             Assert.assertEquals("canh05", s2);
@@ -617,10 +614,9 @@ public class TestVM {
                 "  if$" + //
                 "  \"\\begin{thebibliography}{\"  longest.label  * \"}\" *" + //
                 "}" + //
-                "EXECUTE {begin.bib}" + //
-                "");//
+                "EXECUTE {begin.bib}");//
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
         vm.run(v);
@@ -634,7 +630,7 @@ public class TestVM {
 
         VM vm = new VM("FUNCTION {a}{ #3 \"Hallo\" swap$ } EXECUTE { a }");
 
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         vm.run(v);
 
         Assert.assertEquals(2, vm.getStack().size());
@@ -650,7 +646,7 @@ public class TestVM {
     }
 
     /* TEST DATA */
-    String t1BibtexString() {
+    private String t1BibtexString() {
         return "@inproceedings{canh05,\n"
                 + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
                 + "  title = {Effective work practices for floss development: A model and propositions},\n"
@@ -662,12 +658,12 @@ public class TestVM {
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
         VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
-        Vector<BibEntry> v = new Vector<>();
+        List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
         Assert.assertTrue(vm.run(v).contains("J.-P. Sartre"));
     }
 
-    BibEntry t1BibtexEntry() throws IOException {
+    private BibEntry t1BibtexEntry() throws IOException {
         return TestVM.bibtexString2BibtexEntry(t1BibtexString());
     }
 

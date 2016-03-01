@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.google.common.base.Strings;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibEntry {
@@ -46,12 +46,11 @@ public class BibEntry {
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
-    private static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "id";
+    public static final String DEFAULT_TYPE = "misc";
 
     private String id;
-
-    private EntryType type;
-
+    private String type;
     private Map<String, String> fields = new HashMap<>();
 
     private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
@@ -68,38 +67,20 @@ public class BibEntry {
      */
     private boolean changed;
 
-
     public BibEntry() {
         this(IdGenerator.next());
     }
 
     public BibEntry(String id) {
-        this(id, EntryTypes.getTypeOrDefault("misc"));
+        this(id, DEFAULT_TYPE);
     }
 
-    public BibEntry(String id, EntryType type) {
+    public BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
         changed = true;
         setType(type);
-    }
-
-    /**
-     * @return An array describing the optional fields for this entry. "null" if no fields are required
-     */
-    public List<String> getOptionalFields() {
-        return type.getOptionalFields();
-    }
-
-    /**
-     * Returns all required field names.
-     * No OR relationships are captured here.
-     *
-     * @return a List of required field name Strings
-     */
-    public List<String> getRequiredFieldsFlat() {
-        return type.getRequiredFieldsFlat();
     }
 
     /**
@@ -113,27 +94,22 @@ public class BibEntry {
     }
 
     /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
-     */
-    public boolean hasAllRequiredFields(BibDatabase database) {
-        return allFieldsPresent(type.getRequiredFields(), database);
-    }
-
-    /**
      * Returns this entry's type.
      */
-    public EntryType getType() {
+    public String getType() {
         return type;
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        Objects.requireNonNull(type, "Every BibEntry must have a type.");
+    public void setType(String type) {
+        if(type == null) {
+            type = DEFAULT_TYPE;
+        }
 
-        EntryType oldType = this.type;
+        String oldType = this.type;
+        type = type.toLowerCase();
 
         try {
             // We set the type before throwing the changeEvent, to enable
@@ -141,11 +117,18 @@ public class BibEntry {
             // sets off a change in database sorting etc.
             this.type = type;
             changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType != null ? oldType.getName() : null, type.getName());
+            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType, type);
         } catch (PropertyVetoException pve) {
-            pve.printStackTrace();
+            LOGGER.warn(pve);
         }
 
+    }
+
+    /**
+     * Sets this entry's type.
+     */
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -177,6 +160,20 @@ public class BibEntry {
      */
     public String getField(String name) {
         return fields.get(normalizeFieldName(name));
+    }
+
+    /**
+     * Returns the contents of the given field as an Optional.
+     */
+    public Optional<String> getFieldOptional(String name) {
+        return Optional.ofNullable(fields.get(normalizeFieldName(name)));
+    }
+
+    /**
+     * Returns true if the entry has the given field, or false if it is not set.
+     */
+    public boolean hasField(String name) {
+        return fields.containsKey(normalizeFieldName(name));
     }
 
     private String normalizeFieldName(String fieldName) {
@@ -222,7 +219,7 @@ public class BibEntry {
         }
 
         // Finally, handle dates
-        if (name.equals("date")) {
+        if ("date".equals(name)) {
             String year = getField("year");
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
             if (year != null) {
@@ -233,7 +230,7 @@ public class BibEntry {
                 }
             }
         }
-        if (name.equals("year") || name.equals("month")) {
+        if ("year".equals(name) || "month".equals(name)) {
             String date = getField("date");
             if (date == null) {
                 return null;
@@ -266,10 +263,10 @@ public class BibEntry {
                 Date parsedDate = df.parse(date);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
-                if (name.equals("year")) {
+                if ("year".equals(name)) {
                     return Integer.toString(calendar.get(Calendar.YEAR));
                 }
-                if (name.equals("month")) {
+                if ("month".equals(name)) {
                     return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
@@ -280,7 +277,7 @@ public class BibEntry {
                     Date parsedDate = df.parse(date);
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
-                    if (name.equals("year")) {
+                    if ("year".equals(name)) {
                         return Integer.toString(calendar.get(Calendar.YEAR));
                     }
                 } catch (ParseException e2) {
@@ -385,7 +382,7 @@ public class BibEntry {
      *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
-    boolean allFieldsPresent(String[] allFields, BibDatabase database) {
+    public boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
         final String orSeparator = "/";
 
         for (String field : allFields) {
@@ -404,10 +401,6 @@ public class BibEntry {
             }
         }
         return true;
-    }
-
-    boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
-        return allFieldsPresent(allFields.toArray(new String[allFields.size()]), database);
     }
 
     private boolean atLeastOnePresent(String[] fieldsToCheck, BibDatabase database) {
@@ -487,13 +480,9 @@ public class BibEntry {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField("author"), getField("title"), getField("year")};
+        String[] s = new String[] {getFieldOptional("author").orElse("N/A"), getFieldOptional("title").orElse("N/A"),
+                getFieldOptional("year").orElse("N/A")};
 
-        for (int i = 0; i < s.length; ++i) {
-            if (s[i] == null) {
-                s[i] = "N/A";
-            }
-        }
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
@@ -504,21 +493,17 @@ public class BibEntry {
     /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
-     * @param entry
      * @return will return the publication date of the entry or null if no year was found.
      */
     public String getPublicationDate() {
-
-        Object o = getField("year");
-        if (o == null) {
+        if (!hasField("year")) {
             return null;
         }
 
-        String year = YearUtil.toFourDigitYear(o.toString());
+        String year = YearUtil.toFourDigitYear(getField("year"));
 
-        o = getField("month");
-        if (o != null) {
-            MonthUtil.Month month = MonthUtil.getMonth(o.toString());
+        if (hasField("month")) {
+            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
             if (month.isValid()) {
                 return year + "-" + month.twoDigitNumber;
             }
@@ -540,15 +525,19 @@ public class BibEntry {
         return changed;
     }
 
+    public void setChanged(boolean changed) {
+        this.changed = changed;
+    }
+
     public void putKeywords(List<String> keywords) {
         Objects.requireNonNull(keywords);
         // Set Keyword Field
         String oldValue = this.getField("keywords");
         String newValue;
-        if (!keywords.isEmpty()) {
-            newValue = String.join(", ", keywords);
-        } else {
+        if (keywords.isEmpty()) {
             newValue = null;
+        } else {
+            newValue = String.join(", ", keywords);
         }
         if ((oldValue == null) && (newValue == null)) {
             return;
@@ -566,12 +555,12 @@ public class BibEntry {
     public void addKeyword(String keyword) {
         Objects.requireNonNull(keyword, "keyword must not be empty");
 
-        List<String> keywords = this.getSeparatedKeywords();
-        Boolean duplicate = false;
-
         if (keyword.isEmpty()) {
             return;
         }
+
+        List<String> keywords = this.getSeparatedKeywords();
+        Boolean duplicate = false;
 
         for (String key : keywords) {
             if (keyword.equalsIgnoreCase(key)) {
@@ -592,10 +581,10 @@ public class BibEntry {
      * @param keywords Keywords to add
      */
     public void addKeywords(List<String> keywords) {
-        if (keywords != null) {
-            for (String keyword : keywords) {
-                this.addKeyword(keyword);
-            }
+        Objects.requireNonNull(keywords);
+
+        for (String keyword : keywords) {
+            this.addKeyword(keyword);
         }
     }
 

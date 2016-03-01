@@ -83,13 +83,11 @@ class SearchWorker extends AbstractWorker {
 
         // select first match (i.e., row) if there is any
         int hits = this.matchedEntries.size();
-        if (hits > 0) {
-            if (basePanel.mainTable.getRowCount() > 0) {
-                basePanel.mainTable.setSelected(0);
-            }
+        if ((hits > 0) && (basePanel.mainTable.getRowCount() > 0)) {
+            basePanel.mainTable.setSelected(0);
         }
 
-        basePanel.getSearchBar().updateResults(hits, searchQuery.description, searchQuery.isGrammarBasedSearch());
+        basePanel.getSearchBar().updateResults(hits, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
         basePanel.getSearchBar().getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 

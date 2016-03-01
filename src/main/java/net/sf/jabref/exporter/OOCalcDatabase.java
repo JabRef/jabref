@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,17 +17,18 @@ package net.sf.jabref.exporter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.exporter.layout.format.GetOpenOfficeType;
-import net.sf.jabref.exporter.layout.format.RemoveBrackets;
-import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.layout.format.GetOpenOfficeType;
+import net.sf.jabref.logic.layout.format.RemoveBrackets;
+import net.sf.jabref.logic.layout.format.RemoveWhitespace;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -36,9 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
-
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.SortedList;
 
 /**
  * @author Morten O. Alver.
@@ -59,7 +57,7 @@ class OOCalcDatabase {
         comparators.add(new FieldComparator("year"));
         comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
-        BasicEventList<BibEntry> entryList = new BasicEventList<>();
+        List<BibEntry> entryList = new ArrayList<>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
         if (keySet == null) {
@@ -69,7 +67,8 @@ class OOCalcDatabase {
                 entryList.add(bibtex.getEntryById(key));
             }
         }
-        entries = new SortedList<>(entryList, new FieldComparatorStack<>(comparators));
+        Collections.sort(entryList, new FieldComparatorStack<>(comparators));
+        entries = entryList;
     }
 
     public Document getDOMrepresentation() {
@@ -159,7 +158,7 @@ class OOCalcDatabase {
 
             for (BibEntry e : entries) {
                 row = result.createElement("table:table-row");
-                addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
+                addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
                 addTableCell(result, row, getField(e, "isbn"));
                 addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
@@ -212,8 +211,7 @@ class OOCalcDatabase {
     }
 
     private static String getField(BibEntry e, String field) {
-        Object o = e.getField(field);
-        return o == null ? "" : o.toString();
+        return e.getFieldOptional(field).orElse("");
     }
 
     private static void addTableCell(Document doc, Element parent, String content) {

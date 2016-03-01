@@ -33,6 +33,9 @@ public class FileBasedTestHelper {
     public static File createTempDir(String prefix, File directory) {
         try {
             File tempFile = File.createTempFile(prefix, "", directory);
+            if(tempFile == null) {
+                return null;
+            }
 
             if (!tempFile.delete()) {
                 return null;
@@ -68,6 +71,8 @@ public class FileBasedTestHelper {
                 }
             }
         }
-        file.delete();
+        if (!file.delete()) {
+            System.err.println("Cannot delete file");
+        }
     }
 }

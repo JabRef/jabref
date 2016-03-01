@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -74,11 +75,12 @@ public class AppendDatabaseAction implements BaseAction {
         PositionWindow.placeDialog(md, panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            String[] chosen = FileDialogs.getMultipleFiles(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+            List<String> chosen = FileDialogs.getMultipleFiles(frame,
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
                     null, false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
-            if (chosen == null) {
+            if (chosen.isEmpty()) {
                 return;
             }
             for (String aChosen : chosen) {
@@ -115,11 +117,9 @@ public class AppendDatabaseAction implements BaseAction {
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
-            } catch (Throwable ex) {
+            } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog
-                (panel, ex.getMessage(),
- Localization.lang("Open database"),
+                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open database"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -172,9 +172,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
-                    for (BibEntry appendedEntry : appendedEntries) {
-                        group.addEntry(appendedEntry);
-                    }
+                    appendedEntries.stream().map(group::addEntry);
                 }
 
                 // groupsSelector is always created, even when no groups
@@ -210,7 +208,7 @@ public class AppendDatabaseAction implements BaseAction {
         if (importSelectorWords) {
             for (String s : meta) {
                 if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-                    panel.metaData().putData(s, meta.getData(s));
+                    panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
                 }
             }
         }

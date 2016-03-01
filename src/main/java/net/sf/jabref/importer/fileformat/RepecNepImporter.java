@@ -26,7 +26,6 @@ import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
@@ -284,18 +283,23 @@ public class RepecNepImporter extends ImportFormat {
      */
     private void parseAuthors(BibEntry be) throws IOException {
         // read authors and institutions
-        String authors = "";
-        String institutions = "";
+        List<String> authors = new ArrayList<>();
+        StringBuffer institutions = new StringBuffer();
         while ((this.lastLine != null) && !"".equals(this.lastLine) && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
 
             // read single author
             String author;
-            String institution = null;
+            StringBuffer institution = new StringBuffer();
             boolean institutionDone;
             if (this.lastLine.indexOf('(') >= 0) {
                 author = this.lastLine.substring(0, this.lastLine.indexOf('(')).trim();
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution = this.lastLine.substring(this.lastLine.indexOf('(') + 1, institutionDone && (this.lastLine.indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution
+                        .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
+                                institutionDone && (this.lastLine
+                                        .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
+                                                .indexOf(')') : this.lastLine.length())
+                                .trim());
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
                 institutionDone = true;
@@ -304,23 +308,24 @@ public class RepecNepImporter extends ImportFormat {
             readLine();
             while (!institutionDone && (this.lastLine != null)) {
                 institutionDone = this.lastLine.indexOf(')') > 0;
-                institution += this.lastLine.substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim();
+                institution.append(this.lastLine
+                        .substring(0, institutionDone ? this.lastLine.indexOf(')') : this.lastLine.length()).trim());
                 readLine();
             }
 
-            if (author != null) {
-                authors += "".equals(authors) ? author : " and " + author;
-            }
-            if (institution != null) {
-                institutions += "".equals(institutions) ? institution : " and " + institution;
+            authors.add(author);
+
+            if (institution.length() > 0) {
+                institutions.append(
+                        (institutions.length() == 0) ? institution.toString() : " and " + institution.toString());
             }
         }
 
-        if (!"".equals(authors)) {
-            be.setField("author", authors);
+        if (!authors.isEmpty()) {
+            be.setField("author", String.join(" and ", authors));
         }
-        if (!"".equals(institutions)) {
-            be.setField("institution", institutions);
+        if (institutions.length() > 0) {
+            be.setField("institution", institutions.toString());
         }
     }
 
@@ -386,7 +391,10 @@ public class RepecNepImporter extends ImportFormat {
                 cal.setTime(date == null ? new Date() : date);
                 be.setField("year", String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH)));
+                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH) + 1));
+                }
+                if ((date != null) && recognizedDateFormats[i - 1].contains("dd")) {
+                    be.setField("day", String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
                 }
 
                 // parse URL field
@@ -439,7 +447,7 @@ public class RepecNepImporter extends ImportFormat {
                 }
                 if (isStartOfWorkingPaper()) {
                     BibEntry be = new BibEntry(IdGenerator.next());
-                    be.setType(EntryTypes.getType("techreport"));
+                    be.setType("techreport");
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
                     parseTitleString(be);
                     if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2015 JabRef contributors.
+/*  Copyright (C) 2015-2016 JabRef contributors.
     Copyright (C) 2011 Sascha Hunold.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 
 public class DBLPFetcher implements EntryFetcher {
 
@@ -63,29 +63,29 @@ public class DBLPFetcher implements EntryFetcher {
 
         shouldContinue = true;
 
+        // we save the duplicate check threshold
+        // we need to overcome the "smart" approach of this heuristic
+        // and we will set it back afterwards, so maybe someone is happy again
+        double saveThreshold = DuplicateCheck.duplicateThreshold;
+
         try {
 
             String address = makeSearchURL();
-            //System.out.println(address);
             URL url = new URL(address);
-            String page = Util.getResults(url);
+            URLDownload dl = new URLDownload(url);
 
-            //System.out.println(page);
+            String page = dl.downloadToString();
+
             String[] lines = page.split("\n");
             List<String> bibtexUrlList = new ArrayList<>();
             for (final String line : lines) {
                 if (line.startsWith("\"url\"")) {
                     String addr = line.replace("\"url\":\"", "");
                     addr = addr.substring(0, addr.length() - 2);
-                    //System.out.println("key address: " + addr);
                     bibtexUrlList.add(addr);
                 }
             }
 
-            // we save the duplicate check threshold
-            // we need to overcome the "smart" approach of this heuristic
-            // and we will set it back afterwards, so maybe someone is happy again
-            double saveThreshold = DuplicateCheck.duplicateThreshold;
             DuplicateCheck.duplicateThreshold = Double.MAX_VALUE;
 
             // 2014-11-08
@@ -102,7 +102,7 @@ public class DBLPFetcher implements EntryFetcher {
 
                 final URL bibUrl = new URL(urlStr);
 
-                final String bibtexHTMLPage = Util.getResults(bibUrl);
+                final String bibtexHTMLPage = new URLDownload(bibUrl).downloadToString();
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
@@ -110,15 +110,14 @@ public class DBLPFetcher implements EntryFetcher {
                     if (line.contains("biburl")) {
                         int sidx = line.indexOf('{');
                         int eidx = line.indexOf('}');
-                        // now we take everything within the curley braces
+                        // now we take everything within the curly braces
                         String bibtexUrl = line.substring(sidx + 1, eidx);
 
                         // we do not access dblp.uni-trier.de as they will complain
                         bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
 
                         final URL bibFileURL = new URL(bibtexUrl);
-                        //System.out.println("URL:|"+bibtexUrl+"|");
-                        final String bibtexPage = Util.getResults(bibFileURL);
+                        final String bibtexPage = new URLDownload(bibFileURL).downloadToString();
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
@@ -138,7 +137,6 @@ public class DBLPFetcher implements EntryFetcher {
                 count++;
             }
 
-            DuplicateCheck.duplicateThreshold = saveThreshold;
 
             // everything went smooth
             res = true;
@@ -146,6 +144,9 @@ public class DBLPFetcher implements EntryFetcher {
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
             status.showMessage(e.getMessage());
+        } finally {
+            // Restore the threshold
+            DuplicateCheck.duplicateThreshold = saveThreshold;
         }
 
         return res;

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -39,8 +38,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
 
@@ -72,7 +71,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "DOItoBibTeXHelp.html";
+        return "DOItoBibTeXHelp";
     }
 
     @Override
@@ -89,6 +88,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             status.showMessage(Localization.lang("Invalid DOI: '%0'.", doiStr),
                     Localization.lang("Get BibTeX entry from DOI"),
                     JOptionPane.INFORMATION_MESSAGE);
+            LOGGER.warn("Invalid DOI", e);
             return null;
         }
 
@@ -108,26 +108,18 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             return null;
         }
 
-        URLConnection conn;
+        String bibtexString = "";
         try {
-            conn = url.openConnection();
-        } catch (IOException e) {
-            LOGGER.warn("Could not open URL connection", e);
-            return null;
-        }
-
-        conn.setRequestProperty("Accept", "application/x-bibtex");
-
-        String bibtexString;
-        try {
-            bibtexString = Util.getResultsWithEncoding(conn, StandardCharsets.UTF_8);
+            URLDownload dl = new URLDownload(url);
+            dl.addParameters("Accept", "application/x-bibtex");
+            bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
-
             if (status != null) {
                 status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
                         Localization.lang("Get BibTeX entry from DOI"),
                         JOptionPane.INFORMATION_MESSAGE);
             }
+            LOGGER.debug("Unknown DOI", e);
             return null;
         } catch (IOException e) {
             LOGGER.warn("Communication problems", e);
@@ -141,9 +133,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
         if (entry != null) {
             // Optionally add curly brackets around key words to keep the case
-            String title = entry.getField("title");
-            if (title != null) {
-
+            entry.getFieldOptional("title").ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitFormatter.format(title);
@@ -154,7 +144,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
                     title = caseKeeper.format(title);
                 }
                 entry.setField("title", title);
-            }
+            });
         }
         return entry;
     }

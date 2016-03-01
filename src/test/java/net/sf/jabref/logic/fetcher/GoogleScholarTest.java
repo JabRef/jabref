@@ -9,11 +9,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class GoogleScholarTest {
-    GoogleScholar finder;
-    BibEntry entry;
+
+    private GoogleScholar finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new GoogleScholar();
         entry = new BibEntry();
     }
@@ -21,6 +22,7 @@ public class GoogleScholarTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test

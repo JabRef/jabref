@@ -27,7 +27,10 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.GUIGlobals;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.fileformat.MedlineImporter;
 import net.sf.jabref.importer.OutputPrinter;
@@ -40,25 +43,16 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class MedlineFetcher implements EntryFetcher {
 
-    static class SearchResult {
+    private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
-        public int count;
+    private static final Pattern PART1_PATTERN = Pattern.compile(", ");
+    private static final Pattern PART2_PATTERN = Pattern.compile(",");
 
-        public int retmax;
+    private static final Pattern ID_PATTERN = Pattern.compile("<Id>(\\d+)</Id>");
+    private static final Pattern COUNT_PATTERN = Pattern.compile("<Count>(\\d+)<\\/Count>");
+    private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
+    private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
-        public int retstart;
-
-        public String ids = "";
-
-
-        public void addID(String id) {
-            if (ids.isEmpty()) {
-                ids = id;
-            } else {
-                ids += "," + id;
-            }
-        }
-    }
 
 
     /**
@@ -67,25 +61,16 @@ public class MedlineFetcher implements EntryFetcher {
     private static final int PACING = 20;
 
     private boolean shouldContinue;
-
-    OutputPrinter frame;
-
-    ImportInspector dialog;
-
-
     private static String toSearchTerm(String in) {
-        Pattern part1 = Pattern.compile(", ");
-        Pattern part2 = Pattern.compile(",");
-        Pattern part3 = Pattern.compile(" ");
+        // This can probably be simplified using simple String.replace()...
+        String result = in;
         Matcher matcher;
-        matcher = part1.matcher(in);
-        in = matcher.replaceAll("\\+AND\\+");
-        matcher = part2.matcher(in);
-        in = matcher.replaceAll("\\+AND\\+");
-        matcher = part3.matcher(in);
-        in = matcher.replaceAll("+");
-
-        return in;
+        matcher = PART1_PATTERN.matcher(result);
+        result = matcher.replaceAll("\\+AND\\+");
+        matcher = PART2_PATTERN.matcher(result);
+        result = matcher.replaceAll("\\+AND\\+");
+        result = result.replace(" ", "+");
+        return result;
     }
 
     /**
@@ -97,10 +82,6 @@ public class MedlineFetcher implements EntryFetcher {
         String medlineUrl = baseUrl + "/esearch.fcgi?db=pubmed&retmax=" + Integer.toString(pacing) +
                 "&retstart=" + Integer.toString(start) + "&term=";
 
-        Pattern idPattern = Pattern.compile("<Id>(\\d+)</Id>");
-        Pattern countPattern = Pattern.compile("<Count>(\\d+)<\\/Count>");
-        Pattern retMaxPattern = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
-        Pattern retStartPattern = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
         boolean doCount = true;
         SearchResult result = new SearchResult();
@@ -112,31 +93,28 @@ public class MedlineFetcher implements EntryFetcher {
             while ((inLine = in.readLine()) != null) {
 
                 // get the count
-                Matcher idMatcher = idPattern.matcher(inLine);
+                Matcher idMatcher = ID_PATTERN.matcher(inLine);
                 if (idMatcher.find()) {
                     result.addID(idMatcher.group(1));
                 }
-                Matcher retMaxMatcher = retMaxPattern.matcher(inLine);
+                Matcher retMaxMatcher = RET_MAX_PATTERN.matcher(inLine);
                 if (retMaxMatcher.find()) {
                     result.retmax = Integer.parseInt(retMaxMatcher.group(1));
                 }
-                Matcher retStartMatcher = retStartPattern.matcher(inLine);
+                Matcher retStartMatcher = RET_START_PATTERN.matcher(inLine);
                 if (retStartMatcher.find()) {
                     result.retstart = Integer.parseInt(retStartMatcher.group(1));
                 }
-                Matcher countMatcher = countPattern.matcher(inLine);
+                Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
                 if (doCount && countMatcher.find()) {
                     result.count = Integer.parseInt(countMatcher.group(1));
                     doCount = false;
                 }
             }
         } catch (MalformedURLException e) { // new URL() failed
-            System.out.println("bad url");
-            e.printStackTrace();
+            LOGGER.warn("Bad url", e);
         } catch (IOException e) { // openConnection() failed
-            System.out.println("connection failed");
-            e.printStackTrace();
-
+            LOGGER.warn("Connection failed", e);
         }
         return result;
     }
@@ -148,7 +126,7 @@ public class MedlineFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return GUIGlobals.medlineHelp;
+        return HelpFiles.medlineHelp;
     }
 
     @Override
@@ -167,12 +145,12 @@ public class MedlineFetcher implements EntryFetcher {
 
         shouldContinue = true;
 
-        query = query.trim().replace(';', ',');
+        String cleanQuery = query.trim().replace(';', ',');
 
-        if (query.matches("\\d+[,\\d+]*")) {
+        if (cleanQuery.matches("\\d+[,\\d+]*")) {
             frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-            List<BibEntry> bibs = MedlineImporter.fetchMedline(query, frameOP);
+            List<BibEntry> bibs = MedlineImporter.fetchMedline(cleanQuery, frameOP);
 
             if (bibs.isEmpty()) {
                 frameOP.showMessage(Localization.lang("No references found"));
@@ -214,7 +192,7 @@ public class MedlineFetcher implements EntryFetcher {
                     try {
                         numberToFetch = Integer.parseInt(strCount.trim());
                         break;
-                    } catch (RuntimeException ex) {
+                    } catch (NumberFormatException ex) {
                         frameOP.showMessage(Localization.lang("Please enter a valid number"));
                     }
                 }
@@ -243,4 +221,26 @@ public class MedlineFetcher implements EntryFetcher {
                 Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }
+
+
+    static class SearchResult {
+
+        public int count;
+
+        public int retmax;
+
+        public int retstart;
+
+        public String ids = "";
+
+
+        public void addID(String id) {
+            if (ids.isEmpty()) {
+                ids = id;
+            } else {
+                ids += "," + id;
+            }
+        }
+    }
+
 }

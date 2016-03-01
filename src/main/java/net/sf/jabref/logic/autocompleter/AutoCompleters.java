@@ -4,10 +4,11 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.HashMap;
+import java.util.Map;
 
 class AutoCompleters {
 
-    final HashMap<String, AutoCompleter<String>> autoCompleters = new HashMap<>();
+    protected final Map<String, AutoCompleter<String>> autoCompleters = new HashMap<>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
@@ -15,7 +16,7 @@ class AutoCompleters {
         return autoCompleters.get(fieldName);
     }
 
-    void addDatabase(BibDatabase database) {
+    protected void addDatabase(BibDatabase database) {
         for (BibEntry entry : database.getEntries()) {
             addEntry(entry);
         }
@@ -31,7 +32,7 @@ class AutoCompleters {
         }
     }
 
-    void put(String field, AutoCompleter<String> autoCompleter) {
+    protected void put(String field, AutoCompleter<String> autoCompleter) {
         autoCompleters.put(field, autoCompleter);
     }
 

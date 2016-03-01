@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
@@ -25,6 +26,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 
 /*
  * A transferable object containing an array of BibEntry objects. Used
@@ -32,12 +34,12 @@ import java.io.StringWriter;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private final BibEntry[] data;
+    private final List<BibEntry> data;
     public static final DataFlavor entryFlavor = new DataFlavor(BibEntry.class, "JabRef entry");
 
 
-    public TransferableBibtexEntry(BibEntry[] data) {
-        this.data = data;
+    public TransferableBibtexEntry(List<BibEntry> bes) {
+        this.data = bes;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class TransferableBibtexEntry implements Transferable {
                 StringWriter sw = new StringWriter();
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), false);
                 for (BibEntry entry : data) {
-                    bibtexEntryWriter.write(entry, sw);
+                    bibtexEntryWriter.write(entry, sw, BibDatabaseMode.BIBTEX);
                 }
                 return sw.toString();
             } catch (IOException ex) {

@@ -64,10 +64,10 @@ public class UrlDragDrop implements DropTargetListener {
     private final JabRefFrame frame;
 
 
-    public UrlDragDrop(final EntryEditor _editor, final JabRefFrame _frame, final FieldEditor _feditor) {
-        editor = _editor;
-        feditor = _feditor;
-        frame = _frame;
+    public UrlDragDrop(final EntryEditor editor, final JabRefFrame frame, final FieldEditor feditor) {
+        this.editor = editor;
+        this.feditor = feditor;
+        this.frame = frame;
     }
 
     /*
@@ -77,6 +77,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -86,6 +87,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -95,6 +97,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -104,6 +107,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragExit(DropTargetEvent dte) {
+        // Do nothing
     }
 
 
@@ -114,9 +118,9 @@ public class UrlDragDrop implements DropTargetListener {
         private final int id;
 
 
-        public JOptionChoice(final String _label, final int _id) {
-            label = _label;
-            id = _id;
+        public JOptionChoice(final String label, final int id) {
+            this.label = label;
+            this.id = id;
         }
 
         @Override
@@ -160,34 +164,36 @@ public class UrlDragDrop implements DropTargetListener {
                                     new JOptionChoice(
                                             Localization.lang("Download file"), 1)},
                             new JOptionChoice(Localization.lang("Insert URL"), 0));
-            switch (res.getId()) {
-            //insert URL
-            case 0:
-                feditor.setText(url.toString());
-                editor.updateField(feditor);
-                break;
-            //download file
-            case 1:
-                try {
-                    //auto filename:
-                    File file = new File(new File(Globals.prefs.get("pdfDirectory")),
-                            editor.getEntry().getCiteKey()
-                            + ".pdf");
-                    frame.output(Localization.lang("Downloading..."));
-                    MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
-                    frame.output(Localization.lang("Download completed"));
-                    feditor.setText(file.toURI().toURL().toString());
+            if (res != null) {
+                switch (res.getId()) {
+                //insert URL
+                case 0:
+                    feditor.setText(url.toString());
                     editor.updateField(feditor);
+                    break;
+                //download file
+                case 1:
+                    try {
+                        //auto filename:
+                        File file = new File(new File(Globals.prefs.get("pdfDirectory")),
+                                editor.getEntry().getCiteKey() + ".pdf");
+                        frame.output(Localization.lang("Downloading..."));
+                        MonitoredURLDownload.buildMonitoredDownload(editor, url).downloadToFile(file);
+                        frame.output(Localization.lang("Download completed"));
+                        feditor.setText(file.toURI().toURL().toString());
+                        editor.updateField(feditor);
 
-                } catch (IOException ioex) {
-                    LOGGER.error("Error while downloading file.", ioex);
-                    JOptionPane.showMessageDialog(editor,
-                            Localization.lang("File download"),
-                            Localization.lang("Error while downloading file:"
-                                    + ioex.getMessage()),
-                            JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ioex) {
+                        LOGGER.error("Error while downloading file.", ioex);
+                        JOptionPane.showMessageDialog(editor, Localization.lang("File download"),
+                                Localization.lang("Error while downloading file:" + ioex.getMessage()),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+                default:
+                    LOGGER.warn("Unknown selection (should not happen)");
+                    break;
                 }
-                break;
             }
             return;
         } catch (UnsupportedFlavorException nfe) {

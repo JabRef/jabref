@@ -15,12 +15,15 @@
 */
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.Globals;
+
+import java.util.List;
+
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.journals.Abbreviations;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Converts journal abbreviations back to full name for all selected entries.
@@ -42,12 +45,13 @@ public class UnabbreviateAction extends AbstractWorker {
 
     @Override
     public void run() {
-        BibEntry[] entries = panel.getSelectedEntries();
+        List<BibEntry> entries = panel.getSelectedEntries();
         if (entries == null) {
             return;
         }
 
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Abbreviations.journalAbbrev);
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(
+                Globals.journalAbbreviationLoader.getRepository());
 
         NamedCompound ce = new NamedCompound("Unabbreviate journal names");
         int count = 0;

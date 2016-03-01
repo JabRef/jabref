@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.*;
@@ -36,6 +35,9 @@ import net.sf.jabref.model.entry.*;
  * field "comment".
  */
 public class RisImporter extends ImportFormat {
+
+    private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
+
 
     /**
      * Return the name of this import format.
@@ -62,11 +64,10 @@ public class RisImporter extends ImportFormat {
 
         // Our strategy is to look for the "AU  - *" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        Pattern pat1 = Pattern.compile("TY  - .*");
 
         String str;
         while ((str = in.readLine()) != null) {
-            if (pat1.matcher(str).find()) {
+            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
@@ -88,7 +89,8 @@ public class RisImporter extends ImportFormat {
             sb.append(str);
             sb.append('\n');
         }
-        String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("ER  -.*\\n");
+        String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+                .split("ER  -.*\\n");
 
         for (String entry1 : entries) {
 
@@ -248,11 +250,11 @@ public class RisImporter extends ImportFormat {
                 }
                 // fix authors
                 if (!author.isEmpty()) {
-                    author = AuthorList.fixAuthor_lastNameFirst(author);
+                    author = AuthorList.fixAuthorLastNameFirst(author);
                     hm.put("author", author);
                 }
                 if (!editor.isEmpty()) {
-                    editor = AuthorList.fixAuthor_lastNameFirst(editor);
+                    editor = AuthorList.fixAuthorLastNameFirst(editor);
                     hm.put("editor", editor);
                 }
                 if (!comment.isEmpty()) {
@@ -261,8 +263,7 @@ public class RisImporter extends ImportFormat {
 
                 hm.put("pages", startPage + "--" + endPage);
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes
-                    .getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
             ArrayList<Object> toRemove = new ArrayList<>();

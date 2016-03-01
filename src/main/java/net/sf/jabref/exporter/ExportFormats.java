@@ -26,6 +26,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -41,6 +44,8 @@ import net.sf.jabref.model.entry.BibEntry;
  * Time: 9:35:08 PM
  */
 public class ExportFormats {
+
+    private static final Log LOGGER = LogFactory.getLog(ExportFormats.class);
 
     private static final Map<String, IExportFormat> EXPORT_FORMATS = new TreeMap<>();
 
@@ -197,7 +202,7 @@ public class ExportFormats {
                     final IExportFormat format = eff.getExportFormat();
                     Set<String> entryIds = null;
                     if (selectedOnly) {
-                        BibEntry[] selected = frame.getCurrentBasePanel().getSelectedEntries();
+                        List<BibEntry> selected = frame.getCurrentBasePanel().getSelectedEntries();
                         entryIds = new HashSet<>();
                         for (BibEntry bibtexEntry : selected) {
                             entryIds.add(bibtexEntry.getId());
@@ -207,10 +212,10 @@ public class ExportFormats {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
-                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().metaData()
-                            .getFileDirectory(Globals.FILE_FIELD);
+                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
+                            .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
                     // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().metaData().getFile();
+                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -228,11 +233,11 @@ public class ExportFormats {
                         public void run() {
                             try {
                                 format.performExport(frame.getCurrentBasePanel().database(),
-                                        frame.getCurrentBasePanel().metaData(),
+                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
                                         finFile.getPath(), frame
                                                 .getCurrentBasePanel().getEncoding(), finEntryIDs);
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+                                LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {
                                     errorMessage = ex.toString();
                                 } else {

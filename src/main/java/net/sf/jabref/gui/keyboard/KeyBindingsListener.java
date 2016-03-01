@@ -23,7 +23,6 @@ public class KeyBindingsListener extends KeyAdapter {
             return;
         }
 
-        final String code = KeyEvent.getKeyText(evt.getKeyCode());
         final String modifier = KeyEvent.getKeyModifiersText(evt.getModifiers());
 
         // VALIDATE code and modifier
@@ -37,6 +36,8 @@ public class KeyBindingsListener extends KeyAdapter {
                 return; // need a modifier except for function, escape and delete keys
             }
         }
+
+        final String code = KeyEvent.getKeyText(evt.getKeyCode());
         // second key cannot be a modifiers
         if ("Tab".equals(code)
                 || "Backspace".equals(code)
@@ -50,10 +51,10 @@ public class KeyBindingsListener extends KeyAdapter {
 
         // COMPUTE new key binding
         String newKey;
-        if (!"".equals(modifier)) {
-            newKey = modifier.toLowerCase().replaceAll("\\+", " ") + " " + code;
-        } else {
+        if ("".equals(modifier)) {
             newKey = code;
+        } else {
+            newKey = modifier.toLowerCase().replace("+", " ") + " " + code;
         }
 
         // SHOW new key binding

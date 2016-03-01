@@ -1,0 +1,71 @@
+
+Score
+  *****
+Accession Number
+  00005131-900000000-99049.
+Author
+  Verbeek, Jan MD *;  Hermans, Erik MD +;  van Vugt, Arie MD, PhD +;  Frolke, Jan Paul MD, PhD *
+Institution
+  From the (*)Department of Surgery, Radboud University Medical Center, Nijmegen, The Netherlands;
+  (+)Department of Surgery, Medical Spectrum Twente, Enschede, The Netherlands.
+Title
+  Correct positioning of percutaneous iliosacral screws with computer-navigated versus fluoroscopically guided surgery in traumatic pelvic ring fractures.[Article]
+Source
+  Journal of Orthopaedic Trauma. 
+Status
+  Publish Ahead of Print, POST ACCEPTANCE, 30 November 2015
+Abstract
+  Lorem ipsum abstract
+Author Keywords
+  iliosacral;  iliosacral screw;  IS screw;  SI screw;  sacroiliac joint;  Computer-navigated surgery;  navigation;  Computer-Assisted;  Conventional fluoroscopy;  Fluoroscopy;  computed tomography;  surgery;  OTA;  Traumatic;  Pelvic ring;  fracture;  pelvic fracture.
+Language
+  English.
+Document Type
+  Original Article:  PDF Only.
+Journal Subset
+  Clinical Medicine.  Health Professions.
+ISSN
+  0890-5339
+NLM Journal Code
+  jh4, 8807705
+DOI Number
+  10.1097/BOT.0000000000000502
+Link to the Ovid Full Text or citation
+ http://ovidsp.ovid.com/ovidweb.cgi?T=JS&CSC=Y&NEWS=N&PAGE=fulltext&D=ppvovftq&AN=00005131-900000000-99049
+ 
+
+Score
+  *****
+Accession Number
+  00012097-900000000-99899.
+Author
+  Shapiro, Edward S. 1;  Dennis, Minyi Shih 1;  Fu, Qiong 1
+Institution
+  (1)Center for Promoting Research to Practice, College of Education, Lehigh University
+Title
+  Comparing Computer Adaptive and Curriculum-Based Measures of Math in Progress Monitoring.[Article]
+Source
+  School Psychology Quarterly. 
+Status
+  Publish Ahead of Print, published online before print, 16 March 2015
+Abstract
+  : The purpose of the study was to compare the use of a Computer Adaptive Test and Curriculum-Based Measurement in the assessment of mathematics. This study also investigated the degree to which slope or rate of change predicted student outcomes on the annual state assessment of mathematics above and beyond scores of single point screening assessments (i.e., the computer adaptive test or the CBM assessment just before the administration of the state assessment). Repeated measurement of mathematics once per month across a 7-month period using a Computer Adaptive Test (STAR-Math) and Curriculum-Based Measurement (CBM, AIMSweb Math Computation, AIMSweb Math Concepts/Applications) was collected for a maximum total of 250 third, fourth, and fifth grade students. Results showed STAR-Math in all 3 grades and AIMSweb Math Concepts/Applications in the third and fifth grades had primarily linear growth patterns in mathematics. AIMSweb Math Computation in all grades and AIMSweb Math Concepts/Applications in Grade 4 had decelerating positive trends. Predictive validity evidence showed the strongest relationships were between STAR-Math and outcomes for third and fourth grade students. The blockwise multiple regression by grade revealed that slopes accounted for only a very small proportion of additional variance above and beyond what was explained by the scores obtained on a single point of assessment just prior to the administration of the state assessment.
+
+  (C) 2015 by the American Psychological Association
+Author Keywords
+  computer adaptive test;  curriculum-based measurement;  mathematics assessment;  progress monitoring.
+Language
+  English.
+Document Type
+  Article:  PDF Only.
+Journal Subset
+  Behavioral & Social Sciences.  PsycARTICLES.
+ISSN
+  1045-3830
+NLM Journal Code
+  9102245
+DOI Number
+  10.1037/spq0000116
+Link to the Ovid Full Text or citation
+ http://ovidsp.ovid.com/ovidweb.cgi?T=JS&CSC=Y&NEWS=N&PAGE=fulltext&D=ppvovftq&AN=00012097-900000000-99899
+

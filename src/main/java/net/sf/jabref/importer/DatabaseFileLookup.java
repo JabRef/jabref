@@ -16,59 +16,47 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.model.entry.FileField;
 
 /**
  * Search class for files. <br>
  * <br>
  * This class provides some functionality to search in a {@link BibDatabase} for
  * files. <br>
- * <br>
- *
- *
+
  * @author Nosh&Dan
- * @version 09.11.2008 | 21:21:41
- *
  */
 class DatabaseFileLookup {
 
     private static final String KEY_FILE_FIELD = "file";
 
-    private final Map<File, Boolean> fileToFound = new HashMap<>();
+    private final Set<File> fileCache = new HashSet<>();
 
-    private final Collection<BibEntry> entries;
-
-    private final String[] possibleFilePaths;
-
+    private final List<String> possibleFilePaths;
 
     /**
-     * Creates an instance by passing a {@link BibDatabase} which will be
-     * used for the searches.
+     * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      *
-     * @param aDatabase
-     *            A {@link BibDatabase}.
+     * @param database A {@link BibDatabase}.
      */
-    public DatabaseFileLookup(BibDatabase aDatabase) {
-        if (aDatabase == null) {
-            throw new IllegalArgumentException("Passing a 'null' BibDatabase.");
+    public DatabaseFileLookup(BibDatabase database) {
+        Objects.requireNonNull(database);
+        possibleFilePaths = Optional.ofNullable(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
+
+        for (BibEntry entry : database.getEntries()) {
+            fileCache.addAll(parseFileField(entry));
         }
-        entries = aDatabase.getEntries();
-        possibleFilePaths = JabRef.jrf.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
     }
 
     /**
-     * Returns whether the File <code>aFile</code> is present in the database
+     * Returns whether the File <code>file</code> is present in the database
      * as an attached File to an {@link BibEntry}. <br>
      * <br>
      * To do this, the field specified by the key <b>file</b> will be searched
@@ -76,68 +64,33 @@ class DatabaseFileLookup {
      * <br>
      * For the matching, the absolute file paths will be used.
      *
-     * @param aFile
+     * @param file
      *            A {@link File} Object.
      * @return <code>true</code>, if the file Object is stored in at least one
      *         entry in the database, otherwise <code>false</code>.
      */
-    public boolean lookupDatabase(File aFile) {
-        if (fileToFound.containsKey(aFile)) {
-            return fileToFound.get(aFile);
-        } else {
-            Boolean res = false;
-            for (BibEntry entry : entries) {
-                if (lookupEntry(aFile, entry)) {
-                    res = true;
-                    break;
-                }
-            }
-            fileToFound.put(aFile, res);
-            //System.out.println(aFile);
-            return res;
-        }
+    public boolean lookupDatabase(File file) {
+        return fileCache.contains(file);
     }
 
-    /**
-     * Searches the specified {@link BibEntry} <code>anEntry</code> for the
-     * appearance of the specified {@link File} <code>aFile</code>. <br>
-     * <br>
-     * Therefore the <i>file</i>-field of the bibtex-entry will be searched for
-     * the absolute filepath of the searched file. <br>
-     * <br>
-     *
-     * @param aFile
-     *            A file that is searched in an bibtex-entry.
-     * @param anEntry
-     *            A bibtex-entry, in which the file is searched.
-     * @return <code>true</code>, if the bibtex entry stores the file in its
-     *         <i>file</i>-field, otherwise <code>false</code>.
-     */
-    private boolean lookupEntry(File aFile, BibEntry anEntry) {
+    private List<File> parseFileField(BibEntry entry) {
+        Objects.requireNonNull(entry);
 
-        if ((aFile == null) || (anEntry == null)) {
-            return false;
-        }
+        String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
+        List<FileField.ParsedFileField> entries = FileField.parse(fileField);
 
-        FileListTableModel model = new FileListTableModel();
+        List<File> fileLinks = new ArrayList<>();
+        for (FileField.ParsedFileField field : entries) {
+            String link = field.link;
 
-        String fileField = anEntry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
-        model.setContent(fileField);
-
-        for (int i = 0; i < model.getRowCount(); i++) {
-            FileListEntry flEntry = model.getEntry(i);
-            String link = flEntry.getLink();
-
-            if (link == null) {
-                break;
+            // Do not query external file links (huge performance leak)
+            if(link.contains("//")) {
+                continue;
             }
 
-            File expandedFilename = FileUtil.expandFilename(link, possibleFilePaths);
-            if (Objects.equals(expandedFilename, aFile)) {
-                return true;
-            }
+            FileUtil.expandFilename(link, possibleFilePaths).ifPresent(fileLinks::add);
         }
 
-        return false;
+        return fileLinks;
     }
 }

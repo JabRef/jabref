@@ -25,7 +25,7 @@ public class AutoCompleterFactoryTest {
     public void getForNullThrowsException() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(null);
+        autoCompleterFactory.getFor(null);
     }
 
     @Test

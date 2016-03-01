@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.*;
@@ -34,28 +33,25 @@ import net.sf.jabref.model.entry.*;
  */
 public class OvidImporter extends ImportFormat {
 
-    private static final Pattern ovid_src_pat = Pattern
+    private static final Pattern OVID_SOURCE_PATTERN = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
-    private static final Pattern ovid_src_pat_no_issue = Pattern
+    private static final Pattern OVID_SOURCE_PATTERN_NO_ISSUE = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
 
-    private static final Pattern ovid_src_pat_2 = Pattern.compile(
+    private static final Pattern OVID_SOURCE_PATTERN_2 = Pattern.compile(
             "([ \\w&\\-,]+)\\. Vol ([0-9]+)\\(([\\w\\-]+)\\) ([A-Za-z]+) ([0-9][0-9][0-9][0-9]), ([0-9]+\\-?[0-9]+)");
 
-    private static final Pattern incollection_pat = Pattern.compile(
+    private static final Pattern INCOLLECTION_PATTERN = Pattern.compile(
             "(.+)\\(([0-9][0-9][0-9][0-9])\\)\\. ([ \\w&\\-,:]+)\\.[ ]+\\(pp. ([0-9]+\\-?[0-9]+?)\\).[A-Za-z0-9, ]+pp\\. "
                     + "([\\w, ]+): ([\\w, ]+)");
-    private static final Pattern book_pat = Pattern.compile(
+    private static final Pattern BOOK_PATTERN = Pattern.compile(
             "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
 
+    private static final String OVID_PATTERN_STRING = "<[0-9]+>";
+    private static final Pattern OVID_PATTERN = Pattern.compile(OVID_PATTERN_STRING);
 
-    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
-
-
-    //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
-    // \\w&\\-]+)");
-
+    private static final int MAX_ITEMS = 50;
     /**
      * Return the name of this import format.
      */
@@ -81,19 +77,20 @@ public class OvidImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            int i = 0;
+            while (((str = in.readLine()) != null) && (i < MAX_ITEMS)) {
 
-            if (OvidImporter.ovidPattern.matcher(str).find()) {
-                return true;
+                if (OvidImporter.OVID_PATTERN.matcher(str).find()) {
+                    return true;
+                }
+
+                i++;
             }
 
-            i++;
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -114,7 +111,7 @@ public class OvidImporter extends ImportFormat {
             sb.append('\n');
         }
 
-        String[] items = sb.toString().split("<[0-9]+>");
+        String[] items = sb.toString().split(OVID_PATTERN_STRING);
 
         for (int i = 1; i < items.length; i++) {
             HashMap<String, String> h = new HashMap<>();
@@ -134,33 +131,32 @@ public class OvidImporter extends ImportFormat {
                 if (!isAuthor && content.endsWith(".")) {
                     content = content.substring(0, content.length() - 1);
                 }
-                //fields[j] = fields[j].trim();
                 if (isAuthor) {
 
                     h.put("author", content);
 
-                } else if (fieldName.indexOf("Title") == 0) {
+                } else if (fieldName.startsWith("Title")) {
                     content = content.replaceAll("\\[.+\\]", "").trim();
                     if (content.endsWith(".")) {
                         content = content.substring(0, content.length() - 1);
                     }
                     h.put("title", content);
-                } else if (fieldName.indexOf("Chapter Title") == 0) {
+                } else if (fieldName.startsWith("Chapter Title")) {
                     h.put("chaptertitle", content);
-                } else if (fieldName.indexOf("Source") == 0) {
+                } else if (fieldName.startsWith("Source")) {
                     Matcher matcher;
-                    if ((matcher = OvidImporter.ovid_src_pat.matcher(content)).find()) {
+                    if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {
                         h.put("journal", matcher.group(1));
                         h.put("volume", matcher.group(2));
                         h.put("issue", matcher.group(3));
                         h.put("pages", matcher.group(4));
                         h.put("year", matcher.group(5));
-                    } else if ((matcher = OvidImporter.ovid_src_pat_no_issue.matcher(content)).find()) {// may be missing the issue
+                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) {// may be missing the issue
                         h.put("journal", matcher.group(1));
                         h.put("volume", matcher.group(2));
                         h.put("pages", matcher.group(3));
                         h.put("year", matcher.group(4));
-                    } else if ((matcher = OvidImporter.ovid_src_pat_2.matcher(content)).find()) {
+                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
 
                         h.put("journal", matcher.group(1));
                         h.put("volume", matcher.group(2));
@@ -169,14 +165,14 @@ public class OvidImporter extends ImportFormat {
                         h.put("year", matcher.group(5));
                         h.put("pages", matcher.group(6));
 
-                    } else if ((matcher = OvidImporter.incollection_pat.matcher(content)).find()) {
-                        h.put("editor", matcher.group(1).replaceAll(" \\(Ed\\)", ""));
+                    } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
+                        h.put("editor", matcher.group(1).replace(" (Ed)", ""));
                         h.put("year", matcher.group(2));
                         h.put("booktitle", matcher.group(3));
                         h.put("pages", matcher.group(4));
                         h.put("address", matcher.group(5));
                         h.put("publisher", matcher.group(6));
-                    } else if ((matcher = OvidImporter.book_pat.matcher(content)).find()) {
+                    } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
                         h.put("year", matcher.group(1));
                         h.put("pages", matcher.group(2));
                         h.put("address", matcher.group(3));
@@ -185,7 +181,7 @@ public class OvidImporter extends ImportFormat {
                     }
                     // Add double hyphens to page ranges:
                     if (h.get("pages") != null) {
-                        h.put("pages", h.get("pages").replaceAll("-", "--"));
+                        h.put("pages", h.get("pages").replace("-", "--"));
                     }
 
                 } else if ("Abstract".equals(fieldName)) {
@@ -199,6 +195,15 @@ public class OvidImporter extends ImportFormat {
                     } else if (content.contains("Conference Paper")) {
                         h.put("entrytype", "inproceedings");
                     }
+                } else if (fieldName.startsWith("Language")) {
+                    h.put("language", content);
+                } else if (fieldName.startsWith("Author Keywords")) {
+                    content = content.replace(";", ",").replace("  ", " ");
+                    h.put("keywords", content);
+                } else if (fieldName.startsWith("ISSN")) {
+                    h.put("issn", content);
+                } else if (fieldName.startsWith("DOI Number")) {
+                    h.put("doi", content);
                 }
             }
 
@@ -207,7 +212,7 @@ public class OvidImporter extends ImportFormat {
             String auth = h.get("author");
             if ((auth != null) && auth.contains(" [Ed]")) {
                 h.remove("author");
-                h.put("editor", auth.replaceAll(" \\[Ed\\]", ""));
+                h.put("editor", auth.replace(" [Ed]", ""));
             }
 
             // Rearrange names properly:
@@ -221,7 +226,7 @@ public class OvidImporter extends ImportFormat {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
+            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "misc";
             h.remove("entrytype");
             if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.
@@ -229,7 +234,7 @@ public class OvidImporter extends ImportFormat {
                 // Move the "chaptertitle" to just "title":
                 h.put("title", h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
+            BibEntry b = new BibEntry(IdGenerator.next(), entryType);
             b.setField(h);
 
             bibitems.add(b);
@@ -247,7 +252,7 @@ public class OvidImporter extends ImportFormat {
     private static String fixNames(String content) {
         String names;
         if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
-            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
+            names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replace(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");
             StringBuilder sb = new StringBuilder();
@@ -261,7 +266,7 @@ public class OvidImporter extends ImportFormat {
         } else {
             names = content;
         }
-        return AuthorList.fixAuthor_lastNameFirst(names);
+        return AuthorList.fixAuthorLastNameFirst(names);
     }
 
 }

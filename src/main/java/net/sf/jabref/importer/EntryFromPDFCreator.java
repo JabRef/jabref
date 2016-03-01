@@ -15,8 +15,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -35,7 +35,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     private static ExternalFileType getPDFExternalFileType() {
-        ExternalFileType pdfFileType = JabRefPreferences.getInstance().getExternalFileTypeByExt("pdf");
+        ExternalFileType pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
         if (pdfFileType == null) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
@@ -82,17 +82,16 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param entry
      */
     private void addEntryDataFromPDDocumentInformation(File pdfFile, BibEntry entry) {
-        PDDocument document = null;
-        try {
-            document = PDDocument.load(pdfFile.getAbsoluteFile());
+        try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             PDDocumentInformation pdfDocInfo = document
                     .getDocumentInformation();
 
             if (pdfDocInfo != null) {
-                BibEntry entryDI = XMPUtil.getBibtexEntryFromDocumentInformation(document
+                Optional<BibEntry> entryDI = XMPUtil
+                        .getBibtexEntryFromDocumentInformation(document
                         .getDocumentInformation());
-                if (entryDI != null) {
-                    addEntryDataToEntry(entry, entryDI);
+                if (entryDI.isPresent()) {
+                    addEntryDataToEntry(entry, entryDI.get());
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
@@ -109,14 +108,6 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             }
         } catch (IOException e) {
             // no canceling here, just no data added.
-        } finally {
-            if (document != null) {
-                try {
-                    document.close();
-                } catch (IOException e) {
-                    // no canceling here, just no data added.
-                }
-            }
         }
     }
 

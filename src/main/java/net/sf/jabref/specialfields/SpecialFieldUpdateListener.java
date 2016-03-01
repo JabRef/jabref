@@ -25,9 +25,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.JabRef;
 
 /**
- * Listener triggering 
+ * Listener triggering
  *  * an update of keywords if special field has been updated
- *  * an update of special fields if keywords have been updated 
+ *  * an update of special fields if keywords have been updated
  */
 public class SpecialFieldUpdateListener implements VetoableChangeListener {
 
@@ -40,17 +40,17 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
         final BibEntry entry = (BibEntry) e.getSource();
         final String fieldName = e.getPropertyName();
         // Source editor cycles through all entries
-        // if we immediately updated the fields, the entry editor would detect a subsequent change as a user change 
+        // if we immediately updated the fields, the entry editor would detect a subsequent change as a user change
         // and re-fire this event
-        // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed. 
+        // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed.
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
                 if ("keywords".equals(fieldName)) {
                     // we do NOT pass a named component indicating that we do not want to have undo capabilities
-                    // if the user undoes the change in the keyword field, this method is also called and 
-                    // the special fields are updated accordingly 
+                    // if the user undoes the change in the keyword field, this method is also called and
+                    // the special fields are updated accordingly
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -60,11 +60,10 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
                         }
                     });
                 } else {
-                    SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName);
-                    if (field != null) {
+                    if (SpecialFieldsUtils.isSpecialField(fieldName)) {
                         // we do NOT pass a named component indicating that we do not want to have undo capabilities
-                        // if the user undoes the change in the sepcial field, this method is also called and 
-                        // the keyword field is updated accordingly 
+                        // if the user undoes the change in the special field, this method is also called and
+                        // the keyword field is updated accordingly
                         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, null);
                         SwingUtilities.invokeLater(new Runnable() {
 

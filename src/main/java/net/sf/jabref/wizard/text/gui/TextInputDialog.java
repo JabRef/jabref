@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
- Copyright (C) 2015 JabRef Contributors.
+ Copyright (C) 2015-2016 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -51,63 +51,48 @@
 
 package net.sf.jabref.wizard.text.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.Globals;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.util.Util;
+import net.sf.jabref.wizard.text.TagToMarkedTextStore;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.text.EditorKit;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.wizard.text.TagToMarkedTextStore;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import java.util.Optional;
 
 public class TextInputDialog extends JDialog implements ActionListener {
-    private final JButton okButton = new JButton();
-    private final JButton cancelButton = new JButton();
-    private final JButton insertButton = new JButton();
-    private final JButton parseWithFreeCiteButton = new JButton();
+    private final JButton okButton = new JButton(Localization.lang("Accept"));
+    private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+    private final JButton insertButton = new JButton(Localization.lang("Insert"));
+    private final JButton parseWithFreeCiteButton = new JButton(Localization.lang("Parse with FreeCite"));
     private final JPanel panel1 = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
     private JList<String> fieldList;
-    private JRadioButton overRadio;
+    private final JRadioButton overRadio = new JRadioButton(Localization.lang("Override"));
+    private final JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
+
 
     private final BibEntry entry;
 
@@ -118,7 +103,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private final TagToMarkedTextStore marked;
 
-    private final JabRefFrame _frame;
+    private final JabRefFrame frame;
 
     private boolean okPressed;
 
@@ -126,34 +111,26 @@ public class TextInputDialog extends JDialog implements ActionListener {
     public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
-        _frame = frame;
+        this.frame = frame;
 
         entry = bibEntry;
         marked = new TagToMarkedTextStore();
 
-        try {
-            jbInit();
-            pack();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        jbInit();
+        pack();
         updateSourceView();
     }
 
     private void jbInit() {
         this.setModal(true);
-        //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
-        String typeStr = Localization.lang("for");
-        if (entry != null)
-        {
-            if (entry.getType() != null)
-            {
-                typeStr = typeStr + " " + entry.getType().getName();
-            }
+        StringBuilder typeStr = new StringBuilder(Localization.lang("for"));
+        if ((entry != null) && (entry.getType() != null)) {
+            typeStr.append(' ').append(entry.getType());
         }
 
-        this.setTitle(Localization.lang("Plain_text_import") + " " + typeStr);
+        typeStr.insert(0, Localization.lang("Plain_text_import") + " ");
+        this.setTitle(typeStr.toString());
         getContentPane().add(panel1, BorderLayout.CENTER);
 
         initRawPanel();
@@ -175,6 +152,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -196,7 +174,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         try {
             doc.insertString(0, "", doc.getStyle("regular"));
-        } catch (Exception ignored) {
+        } catch (BadLocationException ignored) {
             // Ignored
         }
 
@@ -219,7 +197,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         testPanel.addMouseListener(popupListener);
 
         // Toolbar
-        JToolBar toolBar = new JToolBar();
+        JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.add(new ClearAction());
         toolBar.setBorderPainted(false);
         toolBar.addSeparator();
@@ -248,7 +226,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
                         new Color(153, 153, 153), 2),
                 Localization.lang("Work_options"));
         inputPanel.setBorder(titledBorder1);
-        //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
         fieldList = new JList<>(getAllFields());
@@ -261,24 +238,18 @@ public class TextInputDialog extends JDialog implements ActionListener {
         JScrollPane fieldScroller = new JScrollPane(fieldList);
         fieldScroller.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        //fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
-        //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
         // insert buttons
-        insertButton.setText(Localization.lang("Insert"));
         insertButton.addActionListener(this);
 
         // parse with FreeCite button
-        parseWithFreeCiteButton.setText(Localization.lang("Parse with FreeCite"));
         parseWithFreeCiteButton.addActionListener(this);
 
         // Radio buttons
-        JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
         appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_bibtex_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
-        overRadio = new JRadioButton(Localization.lang("Override"));
         overRadio.setToolTipText(Localization.lang("Override_the_bibtex_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
@@ -324,19 +295,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        /*infoText.setEditable(false);
-        infoText.setBackground(GUIGlobals.infoField);
-        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        infoText.setPreferredSize( new Dimension(220, 50));
-        infoText.setMinimumSize( new Dimension(180, 50));*/
-
         rawPanel.add(desc, BorderLayout.SOUTH);
     }
 
     private void initButtonPanel() {
-        okButton.setText(Localization.lang("Accept"));
         okButton.addActionListener(this);
-        cancelButton.setText(Localization.lang("Cancel"));
         cancelButton.addActionListener(this);
 
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
@@ -412,8 +375,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     // erase old text selection
                     marked.setStyleForTag(type, "regular", doc); // delete all previous styles
                     marked.insertPosition(type, selStart, selEnd); // insert new selection style
-                }
-                else {
+                } else {
                     // memorize the selection for text highlighting
                     marked.appendPosition(type, selStart, selEnd);
 
@@ -421,17 +383,16 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     String old = entry.getField(type);
 
                     // merge old and selected text
-                    if (old != null) {
-                        // insert a new author with an additional "and"
-                        if (type.hashCode() == "author".hashCode()) {
+                    if (old == null) {
+                        // "null"+"txt" Strings forbidden
+                        entry.setField(type, txt);
+                    } else {
+                        // insert a new author or editor with an additional "and"
+                        if ("author".equals(type) || "editor".equals(type)) {
                             entry.setField(type, old + " and " + txt);
                         } else {
                             entry.setField(type, old + txt);
                         }
-                    }
-                    // "null"+"txt" Strings forbidden
-                    else {
-                        entry.setField(type, txt);
                     }
                 }
                 // make the new data in bibtex source code visible
@@ -453,18 +414,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         if (source == this.okButton) {
             okPressed = true;
             dispose();
-        }
-        else if (source == this.cancelButton) {
+        } else if (source == this.cancelButton) {
             dispose();
-        }
-        else if (source == this.insertButton) {
+        } else if (source == this.insertButton) {
             insertTextForTag();
-        }
-        else if (source == this.parseWithFreeCiteButton) {
-            if (parseWithFreeCiteAndAddEntries()) {
+        } else if ((source == this.parseWithFreeCiteButton) && parseWithFreeCiteAndAddEntries()) {
                 okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
                 dispose();
-            }
         }
     }
 
@@ -484,15 +440,15 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
-        if (importedEntries != null) {
+        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
+        if (importedEntries == null) {
+            return false;
+        } else {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibEntry e : importedEntries) {
-                JabRef.jrf.getCurrentBasePanel().insertEntry(e);
+                frame.getCurrentBasePanel().insertEntry(e);
             }
             return true;
-        } else {
-            return false;
         }
     }
 
@@ -500,7 +456,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -511,18 +467,19 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private String[] getAllFields() {
-        ArrayList<String> f = new ArrayList<>();
-        List<String> req = entry.getRequiredFieldsFlat();
-        List<String> opt = entry.getOptionalFields();
-        List<String> allFields = BibtexFields.getAllFieldNames();
-        f.addAll(req);
-        f.addAll(opt);
-        for (String allField : allFields) {
-            if (!f.contains(allField)) {
-                f.add(allField);
+        List<String> texFields = new ArrayList<>();
+        Optional<EntryType> type = EntryTypes.getType(entry.getType(),
+                frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+        if (type.isPresent()) {
+            texFields.addAll(type.get().getAllFields());
+        }
+        List<String> internalFields = InternalBibtexFields.getAllFieldNames();
+        for (String field : internalFields) {
+            if (!texFields.contains(field)) {
+                texFields.add(field);
             }
         }
-        return f.toArray(new String[f.size()]);
+        return texFields.toArray(new String[texFields.size()]);
     }
 
     class PasteAction extends BasicAction {
@@ -544,7 +501,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 int cPos = textPane.getCaretPosition();
                 try {
                     doc.insertString(cPos, data, doc.getStyle("regular"));
-                } catch (Exception ignored) {
+                } catch (BadLocationException ignored) {
                     // Ignored
                 }
             }
@@ -561,7 +518,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(_frame, null, null,
+                String chosen = FileDialogs.getNewFile(frame, null, null,
                         ".txt",
                         JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
@@ -569,13 +526,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                        try (FileInputStream fis = new FileInputStream(newFile)) {
                             eKit.read(fis, doc, 0);
                             doc.setLogicalStyle(0, doc.getStyle("regular"));
                         }
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (BadLocationException | IOException ignored) {
                 // Ignored
             }
         }
@@ -665,14 +622,12 @@ public class TextInputDialog extends JDialog implements ActionListener {
             /* We additionally set the JLabels icon property here.
              */
             String s = value.toString();
-            //        setIcon((s.length > 10) ? longIcon : shortIcon);
-            if (entry.getField(s) != null) {
+            if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);
                 this.setIcon(okIcon);
                 this.setToolTipText(Localization.lang("Filled"));
-            }
-            else {
+            } else {
                 this.setIcon(needIcon);
                 this.setToolTipText(Localization.lang("Field is missing"));
             }

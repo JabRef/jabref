@@ -50,8 +50,8 @@ public class DoiResolution implements FullTextFinder {
             String sciLink = doi.get().getURLAsASCIIString();
 
             // follow all redirects and scan for a single pdf link
-            try {
-                if (!sciLink.isEmpty()) {
+            if (!sciLink.isEmpty()) {
+                try {
                     Connection connection = Jsoup.connect(sciLink);
                     connection.followRedirects(true);
                     connection.ignoreHttpErrors(true);
@@ -67,10 +67,8 @@ public class DoiResolution implements FullTextFinder {
                         String href = element.attr("abs:href");
                         // Only check if pdf is included in the link
                         // See https://github.com/lehner/LocalCopy for scrape ideas
-                        if(href.contains("pdf")) {
-                            if(MimeTypeDetector.isPdfContentType(href)) {
-                                links.add(Optional.of(new URL(href)));
-                            }
+                        if (href.contains("pdf") && MimeTypeDetector.isPdfContentType(href)) {
+                            links.add(Optional.of(new URL(href)));
                         }
                     }
                     // return if only one link was found (high accuracy)
@@ -78,9 +76,9 @@ public class DoiResolution implements FullTextFinder {
                         LOGGER.info("Fulltext PDF found @ " + sciLink);
                         pdfLink = links.get(0);
                     }
+                } catch (IOException e) {
+                    LOGGER.warn("DoiResolution fetcher failed: ", e);
                 }
-            } catch(IOException e) {
-                LOGGER.warn("DoiResolution fetcher failed: ", e);
             }
         }
         return pdfLink;

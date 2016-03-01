@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -58,7 +57,6 @@ import net.sf.jabref.logic.l10n.Localization;
 public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
     private final EventList<TableEntry> entries = new BasicEventList<>();
-    //protected SortedList<TableEntry> sortedList;
     private final JTable glTable;
     private boolean okPressed;
     private final JabRefFrame frame;
@@ -71,41 +69,22 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         this.warningLimit = warningLimit;
 
         JButton ok = new JButton(Localization.lang("OK"));
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (verifySelection()) {
-                    okPressed = true;
-                    dispose();
-                }
-            }
-        });
-        JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okPressed = false;
+        ok.addActionListener(e -> {
+            if (verifySelection()) {
+                okPressed = true;
                 dispose();
             }
         });
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        cancel.addActionListener(e -> {
+            okPressed = false;
+            dispose();
+        });
         JButton selectAll = new JButton(Localization.lang("Select all"));
-        selectAll.addActionListener(new ActionListener() {
+        selectAll.addActionListener(e -> setSelectionAll(true));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setSelectionAll(true);
-            }
-        });
         JButton deselectAll = new JButton(Localization.lang("Deselect all"));
-        deselectAll.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setSelectionAll(false);
-            }
-        });
+        deselectAll.addActionListener(e -> setSelectionAll(false));
 
         DefaultEventTableModel<TableEntry> tableModelGl = (DefaultEventTableModel<TableEntry>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(entries, new EntryTableFormat());

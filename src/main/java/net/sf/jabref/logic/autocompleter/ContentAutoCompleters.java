@@ -3,9 +3,8 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Vector;
 
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
@@ -13,15 +12,17 @@ import net.sf.jabref.logic.journals.Abbreviation;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
-    AutoCompletePreferences preferences;
+    private final JournalAbbreviationLoader abbreviationLoader;
 
 
-    public ContentAutoCompleters(AutoCompletePreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public ContentAutoCompleters(JournalAbbreviationLoader abbreviationLoader) {
+        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
     }
 
-    public ContentAutoCompleters(BibDatabase database, MetaData metaData, AutoCompletePreferences preferences) {
-        this(preferences);
+    public ContentAutoCompleters(BibDatabase database, MetaData metaData, AutoCompletePreferences preferences,
+            JournalAbbreviationLoader abbreviationLoader) {
+        this(abbreviationLoader);
+        Objects.requireNonNull(preferences);
 
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
         List<String> completeFields = preferences.getCompleteNames();
@@ -44,11 +45,9 @@ public class ContentAutoCompleters extends AutoCompleters {
         for (Map.Entry<String, AutoCompleter<String>> entry : this.autoCompleters.entrySet()) {
             AutoCompleter<String> ac = entry.getValue();
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey()) != null) {
-                Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
+                List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
                 if (items != null) {
-                    for (String item : items) {
-                        ac.addItemToIndex(item);
-                    }
+                    items.forEach(ac::addItemToIndex);
                 }
             }
         }
@@ -61,7 +60,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addJournalListToAutoCompleter() {
         AutoCompleter<String> autoCompleter = get("journal");
         if(autoCompleter != null) {
-            for(Abbreviation abbreviation : Abbreviations.journalAbbrev.getAbbreviations()) {
+            for (Abbreviation abbreviation : abbreviationLoader.getRepository().getAbbreviations()) {
                 autoCompleter.addItemToIndex(abbreviation.getName());
             }
         }

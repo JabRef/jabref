@@ -15,32 +15,21 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
+import javax.swing.*;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpAction;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabaseMode;
 
 import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 
@@ -62,35 +51,42 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox overwriteTimeStamp;
     private final JCheckBox markImportedEntries;
     private final JCheckBox unmarkAllEntriesBeforeImporting;
-
     private final JTextField defOwnerField;
+
     private final JTextField timeStampFormat;
     private final JTextField timeStampField;
     private final JabRefPreferences prefs;
     private final JComboBox<String> language = new JComboBox<>(LANGUAGES.keySet().toArray(new String[LANGUAGES.keySet().size()]));
     private final JComboBox<Charset> encodings;
+    private final JComboBox<BibDatabaseMode> biblatexMode;
+
+    public class DefaultBibModeRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            setText(((BibDatabaseMode) value).getFormattedName());
+            return this;
+        }
+    }
 
 
-    public GeneralTab(JabRefFrame frame, JabRefPreferences prefs) {
+    public GeneralTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         setLayout(new BorderLayout());
 
+        biblatexMode = new JComboBox<>(BibDatabaseMode.values());
+        biblatexMode.setRenderer(new DefaultBibModeRenderer());
         allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         defSort = new JCheckBox(Localization.lang("Sort automatically"));
         ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
+        updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        useTimeStamp.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                updateTimeStamp.setEnabled(useTimeStamp.isSelected());
-            }
-        });
-        updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
+        useTimeStamp.addChangeListener(e -> updateTimeStamp.setEnabled(useTimeStamp.isSelected()));
         overwriteOwner = new JCheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new JCheckBox(Localization.lang("Overwrite"));
         overwriteOwner.setToolTipText(Localization.lang("If a pasted or imported entry already has "
@@ -138,7 +134,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(frame.helpDiag, GUIGlobals.ownerHelp).getIconButton();
+        JButton help = new HelpAction(HelpFiles.ownerHelp).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -148,7 +144,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(frame.helpDiag, GUIGlobals.timeStampHelp).getIconButton();
+        help = new HelpAction(HelpFiles.timeStampHelp).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -168,6 +164,11 @@ class GeneralTab extends JPanel implements PrefsTab {
         lab = new JLabel(Localization.lang("Default encoding") + ':');
         builder.append(lab, 3);
         builder.append(encodings);
+
+        builder.nextLine();
+        builder.appendSeparator(Localization.lang("Default bibliography mode"));
+        builder.append(new JPanel());
+        builder.append(biblatexMode);
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -197,6 +198,11 @@ class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
+        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+            biblatexMode.setSelectedItem(BibDatabaseMode.BIBLATEX);
+        } else {
+            biblatexMode.setSelectedItem(BibDatabaseMode.BIBTEX);
+        }
 
         Charset enc = Globals.prefs.getDefaultEncoding();
         encodings.setSelectedItem(enc);
@@ -243,6 +249,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
+        prefs.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, biblatexMode.getSelectedItem() == BibDatabaseMode.BIBLATEX);
 
         if (!LANGUAGES.get(language.getSelectedItem()).equals(prefs.get(JabRefPreferences.LANGUAGE))) {
             prefs.put(JabRefPreferences.LANGUAGE, LANGUAGES.get(language.getSelectedItem()));

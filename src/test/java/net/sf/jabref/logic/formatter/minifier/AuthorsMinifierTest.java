@@ -14,7 +14,7 @@ public class AuthorsMinifierTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 
@@ -36,7 +36,6 @@ public class AuthorsMinifierTest {
     @Test
     public void formatEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     private void expectCorrect(String input, String expected) {

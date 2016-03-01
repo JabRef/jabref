@@ -24,21 +24,26 @@
 
 package net.sf.jabref.importer.fetcher;
 
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+
+import javax.swing.*;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamException;
-
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.logic.l10n.Localization;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -49,6 +54,9 @@ import net.sf.jabref.logic.l10n.Localization;
  * @author Ryo IGARASHI
  */
 public class ADSFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(ADSFetcher.class);
+
 
     @Override
     public JPanel getOptionsPanel() {
@@ -88,7 +96,7 @@ public class ADSFetcher implements EntryFetcher {
             }
         } catch (Exception e) {
             status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.warn("Error while fetching from ADS", e);
         }
         return true;
     }
@@ -103,8 +111,9 @@ public class ADSFetcher implements EntryFetcher {
         try {
             URL ADSUrl = new URL(url + "&data_type=BIBTEX");
             HttpURLConnection ADSConnection = (HttpURLConnection) ADSUrl.openConnection();
-            ADSConnection.setRequestProperty("User-Agent", "Jabref");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(ADSConnection.getInputStream()))) {
+            ADSConnection.setRequestProperty("User-Agent", "JabRef");
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(ADSConnection.getInputStream(), Charset.forName("ISO-8859-1")))) {
                 ParserResult pr = BibtexParser.parse(reader);
                 return pr.getDatabase();
             }
@@ -113,13 +122,16 @@ public class ADSFetcher implements EntryFetcher {
                     Localization.lang("'%0' is not a valid ADS bibcode.", key) + "\n\n" + Localization
                             .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("File not found", e);
         } catch (IOException e) {
             status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("Problem accessing URL", e);
         } catch (RuntimeException e) {
             status.showMessage(
                     Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
+            LOGGER.warn("Problem fetching from ADS", e);
         }
         return null;
     }
@@ -134,7 +146,7 @@ public class ADSFetcher implements EntryFetcher {
         try {
             URL ADSUrl = new URL(url + "&data_type=XML");
             HttpURLConnection ADSConnection = (HttpURLConnection) ADSUrl.openConnection();
-            ADSConnection.setRequestProperty("User-Agent", "Jabref");
+            ADSConnection.setRequestProperty("User-Agent", "JabRef");
             BufferedInputStream bis = new BufferedInputStream(ADSConnection.getInputStream());
 
             XMLInputFactory factory = XMLInputFactory.newInstance();

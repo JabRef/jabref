@@ -15,6 +15,9 @@
  */
 package net.sf.jabref.sql;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.sql.exporter.DBExporter;
 import net.sf.jabref.sql.exporter.MySQLExporter;
 import net.sf.jabref.sql.exporter.PostgreSQLExporter;
@@ -24,39 +27,42 @@ import net.sf.jabref.sql.importer.PostgreSQLImporter;
 
 /**
  * Created by ifsteinm
- * 
+ *
  * Jan 20th 	This class is a factory that creates DBImporter and DBExporters
  * 				when the user wishes to import or export a bib file to DBMS
- * 
+ *
  */
 public class DBExporterAndImporterFactory {
+
+    private static final Log LOGGER = LogFactory.getLog(DBExporterAndImporterFactory.class);
+
 
     /**
      * All DBTypes must appear here. The enum items must be the
      * names that appear in the combobox used to select the DB,
      * because this text is used to choose which DBImporter/Exporter
      * will be sent back to the requester
-     * 
+     *
      */
     public enum DBType {
         MYSQL("MYSQL"), POSTGRESQL("POSTGRESQL");
 
-        private final String dbType;
+        private final String dataBaseType;
 
 
         DBType(String dbType) {
-            this.dbType = dbType;
+            this.dataBaseType = dbType;
         }
 
         public String getDBType() {
-            return dbType;
+            return dataBaseType;
         }
     }
 
 
     /**
      * Returns a DBExporter object according to a given DBType
-     * 
+     *
      * @param type
      * 		The type of the database selected
      * @return The DBExporter object instance
@@ -70,13 +76,16 @@ public class DBExporterAndImporterFactory {
         case POSTGRESQL:
             exporter = PostgreSQLExporter.getInstance();
             break;
+        default:
+            LOGGER.warn("Unkown database type");
+            break;
         }
         return exporter;
     }
 
     /**
      * Returns a DBExporter object according the type given as a String
-     * 
+     *
      * @param type
      * 		The type of the DB as a String. (e.g. Postgresql, MySQL)
      * @return The DBExporter object instance
@@ -87,7 +96,7 @@ public class DBExporterAndImporterFactory {
 
     /**
      * Returns a DBImporter object according to a given DBType
-     * 
+     *
      * @param type
      * 		The type of the database selected
      * @return The DBImporter object instance
@@ -101,13 +110,16 @@ public class DBExporterAndImporterFactory {
         case POSTGRESQL:
             importer = PostgreSQLImporter.getInstance();
             break;
+        default:
+            LOGGER.warn("Unknown database type");
+            break;
         }
         return importer;
     }
 
     /**
      * Returns a DBImporter object according the type given as a String
-     * 
+     *
      * @param type
      * 		The type of the DB as a String. (e.g. Postgresql, MySQL)
      * @return The DBImporter object instance

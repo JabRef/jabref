@@ -18,10 +18,11 @@ package net.sf.jabref.gui;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.HashSet;
+import java.util.Set;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
 
-    private final HashSet<String> extSet = new HashSet<>();
+    private final Set<String> extSet = new HashSet<>();
     private final String desc;
 
 
@@ -72,37 +73,37 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         return accept(file.getName());
     }
 
-    public boolean accept(String filenm) {
+    public boolean accept(String filename) {
 
-        filenm = filenm.toLowerCase();
-        int dotPos = filenm.lastIndexOf(".");
+        String lowerCaseFileName = filename.toLowerCase();
+        int dotPos = lowerCaseFileName.lastIndexOf('.');
 
         if (dotPos == -1) {
             return false;
         }
 
-        int dotDotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
+        int dotDotPos = lowerCaseFileName.lastIndexOf('.', dotPos - 1); // for dot.dot extensions
 
-        return extSet.contains(filenm.substring(dotPos)) ||
-                ((dotDotPos >= 0) && extSet.contains(filenm.substring(dotDotPos)));
+        return extSet.contains(lowerCaseFileName.substring(dotPos)) ||
+                ((dotDotPos >= 0) && extSet.contains(lowerCaseFileName.substring(dotDotPos)));
     }
 
     public String getSuffix(String filenm) {
 
         int dotPos;
-        String suffix;
 
-        dotPos = filenm.lastIndexOf(".");
+        dotPos = filenm.lastIndexOf('.');
         if (dotPos == -1) {
             return null;
         }
 
+        String suffix;
         suffix = filenm.substring(dotPos);
         if (extSet.contains(suffix)) {
             return suffix;
         }
 
-        dotPos = filenm.lastIndexOf(".", dotPos - 1); // for dot.dot extensions
+        dotPos = filenm.lastIndexOf('.', dotPos - 1); // for dot.dot extensions
         if (dotPos == -1) {
             return null;
         }

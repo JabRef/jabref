@@ -22,7 +22,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
-import net.sf.jabref.logic.logging.CacheableHandler;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
 import org.apache.commons.logging.Log;
@@ -49,17 +49,20 @@ public class Globals {
 
     public static final ImportFormatReader importFormatReader = new ImportFormatReader();
 
-    public static CacheableHandler handler;
-
     public static final String FILETYPE_PREFS_EXT = "_dir";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
-    public static final String FORMATTER_PACKAGE = "net.sf.jabref.exporter.layout.format.";
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
+
+    /**
+     * This field is initialized upon startup.
+     * Only GUI code is allowed to access it, logic code should use dependency injection.
+     */
+    public static JournalAbbreviationLoader journalAbbreviationLoader;
 
     private static KeyBindingPreferences keyPrefs;
     public static KeyBindingPreferences getKeyPrefs() {

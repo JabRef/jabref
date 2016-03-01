@@ -41,10 +41,7 @@ class DBLPHelper {
         public String cleanQuery(final String query) {
             String cleaned = query;
 
-            cleaned = cleaned.replaceAll("-", " ");
-            cleaned = cleaned.replaceAll(" ", "%20");
-            cleaned = cleaned.replaceAll(":", "");
-            cleaned = cleaned.toLowerCase();
+            cleaned = cleaned.replace("-", " ").replace(" ", "%20").replace(":", "").toLowerCase();
 
             return cleaned;
         }
@@ -82,7 +79,6 @@ class DBLPHelper {
                 endIdx);
         entry1 = cleanEntry(entry1);
         bibtexList.add(BibtexParser.singleFromString(entry1));
-        // System.out.println("'" + entry1 + "'");
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr

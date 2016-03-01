@@ -34,6 +34,7 @@ public class CaseChangers {
     public static final UpperFirstCaseChanger UPPER_FIRST = new UpperFirstCaseChanger();
     public static final UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
     public static final TitleCaseChanger TITLE = new TitleCaseChanger();
+    public static final CaseKeeper CASE_KEEPER = new CaseKeeper();
 
-    public static final List<Formatter> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST, TITLE);
+    public static final List<Formatter> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST, TITLE, CASE_KEEPER);
 }

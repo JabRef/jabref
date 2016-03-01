@@ -7,8 +7,20 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.entry.FileField;
 
 public class StringUtilTest {
+
+    private static final String[][] STRING_ARRAY_1 = {{"a", "b"}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_1 = "a:b;c:d";
+    private static final String[][] STRING_ARRAY_2_WITH_NULL = {{"a", null}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2_WITH_NULL = "a:" + null + ";c:d";
+    private static final String[][] STRING_ARRAY_2 = {{"a", ""}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2 = "a:;c:d";
+    private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
+    private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
+
+
     @BeforeClass
     public static void loadPreferences() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -86,8 +98,6 @@ public class StringUtilTest {
         assertEquals("", StringUtil.join(s, "\\", 3, s.length));
 
         assertEquals("", StringUtil.join(new String[] {}, "\\", 0, 0));
-
-        assertEquals("a:b", StringUtil.join(stringArray1[0], ":"));
     }
 
     @Test
@@ -130,14 +140,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testQuote() {
-        assertEquals("a::", StringUtil.quote("a:", "", ':'));
-        assertEquals("a::", StringUtil.quote("a:", null, ':'));
-        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
-        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
-    }
-
-    @Test
     public void testUnquote() {
         assertEquals("a:", StringUtil.unquote("a::", ':'));
         assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
@@ -145,31 +147,22 @@ public class StringUtilTest {
     }
 
 
-    static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
-    static final String encStringArray1 = "a:b;c:d";
-    static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
-    static final String encStringArray2 = "a:;c:d";
-    static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
-    static final String encStringArray2null = "a:" + null + ";c:d";
-    static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
-    static final String encStringArray3 = "a:\\:b;c\\;:d";
-
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals(encStringArray1, StringUtil.encodeStringArray(stringArray1));
-        assertEquals(encStringArray2, StringUtil.encodeStringArray(stringArray2));
-        assertEquals(encStringArray2null, StringUtil.encodeStringArray(stringArray2null));
-        assertEquals(encStringArray3, StringUtil.encodeStringArray(stringArray3));
+        assertEquals(ENCODED_STRING_ARRAY_1, FileField.encodeStringArray(STRING_ARRAY_1));
+        assertEquals(ENCODED_STRING_ARRAY_2, FileField.encodeStringArray(STRING_ARRAY_2));
+        assertEquals(ENCODED_STRING_ARRAY_2_WITH_NULL, FileField.encodeStringArray(STRING_ARRAY_2_WITH_NULL));
+        assertEquals(ENCODED_STRING_ARRAY_3, FileField.encodeStringArray(STRING_ARRAY_3));
     }
 
     @Test
     public void testDecodeStringDoubleArray() {
-        assertArrayEquals(stringArray1, StringUtil.decodeStringDoubleArray(encStringArray1));
-        assertArrayEquals(stringArray2, StringUtil.decodeStringDoubleArray(encStringArray2));
+        assertArrayEquals(STRING_ARRAY_1, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_1));
+        assertArrayEquals(STRING_ARRAY_2, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_2));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(stringArray3, StringUtil.decodeStringDoubleArray(encStringArray3));
+        assertArrayEquals(STRING_ARRAY_3, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_3));
     }
 
     @Test
@@ -209,4 +202,84 @@ public class StringUtilTest {
         assertFalse(StringUtil.isInCitationMarks("\""));
         assertFalse(StringUtil.isInCitationMarks("a\"\"a"));
     }
+
+    @Test
+    public void testIntValueOfSingleDigit() {
+        assertEquals(1, StringUtil.intValueOf("1"));
+        assertEquals(2, StringUtil.intValueOf("2"));
+        assertEquals(8, StringUtil.intValueOf("8"));
+    }
+
+    @Test
+    public void testIntValueOfLongString() {
+        assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfStartWithZeros() {
+        assertEquals(1234, StringUtil.intValueOf("001234"));
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringContainsLetter() {
+            StringUtil.intValueOf("12A2");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionIfStringNull() {
+            StringUtil.intValueOf(null);
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testIntValueOfExceptionfIfStringEmpty() {
+            StringUtil.intValueOf("");
+    }
+
+    @Test
+    public void testQuoteSimple() {
+        assertEquals("a::", StringUtil.quote("a:", "", ':'));
+    }
+
+    @Test
+    public void testQuoteNullQuotation() {
+        assertEquals("a::", StringUtil.quote("a:", null, ':'));
+    }
+
+    @Test
+    public void testQuoteNullString() {
+        assertEquals("", StringUtil.quote(null, ";", ':'));
+    }
+
+    @Test
+    public void testQuoteQuotationCharacter() {
+        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
+    }
+
+    @Test
+    public void testQuoteMoreComplicated() {
+        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
+    }
+
+    @Test
+    public void testLimitStringLengthShort() {
+        assertEquals("Test", StringUtil.limitStringLength("Test", 20));
+    }
+
+    @Test
+    public void testLimitStringLengthLimiting() {
+        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
+        assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
+    }
+
+    @Test
+    public void testLimitStringLengthNullInput() {
+        assertEquals("", StringUtil.limitStringLength(null, 10));
+    }
+
+    @Test
+    public void testReplaceSpecialCharacters() {
+        assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
+        assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
+    }
+
 }

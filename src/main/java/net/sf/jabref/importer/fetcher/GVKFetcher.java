@@ -63,7 +63,7 @@ public class GVKFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "GVKHelp.html";
+        return "GVKHelp";
     }
 
     @Override
@@ -97,7 +97,7 @@ public class GVKFetcher implements EntryFetcher {
             }
         }
 
-        String gvkQuery = "";
+        String gvkQuery;
         if (searchKeys.containsKey(qterms[0])) {
             gvkQuery = processComplexQuery(qterms);
         } else {
@@ -140,8 +140,7 @@ public class GVKFetcher implements EntryFetcher {
                     result = result.concat("%20");
                 }
                 String encoded = s[x];
-                encoded = encoded.replaceAll(",", "%2C");
-                encoded = encoded.replaceAll("\\?", "%3F");
+                encoded = encoded.replace(",", "%2C").replace("?", "%3F");
 
                 result = result.concat(encoded);
                 lastWasKey = false;
@@ -159,7 +158,7 @@ public class GVKFetcher implements EntryFetcher {
         String searchstring = (urlPrefix + query + urlSuffix);
         LOGGER.debug(searchstring);
         try {
-            URI uri = null;
+            URI uri;
             try {
                 uri = new URI(searchstring);
             } catch (URISyntaxException e) {

@@ -1,3 +1,4 @@
+
 import org.gradle.internal.os.OperatingSystem
 
 buildscript {
@@ -8,14 +9,16 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.install4j', name: 'gradle-plugin', version: '6.0'
+        classpath 'com.github.edwgiz:maven-shade-plugin.log4j2-cachefile-transformer:2.1'
     }
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.2'
-    id "com.github.kt3k.coveralls" version "2.4.0x"
-    id "com.github.youribonnaffe.gradle.format" version "1.2"
-    id "com.coverity.ondemand" version "1.4.742"
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "com.github.kt3k.coveralls" version "2.6.3"
+    id "com.github.youribonnaffe.gradle.format" version "1.3"
+    id "com.coverity.ondemand" version "1.5.61"
+    id "net.ltgt.errorprone" version "0.0.8"
 }
 
 apply plugin: "java"
@@ -32,8 +35,8 @@ apply from: 'eclipse.gradle'
 gradle.taskGraph.whenReady { taskGraph ->
     def tasks = taskGraph.getAllTasks()
     if (System.env.CI == null) {
-        tasks.findAll {it.name.startsWith('coverityCheck')}.each { task ->
-                task.enabled = false
+        tasks.findAll { it.name.startsWith('coverityCheck') }.each { task ->
+            task.enabled = false
         }
     }
 }
@@ -51,7 +54,7 @@ install4j {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+    gradleVersion = '2.11'
 }
 
 
@@ -71,9 +74,9 @@ dependencies {
 
     compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
 
-    compile 'org.apache.pdfbox:pdfbox:1.8.10'
-    compile 'org.apache.pdfbox:fontbox:1.8.10'
-    compile 'org.apache.pdfbox:jempbox:1.8.10'
+    compile 'org.apache.pdfbox:pdfbox:1.8.11'
+    compile 'org.apache.pdfbox:fontbox:1.8.11'
+    compile 'org.apache.pdfbox:jempbox:1.8.11'
 
     compile 'commons-cli:commons-cli:1.3.1'
 
@@ -85,11 +88,11 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.5.1-1'
-    compile 'org.antlr:antlr4-runtime:4.5.1-1'
+    antlr4 'org.antlr:antlr4:4.5.2-1'
+    compile 'org.antlr:antlr4-runtime:4.5.2-1'
 
     compile 'mysql:mysql-connector-java:5.1.38'
-    compile 'org.postgresql:postgresql:9.4.1207'
+    compile 'org.postgresql:postgresql:9.4.1208'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -98,11 +101,16 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
+    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.mashape.unirest:unirest-java:1.4.8'
+
+    compile 'org.apache.logging.log4j:log4j-jcl:2.5'
+    compile 'org.apache.logging.log4j:log4j-api:2.5'
+    compile 'org.apache.logging.log4j:log4j-core:2.5'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.7'
+    testCompile 'com.github.tomakehurst:wiremock:1.58'
 }
 
 sourceSets {
@@ -114,65 +122,11 @@ sourceSets {
 }
 
 processResources {
-    def licenseInformation = ""
-    def id = ""
-    def projectName
-    def url
-    def license
-    def note = ""
-
-    def externalLibraries = new File('external-libraries.txt')
-    externalLibraries.eachLine { currentLine ->
-        if (currentLine.startsWith('Id')) {
-            id = currentLine.substring(9)
-            // TODO: we can distinguish between fonts and libraries by the suffix of the id:
-            // fonts always end with ".font"
-            // With that information we can generate different sections
-        } else if (currentLine.startsWith('Project')) {
-            projectName = currentLine.substring(9)
-        } else if (currentLine.startsWith('URL')) {
-            url = currentLine.substring(9)
-        } else if (currentLine.startsWith('License:')) {
-            license = currentLine.substring(9)
-        } else if (currentLine.startsWith('Note:')) {
-            note =  currentLine.substring(9)
-        } else if (currentLine.isEmpty() && (!id.equals(""))) {
-            // the entry is finished, write it
-
-            licenseInformation += "\n<h3>" + projectName + "</h3>\n"
-            licenseInformation += '<p>URL: <a href="' + url + '">' + url + '</a></p>\n'
-            licenseInformation += '<p>License: ' + license + '</p>\n'
-            if (!note.equals("")) {
-                licenseInformation += '<p>Note: ' + note + '</p>\n'
-            }
-
-            id = id.replaceAll(':', '_')
-            def fileName = "licenses/" + id + ".txt"
-            def licenseInformationFile = new File(fileName)
-            if (licenseInformationFile.exists()) {
-                licenseInformation += '\n<h4>Further information</h4>\n'
-                licenseInformation += '<pre>\n'
-                licenseInformation += licenseInformationFile.text
-                licenseInformation += '</pre>\n'
-            }
-
-            // mark that entry has been written
-            id = ""
-            // note is not present at all entries. Ensure that no note is written instead of the last note.
-            note = ""
-        }
-    }
-
-    filesMatching("help/**/About.html") {
-        expand ("version": project.version,
-                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll {!it.startsWith("#")}.join(", "),
-                "licenseInformation": licenseInformation)
-    }
-
     filesMatching("build.properties") {
-        expand version: project.version
+        expand(version: project.version,
+                "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
+                "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
     }
 
     filesMatching("resource/**/meta.xml") {
@@ -270,6 +224,33 @@ format {
 
 shadowJar {
     classifier 'fat'
+
+    transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {
+
+        // this is an adapter required for generating a fat jar with correct log4j2 output
+
+        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer();
+
+        @Override
+        boolean canTransformResource(FileTreeElement element) {
+            return target.canTransformResource(element.getPath());
+        }
+
+        @Override
+        void transform(String path, InputStream is, List<com.github.jengelman.gradle.plugins.shadow.relocation.Relocator> relocators) {
+            target.processResource(path, is, relocators);
+        }
+
+        @Override
+        boolean hasTransformedResource() {
+            return target.hasTransformedResource();
+        }
+
+        @Override
+        void modifyOutputStream(org.apache.tools.zip.ZipOutputStream jos) {
+            target.modifyOutputStream(jos);
+        }
+    })
 }
 
 /*
@@ -310,9 +291,9 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
     release = project.version
     variables = [
-        versionFourDots: project.ext.threeDotVersion,
-        buildFileName: jar.archiveName,
-        version: project.version
+            versionFourDots: project.ext.threeDotVersion,
+            buildFileName  : jar.archiveName,
+            version        : project.version
     ]
 
     doLast {
@@ -349,7 +330,7 @@ task releaseJar(dependsOn: "shadowJar") {
 // see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
 // better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
 task getdeps(type: Copy) {
-    from (configurations.compile+configurations.antlr3+configurations.antlr4+configurations.testCompile) {
+    from(configurations.compile + configurations.antlr3 + configurations.antlr4 + configurations.testCompile) {
         include "*.jar"
     }
     into 'build/tmp/alldeps/'

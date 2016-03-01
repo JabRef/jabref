@@ -2,6 +2,10 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -11,43 +15,23 @@ import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
- * Util class for searching files on the file system which are not linked to a
- * provided {@link BibDatabase}.
- *
- * @author Nosh&Dan
- * @version 09.11.2008 | 19:55:20
- *
+ * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
 public class UnlinkedFilesCrawler {
-
     /**
      * File filter, that accepts directories only.
      */
-    private final FileFilter directoryFilter = new FileFilter() {
+    private final static FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
 
-        @Override
-        public boolean accept(File pathname) {
-            if (pathname == null) {
-                return false;
-            }
-            return pathname.isDirectory();
-        }
-    };
     private final BibDatabase database;
 
-
-    /**
-     * CONSTRUCTOR
-     *
-     * @param database
-     */
     public UnlinkedFilesCrawler(BibDatabase database) {
         this.database = database;
     }
 
-    public CheckableTreeNode searchDirectory(File directory, FileFilter aFileFilter) {
-        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(aFileFilter, database);
-        return searchDirectory(directory, ff, new int[] {1}, null);
+    public CheckableTreeNode searchDirectory(File directory, FileFilter filter) {
+        UnlinkedPDFFileFilter ff = new UnlinkedPDFFileFilter(filter, database);
+        return searchDirectory(directory, ff, new AtomicBoolean(true), null);
     }
 
     /**
@@ -67,22 +51,34 @@ public class UnlinkedFilesCrawler {
      * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
-    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
+    public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
         /* Cancellation of the search from outside! */
-        if ((state == null) || (state.length < 1) || (state[0] != 1)) {
+        if ((state == null) || !state.get()) {
             return null;
         }
-        /* Return null if the directory is not valid. */
+        // Return null if the directory is not valid.
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
         }
 
-        File[] files = directory.listFiles(ff);
+        File[] filesArray = directory.listFiles(ff);
+        List<File> files;
+        if (filesArray == null) {
+            files = Collections.emptyList();
+        } else {
+            files = Arrays.asList(filesArray);
+        }
         CheckableTreeNode root = new CheckableTreeNode(null);
 
         int filesCount = 0;
 
-        File[] subDirectories = directory.listFiles(directoryFilter);
+        filesArray = directory.listFiles(DIRECTORY_FILTER);
+        List<File> subDirectories;
+        if (filesArray == null) {
+            subDirectories = Collections.emptyList();
+        } else {
+            subDirectories = Arrays.asList(filesArray);
+        }
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
             if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
@@ -91,7 +87,7 @@ public class UnlinkedFilesCrawler {
             }
         }
 
-        root.setUserObject(new FileNodeWrapper(directory, files.length + filesCount));
+        root.setUserObject(new FileNodeWrapper(directory, files.size() + filesCount));
 
         for (File file : files) {
             root.add(new CheckableTreeNode(new FileNodeWrapper(file)));

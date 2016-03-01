@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class RegExpFileSearchTests {
 
-    private final String filesDirectory = "/src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
+    private static final String filesDirectory = "/src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
 
 
     @Before
@@ -46,7 +46,7 @@ public class RegExpFileSearchTests {
     public void testFindFiles() {
         //given
         List<BibEntry> entries = new ArrayList<>();
-        BibEntry entry = new BibEntry("123", BibtexEntryTypes.ARTICLE);
+        BibEntry entry = new BibEntry("123", BibtexEntryTypes.ARTICLE.getName());
         entry.setField(BibEntry.KEY_FIELD, "pdfInDatabase");
         entry.setField("year", "2001");
         entries.add(entry);

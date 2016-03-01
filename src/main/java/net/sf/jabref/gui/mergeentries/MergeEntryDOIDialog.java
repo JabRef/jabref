@@ -61,14 +61,14 @@ public class MergeEntryDOIDialog extends JDialog {
 
         this.panel = panel;
 
-        if (panel.getSelectedEntries().length != 1) {
+        if (panel.getSelectedEntries().size() != 1) {
             JOptionPane.showMessageDialog(panel.frame(), Localization.lang("Select one entry."),
                     Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
 
-        this.originalEntry = panel.getSelectedEntries()[0];
+        this.originalEntry = panel.getSelectedEntries().get(0);
         panel.output(Localization.lang("Fetching info based on DOI"));
         this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi"), null);
 
@@ -88,12 +88,10 @@ public class MergeEntryDOIDialog extends JDialog {
 
     /**
      * Sets up the dialog
-     *
-     * @param selected Selected BibtexEntries
      */
     private void init() {
         mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"),
-                Localization.lang("Entry from DOI"));
+                Localization.lang("Entry from DOI"), panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
         ce = new NamedCompound(Localization.lang("Merge from DOI"));
@@ -162,12 +160,12 @@ public class MergeEntryDOIDialog extends JDialog {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
         } else if ("done".equals(button)) {
-            // Create a new entry and add it to the undo stack
-            // Remove the old entry and add it to the undo stack (which is not working...)
-            Set<String> joint = new TreeSet<>(mergedEntry.getFieldNames());
+            // Updated the original entry with the new fields
+            Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());
+            Set<String> originalFields = new TreeSet<>(originalEntry.getFieldNames());
             Boolean edited = false;
 
-            for (String field : joint) {
+            for (String field : jointFields) {
                 String originalString = originalEntry.getField(field);
                 String mergedString = mergedEntry.getField(field);
                 if ((originalString == null) || !originalString.equals(mergedEntry.getField(field))) {
@@ -176,6 +174,18 @@ public class MergeEntryDOIDialog extends JDialog {
                     edited = true;
                 }
             }
+
+            // Remove fields which are not in the merged entry
+            for (String field : originalFields) {
+                if (!jointFields.contains(field)) {
+                    String originalString = originalEntry.getField(field);
+                    originalEntry.clearField(field);
+                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString, null));
+                    edited = true;
+                }
+            }
+
+            //
 
             if (edited) {
                 ce.end();

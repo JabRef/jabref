@@ -101,6 +101,10 @@ public class JabRefCLI {
         return cl.getOptionValue("importToOpen");
     }
 
+    public boolean isDebugLogging() {
+        return cl.hasOption("debug");
+    }
+
     public boolean isFetcherEngine() {
         return cl.hasOption("fetch");
     }
@@ -117,6 +121,10 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
+    public boolean isGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
+
+    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks");}
+
     private Options getOptions() {
         Options options = new Options();
 
@@ -124,8 +132,8 @@ public class JabRefCLI {
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options."));
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
-        options.addOption("l", "loads", false, Localization.lang("Load session"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
+        options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
         options.addOption(Option.builder("i").
                 longOpt("import").
@@ -190,6 +198,16 @@ public class JabRefCLI {
                 desc(JabRefCLI.getExportMatchesSyntax()).
                 hasArg().
                 argName("FILE").
+                build());
+
+        options.addOption(Option.builder("g").
+                longOpt("generateBibtexKeys").
+                desc(Localization.lang("Regenerate all keys for the entries in a bibtex file"))
+                .build());
+
+        options.addOption(Option.builder("asfl").
+                longOpt("automaticallySetFileLinks").
+                desc(Localization.lang("Automatically set file links")).
                 build());
 
         return options;

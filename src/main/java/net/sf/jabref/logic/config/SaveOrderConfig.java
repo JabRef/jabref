@@ -1,20 +1,20 @@
 package net.sf.jabref.logic.config;
 
-import java.util.Vector;
+import net.sf.jabref.JabRefPreferences;
+
+import java.util.*;
 
 /**
  * Stores the save order config from MetaData
- * 
+ * <p>
  * Format: <choice>, pair of field + ascending (boolean)
  */
 public class SaveOrderConfig {
 
     public boolean saveInOriginalOrder;
-    public boolean saveInSpecifiedOrder;
 
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
-
 
     public static class SortCriterion {
 
@@ -30,8 +30,46 @@ public class SaveOrderConfig {
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if ((o == null) || (getClass() != o.getClass())) {
+                return false;
+            }
+            SortCriterion that = (SortCriterion) o;
+            return Objects.equals(descending, that.descending) &&
+                    Objects.equals(field, that.field);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(field, descending);
+        }
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof SaveOrderConfig) {
+            SaveOrderConfig that = (SaveOrderConfig) o;
+            boolean sortCriteriaEquals = sortCriteria[0].equals(that.sortCriteria[0])
+                    && sortCriteria[1].equals(that.sortCriteria[1]) && sortCriteria[2].equals(that.sortCriteria[2]);
+
+            return Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) && sortCriteriaEquals;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(saveInOriginalOrder, Arrays.hashCode(sortCriteria));
+    }
 
     public SaveOrderConfig() {
         // fill default values
@@ -41,7 +79,7 @@ public class SaveOrderConfig {
         sortCriteria[2] = new SortCriterion();
     }
 
-    public SaveOrderConfig(Vector<String> data) {
+    public SaveOrderConfig(List<String> data) {
         if (data == null) {
             throw new NullPointerException();
         }
@@ -49,7 +87,7 @@ public class SaveOrderConfig {
             throw new IllegalArgumentException();
         }
 
-        String choice = data.elementAt(0);
+        String choice = data.get(0);
         if ("original".equals(choice)) {
             setSaveInOriginalOrder();
         } else {
@@ -57,17 +95,17 @@ public class SaveOrderConfig {
         }
 
         if (data.size() >= 3) {
-            sortCriteria[0] = new SortCriterion(data.elementAt(1), data.elementAt(2));
+            sortCriteria[0] = new SortCriterion(data.get(1), data.get(2));
         } else {
             sortCriteria[0] = new SortCriterion();
         }
         if (data.size() >= 5) {
-            sortCriteria[1] = new SortCriterion(data.elementAt(3), data.elementAt(4));
+            sortCriteria[1] = new SortCriterion(data.get(3), data.get(4));
         } else {
             sortCriteria[1] = new SortCriterion();
         }
         if (data.size() >= 7) {
-            sortCriteria[2] = new SortCriterion(data.elementAt(5), data.elementAt(6));
+            sortCriteria[2] = new SortCriterion(data.get(5), data.get(6));
         } else {
             sortCriteria[2] = new SortCriterion();
         }
@@ -75,32 +113,63 @@ public class SaveOrderConfig {
 
     public void setSaveInOriginalOrder() {
         this.saveInOriginalOrder = true;
-        this.saveInSpecifiedOrder = false;
     }
 
     public void setSaveInSpecifiedOrder() {
         this.saveInOriginalOrder = false;
-        this.saveInSpecifiedOrder = true;
+    }
+
+    public static SaveOrderConfig loadExportSaveOrderFromPreferences(JabRefPreferences preferences) {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = preferences.get(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = preferences.getBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = preferences.get(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = preferences.getBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = preferences.get(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = preferences.getBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public static SaveOrderConfig loadTableSaveOrderFromPreferences(JabRefPreferences preferences) {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = preferences.get(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = preferences.getBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = preferences.get(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = preferences.getBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = preferences.get(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = preferences.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public void storeAsExportSaveOrderInPreferences(JabRefPreferences preferences) {
+        preferences.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, sortCriteria[0].descending);
+        preferences.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, sortCriteria[1].descending);
+        preferences.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, sortCriteria[2].descending);
+
+        preferences.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, sortCriteria[0].field);
+        preferences.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, sortCriteria[1].field);
+        preferences.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, sortCriteria[2].field);
     }
 
     /**
      * Outputs the current configuration to be consumed later by the constructor
      */
-    public Vector<String> getVector() {
-        Vector<String> res = new Vector<>(7);
+    public List<String> getConfigurationList() {
+        List<String> res = new ArrayList<>(7);
         if (saveInOriginalOrder) {
-            res.insertElementAt("original", 0);
+            res.add("original");
         } else {
-            assert saveInSpecifiedOrder;
-            res.insertElementAt("specified", 0);
+            res.add("specified");
         }
 
-        res.insertElementAt(sortCriteria[0].field, 1);
-        res.insertElementAt(Boolean.toString(sortCriteria[0].descending), 2);
-        res.insertElementAt(sortCriteria[1].field, 3);
-        res.insertElementAt(Boolean.toString(sortCriteria[1].descending), 4);
-        res.insertElementAt(sortCriteria[2].field, 5);
-        res.insertElementAt(Boolean.toString(sortCriteria[2].descending), 6);
+        res.add(sortCriteria[0].field);
+        res.add(Boolean.toString(sortCriteria[0].descending));
+        res.add(sortCriteria[1].field);
+        res.add(Boolean.toString(sortCriteria[1].descending));
+        res.add(sortCriteria[2].field);
+        res.add(Boolean.toString(sortCriteria[2].descending));
 
         return res;
     }

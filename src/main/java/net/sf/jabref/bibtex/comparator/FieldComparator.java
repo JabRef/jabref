@@ -15,30 +15,32 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
- * 
+ *
  * A comparator for BibEntry fields
- * 
+ *
  * Initial Version:
- * 
+ *
  * @author alver
  * @version Date: Oct 13, 2005 Time: 10:10:04 PM To
- * 
+ *
  * TODO: Testcases
- * 
+ *
  */
 public class FieldComparator implements Comparator<BibEntry> {
 
@@ -71,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     public FieldComparator(String field, boolean reversed) {
-        this.fieldName = field;
+        this.fieldName = Objects.requireNonNull(field);
         this.field = field.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
         multiplier = reversed ? -1 : 1;
         isTypeHeader = this.field[0].equals(BibEntry.TYPE_HEADER);
@@ -79,7 +81,11 @@ public class FieldComparator implements Comparator<BibEntry> {
                 || "editor".equals(this.field[0]);
         isYearField = "year".equals(this.field[0]);
         isMonthField = "month".equals(this.field[0]);
-        isNumeric = BibtexFields.isNumeric(this.field[0]);
+        isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
+    }
+
+    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+        this(sortCriterion.field, sortCriterion.descending);
     }
 
     @Override
@@ -89,8 +95,8 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         if (isTypeHeader) {
             // Sort by type.
-            f1 = e1.getType().getName();
-            f2 = e2.getType().getName();
+            f1 = e1.getType();
+            f2 = e2.getType();
         } else {
 
             // If the field is author or editor, we rearrange names so they are
@@ -101,7 +107,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
         /*
          * [ 1598777 ] Month sorting
-         * 
+         *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
          */
         int localMultiplier = multiplier;
@@ -125,7 +131,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else if (isYearField) {
             /*
              * [ 1285977 ] Impossible to properly sort a numeric field
-             * 
+             *
              * http://sourceforge.net/tracker/index.php?func=detail&aid=1285977&group_id=92314&atid=600307
              */
             f1 = YearUtil.toFourDigitYear((String) f1);
@@ -133,7 +139,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else if (isMonthField) {
             /*
              * [ 1535044 ] Month sorting
-             * 
+             *
              * http://sourceforge.net/tracker/index.php?func=detail&aid=1535044&group_id=92314&atid=600306
              */
             f1 = MonthUtil.getMonth((String) f1).number;
@@ -144,18 +150,18 @@ public class FieldComparator implements Comparator<BibEntry> {
             Integer i1 = null;
             Integer i2 = null;
             try {
-                i1 = Util.intValueOf((String) f1);
+                i1 = StringUtil.intValueOf((String) f1);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
             try {
-                i2 = Util.intValueOf((String) f2);
+                i2 = StringUtil.intValueOf((String) f2);
             } catch (NumberFormatException ex) {
                 // Parsing failed.
             }
 
-            if (i2 != null && i1 != null) {
+            if ((i2 != null) && (i1 != null)) {
                 // Ok, parsing was successful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
@@ -170,11 +176,11 @@ public class FieldComparator implements Comparator<BibEntry> {
                 f2 = i2;
                 f1 = i2 + 1;
             }
-            // Else none of them were parseable, and we can fall back on comparing strings.    
+            // Else none of them were parseable, and we can fall back on comparing strings.
         }
 
         int result;
-        if (f1 instanceof Integer && f2 instanceof Integer) {
+        if ((f1 instanceof Integer) && (f2 instanceof Integer)) {
             result = ((Integer) f1).compareTo((Integer) f2);
         } else if (f2 instanceof Integer) {
             Integer f1AsInteger = Integer.valueOf(f1.toString());
@@ -185,7 +191,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else {
             String ours = ((String) f1).toLowerCase();
             String theirs = ((String) f2).toLowerCase();
-            result = FieldComparator.collator.compare(ours, theirs);//ours.compareTo(theirs);
+            result = FieldComparator.collator.compare(ours, theirs);
         }
 
         return result * localMultiplier;
@@ -203,7 +209,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     /**
      * Returns the field this Comparator compares by.
-     * 
+     *
      * @return The field name.
      */
     public String getFieldName() {

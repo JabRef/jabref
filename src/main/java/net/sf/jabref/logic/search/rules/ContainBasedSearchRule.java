@@ -17,10 +17,8 @@ package net.sf.jabref.logic.search.rules;
 
 import java.util.List;
 
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 /**
  * Search rule for contain-based search.
@@ -58,9 +56,8 @@ public class ContainBasedSearchRule implements SearchRule {
         boolean[] matchFound = new boolean[words.size()];
 
         for (String field : bibEntry.getFieldNames()) {
-            Object fieldContentAsObject = bibEntry.getField(field);
-            if (fieldContentAsObject != null) {
-                String fieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
+            if (bibEntry.hasField(field)) {
+                String fieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }

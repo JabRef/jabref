@@ -28,6 +28,8 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.*;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,13 +37,13 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.exporter.FileActions;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.bibtex.EntryTypes;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBImporterExporter;
@@ -76,12 +78,17 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
                                String dbName) throws Exception {
-        List<BibEntry> entries = FileActions.getSortedEntries(database, metaData, keySet, false);
+        Defaults defaults = new Defaults(
+                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
+
+        SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, keySet, savePrefs);
         GroupTreeNode gtn = metaData.getGroups();
 
         final int database_id = getDatabaseIDByName(metaData, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out);
+        populateEntryTypesTable(out, bibDatabaseContext.getMode());
         populateEntriesTable(database_id, entries, out);
         populateStringTable(database, out, database_id);
         populateGroupTypesTable(out);
@@ -100,30 +107,30 @@ public abstract class DBExporter extends DBImporterExporter {
      */
     private void populateEntriesTable(final int database_id, List<BibEntry> entries, Object out) throws SQLException {
         StringBuilder query = new StringBuilder(75);
-        String val;
         String insert = "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + fieldStr
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
             query.append(insert).append('\'').append(entry.getId())
                     .append("', (SELECT entry_types_id FROM entry_types WHERE label='")
-                    .append(entry.getType().getName().toLowerCase()).append("'), '").append(entry.getCiteKey()).append('\'');
+.append(entry.getType())
+                    .append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
-                val = entry.getField(SQLUtil.getAllFields().get(i));
-                if (val == null) {
-                    query.append("NULL");
-                } else {
+                if (entry.hasField(SQLUtil.getAllFields().get(i))) {
+                    String val = entry.getField(SQLUtil.getAllFields().get(i));
                     /**
                      * The condition below is there since PostgreSQL automatically escapes the backslashes, so the entry
                      * would double the number of slashes after storing/retrieving.
                      **/
-                    if ("MySQL".equals(dbStrings.getServerType())) {
+                    if ((out instanceof Connection) && "MySQL".equals(dbStrings.getServerType())) {
                         val = val.replace("\\", "\\\\");
                         val = val.replace("\"", "\\\"");
                         val = val.replace("\'", "''");
                         val = val.replace("`", "\\`");
                     }
                     query.append('\'').append(val).append('\'');
+                } else {
+                    query.append("NULL");
                 }
             }
             query.append(", '").append(database_id).append("');");
@@ -186,9 +193,10 @@ public abstract class DBExporter extends DBImporterExporter {
      * Generates the SQL required to populate the entry_types table with jabref data.
      *
      * @param out The output (PrintSream or Connection) object to which the DML should be written.
+     * @param type
      */
 
-    private void populateEntryTypesTable(Object out) throws SQLException {
+    private void populateEntryTypesTable(Object out, BibDatabaseMode type) throws SQLException {
         List<String> fieldRequirement = new ArrayList<>();
 
         List<String> existentTypes = new ArrayList<>();
@@ -200,7 +208,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
         }
-        for (EntryType val : EntryTypes.getAllValues()) {
+        for (EntryType val : EntryTypes.getAllValues(type)) {
             StringBuilder querySB = new StringBuilder();
 
             fieldRequirement.clear();
@@ -470,8 +478,9 @@ public abstract class DBExporter extends DBImporterExporter {
 
     private Vector<Vector<String>> createExistentDBNamesMatrix(DBStrings databaseStrings) throws Exception {
         try (Connection conn = this.connectToDB(databaseStrings);
-             Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
-            ResultSet rs = statement.getResultSet();
+                Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database");
+                ResultSet rs = statement.getResultSet()) {
+
             Vector<String> v;
             Vector<Vector<String>> matrix = new Vector<>();
             dbNames.clear();
@@ -489,7 +498,7 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private boolean isValidDBName(List<String> databaseNames, String desiredName) {
-        return (desiredName.trim().length() > 1) && !databaseNames.contains(desiredName);
+        return (desiredName != null) && (desiredName.trim().length() > 1) && !databaseNames.contains(desiredName);
     }
 
     /**

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
@@ -16,9 +17,8 @@ public class GroupsUtil {
 
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                String fieldValue = o.toString().trim();
+            if (be.hasField(field)) {
+                String fieldValue = be.getField(field).trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
                 while (tok.hasMoreTokens()) {
                     res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
@@ -39,16 +39,14 @@ public class GroupsUtil {
      */
     public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
         Set<String> res = new TreeSet<>();
-        StringTokenizer tok;
         for (String s : db.getKeySet()) {
             BibEntry be = db.getEntryById(s);
-            Object o = be.getField(field);
-            if (o != null) {
-                tok = new StringTokenizer(o.toString(), remove, false);
+            be.getFieldOptional(field).ifPresent(o -> {
+                StringTokenizer tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
                     res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
-            }
+            });
         }
         return res;
     }
@@ -68,13 +66,9 @@ public class GroupsUtil {
                 String val = be.getField(field);
                 if ((val != null) && !val.isEmpty()) {
                     AuthorList al = AuthorList.getAuthorList(val);
-                    for (int i = 0; i < al.size(); i++) {
-                        AuthorList.Author a = al.getAuthor(i);
-                        String lastName = a.getLast();
-                        if ((lastName != null) && !lastName.isEmpty()) {
-                            res.add(lastName);
-                        }
-                    }
+                    res.addAll(al.getAuthorList().stream().map(author -> author.getLast())
+                            .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
+                            .collect(Collectors.toList()));
                 }
 
             }

@@ -1,0 +1,34 @@
+<1>
+Score
+  *****
+Accession Number
+  00005131-900000000-99049.
+Author
+  Verbeek, Jan MD *;  Hermans, Erik MD +;  van Vugt, Arie MD, PhD +;  Frolke, Jan Paul MD, PhD *
+Institution
+  From the (*)Department of Surgery, Radboud University Medical Center, Nijmegen, The Netherlands;
+  (+)Department of Surgery, Medical Spectrum Twente, Enschede, The Netherlands.
+Title
+  Correct positioning of percutaneous iliosacral screws with computer-navigated versus fluoroscopically guided surgery in traumatic pelvic ring fractures.[Article]
+Source
+  Journal of Orthopaedic Trauma. 
+Status
+  Publish Ahead of Print, POST ACCEPTANCE, 30 November 2015
+Abstract
+  Lorem ipsum abstract
+Author Keywords
+  iliosacral;  iliosacral screw;  IS screw;  SI screw;  sacroiliac joint;  Computer-navigated surgery;  navigation;  Computer-Assisted;  Conventional fluoroscopy;  Fluoroscopy;  computed tomography;  surgery;  OTA;  Traumatic;  Pelvic ring;  fracture;  pelvic fracture.
+Language
+  English.
+Document Type
+  Original Article:  PDF Only.
+Journal Subset
+  Clinical Medicine.  Health Professions.
+ISSN
+  0890-5339
+NLM Journal Code
+  jh4, 8807705
+DOI Number
+  10.1097/BOT.0000000000000502
+Link to the Ovid Full Text or citation
+ http://ovidsp.ovid.com/ovidweb.cgi?T=JS&CSC=Y&NEWS=N&PAGE=fulltext&D=ppvovftq&AN=00005131-900000000-99049

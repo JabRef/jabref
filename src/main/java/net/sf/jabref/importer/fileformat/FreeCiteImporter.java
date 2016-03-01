@@ -30,6 +30,7 @@ import java.util.Scanner;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.logging.Log;
@@ -41,7 +42,7 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.EntryType;
 
 /**
@@ -62,7 +63,7 @@ public class FreeCiteImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        try(Scanner scan = new Scanner(in)) {
+        try (Scanner scan = new Scanner(in)) {
             String text = scan.useDelimiter("\\A").next();
             return importEntries(text, status);
         }
@@ -74,7 +75,7 @@ public class FreeCiteImporter extends ImportFormat {
         try {
             urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            // e.printStackTrace();
+            LOGGER.warn("Unsupported encoding", e);
         }
 
         // Send the request
@@ -212,14 +213,14 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRef.jrf.getCurrentBasePanel().metaData(), JabRef.jrf.getCurrentBasePanel().database(), e);
+                    LabelPatternUtil.makeLabel(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.jrf.getCurrentBasePanel().database(), e);
 
                     res.add(e);
                 }
                 parser.next();
             }
             parser.close();
-        } catch (Exception ex) {
+        } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
             return null;
         }

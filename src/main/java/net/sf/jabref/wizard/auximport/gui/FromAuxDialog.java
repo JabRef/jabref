@@ -1,5 +1,7 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2016 JabRef Contributors
+
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -36,8 +38,8 @@ package net.sf.jabref.wizard.auximport.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -61,7 +63,6 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.maintable.MainTable;
@@ -93,46 +94,43 @@ public class FromAuxDialog extends JDialog {
 
     private final AuxSubGenerator auxParser;
 
+    private final JabRefFrame parentFrame;
+
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
             JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
+        parentFrame = frame;
 
-        auxParser = new AuxSubGenerator(null);
+        auxParser = new AuxSubGenerator();
 
-        try {
-            jbInit(frame);
-            pack();
-            setSize(600, 500);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        jbInit();
+        pack();
+        setSize(600, 500);
     }
 
-    private void jbInit(JabRefFrame parent) {
+    private void jbInit() {
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
         selectInDBButton.setText(Localization.lang("Select"));
         selectInDBButton.setEnabled(false);
-        selectInDBButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                FromAuxDialog.this.select_actionPerformed();
-            }
-        });
+        selectInDBButton.addActionListener(e -> selectActionPerformed());
         generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
-        generateButton.addActionListener(new FromAuxDialog_generate_actionAdapter(this));
+        generateButton.addActionListener(e -> {
+            generatePressed = true;
+            dispose();
+        });
         cancelButton.setText(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new FromAuxDialog_Cancel_actionAdapter(this));
-        parseButton.setText(Localization.lang("Parse"));
-        parseButton.addActionListener(new FromAuxDialog_parse_actionAdapter(this));
+        cancelButton.addActionListener(e -> dispose());
 
-        initPanels(parent);
+        parseButton.setText(Localization.lang("Parse"));
+        parseButton.addActionListener(e -> parseActionPerformed());
+
+        initPanels();
 
         // insert the buttons
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -178,13 +176,13 @@ public class FromAuxDialog extends JDialog {
 
     }
 
-    private void initPanels(JabRefFrame parent) {
+    private void initPanels() {
         // collect the names of all open databases
         int len = parentTabbedPane.getTabCount();
         int toSelect = -1;
         for (int i = 0; i < len; i++) {
             dbChooser.addItem(parentTabbedPane.getTitleAt(i));
-            if (parent.getBasePanelAt(i) == parent.getCurrentBasePanel()) {
+            if (parentFrame.getBasePanelAt(i) == parentFrame.getCurrentBasePanel()) {
                 toSelect = i;
             }
         }
@@ -194,14 +192,11 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parent));
+        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parentFrame));
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
-        //listScrollPane.setPreferredSize(new Dimension(250, 120));
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
-        //statusScrollPane.setPreferredSize(new Dimension(250, 120));
-        //statusInfos.setBorder(BorderFactory.createEtchedBorder());
         statusInfos.setEditable(false);
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
@@ -226,19 +221,10 @@ public class FromAuxDialog extends JDialog {
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    void generate_actionPerformed(ActionEvent e) {
-        generatePressed = true;
-        dispose();
-    }
-
-    void cancel_actionPerformed(ActionEvent e) {
-        dispose();
-    }
-
-    private void select_actionPerformed() {
+    private void selectActionPerformed() {
         BibDatabase db = getGenerateDB();
-        MainTable mainTable = JabRef.jrf.getCurrentBasePanel().mainTable;
-        BibDatabase database = JabRef.jrf.getCurrentBasePanel().getDatabase();
+        MainTable mainTable = parentFrame.getCurrentBasePanel().mainTable;
+        BibDatabase database = parentFrame.getCurrentBasePanel().getDatabase();
         mainTable.clearSelection();
         for (BibEntry newEntry : db.getEntries()) {
             // the entries are not the same objects as in the original database
@@ -250,7 +236,7 @@ public class FromAuxDialog extends JDialog {
         }
     }
 
-    void parse_actionPerformed(ActionEvent e) {
+    private void parseActionPerformed() {
         parseButton.setEnabled(false);
         BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
                 dbChooser.getSelectedIndex());
@@ -259,35 +245,18 @@ public class FromAuxDialog extends JDialog {
         BibDatabase refBase = bp.getDatabase();
         String auxName = auxFileField.getText();
 
-        if (auxName != null) {
-            if ((refBase != null) && !auxName.isEmpty()) {
-                auxParser.clear();
-                notFoundList.setListData(auxParser.generate(auxName, refBase));
+        if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
+            auxParser.clear();
+            List<String> list = auxParser.generate(auxName, refBase);
+            notFoundList.setListData(list.toArray(new String[list.size()]));
+            statusInfos.append(auxParser.getInformation(false));
 
-                statusInfos.append(Localization.lang("keys in database") + " " +
-                        refBase.getEntryCount());
-                statusInfos.append("\n" + Localization.lang("found in aux file") + " " +
-                        auxParser.getFoundKeysInAux());
-                statusInfos.append("\n" + Localization.lang("resolved") + " " +
-                        auxParser.getResolvedKeysCount());
-                statusInfos.append("\n" + Localization.lang("not found") + " " +
-                        auxParser.getNotResolvedKeysCount());
-                statusInfos.append("\n" + Localization.lang("crossreferenced entries included") + " " +
-                        auxParser.getCrossreferencedEntriesCount());
-
-                int nested = auxParser.getNestedAuxCounter();
-                if (nested > 0) {
-                    statusInfos.append("\n" + Localization.lang("nested_aux_files") + " " +
-                            nested);
-                }
-
-                selectInDBButton.setEnabled(true);
-                generateButton.setEnabled(true);
-            }
+            selectInDBButton.setEnabled(true);
+            generateButton.setEnabled(true);
         }
 
         // the generated database contains no entries -> no active generate-button
-        if (auxParser.getGeneratedDatabase().getEntryCount() < 1) {
+        if (auxParser.emptyGeneratedDatabase()) {
             statusInfos.append("\n" + Localization.lang("empty database"));
             generateButton.setEnabled(false);
         }
@@ -308,18 +277,18 @@ public class FromAuxDialog extends JDialog {
      */
     static class BrowseAction extends AbstractAction {
         private final JTextField comp;
-        private final JabRefFrame _frame;
+        private final JabRefFrame frame;
 
 
         public BrowseAction(JTextField tc, JabRefFrame frame) {
             super(Localization.lang("Browse"));
-            _frame = frame;
+            this.frame = frame;
             comp = tc;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(_frame,
+            String chosen = FileDialogs.getNewFile(frame,
                     new File(comp.getText()),
                     ".aux",
                     JFileChooser.OPEN_DIALOG, false);
@@ -328,55 +297,5 @@ public class FromAuxDialog extends JDialog {
                 comp.setText(newFile.getPath());
             }
         }
-    }
-
-}
-
-// ----------- helper class -------------------
-class FromAuxDialog_generate_actionAdapter
-        implements java.awt.event.ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_generate_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.generate_actionPerformed(e);
-    }
-}
-
-class FromAuxDialog_Cancel_actionAdapter
-        implements java.awt.event.ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_Cancel_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.cancel_actionPerformed(e);
-    }
-}
-
-class FromAuxDialog_parse_actionAdapter
-        implements java.awt.event.ActionListener {
-
-    private final FromAuxDialog adaptee;
-
-
-    FromAuxDialog_parse_actionAdapter(FromAuxDialog adaptee) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        adaptee.parse_actionPerformed(e);
     }
 }

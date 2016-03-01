@@ -25,17 +25,16 @@ public class LastFocusedTabPreferences {
 
     private final JabRefPreferences preferences;
 
-
     public LastFocusedTabPreferences(JabRefPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
     public void setLastFocusedTab(File file) {
-        String filePath = null;
-        if (file != null) {
-            filePath = file.getAbsolutePath();
+        if (file == null) {
+            return; // no change detected
         }
 
+        String filePath = file.getAbsolutePath();
         preferences.put(JabRefPreferences.LAST_FOCUSED, filePath);
     }
 

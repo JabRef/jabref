@@ -60,7 +60,6 @@ public class ImportFormatReader {
         formats.add(new RepecNepImporter());
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
-        formats.add(new SixpackImporter());
 
         /**
          * Get custom import formats
@@ -69,7 +68,7 @@ public class ImportFormatReader {
             try {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
-            } catch (Exception e) {
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Could not instantiate " + importer.getName()
                         + " importer, will ignore it. Please check if the class is still available.", e);
             }
@@ -321,8 +320,7 @@ public class ImportFormatReader {
         return new InputStreamReader(new FileInputStream(f), charset);
     }
 
-    public static Reader getReaderDefaultEncoding(InputStream in)
-            throws IOException {
+    public static Reader getReaderDefaultEncoding(InputStream in) {
         InputStreamReader reader;
         reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
 
@@ -351,6 +349,20 @@ public class ImportFormatReader {
      * @throws IOException
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
+
+
+        // First, see if it is a BibTeX file:
+        try {
+            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+                    Globals.prefs.getDefaultEncoding());
+            if ((pr.getDatabase().getEntryCount() > 0)
+                    || (pr.getDatabase().getStringCount() > 0)) {
+                pr.setFile(new File(filename));
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
+            }
+        } catch (IOException ignore) {
+            // Ignored
+        }
 
         // we don't use a provided OutputPrinter (such as the JabRef frame),
         // as we don't want to see any outputs from failed importers:
@@ -391,19 +403,6 @@ public class ImportFormatReader {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             return new UnknownFormatImport(bestFormatName, parserResult);
-        }
-
-        // Finally, if all else fails, see if it is a BibTeX file:
-        try {
-            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
-                    Globals.prefs.getDefaultEncoding());
-            if ((pr.getDatabase().getEntryCount() > 0)
-                    || (pr.getDatabase().getStringCount() > 0)) {
-                pr.setFile(new File(filename));
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
-            }
-        } catch (Throwable ex) {
-            return null;
         }
 
         return null;

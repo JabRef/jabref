@@ -27,8 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Set;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -56,6 +58,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -67,6 +72,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -88,6 +94,8 @@ import com.jgoodies.forms.layout.FormLayout;
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
 
     private static final String STYLE_FILE_EXTENSION = ".jstyle";
     private final JabRefFrame frame;
@@ -184,18 +192,17 @@ class StyleSelectDialog {
                 if (i == -1) {
                     return;
                 }
-                ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
+                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
                     if (type == null) {
-                        JabRefDesktop.openExternalFileUnknown(frame, null, new MetaData(), link,
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
                     } else {
                         JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
-
+                    LOGGER.warn("Problem open style file editor", e);
                 }
             }
         });
@@ -208,7 +215,7 @@ class StyleSelectDialog {
         // Create a preview panel for previewing styles:
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
-        preview.setEntry(prevEntry);//PreviewPrefsTab.getTestEntry());
+        preview.setEntry(prevEntry);
 
         tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
@@ -434,23 +441,25 @@ class StyleSelectDialog {
     private void addStyles(String dir, boolean recurse) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
-            File[] files = dirF.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    // If the file looks like a style file, parse it:
-                    if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                        addSingleFile(file);
-                    }
+            File[] fileArray = dirF.listFiles();
+            List<File> files;
+            if (fileArray == null) {
+                files = Collections.emptyList();
+            } else {
+                files = Arrays.asList(fileArray);
+            }
+            for (File file : files) {
+                // If the file looks like a style file, parse it:
+                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
+                    addSingleFile(file, Globals.prefs.getDefaultEncoding());
+                } else if (file.isDirectory() && recurse) {
                     // If the file is a directory, and we should recurse, do:
-                    else if (file.isDirectory() && recurse) {
-                        addStyles(file.getPath(), recurse);
-                    }
+                    addStyles(file.getPath(), recurse);
                 }
             }
-        }
-        else {
+        } else {
             // The file wasn't a directory, so we simply parse it:
-            addSingleFile(dirF);
+            addSingleFile(dirF, Globals.prefs.getDefaultEncoding());
         }
     }
 
@@ -458,16 +467,15 @@ class StyleSelectDialog {
      * Parse a single file, and add it to the list of styles if parse was successful.
      * @param file the file to parse.
      */
-    private void addSingleFile(File file) {
+    private void addSingleFile(File file, Charset encoding) {
         try {
-            OOBibStyle style = new OOBibStyle(file);
+            OOBibStyle style = new OOBibStyle(file, Globals.journalAbbreviationLoader.getRepository(), encoding);
             // Check if the parse was successful before adding it:
             if (style.isValid() && !styles.contains(style)) {
                 styles.add(style);
             }
-        } catch (Exception e) {
-            System.out.println("Unable to read style file: '" + file.getPath() + "'");
-            e.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.warn("Unable to read style file: '" + file.getPath() + "'", e);
         }
     }
 
@@ -538,23 +546,12 @@ class StyleSelectDialog {
             case 0:
                 return style.getName();
             case 1:
-                return formatJournals(style.getJournals());
+                return String.join(", ", style.getJournals());
             case 2:
                 return style.getFile().getName();
             default:
                 return "";
             }
-        }
-
-        private static String formatJournals(Set<String> journals) {
-            StringBuilder sb = new StringBuilder("");
-            for (Iterator<String> i = journals.iterator(); i.hasNext();) {
-                sb.append(i.next());
-                if (i.hasNext()) {
-                    sb.append(", ");
-                }
-            }
-            return sb.toString();
         }
     }
 
@@ -612,7 +609,7 @@ class StyleSelectDialog {
             dd.setLocationRelativeTo(diag);
             dd.setVisible(true);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem showing default style", ex);
         }
     }
 

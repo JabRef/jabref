@@ -46,7 +46,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 public class AutoCompleteSupport<E> {
 
     AutoCompleteRenderer<E> renderer;
-    AutoCompleter<E> autoCompleter;
+    private AutoCompleter<E> autoCompleter;
     JTextComponent textComp;
     JPopupMenu popup = new JPopupMenu();
     private boolean selectsTextOnFocusGain = true;
@@ -211,7 +211,7 @@ public class AutoCompleteSupport<E> {
      *
      * @return
      */
-    public boolean getSelectsTextOnFocusGain() {
+    public boolean isSelectsTextOnFocusGain() {
         return selectsTextOnFocusGain;
     }
 
@@ -236,7 +236,7 @@ public class AutoCompleteSupport<E> {
         String text = textComp.getText();
         List<E> candidates = autoCompleter.complete(text);
         renderer.update(candidates);
-        if (textComp.isEnabled() && (candidates.size() > 0)) {
+        if (textComp.isEnabled() && (!candidates.isEmpty())) {
             renderer.selectItem(0);
 
             popup.setPopupSize(textComp.getWidth(), 200);
@@ -278,13 +278,13 @@ public class AutoCompleteSupport<E> {
 
     /**
      * Selects all text when the textbox gains focus. The behavior is controlled by the value returned from
-     * {@link AutoCompleteSupport#getSelectsTextOnFocusGain()}.
+     * {@link AutoCompleteSupport#isSelectsTextOnFocusGain()}.
      */
     private class ComboBoxEditorFocusHandler extends FocusAdapter {
 
         @Override
         public void focusGained(FocusEvent e) {
-            if (getSelectsTextOnFocusGain() && !e.isTemporary()) {
+            if (isSelectsTextOnFocusGain() && !e.isTemporary()) {
                 textComp.selectAll();
             }
         }

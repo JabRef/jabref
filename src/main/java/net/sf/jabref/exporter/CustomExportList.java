@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.exporter;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -41,14 +40,14 @@ import ca.odell.glazedlists.BasicEventList;
 
 public class CustomExportList {
 
-    private final EventList<String[]> list;
-    private final SortedList<String[]> sorted;
+    private final EventList<List<String>> list;
+    private final SortedList<List<String>> sorted;
     private final Map<String, ExportFormat> formats = new TreeMap<>();
 
     private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
 
 
-    public CustomExportList(Comparator<String[]> comp) {
+    public CustomExportList(Comparator<List<String>> comp) {
         list = new BasicEventList<>();
         sorted = new SortedList<>(list, comp);
     }
@@ -63,7 +62,7 @@ public class CustomExportList {
         return list.size();
     }
 
-    public EventList<String[]> getSortedList() {
+    public EventList<List<String>> getSortedList() {
         return sorted;
     }
 
@@ -76,7 +75,7 @@ public class CustomExportList {
             Optional<ExportFormat> format = createFormat(s);
             if (format.isPresent()) {
                 formats.put(format.get().getConsoleName(), format.get());
-                list.add(s.toArray(new String[s.size()]));
+                list.add(s);
             } else {
                 String customExportFormat = Globals.prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
                 LOGGER.error("Error initializing custom export format from string " + customExportFormat);
@@ -100,15 +99,15 @@ public class CustomExportList {
         return Optional.of(format);
     }
 
-    public void addFormat(String[] s) {
-        createFormat(Arrays.asList(s)).ifPresent(format -> {
+    public void addFormat(List<String> s) {
+        createFormat(s).ifPresent(format -> {
             formats.put(format.getConsoleName(), format);
             list.add(s);
         });
     }
 
-    public void remove(String[] toRemove) {
-        createFormat(Arrays.asList(toRemove)).ifPresent(format -> {
+    public void remove(List<String> toRemove) {
+        createFormat(toRemove).ifPresent(format -> {
             formats.remove(format.getConsoleName());
             list.remove(toRemove);
         });
@@ -120,7 +119,7 @@ public class CustomExportList {
             purge(0);
         } else {
             for (int i = 0; i < list.size(); i++) {
-                Globals.prefs.putStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i, Arrays.asList(list.get(i)));
+                Globals.prefs.putStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i, list.get(i));
             }
             purge(list.size());
         }

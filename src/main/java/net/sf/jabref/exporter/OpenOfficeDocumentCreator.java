@@ -24,6 +24,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -37,6 +41,9 @@ import java.util.zip.ZipOutputStream;
  */
 public class OpenOfficeDocumentCreator extends ExportFormat {
 
+    private static final Log LOGGER = LogFactory.getLog(OpenOfficeDocumentCreator.class);
+
+
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
@@ -45,8 +52,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData,
- final String file,
+    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws Exception {
         OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, keySet);
     }
@@ -82,7 +88,9 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
 
         // Delete the temporary file:
-        tmpFile.delete();
+        if (!tmpFile.delete()) {
+            LOGGER.info("Cannot delete temporary export file");
+        }
     }
 
     private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, Set<String> keySet) {
@@ -121,7 +129,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot get resource", e);
         }
     }
 }

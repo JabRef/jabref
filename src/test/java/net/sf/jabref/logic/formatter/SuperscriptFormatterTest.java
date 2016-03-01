@@ -16,7 +16,7 @@ public class SuperscriptFormatterTest {
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         formatter = null;
     }
 
@@ -38,7 +38,6 @@ public class SuperscriptFormatterTest {
     @Test
     public void replaceSuperscriptsEmptyFields() {
         expectCorrect("", "");
-        expectCorrect(null, null);
     }
 
     @Test

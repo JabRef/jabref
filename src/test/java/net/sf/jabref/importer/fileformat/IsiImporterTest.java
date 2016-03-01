@@ -4,7 +4,6 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -147,7 +146,7 @@ public class IsiImporterTest {
                     "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
                     entry.getField("author"));
 
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, entry.getType());
+            Assert.assertEquals("article", entry.getType());
             Assert.assertEquals("Optical Materials", entry.getField("journal"));
             Assert.assertEquals("2006", entry.getField("year"));
             Assert.assertEquals("28", entry.getField("volume"));
@@ -167,7 +166,7 @@ public class IsiImporterTest {
             BibEntry entry = entries.get(0);
             Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
 
-            Assert.assertEquals(BibtexEntryTypes.MISC, entry.getType());
+            Assert.assertEquals("misc", entry.getType());
             Assert.assertEquals("Optical Materials", entry.getField("journal"));
             Assert.assertEquals("2006", entry.getField("year"));
             Assert.assertEquals("28", entry.getField("volume"));
@@ -198,7 +197,7 @@ public class IsiImporterTest {
             Assert.assertEquals(
                     "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
                     a.getField("title"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
 
             Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.",
                     a.getField("author"));
@@ -208,21 +207,13 @@ public class IsiImporterTest {
             Assert.assertEquals("89", a.getField("volume"));
             Assert.assertEquals("4", a.getField("number"));
             Assert.assertEquals(
-                    "We report on the generation of continuous-wave (cw) ultraviolet"
-                            + " (UV) laser light at lambda =278 nm by optical frequency doubling of"
-                            + " visible light in beta -BaB$_2$O$_4$ waveguides. Ridge-type "
-                            + "waveguides were produced by He$^+$ implantation, photolithography"
-                            + " masking, and plasma etching. The final waveguides have core dimension"
-                            + " of a few mu m$^2$ and show transmission losses of 5 dB/cm at 532 nm "
-                            + "and less than 10 dB/cm at 266 nm. In our first experiments, a second "
-                            + "harmonic power of 24 mu W has been generated at 278 nm in an 8 mm long "
-                            + "waveguide pumped by 153 mW at 556 nm.".replaceFirst("266", "\n"),
+                    "Lorem ipsum abstract",
                     a.getField("abstract"));
             Assert.assertEquals("Aip", a.getField("publisher"));
 
             Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
                     b.getField("title"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
+            Assert.assertEquals("article", b.getType());
         }
     }
 
@@ -303,7 +294,7 @@ public class IsiImporterTest {
 
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
-            Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
             Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
             Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
                     + "Images Exploiting Directional Filtering, Perceptual "
@@ -315,23 +306,7 @@ public class IsiImporterTest {
             Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
             Assert.assertEquals("2006", a.getField("year"));
             Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("In this letter, the problem of detecting urban road "
-                    + "networks from high-resolution optical/synthetic aperture "
-                    + "radar (SAR) images is addressed. To this end, this letter "
-                    + "exploits a priori knowledge about road direction "
-                    + "distribution in urban areas. In particular, this letter "
-                    + "presents an adaptive filtering procedure able to capture the "
-                    + "predominant directions of these roads and enhance the "
-                    + "extraction results. After road element extraction, to both "
-                    + "discard redundant segments and avoid gaps, a special "
-                    + "perceptual grouping algorithm is devised, exploiting "
-                    + "colinearity as well as proximity concepts. Finally, the road "
-                    + "network topology is considered, checking for road "
-                    + "intersections and regularizing the overall patterns using "
-                    + "these focal points. The proposed procedure was tested on a "
-                    + "pair of very high resolution images, one from an optical "
-                    + "sensor and one from a SAR sensor. The experiments show an "
-                    + "increase in both the completeness and the quality indexes " + "for the extracted road network.",
+            Assert.assertEquals("Lorem ipsum abstract",
                     a.getField("abstract"));
 
         }
@@ -348,7 +323,7 @@ public class IsiImporterTest {
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
 
-            Assert.assertEquals(a.getType().getName(), BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
             Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
             Assert.assertEquals(
                     "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts",
@@ -360,23 +335,7 @@ public class IsiImporterTest {
             Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
             Assert.assertEquals("2006", a.getField("year"));
             Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("In this letter, the problem of detecting urban road "
-                    + "networks from high-resolution optical/synthetic aperture "
-                    + "radar (SAR) images is addressed. To this end, this letter "
-                    + "exploits a priori knowledge about road direction "
-                    + "distribution in urban areas. In particular, this letter "
-                    + "presents an adaptive filtering procedure able to capture the "
-                    + "predominant directions of these roads and enhance the "
-                    + "extraction results. After road element extraction, to both "
-                    + "discard redundant segments and avoid gaps, a special "
-                    + "perceptual grouping algorithm is devised, exploiting "
-                    + "colinearity as well as proximity concepts. Finally, the road "
-                    + "network topology is considered, checking for road "
-                    + "intersections and regularizing the overall patterns using "
-                    + "these focal points. The proposed procedure was tested on a "
-                    + "pair of very high resolution images, one from an optical "
-                    + "sensor and one from a SAR sensor. The experiments show an "
-                    + "increase in both the completeness and the quality indexes " + "for the extracted road network.",
+            Assert.assertEquals("Lorem ipsum abstract",
                     a.getField("abstract"));
 
         }
@@ -403,7 +362,7 @@ public class IsiImporterTest {
             Assert.assertEquals("12", a.getField("volume"));
             Assert.assertEquals("20", a.getField("number"));
             Assert.assertEquals("2457--71", a.getField("pages"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, a.getType());
+            Assert.assertEquals("article", a.getType());
 
             Assert.assertEquals(
                     "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
@@ -416,7 +375,7 @@ public class IsiImporterTest {
             Assert.assertEquals("13", b.getField("volume"));
             Assert.assertEquals("3", b.getField("number"));
             Assert.assertEquals("411--22", b.getField("pages"));
-            Assert.assertEquals(BibtexEntryTypes.ARTICLE, b.getType());
+            Assert.assertEquals("article", b.getType());
         }
     }
 

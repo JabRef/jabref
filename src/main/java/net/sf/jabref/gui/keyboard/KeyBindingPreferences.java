@@ -18,12 +18,13 @@ public class KeyBindingPreferences {
 
     private final JabRefPreferences prefs;
 
+    private KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
+
+
     public KeyBindingPreferences(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
         restoreKeyBindings();
     }
-
-    private KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
 
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences.

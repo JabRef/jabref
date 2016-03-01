@@ -16,6 +16,7 @@
 package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.gui.*;
@@ -39,10 +40,9 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final String[] URL_FIRST = {"url", "doi"};
-    private static final String[] DOI_FIRST = {"doi", "url"};
-    private static final String[] ARXIV = {"eprint"};
-    public static final String[] FILE = {Globals.FILE_FIELD};
+    private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
+    private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
+    private static final List<String> ARXIV = Arrays.asList("eprint");
 
     private final BibDatabase database;
 
@@ -139,7 +139,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
             String[] fields = columnName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-            tableColumns.add(new MainTableColumn(columnName, fields, database));
+            tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 
 

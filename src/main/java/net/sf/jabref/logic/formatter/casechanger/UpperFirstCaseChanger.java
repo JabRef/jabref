@@ -11,6 +11,11 @@ public class UpperFirstCaseChanger implements Formatter {
         return Localization.lang("Upper first");
     }
 
+    @Override
+    public String getKey() {
+        return "UpperFirstCaseChanger";
+    }
+
     /**
      * Converts the first character of the first word of the given string to a upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with "{"
      */

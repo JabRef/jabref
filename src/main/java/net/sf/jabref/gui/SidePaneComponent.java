@@ -15,14 +15,11 @@
  */
 package net.sf.jabref.gui;
 
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.jdesktop.swingx.JXTitledPanel;
+import org.jdesktop.swingx.painter.MattePainter;
 
 import javax.swing.*;
-
-import org.jdesktop.swingx.JXTitledPanel;
+import java.awt.*;
 
 public abstract class SidePaneComponent extends JXTitledPanel {
 
@@ -35,26 +32,36 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     public SidePaneComponent(SidePaneManager manager, Icon icon, String title) {
         super(title);
-        this.add(new JLabel(icon));
         this.manager = manager;
-        JToolBar tlb = new JToolBar();
+
+        this.add(new JLabel(icon));
+
+        setTitleForeground(new Color(79, 95, 143));
+        setBorder(BorderFactory.createEmptyBorder());
+
         close.setMargin(new Insets(0, 0, 0, 0));
         close.setBorder(null);
+        close.addActionListener(e -> hideAway());
+
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
         up.setMargin(new Insets(0, 0, 0, 0));
+        up.setBorder(null);
+        up.addActionListener(e -> moveUp());
+
         JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
         down.setMargin(new Insets(0, 0, 0, 0));
-        up.setBorder(null);
         down.setBorder(null);
-        up.addActionListener(new UpButtonListener());
-        down.addActionListener(new DownButtonListener());
-        tlb.setFloatable(false);
+        down.addActionListener(e -> moveDown());
+
+        JToolBar tlb = new OSXCompatibleToolbar();
         tlb.add(up);
         tlb.add(down);
         tlb.add(close);
-        close.addActionListener(new CloseButtonListener());
+        tlb.setOpaque(false);
+        tlb.setFloatable(false);
         this.getUI().getTitleBar().add(tlb);
-        setBorder(BorderFactory.createEmptyBorder());
+        setTitlePainter(new MattePainter(Color.lightGray));
+
     }
 
     private void hideAway() {
@@ -94,30 +101,5 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     @Override
     public Dimension getMinimumSize() {
         return getPreferredSize();
-    }
-
-
-    private class CloseButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            hideAway();
-        }
-    }
-
-    private class UpButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            moveUp();
-        }
-    }
-
-    private class DownButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            moveDown();
-        }
     }
 }

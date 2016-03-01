@@ -15,10 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -43,7 +40,7 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 /**
  *
@@ -52,19 +49,19 @@ import net.sf.jabref.util.Util;
 class FieldSetComponent extends JPanel implements ActionListener {
 
     private final Set<ActionListener> additionListeners = new HashSet<>();
-    final JList<String> list;
+    protected final JList<String> list;
     private final JScrollPane sp;
-    DefaultListModel<String> listModel;
+    protected DefaultListModel<String> listModel;
     private JComboBox<String> sel;
     private JTextField input;
     private final JButton add;
-    final JButton remove;
+    protected final JButton remove;
     private JButton up;
     private JButton down;
-    final GridBagLayout gbl = new GridBagLayout();
-    final GridBagConstraints con = new GridBagConstraints();
-    final boolean forceLowerCase;
-    boolean changesMade;
+    protected final GridBagLayout gbl = new GridBagLayout();
+    protected final GridBagConstraints con = new GridBagConstraints();
+    protected final boolean forceLowerCase;
+    protected boolean changesMade;
     private final Set<ListDataListener> modelListeners = new HashSet<>();
 
 
@@ -155,17 +152,17 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         con.gridwidth = 3;
         con.weightx = 1;
-        if (preset != null) {
+        if (preset == null) {
+            input = new JTextField(20);
+            input.addActionListener(this);
+            gbl.setConstraints(input, con);
+            add(input);
+        } else {
             sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
             //sel.addActionListener(this);
             gbl.setConstraints(sel, con);
             add(sel);
-        } else {
-            input = new JTextField(20);
-            input.addActionListener(this);
-            gbl.setConstraints(input, con);
-            add(input);
         }
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 0;
@@ -188,7 +185,10 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
         // Make sure it is visible:
         JViewport viewport = sp.getViewport();
-        viewport.scrollRectToVisible(list.getCellBounds(idx, idx));
+        Rectangle rectangle = list.getCellBounds(idx, idx);
+        if(rectangle != null) {
+            viewport.scrollRectToVisible(rectangle);
+        }
 
     }
 
@@ -232,7 +232,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * This method is called when a new field should be added to the list. Performs validation of the
      * field.
      */
-    void addField(String s) {
+    protected void addField(String s) {
         s = s.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
@@ -241,7 +241,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             return;
         }
 
-        String testString = Util.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "
@@ -257,7 +257,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * This method adds a new field to the list, without any regard to validation. This method can be
      * useful for classes that overrides addField(s) to provide different validation.
      */
-    void addFieldUncritically(String s) {
+    protected void addFieldUncritically(String s) {
         listModel.addElement(s);
         changesMade = true;
         for (ActionListener additionListener : additionListeners) {
@@ -266,7 +266,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
 
     }
 
-    void removeSelected() {
+    protected void removeSelected() {
         int[] selected = list.getSelectedIndices();
         if (selected.length > 0) {
             changesMade = true;
@@ -337,15 +337,12 @@ class FieldSetComponent extends JPanel implements ActionListener {
             } else if ((input != null) && !"".equals(input.getText())) {
                 addField(input.getText());
             }
-        }
-        else if (src == input) {
+        } else if (src == input) {
             addField(input.getText());
-        }
-        else if (src == remove) {
+        } else if (src == remove) {
             // Remove button pressed:
             removeSelected();
-        }
-        else if (src == sel) {
+        } else if (src == sel) {
             if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
@@ -355,11 +352,9 @@ class FieldSetComponent extends JPanel implements ActionListener {
             String s = sel.getSelectedItem().toString();
             addField(s);
             sel.getEditor().selectAll();
-        }
-        else if (src == up) {
+        } else if (src == up) {
             move(-1);
-        }
-        else if (src == down) {
+        } else if (src == down) {
             move(1);
         }
     }

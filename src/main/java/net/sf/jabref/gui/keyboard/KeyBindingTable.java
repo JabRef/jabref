@@ -5,10 +5,6 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class KeyBindingTable extends JTable {
 
-    public KeyBindingTable() {
-        super();
-    }
-
     @Override
     public boolean isCellEditable(int row, int col) {
         return false;

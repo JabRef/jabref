@@ -24,6 +24,10 @@ import java.io.IOException;
 import java.io.FilenameFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.*;
 
 /**
@@ -35,7 +39,11 @@ import java.util.*;
  */
 public class RegExpFileSearch {
 
+    private static final Log LOGGER = LogFactory.getLog(RegExpFileSearch.class);
+
     private static final String EXT_MARKER = "__EXTENSION__";
+
+    private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
 
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories
@@ -68,14 +76,7 @@ public class RegExpFileSearch {
     private static List<File> findFiles(BibEntry entry, Collection<String> extensions,
             Collection<File> directories, String regularExpression) {
 
-        StringBuilder sb = new StringBuilder();
-        for (Iterator<String> i = extensions.iterator(); i.hasNext();) {
-            sb.append(i.next());
-            if (i.hasNext()) {
-                sb.append('|');
-            }
-        }
-        String extensionRegExp = '(' + sb.toString() + ')';
+        String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
         return RegExpFileSearch.findFile(entry, directories, regularExpression, extensionRegExp);
     }
@@ -165,7 +166,7 @@ public class RegExpFileSearch {
                     res.set(i, new File(tmp));
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Problem searching", e);
                 }
             }
         }
@@ -186,7 +187,7 @@ public class RegExpFileSearch {
         }
 
         // Escape handling...
-        Matcher m = Pattern.compile("([^\\\\])\\\\([^\\\\])").matcher(file);
+        Matcher m = ESCAPE_PATTERN.matcher(file);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));

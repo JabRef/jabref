@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.List;
 public class BibtexEntryTests {
 
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -24,14 +23,14 @@ public class BibtexEntryTests {
     public void testDefaultConstructor() {
         BibEntry entry = new BibEntry();
         // we have to use `getType("misc")` in the case of biblatex mode
-        Assert.assertEquals(EntryTypes.getType("misc"), entry.getType());
+        Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
         Assert.assertNull(entry.getField("author"));
     }
 
     @Test
     public void allFieldsPresentDefault() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -47,7 +46,7 @@ public class BibtexEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -62,21 +61,8 @@ public class BibtexEntryTests {
     }
 
     @Test
-    public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
-        e.setField("author", "abc");
-        e.setField("title", "abc");
-        e.setField("journal", "abc");
-
-        Assert.assertFalse(e.hasAllRequiredFields(null));
-
-        e.setField("year", "2015");
-        Assert.assertTrue(e.hasAllRequiredFields(null));
-    }
-
-    @Test
     public void isNullOrEmptyCiteKey() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE);
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         Assert.assertFalse(e.hasCiteKey());
 
         e.setField(BibEntry.KEY_FIELD, "");

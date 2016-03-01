@@ -26,7 +26,7 @@ public class JTextFieldChangeListenerUtil {
      *
      * @param text any text component, such as a {@link JTextField}
      *        or {@link JTextArea}
-     * @param changeListener a listener to receieve {@link ChangeEvent}s
+     * @param changeListener a listener to receive {@link ChangeEvent}s
      *        when the text is changed; the source object for the events
      *        will be the text component
      * @throws NullPointerException if either parameter is null
@@ -35,7 +35,9 @@ public class JTextFieldChangeListenerUtil {
         Objects.requireNonNull(text);
         Objects.requireNonNull(changeListener);
         DocumentListener dl = new DocumentListener() {
-            private int lastChange = 0, lastNotifiedChange = 0;
+
+            private int lastChange;
+            private int lastNotifiedChange;
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -61,12 +63,18 @@ public class JTextFieldChangeListenerUtil {
         text.addPropertyChangeListener("document", (PropertyChangeEvent e) -> {
             Document d1 = (Document)e.getOldValue();
             Document d2 = (Document)e.getNewValue();
-            if (d1 != null) d1.removeDocumentListener(dl);
-            if (d2 != null) d2.addDocumentListener(dl);
+            if (d1 != null) {
+                d1.removeDocumentListener(dl);
+            }
+            if (d2 != null) {
+                d2.addDocumentListener(dl);
+            }
             dl.changedUpdate(null);
         });
         Document d = text.getDocument();
-        if (d != null) d.addDocumentListener(dl);
+        if (d != null) {
+            d.addDocumentListener(dl);
+        }
     }
 
 }

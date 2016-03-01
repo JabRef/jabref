@@ -15,7 +15,8 @@
 */
 package net.sf.jabref.logic.formatter.casechanger;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -23,28 +24,35 @@ import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class CaseKeeper implements Formatter {
 
-    private String format(String text, String[] listOfWords) {
-        Arrays.sort(listOfWords, new StringLengthComparator());
+    private String format(String text, List<String> listOfWords) {
+        String result = text;
+        listOfWords.sort(new StringLengthComparator());
         // For each word in the list
         for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, ", or } or if it is at the start of the string but not if it is followed by a }
-            text = text.replaceAll("(^|[- /\\[(}\"])" + listOfWord + "($|[^}])", "$1\\{" + listOfWord + "\\}$2");
+            result = result.replaceAll("(^|[- /\\[(}\"])" + listOfWord + "($|[^}])", "$1\\{" + listOfWord + "\\}$2");
         }
-        return text;
+        return result;
     }
 
     @Override
     public String format(String text) {
-        if ((text == null) || text.isEmpty()) {
+        Objects.requireNonNull(text);
+
+        if (text.isEmpty()) {
             return text;
         }
-        final CaseKeeperList list = new CaseKeeperList();
-        return this.format(text, list.getAll());
+        return this.format(text, CaseKeeperList.getAll());
     }
 
     @Override
     public String getName() {
         return Localization.lang("CaseKeeper");
+    }
+
+    @Override
+    public String getKey() {
+        return "CaseKeeper";
     }
 
 }

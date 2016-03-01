@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -43,7 +43,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = next;
-        this.numeric = BibtexFields.isNumeric(sortField);
+        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     public EntryComparator(boolean binary, boolean desc, String field) {
@@ -51,11 +51,11 @@ public class EntryComparator implements Comparator<BibEntry> {
         this.sortField = field;
         this.descending = desc;
         this.next = null;
-        this.numeric = BibtexFields.isNumeric(sortField);
+        this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override
-    public int compare(BibEntry e1, BibEntry e2) throws ClassCastException {
+    public int compare(BibEntry e1, BibEntry e2) {
 
         if (e1 == e2) {
             return 0;
@@ -66,10 +66,10 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         if (binary) {
             // We just separate on set and unset fields:
-            if (f1 != null) {
-                return f2 == null ? -1 : next != null ? next.compare(e1, e2) : idCompare(e1, e2);
+            if (f1 == null) {
+                return f2 == null ? (next == null ? idCompare(e1, e2) : next.compare(e1, e2)) : 1;
             } else {
-                return f2 == null ? next != null ? next.compare(e1, e2) : idCompare(e1, e2) : 1;
+                return f2 == null ? -1 : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
             }
         }
 
@@ -78,17 +78,15 @@ public class EntryComparator implements Comparator<BibEntry> {
         if ("author".equals(sortField) || "editor".equals(sortField)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
-                //ImportFormatReader.fixAuthor_lastNameFirst((String)f1);
             }
             if (f2 != null) {
                 f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase();
-                //ImportFormatReader.fixAuthor_lastNameFirst((String)f2);
             }
 
         } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
             // Sort by type.
-            f1 = e1.getType().getName();
-            f2 = e2.getType().getName();
+            f1 = e1.getType();
+            f2 = e2.getType();
         } else if (numeric) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);
@@ -103,7 +101,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         }
 
         if ((f1 == null) && (f2 == null)) {
-            return next != null ? next.compare(e1, e2) : idCompare(e1, e2);
+            return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
         }
         if ((f1 != null) && (f2 == null)) {
             return -1;
@@ -131,11 +129,10 @@ public class EntryComparator implements Comparator<BibEntry> {
         if (result != 0) {
             return descending ? result : -result; // Primary sort.
         }
-        if (next != null) {
-            return next.compare(e1, e2); // Secondary sort if existent.
-        } else {
-
+        if (next == null) {
             return idCompare(e1, e2); // If still equal, we use the unique IDs.
+        } else {
+            return next.compare(e1, e2); // Secondary sort if existent.
         }
     }
 

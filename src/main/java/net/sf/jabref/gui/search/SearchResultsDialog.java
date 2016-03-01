@@ -41,8 +41,11 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.BibtexFields;
+import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -53,7 +56,7 @@ import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
-import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -82,6 +85,8 @@ import net.sf.jabref.model.entry.EntryUtil;
  */
 public class SearchResultsDialog {
 
+    private static final Log LOGGER = LogFactory.getLog(SearchResultsDialog.class);
+
     private final JabRefFrame frame;
 
     private JDialog diag;
@@ -99,7 +104,7 @@ public class SearchResultsDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final EventList<BibEntry> entries = new BasicEventList<>();
 
-    private final HashMap<BibEntry, BasePanel> entryHome = new HashMap<>();
+    private final Map<BibEntry, BasePanel> entryHome = new HashMap<>();
     private DefaultEventTableModel<BibEntry> model;
 
     private SortedList<BibEntry> sortedEntries;
@@ -116,8 +121,9 @@ public class SearchResultsDialog {
         diag = new JDialog(frame, title, false);
 
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        preview = new PreviewPanel(null, new MetaData(),
-                activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs.get(JabRefPreferences.PREVIEW_1));
+        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
+                .get(JabRefPreferences.PREVIEW_1);
+        preview = new PreviewPanel(null, new MetaData(), layoutFile);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -160,13 +166,12 @@ public class SearchResultsDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
-                    BibEntry[] bes = selectionModel.getSelected().toArray
-                            (new BibEntry[selectionModel.getSelected().size()]);
+                    List<BibEntry> bes = selectionModel.getSelected();
                     TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
                     // ! look at ClipBoardManager
                     Toolkit.getDefaultToolkit().getSystemClipboard()
                             .setContents(trbe, frame.getCurrentBasePanel());
-                    frame.output(Localization.lang("Copied") + ' ' + (bes.length > 1 ? bes.length + " "
+                    frame.output(Localization.lang("Copied") + ' ' + (bes.size() > 1 ? bes.size() + " "
                             + Localization.lang("entries")
                             : "1 " + Localization.lang("entry") + '.'));
                 }
@@ -217,8 +222,7 @@ public class SearchResultsDialog {
      */
     private void setupComparatorChooser(TableComparatorChooser<BibEntry> comparatorChooser) {
         // First column:
-        java.util.List<Comparator> comparators = comparatorChooser
-                .getComparatorsForColumn(0);
+        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
 
         comparators = comparatorChooser.getComparatorsForColumn(1);
@@ -261,7 +265,7 @@ public class SearchResultsDialog {
         }
 
         for (int i = 0; i < fields.length; i++) {
-            int width = BibtexFields.getFieldLength(fields[i]);
+            int width = InternalBibtexFields.getFieldLength(fields[i]);
             cm.getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -337,27 +341,24 @@ public class SearchResultsDialog {
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
-                    Object o = entry.getField(Globals.FILE_FIELD);
-                    if (o != null) {
+                    if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent((String) o);
+                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
-                                p.metaData(), fl.getType())).actionPerformed(null);
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
+                                p.getBibDatabaseContext().getMetaData(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
-                    Object link = entry.getField("url");
-                    try {
-                        if (link != null) {
-                            JabRefDesktop.openExternalViewer(p.metaData(), (String) link, "url");
-                        }
+                    entry.getFieldOptional("url").ifPresent(link -> { try {
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext().getMetaData(), link, "url");
                     } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                            LOGGER.warn("Could not open viewer", ex);
+                        }
+                    });
                     break;
 
                 }
@@ -380,19 +381,18 @@ public class SearchResultsDialog {
 
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
-                Object o = entry.getField(Globals.FILE_FIELD);
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent((String) o);
+                fileList.setContent(entry.getField(Globals.FILE_FIELD));
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
-                    String description = flEntry.getDescription();
+                    String description = flEntry.description;
                     if ((description == null) || (description.trim().isEmpty())) {
-                        description = flEntry.getLink();
+                        description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.getLink(), flEntry.getType().getIcon(), p.metaData(),
-                            flEntry.getType()));
+                            flEntry.link, flEntry.type.getIcon(), p.getBibDatabaseContext().getMetaData(),
+                            flEntry.type));
                     count++;
                 }
 
@@ -417,7 +417,7 @@ public class SearchResultsDialog {
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
                 // Update the preview's metadata reference:
-                preview.setMetaData(p.metaData());
+                preview.setMetaData(p.getBibDatabaseContext().getMetaData());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
@@ -455,25 +455,26 @@ public class SearchResultsDialog {
         @Override
         public Object getColumnValue(BibEntry entry, int column) {
             if (column < PAD) {
-                Object o;
                 switch (column) {
                 case FILE_COL:
-                    o = entry.getField(Globals.FILE_FIELD);
-                    if (o != null) {
+                    if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tmpModel = new FileListTableModel();
-                        tmpModel.setContent((String) o);
+                        tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            fileLabel.setIcon(tmpModel.getEntry(0).getType().getIcon());
+                            if(tmpModel.getEntry(0).type!=null) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            } else {
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            }
                         }
                         return fileLabel;
                     } else {
                         return null;
                     }
                 case URL_COL:
-                    o = entry.getField("url");
-                    if (o != null) {
-                        urlLabel.setToolTipText((String) o);
+                    if (entry.hasField("url")) {
+                        urlLabel.setToolTipText(entry.getField("url"));
                         return urlLabel;
                     } else {
                         return null;

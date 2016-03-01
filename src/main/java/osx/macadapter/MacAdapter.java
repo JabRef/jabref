@@ -24,7 +24,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import java.io.File;
 import java.util.List;
 
-public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler {
+public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler, OpenFilesHandler, AppReOpenedListener {
 
     private JabRefFrame parentFrame;
 
@@ -34,6 +34,7 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
         Application.getApplication().setAboutHandler(this);
         Application.getApplication().setPreferencesHandler(this);
         Application.getApplication().setQuitHandler(this);
+        Application.getApplication().addAppEventListener(this);
         FullScreenUtilities.setWindowCanFullScreen(parentFrame, true);
     }
 
@@ -80,5 +81,10 @@ public class MacAdapter implements PreferencesHandler, AboutHandler, QuitHandler
         }
 
         parentFrame.preferences();
+    }
+
+    @Override
+    public void appReOpened(AppEvent.AppReOpenedEvent appReOpenedEvent) {
+        parentFrame.setVisible(true);
     }
 }

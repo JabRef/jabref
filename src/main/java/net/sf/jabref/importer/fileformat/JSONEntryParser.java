@@ -24,18 +24,12 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
 public class JSONEntryParser {
 
     private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
-
-
-    public JSONEntryParser() {
-
-    }
 
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry
@@ -53,7 +47,7 @@ public class JSONEntryParser {
 
 
         BibEntry entry = new BibEntry();
-        entry.setType(EntryTypes.getType("article"));
+        entry.setType("article");
 
         // Authors
         if (bibJsonEntry.has("author")) {
@@ -168,11 +162,11 @@ public class JSONEntryParser {
         String isbn = springerJsonEntry.optString("isbn");
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
-            entry.setType(EntryTypes.getType("article"));
+            entry.setType("article");
             nametype = "journal";
         } else {
             // Probably book chapter or from proceeding, go for book chapter
-            entry.setType(EntryTypes.getType("incollection"));
+            entry.setType("incollection");
             nametype = "booktitle";
             entry.setField("isbn", isbn);
         }
@@ -232,7 +226,7 @@ public class JSONEntryParser {
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
             entry.setField("date", date); // For BibLatex
-            String dateparts[] = date.split("-");
+            String[] dateparts = date.split("-");
             entry.setField("year", dateparts[0]);
             entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }

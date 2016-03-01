@@ -22,6 +22,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import javax.swing.*;
 
@@ -36,7 +37,6 @@ public class ImportDialog extends JDialog {
     public static final int CONTENT = 2;
     public static final int ONLYATTACH = 4;
 
-    private final JPanel contentPane;
     private final JCheckBox checkBoxDoNotShowAgain;
     private final JCheckBox useDefaultPDFImportStyle;
     private final JRadioButton radioButtonXmp;
@@ -48,7 +48,7 @@ public class ImportDialog extends JDialog {
 
     public ImportDialog(boolean targetIsARow, String fileName) {
         Boolean targetIsARow1 = targetIsARow;
-        contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
@@ -104,11 +104,7 @@ public class ImportDialog extends JDialog {
             this.radioButtononlyAttachPDF.setEnabled(false);
         }
         String name = new File(fileName).getName();
-        if (name.length() < 34) {
-            labelFileName.setText(name);
-        } else {
-            labelFileName.setText(new File(fileName).getName().substring(0, 33) + "...");
-        }
+        labelFileName.setText(StringUtil.limitStringLength(name, 34));
         this.setTitle(Localization.lang("Import_Metadata_From_PDF"));
 
         setModal(true);
@@ -121,21 +117,8 @@ public class ImportDialog extends JDialog {
         bg.add(radioButtonPDFcontent);
         bg.add(radioButtononlyAttachPDF);
 
-        buttonOK.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -146,13 +129,8 @@ public class ImportDialog extends JDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         switch (Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
@@ -210,16 +188,12 @@ public class ImportDialog extends JDialog {
         }
     }
 
-    public boolean getDoNotShowAgain() {
+    public boolean isDoNotShowAgain() {
         return this.checkBoxDoNotShowAgain.isSelected();
     }
 
     public int getResult() {
         return result;
-    }
-
-    public JComponent $$$getRootComponent$$$() {
-        return contentPane;
     }
 
     public void disableXMPChoice() {

@@ -2,6 +2,7 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,9 +16,21 @@ import java.util.regex.Pattern;
  * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
  */
 public class PageNumbersFormatter implements Formatter {
+
+    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
+
+    private static final String REJECT_LITERALS = "[^0-9,\\-\\+]";
+    private static final String PAGES_REPLACE_PATTERN = "$1--$2";
+
+
     @Override
     public String getName() {
         return "Page numbers";
+    }
+
+    @Override
+    public String getKey() {
+        return "PageNumbersFormatter";
     }
 
     /**
@@ -36,21 +49,19 @@ public class PageNumbersFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        final String rejectLiterals = "[^0-9,\\-\\+]";
-        final Pattern pagesPattern = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
-        final String replace = "$1--$2";
+        Objects.requireNonNull(value);
 
-        // nothing to do
-        if ((value == null) || value.isEmpty()) {
+        if (value.isEmpty()) {
+            // nothing to do
             return value;
         }
 
         // remove unwanted literals incl. whitespace
-        String cleanValue = value.replaceAll(rejectLiterals, "");
+        String cleanValue = value.replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
-        Matcher matcher = pagesPattern.matcher(cleanValue);
+        Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         // replace
-        String newValue = matcher.replaceFirst(replace);
+        String newValue = matcher.replaceFirst(PAGES_REPLACE_PATTERN);
         // replacement?
         if(!newValue.equals(cleanValue)) {
             // write field

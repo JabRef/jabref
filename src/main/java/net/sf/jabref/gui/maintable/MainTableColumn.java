@@ -2,6 +2,7 @@ package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 import javax.swing.*;
 import java.util.*;
 
@@ -25,17 +26,17 @@ public class MainTableColumn {
         this.database = Optional.empty();
     }
 
-    public MainTableColumn(String columnName, String[] bibtexFields, BibDatabase database) {
+    public MainTableColumn(String columnName, List<String> bibtexFields, BibDatabase database) {
         this.columnName = columnName;
-        this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
+        this.bibtexFields = Collections.unmodifiableList(bibtexFields);
         this.isIconColumn = false;
         this.iconLabel = Optional.empty();
         this.database = Optional.of(database);
     }
 
-    public MainTableColumn(String columnName, String[] bibtexFields, JLabel iconLabel) {
+    public MainTableColumn(String columnName, List<String> bibtexFields, JLabel iconLabel) {
         this.columnName = columnName;
-        this.bibtexFields = Collections.unmodifiableList(Arrays.asList(bibtexFields));
+        this.bibtexFields = Collections.unmodifiableList(bibtexFields);
         this.isIconColumn = true;
         this.iconLabel = Optional.of(iconLabel);
         this.database = Optional.empty();
@@ -92,7 +93,7 @@ public class MainTableColumn {
         String content = null;
         for (String field : bibtexFields) {
             if (field.equals(BibEntry.TYPE_HEADER)) {
-                content = entry.getType().getName();
+                content = EntryUtil.capitalizeFirst(entry.getType());
             } else {
                 content = entry.getFieldOrAlias(field);
                 if (database.isPresent() && "Author".equalsIgnoreCase(columnName) && (content != null)) {

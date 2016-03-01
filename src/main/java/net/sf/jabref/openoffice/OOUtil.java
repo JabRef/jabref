@@ -16,6 +16,7 @@
 package net.sf.jabref.openoffice;
 
 import java.util.List;
+import java.util.BitSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +27,12 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.Layout;
 
+import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
@@ -36,15 +40,34 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
 
 /**
  * Utility methods for processing OO Writer documents.
  */
 class OOUtil {
 
-    private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
+    private static final String CHAR_STRIKEOUT = "CharStrikeout";
+    private static final String CHAR_UNDERLINE = "CharUnderline";
+    private static final String PARA_STYLE_NAME = "ParaStyleName";
+    private static final String CHAR_CASE_MAP = "CharCaseMap";
+    private static final String CHAR_POSTURE = "CharPosture";
+    private static final String CHAR_WEIGHT = "CharWeight";
+    private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
+    private static final String CHAR_ESCAPEMENT = "CharEscapement";
 
-    static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
+    public static final int TOTAL_FORMAT_COUNT = 8;
+
+    private static final int FORMAT_BOLD = 0;
+    private static final int FORMAT_ITALIC = 1;
+    private static final int FORMAT_SMALLCAPS = 2;
+    private static final int FORMAT_SUPERSCRIPT = 3;
+    private static final int FORMAT_SUBSCRIPT = 4;
+    private static final int FORMAT_UNDERLINE = 5;
+    private static final int FORMAT_STRIKEOUT = 6;
+    private static final int FORMAT_MONOSPACE = 7;
+
+    private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
     private static final String UNIQUEFIER_FIELD = "uniq";
 
@@ -63,7 +86,8 @@ class OOUtil {
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
-            throws Exception {
+                    throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+                    WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
         String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
@@ -97,10 +121,14 @@ class OOUtil {
      * @param cursor The cursor giving the insert location.
      * @param lText The marked-up text to insert.
      * @param parStyle The name of the paragraph style to use.
-     * @throws Exception
+     * @throws WrappedTargetException
+     * @throws PropertyVetoException
+     * @throws UnknownPropertyException
+     * @throws IllegalArgumentException
      */
-    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor,
-            String lText, String parStyle) throws Exception {
+    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor, String lText,
+            String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+                    WrappedTargetException, IllegalArgumentException {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
                 XParagraphCursor.class, cursor);
@@ -108,55 +136,54 @@ class OOUtil {
                 XPropertySet.class, parCursor);
 
         try {
-            props.setPropertyValue("ParaStyleName", parStyle);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
+        } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 
+        BitSet formatting = new BitSet(TOTAL_FORMAT_COUNT);
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        int italic = 0;
-        int bold = 0;
-        int sup = 0;
-        int sub = 0;
-        int mono = 0;
-        int smallCaps = 0;
-        //insertTextAtCurrentLocation(text, cursor, "_",
-        //    false, false, false, false, false, false);
-        //cursor.goLeft((short)1, true);
         Matcher m = OOUtil.HTML_TAG.matcher(lText);
         while (m.find()) {
             String ss = lText.substring(piv, m.start());
             if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, (bold % 2) > 0, (italic % 2) > 0,
-                        mono > 0, smallCaps > 0, sup > 0, sub > 0);
+                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, formatting);
             }
             String tag = m.group();
             // Handle tags:
             if ("<b>".equals(tag)) {
-                bold++;
+                formatting.set(FORMAT_BOLD);
             } else if ("</b>".equals(tag)) {
-                bold--;
+                formatting.clear(FORMAT_BOLD);
             } else if ("<i>".equals(tag) || "<em>".equals(tag)) {
-                italic++;
+                formatting.set(FORMAT_ITALIC);
             } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
-                italic--;
-            } else if ("</monospace>".equals(tag)) {
-                mono = 0;
-            } else if ("<monospace>".equals(tag)) {
-                mono = 1;
-            } else if ("</smallcaps>".equals(tag)) {
-                smallCaps = 0;
+                formatting.clear(FORMAT_ITALIC);
+            } else if ("<tt>".equals(tag)) {
+                formatting.set(FORMAT_MONOSPACE);
+            } else if ("</tt>".equals(tag)) {
+                formatting.clear(FORMAT_MONOSPACE);
             } else if ("<smallcaps>".equals(tag)) {
-                smallCaps = 1;
-            } else if ("</sup>".equals(tag)) {
-                sup = 0;
+                formatting.set(FORMAT_SMALLCAPS);
+            } else if ("</smallcaps>".equals(tag)) {
+                formatting.clear(FORMAT_SMALLCAPS);
             } else if ("<sup>".equals(tag)) {
-                sup = 1;
-            } else if ("</sub>".equals(tag)) {
-                sub = 0;
+                formatting.set(FORMAT_SUPERSCRIPT);
+            } else if ("</sup>".equals(tag)) {
+                formatting.clear(FORMAT_SUPERSCRIPT);
             } else if ("<sub>".equals(tag)) {
-                sub = 1;
+                formatting.set(FORMAT_SUBSCRIPT);
+            } else if ("</sub>".equals(tag)) {
+                formatting.clear(FORMAT_SUBSCRIPT);
+            } else if ("<u>".equals(tag)) {
+                formatting.set(FORMAT_UNDERLINE);
+            } else if ("</u>".equals(tag)) {
+                formatting.clear(FORMAT_UNDERLINE);
+            } else if ("<s>".equals(tag)) {
+                formatting.set(FORMAT_STRIKEOUT);
+            } else if ("</s>".equals(tag)) {
+                formatting.clear(FORMAT_STRIKEOUT);
             }
 
             piv = m.end();
@@ -164,54 +191,52 @@ class OOUtil {
         }
 
         if (piv < lText.length()) {
-            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv),
-                    (bold % 2) > 0, (italic % 2) > 0, mono > 0, smallCaps > 0, sup > 0, sub > 0);
+            OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv), formatting);
         }
 
         cursor.collapseToEnd();
     }
 
-    public static void insertParagraphBreak(XText text, XTextCursor cursor) throws Exception {
+    public static void insertParagraphBreak(XText text, XTextCursor cursor) throws IllegalArgumentException {
         text.insertControlCharacter(cursor, ControlCharacter.PARAGRAPH_BREAK, true);
         cursor.collapseToEnd();
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            boolean bold, boolean italic, boolean monospace, boolean smallCaps, boolean superscript,
-            boolean subscript) throws Exception {
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, BitSet formatting)
+                    throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
+                    IllegalArgumentException {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
                 XPropertySet.class, cursor);
-        if (bold) {
-            xCursorProps.setPropertyValue("CharWeight",
+        if (formatting.get(FORMAT_BOLD)) {
+            xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.BOLD);
         } else {
-            xCursorProps.setPropertyValue("CharWeight",
+            xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.NORMAL);
         }
 
-        if (italic) {
-            xCursorProps.setPropertyValue("CharPosture",
+        if (formatting.get(FORMAT_ITALIC)) {
+            xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.ITALIC);
         } else {
-            xCursorProps.setPropertyValue("CharPosture",
+            xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.NONE);
         }
 
-        if (smallCaps) {
-            xCursorProps.setPropertyValue("CharCaseMap",
+        if (formatting.get(FORMAT_SMALLCAPS)) {
+            xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
-        }
-        else {
-            xCursorProps.setPropertyValue("CharCaseMap",
+        }        else {
+            xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.NONE);
         }
 
         // TODO: the <monospace> tag doesn't work
         /*
-        if (monospace) {
+        if (formatting.get(FORMAT_MONOSPACE)) {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.FIXED);
         }
@@ -219,31 +244,41 @@ class OOUtil {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.VARIABLE);
         } */
-        if (subscript) {
-            xCursorProps.setPropertyValue("CharEscapement",
+        if (formatting.get(FORMAT_SUBSCRIPT)) {
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) -101);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        }
-        else if (superscript) {
-            xCursorProps.setPropertyValue("CharEscapement",
+        } else if (formatting.get(FORMAT_SUPERSCRIPT)) {
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 101);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        }
-        else {
-            xCursorProps.setPropertyValue("CharEscapement",
+        } else {
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 0);
-            xCursorProps.setPropertyValue("CharEscapementHeight",
+            xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 100);
         }
 
+        if (formatting.get(FORMAT_UNDERLINE)) {
+            xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.SINGLE);
+        } else {
+            xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.NONE);
+        }
+
+        if (formatting.get(FORMAT_STRIKEOUT)) {
+            xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.SINGLE);
+        } else {
+            xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.NONE);
+        }
         cursor.collapseToEnd();
 
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            String parStyle) throws Exception {
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, String parStyle)
+            throws WrappedTargetException, PropertyVetoException, UnknownPropertyException,
+            UndefinedParagraphFormatException {
         text.insertString(cursor, string, true);
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
                 XParagraphCursor.class, cursor);
@@ -252,21 +287,23 @@ class OOUtil {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, parCursor);
         try {
-            props.setPropertyValue("ParaStyleName", parStyle);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
+        } catch (IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
         cursor.collapseToEnd();
 
     }
 
-    public static Object getProperty(Object o, String property) throws Exception {
+    public static Object getProperty(Object o, String property)
+            throws UnknownPropertyException, WrappedTargetException {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
     }
 
-    public static XTextDocument selectComponent(List<XTextDocument> list) throws Exception {
+    public static XTextDocument selectComponent(List<XTextDocument> list)
+            throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
         String[] values = new String[list.size()];
         int ii = 0;
         for (XTextDocument doc : list) {
@@ -283,32 +320,5 @@ class OOUtil {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Make a cloned BibEntry and do the necessary preprocessing for use by the plugin.
-     * If the running JabRef version doesn't support post-processing in Layout, this
-     * preprocessing includes running the OOPreFormatter formatter for all fields except the
-     * BibTeX key.
-     * @param entry the original entry
-     * @return the cloned and processed entry
-     */
-    public static BibEntry createAdaptedEntry(BibEntry entry) {
-        if (entry == null) {
-            return null;
-        }
-        BibEntry e = (BibEntry) entry.clone();
-        for (String field : e.getFieldNames()) {
-            if (field.equals(BibEntry.KEY_FIELD)) {
-                continue;
-            }
-            String value = e.getField(field);
-            // If the running JabRef version doesn't support post-processing in Layout,
-            // preprocess fields instead:
-            if (!OpenOfficePanel.postLayoutSupported && (value != null)) {
-                e.setField(field, OOUtil.POSTFORMATTER.format(value));
-            }
-        }
-        return e;
     }
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,8 +27,7 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchRules;
-import net.sf.jabref.logic.search.describer.SearchDescribers;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
@@ -42,7 +41,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -149,7 +150,7 @@ class GroupDialog extends JDialog {
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(m_kgSearchTerm);
         builderKG.append(new FieldContentSelector(jabrefFrame, m_basePanel, this,
-                m_kgSearchTerm, m_basePanel.metaData(), null, true, ", "));
+                m_kgSearchTerm, m_basePanel.getBibDatabaseContext().getMetaData(), null, true, ", "));
         builderKG.nextLine();
         builderKG.append(m_kgCaseSensitive, 3);
         builderKG.nextLine();
@@ -433,7 +434,7 @@ class GroupDialog extends JDialog {
             s1 = m_sgSearchExpression.getText().trim();
             okEnabled = okEnabled & !s1.isEmpty();
             if (okEnabled) {
-                setDescription(SearchDescribers.getSearchDescriberFor(SearchRules.getSearchRuleByQuery(s1, isCaseSensitive(), isRegex()), s1).getDescription());
+                setDescription(new SearchQuery(s1, isCaseSensitive(), isRegex()).getDescription());
 
                 if (isRegex()) {
                     try {
@@ -479,23 +480,20 @@ class GroupDialog extends JDialog {
         if (i == JOptionPane.NO_OPTION) {
             return;
         }
-        Vector<BibEntry> vec = new Vector<>();
+        List<BibEntry> list = new ArrayList<>();
         for (BibEntry entry : m_basePanel.database().getEntries()) {
             if (m_editedGroup.contains(entry)) {
-                vec.add(entry);
+                list.add(entry);
             }
         }
-        if (!vec.isEmpty()) {
-            BibEntry[] entries = new BibEntry[vec.size()];
-            vec.toArray(entries);
-            if (!Util.warnAssignmentSideEffects(new AbstractGroup[] {mResultingGroup},
-                    entries, m_basePanel.getDatabase(), this)) {
+        if (!list.isEmpty()) {
+            if (!Util.warnAssignmentSideEffects(Arrays.asList(mResultingGroup), this)) {
                 return;
             }
             // the undo information for a conversion to an ExplicitGroup is
             // contained completely in the UndoableModifyGroup object.
             if (!(mResultingGroup instanceof ExplicitGroup)) {
-                mUndoAddPreviousEntires = mResultingGroup.add(entries);
+                mUndoAddPreviousEntires = mResultingGroup.add(list);
             }
         }
     }
@@ -525,8 +523,7 @@ class GroupDialog extends JDialog {
         int lastNewline = s.lastIndexOf("<br>");
         int hat = s.lastIndexOf('^');
         if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4)
-                    + s.substring(lastNewline + 4).replaceAll(" ", "&nbsp;");
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
         }
         return s;
     }

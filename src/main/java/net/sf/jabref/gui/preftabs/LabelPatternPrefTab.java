@@ -23,16 +23,13 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpDialog;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelPattern.GlobalLabelPattern;
-import net.sf.jabref.gui.labelPattern.LabelPatternPanel;
-import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
+import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -57,8 +54,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
     private final JTextField KeyPatternReplacement = new JTextField(20);
 
 
-    public LabelPatternPrefTab(JabRefPreferences prefs, HelpDialog helpDiag) {
-        super(helpDiag);
+    public LabelPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
+        super(panel);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
     }
@@ -147,14 +144,9 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         gbl.setConstraints(builder.getPanel(), con);
         add(builder.getPanel());
 
-        dontOverwrite.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                // Warning before overwriting is only relevant if overwriting can happen:
-                warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
-            }
-        });
+        dontOverwrite.addChangeListener(e ->
+        // Warning before overwriting is only relevant if overwriting can happen:
+        warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected()));
     }
 
     @Override

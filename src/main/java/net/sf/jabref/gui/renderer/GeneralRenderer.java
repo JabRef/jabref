@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,7 +25,7 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class GeneralRenderer extends DefaultTableCellRenderer {
 
-    private Color background;
+    private final Color background;
     private Color selBackground;
 
     public GeneralRenderer(Color c) {
@@ -42,7 +42,6 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
      */
     public GeneralRenderer(Color c, Color fg) {
         this(c);
-        this.background = c;
         setForeground(fg);
     }
 
@@ -53,9 +52,7 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
      * @param sel Selected background color
      */
     public GeneralRenderer(Color c, Color fg, Color sel) {
-        this(c);
-        this.background = c;
-        setForeground(fg);
+        this(c, fg);
         this.selBackground = sel;
     }
 
@@ -97,10 +94,10 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
             // this is plain text
             setIcon(null);
             setToolTipText(null);
-            if (value != null) {
-                setText(value.toString());
-            } else {
+            if (value == null) {
                 setText(null);
+            } else {
+                setText(value.toString());
             }
         }
     }

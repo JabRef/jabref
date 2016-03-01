@@ -24,6 +24,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -37,6 +41,9 @@ import java.util.zip.ZipOutputStream;
  * @author alver
  */
 public class OpenDocumentSpreadsheetCreator extends ExportFormat {
+
+    private static final Log LOGGER = LogFactory.getLog(OpenDocumentSpreadsheetCreator.class);
+
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
@@ -98,25 +105,24 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
             OpenDocumentSpreadsheetCreator.storeOpenDocumentSpreadsheetFile(file, in);
         }
         // Delete the temporary file:
-        tmpFile.delete();
+        if (!tmpFile.delete()) {
+            LOGGER.info("Cannot delete temporary export file");
+        }
     }
 
     private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {
         OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
 
-        try {
-            try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
+        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
 
-                DOMSource source = new DOMSource(od.getDOMrepresentation());
-                StreamResult result = new StreamResult(ps);
-                Transformer trans = TransformerFactory.newInstance().newTransformer();
-                trans.setOutputProperty(OutputKeys.INDENT, "yes");
-                trans.transform(source, result);
-            }
+            DOMSource source = new DOMSource(od.getDOMrepresentation());
+            StreamResult result = new StreamResult(ps);
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.transform(source, result);
         } catch (Exception e) {
             throw new Error(e);
         }
-
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {
@@ -140,7 +146,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot get resource", e);
         }
     }
 }

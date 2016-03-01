@@ -21,18 +21,26 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.logic.fetcher.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
+
+    private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private final BasePanel basePanel;
     private BibEntry entry;
@@ -51,7 +59,7 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void run() {
         // TODO: just download for all entries and save files without dialog
-        entry = basePanel.getSelectedEntries()[0];
+        entry = basePanel.getSelectedEntries().get(0);
         FindFullText fft = new FindFullText();
         result = fft.findFullTextPDF(entry);
     }
@@ -59,15 +67,15 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            String[] dirs = basePanel.metaData().getFileDirectory(Globals.FILE_FIELD);
-            if (dirs.length == 0) {
+            List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            if (dirs.isEmpty()) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String bibtexKey = entry.getCiteKey();
             // TODO: this needs its own thread as it blocks the UI!
-            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.metaData(), bibtexKey);
+            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.getBibDatabaseContext().getMetaData(), bibtexKey);
             try {
                 def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
                     @Override
@@ -84,7 +92,7 @@ public class FindFullTextAction extends AbstractWorker {
                     }
                 });
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Problem downloading file", e);
             }
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }

@@ -56,13 +56,11 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
             return;
         }
 
-        String fieldValue = entry.getField(fieldName);
-        if (fieldValue != null) {
+        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
-                String word = tok.nextToken();
-                addItemToIndex(word);
+                addItemToIndex(tok.nextToken());
             }
-        }
+        });
     }
 }

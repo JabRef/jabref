@@ -8,6 +8,25 @@ import java.util.List;
  */
 public class MonthUtil {
 
+
+    private static final Month NULL_OBJECT = new UnknownMonth();
+
+    private static final List<Month> MONTHS = Arrays.asList(
+            new Month("January", "jan", "01", "#jan#", 1, 0),
+            new Month("February", "feb", "02", "#feb#", 2, 1),
+            new Month("March", "mar", "03", "#mar#", 3, 2),
+            new Month("April", "apr", "04", "#apr#", 4, 3),
+            new Month("May", "may", "05", "#may#", 5, 4),
+            new Month("June", "jun", "06", "#jun#", 6, 5),
+            new Month("July", "jul", "07", "#jul#", 7, 6),
+            new Month("August", "aug", "08", "#aug#", 8, 7),
+            new Month("September", "sep", "09", "#sep#", 9, 8),
+            new Month("October", "oct", "10", "#oct#", 10, 9),
+            new Month("November", "nov", "11", "#nov#", 11, 10),
+            new Month("December", "dec", "12", "#dec#", 12, 11)
+            );
+
+
     public static class Month {
 
         public final String fullName;
@@ -45,24 +64,6 @@ public class MonthUtil {
     }
 
 
-    private static final Month NULL_OBJECT = new UnknownMonth();
-
-    private static final List<Month> months = Arrays.asList(
-            new Month("January", "jan", "01", "#jan#", 1, 0),
-            new Month("February", "feb", "02", "#feb#", 2, 1),
-            new Month("March", "mar", "03", "#mar#", 3, 2),
-            new Month("April", "apr", "04", "#apr#", 4, 3),
-            new Month("May", "may", "05", "#may#", 5, 4),
-            new Month("June", "jun", "06", "#jun#", 6, 5),
-            new Month("July", "jul", "07", "#jul#", 7, 6),
-            new Month("August", "aug", "08", "#aug#", 8, 7),
-            new Month("September", "sep", "09", "#sep#", 9, 8),
-            new Month("October", "oct", "10", "#oct#", 10, 9),
-            new Month("November", "nov", "11", "#nov#", 11, 10),
-            new Month("December", "dec", "12", "#dec#", 12, 11)
-            );
-
-
     /**
      * Find month by number
      *
@@ -80,7 +81,7 @@ public class MonthUtil {
      * @return if valid index -> month.isValid() == true, else otherwise
      */
     public static Month getMonthByIndex(int index) {
-        for (Month month : MonthUtil.months) {
+        for (Month month : MonthUtil.MONTHS) {
             if (month.index == index) {
                 return month;
             }
@@ -95,7 +96,7 @@ public class MonthUtil {
      * @return if valid shortName -> month.isValid() == true, else otherwise
      */
     public static Month getMonthByShortName(String shortName) {
-        for (Month month : MonthUtil.months) {
+        for (Month month : MonthUtil.MONTHS) {
             if (month.shortName.equalsIgnoreCase(shortName)) {
                 return month;
             }

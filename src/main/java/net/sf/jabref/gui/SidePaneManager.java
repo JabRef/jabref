@@ -45,8 +45,6 @@ public class SidePaneManager {
 
     private final JabRefFrame frame;
 
-    BasePanel panel;
-
     private final SidePane sidep;
 
     private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
@@ -88,12 +86,12 @@ public class SidePaneManager {
         return components.get(name) != null;
     }
 
-    public boolean isComponentVisible(String name) {
+    public synchronized boolean isComponentVisible(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            return visible.contains(o);
-        } else {
+        if (o == null) {
             return false;
+        } else {
+            return visible.contains(o);
         }
     }
 
@@ -105,21 +103,21 @@ public class SidePaneManager {
         }
     }
 
-    public void show(String name) {
+    public synchronized void show(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            show((SidePaneComponent) o);
-        } else {
+        if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
+        } else {
+            show((SidePaneComponent) o);
         }
     }
 
-    public void hide(String name) {
+    public synchronized void hide(String name) {
         Object o = components.get(name);
-        if (o != null) {
-            hideComponent((SidePaneComponent) o);
-        } else {
+        if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
+        } else {
+            hideComponent((SidePaneComponent) o);
         }
     }
 
@@ -141,11 +139,11 @@ public class SidePaneManager {
         }
     }
 
-    public SidePaneComponent getComponent(String name) {
+    public synchronized SidePaneComponent getComponent(String name) {
         return components.get(name);
     }
 
-    private String getComponentName(SidePaneComponent comp) {
+    private synchronized String getComponentName(SidePaneComponent comp) {
         return componentNames.get(comp);
     }
 
@@ -266,15 +264,21 @@ public class SidePaneManager {
      *
      * @param panel
      */
-    private void setActiveBasePanel(BasePanel panel) {
+
+    private synchronized void setActiveBasePanel(BasePanel panel) {
         for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
             stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
         }
     }
 
-    public void updateView() {
+    public synchronized void updateView() {
         sidep.setComponents(visible);
-        if (!visible.isEmpty()) {
+        if (visible.isEmpty()) {
+            if (sidep.isVisible()) {
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
+            }
+            sidep.setVisible(false);
+        } else {
             boolean wasVisible = sidep.isVisible();
             sidep.setVisible(true);
             if (!wasVisible) {
@@ -285,12 +289,6 @@ public class SidePaneManager {
                     frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
                 }
             }
-        } else {
-            if (sidep.isVisible()) {
-                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
-            }
-            sidep.setVisible(false);
-
         }
     }
 }

@@ -55,8 +55,8 @@ public class SpringerFetcher implements EntryFetcher {
         try {
             status.setStatus(Localization.lang("Searching..."));
             HttpResponse<JsonNode> jsonResponse;
-            query = URLEncoder.encode(query, "UTF-8");
-            jsonResponse = Unirest.get(API_URL + query + "&api_key=" + API_KEY + "&p=1")
+            String encodedQuery = URLEncoder.encode(query, "UTF-8");
+            jsonResponse = Unirest.get(API_URL + encodedQuery + "&api_key=" + API_KEY + "&p=1")
                     .header("accept", "application/json")
                     .asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
@@ -95,7 +95,7 @@ public class SpringerFetcher implements EntryFetcher {
 
                     int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - startItem);
                     jsonResponse = Unirest
-                            .get(API_URL + query + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
+                            .get(API_URL + encodedQuery + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();
                     jo = jsonResponse.getBody().getObject();
                     if (jo.has("records")) {
@@ -111,7 +111,7 @@ public class SpringerFetcher implements EntryFetcher {
                 }
                 return true;
             } else {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
+                status.showMessage(Localization.lang("No entries found for the search string '%0'", encodedQuery),
                         Localization.lang("Search %0", "Springer"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -131,7 +131,7 @@ public class SpringerFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "SpringerHelp.html";
+        return "SpringerHelp";
     }
 
     @Override
@@ -139,9 +139,4 @@ public class SpringerFetcher implements EntryFetcher {
         // No additional options available
         return null;
     }
-
-    public SpringerFetcher() {
-        super();
-    }
-
 }

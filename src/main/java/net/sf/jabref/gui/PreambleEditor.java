@@ -35,7 +35,13 @@ class PreambleEditor extends JDialog {
     private final BibDatabase base;
     private final BasePanel panel;
 
-    private FieldEditor ed;
+    private final FieldEditor ed;
+
+    private final UndoAction undoAction = new UndoAction();
+    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
+    private final RedoAction redoAction = new RedoAction();
+    // The action concerned with closing the window.
+    private final CloseAction closeAction = new CloseAction();
 
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
@@ -76,7 +82,7 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new TextArea(Localization.lang("Preamble"), content != null ? content : "");
+        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
         //ed.addUndoableEditListener(panel.undoListener);
         setupJTextComponent((TextArea) ed);
 
@@ -131,8 +137,6 @@ class PreambleEditor extends JDialog {
     }
 
 
-    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
-
 
     class StoreFieldAction extends AbstractAction {
 
@@ -161,13 +165,12 @@ class PreambleEditor extends JDialog {
                 panel.undoManager.addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
-                if ((toSet != null) && !toSet.isEmpty()) {
-                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
-                    ed.setValidBackgroundColor();
-                } else {
+                if ((toSet == null) || toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.nullFieldColor);
-                    ed.setValidBackgroundColor();
+                } else {
+                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
                 }
+                ed.setValidBackgroundColor();
                 if (ed.getTextComponent().hasFocus()) {
                     ed.setActiveBackgroundColor();
                 }
@@ -177,8 +180,6 @@ class PreambleEditor extends JDialog {
         }
     }
 
-
-    private final UndoAction undoAction = new UndoAction();
 
 
     class UndoAction extends AbstractAction {
@@ -199,8 +200,6 @@ class PreambleEditor extends JDialog {
     }
 
 
-    private final RedoAction redoAction = new RedoAction();
-
 
     class RedoAction extends AbstractAction {
 
@@ -219,9 +218,6 @@ class PreambleEditor extends JDialog {
         }
     }
 
-
-    // The action concerned with closing the window.
-    private final CloseAction closeAction = new CloseAction();
 
 
     class CloseAction extends AbstractAction {

@@ -15,12 +15,12 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.List;
 
 import javax.swing.*;
+
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
@@ -45,10 +45,6 @@ public class MergeEntriesDialog extends JDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
-    private BibEntry one;
-    private BibEntry two;
-    private NamedCompound ce;
-    private MergeEntries mergeEntries;
 
     private PositionWindow pw;
 
@@ -70,10 +66,10 @@ public class MergeEntriesDialog extends JDialog {
      *
      * @param selected Selected BibtexEntries
      */
-    private void init(BibEntry[] selected) {
+    private void init(List<BibEntry> selected) {
 
         // Check if there are two entries selected
-        if (selected.length != 2) { // None selected. Inform the user to select entries first.
+        if (selected.size() != 2) { // None selected. Inform the user to select entries first.
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("You have to choose exactly two entries to merge."),
                     MERGE_ENTRIES, JOptionPane.INFORMATION_MESSAGE);
@@ -82,16 +78,15 @@ public class MergeEntriesDialog extends JDialog {
         }
 
         // Store the two entries
-        one = selected[0];
-        two = selected[1];
+        BibEntry one = selected.get(0);
+        BibEntry two = selected.get(1);
 
-        mergeEntries = new MergeEntries(one, two);
+        MergeEntries mergeEntries = new MergeEntries(one, two, panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(MERGE_ENTRIES);
+        NamedCompound ce = new NamedCompound(MERGE_ENTRIES);
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
-        // layout.setColumnGroups(new int[][] {{3, 11}});
         this.setLayout(layout);
 
         this.add(mergeEntries.getMergeEntryPanel(), cc.xy(1, 1));
@@ -102,22 +97,27 @@ public class MergeEntriesDialog extends JDialog {
         bb.addGlue();
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.setActionCommand("cancel");
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(e.getActionCommand());
-            }
+        cancel.addActionListener(e -> {
+            panel.output(Localization.lang("Cancelled merging entries"));
+            dispose();
         });
 
         JButton replaceentries = new JButton(MERGE_ENTRIES);
         replaceentries.setActionCommand("replace");
-        replaceentries.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(e.getActionCommand());
-            }
+        replaceentries.addActionListener(e -> {
+            // Create a new entry and add it to the undo stack
+            // Remove the other two entries and add them to the undo stack (which is not working...)
+            BibEntry mergedEntry = mergeEntries.getMergeEntry();
+            panel.insertEntry(mergedEntry);
+            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
+            ce.addEdit(new UndoableRemoveEntry(panel.database(), one, panel));
+            panel.database().removeEntry(one);
+            ce.addEdit(new UndoableRemoveEntry(panel.database(), two, panel));
+            panel.database().removeEntry(two);
+            ce.end();
+            panel.undoManager.addEdit(ce);
+            panel.output(Localization.lang("Merged entries"));
+            dispose();
         });
 
         bb.addButton(new JButton[] {replaceentries, cancel});
@@ -151,31 +151,5 @@ public class MergeEntriesDialog extends JDialog {
 
         // Show what we've got
         setVisible(true);
-    }
-
-    /**
-     * Act on button pressed
-     *
-     * @param button Button pressed
-     */
-    private void buttonPressed(String button) {
-        BibEntry mergedEntry = mergeEntries.getMergeEntry();
-        if ("cancel".equals(button)) {
-            // Cancelled, throw it away
-            panel.output(Localization.lang("Cancelled merging entries"));
-        } else if ("replace".equals(button)) {
-            // Create a new entry and add it to the undo stack
-            // Remove the other two entries and add them to the undo stack (which is not working...)
-            panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
-            ce.addEdit(new UndoableRemoveEntry(panel.database(), one, panel));
-            panel.database().removeEntry(one);
-            ce.addEdit(new UndoableRemoveEntry(panel.database(), two, panel));
-            panel.database().removeEntry(two);
-            ce.end();
-            panel.undoManager.addEdit(ce);
-            panel.output(Localization.lang("Merged entries"));
-        }
-        dispose();
     }
 }

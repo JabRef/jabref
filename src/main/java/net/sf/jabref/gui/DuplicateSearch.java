@@ -30,7 +30,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
-import net.sf.jabref.bibtex.DuplicateCheck;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import spin.Spin;
@@ -150,9 +150,10 @@ public class DuplicateSearch implements Runnable {
                     panel.markBaseChanged();
                 }
 
-                panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
-
+                synchronized (duplicates) {
+                    panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size() + ' '
+                            + Localization.lang("pairs processed") + ": " + dupliC);
+                }
                 ce.end();
                 panel.undoManager.addEdit(ce);
 
@@ -171,7 +172,7 @@ public class DuplicateSearch implements Runnable {
         public void run() {
             for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
                 for (int j = i + 1; (j < bes.length) && !finished; j++) {
-                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j]);
+                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j], panel.getBibDatabaseContext().getMode());
 
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {

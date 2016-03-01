@@ -22,6 +22,9 @@ import java.io.IOException;
 
 import javax.swing.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.*;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -34,6 +37,8 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
  * to process the request if the user clicks this menu item.
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
+
+    private static final Log LOGGER = LogFactory.getLog(ExternalFileMenuItem.class);
 
     private final BibEntry entry;
     private final String link;
@@ -75,21 +80,20 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
         try {
             ExternalFileType type = fileType;
             if (this.fileType == null) {
-                if (this.fieldName != null) {
-                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().metaData(), link, fieldName);
-                    return true;
-                }
-                else {
+                if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
                     File file = new File(link);
                     // We try to check the extension for the file:
                     String name = file.getName();
                     int pos = name.indexOf('.');
-                    String extension = pos >= 0 && pos < name.length() - 1 ? name.substring(pos + 1)
+                    String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name.substring(pos + 1)
                             .trim().toLowerCase() : null;
                     // Now we know the extension, check if it is one we know about:
-                    type = Globals.prefs.getExternalFileTypeByExt(extension);
+                    type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;
+                } else {
+                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), link, fieldName);
+                    return true;
                 }
             }
 
@@ -105,7 +109,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // link with. We check if the file type is set, and if the file type has a non-empty
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
-            if (fileType != null && fileType.getOpenWith() != null
+            if ((fileType != null) && (fileType.getOpenWith() != null)
                     && !fileType.getOpenWith().isEmpty() &&
                     e1.getMessage().contains(fileType.getOpenWith())) {
 
@@ -116,7 +120,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 return false;
             }
 
-            e1.printStackTrace();
+            LOGGER.warn("Unable to open link", e1);
         }
         return false;
     }

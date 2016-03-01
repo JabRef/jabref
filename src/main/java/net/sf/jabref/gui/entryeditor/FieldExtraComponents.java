@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,12 +20,11 @@ import java.awt.Component;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -36,19 +35,18 @@ import javax.swing.JTextArea;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFilePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OpenFileFilter;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.Abbreviations;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -72,12 +70,12 @@ public class FieldExtraComponents {
      * @param storeFieldAction
      * @return
      */
-    static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            BibEntry entry, HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
+        if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
@@ -86,19 +84,16 @@ public class FieldExtraComponents {
         // Button to toggle abbreviated/full journal names
         JButton button = new JButton(Localization.lang("Toggle abbreviation"));
         button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
-        button.addActionListener(new ActionListener() {
+        button.addActionListener(actionEvent -> {
+            String text = editor.getText();
+            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader.getRepository();
+            if (abbreviationRepository.isKnownName(text)) {
+                String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String text = editor.getText();
-                if (Abbreviations.journalAbbrev.isKnownName(text)) {
-                    String s = Abbreviations.toggleAbbreviation(text);
-
-                    if (s != null) {
-                        editor.setText(s);
-                        storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                        panel.undoManager.addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
-                    }
+                if (s != null) {
+                    editor.setText(s);
+                    storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
+                    panel.undoManager.addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
                 }
             }
         });
@@ -120,53 +115,25 @@ public class FieldExtraComponents {
         JButton but = new JButton(Localization.lang("Browse"));
         ((JComponent) fieldEditor).addMouseListener(entryEditor.new ExternalViewerListener());
 
-        but.addActionListener(new ActionListener() {
+        but.addActionListener(e -> {
+            String dir = fieldEditor.getText();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String dir = fieldEditor.getText();
+            if (dir.isEmpty()) {
+                dir = Globals.prefs.get(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, "");
+            }
 
-                if (dir.isEmpty()) {
-                    dir = Globals.prefs.get(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, "");
-                }
+            String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldEditor.getFieldName(),
+                    JFileChooser.OPEN_DIALOG, false);
 
-                String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldEditor.getFieldName(),
-                        JFileChooser.OPEN_DIALOG, false);
-
-                if (chosenFile != null) {
-                    File newFile = new File(chosenFile); // chooser.getSelectedFile();
-                    fieldEditor.setText(newFile.getPath());
-                    Globals.prefs.put(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-                    entryEditor.updateField(fieldEditor);
-                }
+            if (chosenFile != null) {
+                File newFile = new File(chosenFile);
+                fieldEditor.setText(newFile.getPath());
+                Globals.prefs.put(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
+                entryEditor.updateField(fieldEditor);
             }
         });
 
         return Optional.of(but);
-    }
-
-    /**
-     *
-     * @param frame
-     * @param panel
-     * @param fieldEditor
-     * @param entryEditor
-     * @param isZip
-     * @return
-     */
-    static Optional<JComponent> getBrowseDocExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor fieldEditor,
-            EntryEditor entryEditor, Boolean isZip) {
-
-        final String ext = '.' + fieldEditor.getFieldName().toLowerCase();
-        final OpenFileFilter off;
-        if (isZip) {
-            off = new OpenFileFilter(new String[] {ext, ext + ".gz", ext + ".bz2"});
-        } else {
-            off = new OpenFileFilter(new String[] {ext});
-        }
-
-        return Optional.of(new ExternalFilePanel(frame, panel.metaData(), entryEditor, fieldEditor.getFieldName(), off,
-                fieldEditor));
     }
 
     /**
@@ -192,14 +159,9 @@ public class FieldExtraComponents {
     public static Optional<JComponent> getYesNoExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
         final String[] options = {"", "Yes", "No"};
         JComboBox<String> yesno = new JComboBox<>(options);
-        yesno.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-
-                fieldEditor.setText(((String) yesno.getSelectedItem()).toLowerCase());
-                entryEditor.updateField(fieldEditor);
-            }
+        yesno.addActionListener(actionEvent -> {
+            fieldEditor.setText(((String) yesno.getSelectedItem()).toLowerCase());
+            entryEditor.updateField(fieldEditor);
         });
         return Optional.of(yesno);
 
@@ -210,32 +172,29 @@ public class FieldExtraComponents {
      *
      * @param fieldEditor
      * @param entryEditor
+     * @param type
      * @return
      */
-    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+    public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor, BibDatabaseMode type) {
         final String[] options = new String[13];
         options[0] = Localization.lang("Select");
         for (int i = 1; i <= 12; i++) {
             options[i] = MonthUtil.getMonthByNumber(i).fullName;
         }
         JComboBox<String> month = new JComboBox<>(options);
-        month.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int monthnumber = month.getSelectedIndex();
-                if (monthnumber >= 1) {
-                    if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_MODE)) {
-                        fieldEditor.setText(String.valueOf(monthnumber));
-                    } else {
-                        fieldEditor.setText((MonthUtil.getMonthByNumber(monthnumber).bibtexFormat));
-                    }
+        month.addActionListener(actionEvent -> {
+            int monthnumber = month.getSelectedIndex();
+            if (monthnumber >= 1) {
+                if (type == BibDatabaseMode.BIBLATEX) {
+                    fieldEditor.setText(String.valueOf(monthnumber));
                 } else {
-                    fieldEditor.setText("");
+                    fieldEditor.setText("#" + (MonthUtil.getMonthByNumber(monthnumber).bibtexFormat) + "#");
                 }
-                entryEditor.updateField(fieldEditor);
-                month.setSelectedIndex(0);
+            } else {
+                fieldEditor.setText("");
             }
+            entryEditor.updateField(fieldEditor);
+            month.setSelectedIndex(0);
         });
         return Optional.of(month);
 
@@ -250,13 +209,9 @@ public class FieldExtraComponents {
     public static Optional<JComponent> getSetOwnerExtraComponent(FieldEditor fieldEditor,
             StoreFieldAction storeFieldAction) {
         JButton button = new JButton(Localization.lang("Auto"));
-        button.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                fieldEditor.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
-                storeFieldAction.actionPerformed(new ActionEvent(fieldEditor, 0, ""));
-            }
+        button.addActionListener(actionEvent -> {
+            fieldEditor.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
+            storeFieldAction.actionPerformed(new ActionEvent(fieldEditor, 0, ""));
         });
         return Optional.of(button);
 
@@ -288,8 +243,8 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            HashSet<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.metaData,
+            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                 storeFieldAction, false,
                 "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
         contentSelectors.add(ws);

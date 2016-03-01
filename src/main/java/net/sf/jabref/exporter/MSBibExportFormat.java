@@ -23,7 +23,9 @@ import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -46,7 +48,7 @@ class MSBibExportFormat extends ExportFormat {
             final Charset encoding, Set<String> keySet) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
-        SaveSession ss = getSaveSession(StandardCharsets.UTF_8, new File(file));
+        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         MSBibDatabase md = new MSBibDatabase(database, keySet);
         try (VerifyingWriter ps = ss.getWriter()) {
 
@@ -58,16 +60,12 @@ class MSBibExportFormat extends ExportFormat {
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
                 trans.transform(source, result);
-            } catch (Exception e) {
+            } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-        }
-        try {
-            finalizeSaveSession(ss);
-        } catch (SaveException ex) {
+            finalizeSaveSession(ss, new File(file));
+        } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
-        } catch (Exception e) {
-            throw new IOException(e.getMessage());
         }
     }
 }

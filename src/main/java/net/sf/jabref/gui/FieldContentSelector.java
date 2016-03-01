@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,9 +20,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -51,10 +49,6 @@ public class FieldContentSelector extends JComponent {
     private final FieldEditor editor;
 
     private final MetaData metaData;
-
-    private final JabRefFrame frame;
-
-    private final Window owner;
 
     private final AbstractAction action;
     private final String delimiter;
@@ -89,10 +83,9 @@ public class FieldContentSelector extends JComponent {
             Window owner, final FieldEditor editor, final MetaData metaData,
             final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
-        this.frame = frame;
+
         this.editor = editor;
         this.metaData = metaData;
-        this.owner = owner;
         this.action = action;
         this.delimiter = delimiter;
 
@@ -128,21 +121,17 @@ public class FieldContentSelector extends JComponent {
         con.weightx = 1;
         gbl.setConstraints(comboBox, con);
 
-        comboBox.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                /*
-                 * These conditions signify arrow key navigation in the dropdown
-                 * list, so we should not react to it. I'm not sure if this is
-                 * well defined enough to be guaranteed to work everywhere.
-                 */
-                if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
-                    return;
-                }
-
-                selectionMade();
+        comboBox.addActionListener(e -> {
+            /*
+             * These conditions signify arrow key navigation in the dropdown
+             * list, so we should not react to it. I'm not sure if this is
+             * well defined enough to be guaranteed to work everywhere.
+             */
+            if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
+                return;
             }
+
+            selectionMade();
         });
         // Add an action for the Enter key that signals a selection:
         comboBox.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "enter");
@@ -165,20 +154,17 @@ public class FieldContentSelector extends JComponent {
         gbl.setConstraints(manage, con);
         add(manage);
 
-        manage.addActionListener(new ActionListener() {
+        manage.addActionListener(e -> {
+            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, metaData,
+                    editor.getFieldName());
+            PositionWindow.placeDialog(csd, frame);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ContentSelectorDialog2 csd = new ContentSelectorDialog2(FieldContentSelector.this.owner, FieldContentSelector.this.frame, panel, true, metaData, editor.getFieldName());
-                PositionWindow.placeDialog(csd, FieldContentSelector.this.frame);
+            // Calling setVisible(true) will open the modal dialog and block
+            // for the dialog to close.
+            csd.setVisible(true);
 
-                // Calling setVisible(true) will open the modal dialog and block
-                // for the dialog to close.
-                csd.setVisible(true);
-
-                // So we need to rebuild the ComboBox afterwards
-                rebuildComboBox();
-            }
+            // So we need to rebuild the ComboBox afterwards
+            rebuildComboBox();
         });
     }
 
@@ -224,7 +210,7 @@ public class FieldContentSelector extends JComponent {
 
         // TODO: CO - What for?
         comboBox.addItem("");
-        Vector<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
+        List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
         if (items != null) {
             for (String item : items) {
                 comboBox.addItem(item);

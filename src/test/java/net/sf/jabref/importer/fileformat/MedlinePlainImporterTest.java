@@ -15,7 +15,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.bibtex.EntryTypes;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -73,7 +72,7 @@ public class MedlinePlainImporterTest {
             Assert.assertEquals(7, entries.size());
 
             BibEntry testEntry = entries.get(0);
-            Assert.assertEquals(EntryTypes.getType("article"), testEntry.getType());
+            Assert.assertEquals("article", testEntry.getType());
             Assert.assertNull(testEntry.getField("month"));
             Assert.assertEquals("Long, Vicky and Marland, Hilary", testEntry.getField("author"));
             Assert.assertEquals(
@@ -81,30 +80,30 @@ public class MedlinePlainImporterTest {
                     testEntry.getField("title"));
 
             testEntry = entries.get(1);
-            Assert.assertEquals(EntryTypes.getType("Conference"), testEntry.getType());
+            Assert.assertEquals("conference", testEntry.getType());
             Assert.assertEquals("06", testEntry.getField("month"));
             Assert.assertNull(testEntry.getField("author"));
             Assert.assertNull(testEntry.getField("title"));
 
             testEntry = entries.get(2);
-            Assert.assertEquals(EntryTypes.getType("Book"), testEntry.getType());
+            Assert.assertEquals("book", testEntry.getType());
             Assert.assertEquals(
                     "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle",
                     testEntry.getField("title"));
 
             testEntry = entries.get(3);
-            Assert.assertEquals(EntryTypes.getType("TechReport"), testEntry.getType());
+            Assert.assertEquals("techreport", testEntry.getType());
             Assert.assertNotNull(testEntry.getField("doi"));
 
             testEntry = entries.get(4);
-            Assert.assertEquals(EntryTypes.getType("InProceedings"), testEntry.getType());
+            Assert.assertEquals("inproceedings", testEntry.getType());
             Assert.assertEquals("Inproceedings book title", testEntry.getField("booktitle"));
 
             testEntry = entries.get(5);
-            Assert.assertEquals(EntryTypes.getType("Proceedings"), testEntry.getType());
+            Assert.assertEquals("proceedings", testEntry.getType());
 
             testEntry = entries.get(6);
-            Assert.assertEquals(EntryTypes.getTypeOrDefault(""), testEntry.getType());
+            Assert.assertEquals("misc", testEntry.getType());
 
         }
     }
@@ -174,7 +173,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(EntryTypes.getType("article"));
+            expectedEntry.setType("article");
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }

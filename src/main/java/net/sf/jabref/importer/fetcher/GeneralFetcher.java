@@ -15,60 +15,46 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
     private final JTextField tf = new JTextField();
 
-    private final JComboBox<String> fetcherChoice;
     private final CardLayout optionsCards = new CardLayout();
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
-    private final HelpAction help;
-    private final JButton helpBut;
 
     private final SidePaneManager sidePaneManager;
     private final Action action;
     private final JabRefFrame frame;
     private EntryFetcher activeFetcher;
-    private final EntryFetcher[] fetcherArray;
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
         super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
-        List<EntryFetcher> fetchers = EntryFetchers.INSTANCE.getEntryFetchers();
-        fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
+        List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
+        EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];
         String[] choices = new String[fetcherArray.length];
@@ -81,7 +67,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             else
                 optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
-        fetcherChoice = new JComboBox<>(choices);
+        JComboBox<String> fetcherChoice = new JComboBox<>(choices);
         int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
         if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
@@ -91,8 +77,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         if (this.activeFetcher.getOptionsPanel() != null) {
             optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
-        help = new HelpAction(GUIGlobals.helpDiag, activeFetcher.getHelpPage());
-        helpBut = help.getIconButton();
+        HelpAction help = new HelpAction(activeFetcher.getHelpPage());
+        JButton helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
@@ -114,25 +100,21 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                 return label;
             }
         });*/
-        fetcherChoice.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
-                Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (activeFetcher.getHelpPage() == null) {
-                    helpBut.setEnabled(false);
-                } else {
-                    help.setHelpFile(activeFetcher.getHelpPage());
-                    helpBut.setEnabled(true);
-                }
-                optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
-                optPanel.removeAll();
-                if (activeFetcher.getOptionsPanel() != null) {
-                    optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
-                }
-                revalidate();
+        fetcherChoice.addActionListener(actionEvent -> {
+            activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
+            Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
+            if (activeFetcher.getHelpPage() == null) {
+                helpBut.setEnabled(false);
+            } else {
+                help.setHelpFile(activeFetcher.getHelpPage());
+                helpBut.setEnabled(true);
             }
+            optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
+            optPanel.removeAll();
+            if (activeFetcher.getOptionsPanel() != null) {
+                optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
+            }
+            revalidate();
         });
 
         action = new FetcherAction();
@@ -141,18 +123,16 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
+        if (OS.OS_X) {
+            tf.putClientProperty("JTextField.variant", "search");
+        }
 
         tf.setName("tf");
         // add action to reset-button. resets tf and requests focus
-        JButton reset = new JButton(
-                Localization.lang("Reset"));
-        reset.addActionListener(new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                tf.setText("");
-                new FocusRequester(tf);
-            }
+        JButton reset = new JButton(Localization.lang("Reset"));
+        reset.addActionListener(event -> {
+            tf.setText("");
+            new FocusRequester(tf);
         });
 
         JPanel main = new JPanel();
@@ -201,10 +181,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         tf.addActionListener(this);
     }
 
-    public void setHelpResourceOwner(Class<?> c) {
-        help.setResourceOwner(c);
-    }
-
     private JTextField getTextField() {
         return tf;
     }
@@ -234,62 +210,44 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
             final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
                     pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            frame.setProgressBarVisible(false);
-                            frame.output("");
-                            if (!result) {
-                                return;
-                            }
-                            dialog.setLocationRelativeTo(frame);
-                            dialog.setVisible(true);
-                            if (dialog.isOkPressed()) {
-                                final ImportInspectionDialog d2 = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                                        BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
-                                d2.addCallBack(activeFetcher);
-                                PositionWindow.placeDialog(d2, frame);
-                                d2.setVisible(true);
-                                JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        pFetcher.getEntries(dialog.getSelection(), d2);
-                                        d2.entryListComplete();
-                                    }
-                                });
-
-                            }
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                final boolean result = pFetcher.processQueryGetPreview(tf.getText().trim(), dialog, dialog);
+                SwingUtilities.invokeLater(() -> {
+                    frame.setProgressBarVisible(false);
+                    frame.output("");
+                    if (result) {
+                        dialog.setLocationRelativeTo(frame);
+                        dialog.setVisible(true);
+                        if (dialog.isOkPressed()) {
+                            final ImportInspectionDialog d2 = new ImportInspectionDialog(frame,
+                                    frame.getCurrentBasePanel(), InternalBibtexFields.DEFAULT_INSPECTION_FIELDS,
+                                    activeFetcher.getTitle(), false);
+                            d2.addCallBack(activeFetcher);
+                            PositionWindow.placeDialog(d2, frame);
+                            d2.setVisible(true);
+                            JabRefExecutorService.INSTANCE.execute(() -> {
+                                pFetcher.getEntries(dialog.getSelection(), d2);
+                                d2.entryListComplete();
+                            });
                         }
-                    });
-
-                }
+                    }
+                });
             });
         }
 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                    BibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
             PositionWindow.placeDialog(dialog, frame);
             dialog.setVisible(true);
 
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
-                        dialog.entryListComplete();
-                    } else {
-                        dialog.dispose();
-                    }
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
+                    dialog.entryListComplete();
+                } else {
+                    dialog.dispose();
                 }
             });
         }

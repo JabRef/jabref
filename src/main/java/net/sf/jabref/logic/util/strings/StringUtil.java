@@ -17,7 +17,9 @@ package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,10 @@ public class StringUtil {
 
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
+
+    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+
+    public static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
@@ -40,11 +46,11 @@ public class StringUtil {
         if ((toShave == null) || (toShave.isEmpty())) {
             return "";
         }
-        toShave = toShave.trim();
-        if (isInCurlyBrackets(toShave) || isInCitationMarks(toShave)) {
-            return toShave.substring(1, toShave.length() - 1);
+        String shaved = toShave.trim();
+        if (isInCurlyBrackets(shaved) || isInCitationMarks(shaved)) {
+            return shaved.substring(1, shaved.length() - 1);
         }
-        return toShave;
+        return shaved;
     }
 
     /**
@@ -67,23 +73,14 @@ public class StringUtil {
             return "";
         }
 
-        from = Math.max(from, 0);
-        to = Math.min(strings.length, to);
+        int updatedFrom = Math.max(from, 0);
+        int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = from; i < (to - 1); i++) {
+        for (int i = updatedFrom; i < (updatedTo - 1); i++) {
             stringBuilder.append(strings[i]).append(separator);
         }
-        return stringBuilder.append(strings[to - 1]).toString();
-    }
-
-    public static String join(Collection<String> strings, String separator) {
-        String[] arr = strings.toArray(new String[strings.size()]);
-        return join(arr, separator, 0, arr.length);
-    }
-
-    public static String join(String[] strings, String separator) {
-        return join(strings, separator, 0, strings.length);
+        return stringBuilder.append(strings[updatedTo - 1]).toString();
     }
 
     /**
@@ -108,13 +105,14 @@ public class StringUtil {
             return "";
         }
 
+
         if (orgName.toLowerCase().endsWith("." + defaultExtension.toLowerCase())) {
             return orgName;
         }
 
         int hiddenChar = orgName.indexOf('.', 1); // hidden files Linux/Unix (?)
         if (hiddenChar < 1) {
-            orgName = orgName + "." + defaultExtension;
+            return orgName + "." + defaultExtension;
         }
 
         return orgName;
@@ -124,18 +122,18 @@ public class StringUtil {
      * Creates a substring from a text
      *
      * @param text
-     * @param index
+     * @param startIndex
      * @param terminateOnEndBraceOnly
      * @return
      */
-    public static String getPart(String text, int index, boolean terminateOnEndBraceOnly) {
+    public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
         int count = 0;
 
         StringBuilder part = new StringBuilder();
 
         // advance to first char and skip whitespace
-        index++;
+        int index = startIndex + 1;
         while ((index < text.length()) && Character.isWhitespace(text.charAt(index))) {
             index++;
         }
@@ -222,35 +220,6 @@ public class StringUtil {
     }
 
     /**
-     * Quote special characters.
-     *
-     * @param toQuote         The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting
-     *                  character itself, which is automatically quoted.
-     * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting
-     * character itself) quoted.
-     */
-    public static String quote(String toQuote, String specials, char quoteChar) {
-        StringBuilder result = new StringBuilder();
-        char c;
-        boolean isSpecial;
-        for (int i = 0; i < toQuote.length(); ++i) {
-            c = toQuote.charAt(i);
-
-            isSpecial = (c == quoteChar);
-            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
-            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
-
-            if (isSpecial) {
-                result.append(quoteChar);
-            }
-            result.append(c);
-        }
-        return result.toString();
-    }
-
-    /**
      * Unquote special characters.
      *
      * @param toUnquote         The String which may contain quoted special characters.
@@ -283,41 +252,6 @@ public class StringUtil {
     }
 
     /**
-     * Encodes a two-dimensional String array into a single string, using ':' and
-     * ';' as separators. The characters ':' and ';' are escaped with '\'.
-     * @param values The String array.
-     * @return The encoded String.
-     */
-    public static String encodeStringArray(String[][] values) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(encodeStringArray(values[i]));
-            if (i < (values.length - 1)) {
-                sb.append(';');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Encodes a String array into a single string, using ':' as separator.
-     * The characters ':' and ';' are escaped with '\'.
-     * @param entry The String array.
-     * @return The encoded String.
-     */
-    private static String encodeStringArray(String[] entry) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < entry.length; i++) {
-            sb.append(encodeString(entry[i]));
-            if (i < (entry.length - 1)) {
-                sb.append(':');
-            }
-
-        }
-        return sb.toString();
-    }
-
-    /**
      * Decodes an encoded double String array back into array form. The array
      * is assumed to be square, and delimited by the characters ';' (first dim) and
      * ':' (second dim).
@@ -325,9 +259,9 @@ public class StringUtil {
      * @return The decoded String array.
      */
     public static String[][] decodeStringDoubleArray(String value) {
-        ArrayList<ArrayList<String>> newList = new ArrayList<>();
+        List<List<String>> newList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        ArrayList<String> thisEntry = new ArrayList<>();
+        List<String> thisEntry = new ArrayList<>();
         boolean escaped = false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -363,21 +297,6 @@ public class StringUtil {
             }
         }
         return res;
-    }
-
-    private static String encodeString(String s) {
-        if (s == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if ((c == ';') || (c == ':') || (c == '\\')) {
-                sb.append('\\');
-            }
-            sb.append(c);
-        }
-        return sb.toString();
     }
 
     /**
@@ -435,16 +354,6 @@ public class StringUtil {
         }
 
         return buf.toString();
-
-        /*
-         * if (s.isEmpty()) return s; // Protect against ArrayIndexOutOf....
-         * StringBuffer buf = new StringBuffer();
-         *
-         * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while
-         * (mcr.find()) { String replaceStr = mcr.group();
-         * mcr.appendReplacement(buf, "{" + replaceStr + "}"); }
-         * mcr.appendTail(buf); return s.substring(0, 1) + buf.toString();
-         */
     }
 
     /**
@@ -457,11 +366,12 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     public static String removeBracesAroundCapitals(String s) {
+        String current = s;
         String previous = s;
-        while ((s = removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
-            previous = s;
+        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
+            previous = current;
         }
-        return s;
+        return current;
     }
 
     /**
@@ -474,7 +384,6 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
-        final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
         Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
@@ -524,6 +433,143 @@ public class StringUtil {
         } else {
             return (toCheck.charAt(0) == '"') && (toCheck.charAt(toCheck.length() - 1) == '"');
         }
+    }
+
+    /**
+     * Optimized method for converting a String into an Integer
+     *
+     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     *
+     * @param str the String holding an Integer value
+     * @throws NumberFormatException if str cannot be parsed to an int
+     * @return the int value of str
+     */
+    public static int intValueOf(String str) {
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            throw new NumberFormatException(str);
+        }
+
+        int ival = 0;
+        for (;; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                throw new NumberFormatException(str);
+            }
+        }
+    }
+
+    /**
+     * This method ensures that the output String has only
+     * valid XML unicode characters as specified by the
+     * XML 1.0 standard. For reference, please see
+     * <a href="http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char">the
+     * standard</a>. This method will return an empty
+     * String if the input is null or empty.
+     * <p>
+     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+     *
+     * @param in The String whose non-valid characters we want to remove.
+     * @return The in String, stripped of non-valid characters.
+     */
+    public static String stripNonValidXMLCharacters(String in) {
+        if ((in == null) || in.isEmpty()) {
+            return ""; // vacancy test.
+        }
+        StringBuilder out = new StringBuilder(); // Used to hold the output.
+        char current; // Used to reference the current character.
+
+        for (int i = 0; i < in.length(); i++) {
+            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
+                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+                out.append(current);
+            }
+        }
+        return out.toString();
+    }
+
+    /*
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
+    public static List<String> tokenizeToList(String buf, String delimstr)
+    {
+        List<String> list = new ArrayList<>();
+        String buffer = buf + '\n';
+
+        StringTokenizer st = new StringTokenizer(buffer, delimstr);
+
+        while (st.hasMoreTokens()) {
+            list.add(st.nextToken());
+        }
+
+        return list;
+    }
+
+    /**
+     * Quote special characters.
+     *
+     * @param toQuote         The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting
+     *                  character itself, which is automatically quoted.
+     * @param quoteChar The quoting character.
+     * @return A String with every special character (including the quoting
+     * character itself) quoted.
+     */
+    public static String quote(String toQuote, String specials, char quoteChar) {
+        if (toQuote == null) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+        char c;
+        boolean isSpecial;
+        for (int i = 0; i < toQuote.length(); ++i) {
+            c = toQuote.charAt(i);
+
+            isSpecial = (c == quoteChar);
+            // If non-null specials performs logic-or with specials.indexOf(c) >= 0
+            isSpecial |= ((specials != null) && (specials.indexOf(c) >= 0));
+
+            if (isSpecial) {
+                result.append(quoteChar);
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
+
+    public static String limitStringLength(String s, int maxLength) {
+        if (s == null) {
+            return "";
+        }
+
+        if (s.length() <= maxLength) {
+            return s;
+        }
+
+        return s.substring(0, maxLength - 3) + "...";
+    }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        String result = s;
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
+            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return result;
     }
 
 }

@@ -18,14 +18,9 @@ package net.sf.jabref.pdfimport;
 import java.io.File;
 import java.io.FileFilter;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Christoph Arbeit
- * Date: 08.09.2010
- * Time: 15:03:36
- * To change this template use File | Settings | File Templates.
- */
 public class PdfFileFilter implements FileFilter {
+
+    public final static PdfFileFilter INSTANCE = new PdfFileFilter();
 
     @Override
     public boolean accept(File file) {
@@ -43,8 +38,8 @@ public class PdfFileFilter implements FileFilter {
     }
 
     private static boolean isMatchingFileFilter(String path) {
-        String dateiEndung = path.substring(path.lastIndexOf(".") + 1);
-        return "pdf".equalsIgnoreCase(dateiEndung);
+        String extension = path.substring(path.lastIndexOf('.') + 1);
+        return "pdf".equalsIgnoreCase(extension);
     }
 
 }

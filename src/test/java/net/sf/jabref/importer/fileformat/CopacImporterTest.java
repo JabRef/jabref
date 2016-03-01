@@ -4,7 +4,6 @@ import net.sf.jabref.*;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +67,7 @@ public class CopacImporterTest {
             Assert.assertEquals("Interner Bericht ; Nr.2/92", entry.getField("series"));
             Assert.assertEquals("1992", entry.getField("year"));
             Assert.assertEquals("Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik", entry.getField("publisher"));
-            Assert.assertEquals(BibtexEntryTypes.BOOK, entry.getType());
+            Assert.assertEquals("book", entry.getType());
         }
     }
 

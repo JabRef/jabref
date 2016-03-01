@@ -38,22 +38,18 @@ public class Cache {
         this.capacity = capacity;
     }
 
-    public String get() {
+    public synchronized String get() {
         ensureCacheIsFresh();
         return cache;
     }
 
     private void ensureCacheIsFresh() {
         if (cacheRefreshNeeded) {
-            StringBuilder sb = new StringBuilder();
-            for (String line : queue) {
-                sb.append(line);
-            }
-            cache = sb.toString();
+            cache = String.join("", queue);
         }
     }
 
-    public void add(String message) {
+    public synchronized void add(String message) {
         queue.add(message);
 
         if (isCapacityExceeded()) {

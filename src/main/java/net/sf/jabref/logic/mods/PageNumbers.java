@@ -33,14 +33,14 @@ public class PageNumbers {
     private int start;
     private int end;
 
+    private static final Pattern PAGE_PATTERN = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
 
     public PageNumbers(String s) {
         parsePageNums(s);
     }
 
     private void parsePageNums(String numberString) {
-        Pattern pattern = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
-        Matcher matcher = pattern.matcher(numberString);
+        Matcher matcher = PAGE_PATTERN.matcher(numberString);
         if (matcher.matches()) {
             start = Integer.parseInt(matcher.group(1));
             end = Integer.parseInt(matcher.group(2));
@@ -52,17 +52,16 @@ public class PageNumbers {
     public Element getDOMrepresentation(Document document) {
         Element result = document.createElement("extent");
         result.setAttribute("unit", "page");
-        if (freeform != null) {
-            Node textNode = document.createTextNode(freeform);
-            result.appendChild(textNode);
-        }
-        else {
+        if (freeform == null) {
             Element tmpStart = document.createElement("start");
             Element tmpEnd = document.createElement("end");
             tmpStart.appendChild(document.createTextNode(String.valueOf(this.start)));
             tmpEnd.appendChild(document.createTextNode(String.valueOf(this.end)));
             result.appendChild(tmpStart);
             result.appendChild(tmpEnd);
+        } else {
+            Node textNode = document.createTextNode(freeform);
+            result.appendChild(textNode);
         }
         return result;
     }

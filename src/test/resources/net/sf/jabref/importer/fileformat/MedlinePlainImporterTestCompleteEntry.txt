@@ -12,25 +12,7 @@ DP  - 2009
 TI  - From danger and motherhood to health and beauty: health advice for the factory
       girl in early twentieth-century Britain.
 PG  - 454-81
-AB  - A survey of government reports and the archives and journals of other agencies
-     
-     
-      interested in industrial health in early twentieth-century Britain has led us to 
-      conclude that, in addition to apprehension about the potentially harmful impact
-      of industrial work on the reproductive health of women, there was a great deal of
-      interest in the health of young, unmarried girls in the workplace, particularly
-      the factory. Adopting a broader time frame, we suggest that the First World War, 
-      with its emphasis on the reproductive health of women, was an anomalous
-      experience in a broader trend which stressed the growing acceptability of women's
-      work within industry. Concern with girls' health and welfare embraced hygiene,
-      diet, exercise, recreation, fashion and beauty within and outside of the 
-      workplace, as well as the impact of the boredom and monotony associated with
-      industrial work. The health problems of young women workers tended to be
-      associated with behaviour and environment rather than biology, as were anxieties 
-      about the impact of work on morals, habits and character. Efforts to ensure that 
-      young female factory workers would be equipped to take their place as citizens
-      and parents, we argue, often dovetailed rather than diverged with the 'boy
-      labour' question.
+AB  - Lorem ipsum abstract
 FAU - Long, Vicky
 AU  - Long V
 AD  - Centre for the History of Science, Technology and Medicine, University of

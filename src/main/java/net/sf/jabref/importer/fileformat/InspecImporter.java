@@ -29,12 +29,13 @@ import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.regex.Pattern;
 
-import net.sf.jabref.bibtex.EntryTypes;
-
 /**
  * INSPEC format importer.
  */
 public class InspecImporter extends ImportFormat {
+
+    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
+
 
     /**
      * Return the name of this import format.
@@ -61,7 +62,6 @@ public class InspecImporter extends ImportFormat {
         // Our strategy is to look for the "PY <year>" line.
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         //Pattern pat1 = Pattern.compile("PY:  \\d{4}");
-        Pattern pat1 = Pattern.compile("Record.*INSPEC.*");
 
         //was PY \\\\d{4}? before
         String str;
@@ -71,7 +71,7 @@ public class InspecImporter extends ImportFormat {
             //str = str.replace(" - ", "");
             //System.out.println(str);
 
-            if (pat1.matcher(str).find()) {
+            if (INSPEC_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
@@ -119,7 +119,7 @@ public class InspecImporter extends ImportFormat {
                     h.put("year", frest);
                 } else if ("AU".equals(f3)) {
                     h.put("author",
-                            AuthorList.fixAuthor_lastNameFirst(frest.replaceAll(",-", ", ").replaceAll(";", " and ")));
+                            AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
                     h.put("abstract", frest);
                 } else if ("ID".equals(f3)) {
@@ -128,7 +128,7 @@ public class InspecImporter extends ImportFormat {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replaceAll("-", " "));
+                        h.put("journal", jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
@@ -151,11 +151,11 @@ public class InspecImporter extends ImportFormat {
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
                         type = "inproceedings";
                     } else {
-                        type = frest.replaceAll(" ", "");
+                        type = frest.replace(" ", "");
                     }
                 }
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, EntryTypes.getTypeOrDefault(type)); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
             // create one here
             b.setField(h);
 

@@ -15,10 +15,8 @@
 */
 package net.sf.jabref.logic.search.rules;
 
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.search.SearchRule;
-import net.sf.jabref.logic.search.rules.util.SentenceAnalyzer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,9 +82,8 @@ public class RegexBasedSearchRule implements SearchRule {
         boolean[] matchFound = new boolean[words.size()];
 
         for (String field : bibEntry.getFieldNames()) {
-            Object fieldContentAsObject = bibEntry.getField(field);
-            if (fieldContentAsObject != null) {
-                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContentAsObject.toString());
+            if (bibEntry.hasField(field)) {
+                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
                 if (!caseSensitive) {
                     fieldContent = fieldContent.toLowerCase();
                 }

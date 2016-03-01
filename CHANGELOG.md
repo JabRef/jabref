@@ -13,13 +13,61 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
+- Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
+- Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
+- OvidImporter now also imports fields: doi, issn, language and keywords
+- Implemented [#647](https://github.com/JabRef/jabref/issues/647): The preview can now be copied
+- [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
+- Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
+- Improved layout for OSX: Toolbar buttons and search field
+- Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
+- BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
+- Moved all quality-related database actions inside a new quality menu
+- [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
+- Moved default bibliography mode to general preferences tab
+- Add dialog to show all preferences in their raw form plus some filtering
+- Added Ordinal formatter (1 -> 1st etc)
+- The LaTeX to Unicode/HTML functionality is much improved by covering many more cases
+- Ability to convert from LaTeX to Unicode in right-click field menu
+
+- [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
+- Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 
 ### Fixed
+- Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
+- Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup
+- Fixed [#466](https://github.com/JabRef/jabref/issues/466): Rename PDF cleanup now also changes case of file name
+- Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
+- Make BibTex parser more robust against missing newlines
+- Fix bug that prevented the import of BibTex entries having only a key as content
+- Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
+- Fixed [#670](https://github.com/JabRef/jabref/issues/670): Expressions using enclosed quotes (keywords="one two") did not work.
+- Fixed [#667](https://github.com/JabRef/jabref/issues/667): URL field is not sanitized anymore upon opening in browser.
+- Fixed [#687](https://github.com/JabRef/jabref/issues/687): Fixed NPE when closing JabRef with new unsaved database.
+- Fixed [#680](https://github.com/JabRef/jabref/issues/680): Synchronize Files key binding works again.
+- Fixed [#212](https://github.com/JabRef/jabref/issues/212): Added command line option -g for autogenerating bibtex keys
+- Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option -asfl for autosetting file links
+- Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
+- IEEEXplore fetcher replaces keyword separator with the preferred
+- Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
+- Merge from DOI now honors removed fields
+- Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
+- Fixed [#824](https://github.com/JabRef/jabref/issues/824): MimeTypeDetector can now also handle local file links
+- Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
+- Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
+- Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
+
+- Fixed [#685](https://github.com/JabRef/jabref/issues/685): Fixed MySQL exporting for more than one entry
 
 ### Removed
-
-
-
+- Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
+- Removed configuration option to use database file directory as base directory for attached files and make it default instead.
+- Removed save session functionality as it just saved the last opened tabs which is done by default
+- Removed CLI option -l to load a session
+- Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
+- Removed PDF preview functionality
+- Removed Sixpackimporter it is not used in the wild anymore
 
 
 
@@ -45,9 +93,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Fixed
 - Changes in customized entry types are now directly reflected in the table when clicking "Apply" or "OK"
-- Fixed [#593](https://github.com/JabRef/jabref/issues/593): Reference list generation works for OpenOffice/LibreOffice again
-- Fixed [#545](https://github.com/JabRef/jabref/issues/545): ACM fetcher works again
-- Fixed [#598](https://github.com/JabRef/jabref/issues/598): Use default file icon for custom external file types
 - Fixed [#608](https://github.com/JabRef/jabref/issues/608): Export works again
 - Fixed [#417](https://github.com/JabRef/jabref/issues/417): Table now updates when switching groups
 - Fixed [#534](https://github.com/JabRef/jabref/issues/534): No OpenOffice setup panel in preferences
@@ -81,6 +126,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implements [#565](https://github.com/JabRef/jabref/issues/565): Highlighting matches works now also for regular expressions in preview panel and entry editor
 - IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
 - Christmas color theme (red and green)
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Added command line switch --debug to show more detailed logging messages
 
 ### Fixed
 - Fixed [bug 482](https://sourceforge.net/p/jabref/bugs/482/) partly: escaped brackets are now parsed properly when opening a bib file
@@ -225,18 +272,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 Version 2.80 was intended as intermediate step to JabRef 3.0.
 Since much functionality has changed during development, a release of this version was skipped.
 
-## [dev_2.11] - unreleased
-
-### Fixed
- - Fix [#345](https://github.com/JabRef/jabref/issues/345): Remove history from help file
-
-## [2.11.1] - 2015-11-16
-
-### Fixed
- - Backports from 2.80: Fixed [#250](https://github.com/JabRef/jabref/issues/250): No hard line breaks after 70 chars in serialized JabRef meta data
- - Backports from 2.80: Fixed [#325](https://github.com/JabRef/jabref/issues/325): Deactivating AutoCompletion crashes EntryEditor
-
-## 2.11 - 2015-11-11
+## 2.11
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 

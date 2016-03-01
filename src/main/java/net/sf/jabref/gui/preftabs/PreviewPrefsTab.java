@@ -15,26 +15,17 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.*;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.bibtex.EntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import java.awt.*;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 
@@ -45,17 +36,11 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
     private final JTextArea layout1 = new JTextArea("", 1, 1);
     private final JTextArea layout2 = new JTextArea("", 1, 1);
 
-    private final JButton help = new HelpAction(GUIGlobals.helpDiag, GUIGlobals.previewHelp,
-            Localization.lang("Help on Preview Settings")).getIconButton();
-
     private final JButton testButton = new JButton(Localization.lang("Test"));
     private final JButton defaultButton = new JButton(Localization.lang("Default"));
     private final JButton testButton2 = new JButton(Localization.lang("Test"));
     private final JButton defaultButton2 = new JButton(Localization.lang("Default"));
 
-    private final JPanel pdfPreviewPanel = new JPanel(new BorderLayout());
-
-    private final JCheckBox pdfPreview = new JCheckBox(Localization.lang("Enable PDF preview"));
     private final JPanel firstPanel = new JPanel();
     private final JScrollPane firstScrollPane = new JScrollPane(layout1);
 
@@ -140,79 +125,52 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         layoutConstraints.weighty = 1;
         layout.setConstraints(secondPanel, layoutConstraints);
         add(secondPanel);
-
-        // PDF Preview button
-        pdfPreviewPanel.add(pdfPreview, BorderLayout.WEST);
-
-        // Help Button
-        pdfPreviewPanel.add(help, BorderLayout.EAST);
-
         layoutConstraints.weighty = 0;
-        layout.setConstraints(pdfPreviewPanel, layoutConstraints);
-        add(pdfPreviewPanel);
 
-        defaultButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tmp = layout1.getText().replaceAll("\n", "__NEWLINE__");
-                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
-                layout1.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
-            }
-        });
-        defaultButton2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tmp = layout2.getText().replaceAll("\n", "__NEWLINE__");
-                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
-                layout2.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
-                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
-            }
+        defaultButton.addActionListener(e -> {
+            String tmp = layout1.getText().replace("\n", "__NEWLINE__");
+            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
+            layout1.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
+            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
         });
 
-        testButton.addActionListener(new ActionListener() {
+        defaultButton2.addActionListener(e -> {
+            String tmp = layout2.getText().replace("\n", "__NEWLINE__");
+            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
+            layout2.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
+            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
+        });
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PreviewPrefsTab.getTestEntry();
-                try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                            layout1.getText());
-                    testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
-                            JOptionPane.PLAIN_MESSAGE);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    LOGGER.warn("Parsing error.", ex);
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
-                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
-                }
+        testButton.addActionListener(e -> {
+            PreviewPrefsTab.getTestEntry();
+            try {
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                        layout1.getText());
+                testPanel.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+            } catch (StringIndexOutOfBoundsException ex) {
+                LOGGER.warn("Parsing error.", ex);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
+                                + ".\n" + ex.getMessage(),
+                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        testButton2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PreviewPrefsTab.getTestEntry();
-                try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                            layout2.getText());
-                    testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
-                            JOptionPane.PLAIN_MESSAGE);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    LOGGER.warn("Parsing error.", ex);
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
-                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
-                }
+        testButton2.addActionListener(e -> {
+            PreviewPrefsTab.getTestEntry();
+            try {
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                        layout2.getText());
+                testPanel.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
+                        JOptionPane.PLAIN_MESSAGE);
+            } catch (StringIndexOutOfBoundsException ex) {
+                LOGGER.warn("Parsing error.", ex);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
+                                + ".\n" + ex.getMessage(),
+                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -221,7 +179,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         if (PreviewPrefsTab.entry != null) {
             return PreviewPrefsTab.entry;
         }
-        PreviewPrefsTab.entry = new BibEntry(IdGenerator.next(), EntryTypes.getType("article"));
+        PreviewPrefsTab.entry = new BibEntry(IdGenerator.next(), "article");
         PreviewPrefsTab.entry.setField(BibEntry.KEY_FIELD, "conceicao1997");
         PreviewPrefsTab.entry.setField("author",
                 "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
@@ -262,16 +220,14 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replaceAll("__NEWLINE__", "\n"));
-        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replaceAll("__NEWLINE__", "\n"));
-        pdfPreview.setSelected(prefs.getBoolean(JabRefPreferences.PDF_PREVIEW));
+        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
+        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
     }
 
     @Override
     public void storeSettings() {
-        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replaceAll("\n", "__NEWLINE__"));
-        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replaceAll("\n", "__NEWLINE__"));
-        prefs.putBoolean(JabRefPreferences.PDF_PREVIEW, pdfPreview.isSelected());
+        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replace("\n", "__NEWLINE__"));
+        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replace("\n", "__NEWLINE__"));
     }
 
     @Override

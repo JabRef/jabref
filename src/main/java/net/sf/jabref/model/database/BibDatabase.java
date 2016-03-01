@@ -29,30 +29,23 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.MonthUtil;
-
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * A bibliograhpy database.
+ * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -76,8 +69,8 @@ public class BibDatabase {
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
-    public BibDatabaseType getBibType() {
-        return BibDatabaseTypeDetection.inferType(entries.values());
+    public BibDatabaseMode getBibType() {
+        return BibDatabaseModeDetection.inferMode(this);
     }
 
     /**
@@ -240,7 +233,7 @@ public class BibDatabase {
         }
 
         if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibtexString id.");
+            throw new KeyCollisionException("Duplicate BibTeXString id.");
         }
 
         bibtexStrings.put(string.getId(), string);
@@ -347,8 +340,8 @@ public class BibDatabase {
             entry = (BibEntry) entry.clone();
         }
 
-        for (Object field : entry.getFieldNames()) {
-            entry.setField(field.toString(), this.resolveForStrings(entry.getField(field.toString())));
+        for (String field : entry.getFieldNames()) {
+            entry.setField(field, this.resolveForStrings(entry.getField(field)));
         }
         return entry;
     }
@@ -551,28 +544,27 @@ public class BibDatabase {
      * unset fields in the entry linked by the "crossref" field, if any.
      *
      * @param field    The field to return the value of.
-     * @param bibtex   maybenull
+     * @param entry    maybenull
      *                 The bibtex entry which contains the field.
      * @param database maybenull
      *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public static String getResolvedField(String field, BibEntry bibtex, BibDatabase database) {
+    public static String getResolvedField(String field, BibEntry entry, BibDatabase database) {
         if ("bibtextype".equals(field)) {
-            return bibtex.getType().getName();
+            return EntryUtil.capitalizeFirst(entry.getType());
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected
         // behavior for the preview layout and for the check whatever all fields are present.
         // But there might be unwanted side-effects?!
-        Object o = bibtex.getFieldOrAlias(field);
+        Object o = entry.getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibEntry.KEY_FIELD)) {
-            Object crossRef = bibtex.getField("crossref");
-            if (crossRef != null) {
-                BibEntry referred = database.getEntryByKey((String) crossRef);
+            if (entry.hasField("crossref")) {
+                BibEntry referred = database.getEntryByKey(entry.getField("crossref"));
                 if (referred != null) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:

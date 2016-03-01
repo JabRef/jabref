@@ -15,22 +15,23 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
@@ -62,7 +63,7 @@ public class MoveFileAction extends AbstractAction {
         }
         FileListEntry flEntry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
-        String ln = flEntry.getLink();
+        String ln = flEntry.link;
         boolean httpLink = ln.toLowerCase().startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
@@ -70,10 +71,10 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        String[] dirs = frame.getCurrentBasePanel().metaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
         int found = -1;
-        for (int i = 0; i < dirs.length; i++) {
-            if (new File(dirs[i]).exists()) {
+        for (int i = 0; i < dirs.size(); i++) {
+            if (new File(dirs.get(i)).exists()) {
                 found = i;
                 break;
             }
@@ -85,13 +86,13 @@ public class MoveFileAction extends AbstractAction {
         }
         File file = new File(ln);
         if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs);
+            file = FileUtil.expandFilename(ln, dirs).orElse(null);
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;
-            if (flEntry.getType() != null) {
-                extension = "." + flEntry.getType().getExtension();
+            if (flEntry.type != null) {
+                extension = "." + flEntry.type.getExtension();
             }
 
             File newFile = null;
@@ -101,8 +102,10 @@ public class MoveFileAction extends AbstractAction {
                 String chosenFile;
                 if (toFileDir) {
                     // Determine which name to suggest:
-                    String suggName = Util.getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry()).concat(".")
-                            .concat(flEntry.getType().getExtension());
+                    String suggName = Util
+                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
+                                    Globals.journalAbbreviationLoader.getRepository())
+                            .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));
@@ -119,15 +122,14 @@ public class MoveFileAction extends AbstractAction {
                         return;
                     }
                     Globals.prefs.putBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR, cbm.isSelected());
-                    StringBuilder sb = new StringBuilder(dirs[found]);
-                    if (!dirs[found].endsWith(File.separator)) {
+                    StringBuilder sb = new StringBuilder(dirs.get(found));
+                    if (!dirs.get(found).endsWith(File.separator)) {
                         sb.append(File.separator);
                     }
                     if (cbm.isSelected()) {
                         // Rename:
                         sb.append(suggName);
-                    }
-                    else {
+                    } else {
                         // Do not rename:
                         sb.append(file.getName());
                     }
@@ -159,19 +161,25 @@ public class MoveFileAction extends AbstractAction {
                     }
                     if (success) {
                         // Remove the original file:
-                        file.delete();
+                        if (!file.delete()) {
+                            LOGGER.info("Cannot delete original file");
+                        }
                         // Relativise path, if possible.
-                        String canPath = new File(dirs[found]).getCanonicalPath();
+                        String canPath = new File(dirs.get(found)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
                             if ((newFile.getCanonicalPath().length() > canPath.length()) &&
                                     (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {
-                                flEntry.setLink(newFile.getCanonicalPath().substring(1 + canPath.length()));
+
+                                String newLink = newFile.getCanonicalPath().substring(1 + canPath.length());
+                                editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                             } else {
-                                flEntry.setLink(newFile.getCanonicalPath().substring(canPath.length()));
+                                String newLink = newFile.getCanonicalPath().substring(canPath.length());
+                                editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                             }
 
                         } else {
-                            flEntry.setLink(newFile.getCanonicalPath());
+                            String newLink = newFile.getCanonicalPath();
+                            editor.getTableModel().setEntry(selected, new FileListEntry(flEntry.description, newLink, flEntry.type));
                         }
                         eEditor.updateField(editor);
                         //JOptionPane.showMessageDialog(frame, Globals.lang("File moved"),
@@ -193,7 +201,7 @@ public class MoveFileAction extends AbstractAction {
         } else {
 
             // File doesn't exist, so we can't move it.
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", flEntry.getLink()),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", flEntry.link),
                     Localization.lang("File not found"), JOptionPane.ERROR_MESSAGE);
 
         }

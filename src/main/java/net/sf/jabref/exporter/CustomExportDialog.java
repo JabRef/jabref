@@ -56,29 +56,23 @@ class CustomExportDialog extends JDialog {
 
     public CustomExportDialog(final JabRefFrame parent) {
         super(parent, Localization.lang("Edit custom export"), true);
-        ActionListener okListener = new ActionListener() {
+        ActionListener okListener = e -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                // Check that there are no empty strings.
-                if (layoutFile.getText().isEmpty() ||
-                        name.getText().isEmpty() ||
-                        extension.getText().isEmpty() ||
-                        !layoutFile.getText().endsWith(".layout")) {
-                    //JOptionPane.showMessageDialog
-                    //    (parent, Globals.lang("You must provide a name, a search "
-                    //			  +"string and a field name for this group."),
-                    //			  Globals.lang("Create group"),
-                    //     JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Handling of : and ; must also be done.
-
-                okPressed = true;
-                dispose();
+            // Check that there are no empty strings.
+            if (layoutFile.getText().isEmpty() || name.getText().isEmpty() || extension.getText().isEmpty()
+                    || !layoutFile.getText().endsWith(".layout")) {
+                //JOptionPane.showMessageDialog
+                //    (parent, Globals.lang("You must provide a name, a search "
+                //			  +"string and a field name for this group."),
+                //			  Globals.lang("Create group"),
+                //     JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            // Handling of : and ; must also be done.
+
+            okPressed = true;
+            dispose();
         };
         JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
@@ -98,10 +92,7 @@ class CustomExportDialog extends JDialog {
         cancel.addActionListener(cancelAction);
 
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        browse.addActionListener(e -> {
                 File directory = new File(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 String chosenStr = FileDialogs.getNewFile(parent, directory, ".layout",
                         JFileChooser.OPEN_DIALOG, false);
@@ -114,7 +105,6 @@ class CustomExportDialog extends JDialog {
                 Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, chosen.getParent());
 
                 layoutFile.setText(chosen.getPath());
-            }
         });
 
         // Key bindings:
@@ -186,8 +176,7 @@ class CustomExportDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
 
-        //pack();
-        setSize(600, 170);
+        setSize(700, 200);
 
         PositionWindow.placeDialog(this, parent);
     }

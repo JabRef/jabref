@@ -1,0 +1,47 @@
+From ernad at nep.repec.org  Wed Nov  2 03:26:25 2005
+From: ernad at nep.repec.org (Laszlo A. Koczy)
+Date: Wed Nov  2 03:26:27 2005
+Subject: [nep-gth] 2005-10-29, 16 papers
+Message-ID: <E1EXEsz-0001H7-PM@snefru.openlib.org>
+
+
+----------------------------------------------------------------------------
+NEP: New Economics Papers
+Game Theory
+----------------------------------------------------------------------------
+
+Edited by: L?szl? ?. K?czy 
+           http://ideas.repec.org/e/pko27.html
+           Universiteit Maastricht
+Date:      2005-10-29-100-347-9922
+Papers:	   16
+
+This document is in the public domain, feel free to circulate it.
+
+   +++++++++++++++++++++++++++++++++++++++++++++++++++
+   + Note: Access to full contents may be restricted +
+   +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ 
+In this issue we have:
+----------------------------------------------------------------------------
+
+1. Weak Monotonicity and Bayes-Nash Incentive Compatibility
+     M?ller,Rudolf; Perea,Andr?s; Wolf,Sascha
+     Date: 2005-10-29-100-23423
+ 
+----------------------------------------------------------------------------
+
+1. Weak Monotonicity and Bayes-Nash Incentive Compatibility
+  
+    M?ller,Rudolf
+    Perea,Andr?s
+    Wolf,Sascha
+
+Lorem ipsum abstract
+
+Keywords: mathematical economics;
+Date:     2005-08-31
+URL:      http://d.repec.org/n?u=RePEc:dgr:umamet:2005039&r=gth
+
+

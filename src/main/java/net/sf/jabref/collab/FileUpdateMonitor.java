@@ -81,12 +81,11 @@ public class FileUpdateMonitor implements Runnable {
      * Forces a check on the file, and returns the result. Does not
      * force a report to all listeners before the next routine check.
      */
-    public boolean hasBeenModified(String handle) throws IllegalArgumentException {
+    public boolean hasBeenModified(String handle) {
         Object o = entries.get(handle);
         if (o == null) {
             return false;
         }
-        //	    throw new IllegalArgumentException("Entry not found");
         try {
             return ((Entry) o).hasBeenUpdated();
         } catch (IOException ex) {
@@ -118,14 +117,12 @@ public class FileUpdateMonitor implements Runnable {
         entries.remove(handle);
     }
 
-    public void updateTimeStamp(String key) throws IllegalArgumentException {
+    public void updateTimeStamp(String key) {
         Object o = entries.get(key);
-        if (o == null) {
-            throw new IllegalArgumentException("Entry not found");
+        if (o != null) {
+            Entry entry = (Entry) o;
+            entry.updateTimeStamp();
         }
-        Entry entry = (Entry) o;
-        entry.updateTimeStamp();
-
     }
 
     /**

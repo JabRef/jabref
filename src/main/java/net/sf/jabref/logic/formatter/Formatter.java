@@ -13,15 +13,24 @@ public interface Formatter {
     /**
      * Returns a human readable name of the formatter usable for e.g. in the GUI
      *
-     * @return the name of the formatter
+     * @return the name of the formatter, always not null
      */
     String getName();
+
+
+    /**
+     * Returns a unique key for the formatter that can be used for its identification
+     * @return the key of the formatter, always not null
+     */
+    String getKey();
 
     /**
      * Formats a field value by with a particular formatter transformation.
      *
+     * Calling this method with a null argument results in a NullPointerException.
+     *
      * @param value the input String
-     * @return the formatted output String
+     * @return the formatted output String, always not null
      */
     String format(String value);
 }

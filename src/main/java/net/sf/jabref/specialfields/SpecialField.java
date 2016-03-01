@@ -34,17 +34,13 @@ public abstract class SpecialField {
     private HashMap<String, SpecialFieldValue> map;
 
 
-    void setValues(List<SpecialFieldValue> values) {
+    protected void setValues(List<SpecialFieldValue> values) {
         this.values = values;
         this.keywords = new ArrayList<>();
         this.map = new HashMap<>();
         for (SpecialFieldValue v : values) {
-            if (v.getKeyword() != null) {
-                keywords.add(v.getKeyword());
-            }
-            if (v.getFieldValue() != null) {
-                map.put(v.getFieldValue(), v);
-            }
+            v.getKeyword().ifPresent(keywords::add);
+            v.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, v));
         }
     }
 

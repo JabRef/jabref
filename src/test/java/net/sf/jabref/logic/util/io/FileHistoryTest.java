@@ -12,8 +12,8 @@ import net.sf.jabref.JabRefPreferences;
 
 public class FileHistoryTest {
 
-    JabRefPreferences prefs;
-    List<String> oldFileNames;
+    private JabRefPreferences prefs;
+    private List<String> oldFileNames;
 
     @Before
     public void setUp() throws Exception {
@@ -25,12 +25,7 @@ public class FileHistoryTest {
     public void restore() {
         prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
     }
-    @Test
-    public void testConstructor() {
-        FileHistory fh = new FileHistory(prefs);
-    }
-
-
+    
     @Test
     public void testFileHistory() {
         FileHistory fh = new FileHistory(prefs);

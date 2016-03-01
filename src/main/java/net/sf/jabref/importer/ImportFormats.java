@@ -17,6 +17,7 @@ package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -103,8 +104,7 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = ImportFormats.createImportFileChooser
-                        (Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
+                JFileChooser fc = ImportFormats.createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 fc.showOpenDialog(frame);
                 File file = fc.getSelectedFile();
                 if (file == null) {
@@ -127,7 +127,7 @@ public class ImportFormats {
                     }
                     ImportMenuItem imi = new ImportMenuItem(frame,
                             openInNew, format);
-                    imi.automatedImport(new String[] {file.getAbsolutePath()});
+                    imi.automatedImport(Arrays.asList(file.getAbsolutePath()));
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:
