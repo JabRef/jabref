@@ -50,8 +50,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -164,8 +162,6 @@ class ZipFileChooser extends JDialog {
 
     /** table of Zip entries */
     private final JTable table;
-    /** shortcut to preferences */
-    private final JabRefPreferences prefs = Globals.prefs;
     /** this */
     private final ZipFileChooser zipFileChooser;
     /** import customization dialog, owner of this dialog */

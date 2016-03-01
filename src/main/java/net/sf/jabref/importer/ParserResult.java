@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,8 +37,8 @@ public class ParserResult {
     private final HashMap<String, EntryType> entryTypes;
 
     private File file;
-    private final ArrayList<String> warnings = new ArrayList<>();
-    private final ArrayList<String> duplicateKeys = new ArrayList<>();
+    private final List<String> warnings = new ArrayList<>();
+    private final List<String> duplicateKeys = new ArrayList<>();
 
     private String errorMessage;
     // Which encoding was used?
@@ -127,12 +128,8 @@ public class ParserResult {
         return !warnings.isEmpty();
     }
 
-    public String[] warnings() {
-        String[] s = new String[warnings.size()];
-        for (int i = 0; i < warnings.size(); i++) {
-            s[i] = warnings.get(i);
-        }
-        return s;
+    public List<String> warnings() {
+        return new ArrayList<>(warnings);
     }
 
     /**

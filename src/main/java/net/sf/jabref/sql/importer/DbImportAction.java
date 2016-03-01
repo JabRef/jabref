@@ -138,7 +138,7 @@ public class DbImportAction extends AbstractWorker {
                 DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                 DBImporter importer = factory.getImporter(dbs.getServerType());
                 try (Connection conn = importer.connectToDB(dbs);
-                        ResultSet rs = SQLUtil.queryAllFromTable(conn, "jabref_database")) {
+                        ResultSet rs = SQLUtil.queryAllFromTable(conn, "jabref_database").getResultSet()) {
                     Vector<String> v;
                     Vector<Vector<String>> matrix = new Vector<>();
 

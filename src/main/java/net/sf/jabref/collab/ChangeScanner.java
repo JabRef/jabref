@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.ArrayList;
 
@@ -412,10 +413,10 @@ public class ChangeScanner implements Runnable {
                         // We have found a string with a matching name.
                         if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
-                            BibtexString mem = findString(inMem1, tmp.getName(), usedInMem);
-                            if (mem != null) {
-                                changes.add(
-                                        new StringChange(mem, tmp, tmp.getName(), mem.getContent(), disk.getContent()));
+                            Optional<BibtexString> mem = findString(inMem1, tmp.getName(), usedInMem);
+                            if (mem.isPresent()) {
+                                changes.add(new StringChange(mem.get(), tmp, tmp.getName(), mem.get().getContent(),
+                                        disk.getContent()));
                             } else {
                                 changes.add(new StringChange(null, tmp, tmp.getName(), null, disk.getContent()));
                             }
@@ -477,10 +478,9 @@ public class ChangeScanner implements Runnable {
             // Still one or more non-matched strings. So they must have been removed.
             for (String nmId : notMatched) {
                 BibtexString tmp = onTmp.getString(nmId);
-                BibtexString mem = findString(inMem1, tmp.getName(), usedInMem);
-                if (mem != null) { // The removed string is not removed from the mem version.
-                    changes.add(new StringRemoveChange(tmp, tmp, mem));
-                }
+                // The removed string is not removed from the mem version.
+                findString(inMem1, tmp.getName(), usedInMem)
+                        .ifPresent(x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
             }
         }
 
@@ -496,18 +496,18 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private static BibtexString findString(BibDatabase base, String name, HashSet<Object> used) {
+    private static Optional<BibtexString> findString(BibDatabase base, String name, HashSet<Object> used) {
         if (!base.hasStringLabel(name)) {
-            return null;
+            return Optional.empty();
         }
         for (String key : base.getStringKeySet()) {
             BibtexString bs = base.getString(key);
             if (bs.getName().equals(name) && !used.contains(key)) {
                 used.add(key);
-                return bs;
+                return Optional.of(bs);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**

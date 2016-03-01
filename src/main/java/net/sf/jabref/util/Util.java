@@ -326,7 +326,7 @@ public class Util {
         if (setOwner) {
             // No or empty owner field?
             // if (entry.getField(Globals.OWNER) == null
-            // || ((String) entry.getField(Globals.OWNER)).length() == 0) {
+            // || ((String) entry.getField(Globals.OWNER)).isEmpty()) {
             // Set owner field to default value
             entry.setField(BibtexFields.OWNER, owner);
             // }
@@ -579,7 +579,11 @@ public class Util {
             return;
         }
         if ((oldValue == null) || !oldValue.equals(newValue)) {
-            be.setField(field, newValue);
+            if (newValue == null) {
+                be.clearField(field);
+            } else {
+                be.setField(field, newValue);
+            }
             if (ce != null) {
                 ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
             }
@@ -718,7 +722,7 @@ public class Util {
         if (affectedFields.isEmpty()) {
             return true; // no side effects
         }
-    
+
         // show a warning, then return
         StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
         for (int i = 0; i < affectedFields.size(); ++i) {
@@ -727,7 +731,7 @@ public class Util {
         message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
-    
+
         // if (groups instanceof KeywordGroup) {
         // KeywordGroup kg = (KeywordGroup) groups;
         // String field = kg.getSearchField().toLowerCase();

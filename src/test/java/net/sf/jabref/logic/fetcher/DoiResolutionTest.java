@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.fetcher;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.support.DevEnvironment;
 import org.junit.*;
 
 import java.io.IOException;
@@ -29,6 +30,9 @@ public class DoiResolutionTest {
 
     @Test
     public void findByDOI() throws IOException {
+        // CI server is blocked
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("doi", "10.1051/0004-6361/201527330");
 
         Assert.assertEquals(
@@ -44,6 +48,9 @@ public class DoiResolutionTest {
 
     @Test
     public void notFoundByDOI() throws IOException {
+        // CI server is blocked
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         entry.setField("doi", "10.1186/unknown-doi");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));

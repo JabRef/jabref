@@ -287,10 +287,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return frame;
     }
 
-    public JabRefPreferences prefs() {
-        return Globals.prefs;
-    }
-
     public Charset getEncoding() {
         return encoding;
     }
@@ -492,8 +488,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening the preamble editor
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
-                PreambleEditor form = new PreambleEditor
-                        (frame, BasePanel.this, database, Globals.prefs);
+                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database, Globals.prefs);
                 PositionWindow.placeDialog(form, frame);
                 form.setVisible(true);
                 preambleEditor = form;
@@ -506,7 +501,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening the string editor
         actions.put(Actions.EDIT_STRINGS, (BaseAction) () -> {
             if (stringDialog == null) {
-                StringDialog form = new StringDialog(frame, BasePanel.this, database, Globals.prefs);
+                StringDialog form = new StringDialog(frame, BasePanel.this, database);
                 form.setVisible(true);
                 stringDialog = form;
             } else {

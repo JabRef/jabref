@@ -65,7 +65,6 @@ class StringDialog extends JDialog {
 
     // A reference to the entry this object works on.
     private final BibDatabase base;
-    private final JabRefFrame frame;
     private final BasePanel panel;
     private Object[] strings;
 
@@ -74,9 +73,9 @@ class StringDialog extends JDialog {
 
     private PositionWindow pw;
 
-    public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
+
+    public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
         super(frame);
-        this.frame = frame;
         this.panel = panel;
         this.base = base;
 

@@ -64,6 +64,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -186,10 +187,8 @@ class FontSelector extends JButton {
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            Font font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
-            if (font != null) {
-                setFont(font);
-            }
+            Optional<Font> font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
+            font.ifPresent(f -> setFont(f));
         }
     }
 
@@ -314,9 +313,9 @@ public class FontSelectorDialog extends JDialog {
         dispose();
     }
 
-    public Font getSelectedFont() {
+    public Optional<Font> getSelectedFont() {
         if (!isOK) {
-            return null;
+            return Optional.empty();
         }
 
         int size;
@@ -326,7 +325,7 @@ public class FontSelectorDialog extends JDialog {
             size = 14;
         }
 
-        return new Font(familyField.getText(), styleList.getSelectedIndex(), size);
+        return Optional.of(new Font(familyField.getText(), styleList.getSelectedIndex(), size));
     }
 
 

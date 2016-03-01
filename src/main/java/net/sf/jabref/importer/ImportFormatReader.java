@@ -46,7 +46,6 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter());
         formats.add(new BibteXMLImporter());
-        formats.add(new BiomailImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
@@ -60,7 +59,6 @@ public class ImportFormatReader {
         formats.add(new PdfXmpImporter());
         formats.add(new RepecNepImporter());
         formats.add(new RisImporter());
-        formats.add(new ScifinderImporter());
         formats.add(new SilverPlatterImporter());
         formats.add(new SixpackImporter());
 
@@ -128,13 +126,18 @@ public class ImportFormatReader {
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
         File file = new File(filename);
 
-        try (InputStream stream = new FileInputStream(file)) {
+        try (InputStream stream = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(stream)) {
 
-            if (!importer.isRecognizedFormat(stream)) {
+            bis.mark(Integer.MAX_VALUE);
+
+            if (!importer.isRecognizedFormat(bis)) {
                 throw new IOException("Wrong file format");
             }
 
-            return importer.importEntries(stream, status);
+            bis.reset();
+
+            return importer.importEntries(bis, status);
         }
     }
 
@@ -355,7 +358,7 @@ public class ImportFormatReader {
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
-     * <p>
+     * <p/>
      * If all fails this method attempts to read this file as bibtex.
      *
      * @throws IOException
@@ -406,7 +409,7 @@ public class ImportFormatReader {
         // Finally, if all else fails, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
- Globals.prefs.getDefaultEncoding());
+                    Globals.prefs.getDefaultEncoding());
             if ((pr.getDatabase().getEntryCount() > 0)
                     || (pr.getDatabase().getStringCount() > 0)) {
                 pr.setFile(new File(filename));

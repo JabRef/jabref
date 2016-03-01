@@ -206,8 +206,8 @@ public class JSONEntryParser {
         }
 
         // Page numbers
-        if (springerJsonEntry.has("startingPage") && (springerJsonEntry.getString("startingPage").length() > 0)) {
-            if (springerJsonEntry.has("endPage") && (springerJsonEntry.getString("endPage").length() > 0)) {
+        if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
+            if (springerJsonEntry.has("endPage") && !(springerJsonEntry.getString("endPage").isEmpty())) {
                 entry.setField("pages",
                         springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endPage"));
             } else {

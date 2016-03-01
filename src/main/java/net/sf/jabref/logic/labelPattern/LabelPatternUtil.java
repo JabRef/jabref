@@ -73,7 +73,7 @@ public class LabelPatternUtil {
         String token = "";
         for (int p = 0; p < content.length(); p++) {
             if (b == 0) {
-                if (("".equals(and) && (content.charAt(p) == ' '))
+                if ((and.isEmpty() && (content.charAt(p) == ' '))
                         || (" ".equals(and) && (content.charAt(p) == 'a'))
                         || (" a".equals(and) && (content.charAt(p) == 'n'))
                         || (" an".equals(and) && (content.charAt(p) == 'd'))) {
@@ -122,8 +122,8 @@ public class LabelPatternUtil {
      * @return The content without diacritics.
      */
     private static String removeDiacritics(String content) {
-        if (content == null) {
-            return null;
+        if (content.isEmpty()) {
+            return content;
         }
 
         // Replace umaut with '?e'
@@ -175,8 +175,11 @@ public class LabelPatternUtil {
      * @return True if the author or editor is an institution.
      */
     private static boolean isInstitution(String author) {
-        return (author.charAt(0) == '{')
-                && (author.charAt(author.length() - 1) == '}');
+        if (!(author.isEmpty())) {
+            return (author.charAt(0) == '{') && (author.charAt(author.length() - 1) == '}');
+        } else {
+            return false; // In case of empty author
+        }
     }
 
     /**
@@ -245,14 +248,14 @@ public class LabelPatternUtil {
      *
      * @param content the institution to generate a Bibtex key for
      * @return <ul>
-     *         <li>the institutation key</li>
+     *         <li>the institution key</li>
      *         <li>"" in the case of a failure</li>
      *         <li>null if content is null</li>
      *         </ul>
      */
     private static String generateInstitutionKey(String content) {
-        if (content == null) {
-            return null;
+        if (content.isEmpty()) {
+            return content;
         }
         content = LabelPatternUtil.unifyDiacritics(content);
         List<String> ignore = Arrays.asList("press", "the");
@@ -277,7 +280,7 @@ public class LabelPatternUtil {
 
             // Cleanup: remove unnecessary words.
             for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
-                if ((!"".equals(k) // remove empty
+                if ((!(k.isEmpty()) // remove empty
                         && !ignore.contains(k.toLowerCase()) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
                         && (String.valueOf(k.charAt(0))).matches("[A-Z]"))
@@ -341,7 +344,7 @@ public class LabelPatternUtil {
                     if ((k.length() >= 7) && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
                             && !"school".equals(k.toLowerCase())
                             && !"faculty".equals(k.toLowerCase())
-                            && !"".equals(k.replaceAll("[^A-Z]", ""))) {
+                            && !(k.replaceAll("[^A-Z]", "").isEmpty())) {
                         if (isSchool) {
                             schoolSB.append(k.replaceAll("[^A-Z]", ""));
                         }
@@ -369,7 +372,7 @@ public class LabelPatternUtil {
                 } else {
                     for (String k : part) {
                         k = k.replaceAll("[^A-Z]", "");
-                        if (!"".equals(k)) {
+                        if (!(k.isEmpty())) {
                             restSB.append(k);
                         }
                     }
@@ -570,7 +573,7 @@ public class LabelPatternUtil {
                 } else if (modifier.startsWith("(") && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if
                     // the label is empty:
-                    if ("".equals(label) && (modifier.length() > 2)) {
+                    if (label.isEmpty() && (modifier.length() > 2)) {
                         return modifier.substring(1, modifier.length() - 1);
                     }
 
@@ -609,7 +612,7 @@ public class LabelPatternUtil {
                     val = val.substring(4);
                 }
 
-                if ((authString == null) || "".equals(authString)) {
+                if ((authString == null) || authString.isEmpty()) {
                     authString = entry.getField("editor");
                     if (authString != null) {
                         authString = LabelPatternUtil

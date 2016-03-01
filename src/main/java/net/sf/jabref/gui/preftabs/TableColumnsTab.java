@@ -150,10 +150,9 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 switch (column) {
                 case 0:
                     return tr.name;
-                case 1:
+                default: // Only two columns
                     return tr.length > 0 ? Integer.toString(tr.length) : "";
                 }
-                return null; // Unreachable.
             }
 
             @Override

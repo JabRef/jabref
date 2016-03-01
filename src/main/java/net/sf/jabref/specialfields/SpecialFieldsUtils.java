@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.specialfields;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.util.Util;
@@ -137,7 +136,8 @@ public class SpecialFieldsUtils {
         SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
     }
 
-    private static void importKeywordsForField(ArrayList<String> keywordList, SpecialField c, BibEntry be, NamedCompound nc) {
+    private static void importKeywordsForField(List<String> keywordList, SpecialField c, BibEntry be,
+            NamedCompound nc) {
         List<String> values = c.getKeyWords();
         String newValue = null;
         for (String val : values) {
@@ -158,7 +158,7 @@ public class SpecialFieldsUtils {
         if (be.getField("keywords") == null) {
             return;
         }
-        ArrayList<String> keywordList = net.sf.jabref.model.entry.EntryUtil
+        List<String> keywordList = net.sf.jabref.model.entry.EntryUtil
                 .getSeparatedKeywords(be.getField("keywords"));
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);

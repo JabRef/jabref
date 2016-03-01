@@ -27,6 +27,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Default order in entry table:  # | all file based icons (file, URL/DOI, ...) | all bibtex field based icons (bibtexkey, entrytype, author, title, ...) | all activated special field icons (ranking, quality, ...)
 
 ### Fixed
+- Fixed #479: Import works again
 - Fixed #434: Revert to old 'JabRef' installation folder name instead of 'jabref'
 - Fixed #435: Retrieve non open access ScienceDirect PDFs via HTTP DOM
 - Fixed: Cleanup process aborts if linked file does not exists
@@ -43,8 +44,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed #533: Preview parsed incorrectly when regular expression was enabled
 
 ### Removed
+- Removed BioMail format importer
 - Removed file history size preference (never available from the UI)
 - Removed jstorImporter because it's hardly ever used, even Jstor.org doesn't support/export said format anymore
+- Removed ScifinderImporter because it's hardly ever used, and we could not get resource files to test against
 - Removed option "Show one letter heading for icon columns" which is obsolete with the fix of #315/384
 - Removed table column "PDF/PS" which refers to legacy fields "ps" resp. "pdf" which are no longer supported (see also fix #498)
 - Removed the ability to export references on the CLI interface based on year ranges
