@@ -19,6 +19,7 @@ import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Comparator;
  * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
  * return 0 unless the entries are the same object.
  */
-public class EntryComparator implements Comparator<BibEntry> {
+public class EntryComparator implements Comparator<BibEntry>, Serializable {
 
     private final String sortField;
     private final boolean descending;

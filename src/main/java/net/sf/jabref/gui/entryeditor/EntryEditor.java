@@ -748,7 +748,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             // See if the user has changed the entry type:
-            if (newEntry.getType() != entry.getType()) {
+            if (!newEntry.getType().equals(entry.getType())) {
                 compound.addEdit(new UndoableChangeType(entry,
                         entry.getType(), newEntry.getType()));
                 entry.setType(newEntry.getType());

@@ -15,20 +15,20 @@
  */
 package net.sf.jabref.groups.structure;
 
-import net.sf.jabref.logic.search.SearchMatcher;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.groups.UndoableChangeAssignment;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.strings.StringUtil;
-
-import javax.swing.undo.AbstractUndoableEdit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.groups.UndoableChangeAssignment;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.

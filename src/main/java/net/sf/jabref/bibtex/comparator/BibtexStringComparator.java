@@ -17,9 +17,11 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.model.entry.BibtexString;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class BibtexStringComparator implements Comparator<BibtexString> {
+
+public class BibtexStringComparator implements Comparator<BibtexString>, Serializable {
 
     private final boolean considerRefs;
 

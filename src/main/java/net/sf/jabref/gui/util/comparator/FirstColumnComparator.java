@@ -19,10 +19,11 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.TypedBibEntry;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Optional;
 
-public class FirstColumnComparator implements Comparator<BibEntry> {
+public class FirstColumnComparator implements Comparator<BibEntry>, Serializable {
 
     private final BibDatabaseContext database;
 

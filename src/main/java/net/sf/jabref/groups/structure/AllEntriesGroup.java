@@ -16,10 +16,7 @@
 package net.sf.jabref.groups.structure;
 
 import java.util.List;
-
 import javax.swing.undo.AbstractUndoableEdit;
-
-import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
