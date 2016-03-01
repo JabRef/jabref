@@ -143,6 +143,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
+
         this.groupsRoot = new GroupTreeNodeViewModel(new GroupTreeNode(new AllEntriesGroup()));
 
         this.frame = frame;
@@ -342,7 +343,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
                 groupsRoot.addNewGroup(newGroup, panel.undoManager, this);
-                revalidateGroups();
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Created group \"%0\".", newGroup.getName()));
             }
@@ -839,6 +839,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
+        this.groupsRoot.subscribeToDescendantChanged(source -> revalidateGroups());
         groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(this.groupsRoot));
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
             this.groupsRoot.expandSubtree(groupsTree);
@@ -944,7 +945,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             }
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups();
             groupsTree.expandPath((node == null ? groupsRoot : node).getTreePath());
             // Store undo information.
             panel.undoManager.addEdit(undo);
@@ -972,7 +972,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             node.getNode().addChild(newNode);
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
-            revalidateGroups();
             groupsTree.expandPath(node.getTreePath());
             // Store undo information.
             panel.undoManager.addEdit(undo);
@@ -998,7 +997,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(GroupSelector.this, groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
                 node.getNode().removeFromParent();
-                revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -1020,10 +1018,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                     Localization.lang("Remove all subgroups of \"%0\"?", node.getName()),
                     Localization.lang("Remove subgroups"), JOptionPane.YES_NO_OPTION);
             if (conf == JOptionPane.YES_OPTION) {
-                final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(),
+                final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(),
                         node, "Remove subgroups");
                 node.getNode().removeAllChildren();
-                revalidateGroups();
+                //revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -1051,7 +1049,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 node.getNode().removeFromParent();
                 node.getNode().moveAllChildrenTo(parent.getNode(), parent.getIndex(node));
 
-                revalidateGroups();
                 // Store undo information.
                 panel.undoManager.addEdit(undo);
                 panel.markBaseChanged();
@@ -1075,7 +1072,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         @Override
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNodeViewModel node = getNodeToUse();
-            final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(), node,
+            final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node,
                     Localization.lang("sort subgroups"));
             groupsTree.sort(node, false);
             panel.undoManager.addEdit(undo);
@@ -1093,7 +1090,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         @Override
         public void actionPerformed(ActionEvent ae) {
             final GroupTreeNodeViewModel node = getNodeToUse();
-            final UndoableModifySubtree undo = new UndoableModifySubtree(GroupSelector.this, getGroupTreeRoot(), node,
+            final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node,
                     Localization.lang("sort subgroups"));
             groupsTree.sort(node, true);
             panel.undoManager.addEdit(undo);

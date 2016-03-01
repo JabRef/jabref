@@ -43,7 +43,7 @@ class GroupChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups();
-        final UndoableModifySubtree undo = new UndoableModifySubtree(panel.getGroupSelector(),
+        final UndoableModifySubtree undo = new UndoableModifySubtree(
                 new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups()),
                 new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
@@ -62,9 +62,6 @@ class GroupChange extends Change {
             root.refreshGroupsForNewDatabase(panel.database());
         }
 
-        if (panel.getGroupSelector().getGroupTreeRoot().getNode() == root) {
-            panel.getGroupSelector().revalidateGroups();
-        }
         undoEdit.addEdit(undo);
 
         // Update tmp database:

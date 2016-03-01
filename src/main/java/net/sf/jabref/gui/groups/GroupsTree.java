@@ -397,7 +397,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
     /** Sort immediate children of the specified node alphabetically. */
     public void sort(GroupTreeNodeViewModel node, boolean recursive) {
         node.sortChildrenByName(recursive);
-        groupSelector.revalidateGroups();
     }
 
     /**

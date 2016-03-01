@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.groups;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Represents a node in a tree.
@@ -335,7 +336,7 @@ import java.util.*;
      */
     public void removeFromParent() {
         if (parent != null) {
-            parent.remove((T) this);
+            parent.removeChild((T) this);
         }
     }
 
@@ -345,7 +346,7 @@ import java.util.*;
      */
     public void removeAllChildren() {
         while (getNumberOfChildren() > 0) {
-            remove(0);
+            removeChild(0);
         }
     }
 
@@ -403,11 +404,13 @@ import java.util.*;
      *
      * @param child a child of this node to remove
      */
-    public void remove(T child) {
+    public void removeChild(T child) {
         Objects.requireNonNull(child);
 
         children.remove(child);
         child.setParent(null);
+
+        notifyAboutDescendantChange((T)this);
     }
 
     /**
@@ -417,12 +420,14 @@ import java.util.*;
      *
      * @param childIndex the index in this node's child array of the child to remove
      */
-    public void remove(int childIndex) {
+    public void removeChild(int childIndex) {
         Optional<T> child = getChildAt(childIndex);
         if (child.isPresent()) {
             children.remove(childIndex);
             child.get().setParent(null);
         }
+
+        notifyAboutDescendantChange((T)this);
     }
 
     /**
@@ -430,9 +435,10 @@ import java.util.*;
      * The given node is not allowed to already be in a tree (i.e. it has to have no parent).
      *
      * @param child the node to add
+     * @return the child node
      */
-    public void addChild(T child) {
-        addChild(child, children.size());
+    public T addChild(T child) {
+        return addChild(child, children.size());
     }
 
     /**
@@ -441,9 +447,10 @@ import java.util.*;
      *
      * @param child the node to add
      * @param index the position where the node should be added
+     * @return the child node
      * @throws IndexOutOfBoundsException if the index is out of range
      */
-    public void addChild(T child, int index) {
+    public T addChild(T child, int index) {
         Objects.requireNonNull(child);
         if (child.getParent().isPresent()) {
             throw new UnsupportedOperationException("Cannot add a node which already has a parent, use moveTo instead");
@@ -451,6 +458,10 @@ import java.util.*;
 
         child.setParent((T) this);
         children.add(index, child);
+
+        notifyAboutDescendantChange((T)this);
+
+        return child;
     }
 
     /**
@@ -530,7 +541,7 @@ import java.util.*;
         // Remove from previous parent
         Optional<T> oldParent = getParent();
         if (oldParent.isPresent()) {
-            oldParent.get().remove((T) this);
+            oldParent.get().removeChild((T) this);
         }
 
         // Add as child
@@ -556,4 +567,34 @@ import java.util.*;
      * @return a deep copy of this node
      */
     public abstract T copyNode();
+
+    /**
+     * The function which is invoked when something changed in the subtree.
+     */
+    private Consumer<T> onDescendantChanged = t -> {};
+
+    /**
+     * Adds the given function to the list of subscribers which are notified when something changes in the subtree.
+     *
+     * The following events are supported (the text in parentheses specifies which node is passed as the source):
+     *  - addChild (new parent)
+     *  - removeChild (old parent)
+     *  - move (old parent and new parent)
+     * @param subscriber function to be invoked upon a change
+     */
+    public void subscribeToDescendantChanged(Consumer<T> subscriber) {
+        onDescendantChanged = onDescendantChanged.andThen(subscriber);
+    }
+
+    /**
+     * Helper method which notifies all subscribers about a change in the subtree and bubbles the event to all parents.
+     * @param source the node which changed
+     */
+    protected void notifyAboutDescendantChange(T source) {
+        onDescendantChanged.accept(source);
+
+        if(! isRoot()) {
+            parent.notifyAboutDescendantChange(source);
+        }
+    }
 }

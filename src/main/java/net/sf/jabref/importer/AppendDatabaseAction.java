@@ -183,8 +183,6 @@ public class AppendDatabaseAction implements BaseAction {
                 // be "reassigned", i.e. the old reference is removed and the reference
                 // to the new fromDatabase is added.
                 newGroups.replaceEntriesInExplicitGroup(originalEntries, appendedEntries);
-
-                frame.groupSelector.revalidateGroups();
             }
         }
 

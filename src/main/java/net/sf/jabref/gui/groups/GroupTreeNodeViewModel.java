@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
@@ -98,8 +99,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     @Override
     public TreeNode getParent() {
-        Optional<GroupTreeNode> parent = node.getParent();
-        return parent.map(GroupTreeNodeViewModel::new).orElse(null);
+        return node.getParent().map(GroupTreeNodeViewModel::new).orElse(null);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
             @Override
             public Object nextElement() {
-                return children.iterator().next();
+                return new GroupTreeNodeViewModel(children.iterator().next());
             }
         };
     }
@@ -157,7 +157,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         tree.expandPath(this.getTreePath());
 
         for(GroupTreeNodeViewModel child : getChildren()) {
-            child.collapseSubtree(tree);
+            child.expandSubtree(tree);
         }
     }
 
@@ -393,4 +393,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
     }
 
+    public void subscribeToDescendantChanged(Consumer<GroupTreeNodeViewModel> subscriber) {
+        getNode().subscribeToDescendantChanged(node -> subscriber.accept(new GroupTreeNodeViewModel(node)));
+    }
 }

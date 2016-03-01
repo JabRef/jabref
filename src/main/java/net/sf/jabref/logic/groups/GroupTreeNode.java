@@ -143,10 +143,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
         AbstractGroup g1 = group;
         AbstractGroup g2 = otherNode.group;
-        if (((g1 == null) && (g2 != null)) || ((g1 != null) && (g2 == null))) {
-            return false;
-        }
-        if ((g1 != null) && (g2 != null) && !g1.equals(g2)) {
+        if (!g1.equals(g2)) {
             return false;
         }
         for (int i = 0; i < getNumberOfChildren(); ++i) {
@@ -242,7 +239,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     @Override
     public String toString() {
-        return new StringBuilder().append(this.getLevel()).append(' ').append(group.toString()).toString();
+        return String.valueOf(this.getLevel()) + ' ' + group.toString();
     }
 
     @Override

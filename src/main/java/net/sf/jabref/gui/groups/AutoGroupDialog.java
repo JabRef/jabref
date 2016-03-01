@@ -117,7 +117,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 ce.addEdit(undo);
 
                 panel.markBaseChanged(); // a change always occurs
-                gs.revalidateGroups();
                 frame.output(Localization.lang("Created groups."));
                 ce.end();
                 panel.undoManager.addEdit(ce);

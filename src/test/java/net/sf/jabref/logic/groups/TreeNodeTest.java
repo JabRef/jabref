@@ -6,8 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class TreeNodeTest {
 
@@ -482,38 +486,38 @@ public class TreeNodeTest {
     }
 
     @Test
-    public void removeSetsParentToEmpty() {
+    public void removeChildSetsParentToEmpty() {
         TreeNodeMock root = new TreeNodeMock();
         TreeNodeMock node = getNodeAsChild(root);
 
-        root.remove(node);
+        root.removeChild(node);
         assertEquals(Optional.empty(), node.getParent());
     }
 
     @Test
-    public void removeRemovesNodeFromChildrenCollection() {
+    public void removeChildRemovesNodeFromChildrenCollection() {
         TreeNodeMock root = new TreeNodeMock();
         TreeNodeMock node = getNodeAsChild(root);
 
-        root.remove(node);
+        root.removeChild(node);
         assertFalse(root.getChildren().contains(node));
     }
 
     @Test
-    public void removeIndexSetsParentToEmpty() {
+    public void removeChildIndexSetsParentToEmpty() {
         TreeNodeMock root = new TreeNodeMock();
         TreeNodeMock node = getNodeAsChild(root);
 
-        root.remove(2);
+        root.removeChild(2);
         assertEquals(Optional.empty(), node.getParent());
     }
 
     @Test
-    public void removeIndexRemovesNodeFromChildrenCollection() {
+    public void removeChildIndexRemovesNodeFromChildrenCollection() {
         TreeNodeMock root = new TreeNodeMock();
         TreeNodeMock node = getNodeAsChild(root);
 
-        root.remove(2);
+        root.removeChild(2);
         assertFalse(root.getChildren().contains(node));
     }
 
@@ -599,6 +603,58 @@ public class TreeNodeTest {
         assertEquals(Optional.empty(), copiedRoot.getParent());
         assertFalse(copiedRoot.getChildren().contains(node));
         assertEquals(root.getNumberOfChildren(), copiedRoot.getNumberOfChildren());
+    }
+
+    @Test
+    public void addChildSomewhereInTreeInvokesChangeEvent() {
+        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeMock node = getNodeInComplexTree(root);
+
+        Consumer<TreeNodeMock> subscriber = (Consumer<TreeNodeMock>) mock(Consumer.class);
+        root.subscribeToDescendantChanged(subscriber);
+
+        node.addChild(new TreeNodeMock());
+        verify(subscriber).accept(node);
+    }
+
+    @Test
+    public void moveNodeSomewhereInTreeInvokesChangeEvent() {
+        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeMock oldParent = node.getParent().get();
+
+        Consumer<TreeNodeMock> subscriber = (Consumer<TreeNodeMock>) mock(Consumer.class);
+        root.subscribeToDescendantChanged(subscriber);
+
+        node.moveTo(root);
+        verify(subscriber).accept(root);
+        verify(subscriber).accept(oldParent);
+    }
+
+    @Test
+    public void removeChildSomewhereInTreeInvokesChangeEvent() {
+        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeMock child = node.addChild(new TreeNodeMock());
+
+        Consumer<TreeNodeMock> subscriber = (Consumer<TreeNodeMock>) mock(Consumer.class);
+        root.subscribeToDescendantChanged(subscriber);
+
+        node.removeChild(child);
+        verify(subscriber).accept(node);
+    }
+
+    @Test
+    public void removeChildIndexSomewhereInTreeInvokesChangeEvent() {
+        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeMock node = getNodeInComplexTree(root);
+        node.addChild(new TreeNodeMock());
+
+        Consumer<TreeNodeMock> subscriber = (Consumer<TreeNodeMock>) mock(Consumer.class);
+        root.subscribeToDescendantChanged(subscriber);
+
+        node.removeChild(0);
+        verify(subscriber).accept(node);
     }
 
     /**

@@ -126,7 +126,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         if (undo) {
             switch (m_editType) {
             case ADD_NODE:
-                cursor.remove(childIndex);
+                cursor.removeChild(childIndex);
                 break;
             case REMOVE_NODE_KEEP_CHILDREN:
                 // move all children to newNode, then add newNode
@@ -152,19 +152,17 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 // remove node, then insert all children
                 GroupTreeNode removedNode = cursor
                         .getChildAt(childIndex).get();
-                cursor.remove(childIndex);
+                cursor.removeChild(childIndex);
                 while (removedNode.getNumberOfChildren() > 0) {
                     removedNode.getFirstChild().get().moveTo(cursor, childIndex);
                 }
                 break;
             case REMOVE_NODE_AND_CHILDREN:
-                cursor.remove(childIndex);
+                cursor.removeChild(childIndex);
                 break;
             default:
                 break;
             }
         }
-
-        m_groupSelector.revalidateGroups();
     }
 }

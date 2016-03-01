@@ -67,7 +67,6 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
         GroupTreeNode node = newParent.getChildAt(newChildIndex).get(); //TODO: Null
         //TODO: NULL
         node.moveTo(root.getNode().getDescendant(pathToOldParent).get(), oldChildIndex);
-        groupSelector.revalidateGroups();
     }
 
     @Override
@@ -78,6 +77,5 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
         GroupTreeNode node = oldParent.getChildAt(oldChildIndex).get(); //TODO:Null
         //TODO: NULL
         node.moveTo(root.getNode().getDescendant(pathToNewParent).get(), newChildIndex);
-        groupSelector.revalidateGroups();
     }
 }

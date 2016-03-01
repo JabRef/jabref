@@ -30,10 +30,8 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private final GroupTreeNode m_subtreeBackup;
     /** The path to the global groups root node */
     private final List<Integer> m_subtreeRootPath;
-    private final GroupSelector m_groupSelector;
     /** This holds the new subtree (the root's modified children) to allow redo. */
     private final List<GroupTreeNode> m_modifiedSubtree = new Vector<>();
-    private boolean mRevalidate = true;
     private final String m_name;
 
 
@@ -43,12 +41,11 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
      *            The root node of the subtree that was modified (this node may
      *            not be modified, it is just used as a convenience handle).
      */
-    public UndoableModifySubtree(GroupSelector groupSelector, GroupTreeNodeViewModel groupRoot,
+    public UndoableModifySubtree(GroupTreeNodeViewModel groupRoot,
             GroupTreeNodeViewModel subtree, String name) {
         m_subtreeBackup = subtree.getNode().copySubtree();
         m_groupRoot = groupRoot.getNode();
         m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();
-        m_groupSelector = groupSelector;
         m_name = name;
     }
 
@@ -78,9 +75,6 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         for (GroupTreeNode child : m_subtreeBackup.getChildren()) {
             child.copySubtree().moveTo(subtreeRoot);
         }
-        if (mRevalidate) {
-            m_groupSelector.revalidateGroups();
-        }
     }
 
     @Override
@@ -91,16 +85,5 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         for (GroupTreeNode modifiedNode : m_modifiedSubtree) {
             modifiedNode.moveTo(subtreeRoot);
         }
-        if (mRevalidate) {
-            m_groupSelector.revalidateGroups();
-        }
-    }
-
-    /**
-     * Call this method to decide if the group list should be immediately
-     * revalidated by this operation. Default is true.
-     */
-    public void setRevalidate(boolean revalidate) {
-        mRevalidate = revalidate;
     }
 }
