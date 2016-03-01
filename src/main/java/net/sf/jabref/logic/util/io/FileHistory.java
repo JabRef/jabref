@@ -16,8 +16,8 @@
 
 package net.sf.jabref.logic.util.io;
 
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sf.jabref.JabRefPreferences;
 
@@ -31,9 +31,9 @@ public class FileHistory {
 
     public FileHistory(JabRefPreferences prefs) {
         this.prefs = prefs;
-        String[] old = prefs.getStringArray(JabRefPreferences.RECENT_FILES);
+        List<String> old = prefs.getStringList(JabRefPreferences.RECENT_FILES);
         if (old != null) {
-            history.addAll(Arrays.asList(old));
+            history.addAll(old);
         }
     }
 
@@ -65,8 +65,7 @@ public class FileHistory {
 
     public void storeHistory() {
         if (!history.isEmpty()) {
-            String[] names = history.toArray(new String[history.size()]);
-            prefs.putStringArray(JabRefPreferences.RECENT_FILES, names);
+            prefs.putStringList(JabRefPreferences.RECENT_FILES, history);
         }
     }
 

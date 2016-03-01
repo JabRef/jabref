@@ -76,7 +76,6 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (UnsupportedEncodingException e) {
             // e.printStackTrace();
         }
-        String data = "citation=" + urlencodedCitation;
 
         // Send the request
         URL url;
@@ -85,10 +84,10 @@ public class FreeCiteImporter extends ImportFormat {
             url = new URL("http://freecite.library.brown.edu/citations/create");
             conn = url.openConnection();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not download", e);
             return null;
         }
         try {
@@ -96,6 +95,7 @@ public class FreeCiteImporter extends ImportFormat {
             conn.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
+            String data = "citation=" + urlencodedCitation;
             // write parameters
             writer.write(data);
             writer.flush();
@@ -188,7 +188,7 @@ public class FreeCiteImporter extends ImportFormat {
                             } else {
                                 // all other tags are stored as note
                                 noteSB.append(ln);
-                                noteSB.append(":");
+                                noteSB.append(':');
                                 noteSB.append(parser.getElementText());
                                 noteSB.append(Globals.NEWLINE);
                             }
@@ -198,11 +198,11 @@ public class FreeCiteImporter extends ImportFormat {
 
                     if (noteSB.length() > 0) {
                         String note = e.getField("note");
-                        if (note != null) {
+                        if (note == null) {
+                            note = noteSB.toString();
+                        } else {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
                             note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
-                        } else {
-                            note = noteSB.toString();
                         }
                         e.setField("note", note);
                     }
@@ -220,7 +220,7 @@ public class FreeCiteImporter extends ImportFormat {
             }
             parser.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Could not parse", ex);
             return null;
         }
 

@@ -58,16 +58,7 @@ public class MsBibImporter extends ImportFormat {
         } catch (Exception e) {
             return false;
         }
-        if (docin != null && !docin.getDocumentElement().getTagName().contains("Sources")) {
-            return false;
-        }
-        //   		NodeList rootLst = docin.getElementsByTagName("b:Sources");
-        //   		if(rootLst.getLength()==0)
-        //   			rootLst = docin.getElementsByTagName("Sources");
-        //   		if(rootLst.getLength()==0)
-        //   			return false;
-        // System.out.println(docin.getDocumentElement().getTagName());
-        return true;
+        return ((docin == null) || docin.getDocumentElement().getTagName().contains("Sources"));
     }
 
     /**

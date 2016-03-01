@@ -306,22 +306,16 @@ class ManageJournalsPanel extends JPanel {
     }
 
     private void setupExternals() {
-        String[] externalFiles = Globals.prefs.getStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
-        if ((externalFiles == null) || (externalFiles.length == 0)) {
+        List<String> externalFiles = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        if (externalFiles.isEmpty()) {
             ExternalFileEntry efe = new ExternalFileEntry();
             externals.add(efe);
         } else {
             for (String externalFile : externalFiles) {
                 ExternalFileEntry efe = new ExternalFileEntry(externalFile);
                 externals.add(efe);
-
             }
-
         }
-
-        //efe = new ExternalFileEntry();
-        //externals.add(efe);
-
     }
 
     private void setupUserTable() {
@@ -399,18 +393,13 @@ class ManageJournalsPanel extends JPanel {
         }
 
         // Store the list of external files set up:
-        ArrayList<String> extFiles = new ArrayList<>();
+        List<String> extFiles = new ArrayList<>();
         for (ExternalFileEntry efe : externals) {
             if (!"".equals(efe.getValue())) {
                 extFiles.add(efe.getValue());
             }
         }
-        if (extFiles.isEmpty()) {
-            Globals.prefs.put(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, "");
-        } else {
-            String[] list = extFiles.toArray(new String[extFiles.size()]);
-            Globals.prefs.putStringArray(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, list);
-        }
+        Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         Abbreviations.initializeJournalNames(Globals.prefs);
 

@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
@@ -44,12 +44,13 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
 
     public static final boolean DEFAULT_ENABLED = true;
 
-    private static final String simpleClassName = PersistenceTableColumnListener.class.getSimpleName();
+    private static final String SIMPLE_CLASS_NAME = PersistenceTableColumnListener.class.getSimpleName();
 
     // needed to get column names / indices mapped from view to model
     // and to access the table model
     private final MainTable mainTable;
 
+    private static final String RECEIVED_NULL_EVENT = " received null event";
 
     /**
      * @param mainTable
@@ -63,8 +64,8 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     private void updateColumnPrefs() {
         final int columnCount = mainTable.getColumnCount();
-        Vector<String> storedColumns = new Vector<>(columnCount - 1);
-        Vector<String> columnsWidths = new Vector<>(columnCount - 1);
+        List<String> storedColumns = new ArrayList<>(columnCount - 1);
+        List<String> columnsWidths = new ArrayList<>(columnCount - 1);
         int ncWidth = -1;
 
         for (int i = 0; i < columnCount; i++) {
@@ -80,10 +81,8 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
         }
 
         // Finally, we store the new preferences.
-        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_NAMES,
-                storedColumns.toArray(new String[storedColumns.size()]));
-        Globals.prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS,
-                columnsWidths.toArray(new String[columnsWidths.size()]));
+        Globals.prefs.putStringList(JabRefPreferences.COLUMN_NAMES, storedColumns);
+        Globals.prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnsWidths);
 
         // width of the number ("#") column
         Globals.prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
@@ -94,7 +93,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnAdded(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
     }
@@ -104,7 +103,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnMarginChanged(ChangeEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
     }
@@ -114,7 +113,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnMoved(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         // not really moved, ignore ...
         if (e.getFromIndex() == e.getToIndex()) {
@@ -130,7 +129,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
      */
     @Override
     public void columnRemoved(TableColumnModelEvent e) {
-        assert e != null : PersistenceTableColumnListener.simpleClassName + " received null event";
+        assert e != null : PersistenceTableColumnListener.SIMPLE_CLASS_NAME + RECEIVED_NULL_EVENT;
 
         updateColumnPrefs();
 

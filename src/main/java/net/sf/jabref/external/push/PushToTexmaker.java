@@ -38,7 +38,7 @@ public class PushToTexmaker extends AbstractPushToApplication implements PushToA
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-insert", citeCommand + "{" + keyString + "}"};
+        return new String[] {commandPath, "-insert", getCiteCommand() + "{" + keyString + "}"};
     }
 
     @Override

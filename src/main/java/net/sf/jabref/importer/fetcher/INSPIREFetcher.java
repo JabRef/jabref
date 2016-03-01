@@ -27,6 +27,9 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
@@ -49,7 +52,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
-
+    private static final Log LOGGER = LogFactory.getLog(INSPIREFetcher.class);
     /**
      * Construct the query URL
      *
@@ -67,15 +70,12 @@ public class INSPIREFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        StringBuilder sb = new StringBuilder("http://").append(INSPIREFetcher.INSPIRE_HOST).append("/");
-        sb.append("/search?ln=en&ln=en&p=find+");
-        //sb.append("spires/find/hep/www").append("?");
-        //sb.append("rawcmd=find+");
-        sb.append(identifier);
-        //sb.append("&action_search=Search&sf=&so=d&rm=&rg=25&sc=0&of=hx");
-        sb.append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
+        // At least 87 characters
+        StringBuilder sb = new StringBuilder(87).append("http://").append(INSPIREFetcher.INSPIRE_HOST)
+                .append("/search?ln=en&ln=en&p=find+").append(identifier)
+                .append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
         //sb.append("&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=");
-        System.out.print("Inspire URL: " + sb + "\n");
+        LOGGER.debug("Inspire URL: " + sb + "\n");
         return sb.toString();
     }
 
@@ -192,7 +192,7 @@ public class INSPIREFetcher implements EntryFetcher {
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
             frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.warn("Error while fetching from Inspire", e);
         }
         return true;
     }

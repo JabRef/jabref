@@ -62,6 +62,7 @@ import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.PreviewPanel;
@@ -135,20 +136,20 @@ class StyleSelectDialog {
         bg.add(useDefaultNumerical);
         bg.add(chooseDirectly);
         bg.add(setDirectory);
-        if (Globals.prefs.getBoolean("ooUseDefaultAuthoryearStyle")) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE)) {
             useDefaultAuthoryear.setSelected(true);
-        } else if (Globals.prefs.getBoolean("ooUseDefaultNumericalStyle")) {
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE)) {
             useDefaultNumerical.setSelected(true);
         } else {
-            if (Globals.prefs.getBoolean("ooChooseStyleDirectly")) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.OO_CHOOSE_STYLE_DIRECTLY)) {
                 chooseDirectly.setSelected(true);
             } else {
                 setDirectory.setSelected(true);
             }
         }
 
-        directFile.setText(Globals.prefs.get("ooDirectFile"));
-        styleDir.setText(Globals.prefs.get("ooStyleDirectory"));
+        directFile.setText(Globals.prefs.get(JabRefPreferences.OO_DIRECT_FILE));
+        styleDir.setText(Globals.prefs.get(JabRefPreferences.OO_STYLE_DIRECTORY));
         directFile.setEditable(false);
         styleDir.setEditable(false);
 
@@ -186,11 +187,11 @@ class StyleSelectDialog {
                 ExternalFileType type = Globals.prefs.getExternalFileTypeByExt("jstyle");
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
-                    if (type != null) {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
-                    } else {
+                    if (type == null) {
                         JabRefDesktop.openExternalFileUnknown(frame, null, new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
+                    } else {
+                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -402,7 +403,11 @@ class StyleSelectDialog {
      */
     private void selectLastUsed() {
         // Set the initial selection of the table:
-        if (initSelection != null) {
+        if (initSelection == null) {
+            if (table.getRowCount() > 0) {
+                table.setRowSelectionInterval(0, 0);
+            }
+        } else {
             boolean found = false;
             for (int i = 0; i < table.getRowCount(); i++) {
                 if (tableModel.getElementAt(i).getFile().getPath().
@@ -413,11 +418,6 @@ class StyleSelectDialog {
                 }
             }
             if (!found && (table.getRowCount() > 0)) {
-                table.setRowSelectionInterval(0, 0);
-            }
-        }
-        else {
-            if (table.getRowCount() > 0) {
                 table.setRowSelectionInterval(0, 0);
             }
         }
@@ -473,16 +473,16 @@ class StyleSelectDialog {
 
     private void storeSettings() {
         OOBibStyle selected = getSelectedStyle();
-        Globals.prefs.putBoolean("ooUseDefaultAuthoryearStyle", useDefaultAuthoryear.isSelected());
-        Globals.prefs.putBoolean("ooUseDefaultNumericalStyle", useDefaultNumerical.isSelected());
-        Globals.prefs.putBoolean("ooChooseStyleDirectly", chooseDirectly.isSelected());
-        Globals.prefs.put("ooDirectFile", directFile.getText());
-        Globals.prefs.put("ooStyleDirectory", styleDir.getText());
+        Globals.prefs.putBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE, useDefaultAuthoryear.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE, useDefaultNumerical.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.OO_CHOOSE_STYLE_DIRECTLY, chooseDirectly.isSelected());
+        Globals.prefs.put(JabRefPreferences.OO_DIRECT_FILE, directFile.getText());
+        Globals.prefs.put(JabRefPreferences.OO_STYLE_DIRECTORY, styleDir.getText());
         if (chooseDirectly.isSelected()) {
-            Globals.prefs.put("ooBibliographyStyleFile", directFile.getText());
+            Globals.prefs.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, directFile.getText());
         }
         else if (setDirectory.isSelected() && (selected != null)) {
-            Globals.prefs.put("ooBibliographyStyleFile", selected.getFile().getPath());
+            Globals.prefs.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, selected.getFile().getPath());
         }
 
     }
@@ -570,14 +570,14 @@ class StyleSelectDialog {
     private void displayDefaultStyle(boolean authoryear) {
         try {
             // Read the contents of the default style file:
-            URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.defaultAuthorYearStylePath) :
-                JabRef.class.getResource(OpenOfficePanel.defaultNumericalStylePath);
+            URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH) :
+                JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
             BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream()));
             String line;
             StringBuilder sb = new StringBuilder();
             while ((line = r.readLine()) != null) {
                 sb.append(line);
-                sb.append("\n");
+                sb.append('\n');
             }
 
             // Make a dialog box to display the contents:

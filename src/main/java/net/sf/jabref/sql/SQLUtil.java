@@ -37,11 +37,11 @@ import net.sf.jabref.gui.BibtexFields;
  *         Exporters and Importers
  */
 
-public class SQLUtil {
+final public class SQLUtil {
 
-    private static final ArrayList<String> reservedDBWords = new ArrayList<>(Collections.singletonList("key"));
+    private static final List<String> RESERVED_DB_WORDS = new ArrayList<>(Collections.singletonList("key"));
 
-    private static ArrayList<String> allFields;
+    private static List<String> allFields;
 
     private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
 
@@ -65,7 +65,7 @@ public class SQLUtil {
     /**
      * @return All existent fields for a bibtex entry
      */
-    public static ArrayList<String> getAllFields() {
+    public static List<String> getAllFields() {
         if (SQLUtil.allFields == null) {
             SQLUtil.refreshFields();
         }
@@ -81,7 +81,7 @@ public class SQLUtil {
         List<String> fieldNames = new ArrayList<>();
         for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
             field = SQLUtil.allFields.get(i);
-            if (SQLUtil.reservedDBWords.contains(field)) {
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
                 field += "_";
             }
             fieldNames.add(field);
@@ -117,12 +117,12 @@ public class SQLUtil {
      * @param datatype Specifies the SQL data type that the fields should take on.
      * @return The SQL code to be included in a CREATE TABLE statement.
      */
-    public static String fieldsAsCols(ArrayList<String> fields, String datatype) {
+    public static String fieldsAsCols(List<String> fields, String datatype) {
         String field;
-        ArrayList<String> newFields = new ArrayList<>();
+        List<String> newFields = new ArrayList<>();
         for (String field1 : fields) {
             field = field1;
-            if (SQLUtil.reservedDBWords.contains(field)) {
+            if (SQLUtil.RESERVED_DB_WORDS.contains(field)) {
                 field = field + '_';
             }
             newFields.add(field + datatype);
@@ -139,8 +139,8 @@ public class SQLUtil {
      * @return origList changing the values of the fields that appear on reqFields, optFields, utiFields set to 'req',
      * 'opt' and 'uti' respectively
      */
-    public static ArrayList<String> setFieldRequirement(ArrayList<String> allFields, List<String> reqFields,
-                                                        List<String> optFields, List<String> utiFields, ArrayList<String> origList) {
+    public static List<String> setFieldRequirement(List<String> allFields, List<String> reqFields,
+            List<String> optFields, List<String> utiFields, List<String> origList) {
 
         String currentField;
         for (int i = 0; i < allFields.size(); i++) {
@@ -181,8 +181,7 @@ public class SQLUtil {
      */
     public static Statement queryAllFromTable(Connection conn, String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName + ';';
-        Statement res = (Statement) SQLUtil.processQueryWithResults(conn, query);
-        return res;
+        return (Statement) SQLUtil.processQueryWithResults(conn, query);
     }
 
     /**

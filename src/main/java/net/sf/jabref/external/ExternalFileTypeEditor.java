@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -44,7 +45,7 @@ import net.sf.jabref.logic.l10n.Localization;
 public class ExternalFileTypeEditor extends JDialog {
     private JFrame frame;
     private JDialog dialog;
-    private ArrayList<ExternalFileType> fileTypes;
+    private List<ExternalFileType> fileTypes;
     private JTable table;
     private ExternalFileTypeEntryEditor entryEditor;
     private FileTypeTableModel tableModel;
@@ -180,10 +181,10 @@ public class ExternalFileTypeEditor extends JDialog {
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", cancelAction);
 
-        if (frame != null) {
-            setLocationRelativeTo(frame);
-        } else {
+        if (frame == null) {
             setLocationRelativeTo(dialog);
+        } else {
+            setLocationRelativeTo(frame);
         }
     }
 
@@ -267,7 +268,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
     static class IconRenderer implements TableCellRenderer {
 
-        final JLabel lab = new JLabel();
+        private final JLabel lab = new JLabel();
 
 
         @Override
@@ -360,7 +361,7 @@ public class ExternalFileTypeEditor extends JDialog {
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
         private JabRefFrame frame;
         private JDialog dialog;
-        ExternalFileTypeEditor editor;
+        private ExternalFileTypeEditor editor;
 
 
         public EditExternalFileTypesAction(JabRefFrame frame) {
@@ -378,18 +379,16 @@ public class ExternalFileTypeEditor extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (editor == null) {
-                if (frame != null) {
-                    editor = new ExternalFileTypeEditor(frame);
-                } else {
+                if (frame == null) {
                     editor = new ExternalFileTypeEditor(dialog);
+                } else {
+                    editor = new ExternalFileTypeEditor(frame);
                 }
             }
             editor.setValues();
             editor.setVisible(true);
-            if (frame != null) {
-                if (frame.getCurrentBasePanel() != null) {
-                    frame.getCurrentBasePanel().mainTable.repaint();
-                }
+            if ((frame != null) && (frame.getCurrentBasePanel() != null)) {
+                frame.getCurrentBasePanel().mainTable.repaint();
             }
         }
     }

@@ -87,6 +87,8 @@ public class LocalizationConsistencyTest {
     }
 
     private String convertPropertiesFile(List<LocalizationEntry> missingKeys) {
+        System.out.println(
+                "EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
         System.out.println("PASTE THIS INTO THE NON-ENGLISH LANGUAGE FILES");
         StringJoiner result = new StringJoiner("\n");
         for (LocalizationEntry key : missingKeys) {

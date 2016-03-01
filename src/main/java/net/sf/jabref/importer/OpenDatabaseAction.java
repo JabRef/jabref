@@ -60,17 +60,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final ArrayList<PostOpenAction> postOpenActions = new ArrayList<>();
+    private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
 
     static {
         // Add the action for checking for new custom entry types loaded from
         // the bib file:
-        OpenDatabaseAction.postOpenActions.add(new CheckForNewEntryTypesAction());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
         // Add the action for the new external file handling system in version 2.3:
-        OpenDatabaseAction.postOpenActions.add(new FileLinksUpgradeWarning());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
-        OpenDatabaseAction.postOpenActions.add(new HandleDuplicateWarnings());
+        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -107,9 +107,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     class OpenItSwingHelper implements Runnable {
 
-        final BasePanel basePanel;
-        final boolean raisePanel;
-        final File file;
+        private final BasePanel basePanel;
+        private final boolean raisePanel;
+        private final File file;
 
 
         OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
@@ -235,7 +235,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String fileName = file.getPath();
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
-                Charset encoding = Globals.prefs.getDefaultEncoding();
 
                 if (FileBasedLock.hasLockFile(file)) {
                     long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
@@ -261,6 +260,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     }
 
                 }
+
+                Charset encoding = Globals.prefs.getDefaultEncoding();
                 ParserResult result;
                 String errorMessage = null;
                 try {
@@ -322,7 +323,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * @param result The result of the bib file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
-        for (PostOpenAction action : OpenDatabaseAction.postOpenActions) {
+        for (PostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
                 if (mustRaisePanel) {
                     panel.frame().getTabbedPane().setSelectedComponent(panel);
@@ -413,7 +414,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             try {
                 return ImportFormatReader.getReader(fileToOpen, encoding.get());
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.warn("Problem getting reader", ex);
                 // The supplied encoding didn't work out, so we use the fallback.
                 return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
             }

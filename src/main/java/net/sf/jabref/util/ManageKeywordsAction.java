@@ -205,7 +205,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                String[] values = keywordList.getSelectedValuesList().toArray(new String[0]);
+                List<String> var = keywordList.getSelectedValuesList();
+                String[] values = var.toArray(new String[var.size()]);
 
                 for (String val : values) {
                     keywordListModel.removeElement(val);

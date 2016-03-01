@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.groups.EntryTableTransferHandler;
@@ -119,12 +121,10 @@ class FileListEditorTransferHandler extends TransferHandler {
                         for (File file : theFiles) {
                             // Find the file's extension, if any:
                             String name = file.getAbsolutePath();
-                            String extension;
+                            Optional<String> extension = FileUtil.getFileExtension(name);
                             ExternalFileType fileType = null;
-                            int index = name.lastIndexOf('.');
-                            if ((index >= 0) && (index < name.length())) {
-                                extension = name.substring(index + 1).toLowerCase();
-                                fileType = Globals.prefs.getExternalFileTypeByExt(extension);
+                            if (extension.isPresent()) {
+                                fileType = Globals.prefs.getExternalFileTypeByExt(extension.get());
                             }
                             if (fileType != null) {
                                 if (droppedFileHandler == null) {
@@ -148,7 +148,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         StringBuilder logMessage = new StringBuilder("Cannot transfer input:");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            logMessage.append(" " + inflav);
+            logMessage.append(" ").append(inflav);
         }
         LOGGER.warn(logMessage.toString());
 

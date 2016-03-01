@@ -40,9 +40,8 @@ public class BuildInfo {
         } catch (IOException ignored) {
             // nothing to do -> default already set
         }
-        String versionFromProps = properties.getProperty("version", UNKOWN_VERSION);
 
-        version = versionFromProps;
+        version = properties.getProperty("version", UNKOWN_VERSION);
     }
 
     public String getVersion() {

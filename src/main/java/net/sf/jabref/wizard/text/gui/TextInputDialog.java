@@ -86,7 +86,7 @@ import javax.swing.text.StyledDocument;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -122,7 +122,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private boolean okPressed;
 
-    public TextInputDialog(JabRefFrame frame, BasePanel panel, String title, boolean modal, BibEntry bibEntry) {
+
+    public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
         super(frame, title, modal);
 
         _frame = frame;
@@ -131,7 +132,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         marked = new TagToMarkedTextStore();
 
         try {
-            jbInit(frame);
+            jbInit();
             pack();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -139,7 +140,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         updateSourceView();
     }
 
-    private void jbInit(JabRefFrame parent) {
+    private void jbInit() {
         this.setModal(true);
         //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
@@ -349,7 +350,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     // Panel with bibtex source code
     private void initSourcePanel() {
-        //    preview =  new PreviewPanel(entry) ;
         preview = new JTextArea();
         preview.setEditable(false);
 
@@ -500,7 +500,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw);
             String srcString = sw.getBuffer().toString();
             preview.setText(srcString);
         } catch (IOException ignored) {
@@ -534,7 +534,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = ClipBoardManager.clipBoard.getClipboardContents();
+            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
             if (data != null) {
                 int selStart = textPane.getSelectionStart();
                 int selEnd = textPane.getSelectionEnd();

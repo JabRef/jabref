@@ -50,6 +50,9 @@ public class OvidImporter extends ImportFormat {
             "\\(([0-9][0-9][0-9][0-9])\\)\\. [A-Za-z, ]+([0-9]+) pp\\. ([\\w, ]+): ([\\w, ]+)");
 
 
+    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
+
+
     //   public static Pattern ovid_pat_inspec= Pattern.compile("Source ([
     // \\w&\\-]+)");
 
@@ -70,8 +73,6 @@ public class OvidImporter extends ImportFormat {
         return "ovid";
     }
 
-
-    private static final Pattern ovidPattern = Pattern.compile("<[0-9]+>");
 
 
     /**
@@ -222,13 +223,11 @@ public class OvidImporter extends ImportFormat {
             // Set the entrytype properly:
             String entryType = h.containsKey("entrytype") ? h.get("entrytype") : "other";
             h.remove("entrytype");
-            if ("book".equals(entryType)) {
-                if (h.containsKey("chaptertitle")) {
-                    // This means we have an "incollection" entry.
-                    entryType = "incollection";
-                    // Move the "chaptertitle" to just "title":
-                    h.put("title", h.remove("chaptertitle"));
-                }
+            if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
+                // This means we have an "incollection" entry.
+                entryType = "incollection";
+                // Move the "chaptertitle" to just "title":
+                h.put("title", h.remove("chaptertitle"));
             }
             BibEntry b = new BibEntry(IdGenerator.next(), EntryTypes.getTypeOrDefault(entryType));
             b.setField(h);
@@ -247,7 +246,7 @@ public class OvidImporter extends ImportFormat {
      */
     private static String fixNames(String content) {
         String names;
-        if (content.indexOf(";") > 0) { //LN FN; [LN FN;]*
+        if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replaceAll(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");

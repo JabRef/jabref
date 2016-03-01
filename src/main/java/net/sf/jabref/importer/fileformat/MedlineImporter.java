@@ -112,7 +112,7 @@ public class MedlineImporter extends ImportFormat {
         parserFactory.setNamespaceAware(true);
 
         // Now create a SAXParser object
-        ArrayList<BibEntry> bibItems = null;
+        List<BibEntry> bibItems = null;
         try {
             SAXParser parser = parserFactory.newSAXParser(); // May throw
             // exceptions
@@ -141,7 +141,7 @@ public class MedlineImporter extends ImportFormat {
         } catch (org.xml.sax.SAXException e2) {
             LOGGER.error("Error during XML parsing", e2);
             status.showMessage(e2.getLocalizedMessage());
-        } catch (java.io.IOException e3) {
+        } catch (IOException e3) {
             LOGGER.error("Error during file import", e3);
             status.showMessage(e3.getLocalizedMessage());
         }

@@ -17,10 +17,8 @@ package net.sf.jabref.exporter.layout;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.gui.search.MatchesHighlighter;
 import org.apache.commons.logging.Log;
@@ -49,22 +47,22 @@ class LayoutEntry {
 
     private final String classPrefix;
 
-    private ArrayList<String> invalidFormatter;
+    private List<String> invalidFormatter;
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
 
-    public LayoutEntry(StringInt si, String classPrefix_) {
+    public LayoutEntry(StringInt si, final String classPrefix_) {
         type = si.i;
         classPrefix = classPrefix_;
 
-        if (si.i == LayoutHelper.IS_LAYOUT_TEXT) {
+        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
             text = si.s;
-        } else if (si.i == LayoutHelper.IS_SIMPLE_FIELD) {
+        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
             text = si.s.trim();
-        } else if ((si.i == LayoutHelper.IS_FIELD_START) || (si.i == LayoutHelper.IS_FIELD_END)) {
+        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
             // Do nothing
-        } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
             Vector<String> v = new Vector<>();
             WSITools.tokenize(v, si.s, "\n");
 
@@ -90,40 +88,31 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(Vector<StringInt> parsedEntries, String classPrefix_, int layoutType) {
+    public LayoutEntry(Vector<StringInt> parsedEntries, final String classPrefix_, int layoutType) {
         classPrefix = classPrefix_;
-        String blockStart;
-        String blockEnd;
-        StringInt si;
         Vector<StringInt> blockEntries = null;
         Vector<LayoutEntry> tmpEntries = new Vector<>();
         LayoutEntry le;
-        si = parsedEntries.get(0);
-        blockStart = si.s;
-        si = parsedEntries.get(parsedEntries.size() - 1);
-        blockEnd = si.s;
+        String blockStart = parsedEntries.get(0).s;
+        String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
 
         if (!blockStart.equals(blockEnd)) {
             LOGGER.warn("Field start and end entry must be equal.");
         }
 
         type = layoutType;
-        text = si.s;
-
-        for (int i = 1; i < (parsedEntries.size() - 1); i++) {
-            si = parsedEntries.get(i);
-
-            // System.out.println("PARSED-ENTRY: "+si.s+"="+si.i);
-            if ((si.i == LayoutHelper.IS_LAYOUT_TEXT) || (si.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+        text = blockEnd;
+        for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
+            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
                 // Do nothing
-            } else if ((si.i == LayoutHelper.IS_FIELD_START)
-                    || (si.i == LayoutHelper.IS_GROUP_START)) {
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                    || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
                 blockEntries = new Vector<>();
-                blockStart = si.s;
-            } else if ((si.i == LayoutHelper.IS_FIELD_END) || (si.i == LayoutHelper.IS_GROUP_END)) {
-                if (blockStart.equals(si.s)) {
-                    blockEntries.add(si);
-                    if (si.i == LayoutHelper.IS_GROUP_END) {
+                blockStart = parsedEntry.s;
+            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                if (blockStart.equals(parsedEntry.s)) {
+                    blockEntries.add(parsedEntry);
+                    if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_GROUP_START);
                     } else {
                         le = new LayoutEntry(blockEntries, classPrefix, LayoutHelper.IS_FIELD_START);
@@ -133,18 +122,14 @@ class LayoutEntry {
                 } else {
                     LOGGER.warn("Nested field entries are not implemented !!!");
                 }
-            } else if (si.i == LayoutHelper.IS_OPTION_FIELD) {
+            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
                 // Do nothing
             }
 
-            // else if (si.i == LayoutHelper.IS_OPTION_FIELD_PARAM)
-            // {
-            // }
             if (blockEntries == null) {
-                // System.out.println("BLOCK ADD: "+si.s+"="+si.i);
-                tmpEntries.add(new LayoutEntry(si, classPrefix));
+                tmpEntries.add(new LayoutEntry(parsedEntry, classPrefix));
             } else {
-                blockEntries.add(si);
+                blockEntries.add(parsedEntry);
             }
         }
 
@@ -173,7 +158,7 @@ class LayoutEntry {
         return doLayout(bibtex, database, null);
     }
 
-    public String doLayout(BibEntry bibtex, BibDatabase database, List<String> wordsToHighlight) {
+    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
@@ -264,7 +249,7 @@ class LayoutEntry {
                              *
                             */
                             if (bibtex.isSearchHit()) {
-                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, wordsToHighlight));
+                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
                             } else {
                                 sb.append(fieldText);
                             }
@@ -357,14 +342,12 @@ class LayoutEntry {
             return field;
         } else if (type == LayoutHelper.IS_ENCODING_NAME) {
             return encoding.displayName();
-        }
-        else if (type == LayoutHelper.IS_FILENAME) {
+        } else if (type == LayoutHelper.IS_FILENAME) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getName() : "";
-        }
-        else if (type == LayoutHelper.IS_FILEPATH) {
+            return f == null ? "" : f.getName();
+        } else if (type == LayoutHelper.IS_FILEPATH) {
             File f = Globals.prefs.databaseFile;
-            return f != null ? f.getPath() : "";
+            return f == null ? "" : f.getPath();
         }
         return "";
     }
@@ -426,10 +409,8 @@ class LayoutEntry {
                 LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, classPrefix);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
-                if (f instanceof ParamLayoutFormatter) {
-                    if (strings.length >= 2) {
+                if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {
                         ((ParamLayoutFormatter) f).setArgument(strings[1]);
-                    }
                 }
                 results.add(f);
                 continue;
@@ -460,7 +441,7 @@ class LayoutEntry {
         return invalidFormatter != null;
     }
 
-    public ArrayList<String> getInvalidFormatters() {
+    public List<String> getInvalidFormatters() {
         return invalidFormatter;
     }
 

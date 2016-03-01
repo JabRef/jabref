@@ -86,10 +86,10 @@ public class EntryMarker {
             int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Marked 1 for this user.
-                if (!onlyMaxLevel) {
-                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
-                } else {
+                if (onlyMaxLevel) {
                     return;
+                } else {
+                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
                 }
             } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(s);
@@ -165,12 +165,12 @@ public class EntryMarker {
         }
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
-            newVal = null;
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), null));
+            be.clearField(BibtexFields.MARKED);
+        } else {
+            ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be.getField(BibtexFields.MARKED), newVal));
+            be.setField(BibtexFields.MARKED, newVal);
         }
-        ce.addEdit(new UndoableFieldChange(be, BibtexFields.MARKED, be
-                .getField(BibtexFields.MARKED), newVal));
-        be.setField(BibtexFields.MARKED, newVal);
-
     }
 
     public static int isMarked(BibEntry be) {

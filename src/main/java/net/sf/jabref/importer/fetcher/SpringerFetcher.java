@@ -40,9 +40,8 @@ public class SpringerFetcher implements EntryFetcher {
     private static final String API_URL = "http://api.springer.com/metadata/json?q=";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
     private static final Log LOGGER = LogFactory.getLog(SpringerFetcher.class);
-    private final int maxPerPage = 100;
+    private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
-    private final JSONEntryParser jep;
 
 
     @Override
@@ -64,7 +63,7 @@ public class SpringerFetcher implements EntryFetcher {
             int hits = jo.getJSONArray("result").getJSONObject(0).getInt("total");
             int numberToFetch = 0;
             if (hits > 0) {
-                if (hits > maxPerPage) {
+                if (hits > MAX_PER_PAGE) {
                     while (true) {
                         String strCount = JOptionPane
                                 .showInputDialog(
@@ -80,7 +79,7 @@ public class SpringerFetcher implements EntryFetcher {
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
                             break;
-                        } catch (RuntimeException ex) {
+                        } catch (NumberFormatException ex) {
                             status.showMessage(Localization.lang("Please enter a valid number"));
                         }
                     }
@@ -89,12 +88,12 @@ public class SpringerFetcher implements EntryFetcher {
                 }
 
                 int fetched = 0; // Keep track of number of items fetched for the progress bar
-                for (int startItem = 1; startItem <= numberToFetch; startItem += maxPerPage) {
+                for (int startItem = 1; startItem <= numberToFetch; startItem += MAX_PER_PAGE) {
                     if (!shouldContinue) {
                         break;
                     }
 
-                    int noToFetch = Math.min(maxPerPage, numberToFetch - startItem);
+                    int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - startItem);
                     jsonResponse = Unirest
                             .get(API_URL + query + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();
@@ -103,7 +102,7 @@ public class SpringerFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("records");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject springerJsonEntry = results.getJSONObject(i);
-                            BibEntry entry = jep.SpringerJSONtoBibtex(springerJsonEntry);
+                            BibEntry entry = JSONEntryParser.SpringerJSONtoBibtex(springerJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
@@ -143,7 +142,6 @@ public class SpringerFetcher implements EntryFetcher {
 
     public SpringerFetcher() {
         super();
-        jep = new JSONEntryParser();
     }
 
 }

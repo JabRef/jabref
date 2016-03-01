@@ -20,9 +20,10 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Optional;
-
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 
@@ -33,6 +34,8 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
+
+    private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
     private final JCheckBox colorCodes;
@@ -121,8 +124,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                Optional<Font> f = new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont();
-                f.ifPresent(x -> font = x);
+                new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x);
             }
         });
 
@@ -173,13 +175,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                         JOptionPane.WARNING_MESSAGE);
             }
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            LOGGER.info("Invalid font size", ex);
         }
         try {
             int padding = Integer.parseInt(rowPadding.getText());
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
-            ex.printStackTrace();
+            LOGGER.info("Invalid row padding", ex);
         }
     }
 
@@ -206,12 +208,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
 
         // Test if row padding is a number:
-        if (!validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
-                Localization.lang("Invalid setting"))) {
-            return false;
-        }
-
-        return true;
+        return validateIntegerField(Localization.lang("Table row height padding"), rowPadding.getText(),
+                Localization.lang("Invalid setting"));
     }
 
     @Override

@@ -65,11 +65,11 @@ public class BiblioscapeImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
 
-        ArrayList<BibEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
-        HashMap<String, String> hm = new HashMap<>();
-        HashMap<String, StringBuffer> lines = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
+        Map<String, StringBuffer> lines = new HashMap<>();
         StringBuffer previousLine = null;
         while ((line = in.readLine()) != null) {
             if (line.isEmpty())
@@ -264,15 +264,12 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put("pages",
-                            (pages[0] != null ? pages[0] : "")
-                            + (pages[1] != null ? "--" + pages[1] : ""));
+                    hm.put("pages", (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
                 }
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put("address", address
-                            + (country != null ? ", " + country : ""));
+                    hm.put("address", address + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present

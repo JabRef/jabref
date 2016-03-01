@@ -2,7 +2,7 @@ package net.sf.jabref.gui.actions;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
@@ -51,7 +51,7 @@ public class RelativePathsCleanup implements Cleaner {
             assert(!oldValue.equals(newValue));
             entry.setField(Globals.FILE_FIELD, newValue);
             FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-            return Arrays.asList(new FieldChange[] {change});
+            return Collections.singletonList(change);
         }
         return new ArrayList<>();
     }

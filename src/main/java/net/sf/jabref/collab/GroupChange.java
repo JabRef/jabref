@@ -33,8 +33,8 @@ class GroupChange extends Change {
 
 
     public GroupChange(GroupTreeNode changedGroups, GroupTreeNode tmpGroupRoot) {
-        super(changedGroups != null ? Localization.lang("Modified groups tree") :
-            Localization.lang("Removed all groups"));
+        super(changedGroups == null ? Localization.lang("Removed all groups") : Localization
+                .lang("Modified groups tree"));
         this.changedGroups = changedGroups;
         this.tmpGroupRoot = tmpGroupRoot;
     }
@@ -67,20 +67,23 @@ class GroupChange extends Change {
         undoEdit.addEdit(undo);
 
         // Update tmp database:
-        GroupTreeNode copied = changedGroups.deepCopy();
         tmpGroupRoot.removeAllChildren();
-        tmpGroupRoot.setGroup(copied.getGroup());
-        for (int i = 0; i < copied.getChildCount(); ++i) {
-            tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+        if (changedGroups != null) {
+            GroupTreeNode copied = changedGroups.deepCopy();
+            tmpGroupRoot.setGroup(copied.getGroup());
+            for (int i = 0; i < copied.getChildCount(); ++i) {
+                tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+            }
         }
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
         return true;
     }
 
     @Override
-    JComponent description() {
-        return new JLabel("<html>" + toString() + '.' + (changedGroups != null ? ' ' +
-                Localization.lang("Accepting the change replaces the complete groups tree with the externally modified groups tree.") : "")
+    public JComponent description() {
+        return new JLabel("<html>" + toString() + '.'
+                + (changedGroups == null ? "" : ' ' + Localization
+                        .lang("Accepting the change replaces the complete groups tree with the externally modified groups tree."))
                 + "</html>");
 
     }

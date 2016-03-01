@@ -54,7 +54,7 @@ public class DBImporterExporter {
         }
     }
 
-    private void removeAGivenDB(Object out, int database_id) throws SQLException {
+    private void removeAGivenDB(Object out, final int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
         SQLUtil.processQuery(out, "DELETE FROM jabref_database WHERE database_id='" + database_id + "';");
     }
@@ -66,7 +66,7 @@ public class DBImporterExporter {
      * @param database_id Id of the database being exported.
      * @throws SQLException
      */
-    protected void removeAllRecordsForAGivenDB(Object out, int database_id) throws SQLException {
+    protected void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
         SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='" + database_id + "';");

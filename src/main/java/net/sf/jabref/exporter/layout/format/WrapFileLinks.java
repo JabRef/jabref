@@ -146,7 +146,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         if (Globals.prefs.fileDirForDatabase != null) {
                             dirs = Globals.prefs.fileDirForDatabase;
                         } else {
-                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + "Directory")};
+                            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
                         }
 
                         File f = FileUtil.expandFilename(flEntry.getLink(), dirs);

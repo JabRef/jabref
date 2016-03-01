@@ -35,12 +35,10 @@ public class EditModeAction extends AbstractAction {
     }
 
     private String getOppositeMode() {
-        String mode = isBiblatexMode() ? "BibTeX" : "BibLaTeX";
-        return mode;
+        return isBiblatexMode() ? "BibTeX" : "BibLaTeX";
     }
 
     private String getMode() {
-        String mode = isBiblatexMode() ? "BibLaTeX" : "BibTeX";
-        return mode;
+        return isBiblatexMode() ? "BibLaTeX" : "BibTeX";
     }
 }

@@ -27,7 +27,7 @@ task checkTranslationsSummary(type: JavaExec) {
 }
 
 task compareTranslationsWithEnglishTranslation(type: JavaExec) {
-    description "Prints differences between the english translation and translations in other languages."
+    description "Prints differences between the English translation and translations in other languages."
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
@@ -35,7 +35,7 @@ task compareTranslationsWithEnglishTranslation(type: JavaExec) {
 }
 
 task compareAndUpdateTranslationsWithEnglishTranslation(type: JavaExec) {
-    description "Prints differences between the english translation and translations in other languages, and updates translations if possible."
+    description "Prints differences between the English translation and translations in other languages, and updates translations if possible."
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")

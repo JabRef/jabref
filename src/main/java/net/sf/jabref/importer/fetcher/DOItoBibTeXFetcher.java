@@ -28,6 +28,9 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -40,6 +43,8 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.util.Util;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -93,13 +98,13 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         URL url;
         try {
             Optional<URI> uri = doi.getURI();
-            if(!uri.isPresent()) {
-                return null;
-            } else {
+            if (uri.isPresent()) {
                 url = uri.get().toURL();
+            } else {
+                return null;
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL", e);
             return null;
         }
 
@@ -107,7 +112,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         try {
             conn = url.openConnection();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Could not open URL connection", e);
             return null;
         }
 
@@ -125,7 +130,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             }
             return null;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Communication problems", e);
             return null;
         }
 

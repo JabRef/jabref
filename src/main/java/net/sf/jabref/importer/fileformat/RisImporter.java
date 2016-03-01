@@ -86,7 +86,7 @@ public class RisImporter extends ImportFormat {
         String str;
         while ((str = in.readLine()) != null) {
             sb.append(str);
-            sb.append("\n");
+            sb.append('\n');
         }
         String[] entries = sb.toString().replaceAll("\u2013", "-").replaceAll("\u2014", "--").replaceAll("\u2015", "--").split("ER  -.*\\n");
 
@@ -223,11 +223,11 @@ public class RisImporter extends ImportFormat {
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (!hm.containsKey("keywords")) {
-                            hm.put("keywords", val);
-                        } else {
+                        if (hm.containsKey("keywords")) {
                             String kw = hm.get("keywords");
                             hm.put("keywords", kw + ", " + val);
+                        } else {
+                            hm.put("keywords", val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {

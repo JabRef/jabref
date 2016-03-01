@@ -52,7 +52,7 @@ public class BibtexParser {
 
     private final PushbackReader pushbackReader;
     private BibDatabase database;
-    private HashMap<String, EntryType> entryTypes;
+    private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
     private final FieldContentParser fieldContentParser = new FieldContentParser();
@@ -97,7 +97,8 @@ public class BibtexParser {
         try {
             return parser.parse().getDatabase().getEntries();
         } catch (Exception e) {
-            return new ArrayList<>();
+            LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
+            return Collections.EMPTY_LIST;
         }
     }
 
@@ -242,7 +243,7 @@ public class BibtexParser {
         }
     }
 
-    private void parseJabRefComment(HashMap<String, String> meta) throws IOException {
+    private void parseJabRefComment(Map<String, String> meta) throws IOException {
         StringBuffer buffer = parseBracketedTextExactly();
         /**
          *
@@ -374,9 +375,7 @@ public class BibtexParser {
                 return;
             }
 
-            if (Character.isWhitespace((char) character)) {
-                continue;
-            } else {
+            if (!Character.isWhitespace((char) character)) {
                 // found non-whitespace char
                 unread(character);
                 break;
@@ -404,7 +403,6 @@ public class BibtexParser {
                 if (nextCharacter != ' ') {
                     stringBuilder.append((char) nextCharacter);
                 }
-                continue;
             } else {
                 // found non-whitespace char
                 unread(nextCharacter);
@@ -574,7 +572,7 @@ public class BibtexParser {
                             + "Empty text token.\nThis could be caused "
                             + "by a missing comma between two fields.");
                 }
-                value.append("#").append(textToken).append("#");
+                value.append('#').append(textToken).append('#');
             }
             skipWhitespace();
         }
@@ -863,23 +861,27 @@ public class BibtexParser {
         consume('{');
 
         int brackets = 0;
+        char character;
+        char lastCharacter = '\0';
 
-        while (!((peek() == '}') && (brackets == 0))) {
+        while (true) {
+            character = (char) read();
 
-            int character = read();
-            if (isEOFCharacter(character)) {
+            boolean isClosingBracket = (character == '}') && (lastCharacter != '\\');
+            if (isClosingBracket && (brackets == 0)) {
+                return value;
+            } else if (isEOFCharacter(character)) {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
-            } else if (character == '{') {
+            } else if ((character == '{') && (lastCharacter != '\\')) {
                 brackets++;
-            } else if (character == '}') {
+            } else if (isClosingBracket) {
                 brackets--;
             }
 
-            value.append((char) character);
-        }
-        consume('}');
+            value.append(character);
 
-        return value;
+            lastCharacter = character;
+        }
     }
 
     private StringBuffer parseQuotedFieldExactly() throws IOException {
@@ -946,13 +948,11 @@ public class BibtexParser {
                 // Look up the unknown type name in our map of parsed types:
                 String name = bibEntry.getType().getName();
                 EntryType type = entryTypes.get(name);
-                if (type != null) {
-                    bibEntry.setType(type);
-                } else {
+                if (type == null) {
                     parserResult.addWarning(
-                            Localization.lang("Unknown entry type")
-                                    + ": " + name + "; key: " + bibEntry.getCiteKey()
-                    );
+                            Localization.lang("Unknown entry type") + ": " + name + "; key: " + bibEntry.getCiteKey());
+                } else {
+                    bibEntry.setType(type);
                 }
             }
         }

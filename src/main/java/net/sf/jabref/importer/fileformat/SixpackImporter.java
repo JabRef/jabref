@@ -117,7 +117,6 @@ public class SixpackImporter extends ImportFormat {
         fI.put("cr", "crossref");
         fI.put("fi", "file");
 
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         in.readLine();
         String ln = in.readLine();
@@ -125,6 +124,8 @@ public class SixpackImporter extends ImportFormat {
             return null;
         }
         String[] fieldDef = ln.split(",");
+
+        List<BibEntry> bibitems = new ArrayList<>();
 
         String s;
         BibEntry entry;

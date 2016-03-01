@@ -16,8 +16,6 @@
 package net.sf.jabref.groups;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -52,8 +50,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JTextField remove = new JTextField(60);
     private final JTextField field = new JTextField(60);
     private final JTextField deliminator = new JTextField(60);
-    JLabel nf = new JLabel(Localization.lang("Field to group by") + ":");
-    JLabel nr = new JLabel(Localization.lang("Characters to ignore") + ":");
     private final JRadioButton keywords = new JRadioButton(
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
@@ -64,8 +60,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final GroupSelector gs;
-    GridBagLayout gbl = new GridBagLayout();
-    GridBagConstraints con = new GridBagConstraints();
 
 
     /**
@@ -106,7 +100,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     fields.add("author");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = "author";
-                } else if (editors.isSelected()) {
+                } else { // editors.isSelected() as it is a radio button group.
                     List<String> fields = new ArrayList<>(2);
                     fields.add("editor");
                     hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);

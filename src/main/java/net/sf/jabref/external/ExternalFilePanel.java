@@ -63,7 +63,8 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  *
  */
 public class ExternalFilePanel extends JPanel {
-    private EntryEditor entryEditor;
+
+    private final EntryEditor entryEditor;
 
     private final JabRefFrame frame;
 
@@ -81,7 +82,6 @@ public class ExternalFilePanel extends JPanel {
     public ExternalFilePanel(final String fieldName, final MetaData metaData, final BibEntry entry, final FieldEditor editor, final OpenFileFilter off) {
         this(null, metaData, null, fieldName, off, editor);
         this.entry = entry;
-        this.entryEditor = null;
     }
 
     public ExternalFilePanel(final JabRefFrame frame, final MetaData metaData,
@@ -445,7 +445,7 @@ public class ExternalFilePanel extends JPanel {
      */
     public Runnable autoSetFile(final String fieldName, final FieldEditor editor) {
         Object o = getKey();
-        if ((o == null) || (Globals.prefs.get(fieldName + "Directory") == null)) {
+        if ((o == null) || (Globals.prefs.get(fieldName + Globals.DIR_SUFFIX) == null)) {
             output(Localization.lang("You must set both BibTeX key and %0 directory", fieldName
                     .toUpperCase())
                     + '.');

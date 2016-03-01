@@ -33,10 +33,10 @@ class ComparableMark implements Comparable<ComparableMark> {
 
     @Override
     public int compareTo(ComparableMark other) {
-        if (position.Y != other.position.Y) {
-            return position.Y - other.position.Y;
-        } else {
+        if (position.Y == other.position.Y) {
             return position.X - other.position.X;
+        } else {
+            return position.Y - other.position.Y;
         }
     }
 

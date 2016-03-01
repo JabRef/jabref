@@ -62,11 +62,7 @@ class StringNameChange extends Change {
                     + "is already in use.");
         }
 
-        if (string != null) {
-            string.setName(disk);
-            undoEdit.addEdit(new UndoableStringChange(panel, string, true, mem,
-                    disk));
-        } else {
+        if (string == null) {
             // The string was removed or renamed locally. We guess that it was removed.
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
@@ -76,23 +72,25 @@ class StringNameChange extends Change {
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
+        } else {
+            string.setName(disk);
+            undoEdit.addEdit(new UndoableStringChange(panel, string, true, mem, disk));
         }
 
         // Update tmp database:
-        if (tmpString != null) {
-            tmpString.setName(disk);
-        }
-        else {
+        if (tmpString == null) {
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
             secondary.addString(bs);
+        } else {
+            tmpString.setName(disk);
         }
 
         return true;
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return new JLabel(disk + " : " + content);
     }
 

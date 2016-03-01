@@ -54,10 +54,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private Layout defaultBibLayout;
 
     // reference layout mapped from entry type number:
-    private final HashMap<String, Layout> bibLayout = new HashMap<>();
+    private final Map<String, Layout> bibLayout = new HashMap<>();
 
-    private final HashMap<String, Object> properties = new HashMap<>();
-    private final HashMap<String, Object> citProperties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<String, Object> citProperties = new HashMap<>();
 
     private final Pattern numPattern = Pattern.compile("-?\\d+");
 
@@ -186,10 +186,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true if the file has not been modified, false otherwise.
      */
     private boolean isUpToDate() {
-        if (styleFile != null) {
-            return styleFile.lastModified() == OOBibStyle.styleFileModificationTime;
-        } else {
+        if (styleFile == null) {
             return true;
+        } else {
+            return styleFile.lastModified() == OOBibStyle.styleFileModificationTime;
         }
     }
 
@@ -277,16 +277,12 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @throws IOException
      */
     private void handleStructureLine(String line) {
-        int index = line.indexOf("=");
+        int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
             String formatString = line.substring(index + 1);
-            //System.out.println("'"+line.substring(0, index)+"' : '"+formatString+"'");
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                /*typeS = new Short(Short.parseShort(type));
-                OOBibFormatParser parser = new OOBibFormatParser(new StringReader(formatString));
-                PropertyValue[][] layout = parser.parse();*/
                 Layout layout = new LayoutHelper(new StringReader(formatString)).
                         getLayoutFromText(Globals.FORMATTER_PACKAGE);
                 if (setDefault) {
@@ -308,8 +304,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param line The line containing the formatter names.
      * @throws IOException
      */
-    private void handlePropertiesLine(String line, HashMap<String, Object> map) {
-        int index = line.indexOf("=");
+    private void handlePropertiesLine(String line, Map<String, Object> map) {
+        int index = line.indexOf('=');
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
@@ -342,10 +338,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public Layout getReferenceFormat(String type) {
         Layout l = bibLayout.get(type.toLowerCase());
-        if (l != null) {
-            return l;
-        } else {
+        if (l == null) {
             return defaultBibLayout;
+        } else {
+            return l;
         }
     }
 
@@ -442,9 +438,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *                      entries.
      * @return The formatted citation.
      */
-    public String getCitationMarker(BibEntry entry, BibDatabase database, boolean inParenthesis,
-                                    String uniquefier, int unlimAuthors) {
-        return getCitationMarker(new BibEntry[]{entry}, database, inParenthesis, new String[]{uniquefier},
+    public String getCitationMarker(BibEntry entry, BibDatabase database, boolean inParenthesis, String uniquefier,
+            int unlimAuthors) {
+        return getCitationMarker(new BibEntry[] {entry}, database, inParenthesis, new String[] {uniquefier},
                 new int[]{unlimAuthors});
     }
 
@@ -475,44 +471,36 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     int maxAuthors = (Integer) citProperties.get("MaxAuthors");
                     if (piv == -1) {
                         piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
-                                authorField,
-                                (String) citProperties.get("YearField"),
-                                maxAuthors,
+                        tmpMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database, authorField,
+                                (String) citProperties.get("YearField"), maxAuthors,
                                 (String) citProperties.get("AuthorSeparator"),
                                 (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"),
-                                (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"),
-                                (String) citProperties.get("BracketAfter"),
+                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
+                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
                                 (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
                         //System.out.println("piv="+piv+" tmpMarker='"+tmpMarker+"'");
                     } else {
                         // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[]{entries[i]}, database,
-                                authorField,
-                                (String) citProperties.get("YearField"),
-                                maxAuthors,
+                        String thisMarker = getAuthorYearParenthesisMarker(new BibEntry[] {entries[i]}, database,
+                                authorField, (String) citProperties.get("YearField"), maxAuthors,
                                 (String) citProperties.get("AuthorSeparator"),
                                 (String) citProperties.get("AuthorLastSeparator"),
-                                (String) citProperties.get("EtAlString"),
-                                (String) citProperties.get("YearSeparator"),
-                                (String) citProperties.get("BracketBefore"),
-                                (String) citProperties.get("BracketAfter"),
+                                (String) citProperties.get("EtAlString"), (String) citProperties.get("YearSeparator"),
+                                (String) citProperties.get("BracketBefore"), (String) citProperties.get("BracketAfter"),
                                 (String) citProperties.get("CitationSeparator"), null, unlimAuthors);
 
-                        String author = getCitationMarkerField(entries[i], database,
-                                authorField);
+                        String author = getCitationMarkerField(entries[i], database, authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
                         //System.out.println("i="+i+" thisMarker='"+thisMarker+"'");
                         int prevALim = i > 0 ? unlimAuthors[i - 1] : unlimAuthors[0];
-                        if (!thisMarker.equals(tmpMarker) ||
-                                ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
+                        if (!thisMarker.equals(tmpMarker)
+                                || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
                             if ((piv > -1) && (i > (piv + 1))) {
                                 // Do the grouping:
-                                group(entries, uniquefiers, piv, i - 1, (String) citProperties.get("UniquefierSeparator"));
+                                group(entries, uniquefiers, piv, i - 1,
+                                        (String) citProperties.get("UniquefierSeparator"));
                             }
                             tmpMarker = thisMarker;
                             piv = i;
@@ -533,7 +521,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             // Finished with the loop. See if the last entries form a group:
             if (piv >= 0) {
                 // Do the grouping:
-                group(entries, uniquefiers, piv, uniquefiers.length - 1, (String) citProperties.get("UniquefierSeparator"));
+                group(entries, uniquefiers, piv, uniquefiers.length - 1,
+                        (String) citProperties.get("UniquefierSeparator"));
             }
         }
 
@@ -567,7 +556,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                     (String) citProperties.get("BracketBefore"),
                     (String) citProperties.get("BracketAfter"),
                     (String) citProperties.get("CitationSeparator"),
-                    uniquefiers, unlimAuthors);
+ uniquefiers, unlimAuthors);
         }
     }
 
@@ -618,7 +607,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         StringBuffer sb = new StringBuffer(startBrace);
         for (int j = 0; j < entries.length; j++) {
 
-            int unlimA = unlimAuthors != null ? unlimAuthors[j] : -1;
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             BibEntry entry = entries[j];
@@ -690,7 +679,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < entries.length; i++) {
 
-            int unlimA = unlimAuthors != null ? unlimAuthors[i] : -1;
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
@@ -898,10 +887,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
-        if (o != null) {
-            return styleFile.equals(((OOBibStyle) o).styleFile);
-        } else {
+        if (o == null) {
             return false;
+        } else {
+            return styleFile.equals(((OOBibStyle) o).styleFile);
         }
     }
 

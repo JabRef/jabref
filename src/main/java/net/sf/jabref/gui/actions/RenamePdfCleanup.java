@@ -2,7 +2,7 @@ package net.sf.jabref.gui.actions;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
@@ -107,7 +107,7 @@ public class RenamePdfCleanup implements Cleaner {
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
             FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-            return Arrays.asList(new FieldChange[] {change});
+            return Collections.singletonList(change);
         }
 
         return new ArrayList<>();

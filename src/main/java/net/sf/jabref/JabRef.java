@@ -25,6 +25,7 @@ import java.net.Authenticator;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -77,8 +78,6 @@ public class JabRef {
     private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
     public static JabRefFrame jrf;
-
-    private static final int MAX_DIALOG_WARNINGS = 10;
 
     private JabRefCLI cli;
 
@@ -287,7 +286,6 @@ public class JabRef {
                 //export database
                 if ((newBase != null) && (newBase.getEntryCount() > 0)) {
                     String formatName = null;
-                    IExportFormat format;
 
                     //read in the export format, take default format if no format entered
                     switch (data.length) {
@@ -306,8 +304,10 @@ public class JabRef {
                     } //end switch
 
                     //export new database
-                    format = ExportFormats.getExportFormat(formatName);
-                    if (format != null) {
+                    IExportFormat format = ExportFormats.getExportFormat(formatName);
+                    if (format == null) {
+                        System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+                    } else {
                         // We have an ExportFormat instance:
                         try {
                             System.out.println(Localization.lang("Exporting") + ": " + data[1]);
@@ -316,8 +316,6 @@ public class JabRef {
                             System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                                     + ex.getMessage());
                         }
-                    } else {
-                        System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
                     }
                 } /*end if newBase != null*/else {
                     System.err.println(Localization.lang("No search matches."));
@@ -378,7 +376,9 @@ public class JabRef {
                     Globals.prefs.databaseFile = metaData.getFile();
                     System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
-                    if (format != null) {
+                    if (format == null) {
+                        System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
+                    } else {
                         // We have an ExportFormat instance:
                         try {
                             format.performExport(pr.getDatabase(), pr.getMetaData(), data[0], pr.getEncoding(), null);
@@ -386,8 +386,6 @@ public class JabRef {
                             System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                                     + ex.getMessage());
                         }
-                    } else {
-                        System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
                     }
 
                 }
@@ -488,11 +486,10 @@ public class JabRef {
 
         String[] split = fetchCommand.split(":");
         String engine = split[0];
-        String query = split[1];
 
         EntryFetcher fetcher = null;
         for (EntryFetcher e : EntryFetchers.INSTANCE.getEntryFetchers()) {
-            if (engine.toLowerCase().equals(e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase())) {
+            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
                 fetcher = e;
             }
         }
@@ -507,6 +504,7 @@ public class JabRef {
             return Optional.empty();
         }
 
+        String query = split[1];
         System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) + " "
                 + Localization.lang("Please wait..."));
         Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
@@ -541,7 +539,8 @@ public class JabRef {
             } else {
                 try {
                     UIManager.setLookAndFeel(lookFeel);
-                } catch (Exception e) { // javax.swing.UnsupportedLookAndFeelException (sure; see bug #1278) or ClassNotFoundException (unsure) may be thrown
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                        UnsupportedLookAndFeelException e) {
                     // specified look and feel does not exist on the classpath, so use system l&f
                     UIManager.setLookAndFeel(systemLnF);
                     // also set system l&f as default
@@ -564,8 +563,7 @@ public class JabRef {
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
             Double zoomLevel = null;
-            while (keys.hasMoreElements()) {
-                Object key = keys.nextElement();
+            for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
                     if (zoomLevel == null) {
@@ -619,7 +617,7 @@ public class JabRef {
         if (!cli.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
                 && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
-            String[] names = Globals.prefs.getStringArray(JabRefPreferences.LAST_EDITED);
+            List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
             lastEdLoop: for (String name : names) {
                 File fileToOpen = new File(name);
 
@@ -726,8 +724,7 @@ public class JabRef {
 
         for (int i = 0; i < loaded.size(); i++) {
             if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf,
-                        JabRef.MAX_DIALOG_WARNINGS, i);
+                ParserResultWarningDialog.showParserResultWarningDialog(loaded.elementAt(i), JabRef.jrf, i);
             }
         }
 
@@ -849,12 +846,12 @@ public class JabRef {
                             .importUnknownFormat(data[0].replaceAll("~", System.getProperty("user.home")));
                 }
 
-                if (importResult != null) {
+                if (importResult == null) {
+                    System.out.println(Localization.lang("Could not find a suitable import format."));
+                } else {
                     System.out.println(Localization.lang("Format used") + ": " + importResult.format);
 
                     return Optional.of(importResult.parserResult);
-                } else {
-                    System.out.println(Localization.lang("Could not find a suitable import format."));
                 }
             }
         } catch (IOException ex) {

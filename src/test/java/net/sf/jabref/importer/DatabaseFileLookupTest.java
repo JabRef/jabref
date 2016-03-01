@@ -5,6 +5,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
@@ -34,11 +35,10 @@ public class DatabaseFileLookupTest {
     private BibEntry entry2;
 
 
-    /* (non-Javadoc)
-     * @see junit.framework.TestCase#setUp()
-     */
     @Before
     public void setUp() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
             ParserResult result = BibtexParser.parse(fr);
             database = result.getDatabase();
@@ -63,7 +63,6 @@ public class DatabaseFileLookupTest {
     @Test
     @Ignore
     public void testInsertTestData() throws Exception {
-
         entry1 = new BibEntry();
         JabRefPreferences jabRefPreferences = JabRefPreferences.getInstance();
         ExternalFileType fileType = jabRefPreferences.getExternalFileTypeByExt("PDF");
@@ -87,8 +86,7 @@ public class DatabaseFileLookupTest {
          * Select all nodes manually.
          */
         Enumeration<CheckableTreeNode> enumeration = treeNode.breadthFirstEnumeration();
-        while (enumeration.hasMoreElements()) {
-            CheckableTreeNode nextElement = enumeration.nextElement();
+        for (CheckableTreeNode nextElement : Collections.list(enumeration)) {
             nextElement.setSelected(true);
         }
 

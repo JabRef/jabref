@@ -32,70 +32,41 @@ public class RemoveLatexCommands implements LayoutFormatter {
         int i;
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
-            if (escaped && c == '\\') {
+            if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
-            }
-            else if (c == '\\') {
+            } else if (c == '\\') {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuffer();
-            }
-            else if (!incommand && (c == '{' || c == '}')) {
+            } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            }
-
-            else if (Character.isLetter(c) ||
+            } else if (Character.isLetter(c) ||
                     Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
-                if (!incommand) {
-                    sb.append(c);
-                } else {
+                if (incommand) {
                     currentCommand.append(c);
-                    if (currentCommand.length() == 1
+                    if ((currentCommand.length() == 1)
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type \^o or \~{n}
-                        /*            if (i >= field.length()-1)
-                                      break testCharCom;
-
-                                    String command = currentCommand.toString();
-                                    i++;
-                                    c = field.charAt(i);
-                                    //System.out.println("next: "+(char)c);
-                                    String combody;
-                                    if (c == '{') {
-                                      IntAndString part = getPart(field, i);
-                                      i += part.i;
-                                      combody = part.s;
-                                    }
-                                    else {
-                                      combody = field.substring(i,i+1);
-                                      //System.out.println("... "+combody);
-                                    }
-                                    Object result = Globals.HTMLCHARS.get(command+combody);
-                                    if (result != null)
-                                      sb.append((String)result);
-                        */
                         incommand = false;
                         escaped = false;
 
                     }
-
-                }
-            }
-
-            else if (Character.isLetter(c)) {
-                escaped = false;
-                if (!incommand) {
-                    sb.append(c);
-                // Else we are in a command, and should not keep the letter.
                 } else {
-                    currentCommand.append(c);
+                    sb.append(c);
                 }
-            }
-            else {
+            } else if (Character.isLetter(c)) {
+                escaped = false;
+                if (incommand) {
+                    // We are in a command, and should not keep the letter.
+                    currentCommand.append(c);
+                } else {
+                    sb.append(c);
+                }
+            } else {
                 //if (!incommand || ((c!='{') && !Character.isWhitespace(c)))
-                if (!incommand || !Character.isWhitespace(c) && c != '{') {
+                if (!incommand || (!Character.isWhitespace(c) && (c != '{'))) {
                     sb.append(c);
                 } else {
                     if (c != '{') {

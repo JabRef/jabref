@@ -44,12 +44,12 @@ public class ExportFormat implements IExportFormat {
     private String lfFileName;
     private String directory;
     private String extension;
-    Charset encoding; // If this value is set, it will be used to override
+    private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
 
     private FileFilter fileFilter;
     private boolean customExport;
-    private final String LAYOUT_PREFIX = "/resource/layout/";
+    private static final String LAYOUT_PREFIX = "/resource/layout/";
 
     private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
 
@@ -116,7 +116,7 @@ public class ExportFormat implements IExportFormat {
      * obtained from the basepanel.
      * @param encoding The name of the encoding to use.
      */
-    void setEncoding(Charset encoding) {
+    public void setEncoding(Charset encoding) {
         this.encoding = encoding;
     }
 
@@ -137,7 +137,7 @@ public class ExportFormat implements IExportFormat {
      *
      * @return a newly created reader
      */
-    Reader getReader(String filename) throws IOException {
+    private Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given filename:
         String dir;
         if (customExport) {
@@ -291,7 +291,7 @@ public class ExportFormat implements IExportFormat {
             Globals.prefs.customExportNameFormatters = null;
 
             if (!missingFormatters.isEmpty()) {
-                StringBuilder sb = new StringBuilder("The following formatters could not be found").append(": ");
+                StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
                 for (Iterator<String> i = missingFormatters.iterator(); i.hasNext();) {
                     sb.append(i.next());
                     if (i.hasNext()) {
@@ -300,8 +300,8 @@ public class ExportFormat implements IExportFormat {
                 }
                 LOGGER.warn(sb);
             }
+            finalizeSaveSession(ss);
         }
-        finalizeSaveSession(ss);
 
     }
 
@@ -310,7 +310,7 @@ public class ExportFormat implements IExportFormat {
      * all the name formatters so they can be used by the filter layouts.
      * @param lfFileName The layout filename.
      */
-    private static HashMap<String, String> readFormatterFile(String lfFileName) {
+    private static Map<String, String> readFormatterFile(String lfFileName) {
         HashMap<String, String> formatters = new HashMap<>();
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
@@ -329,7 +329,7 @@ public class ExportFormat implements IExportFormat {
                     if (line.isEmpty()) {
                         continue;
                     }
-                    int index = line.indexOf(":"); // TODO: any need to accept escaped colons here?
+                    int index = line.indexOf(':'); // TODO: any need to accept escaped colons here?
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
@@ -345,7 +345,7 @@ public class ExportFormat implements IExportFormat {
         return formatters;
     }
 
-    SaveSession getSaveSession(final Charset enc,
+    public SaveSession getSaveSession(final Charset enc,
                                final File outFile) throws IOException {
         return new SaveSession(outFile, enc, false);
     }
@@ -361,7 +361,7 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    void finalizeSaveSession(final SaveSession ss) throws Exception {
+    public void finalizeSaveSession(final SaveSession ss) throws Exception {
         ss.getWriter().flush();
         ss.getWriter().close();
 

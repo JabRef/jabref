@@ -13,27 +13,24 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.logic.search;
+
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: 16-Dec-2007
- * Time: 10:37:23
- * To change this template use File | Settings | File Templates.
+ * Every Listener that wants to receive events from a search needs to
+ * implement this interface
+ * 
+ * @author Ben
+ * 
  */
-class BibtexEntryNotFoundException extends Exception {
+public interface SearchQueryHighlightListener {
 
-    private final String bibtexKey;
-
-
-    public BibtexEntryNotFoundException(String bibtexKey, String message) {
-        super(message);
-
-        this.bibtexKey = bibtexKey;
-    }
-
-    public String getBibtexKey() {
-        return bibtexKey;
-    }
+    /**
+     * Pattern with which one can determine what to highlight
+     * 
+     * @param words null if nothing is searched for
+     */
+    void highlightPattern(Optional<Pattern> highlightPattern);
 }

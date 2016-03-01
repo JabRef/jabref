@@ -52,7 +52,7 @@ import net.sf.jabref.logic.util.io.FileFinder;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.util.strings.UnicodeCharMap;
+import net.sf.jabref.logic.util.strings.UnicodeToReadableCharMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,7 +95,7 @@ public class Util {
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
-    private static final UnicodeCharMap UNICODE_CHAR_MAP = new UnicodeCharMap();
+    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
@@ -115,7 +115,7 @@ public class Util {
 
     /**
      * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
-     * accept. The basis for replacement is the HashMap Globals.UNICODE_CHARS.
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
         for (Map.Entry<String, String> chrAndReplace : net.sf.jabref.util.Util.UNICODE_CHAR_MAP.entrySet()) {
@@ -260,10 +260,7 @@ public class Util {
         Matcher m = net.sf.jabref.util.Util.squareBracketsPattern.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = net.sf.jabref.util.Util.getFieldAndFormat(m.group(), entry, database);
-            if (replacement == null) {
-                replacement = "";
-            }
+            String replacement = Optional.ofNullable(getFieldAndFormat(m.group(), entry, database)).orElse("");
             m.appendReplacement(s, replacement);
         }
         m.appendTail(s);
@@ -624,7 +621,6 @@ public class Util {
      * @throws IOException
      */
     public static String getResults(URLConnection source) throws IOException {
-
         return net.sf.jabref.util.Util.getResultsWithEncoding(source, null);
     }
 
@@ -666,6 +662,54 @@ public class Util {
             sb.append((char) byteRead);
         }
         return sb.toString();
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResults(URL source, String postData, Charset encoding) throws IOException {
+        HttpURLConnection con = (HttpURLConnection) source.openConnection();
+        return getPostResults(con, postData, encoding);
+    }
+
+    /**
+     * Get the results of HTTP post on a URL and return contents as a String.
+     *
+     * @param source postData encoding
+     * @return
+     * @throws IOException
+     */
+    public static String getPostResults(HttpURLConnection source, String postData, Charset encoding)
+            throws IOException {
+
+        //add a default request header
+        source.setRequestMethod("POST");
+        source.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+        source.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        // Send post request
+        source.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(source.getOutputStream());) {
+            wr.writeBytes(postData);
+        }
+
+        int responseCode = source.getResponseCode();
+
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(source.getInputStream(), encoding));) {
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+
+
+        return response.toString();
     }
 
     /**
@@ -872,9 +916,9 @@ public class Util {
                         if (!alreadyHas) {
                             foundAny = true;
                             ExternalFileType type;
-                            int index = f.getPath().lastIndexOf('.');
-                            if ((index >= 0) && (index < (f.getPath().length() - 1))) {
-                                type = Globals.prefs.getExternalFileTypeByExt(f.getPath().substring(index + 1).toLowerCase());
+                            Optional<String> extension = FileUtil.getFileExtension(f);
+                            if (extension.isPresent()) {
+                                type = Globals.prefs.getExternalFileTypeByExt(extension.get());
                             } else {
                                 type = new UnknownExternalFileType("");
                             }

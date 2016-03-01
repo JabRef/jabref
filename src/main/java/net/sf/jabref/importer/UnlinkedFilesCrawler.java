@@ -11,17 +11,17 @@ import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
 
 /**
- * Util class for searching files on the filessystem which are not linked to a
+ * Util class for searching files on the file system which are not linked to a
  * provided {@link BibDatabase}.
- * 
+ *
  * @author Nosh&Dan
  * @version 09.11.2008 | 19:55:20
- * 
+ *
  */
 public class UnlinkedFilesCrawler {
 
     /**
-     * File filter, that accepts directorys only.
+     * File filter, that accepts directories only.
      */
     private final FileFilter directoryFilter = new FileFilter() {
 
@@ -38,7 +38,7 @@ public class UnlinkedFilesCrawler {
 
     /**
      * CONSTRUCTOR
-     * 
+     *
      * @param database
      */
     public UnlinkedFilesCrawler(BibDatabase database) {
@@ -60,20 +60,20 @@ public class UnlinkedFilesCrawler {
      * {@link CheckableTreeNode}. <br>
      * <br>
      * The user objects that are attached to the nodes is the
-     * {@link FileNodeWrapper}, which wrapps the {@link File}-Object. <br>
+     * {@link FileNodeWrapper}, which wraps the {@link File}-Object. <br>
      * <br>
      * For ensuring the capability to cancel the work of this recursive method,
      * the first position in the integer array 'state' must be set to 1, to keep
-     * the recursion running. When the states value changes, the methode will
+     * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
     public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, int[] state, ChangeListener changeListener) {
         /* Cancellation of the search from outside! */
-        if (state == null || state.length < 1 || state[0] != 1) {
+        if ((state == null) || (state.length < 1) || (state[0] != 1)) {
             return null;
         }
         /* Return null if the directory is not valid. */
-        if (directory == null || !directory.exists() || !directory.isDirectory()) {
+        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
         }
 
@@ -85,7 +85,7 @@ public class UnlinkedFilesCrawler {
         File[] subDirectories = directory.listFiles(directoryFilter);
         for (File subDirectory : subDirectories) {
             CheckableTreeNode subRoot = searchDirectory(subDirectory, ff, state, changeListener);
-            if (subRoot != null && subRoot.getChildCount() > 0) {
+            if ((subRoot != null) && (subRoot.getChildCount() > 0)) {
                 filesCount += ((FileNodeWrapper) subRoot.getUserObject()).fileCount;
                 root.add(subRoot);
             }

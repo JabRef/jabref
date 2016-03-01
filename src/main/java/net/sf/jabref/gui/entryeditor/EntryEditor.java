@@ -41,7 +41,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -55,7 +55,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelPattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.SearchTextListener;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
@@ -449,7 +449,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        panel.getSearchBar().getSearchTextObservable().addSearchListener((SearchTextListener) source);
+        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -514,7 +514,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public static String getSourceString(BibEntry entry) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
-        new BibtexEntryWriter(formatter, false).write(entry, stringWriter);
+        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter);
 
         return stringWriter.getBuffer().toString();
     }
@@ -681,10 +681,10 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
      * Updates this editor to show the given entry, regardless of type
      * correspondence.
      *
-     * @param swtichEntry a <code>BibEntry</code> value
+     * @param switchEntry a <code>BibEntry</code> value
      */
-    public synchronized void switchTo(BibEntry swtichEntry) {
-        if (this.entry == swtichEntry) {
+    public synchronized void switchTo(BibEntry switchEntry) {
+        if (this.entry == switchEntry) {
             /**
              * Even if the editor is already showing the same entry, update
              * the source panel. I'm not sure if this is the correct place to
@@ -701,34 +701,18 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.removePropertyChangeListener(this);
 
         // Register as property listener for the new entry:
-        swtichEntry.addPropertyChangeListener(this);
+        switchEntry.addPropertyChangeListener(this);
 
-        this.entry = swtichEntry;
+        this.entry = switchEntry;
 
         updateAllFields();
         validateAllFields();
         updateSource();
-        panel.newEntryShowing(swtichEntry);
+        panel.newEntryShowing(switchEntry);
 
     }
 
-    /**
-     * Returns false if the contents of the source panel has not been validated,
-     * true otherwise.
-     */
-    public boolean lastSourceAccepted() {
-        if (tabbed.getSelectedComponent() == srcPanel) {
-            storeSource(false);
-        }
-
-        return lastSourceAccepted;
-    }
-
-    /*
-     * public boolean storeSourceIfNeeded() { if (tabbed.getSelectedIndex() ==
-     * sourceIndex) return storeSource(); else return true; }
-     */
-    private boolean storeSource(boolean showError) {
+    private boolean storeSource() {
         // Store edited bibtex code.
         BibtexParser bibtexParser = new BibtexParser(new java.io.StringReader(source.getText()));
 
@@ -807,7 +791,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             if (duplicateWarning) {
                 warnDuplicateBibtexkey();
-            } else if (emptyWarning && showError) {
+            } else if (emptyWarning) {
                 warnEmptyBibtexkey();
             } else {
                 panel.output(Localization.lang("Stored entry") + '.');
@@ -844,18 +828,15 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             lastSourceAccepted = false;
             tabbed.setSelectedComponent(srcPanel);
 
-            if (showError) {
-                Object[] options = {Localization.lang("Edit"),
-                        Localization.lang("Revert to original source")};
+            Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
 
-                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+            int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                    Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                    JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-                if (answer != 0) {
-                    updateSource = true;
-                    updateSource();
-                }
+            if (answer != 0) {
+                updateSource = true;
+                updateSource();
             }
 
             return false;
@@ -1037,7 +1018,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             panel.entryEditorClosing(EntryEditor.this);
-            panel.getDatabase().removeEntry(entry.getId());
+            panel.getDatabase().removeEntry(entry);
             panel.markBaseChanged();
             panel.undoManager.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             panel.output(Localization.lang("Deleted entry"));
@@ -1200,13 +1181,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
-                boolean accepted = storeSource(true);
-
+                storeSource();
             }
-            ////////////////////////////////////
+
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
-            //System.out.println(getType().getName()+": movingAway="+movingAway+", isShowing="+isShowing());
             if (!movingAway && isShowing()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -1214,9 +1193,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     public void run() {
                         final int row = panel.mainTable.findEntry(entry);
                         if (row >= 0) {
-                            //if (panel.mainTable.getSelectedRowCount() == 0)
-                            //    panel.mainTable.setRowSelectionInterval(row, row);
-                            //scrollTo(row);
                             panel.mainTable.ensureVisible(row);
                         }
                     }
@@ -1322,7 +1298,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            // 1. get Bitexentry for selected index (already have)
+            // 1. get BibEntry for selected index (already have)
             // 2. update label
 
             // Store the current edit in case this action is called during the

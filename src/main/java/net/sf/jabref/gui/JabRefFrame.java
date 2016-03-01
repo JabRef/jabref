@@ -104,7 +104,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     final JSplitPane contentPane = new JSplitPane();
 
-    final JabRefPreferences prefs = Globals.prefs;
+    private final JabRefPreferences prefs = Globals.prefs;
     private PreferencesDialog prefsDialog;
 
     private int lastTabbedPanelSelectionIndex = -1;
@@ -207,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    final ToolBar tlb = new ToolBar();
+    private final ToolBar tlb = new ToolBar();
 
     private final JMenuBar mb = new JMenuBar();
 
@@ -286,7 +286,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcon.RIGHT.getIcon());
     final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
             Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
-    final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
+    private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
     private final AbstractAction copy = new EditAction(Actions.COPY, Localization.menuTitle("Copy"),
             Localization.lang("Copy"), Globals.getKeyPrefs().getKey(KeyBinding.COPY), IconTheme.JabRefIcon.COPY.getIcon());
@@ -487,7 +487,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PushToApplicationButton pushExternalButton;
 
-    GeneralFetcher generalFetcher;
+    private GeneralFetcher generalFetcher;
 
     private final List<Action> fetcherActions = new LinkedList<>();
 
@@ -794,11 +794,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (filenames.isEmpty()) {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
-                String[] names = new String[filenames.size()];
-                for (int i = 0; i < filenames.size(); i++) {
-                    names[i] = filenames.elementAt(i);
-                }
-                prefs.putStringArray(JabRefPreferences.LAST_EDITED, names);
+                prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
                 File focusedDatabase = getCurrentBasePanel().getDatabaseFile();
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
@@ -848,9 +844,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
                 if (getBasePanelAt(i).isModified()) {
                     tabbedPane.setSelectedIndex(i);
-                    Object[] options = {Localization.lang("Save changes"),
-                            Localization.lang("Discard changes"),
-                            Localization.lang("Return to JabRef")};
                     String filename;
 
                     if (getBasePanelAt(i).getDatabaseFile() != null) {
@@ -915,7 +908,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         setProgressBarVisible(false);
 
-        pushExternalButton = new PushToApplicationButton(this, PushToApplications.applications);
+        pushExternalButton = new PushToApplicationButton(this, PushToApplications.APPLICATIONS);
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
@@ -1361,19 +1354,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    private static void createEntryTypeSection(JMenu menu, String title, java.util.List<NewEntryAction> actions) {
-        // bibtex
-        JMenuItem header = new JMenuItem(title);
-        Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
-        header.setFont(font);
-        header.setEnabled(false);
-        menu.add(header);
-
-        for (NewEntryAction action : actions) {
-            menu.add(action);
-        }
-    }
-
     public static JMenu subMenu(String name) {
         int i = name.indexOf('&');
         JMenu res;
@@ -1632,9 +1612,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private List<String> getUniquePathParts() {
         List<String> dbPaths = collectDatabaseFilePaths();
-        List<String> uniquePaths = FileUtil.uniquePathSubstrings(dbPaths);
 
-        return uniquePaths;
+        return FileUtil.uniquePathSubstrings(dbPaths);
     }
 
     public void updateAllTabTitles() {
@@ -1934,11 +1913,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (filenames.isEmpty()) {
                 output(Localization.lang("Not saved (empty session)") + '.');
             } else {
-                String[] names = new String[filenames.size()];
-                for (int i = 0; i < filenames.size(); i++) {
-                    names[i] = filenames.elementAt(i);
-                }
-                prefs.putStringArray("savedSession", names);
+                prefs.putStringList(JabRefPreferences.SAVED_SESSION, filenames);
                 output(Localization.lang("Saved session") + '.');
             }
 
@@ -1957,7 +1932,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (prefs.get("savedSession") == null) {
+            if (prefs.get(JabRefPreferences.SAVED_SESSION) == null) {
                 output(Localization.lang("No saved session found."));
                 return;
             }
@@ -1980,7 +1955,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             }
                         }
                     }
-                    String[] names = prefs.getStringArray("savedSession");
+                    List<String> names = prefs.getStringList(JabRefPreferences.SAVED_SESSION);
                     ArrayList<File> filesToOpen = new ArrayList<>();
                     for (String name : names) {
                         filesToOpen.add(new File(name));
@@ -2106,7 +2081,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class DatabasePropertiesAction extends MnemonicAwareAction {
 
-        DatabasePropertiesDialog propertiesDialog;
+        private DatabasePropertiesDialog propertiesDialog;
 
 
         public DatabasePropertiesAction() {
@@ -2127,7 +2102,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     class BibtexKeyPatternAction extends MnemonicAwareAction {
 
-        BibtexKeyPatternDialog bibtexKeyPatternDialog;
+        private BibtexKeyPatternDialog bibtexKeyPatternDialog;
 
 
         public BibtexKeyPatternAction() {

@@ -1,12 +1,7 @@
 package net.sf.jabref.gui.search;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,21 +22,15 @@ public class MatchesHighlighter {
      * @param wordsToHighlight List of all words which must be highlighted
      * @return String that was called by the method, with HTML Tags if a word was found
      */
-    public static String highlightWordsWithHTML(String text, List<String> wordsToHighlight) {
-        Objects.requireNonNull(wordsToHighlight);
+    public static String highlightWordsWithHTML(String text, Optional<Pattern> highlightPattern) {
+        Objects.requireNonNull(highlightPattern);
         Objects.requireNonNull(text);
 
-        if (text.isEmpty() || wordsToHighlight.isEmpty()) {
+        if (text.isEmpty() || !highlightPattern.isPresent()) {
             return text;
         }
 
-        Optional<Pattern> patternForWords = getPatternForWords(wordsToHighlight, Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP),
-                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
-        if (!patternForWords.isPresent()) {
-            return text;
-        }
-
-        Matcher matcher = patternForWords.get().matcher(text);
+        Matcher matcher = highlightPattern.get().matcher(text);
 
         StringBuffer sb = new StringBuffer();
         boolean foundSomething = false;
@@ -62,23 +51,4 @@ public class MatchesHighlighter {
         return text;
     }
 
-    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-    public static Optional<Pattern> getPatternForWords(List<String> words, boolean useRegex, boolean isCaseSensitive) {
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
-            return Optional.empty();
-        }
-
-        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
-        StringJoiner joiner = new StringJoiner(")|(", "(", ")");
-        for (String word : words) {
-            joiner.add(useRegex ? word : Pattern.quote(word));
-        }
-        String searchPattern = joiner.toString();
-
-        if (isCaseSensitive) {
-            return Optional.of(Pattern.compile(searchPattern));
-        } else {
-            return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
-        }
-    }
 }

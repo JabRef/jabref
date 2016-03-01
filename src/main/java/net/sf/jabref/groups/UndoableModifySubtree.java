@@ -32,7 +32,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
     private final GroupSelector m_groupSelector;
     /** This holds the new subtree (the root's modified children) to allow redo. */
     private final Vector<TreeNode> m_modifiedSubtree = new Vector<>();
-    private boolean m_revalidate = true;
+    private boolean mRevalidate = true;
     private final String m_name;
 
 
@@ -79,7 +79,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
             subtreeRoot.add(((GroupTreeNode) m_subtreeBackup.getChildAt(i))
                     .deepCopy());
         }
-        if (m_revalidate) {
+        if (mRevalidate) {
             m_groupSelector.revalidateGroups();
         }
     }
@@ -93,7 +93,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         for (int i = 0; i < m_modifiedSubtree.size(); ++i) {
             subtreeRoot.add((GroupTreeNode) m_modifiedSubtree.elementAt(i));
         }
-        if (m_revalidate) {
+        if (mRevalidate) {
             m_groupSelector.revalidateGroups();
         }
     }
@@ -103,6 +103,6 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
      * revalidated by this operation. Default is true.
      */
     public void setRevalidate(boolean revalidate) {
-        m_revalidate = revalidate;
+        mRevalidate = revalidate;
     }
 }

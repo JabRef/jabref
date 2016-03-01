@@ -12,9 +12,7 @@
 This version is a development version. Features may not work as expected.
 
 The branch of this README file is `master`.
-The intention of this branch is to move JabRef forward to modern technologies such as Java8 and JavaFX.
-
-The last version with Java 6 support is `v2.11` being developed at the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The intention of this branch is to incorporate fixes and improvements as soon as possible and to move [JabRef] forward to modern technologies such as [Java8] and JavaFX.
 
 Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
@@ -22,17 +20,12 @@ Explanation of donation possibilities and usage of donations is available at our
 
 We use [install4j], the multi-platform installer builder.
 
-### Breaking Changes in Comparison to v2.11
-
-* No plugin support
-* Transition to Java8
-
 ### Background
 
-JabRef is a graphical Java application for editing bibtex (`.bib`) databases.
+JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] (`.bib`) databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
-You can customize the entry information shown in the main window, and sort by any of the standard Bibtex fields.
-JabRef can autogenerate bibtex keys for your entries.
+You can customize the entry information shown in the main window, and sort by any of the standard BibTeX fields.
+JabRef can autogenerate BibTeX keys for your entries.
 JabRef also lets you easily link to PDF or web sources for your reference entries.
 
 JabRef can import from and export to several formats, and you can customize export filters.
@@ -132,4 +125,9 @@ See the [LICENSE](LICENSE) for full details.
 JabRef also uses libraries distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
 
+  [BibTeX]: https://www.ctan.org/pkg/bibtex
+  [Biblatex]: https://www.ctan.org/pkg/biblatex
   [install4j]: https://www.ej-technologies.com/products/install4j/overview.html
+  [JabRef]: http://www.jabref.org
+  [Java8]: http://docs.oracle.com/javase/8/docs/technotes/guides/language/enhancements.html#javase8
+  [JavaFX]: http://docs.oracle.com/javase/8/javafx/get-started-tutorial/jfx-overview.htm

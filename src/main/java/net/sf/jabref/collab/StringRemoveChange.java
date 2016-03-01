@@ -67,7 +67,7 @@ class StringRemoveChange extends Change {
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return sp;
     }
 

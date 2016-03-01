@@ -20,7 +20,7 @@ import net.sf.jabref.exporter.layout.LayoutFormatter;
 
 /**
  * Used to fix [ 1588028 ] export HTML table DOI URL.
- * 
+ *
  * Will prepend "http://doi.org/" if only DOI and not an URL is given.
  */
 public class DOICheck implements LayoutFormatter {
@@ -29,7 +29,9 @@ public class DOICheck implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         }
-
+        if (fieldText.startsWith("/")) {
+            fieldText = fieldText.substring(1);
+        }
         return DOI.build(fieldText).map(DOI::getURLAsASCIIString).orElse(fieldText);
     }
 }

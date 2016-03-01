@@ -52,7 +52,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 public class ImportCustomizationDialog extends JDialog {
     private final JabRefFrame frame;
 
-    private JTable customImporterTable;
+    private final JTable customImporterTable;
     private final JabRefPreferences prefs = Globals.prefs;
     private final ImportCustomizationDialog importCustomizationDialog;
 
@@ -83,7 +83,7 @@ public class ImportCustomizationDialog extends JDialog {
         String className = null;
         // remove leading basepath from path
         while (!path.equals(basePath)) {
-            className = path.getName() + (className != null ? "." + className : "");
+            className = path.getName() + (className == null ? "" : "." + className);
             path = path.getParentFile();
         }
         int lastDot = className.lastIndexOf('.');
@@ -99,7 +99,7 @@ public class ImportCustomizationDialog extends JDialog {
      *
      * @param importer  importer
      */
-    void addOrReplaceImporter(CustomImportList.Importer importer) {
+    void addOrReplaceImporter(CustomImporter importer) {
         prefs.customImports.replaceImporter(importer);
         Globals.importFormatReader.resetImportFormats();
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
@@ -110,7 +110,7 @@ public class ImportCustomizationDialog extends JDialog {
      * @param frame_
      * @throws HeadlessException
      */
-    public ImportCustomizationDialog(JabRefFrame frame_) throws HeadlessException {
+    public ImportCustomizationDialog(final JabRefFrame frame_) throws HeadlessException {
         super(frame_, Localization.lang("Manage custom imports"), false);
         this.importCustomizationDialog = this;
         frame = frame_;
@@ -121,8 +121,9 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String chosenFileStr = null;
-                CustomImportList.Importer importer = new CustomImportList.Importer();
-                importer.setBasePath(FileDialogs.getNewDir(frame, new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
+                CustomImporter importer = new CustomImporter();
+                importer.setBasePath(FileDialogs.getNewDir(frame,
+                        new File(prefs.get(JabRefPreferences.WORKING_DIRECTORY)), "",
                         Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
                 if (importer.getBasePath() != null) {
                     chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
@@ -165,7 +166,6 @@ public class ImportCustomizationDialog extends JDialog {
                         LOGGER.info("Could not open Zip-archive.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath)
                                 + "\n" + Localization.lang("Have you chosen the correct package path?"));
-                        return;
                     } catch (NoClassDefFoundError exc) {
                         LOGGER.info("Could not instantiate Zip-archive reader.", exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath)
@@ -183,17 +183,17 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
-                if (row != -1) {
-                    CustomImportList.Importer importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
+                if (row == -1) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                } else {
+                    CustomImporter importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
                     try {
                         ImportFormat importFormat = importer.getInstance();
                         JOptionPane.showMessageDialog(frame, importFormat.getDescription());
                     } catch (Exception exc) {
-                        exc.printStackTrace();
+                        LOGGER.warn("Could not instantiate importer " + importer.getName(), exc);
                         JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
                     }
-                } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });
@@ -204,14 +204,14 @@ public class ImportCustomizationDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int row = customImporterTable.getSelectedRow();
-                if (row != -1) {
+                if (row == -1) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
+                } else {
                     customImporterTable.removeRowSelectionInterval(row, row);
                     prefs.customImports.remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
                     Globals.importFormatReader.resetImportFormats();
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
-                } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
                 }
             }
         });
@@ -290,7 +290,7 @@ public class ImportCustomizationDialog extends JDialog {
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Object value = null;
-            CustomImportList.Importer importer = getImporter(rowIndex);
+            CustomImporter importer = getImporter(rowIndex);
             if (columnIndex == 0) {
                 value = importer.getName();
             } else if (columnIndex == 1) {
@@ -318,8 +318,9 @@ public class ImportCustomizationDialog extends JDialog {
             return columnNames[col];
         }
 
-        public CustomImportList.Importer getImporter(int rowIndex) {
-            CustomImportList.Importer[] importers = Globals.prefs.customImports.toArray(new CustomImportList.Importer[Globals.prefs.customImports.size()]);
+        public CustomImporter getImporter(int rowIndex) {
+            CustomImporter[] importers = Globals.prefs.customImports
+                    .toArray(new CustomImporter[Globals.prefs.customImports.size()]);
             return importers[rowIndex];
         }
     }

@@ -6,9 +6,11 @@ import net.sf.jabref.logic.util.OS;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
-import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KeyBindingPreferences {
 
@@ -78,35 +80,28 @@ public class KeyBindingPreferences {
     public void setNewKeyBindings(SortedMap<KeyBinding, String> newBindings) {
         if (!newBindings.equals(keyBindingRepository.getKeyBindings())) {
             // This confirms that the bindings have actually changed.
-            String[] bindNames = new String[newBindings.size()];
-            String[] bindings = new String[newBindings.size()];
-            int index = 0;
-            for (Map.Entry<KeyBinding, String> keyBinding : newBindings.entrySet()) {
-                bindNames[index] = keyBinding.getKey().getKey();
-                bindings[index] = keyBinding.getValue();
-                index++;
-            }
-            prefs.putStringArray("bindNames", bindNames);
-            prefs.putStringArray("bindings", bindings);
+            List<String> bindNames = newBindings.keySet().stream().map(KeyBinding::getKey).collect(Collectors.toList());
+            List<String> bindings = new ArrayList<>(newBindings.values());
+            prefs.putStringList(JabRefPreferences.BIND_NAMES, bindNames);
+            prefs.putStringList(JabRefPreferences.BINDINGS, bindings);
             keyBindingRepository.overwriteBindings(newBindings);
         }
     }
 
     private void restoreKeyBindings() {
         // First read the bindings, and their names.
-        String[] bindNames = prefs.getStringArray("bindNames");
-        String[] bindings = prefs.getStringArray("bindings");
+        List<String> bindNames = prefs.getStringList(JabRefPreferences.BIND_NAMES);
+        List<String> bindings = prefs.getStringList(JabRefPreferences.BINDINGS);
 
         // Then set up the key bindings HashMap.
-        if ((bindNames == null) || (bindings == null)
-                || (bindNames.length != bindings.length)) {
+        if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Nothing defined in Preferences, or something is wrong.
             keyBindingRepository = new KeyBindingRepository();
             return;
         }
 
-        for (int i = 0; i < bindNames.length; i++) {
-            keyBindingRepository.put(bindNames[i], bindings[i]);
+        for (int i = 0; i < bindNames.size(); i++) {
+            keyBindingRepository.put(bindNames.get(i), bindings.get(i));
         }
     }
 

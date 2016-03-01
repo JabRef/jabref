@@ -116,7 +116,10 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     public void enable(String typeName, boolean isChanged) {
         //String s = (String)list.getSelectedValue();
 
-        if (EntryTypes.getStandardType(typeName) != null) {
+        if (EntryTypes.getStandardType(typeName) == null) {
+            def.setEnabled(false);
+            remove.setEnabled(true);
+        } else {
 
             if (isChanged || (EntryTypes.getType(typeName) instanceof CustomEntryType)) {
                 def.setEnabled(true);
@@ -125,9 +128,6 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             }
 
             remove.setEnabled(false);
-        } else {
-            def.setEnabled(false);
-            remove.setEnabled(true);
         }
     }
 

@@ -23,8 +23,7 @@ class Cookie {
 
     private final String name;
     private final String value;
-    private final URI uri;
-    String domain;
+    private String domain;
     private Date expires;
     private String path;
 
@@ -45,7 +44,6 @@ class Cookie {
     public Cookie(URI uri, String header) {
         String[] attributes = header.split(";");
         String nameValue = attributes[0].trim();
-        this.uri = uri;
         this.name =
                 nameValue.substring(0, nameValue.indexOf('='));
         this.value =
@@ -69,8 +67,7 @@ class Cookie {
                     if (!value.startsWith(".")) {
                         value = '.' + value;
                     }
-                    uriDomain = uriDomain.substring(
-                            uriDomain.indexOf('.'));
+                    uriDomain = uriDomain.substring(uriDomain.indexOf('.'));
                     if (!uriDomain.equals(value) && !uriDomain.endsWith(value)
                             && !value.endsWith(uriDomain)) {
                         throw new IllegalArgumentException("Trying to set foreign cookie");
@@ -102,14 +99,6 @@ class Cookie {
         return now.after(expires);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public URI getURI() {
-        return uri;
-    }
-
     /**
      * Check if cookie isn't expired and if URI matches,
      * should cookie be included in response.
@@ -123,12 +112,13 @@ class Cookie {
             return false;
         }
 
-        String path = uri.getPath();
-        if (path == null) {
-            path = "/";
-        }
+        String uriPath = Optional.ofNullable(uri.getPath()).orElse("/");
 
-        return path.startsWith(this.path);
+        return uriPath.startsWith(this.path);
+    }
+
+    public boolean equalNameAndDomain(Cookie cookie) {
+        return ((domain.equals(cookie.domain)) && (name.equals(cookie.name)));
     }
 
     @Override

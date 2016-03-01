@@ -19,6 +19,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class ParserResult {
     public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
     private final BibDatabase base;
     private MetaData metaData;
-    private final HashMap<String, EntryType> entryTypes;
+    private final Map<String, EntryType> entryTypes;
 
     private File file;
     private final List<String> warnings = new ArrayList<>();
@@ -53,7 +54,7 @@ public class ParserResult {
         this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
     }
 
-    public ParserResult(BibDatabase base, MetaData metaData, HashMap<String, EntryType> entryTypes) {
+    public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
@@ -84,7 +85,7 @@ public class ParserResult {
         this.metaData = md;
     }
 
-    public HashMap<String, EntryType> getEntryTypes() {
+    public Map<String, EntryType> getEntryTypes() {
         return entryTypes;
     }
 

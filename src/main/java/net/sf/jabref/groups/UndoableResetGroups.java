@@ -27,7 +27,7 @@ class UndoableResetGroups extends AbstractUndoableEdit {
     /** A handle to the global groups root node */
     private final GroupTreeNode m_groupsRootHandle;
     private final GroupSelector m_groupSelector;
-    private boolean m_revalidate = true;
+    private boolean mRevalidate = true;
 
 
     public UndoableResetGroups(GroupSelector groupSelector,
@@ -59,7 +59,7 @@ class UndoableResetGroups extends AbstractUndoableEdit {
             m_groupsRootHandle.add(((GroupTreeNode) m_groupsBackup
                     .getChildAt(i)).deepCopy());
         }
-        if (m_revalidate) {
+        if (mRevalidate) {
             m_groupSelector.revalidateGroups();
         }
     }
@@ -69,7 +69,7 @@ class UndoableResetGroups extends AbstractUndoableEdit {
         super.redo();
         m_groupsRootHandle.removeAllChildren();
         m_groupsRootHandle.setGroup(new AllEntriesGroup());
-        if (m_revalidate) {
+        if (mRevalidate) {
             m_groupSelector.revalidateGroups();
         }
     }
@@ -79,6 +79,6 @@ class UndoableResetGroups extends AbstractUndoableEdit {
      * revalidated by this operation. Default is true.
      */
     public void setRevalidate(boolean revalidate) {
-        m_revalidate = revalidate;
+        mRevalidate = revalidate;
     }
 }

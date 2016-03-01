@@ -198,7 +198,7 @@ public class MetaData implements Iterable<String> {
             }
             dirs.add(dir);
         } else {
-            String dir = Globals.prefs.get(fieldName + "Directory");
+            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX);
             if (dir != null) {
                 dirs.add(dir);
             }
@@ -392,14 +392,12 @@ public class MetaData implements Iterable<String> {
         }
 
         // set new value if it is not a default value
-        Enumeration<String> allKeys = labelPattern.getAllKeys();
-        while (allKeys.hasMoreElements()) {
-            String key = allKeys.nextElement();
+        Set<String> allKeys = labelPattern.getAllKeys();
+        for (String key : allKeys) {
             String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
             if (!labelPattern.isDefaultValue(key)) {
-                ArrayList<String> value = labelPattern.getValue(key);
                 Vector<String> data = new Vector<>();
-                data.add(value.get(0));
+                data.add(labelPattern.getValue(key).get(0));
                 this.putData(metaDataKey, data);
             }
         }

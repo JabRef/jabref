@@ -106,9 +106,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                                     @Override
                                     public void scanResultsResolved(boolean resolved) {
-                                        if (!resolved) {
-                                            cancelled = true;
-                                        } else {
+                                        if (resolved) {
                                             panel.setUpdatedExternally(false);
                                             SwingUtilities.invokeLater(new Runnable() {
 
@@ -117,6 +115,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                                                     panel.getSidePaneManager().hide("fileUpdate");
                                                 }
                                             });
+                                        } else {
+                                            cancelled = true;
                                         }
                                     }
                                 });
@@ -180,12 +180,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (!FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
-                success = false;
-                fileLockedError = true;
-            }
-            else {
-                // Now save the database:
+            if (FileBasedLock.waitForFileLock(panel.getDatabaseFile(), 10)) {
+                // Save the database:
                 success = saveDatabase(panel.getDatabaseFile(), false, panel.getEncoding());
 
                 try {
@@ -195,6 +191,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                     // when doing a "Save as". Maybe we should change the monitor so no
                     // exception is cast.
                 }
+            } else {
+                // No file lock
+                success = false;
+                fileLockedError = true;
             }
             panel.setSaving(false);
             if (success) {
@@ -217,7 +217,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 fileLockedError = true;
                 return;
             }
-            ex2.printStackTrace();
+            LOGGER.error("Problem saving file", ex2);
         }
     }
 
@@ -225,12 +225,12 @@ public class SaveDatabaseAction extends AbstractWorker {
         SaveSession session;
         frame.block();
         try {
-            if (!selectedOnly) {
+            if (selectedOnly) {
+                session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file, Globals.prefs,
+                        panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
+            } else {
                 session = FileActions.saveDatabase(panel.database(), panel.metaData(), file,
                         Globals.prefs, false, false, encoding, false);
-            } else {
-                session = FileActions.savePartOfDatabase(panel.database(), panel.metaData(), file,
-                        Globals.prefs, panel.getSelectedEntries(), encoding, FileActions.DatabaseSaveType.DEFAULT);
             }
 
         } catch (UnsupportedCharsetException ex2) {
@@ -251,7 +251,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.mainTable.scrollTo(topShow);
                 panel.showEntry(ex.getEntry());
             } else {
-                ex.printStackTrace();
+                LOGGER.error("Problem saving file", ex);
             }
 
             JOptionPane.showMessageDialog
@@ -286,11 +286,11 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Localization.lang("Save database"),
  JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
-                if (choice != null) {
+                if (choice == null) {
+                    commit = false;
+                } else {
                     Charset newEncoding = Charset.forName((String) choice);
                     return saveDatabase(file, selectedOnly, newEncoding);
-                } else {
-                    commit = false;
                 }
             } else if (answer == JOptionPane.CANCEL_OPTION) {
                 commit = false;
@@ -388,7 +388,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             try {
                 panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getDatabaseFile()));
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOGGER.error("Problem registering file change notifications", ex);
             }
             frame.getFileHistory().newFile(panel.metaData().getFile().getPath());
         }

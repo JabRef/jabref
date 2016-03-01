@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.BibtexFields;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -52,7 +52,7 @@ public class FileActions {
     }
 
 
-    private static final Pattern refPat = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static BibtexString.Type previousStringType;
 
     private static final Log LOGGER = LogFactory.getLog(FileActions.class);
@@ -98,7 +98,8 @@ public class FileActions {
         }
     }
 
-    private static void writeString(Writer fw, BibtexString bs, HashMap<String, BibtexString> remaining, int maxKeyLength) throws IOException {
+    private static void writeString(Writer fw, BibtexString bs, Map<String, BibtexString> remaining, int maxKeyLength)
+            throws IOException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bs.getName());
 
@@ -113,7 +114,7 @@ public class FileActions {
         // that the string order will be acceptable for BibTeX.
         String content = bs.getContent();
         Matcher m;
-        while ((m = FileActions.refPat.matcher(content)).find()) {
+        while ((m = FileActions.REFERENCE_PATTERN.matcher(content)).find()) {
             String foundLabel = m.group(1);
             int restIndex = content.indexOf(foundLabel) + foundLabel.length();
             content = content.substring(restIndex);
@@ -131,7 +132,7 @@ public class FileActions {
 
         StringBuilder suffixSB = new StringBuilder();
         for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffixSB.append(" ");
+            suffixSB.append(' ');
         }
         String suffix = suffixSB.toString();
 
@@ -175,8 +176,6 @@ public class FileActions {
                                            boolean checkSearch, boolean checkGroup, Charset encoding, boolean suppressBackup)
             throws SaveException {
 
-        TreeMap<String, EntryType> types = new TreeMap<>();
-
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
         if (suppressBackup) {
             backup = false;
@@ -197,6 +196,8 @@ public class FileActions {
             throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
 
+        Map<String, EntryType> types = new TreeMap<>();
+
         // Get our data stream. This stream writes only to a temporary file,
         // until committed.
         try (VerifyingWriter writer = session.getWriter()) {
@@ -216,7 +217,7 @@ public class FileActions {
             // sorted as they appear on the screen.
             List<BibEntry> sorter = FileActions.getSortedEntries(database, metaData, null, true);
 
-            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+            BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry entry : sorter) {
                 exceptionCause = entry;
@@ -371,13 +372,6 @@ public class FileActions {
                                                  JabRefPreferences prefs, BibEntry[] bes, Charset encoding, DatabaseSaveType saveType)
             throws SaveException {
 
-        TreeMap<String, EntryType> types = new TreeMap<>(); // Map
-        // to
-        // collect
-        // entry
-        // type
-        // definitions
-        // that we must save along with entries using them.
 
         BibEntry be = null;
         boolean backup = prefs.getBoolean(JabRefPreferences.BACKUP);
@@ -388,6 +382,10 @@ public class FileActions {
         } catch (IOException e) {
             throw new SaveException(e.getMessage(), e.getLocalizedMessage());
         }
+
+        // Map to collect entry type definitions
+        // that we must save along with entries using them.
+        Map<String, EntryType> types = new TreeMap<>();
 
         // Define our data stream.
         try (VerifyingWriter fw = session.getWriter()) {
@@ -414,7 +412,7 @@ public class FileActions {
             Collections.addAll(sorter, bes);
             Collections.sort(sorter, new FieldComparatorStack<>(comparators));
 
-            BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), true);
+            BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
 
             for (BibEntry aSorter : sorter) {
                 be = aSorter;
@@ -524,12 +522,8 @@ public class FileActions {
             keySet = database.getKeySet();
         }
 
-        if (keySet != null) {
-            Iterator<String> i = keySet.iterator();
-
-            for (; i.hasNext(); ) {
-                sorter.add(database.getEntryById(i.next()));
-            }
+        for (String id : keySet) {
+            sorter.add(database.getEntryById(id));
         }
 
         Collections.sort(sorter, comparatorStack);

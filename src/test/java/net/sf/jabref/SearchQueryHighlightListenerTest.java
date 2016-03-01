@@ -23,9 +23,10 @@ import org.junit.Test;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
-import java.util.ArrayList;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
-public class SearchTextListenerTest {
+public class SearchQueryHighlightListenerTest {
 
     @Before
     public void setUp() throws Exception {
@@ -47,10 +48,7 @@ public class SearchTextListenerTest {
         //there is no area to highlight!
         Assert.assertEquals("Expected no highlighting area ", 0, highlight.length);
 
-        //set up arraylist with "word" and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight = new ArrayList<>();
-        wordsToHighlight.add(contentToHighlight1);
-        ta.searchText(wordsToHighlight);
+        ta.highlightPattern(Optional.of(Pattern.compile("Word")));
 
         highlighter = ta.getHighlighter();
         highlight = highlighter.getHighlights();
@@ -64,8 +62,7 @@ public class SearchTextListenerTest {
         Assert.assertEquals(content.indexOf(contentToHighlight1) + contentToHighlight1.length(), highlight[0].getEndOffset());
 
         //add another word "content" and refresh highlighting
-        wordsToHighlight.add(contentToHighlight2);
-        ta.searchText(wordsToHighlight);
+        ta.highlightPattern(Optional.of(Pattern.compile("(Word|Content)")));
         highlighter = ta.getHighlighter();
         highlight = highlighter.getHighlights();
 
@@ -79,8 +76,7 @@ public class SearchTextListenerTest {
         Assert.assertEquals(content.indexOf(contentToHighlight2) + contentToHighlight2.length(), highlight[1].getEndOffset());
 
         //remove everything and check if highlighting is vanished
-        wordsToHighlight.clear();
-        ta.searchText(wordsToHighlight);
+        ta.highlightPattern(Optional.empty());
         highlighter = ta.getHighlighter();
         highlight = highlighter.getHighlights();
 
@@ -90,39 +86,29 @@ public class SearchTextListenerTest {
 
     @Test
     public void testHighlightingContentIndependence() {
-
         String content = "Test Word Content";
-        String contentToHighlight1 = "Word";
-
         TextArea ta = new TextArea("", content);
-
         String textOne = ta.getText();
 
-        //set up arraylist with "word" and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight = new ArrayList<>();
-        wordsToHighlight.add(contentToHighlight1);
-        ta.searchText(wordsToHighlight);
+        ta.highlightPattern(Optional.of((Pattern.compile("Word"))));
 
         String textTwo = ta.getText();
+        Assert.assertEquals("Highlighting may not change content", textOne, textTwo);
 
         //set up empty arraylist and inform the fieldtextarea
-        ArrayList<String> wordsToHighlight2 = new ArrayList<>();
-        ta.searchText(wordsToHighlight2);
+        ta.highlightPattern(Optional.empty());
 
         String textThree = ta.getText();
-
-        Assert.assertEquals("Highlighting may not change content", textOne, textTwo);
         Assert.assertEquals("Highlighting may not change content", textOne, textThree);
     }
 
     @Test
     public void testHighlightingInvalidParameter() {
-
         String content = "Test Word Content";
 
         TextArea ta = new TextArea("", content);
 
         //should not matter at all
-        ta.searchText(null);
+        ta.highlightPattern(null);
     }
 }

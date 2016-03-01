@@ -95,30 +95,7 @@ class EntryEditorTab {
     private void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
                             boolean compressed, String title) {
 
-        InputMap inputMap = panel.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap actionMap = panel.getActionMap();
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
-        actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
-        actionMap.put("next", parent.nextEntryAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("right", parent.switchRightAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", parent.helpAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", parent.saveDatabaseAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
-        actionMap.put("nexttab", parent.frame.nextTab);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
-        actionMap.put("prevtab", parent.frame.prevTab);
+        setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
         panel.setName(title);
         // Use the title for the scrollPane, too.
@@ -159,7 +136,7 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(fields[i], null);
-                bPanel.getSearchBar().getSearchTextObservable().addSearchListener((TextArea) fieldEditor);
+                bPanel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
@@ -200,8 +177,7 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent
-.getEntry().getCiteKey(), true);
+            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true);
             setupJTextComponent(textField, null);
 
             editors.put("bibtexkey", textField);
@@ -359,6 +335,30 @@ class EntryEditorTab {
         return tabTitle;
     }
 
+    private void setupKeyBindings(final InputMap inputMap, final ActionMap actionMap) {
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
+        actionMap.put("prev", parent.prevEntryAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
+        actionMap.put("next", parent.nextEntryAction);
+
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
+        actionMap.put("store", parent.storeFieldAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
+        actionMap.put("left", parent.switchLeftAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
+        actionMap.put("right", parent.switchRightAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
+        actionMap.put("help", parent.helpAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
+        actionMap.put("save", parent.saveDatabaseAction);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
+        actionMap.put("nexttab", parent.frame.nextTab);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
+        actionMap.put("prevtab", parent.frame.prevTab);
+    }
+
     /**
      * Set up key bindings and focus listener for the FieldEditor.
      *
@@ -382,31 +382,7 @@ class EntryEditorTab {
             component.addFocusListener(fieldListener);
         }
 
-        InputMap inputMap = component.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap actionMap = component.getActionMap();
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
-        actionMap.put("prev", parent.prevEntryAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
-        actionMap.put("next", parent.nextEntryAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", parent.storeFieldAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("left", parent.switchLeftAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("right", parent.switchRightAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", parent.helpAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", parent.saveDatabaseAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
-        actionMap.put("nexttab", parent.frame.nextTab);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
-        actionMap.put("prevtab", parent.frame.prevTab);
-
+        setupKeyBindings(component.getInputMap(JComponent.WHEN_FOCUSED), component.getActionMap());
 
         HashSet<AWTKeyStroke> keys = new HashSet<>(component
                 .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));

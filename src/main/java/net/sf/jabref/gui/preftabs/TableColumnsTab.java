@@ -18,12 +18,12 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -52,7 +52,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JTable colSetup;
     private int rowCount = -1;
     private int ncWidth = -1;
-    private final Vector<TableRow> tableRows = new Vector<>(10);
+    private final List<TableRow> tableRows = new ArrayList<>(10);
     private final JabRefFrame frame;
 
     private final JCheckBox urlColumn;
@@ -60,21 +60,21 @@ class TableColumnsTab extends JPanel implements PrefsTab {
     private final JCheckBox arxivColumn;
 
     private final JCheckBox extraFileColumns;
-    private JList<String> listOfFileColumns;
+    private final JList<String> listOfFileColumns;
 
     private final JRadioButton preferUrl;
     private final JRadioButton preferDoi;
 
     /*** begin: special fields ***/
     private final JCheckBox specialFieldsEnabled;
-    private JCheckBox rankingColumn;
-    private JCheckBox qualityColumn;
-    private JCheckBox priorityColumn;
-    private JCheckBox relevanceColumn;
-    private JCheckBox printedColumn;
-    private JCheckBox readStatusColumn;
-    private JRadioButton syncKeywords;
-    private JRadioButton writeSpecialFields;
+    private final JCheckBox rankingColumn;
+    private final JCheckBox qualityColumn;
+    private final JCheckBox priorityColumn;
+    private final JCheckBox relevanceColumn;
+    private final JCheckBox printedColumn;
+    private final JCheckBox readStatusColumn;
+    private final JRadioButton syncKeywords;
+    private final JRadioButton writeSpecialFields;
     private boolean oldSpecialFieldsEnabled;
     private boolean oldRankingColumn;
     private boolean oldQualityColumn;
@@ -90,8 +90,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     static class TableRow {
 
-        String name;
-        int length;
+        private String name;
+        private int length;
 
 
         public TableRow(String name) {
@@ -106,6 +106,22 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         public TableRow(String name, int length) {
             this.name = name;
+            this.length = length;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public void setLength(int length) {
             this.length = length;
         }
     }
@@ -142,16 +158,16 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if (row >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.elementAt(row);
+                Object rowContent = tableRows.get(row);
                 if (rowContent == null) {
                     return "";
                 }
                 TableRow tr = (TableRow) rowContent;
-                switch (column) {
-                case 0:
-                    return tr.name;
-                default: // Only two columns
-                    return tr.length > 0 ? Integer.toString(tr.length) : "";
+                // Only two columns
+                if (column == 0) {
+                    return tr.getName();
+                } else {
+                    return tr.getLength() > 0 ? Integer.toString(tr.getLength()) : "";
                 }
             }
 
@@ -187,19 +203,19 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     return;
                 }
 
-                TableRow rowContent = tableRows.elementAt(row - 1);
+                TableRow rowContent = tableRows.get(row - 1);
 
                 if (col == 0) {
-                    rowContent.name = value.toString();
+                    rowContent.setName(value.toString());
                     if ("".equals(getValueAt(row, 1))) {
-                        setValueAt("" + GUIGlobals.DEFAULT_FIELD_LENGTH, row, 1);
+                        setValueAt(String.valueOf(GUIGlobals.DEFAULT_FIELD_LENGTH), row, 1);
                     }
                 }
                 else {
                     if (value == null) {
-                        rowContent.length = -1;
+                        rowContent.setLength(-1);
                     } else {
-                        rowContent.length = Integer.parseInt(value.toString());
+                        rowContent.setLength(Integer.parseInt(value.toString()));
                     }
                 }
             }
@@ -372,7 +388,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         extraFileColumns.setSelected(prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS));
         if (extraFileColumns.isSelected()) {
-            String[] desiredColumns = prefs.getStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS);
+            List<String> desiredColumns = prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             int listSize = listOfFileColumns.getModel().getSize();
             int[] indicesToSelect = new int[listSize];
             for (int i = 0; i < listSize; i++) {
@@ -424,13 +440,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** end: special fields ***/
 
         tableRows.clear();
-        String[] names = prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
-        String[] lengths = prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
-        for (int i = 0; i < names.length; i++) {
-            if (i < lengths.length) {
-                tableRows.add(new TableRow(names[i], Integer.parseInt(lengths[i])));
+        List<String> names = prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> lengths = prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
+        for (int i = 0; i < names.size(); i++) {
+            if (i < lengths.size()) {
+                tableRows.add(new TableRow(names.get(i), Integer.parseInt(lengths.get(i))));
             } else {
-                tableRows.add(new TableRow(names[i]));
+                tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
@@ -613,8 +629,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
                 @Override
                 public int compare(TableRow o1, TableRow o2) {
-                    Integer n1 = map.get(o1.name);
-                    Integer n2 = map.get(o2.name);
+                    Integer n1 = map.get(o1.getName());
+                    Integer n2 = map.get(o2.getName());
                     if ((n1 == null) || (n2 == null)) {
                         return 0;
                     }
@@ -646,12 +662,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 try {
                     String name = panel.mainTable.getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
-                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).toLowerCase().equals(name)) {
+                    if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);
                     } else { // Doesn't match; search for a matching col in our table
                         for (int j = 0; j < colSetup.getRowCount(); j++) {
-                            if ((j < tableRows.size()) &&
-                                    ((String) colSetup.getValueAt(j, 0)).toLowerCase().equals(name)) {
+                            if ((j < tableRows.size()) && ((String) colSetup.getValueAt(j, 0)).equalsIgnoreCase(name)) {
                                 colSetup.setValueAt(String.valueOf(width), j, 1);
                                 break;
                             }
@@ -682,15 +697,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         prefs.putBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS, extraFileColumns.isSelected());
         if (extraFileColumns.isSelected() && !listOfFileColumns.isSelectionEmpty()) {
-            String[] selections = new String[listOfFileColumns.getSelectedIndices().length];
-            for (int i = 0; i < selections.length; i++) {
-                selections[i] = listOfFileColumns.getModel().getElementAt(
-                        listOfFileColumns.getSelectedIndices()[i]);
+            int numberSelected = listOfFileColumns.getSelectedIndices().length;
+            List<String> selections = new ArrayList<>(numberSelected);
+            for (int i = 0; i < numberSelected; i++) {
+                selections.add(listOfFileColumns.getModel().getElementAt(listOfFileColumns.getSelectedIndices()[i]));
             }
-            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
-        }
-        else {
-            prefs.putStringArray(JabRefPreferences.LIST_OF_FILE_COLUMNS, new String[]{});
+            prefs.putStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS, selections);
+        } else {
+            prefs.putStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS, new ArrayList<>());
         }
 
         /*** begin: special fields ***/
@@ -752,28 +766,27 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.isEmpty()) {
-                    tableRows.removeElementAt(i);
+                if (tableRows.get(i).getName().isEmpty()) {
+                    tableRows.remove(i);
                 } else {
                     i++;
                 }
             }
             // Then we make arrays
-            String[] names = new String[tableRows.size()];
-            String[] widths = new String[tableRows.size()];
-            int[] nWidths = new int[tableRows.size()];
+            List<String> names = new ArrayList<>(tableRows.size());
+            List<String> widths = new ArrayList<>(tableRows.size());
+            List<Integer> nWidths = new ArrayList<>(tableRows.size());
 
             prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
-            for (i = 0; i < tableRows.size(); i++) {
-                TableRow tr = tableRows.elementAt(i);
-                names[i] = tr.name.toLowerCase();
-                nWidths[i] = tr.length;
-                widths[i] = String.valueOf(tr.length);
+            for (TableRow tr : tableRows) {
+                names.add(tr.getName().toLowerCase());
+                nWidths.add(tr.getLength());
+                widths.add(String.valueOf(tr.getLength()));
             }
 
             // Finally, we store the new preferences.
-            prefs.putStringArray(JabRefPreferences.COLUMN_NAMES, names);
-            prefs.putStringArray(JabRefPreferences.COLUMN_WIDTHS, widths);
+            prefs.putStringList(JabRefPreferences.COLUMN_NAMES, names);
+            prefs.putStringList(JabRefPreferences.COLUMN_WIDTHS, widths);
         }
 
     }

@@ -19,6 +19,7 @@ public class IntegrityCheck {
     public static final Checker TITLE_CHECKER = new TitleChecker();
     public static final Checker BRACKET_CHECKER = new BracketChecker();
     public static final Checker PAGES_CHECKER = new PagesChecker();
+    public static final Checker URL_CHECKER = new UrlChecker();
 
     public List<IntegrityMessage> checkBibtexDatabase(BibDatabase base) {
         List<IntegrityMessage> result = new ArrayList<>();
@@ -69,12 +70,27 @@ public class IntegrityCheck {
             PAGES_CHECKER.check(data.toString(), "pages", entry, result);
         }
 
+        data = entry.getField("url");
+        if (data != null) {
+            URL_CHECKER.check(data.toString(), "url", entry, result);
+        }
+
         return result;
     }
 
-    public static interface Checker {
+    public interface Checker {
 
         void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector);
+    }
+
+    private static class UrlChecker implements Checker {
+
+        @Override
+        public void check(String value, String fieldName, BibEntry entry, List<IntegrityMessage> collector) {
+            if(!value.contains("://")) {
+                collector.add(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, fieldName));
+            }
+        }
     }
 
     private static class AuthorNameChecker implements Checker {

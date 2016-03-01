@@ -35,7 +35,6 @@ class EntryDeleteChange extends Change {
 
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
-    BibEntry diskEntry;
     private final JScrollPane sp;
 
     private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
@@ -51,7 +50,7 @@ class EntryDeleteChange extends Change {
         double matchWithTmp = DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry);
 
         // Check if it has been modified locally, since last tempfile was saved.
-        boolean isModifiedLocally = !(matchWithTmp > 1);
+        boolean isModifiedLocally = (matchWithTmp <= 1);
 
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally);
 
@@ -61,14 +60,14 @@ class EntryDeleteChange extends Change {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        panel.database().removeEntry(memEntry.getId());
+        panel.database().removeEntry(memEntry);
         undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
-        secondary.removeEntry(tmpEntry.getId());
+        secondary.removeEntry(tmpEntry);
         return true;
     }
 
     @Override
-    JComponent description() {
+    public JComponent description() {
         return sp;
     }
 }

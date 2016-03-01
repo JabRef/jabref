@@ -93,9 +93,9 @@ public class ScienceDirect implements FullTextFinder {
                     sciLink = link.getString("@href");
                 }
             }
+            return sciLink;
         } catch(JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
-        } finally {
             return sciLink;
         }
     }

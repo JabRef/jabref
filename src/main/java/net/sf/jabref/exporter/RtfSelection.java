@@ -31,10 +31,8 @@ class RtfSelection implements Transferable {
     public RtfSelection(String s) {
         content = s;
         try {
-            rtfFlavor = new DataFlavor
-                    ("text/rtf; class=java.io.InputStream");
-            supportedFlavors = new DataFlavor[]
-            {rtfFlavor, DataFlavor.stringFlavor};
+            rtfFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
+            supportedFlavors = new DataFlavor[] {rtfFlavor, DataFlavor.stringFlavor};
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -47,8 +45,7 @@ class RtfSelection implements Transferable {
     }
 
     @Override
-    public java.awt.datatransfer.DataFlavor[] getTransferDataFlavors() {
-        //System.out.println("..");
+    public DataFlavor[] getTransferDataFlavors() {
         return supportedFlavors;
     }
 
@@ -57,10 +54,8 @@ class RtfSelection implements Transferable {
             throws UnsupportedFlavorException, IOException {
 
         if (flavor.equals(DataFlavor.stringFlavor)) {
-            //System.out.println("Delivering string data.");
             return content;
         } else if (flavor.equals(rtfFlavor)) {
-            //System.out.println("Delivering rtf data.");
             byte[] byteArray = content.getBytes();
             return new ByteArrayInputStream(byteArray);
         }

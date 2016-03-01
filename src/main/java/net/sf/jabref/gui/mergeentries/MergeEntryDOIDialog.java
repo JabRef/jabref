@@ -25,7 +25,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -45,7 +44,6 @@ import com.jgoodies.forms.layout.ColumnSpec;
 public class MergeEntryDOIDialog extends JDialog {
 
     private final BasePanel panel;
-    private final JabRefFrame frame;
     private final CellConstraints cc = new CellConstraints();
     private BibEntry originalEntry;
     private BibEntry doiEntry;
@@ -55,15 +53,16 @@ public class MergeEntryDOIDialog extends JDialog {
 
     private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
 
+    private static final String MARGIN = "5px";
+
 
     public MergeEntryDOIDialog(BasePanel panel) {
         super(panel.frame(), Localization.lang("Merge entry with DOI information"), true);
 
         this.panel = panel;
-        this.frame = panel.frame();
 
         if (panel.getSelectedEntries().length != 1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Select one entry."),
+            JOptionPane.showMessageDialog(panel.frame(), Localization.lang("Select one entry."),
                     Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
@@ -75,7 +74,8 @@ public class MergeEntryDOIDialog extends JDialog {
 
         if (this.doiEntry == null) {
             panel.output("");
-            JOptionPane.showMessageDialog(frame, Localization.lang("Cannot get info based on given DOI: %0", this.originalEntry.getField("doi")),
+            JOptionPane.showMessageDialog(panel.frame(),
+                    Localization.lang("Cannot get info based on given DOI: %0", this.originalEntry.getField("doi")),
                     Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
@@ -120,10 +120,10 @@ public class MergeEntryDOIDialog extends JDialog {
         this.add(bb.getPanel(), cc.xy(1, 5));
 
         // Add some margin around the layout
-        layout.appendRow(RowSpec.decode("5px"));
-        layout.appendColumn(ColumnSpec.decode("5px"));
-        layout.insertRow(1, RowSpec.decode("5px"));
-        layout.insertColumn(1, ColumnSpec.decode("5px"));
+        layout.appendRow(RowSpec.decode(MARGIN));
+        layout.appendColumn(ColumnSpec.decode(MARGIN));
+        layout.insertRow(1, RowSpec.decode(MARGIN));
+        layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
         pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,

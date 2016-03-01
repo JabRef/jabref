@@ -1,10 +1,7 @@
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.gui.BibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
-
 import javax.swing.*;
 import java.util.*;
 
@@ -47,7 +44,7 @@ public class MainTableColumn {
     /**
      * Get the table column name to be displayed in the UI
      *
-     * @return name to be displayed
+     * @return name to be displayed. null if field is empty.
      */
     public String getDisplayName() {
         if (bibtexFields.isEmpty()) {
@@ -55,13 +52,8 @@ public class MainTableColumn {
         }
 
         StringJoiner joiner = new StringJoiner(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-        for(String field : bibtexFields) {
-            String fieldDisplayName = BibtexFields.getFieldDisplayName(field);
-            if (fieldDisplayName != null) {
-                joiner.add(fieldDisplayName);
-            } else {
-                joiner.add(EntryUtil.capitalizeFirst(field));
-            }
+        for (String field : bibtexFields) {
+            joiner.add(field);
         }
         return joiner.toString();
     }
@@ -93,7 +85,7 @@ public class MainTableColumn {
     }
 
     public Object getColumnValue(BibEntry entry) {
-        if(bibtexFields.isEmpty()) {
+        if (bibtexFields.isEmpty()) {
             return null;
         }
 
@@ -120,7 +112,7 @@ public class MainTableColumn {
     }
 
     public JLabel getHeaderLabel() {
-        if(isIconColumn) {
+        if (isIconColumn) {
             return iconLabel.get();
         } else {
             return new JLabel(getDisplayName());

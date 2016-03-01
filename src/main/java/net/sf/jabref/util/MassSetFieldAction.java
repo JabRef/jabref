@@ -20,8 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.TreeSet;
-
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -62,7 +61,6 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JTextField renameTo;
     private boolean cancelled = true;
     private JCheckBox overwrite;
-    private TreeSet<String> allFields;
 
 
     public MassSetFieldAction(JabRefFrame frame) {
@@ -90,7 +88,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
 
-        allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
+        Set<String> allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
 
         for (String f : allFields) {
             field.addItem(f);

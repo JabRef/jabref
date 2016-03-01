@@ -64,9 +64,9 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Vector;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -188,7 +188,7 @@ class FontSelector extends JButton {
         @Override
         public void actionPerformed(ActionEvent evt) {
             Optional<Font> font = new FontSelectorDialog(FontSelector.this, getFont()).getSelectedFont();
-            font.ifPresent(f -> setFont(f));
+            font.ifPresent(FontSelector.this::setFont);
         }
     }
 
@@ -204,6 +204,25 @@ public class FontSelectorDialog extends JDialog {
     private static final String ITALIC = "italic";
 
 
+    // private members
+    private boolean isOK;
+    private final JTextField familyField;
+    private final JList<String> familyList;
+    private final JTextField sizeField;
+    private final JList<String> sizeList;
+    private final JTextField styleField;
+    private final JList<String> styleList;
+    private final JLabel preview;
+    private final JButton ok;
+    private final JButton cancel;
+
+    /**
+     * For some reason the default Java fonts show up in the
+     * list with .bold, .bolditalic, and .italic extensions.
+     */
+    private static final String[] HIDEFONTS = {".bold", ".italic"};
+
+
     public FontSelectorDialog(Component comp, Font font) {
 
         //super(JOptionPane.getFrameForComponent(comp),jpicedt.Localizer.currentLocalizer().get("widget.FontSelector"),true); //
@@ -214,10 +233,8 @@ public class FontSelectorDialog extends JDialog {
 
         JPanel listPanel = new JPanel(new GridLayout(1, 3, 6, 6));
 
-        JPanel familyPanel = createTextFieldAndListPanel(
-                Localization.lang("Font Family"),
-                familyField = new JTextField(),
-                familyList = new JList<>(getFontList()));
+        JPanel familyPanel = createTextFieldAndListPanel(Localization.lang("Font Family"),
+                familyField = new JTextField(), familyList = new JList<>(getFontList()));
         listPanel.add(familyPanel);
 
         String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
@@ -321,7 +338,7 @@ public class FontSelectorDialog extends JDialog {
         int size;
         try {
             size = Integer.parseInt(sizeField.getText());
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             size = 14;
         }
 
@@ -329,34 +346,16 @@ public class FontSelectorDialog extends JDialog {
     }
 
 
-    // private members
-    private boolean isOK;
-    private final JTextField familyField;
-    private final JList<String> familyList;
-    private final JTextField sizeField;
-    private final JList<String> sizeList;
-    private final JTextField styleField;
-    private final JList<String> styleList;
-    private final JLabel preview;
-    private final JButton ok;
-    private final JButton cancel;
-
-    /**
-     * For some reason the default Java fonts show up in the
-     * list with .bold, .bolditalic, and .italic extensions.
-     */
-    private static final String[] HIDEFONTS = {".bold", ".italic"};
-
 
     // [pending] from GeneralCustomizer :
     // GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()
     private static String[] getFontList() {
         try {
-            Class<?> GEClass = Class.forName("java.awt.GraphicsEnvironment");
-            Object GEInstance = GEClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
+            Class<?> geClass = Class.forName("java.awt.GraphicsEnvironment");
+            Object geInstance = geClass.getMethod("getLocalGraphicsEnvironment").invoke(null);
 
-            String[] nameArray = (String[]) GEClass.getMethod("getAvailableFontFamilyNames").invoke(GEInstance);
-            Vector<String> nameVector = new Vector<>(nameArray.length);
+            String[] nameArray = (String[]) geClass.getMethod("getAvailableFontFamilyNames").invoke(geInstance);
+            List<String> nameList = new ArrayList<>(nameArray.length);
 
             for (int i = 0, j; i < nameArray.length; i++) {
                 for (j = 0; j < FontSelectorDialog.HIDEFONTS.length; j++) {
@@ -366,13 +365,11 @@ public class FontSelectorDialog extends JDialog {
                 }
 
                 if (j == FontSelectorDialog.HIDEFONTS.length) {
-                    nameVector.addElement(nameArray[i]);
+                    nameList.add(nameArray[i]);
                 }
             }
-
-            String[] _array = new String[nameVector.size()];
-            nameVector.copyInto(_array);
-            return _array;
+            String[] resultArray = new String[nameList.size()];
+            return nameList.toArray(resultArray);
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InvocationTargetException |
                 IllegalAccessException | IllegalArgumentException ex) {
             return null;//return Toolkit.getDefaultToolkit().getFontList();
@@ -389,7 +386,7 @@ public class FontSelectorDialog extends JDialog {
         cons.fill = GridBagConstraints.BOTH;
         cons.weightx = 1.0f;
 
-        JLabel _label = new JLabel(label);
+        final JLabel _label = new JLabel(label);
         layout.setConstraints(_label, cons);
         panel.add(_label);
 
@@ -422,7 +419,7 @@ public class FontSelectorDialog extends JDialog {
         int size;
         try {
             size = Integer.parseInt(sizeField.getText());
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             size = 14;
         }
         int style = styleList.getSelectedIndex();
@@ -434,9 +431,9 @@ public class FontSelectorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent evt) {
-            if (evt.getSource() == ok) {
+            if (ok.equals(evt.getSource())) {
                 ok();
-            } else if (evt.getSource() == cancel) {
+            } else if (cancel.equals(evt.getSource())) {
                 cancel();
             }
         }
@@ -448,19 +445,17 @@ public class FontSelectorDialog extends JDialog {
         public void valueChanged(ListSelectionEvent evt)
         {
             Object source = evt.getSource();
-            if (source == familyList) {
+            if (familyList.equals(source)) {
                 String family = familyList.getSelectedValue();
                 if (family != null) {
                     familyField.setText(family);
                 }
-            }
-            else if (source == sizeList) {
+            } else if (sizeList.equals(source)) {
                 String size = sizeList.getSelectedValue();
                 if (size != null) {
                     sizeField.setText(size);
                 }
-            }
-            else if (source == styleList) {
+            } else if (styleList.equals(source)) {
                 String style = styleList.getSelectedValue();
                 if (style != null) {
                     styleField.setText(style);
@@ -469,10 +464,4 @@ public class FontSelectorDialog extends JDialog {
             updatePreview();
         }
     }
-    /*public static void main(String args[])
-        {
-            Font font = new FontSelectorDialog(null,new Font("Times",Font.PLAIN,12)).getSelectedFont();
-
-        }
-     */
 }

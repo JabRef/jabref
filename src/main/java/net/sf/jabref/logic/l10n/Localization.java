@@ -9,8 +9,6 @@ import java.util.*;
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    private static final Locale defaultLocale = Locale.getDefault();
-
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
 
@@ -65,7 +63,7 @@ public class Localization {
             LOGGER.warn("Warning: could not get " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
         }
-        if (translation == null || translation.isEmpty()) {
+        if ((translation == null) || translation.isEmpty()) {
             LOGGER.warn("Warning: no " + idForErrorMessage + " translation for \"" + key + "\" for locale "
                     + Locale.getDefault());
 

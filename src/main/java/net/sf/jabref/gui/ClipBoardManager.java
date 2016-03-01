@@ -37,7 +37,7 @@ public class ClipBoardManager implements ClipboardOwner {
 
     private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
-    public static final ClipBoardManager clipBoard = new ClipBoardManager();
+    public static final ClipBoardManager CLIPBOARD = new ClipBoardManager();
 
     /**
      * Empty implementation of the ClipboardOwner interface.

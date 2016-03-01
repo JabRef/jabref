@@ -35,7 +35,7 @@ import net.sf.jabref.sql.SQLUtil;
  *  			Created after a refactory on SQLUtil
  *
  */
-public class MySQLImporter extends DBImporter {
+final public class MySQLImporter extends DBImporter {
 
     private static MySQLImporter instance;
 

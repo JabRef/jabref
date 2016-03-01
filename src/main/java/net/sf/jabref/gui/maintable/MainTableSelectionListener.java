@@ -89,8 +89,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 new PreviewPanel(panel.database(), null, panel, panel.metaData(), Globals.prefs
                         .get(JabRefPreferences.PREVIEW_1), true)};
 
-        panel.getSearchBar().getSearchTextObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchTextObservable().addSearchListener(previewPanel[1]);
+        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
+        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
 
         this.preview = previewPanel[activePreview];
     }
@@ -117,12 +117,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         Object newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
-                if (newSelected != null) {
-                    return; // More than one new selected. Do nothing.
-                } else {
+                if (newSelected == null) {
                     if (e.getIndex() < selected.size()) {
                         newSelected = selected.get(e.getIndex());
                     }
+                } else {
+                    return; // More than one new selected. Do nothing.
                 }
 
             }
@@ -229,7 +229,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         // Check if the user has right-clicked. If so, open the right-click menu.
         if (e.isPopupTrigger() || (e.getButton() == MouseEvent.BUTTON3)) {
-            if (modelColumn == null || !modelColumn.isIconColumn()) {
+            if ((modelColumn == null) || !modelColumn.isIconColumn()) {
                 // show normal right click menu
                 processPopupTrigger(e, row);
             } else {
@@ -248,7 +248,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     public void mouseClicked(MouseEvent e) {
 
         // First find the column on which the user has clicked.
-        final int col = table.columnAtPoint(e.getPoint());
         final int row = table.rowAtPoint(e.getPoint());
 
         // A double click on an entry should open the entry's editor.
@@ -258,6 +257,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             return;
         }
 
+        final int col = table.columnAtPoint(e.getPoint());
         // get the MainTableColumn which is currently visible at col
         int modelIndex = table.getColumnModel().getColumn(col).getModelIndex();
         MainTableColumn modelColumn = table.getMainTableColumn(modelIndex);
@@ -270,7 +270,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if(modelColumn.isIconColumn() && SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null) {
+        if(modelColumn.isIconColumn() && (SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(modelColumn.getColumnName())!=null)) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -422,16 +422,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                 } else {
                     SpecialField specialField = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(column.getColumnName());
-                    if (specialField != null) {
-                        // full pop should be shown as left click already shows short popup
-                        showDefaultPopup = true;
-                    } else {
+                    if (specialField == null) {
                         String content = entry.getField(field);
                         if (content != null) {
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content,
                                     GUIGlobals.getTableIcon(field).getIcon(), panel.metaData(), field));
                             showDefaultPopup = false;
                         }
+                    } else {
+                        // full pop should be shown as left click already shows short popup
+                        showDefaultPopup = true;
                     }
                 }
             }
@@ -466,12 +466,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     public void setPreviewActive(boolean enabled) {
         previewActive = enabled;
-        if (!previewActive) {
-            panel.hideBottomComponent();
-        } else {
+        if (previewActive) {
             if (!table.getSelected().isEmpty()) {
                 updatePreview(table.getSelected().get(0), false);
             }
+        } else {
+            panel.hideBottomComponent();
         }
     }
 
@@ -503,7 +503,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 //&& !e.isControlDown() && !e.isAltDown() && !e.isMetaDown()) {
                 && (e.getModifiers() == 0)) {
             long time = System.currentTimeMillis();
-            long QUICK_JUMP_TIMEOUT = 2000;
+            final long QUICK_JUMP_TIMEOUT = 2000;
             if ((time - lastPressedTime) > QUICK_JUMP_TIMEOUT)
              {
                 lastPressedCount = 0; // Reset last pressed character

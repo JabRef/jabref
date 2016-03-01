@@ -18,10 +18,10 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
@@ -45,25 +45,27 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
 
 
+    private boolean tableChanged;
+
+    private final JTable table;
+
+    private int rowCount = -1;
+
+    private final List<TableRow> tableRows = new ArrayList<>(10);
+
+
     public static Map<String, String> getNameFormatters() {
 
         Map<String, String> result = new HashMap<>();
 
-        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
 
-        if (names == null) {
-            names = new String[] {};
-        }
-        if (formats == null) {
-            formats = new String[] {};
-        }
-
-        for (int i = 0; i < names.length; i++) {
-            if (i < formats.length) {
-                result.put(names[i], formats[i]);
+        for (int i = 0; i < names.size(); i++) {
+            if (i < formats.size()) {
+                result.put(names.get(i), formats.get(i));
             } else {
-                result.put(names[i], NameFormatter.DEFAULT_FORMAT);
+                result.put(names.get(i), NameFormatter.DEFAULT_FORMAT);
             }
         }
 
@@ -71,20 +73,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     }
 
 
-    private boolean tableChanged;
-
-    private final JTable table;
-
-    private int rowCount = -1;
-
-    private final Vector<TableRow> tableRows = new Vector<>(10);
-
-
     static class TableRow {
 
-        String name;
+        private String name;
 
-        String format;
+        private String format;
 
 
         public TableRow() {
@@ -97,6 +90,22 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
         public TableRow(String name, String format) {
             this.name = name;
+            this.format = format;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+
+        public void setFormat(String format) {
             this.format = format;
         }
     }
@@ -126,15 +135,15 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                 if (row >= tableRows.size()) {
                     return "";
                 }
-                TableRow tr = tableRows.elementAt(row);
+                TableRow tr = tableRows.get(row);
                 if (tr == null) {
                     return "";
                 }
-                switch (column) {
-                case 0:
-                    return tr.name;
-                default: // Only two columns
-                    return tr.format;
+                // Only two columns
+                if (column == 0) {
+                    return tr.getName();
+                } else {
+                    return tr.getFormat();
                 }
             }
 
@@ -163,12 +172,12 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
                     tableRows.add(new TableRow());
                 }
 
-                TableRow rowContent = tableRows.elementAt(row);
+                TableRow rowContent = tableRows.get(row);
 
                 if (col == 0) {
-                    rowContent.name = value.toString();
+                    rowContent.setName(value.toString());
                 } else {
-                    rowContent.format = value.toString();
+                    rowContent.setFormat(value.toString());
                 }
             }
         };
@@ -217,21 +226,14 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        String[] names = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATER_KEY);
-        String[] formats = Globals.prefs.getStringArray(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
 
-        if (names == null) {
-            names = new String[] {};
-        }
-        if (formats == null) {
-            formats = new String[] {};
-        }
-
-        for (int i = 0; i < names.length; i++) {
-            if (i < formats.length) {
-                tableRows.add(new TableRow(names[i], formats[i]));
+        for (int i = 0; i < names.size(); i++) {
+            if (i < formats.size()) {
+                tableRows.add(new TableRow(names.get(i), formats.get(i)));
             } else {
-                tableRows.add(new TableRow(names[i]));
+                tableRows.add(new TableRow(names.get(i)));
             }
         }
         rowCount = tableRows.size() + 5;
@@ -324,25 +326,25 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             // First we remove all rows with empty names.
             int i = 0;
             while (i < tableRows.size()) {
-                if (tableRows.elementAt(i).name.isEmpty()) {
-                    tableRows.removeElementAt(i);
+                if (tableRows.get(i).getName().isEmpty()) {
+                    tableRows.remove(i);
                 } else {
                     i++;
                 }
             }
-            // Then we make arrays
-            String[] names = new String[tableRows.size()];
-            String[] formats = new String[tableRows.size()];
+            // Then we make lists
 
-            for (i = 0; i < tableRows.size(); i++) {
-                TableRow tr = tableRows.elementAt(i);
-                names[i] = tr.name;
-                formats[i] = tr.format;
+            List<String> names = new ArrayList<>(tableRows.size());
+            List<String> formats = new ArrayList<>(tableRows.size());
+
+            for (TableRow tr : tableRows) {
+                names.add(tr.getName());
+                formats.add(tr.getFormat());
             }
 
             // Finally, we store the new preferences.
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringArray(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
         }
     }
 

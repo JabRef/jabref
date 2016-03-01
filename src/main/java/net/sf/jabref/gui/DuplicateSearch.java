@@ -22,8 +22,7 @@
 package net.sf.jabref.gui;
 
 import java.util.ArrayList;
-import java.util.Vector;
-
+import java.util.List;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
@@ -40,7 +39,7 @@ public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
     private BibEntry[] bes;
-    private final Vector<BibEntry[]> duplicates = new Vector<>();
+    private final List<BibEntry[]> duplicates = new ArrayList<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -49,10 +48,7 @@ public class DuplicateSearch implements Runnable {
 
     @Override
     public void run() {
-        final NamedCompound ce = new NamedCompound(Localization.lang("duplicate removal"));
-        int duplicateCounter = 0;
 
-        boolean autoRemoveExactDuplicates = false;
         panel.output(Localization.lang("Searching for duplicates..."));
         Object[] keys = panel.getDatabase().getKeySet().toArray();
         if (keys.length < 2) {
@@ -67,8 +63,11 @@ public class DuplicateSearch implements Runnable {
         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(st, "Searcher");
         int current = 0;
 
-        final ArrayList<BibEntry> toRemove = new ArrayList<>();
-        final ArrayList<BibEntry> toAdd = new ArrayList<>();
+        final List<BibEntry> toRemove = new ArrayList<>();
+        final List<BibEntry> toAdd = new ArrayList<>();
+
+        int duplicateCounter = 0;
+        boolean autoRemoveExactDuplicates = false;
 
         synchronized (duplicates) {
             while (!st.finished() || (current < duplicates.size())) {
@@ -83,9 +82,7 @@ public class DuplicateSearch implements Runnable {
                         // Ignore
                     }
 
-                } else // duplicates found
-                {
-
+                } else { // duplicates found
                     BibEntry[] be = duplicates.get(current);
                     current++;
                     if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
@@ -100,7 +97,7 @@ public class DuplicateSearch implements Runnable {
                             askAboutExact = true;
                         }
 
-                        DuplicateCallBack cb = new DuplicateCallBack(panel.frame, be[0], be[1],
+                        DuplicateCallBack cb = new DuplicateCallBack(JabRef.jrf, be[0], be[1],
                                 askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
                                         DuplicateResolverDialog.DUPLICATE_SEARCH);
                         ((CallBack) Spin.over(cb)).update();
@@ -129,6 +126,8 @@ public class DuplicateSearch implements Runnable {
             }
         }
 
+        final NamedCompound ce = new NamedCompound(Localization.lang("duplicate removal"));
+
         final int dupliC = duplicateCounter;
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -137,7 +136,7 @@ public class DuplicateSearch implements Runnable {
                 // Now, do the actual removal:
                 if (!toRemove.isEmpty()) {
                     for (BibEntry entry : toRemove) {
-                        panel.getDatabase().removeEntry(entry.getId());
+                        panel.getDatabase().removeEntry(entry);
                         ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();
@@ -195,7 +194,7 @@ public class DuplicateSearch implements Runnable {
         }
 
         // Thread cancel option
-        // no synchronized used because no "realy" critical situations expected
+        // no synchronized used because no "really" critical situations expected
         public void setFinished() {
             finished = true;
         }
@@ -204,7 +203,6 @@ public class DuplicateSearch implements Runnable {
     static class DuplicateCallBack implements CallBack {
 
         private int reply = -1;
-        DuplicateResolverDialog diag;
         private final JabRefFrame frame;
         private final BibEntry one;
         private final BibEntry two;
@@ -231,7 +229,7 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void update() {
-            diag = new DuplicateResolverDialog(frame, one, two, dialogType);
+            DuplicateResolverDialog diag = new DuplicateResolverDialog(frame, one, two, dialogType);
             diag.setVisible(true);
             diag.dispose();
             reply = diag.getSelected();

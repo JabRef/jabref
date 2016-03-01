@@ -56,7 +56,6 @@ public class DuplicateResolverDialog extends JDialog {
     private JButton removeExact;
     private final JPanel options = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
-    private boolean block = true;
     private MergeEntries me;
     private PositionWindow pw;
 
@@ -195,7 +194,6 @@ public class DuplicateResolverDialog extends JDialog {
 
     private void buttonPressed(int button) {
         status = button;
-        block = false;
         dispose();
     }
 

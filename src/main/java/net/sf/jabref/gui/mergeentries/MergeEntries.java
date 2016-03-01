@@ -18,6 +18,7 @@ package net.sf.jabref.gui.mergeentries;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -29,7 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -51,6 +52,8 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 public class MergeEntries {
 
+    private static final Log LOGGER = LogFactory.getLog(Globals.class);
+
     // Headings
     private final String[] columnHeadings = {Localization.lang("Field"),
             Localization.lang("Left entry"),
@@ -68,12 +71,12 @@ public class MergeEntries {
     private JTextArea jta;
     private PreviewPanel pp;
     private Boolean doneBuilding = false;
-    private TreeSet<String> joint;
+    private Set<String> joint;
     private String[] jointStrings;
     private final JPanel mergePanel = new JPanel();
     private final JPanel mainPanel = new JPanel();
 
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
+    private static final String MARGIN = "10px";
 
 
     /**
@@ -177,7 +180,9 @@ public class MergeEntries {
         JTextArea type1ta = new JTextArea(type1.getName());
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
-        if (type1.compareTo(type2) != 0) {
+        if (type1.compareTo(type2) == 0) {
+            identical[0] = true;
+        } else {
             identical[0] = false;
             rbg[0] = new ButtonGroup();
             for (int k = 0; k < 3; k += 2) {
@@ -193,8 +198,6 @@ public class MergeEntries {
                 });
             }
             rb[0][0].setSelected(true);
-        } else {
-            identical[0] = true;
         }
         JTextArea type2ta = new JTextArea(type2.getName());
         type2ta.setEditable(false);
@@ -213,10 +216,8 @@ public class MergeEntries {
             String string1 = one.getField(field);
             String string2 = two.getField(field);
             identical[row - 1] = false;
-            if ((string1 != null) && (string2 != null)) {
-                if (string1.equals(string2)) {
-                    identical[row - 1] = true;
-                }
+            if ((string1 != null) && (string2 != null) && (string1.equals(string2))) {
+                identical[row - 1] = true;
             }
 
             tmpLabelWidth = label.getPreferredSize().width;
@@ -244,7 +245,9 @@ public class MergeEntries {
             }
 
             // Add radio buttons if the two entries do not have identical fields
-            if (!identical[row - 1]) {
+            if (identical[row - 1]) {
+                mergedEntry.setField(field, string1);
+            } else {
                 rbg[row - 1] = new ButtonGroup();
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 1] = new JRadioButton();
@@ -258,20 +261,19 @@ public class MergeEntries {
                         }
                     });
                 }
-                if (string1 != null) {
+                if (string1 == null) {
+                    rb[0][row - 1].setEnabled(false);
+                    mergedEntry.setField(field, string2);
+                    rb[2][row - 1].setSelected(true);
+                } else {
                     mergedEntry.setField(field, string1);
                     rb[0][row - 1].setSelected(true);
                     if (string2 == null) {
                         rb[2][row-1].setEnabled(false);
                     }
-                } else {
-                    rb[0][row-1].setEnabled(false);
-                    mergedEntry.setField(field, string2);
-                    rb[2][row - 1].setSelected(true);
                 }
-            } else {
-                mergedEntry.setField(field, string1);
             }
+
             if ("abstract".equals(field) || "review".equals(field)) {
                 // Again, treat abstract and review special
                 JTextArea tf = new JTextArea();
@@ -336,7 +338,7 @@ public class MergeEntries {
         jta.setEditable(false);
         StringWriter sw = new StringWriter();
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
@@ -344,10 +346,10 @@ public class MergeEntries {
         jta.setCaretPosition(0);
 
         // Add some margin around the layout
-        mainLayout.appendRow(RowSpec.decode("10px"));
-        mainLayout.appendColumn(ColumnSpec.decode("10px"));
-        mainLayout.insertRow(1, RowSpec.decode("10px"));
-        mainLayout.insertColumn(1, ColumnSpec.decode("10px"));
+        mainLayout.appendRow(RowSpec.decode(MARGIN));
+        mainLayout.appendColumn(ColumnSpec.decode(MARGIN));
+        mainLayout.insertRow(1, RowSpec.decode(MARGIN));
+        mainLayout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
         if (mainPanel.getHeight() > DIM.height) {
             mainPanel.setSize(new Dimension(mergePanel.getWidth(), DIM.height));
@@ -419,7 +421,7 @@ public class MergeEntries {
         // Update the Bibtex source view
         StringWriter sw = new StringWriter();
         try {
-            new BibtexEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
+            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, sw);
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }

@@ -2,8 +2,8 @@ package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
-public class UnicodeCharMap extends HashMap<String, String> {
-    public UnicodeCharMap() {
+public class UnicodeToReadableCharMap extends HashMap<String, String> {
+    public UnicodeToReadableCharMap() {
         put("\u00C0", "A");
         put("\u00C1", "A");
         put("\u00C2", "A");

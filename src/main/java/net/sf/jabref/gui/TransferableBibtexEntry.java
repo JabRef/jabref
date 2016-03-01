@@ -16,7 +16,7 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.bibtex.BibtexEntryWriter;
+import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
@@ -59,7 +59,7 @@ public class TransferableBibtexEntry implements Transferable {
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
             try {
                 StringWriter sw = new StringWriter();
-                BibtexEntryWriter bibtexEntryWriter = new BibtexEntryWriter(new LatexFieldFormatter(), false);
+                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), false);
                 for (BibEntry entry : data) {
                     bibtexEntryWriter.write(entry, sw);
                 }

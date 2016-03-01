@@ -14,6 +14,16 @@ import static org.junit.Assert.*;
 public class IntegrityCheckTest {
 
     @Test
+    public void testUrlChecks() {
+        assertCorrect("http://www.google.com", IntegrityCheck.URL_CHECKER);
+        assertCorrect("https://www.google.com", IntegrityCheck.URL_CHECKER);
+        assertCorrect("file://c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
+        assertWrong("www.google.com", IntegrityCheck.URL_CHECKER);
+        assertWrong("google.com", IntegrityCheck.URL_CHECKER);
+        assertWrong("c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
+    }
+
+    @Test
     public void testYearChecks() {
         assertCorrect("2014", IntegrityCheck.YEAR_CHECKER);
         assertCorrect("1986", IntegrityCheck.YEAR_CHECKER);

@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +32,8 @@ import net.sf.jabref.logic.formatter.Formatter;
 public class HTMLConverter implements LayoutFormatter, Formatter {
 
     private static final Log LOGGER = LogFactory.getLog(HTMLConverter.class);
+
+    private static final int MAX_TAG_LENGTH = 100;
 
     /*   Portions © International Organization for Standardization 1986:
      Permission to copy in any form is granted for use with
@@ -764,10 +767,10 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         {"866", "sliding"}, // Double rightwards arrow below - requires extraipa
     };
 
-    private final HashMap<String, String> escapedSymbols = new HashMap<>();
-    private final HashMap<Integer, String> escapedAccents = new HashMap<>();
-    private final HashMap<Integer, String> numSymbols = new HashMap<>();
-    private final HashMap<Character, String> unicodeSymbols = new HashMap<>();
+    private final Map<String, String> escapedSymbols = new HashMap<>();
+    private final Map<Integer, String> escapedAccents = new HashMap<>();
+    private final Map<Integer, String> numSymbols = new HashMap<>();
+    private final Map<Character, String> unicodeSymbols = new HashMap<>();
 
 
     public HTMLConverter() {
@@ -902,8 +905,6 @@ public class HTMLConverter implements LayoutFormatter, Formatter {
         return text.trim();
     }
 
-
-    private final int MAX_TAG_LENGTH = 100;
 
 
     /*private final int MAX_TAG_LENGTH = 30;*/

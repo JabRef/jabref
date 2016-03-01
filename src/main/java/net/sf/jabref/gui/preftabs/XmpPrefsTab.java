@@ -18,8 +18,9 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -220,8 +221,8 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        String[] names = JabRefPreferences.getInstance().getStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS);
-        Collections.addAll(tableRows, names);
+        List<String> names = JabRefPreferences.getInstance().getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
+        tableRows.addAll(names);
         rowCount = tableRows.size() + 5;
 
         privacyFilterCheckBox.setSelected(JabRefPreferences.getInstance().getBoolean(
@@ -250,14 +251,13 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
-                if ("".equals(tableRows.elementAt(i))) {
+                if ((tableRows.elementAt(i) == null) || tableRows.elementAt(i).toString().isEmpty()) {
                     tableRows.removeElementAt(i);
                 }
             }
-
             // Finally, we store the new preferences.
-            JabRefPreferences.getInstance().putStringArray(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                    tableRows.toArray(new String[tableRows.size()]));
+            JabRefPreferences.getInstance().putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
+                    tableRows.stream().map(Object::toString).collect(Collectors.toList()));
         }
 
         JabRefPreferences.getInstance().putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, privacyFilterCheckBox.isSelected());

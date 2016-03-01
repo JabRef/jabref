@@ -32,6 +32,7 @@ public class Globals {
 
     public static final String FILE_FIELD = "file";
     public static final String FOLDER_FIELD = "folder";
+    public static final String DIR_SUFFIX = "Directory";
 
     private static final Log LOGGER = LogFactory.getLog(Globals.class);
     // JabRef version info

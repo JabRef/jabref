@@ -47,7 +47,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected final JTextField Path = new JTextField(30);
     protected String commandPath;
     protected String commandPathPreferenceKey;
-    protected String citeCommand = Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
     protected FormBuilder builder;
 
 
@@ -118,7 +117,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * @return String array with the command to call and its arguments
      */
     protected String[] getCommandLine(String keyString) {
-        return null;
+        return new String[0];
     }
 
     /**
@@ -153,14 +152,14 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected void initSettingsPanel() {
         builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
-        String label = Localization.lang("Path to %0", getApplicationName());
+        StringBuffer label = new StringBuffer(Localization.lang("Path to %0", getApplicationName()));
         // In case the application name and the actual command is not the same, add the command in brackets
-        if (getCommandName() != null) {
-            label += " (" + getCommandName() + "):";
+        if (getCommandName() == null) {
+            label.append(':');
         } else {
-            label += ":";
+            label.append(" (").append(getCommandName()).append("):");
         }
-        builder.add(label).xy(1, 1);
+        builder.add(label.toString()).xy(1, 1);
         builder.add(Path).xy(3, 1);
         BrowseAction action = BrowseAction.buildForFile(Path);
         JButton browse = new JButton(Localization.lang("Browse"));
@@ -174,4 +173,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         Globals.prefs.put(commandPathPreferenceKey, Path.getText());
     }
 
+    protected String getCiteCommand() {
+        return Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
+    }
 }

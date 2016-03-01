@@ -102,9 +102,6 @@ public class MainTable extends JTable {
     // Constants used to define how a cell should be rendered.
     private static final int REQUIRED = 1;
     private static final int OPTIONAL = 2;
-    public static final int REQ_STRING = 1;
-    public static final int REQ_NUMBER = 2;
-    public static final int OPT_STRING = 3;
     private static final int OTHER = 3;
     private static final int BOOLEAN = 4;
 
@@ -241,13 +238,11 @@ public class MainTable extends JTable {
      * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
      */
     public void showFloatGrouping() {
-        if(!isFloatGroupingActive) {
-            isFloatGroupingActive = true;
+        isFloatGroupingActive = true;
 
-            groupMatcher = GroupMatcher.INSTANCE;
-            groupComparator = new HitOrMissComparator(groupMatcher);
-            refreshSorting();
-        }
+        groupMatcher = GroupMatcher.INSTANCE;
+        groupComparator = new HitOrMissComparator(groupMatcher);
+        refreshSorting();
     }
 
     /**
@@ -293,7 +288,7 @@ public class MainTable extends JTable {
 
         Rectangle bounds = getCellRect(row, col, false);
 
-        if (comp.getPreferredSize().width > bounds.width && getValueAt(row, col) != null) {
+        if ((comp.getPreferredSize().width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }
         return toolTipText;
@@ -334,11 +329,7 @@ public class MainTable extends JTable {
         }
 
         else if (column == 0) {
-            // Return a renderer with red background if the entry is incomplete.
-            if (!isComplete(row)) {
-                MainTable.incRenderer.setNumber(row);
-                renderer = MainTable.incRenderer;
-            } else {
+            if (isComplete(row)) {
                 MainTable.compRenderer.setNumber(row);
                 int marking = isMarked(row);
                 if (marking > 0) {
@@ -348,6 +339,10 @@ public class MainTable extends JTable {
                 } else {
                     renderer = MainTable.compRenderer;
                 }
+            } else {
+                // Return a renderer with red background if the entry is incomplete.
+                MainTable.incRenderer.setNumber(row);
+                renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
         }
@@ -375,27 +370,27 @@ public class MainTable extends JTable {
     private void setWidths() {
         // Setting column widths:
         int ncWidth = Globals.prefs.getInt(JabRefPreferences.NUMBER_COL_WIDTH);
-        String[] widthsFromPreferences = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_WIDTHS);
+        List<String> widthsFromPreferences = Globals.prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS);
         TableColumnModel cm = getColumnModel();
         cm.getColumn(0).setPreferredWidth(ncWidth);
-        for(int i=1; i<cm.getColumnCount(); i++) {
+        for (int i = 1; i < cm.getColumnCount(); i++) {
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
-            if(SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
+            if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
-            } else if(mainTableColumn.isIconColumn()) {
+            } else if (mainTableColumn.isIconColumn()) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
             } else {
-                String[] allColumns = Globals.prefs.getStringArray(JabRefPreferences.COLUMN_NAMES);
+                List<String> allColumns = Globals.prefs.getStringList(JabRefPreferences.COLUMN_NAMES);
                 // find index of current mainTableColumn in allColumns
-                for(int j=0; j<allColumns.length; j++) {
-                    if(allColumns[j].equalsIgnoreCase(mainTableColumn.getDisplayName())) {
+                for (int j = 0; j < allColumns.size(); j++) {
+                    if (allColumns.get(j).equalsIgnoreCase(mainTableColumn.getDisplayName())) {
                         try {
                             // set preferred width by using found index j in the width array
-                            cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences[j]));
+                            cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
                         } catch (NumberFormatException e) {
                             LOGGER.info("Exception while setting column widths. Choosing default.", e);
                             cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
@@ -493,15 +488,15 @@ public class MainTable extends JTable {
 
                 // TODO where is this prefix set?
 //                if (!sortFields[i].startsWith(MainTableFormat.ICON_COLUMN_PREFIX))
-                if (!sortFields[i].startsWith("iconcol:")) {
-                    index = tableFormat.getColumnIndex(sortFields[i]);
-                } else {
+                if (sortFields[i].startsWith("iconcol:")) {
                     for (int j = 0; j < tableFormat.getColumnCount(); j++) {
                         if (sortFields[i].equals(tableFormat.getColumnName(j))) {
                             index = j;
                             break;
                         }
                     }
+                } else {
+                    index = tableFormat.getColumnIndex(sortFields[i]);
                 }
                 if (index >= 0) {
                     comparatorChooser.appendComparator(index, 0, sortDirections[i]);
@@ -604,7 +599,7 @@ public class MainTable extends JTable {
      * @return true if the column shows the "file" field; false otherwise
      */
     public boolean isFileColumn(int modelIndex) {
-        return tableFormat.getTableColumn(modelIndex) != null && tableFormat.getTableColumn(modelIndex)
+        return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
                 .getBibtexFields().contains(Globals.FILE_FIELD);
     }
 
@@ -702,8 +697,7 @@ public class MainTable extends JTable {
     private static GeneralRenderer[] markedRenderers;
 
     private static IncompleteRenderer incRenderer;
-    private static CompleteRenderer
-            compRenderer;
+    private static CompleteRenderer compRenderer;
     private static CompleteRenderer grayedOutNumberRenderer;
     private static CompleteRenderer veryGrayedOutNumberRenderer;
 
@@ -732,9 +726,9 @@ public class MainTable extends JTable {
         MainTable.markedRenderers = new GeneralRenderer[EntryMarker.MARK_COLOR_LEVELS];
         MainTable.markedNumberRenderers = new CompleteRenderer[EntryMarker.MARK_COLOR_LEVELS];
         for (int i = 0; i < EntryMarker.MARK_COLOR_LEVELS; i++) {
-            Color c = Globals.prefs.getColor("markedEntryBackground" + i);
+            Color c = Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i);
             MainTable.markedRenderers[i] = new GeneralRenderer(c,
-                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor("markedEntryBackground" + i), sel));
+                    Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT), MainTable.mixColors(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + i), sel));
             MainTable.markedNumberRenderers[i] = new CompleteRenderer(c);
         }
 
@@ -769,16 +763,6 @@ public class MainTable extends JTable {
         setTransferHandler(null);
         setTransferHandler(handler);
 
-    }
-
-    /**
-     * Get the first comparator set up for the given column.
-     * @param index The column number.
-     * @return The Comparator, or null if none is set.
-     */
-    public Comparator<BibEntry> getComparatorForColumn(int index) {
-        List<Comparator> l = comparatorChooser.getComparatorsForColumn(index);
-        return l.isEmpty() ? null : l.get(0);
     }
 
     /**

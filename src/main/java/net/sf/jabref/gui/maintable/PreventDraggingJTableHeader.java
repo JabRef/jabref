@@ -21,6 +21,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
 import java.util.Enumeration;
 
 /**
@@ -52,8 +53,7 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
     private void setupTableHeaderIcons() {
 
         Enumeration<TableColumn> columns = columnModel.getColumns();
-        while(columns.hasMoreElements()) {
-            TableColumn column = columns.nextElement();
+        for (TableColumn column : Collections.list(columns)) {
             column.setHeaderRenderer(this);
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(column.getModelIndex());
             column.setHeaderValue(mainTableColumn.getHeaderLabel());
@@ -75,11 +75,8 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
     @Override
     public void setDraggedColumn(TableColumn column) {
 
-        if (column != null) {
-            // prevent dragging of "#"
-            if (column.getModelIndex() == 0) {
+        if ((column != null) && (column.getModelIndex() == 0)) {
                 return;
-            }
         }
         super.setDraggedColumn(column);
     }
@@ -105,14 +102,14 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
         Component resultFromDelegate = delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
         // Changing style is only possible if both value and resultFromDelegate are JLabels
-        if (value instanceof JLabel && resultFromDelegate instanceof JLabel) {
+        if ((value instanceof JLabel) && (resultFromDelegate instanceof JLabel)) {
             String text = ((JLabel) value).getText();
             Icon icon = ((JLabel) value).getIcon();
-            if (icon != null) {
+            if (icon == null) {
+                ((JLabel) resultFromDelegate).setText(text);
+            } else {
                 ((JLabel) resultFromDelegate).setIcon(icon);
                 ((JLabel) resultFromDelegate).setText(null);
-            } else {
-                ((JLabel) resultFromDelegate).setText(text);
             }
         }
 
