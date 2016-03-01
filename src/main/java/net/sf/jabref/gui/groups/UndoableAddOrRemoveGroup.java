@@ -73,7 +73,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         // storing a backup of the whole subtree is not required when children
         // are kept
         m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? editedNode.getNode()
-                .deepCopy() : new GroupTreeNode(editedNode.getNode().getGroup().deepCopy());
+                .copySubtree() : new GroupTreeNode(editedNode.getNode().getGroup().deepCopy());
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.
@@ -130,7 +130,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 break;
             case REMOVE_NODE_KEEP_CHILDREN:
                 // move all children to newNode, then add newNode
-                GroupTreeNode newNode = m_subtreeBackup.deepCopy();
+                GroupTreeNode newNode = m_subtreeBackup.copySubtree();
                 for (int i = childIndex; i < (childIndex
                         + m_subtreeRootChildCount); ++i) {
                     cursor.getChildAt(childIndex).get().moveTo(newNode);
@@ -138,7 +138,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
                 newNode.moveTo(cursor, childIndex);
                 break;
             case REMOVE_NODE_AND_CHILDREN:
-                m_subtreeBackup.deepCopy().moveTo(cursor, childIndex);
+                m_subtreeBackup.copySubtree().moveTo(cursor, childIndex);
                 break;
             default:
                 break;
@@ -146,7 +146,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         } else { // redo
             switch (m_editType) {
             case ADD_NODE:
-                m_subtreeBackup.deepCopy().moveTo(cursor, childIndex);
+                m_subtreeBackup.copySubtree().moveTo(cursor, childIndex);
                 break;
             case REMOVE_NODE_KEEP_CHILDREN:
                 // remove node, then insert all children

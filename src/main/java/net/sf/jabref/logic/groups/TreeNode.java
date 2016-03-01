@@ -536,4 +536,24 @@ import java.util.*;
         // Add as child
         target.addChild((T) this, targetIndex);
     }
+
+    /**
+     * Creates a deep copy of this node and all of its children.
+     *
+     * @return a deep copy of the subtree
+     */
+    public T copySubtree() {
+        T copy = copyNode();
+        for (T child : getChildren()) {
+            child.copySubtree().moveTo(copy);
+        }
+        return copy;
+    }
+
+    /**
+     * Creates a copy of this node, completely separated from the tree (i.e. no children and no parent)
+     *
+     * @return a deep copy of this node
+     */
+    public abstract T copyNode();
 }

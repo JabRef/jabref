@@ -302,10 +302,9 @@ public class BibDatabaseWriter {
             sb.append(Globals.NEWLINE);
             sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
             sb.append(Globals.NEWLINE);
-            // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
-            while (tok.hasMoreTokens()) {
-                sb.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
+
+            for(String groupNode : groupsRoot.getTreeAsString()) {
+                sb.append(StringUtil.quote(groupNode, ";", '\\'));
                 sb.append(";");
                 sb.append(Globals.NEWLINE);
             }

@@ -25,8 +25,6 @@ import net.sf.jabref.logic.search.matchers.MatcherSets;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
- *
- * @author jzieren
  */
 public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
@@ -34,6 +32,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /**
      * Creates this node and associates the specified group with it.
+     *
+     * @param group the group underlying this node
      */
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
@@ -41,7 +41,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * @return The group associated with this node.
+     * Returns the group underlying this node.
+     *
+     * @return the group associated with this node
      */
     public AbstractGroup getGroup() {
         return group;
@@ -49,6 +51,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /**
      * Associates the specified group with this node.
+     *
+     * @param group the new group (has to be non-null)
      */
     public void setGroup(AbstractGroup group) {
         this.group = Objects.requireNonNull(group);
@@ -57,35 +61,24 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /**
      * Returns a textual representation of this node and its children. This
      * representation contains both the tree structure and the textual
-     * representations of the group associated with each node. It thus allows a
-     * complete reconstruction of this object and its children.
+     * representations of the group associated with each node.
+     * Every node is one entry in the list of strings.
+     *
+     * @return a representation of the tree based at this node as a list of strings
      */
-    public String getTreeAsString() {
-        StringBuilder sb = new StringBuilder();
+    public List<String> getTreeAsString() {
+
+        List<String> representation = new ArrayList<>();
 
         // Append myself
-        sb.append(this.getLevel()).append(' ').append(group.toString()).append('\n');
+        representation.add(this.toString());
 
         // Append children
         for(GroupTreeNode child : getChildren()) {
-            sb.append(child.getTreeAsString());
+            representation.addAll(child.getTreeAsString());
         }
 
-        return sb.toString();
-    }
-
-    /**
-     * Creates a deep copy of this node and all of its children, including all
-     * groups.
-     *
-     * @return This object's deep copy.
-     */
-    public GroupTreeNode deepCopy() {
-        GroupTreeNode copy = new GroupTreeNode(group);
-        for (GroupTreeNode child : getChildren()) {
-            child.deepCopy().moveTo(copy);
-        }
-        return copy;
+        return representation;
     }
 
     /**
@@ -94,7 +87,10 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * is for instance used when updating the group tree due to an external change.
      *
      * @param db The database to refresh for.
+     * @deprecated This method shouldn't be necessary anymore once explicit group memberships are saved directly in the entry.
+     * TODO: Remove this method.
      */
+    @Deprecated
     public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (GroupTreeNode node : getChildren()) {
             node.group.refreshForNewDatabase(db);
@@ -103,13 +99,12 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * A GroupTreeNode can create a SearchRule that finds elements contained in
-     * its own group, or the union of those elements in its own group and its
+     * Creates a SearchRule that finds elements contained in this nodes group,
+     * or the union of those elements in its own group and its
      * children's groups (recursively), or the intersection of the elements in
-     * its own group and its parent's group. This setting is configured in the
-     * group contained in this node.
+     * its own group and its parent's group (depending on the hierarchical settings stored in the involved groups)
      *
-     * @return A SearchRule that finds the desired elements.
+     * @return a SearchRule that finds the desired elements
      */
     public SearchMatcher getSearchRule() {
         return getSearchRule(group.getHierarchicalContext());
@@ -120,92 +115,18 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         if (context == GroupHierarchyType.INDEPENDENT) {
             return group;
         }
-        MatcherSet searchRule = MatcherSets.build(context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+        MatcherSet searchRule = MatcherSets.build(
+                context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
         searchRule.addRule(group);
-        if ((context == GroupHierarchyType.INCLUDING)
-                && (originalContext != GroupHierarchyType.REFINING)) {
+        if ((context == GroupHierarchyType.INCLUDING) && (originalContext != GroupHierarchyType.REFINING)) {
             for (GroupTreeNode child : getChildren()) {
                 searchRule.addRule(child.getSearchRule(originalContext));
             }
-        } else if ((context == GroupHierarchyType.REFINING) && !isRoot()
-                && (originalContext != GroupHierarchyType.INCLUDING)) {
-            // TODO: Null!
-            searchRule.addRule(getParent().get()
-                    .getSearchRule(originalContext));
+        } else if ((context == GroupHierarchyType.REFINING) && !isRoot() && (originalContext
+                != GroupHierarchyType.INCLUDING)) {
+            searchRule.addRule(getParent().get().getSearchRule(originalContext));
         }
         return searchRule;
-    }
-
-    public Optional<MoveGroupChange> moveUp() {
-        final GroupTreeNode parent = getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(this).get();
-        if (index > 0) {
-            this.moveTo(parent, index - 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index - 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveDown() {
-        final GroupTreeNode parent = getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(this).get();
-        if (index < (parent.getNumberOfChildren() - 1)) {
-            this.moveTo(parent, index + 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveLeft() {
-        final GroupTreeNode parent = getParent().get(); // TODO: Null!
-        final Optional<GroupTreeNode> grandParent = parent.getParent();
-        final int index = this.getPositionInParent();
-
-        if (! grandParent.isPresent()) {
-            return Optional.empty();
-        }
-        final int indexOfParent = grandParent.get().getIndexOfChild(parent).get();
-        this.moveTo(grandParent.get(), indexOfParent + 1);
-        return Optional.of(new MoveGroupChange(parent, index, grandParent.get(), indexOfParent + 1));
-    }
-
-    public Optional<MoveGroupChange> moveRight() {
-        final GroupTreeNode previousSibling = getPreviousSibling().get(); // TODO: Null
-        final GroupTreeNode parent = getParent().get(); // TODO: Null!
-        final int index = this.getPositionInParent();
-
-        if (previousSibling == null) {
-            return Optional.empty();
-        }
-
-        this.moveTo(previousSibling);
-        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getNumberOfChildren()));
-    }
-
-    /**
-     * Adds the selected entries to this node's group.
-     */
-    public Optional<EntriesGroupChange> addToGroup(List<BibEntry> entries) {
-        if(group.supportsAdd()) {
-            return group.add(entries);
-        }
-        else {
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Removes the selected entries from this node's group.
-     */
-    public Optional<EntriesGroupChange> removeFromGroup(List<BibEntry> entries) {
-        if(group.supportsRemove()) {
-            return group.remove(entries);
-        }
-        else {
-            return Optional.empty();
-        }
     }
 
     /**
@@ -238,26 +159,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     @Override
     public int hashCode() {
-        return group.getName().hashCode();
-    }
-
-    /**
-     * Get all groups which contain any of the entries and which support removal of entries.
-     */
-    public List<GroupTreeNode> getContainingGroupsSupportingRemoval(List<BibEntry> entries) {
-        List<GroupTreeNode> groups = new ArrayList<>();
-
-        // Add myself if I contain the entries
-        if(this.group.supportsRemove() && this.group.containsAny(entries)) {
-            groups.add(this);
-        }
-
-        // Traverse children
-        for(GroupTreeNode child : getChildren()) {
-            groups.addAll(child.getContainingGroupsSupportingRemoval(entries));
-        }
-
-        return groups;
+        return getTreeAsString().hashCode();
     }
 
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
@@ -324,8 +226,27 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
     }
 
-
     public boolean supportsAddingEntries() {
         return group.supportsAdd();
+    }
+
+    public String getName() {
+        return group.getName();
+    }
+
+    public GroupTreeNode addSubgroup(AbstractGroup group) {
+        GroupTreeNode child = new GroupTreeNode(group);
+        addChild(child);
+        return child;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append(this.getLevel()).append(' ').append(group.toString()).toString();
+    }
+
+    @Override
+    public GroupTreeNode copyNode() {
+        return new GroupTreeNode(group);
     }
 }

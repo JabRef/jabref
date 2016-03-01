@@ -54,7 +54,7 @@ class GroupChange extends Change {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(changedGroups.getGroup());
             for (GroupTreeNode child : changedGroups.getChildren()) {
-                child.deepCopy().moveTo(root);
+                child.copySubtree().moveTo(root);
             }
             // the group tree is now appled to a different BibDatabase than it was created
             // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
@@ -70,10 +70,10 @@ class GroupChange extends Change {
         // Update tmp database:
         tmpGroupRoot.removeAllChildren();
         if (changedGroups != null) {
-            GroupTreeNode copied = changedGroups.deepCopy();
+            GroupTreeNode copied = changedGroups.copySubtree();
             tmpGroupRoot.setGroup(copied.getGroup());
             for (GroupTreeNode child : copied.getChildren()) {
-                child.deepCopy().moveTo(tmpGroupRoot);
+                child.copySubtree().moveTo(tmpGroupRoot);
             }
         }
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);

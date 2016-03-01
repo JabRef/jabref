@@ -590,6 +590,17 @@ public class TreeNodeTest {
         assertEquals(Arrays.asList(child1, child2, child3), node.getChildren());
     }
 
+    @Test
+    public void copySubtreeCopiesChildren() {
+        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeMock node = getNodeAsChild(root);
+
+        TreeNodeMock copiedRoot = root.copySubtree();
+        assertEquals(Optional.empty(), copiedRoot.getParent());
+        assertFalse(copiedRoot.getChildren().contains(node));
+        assertEquals(root.getNumberOfChildren(), copiedRoot.getNumberOfChildren());
+    }
+
     /**
      * This is just a dummy class deriving from TreeNode<T> so that we can test the generic class
      */
@@ -616,6 +627,11 @@ public class TreeNodeTest {
                     "name='" + name + '\'' +
                     '}';
         }
+
+        @Override
+        public TreeNodeMock copyNode() {
+            return new TreeNodeMock(name);
+        }
     }
 
     private class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
@@ -624,6 +640,11 @@ public class TreeNodeTest {
         // See test constructorChecksThatClassImplementsCorrectInterface
         public WrongTreeNodeImplementation() {
             super(TreeNodeMock.class);
+        }
+
+        @Override
+        public TreeNodeMock copyNode() {
+            return null;
         }
     }
 }

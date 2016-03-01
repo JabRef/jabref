@@ -35,7 +35,6 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
-import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -562,7 +561,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 insertNodes(menu, child);
             }
         } else {
-            submenu = new JMenu('[' + node.getGroup().getName() + ']');
+            submenu = new JMenu('[' + node.getName() + ']');
             // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled
             submenu.setEnabled(action.isEnabled());
@@ -595,7 +594,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         private final GroupTreeNode node;
 
         public AddToGroupAction(GroupTreeNode node) {
-            super(node.getGroup().getName());
+            super(node.getName());
             this.node = node;
         }
 
@@ -738,7 +737,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                 if (node.supportsAddingEntries()) {
                                     // Add the entry:
 
-                                    Optional<EntriesGroupChange> undo = node.addToGroup(
+                                    Optional<EntriesGroupChange> undo = node.getGroup().add(
                                             Collections.singletonList(entry));
                                     if (undo.isPresent()) {
                                         ce.addEdit(UndoableChangeEntriesOfGroup

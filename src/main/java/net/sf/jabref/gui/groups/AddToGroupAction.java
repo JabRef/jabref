@@ -87,7 +87,8 @@ public class AddToGroupAction extends AbstractAction {
 
     public void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
         List<GroupTreeNode> groupsContainingEntries =
-                node.getNode().getRoot().getContainingGroupsSupportingRemoval(entries);
+                node.getNode().getRoot().getContainingGroups(entries, false).stream().filter(node -> node.getGroup().supportsRemove()).collect(
+                        Collectors.toList());
 
         List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
                 Collectors.toList());
@@ -98,14 +99,14 @@ public class AddToGroupAction extends AbstractAction {
 
         // first remove
         for (GroupTreeNode group : groupsContainingEntries) {
-            Optional<EntriesGroupChange> undoRemove = group.removeFromGroup(entries);
+            Optional<EntriesGroupChange> undoRemove = group.getGroup().remove(entries);
             if (undoRemove.isPresent()) {
                 undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoRemove.get()));
             }
         }
 
         // then add
-        Optional<EntriesGroupChange> undoAdd = node.getNode().addToGroup(entries);
+        Optional<EntriesGroupChange> undoAdd = node.addEntriesToGroup(entries);
         if (undoAdd.isPresent()) {
             undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }
@@ -116,7 +117,7 @@ public class AddToGroupAction extends AbstractAction {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undoAdd = node.getNode().addToGroup(entries);
+        Optional<EntriesGroupChange> undoAdd = node.addEntriesToGroup(entries);
         if (undoAdd.isPresent()) {
             undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
         }

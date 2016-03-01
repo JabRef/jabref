@@ -45,7 +45,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
      */
     public UndoableModifySubtree(GroupSelector groupSelector, GroupTreeNodeViewModel groupRoot,
             GroupTreeNodeViewModel subtree, String name) {
-        m_subtreeBackup = subtree.getNode().deepCopy();
+        m_subtreeBackup = subtree.getNode().copySubtree();
         m_groupRoot = groupRoot.getNode();
         m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();
         m_groupSelector = groupSelector;
@@ -76,7 +76,7 @@ public class UndoableModifySubtree extends AbstractUndoableEdit {
         // keep subtree handle, but restore everything else from backup
         subtreeRoot.removeAllChildren();
         for (GroupTreeNode child : m_subtreeBackup.getChildren()) {
-            child.deepCopy().moveTo(subtreeRoot);
+            child.copySubtree().moveTo(subtreeRoot);
         }
         if (mRevalidate) {
             m_groupSelector.revalidateGroups();

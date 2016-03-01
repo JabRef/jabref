@@ -56,7 +56,7 @@ public class RemoveFromGroupAction extends AbstractAction {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undo = mNode.getNode().removeFromGroup(mPanel.getSelectedEntries());
+        Optional<EntriesGroupChange> undo = mNode.removeEntriesFromGroup(mPanel.getSelectedEntries());
         if (! undo.isPresent()) {
             return; // no changed made
         }

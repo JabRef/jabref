@@ -237,12 +237,8 @@ class GroupDialog extends JDialog {
         builderAll.appendSeparator();
         builderAll.nextLine();
         builderAll.nextLine();
-        //CellConstraints cc = new CellConstraints();
-        //builderAll.add(builderBP.getPanel(), cc.xyw(builderAll.getColumn(),
-        //                builderAll.getRow(), 5, "center, fill"));
 
         Container cp = getContentPane();
-        //cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
         cp.add(builderAll.getPanel(), BorderLayout.CENTER);
         cp.add(builderBP.getPanel(), BorderLayout.SOUTH);
         pack();
@@ -252,13 +248,9 @@ class GroupDialog extends JDialog {
         PositionWindow.placeDialog(this, jabrefFrame);
 
         // add listeners
-        ItemListener radioButtonItemListener = new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                setLayoutForSelectedGroup();
-                updateComponents();
-            }
+        ItemListener radioButtonItemListener = e -> {
+            setLayoutForSelectedGroup();
+            updateComponents();
         };
         m_explicitRadioButton.addItemListener(radioButtonItemListener);
         m_keywordsRadioButton.addItemListener(radioButtonItemListener);
@@ -276,10 +268,7 @@ class GroupDialog extends JDialog {
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         builderAll.getPanel().getActionMap().put("close", cancelAction);
 
-        m_ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        m_ok.addActionListener(e -> {
                 mOkPressed = true;
                 if (m_explicitRadioButton.isSelected()) {
                     if (m_editedGroup instanceof ExplicitGroup) {
@@ -288,8 +277,7 @@ class GroupDialog extends JDialog {
                         mResultingGroup.setName(m_name.getText().trim());
                         mResultingGroup.setHierarchicalContext(getContext());
                     } else {
-                        mResultingGroup = new ExplicitGroup(m_name.getText()
-                                .trim(), getContext());
+                        mResultingGroup = new ExplicitGroup(m_name.getText().trim(), getContext());
                         if (m_editedGroup != null) {
                             addPreviousEntries();
                         }
@@ -319,24 +307,10 @@ class GroupDialog extends JDialog {
                     }
                 }
                 dispose();
-            }
         });
 
-        CaretListener caretListener = new CaretListener() {
-
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                updateComponents();
-            }
-        };
-
-        ItemListener itemListener = new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                updateComponents();
-            }
-        };
+        CaretListener caretListener = e -> updateComponents();
+        ItemListener itemListener = e -> updateComponents();
 
         m_name.addCaretListener(caretListener);
         m_kgSearchField.addCaretListener(caretListener);
@@ -385,14 +359,11 @@ class GroupDialog extends JDialog {
 
     private void setLayoutForSelectedGroup() {
         if (m_explicitRadioButton.isSelected()) {
-            m_optionsLayout.show(m_optionsPanel, String
-                    .valueOf(GroupDialog.INDEX_EXPLICITGROUP));
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(GroupDialog.INDEX_EXPLICITGROUP));
         } else if (m_keywordsRadioButton.isSelected()) {
-            m_optionsLayout.show(m_optionsPanel, String
-                    .valueOf(GroupDialog.INDEX_KEYWORDGROUP));
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(GroupDialog.INDEX_KEYWORDGROUP));
         } else if (m_searchRadioButton.isSelected()) {
-            m_optionsLayout.show(m_optionsPanel, String
-                    .valueOf(GroupDialog.INDEX_SEARCHGROUP));
+            m_optionsLayout.show(m_optionsPanel, String.valueOf(GroupDialog.INDEX_SEARCHGROUP));
         }
     }
 
@@ -575,5 +546,4 @@ class GroupDialog extends JDialog {
             m_independentButton.setSelected(true);
         }
     }
-
 }

@@ -1349,7 +1349,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
                     for (final TreePath tree : selection) {
-                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).getNode().addToGroup(entries);
+                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
                     }
                 }
                 //BasePanel.this.updateEntryEditorIfShowing(); // doesn't seem to be necessary

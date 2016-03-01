@@ -294,7 +294,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                Optional<EntriesGroupChange> undo = target.getNode().addToGroup(selection.getSelection());
+                Optional<EntriesGroupChange> undo = target.addEntriesToGroup(selection.getSelection());
                 if (undo.isPresent()) {
                     dtde.getDropTargetContext().dropComplete(true);
                     groupSelector.revalidateGroups();

@@ -1195,7 +1195,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return false; // not possible
         }
         Optional<MoveGroupChange> moveChange;
-        if (!node.canMoveUp() || (! (moveChange = node.getNode().moveUp()).isPresent())) {
+        if (!node.canMoveUp() || (! (moveChange = node.moveUp()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" up.", node.getNode().getGroup().getName()));
             return false; // not possible
         }
@@ -1217,7 +1217,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return false; // not possible
         }
         Optional<MoveGroupChange> moveChange;
-        if (!node.canMoveDown() || (! (moveChange = node.getNode().moveDown()).isPresent())) {
+        if (!node.canMoveDown() || (! (moveChange = node.moveDown()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" down.", node.getNode().getGroup().getName()));
             return false; // not possible
         }
@@ -1239,7 +1239,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return false; // not possible
         }
         Optional<MoveGroupChange> moveChange;
-        if (!node.canMoveLeft() || (! (moveChange = node.getNode().moveLeft()).isPresent())) {
+        if (!node.canMoveLeft() || (! (moveChange = node.moveLeft()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" left.", node.getNode().getGroup().getName()));
             return false; // not possible
         }
@@ -1260,7 +1260,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return false; // not possible
         }
         Optional<MoveGroupChange> moveChange;
-        if (!node.canMoveRight() || (! (moveChange = node.getNode().moveRight()).isPresent())) {
+        if (!node.canMoveRight() || (! (moveChange = node.moveRight()).isPresent())) {
             frame.output(Localization.lang("Cannot move group \"%0\" right.", node.getNode().getGroup().getName()));
             return false; // not possible
         }
