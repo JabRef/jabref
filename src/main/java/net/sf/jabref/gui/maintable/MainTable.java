@@ -177,6 +177,9 @@ public class MainTable extends JTable {
 
         this.tableColumnListener = new PersistenceTableColumnListener(this);
 
+        // set table header render AFTER creation of comparatorChooser (this enables sort arrow rendering)
+        this.getTableHeader().setDefaultRenderer(new MainTableHeaderRenderer(this.getTableHeader().getDefaultRenderer()));
+
         // TODO: Figure out, whether this call is needed.
         getSelected();
 
@@ -189,7 +192,6 @@ public class MainTable extends JTable {
         setupComparatorChooser();
         refreshSorting();
         setWidths();
-
     }
 
     public void refreshSorting() {
