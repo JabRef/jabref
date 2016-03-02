@@ -44,6 +44,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * Run `gradlew generateSource` (not required at eclipse, already in the dependencies of `eclipse` task)
 * If you use Eclipse: run `gradlew eclipse` (`./gradlew eclipse` in Linux)
 * If you use IntelliJ: No extra setup is required
+* In rare cases you might encounter problems due to out-dated automatically generated source files. Running `gradlew clean` deletes these old copies.
 
 ### Building it into your IDE
 * Open Eclipse (or your preferred IDE)
