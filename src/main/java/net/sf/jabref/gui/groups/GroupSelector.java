@@ -27,10 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -52,8 +49,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
@@ -143,8 +139,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
-
-        this.groupsRoot = new GroupTreeNodeViewModel(new GroupTreeNode(new AllEntriesGroup()));
 
         this.frame = frame;
         hideNonHits = new JRadioButtonMenuItem(Localization.lang("Hide non-hits"),
@@ -347,7 +341,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 frame.output(Localization.lang("Created group \"%0\".", newGroup.getName()));
             }
         });
-        refresh.addActionListener(e -> valueChanged(null));
+        refresh.addActionListener(e -> revalidateGroups());
         andCb.addActionListener(e -> valueChanged(null));
         orCb.addActionListener(e -> valueChanged(null));
         invCb.addActionListener(e -> valueChanged(null));
@@ -414,10 +408,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // helpButton.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.red));
         groupsTree = new GroupsTree(this);
         groupsTree.addTreeSelectionListener(this);
-        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(groupsRoot));
+
         JScrollPane sp = new JScrollPane(groupsTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        revalidateGroups();
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         con.gridx = 0;
@@ -475,6 +468,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         NodeAction moveNodeRightAction = new MoveNodeRightAction();
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
+
+
+        setGroups(new GroupTreeNode(new AllEntriesGroup()));
     }
 
     private void definePopup() {
@@ -839,8 +835,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
-        this.groupsRoot.subscribeToDescendantChanged(source -> revalidateGroups());
-        groupsTree.setModel(groupsTreeModel = new DefaultTreeModel(this.groupsRoot));
+        this.groupsRoot.subscribeToDescendantChanged(source -> groupsTreeModel.nodeStructureChanged(source));
+        groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
+        groupsTree.setModel(groupsTreeModel);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
             this.groupsRoot.expandSubtree(groupsTree);
         }
@@ -1107,9 +1104,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            final GroupTreeNodeViewModel node = getNodeToUse();
-            TreePath path = node.getTreePath();
-            ((GroupTreeNodeViewModel) path.getLastPathComponent()).expandSubtree(groupsTree);
+            getNodeToUse().expandSubtree(groupsTree);
             revalidateGroups();
         }
     }
@@ -1122,9 +1117,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            final GroupTreeNodeViewModel node = getNodeToUse();
-            TreePath path = node.getTreePath();
-            ((GroupTreeNodeViewModel) path.getLastPathComponent()).collapseSubtree(groupsTree);
+            getNodeToUse().collapseSubtree(groupsTree);
             revalidateGroups();
         }
     }

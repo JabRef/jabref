@@ -64,6 +64,14 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     private final GroupTreeNode node;
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("GroupTreeNodeViewModel{");
+        sb.append("node=").append(node);
+        sb.append('}');
+        return sb.toString();
+    }
+
     public GroupTreeNodeViewModel(GroupTreeNode node) {
         this.node = node;
     }
@@ -235,6 +243,24 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         getNode().sortChildren(
                 (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
                 recursive);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) o;
+        return node.equals(viewModel.node);
+    }
+
+    @Override
+    public int hashCode() {
+        return node.hashCode();
     }
 
     public String getName() {

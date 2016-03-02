@@ -129,34 +129,21 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return searchRule;
     }
 
-    /**
-     * Recursively compares this node's group and all subgroups.
-     */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof GroupTreeNode)) {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final GroupTreeNode otherNode = (GroupTreeNode) other;
-        if (getNumberOfChildren() != otherNode.getNumberOfChildren()) {
-            return false;
-        }
-        AbstractGroup g1 = group;
-        AbstractGroup g2 = otherNode.group;
-        if (!g1.equals(g2)) {
-            return false;
-        }
-        for (int i = 0; i < getNumberOfChildren(); ++i) {
-            if (!getChildAt(i).equals(otherNode.getChildAt(i))) {
-                return false;
-            }
-        }
-        return true;
+        GroupTreeNode that = (GroupTreeNode) o;
+        return Objects.equals(group, that.group);
     }
 
     @Override
     public int hashCode() {
-        return getTreeAsString().hashCode();
+        return Objects.hash(group);
     }
 
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
