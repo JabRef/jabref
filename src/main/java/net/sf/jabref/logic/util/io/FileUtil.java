@@ -208,7 +208,7 @@ public class FileUtil {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
      */
-    public static Optional<File> expandFilename(String filename, String dir) {
+    private static Optional<File> expandFilename(String filename, String dir) {
 
         if ((filename == null) || filename.isEmpty()) {
             return Optional.empty();

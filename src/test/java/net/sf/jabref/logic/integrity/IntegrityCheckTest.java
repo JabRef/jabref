@@ -1,14 +1,17 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +20,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class IntegrityCheckTest {
+
+    @BeforeClass
+    public static void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Test
     public void testUrlChecks() {
@@ -95,7 +103,22 @@ public class IntegrityCheckTest {
         Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
 
         assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
+        assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));
         assertWrong(createContext("file", ":asflakjfwofja:PDF", metaData));
+    }
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Test
+    public void fileCheckFindsFilesRelativeToBibFile() throws IOException {
+        File bibFile = testFolder.newFile("lit.bib");
+        testFolder.newFile("file.pdf");
+
+        MetaData metaData = new MetaData();
+        metaData.setFile(bibFile);
+
+        assertCorrect(createContext("file", ":file.pdf:PDF", metaData));
     }
 
     @Test
