@@ -12,7 +12,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_Natbib() {
+    public void testFixAuthorNatbib() {
         Assert.assertEquals("", AuthorList.fixAuthorNatbib(""));
         Assert.assertEquals("Smith", AuthorList.fixAuthorNatbib("John Smith"));
         Assert.assertEquals("Smith and Black Brown", AuthorList
@@ -37,7 +37,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_firstNameFirstCommas() {
+    public void testFixAuthorFirstNameFirstCommas() {
 
         // No Commas
         Assert.assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", true, false));
@@ -106,7 +106,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_firstNameFirst() {
+    public void testFixAuthorFirstNameFirst() {
         Assert.assertEquals("John Smith", AuthorList.fixAuthorFirstNameFirst("John Smith"));
 
         Assert.assertEquals("John Smith and Peter Black Brown", AuthorList
@@ -128,7 +128,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_lastNameFirstCommas() {
+    public void testFixAuthorLastNameFirstCommas() {
 
         { // No commas before and
             Assert.assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", true, false));
@@ -199,7 +199,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_lastNameFirst() {
+    public void testFixAuthorLastNameFirst() {
 
         // Test helper method
 
@@ -259,7 +259,7 @@ public class AuthorListTest {
 
     @SuppressWarnings("unused")
 	@Test
-    public void testFixAuthor_lastNameOnlyCommas() {
+    public void testFixAuthorLastNameOnlyCommas() {
 
         // No comma before and
         Assert.assertEquals("", AuthorList.fixAuthorLastNameOnlyCommas("", false));

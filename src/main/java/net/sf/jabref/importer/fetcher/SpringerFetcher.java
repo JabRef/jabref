@@ -102,7 +102,7 @@ public class SpringerFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("records");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject springerJsonEntry = results.getJSONObject(i);
-                            BibEntry entry = JSONEntryParser.SpringerJSONtoBibtex(springerJsonEntry);
+                            BibEntry entry = JSONEntryParser.parseSpringerJSONtoBibtex(springerJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);
