@@ -67,7 +67,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.wizard.auximport.AuxSubGenerator;
+import net.sf.jabref.wizard.auximport.AuxFileParser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -92,7 +92,7 @@ public class FromAuxDialog extends JDialog {
 
     private boolean generatePressed;
 
-    private final AuxSubGenerator auxParser;
+    private final AuxFileParser auxParser;
 
     private final JabRefFrame parentFrame;
 
@@ -104,7 +104,7 @@ public class FromAuxDialog extends JDialog {
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
 
-        auxParser = new AuxSubGenerator();
+        auxParser = new AuxFileParser();
 
         jbInit();
         pack();
@@ -247,7 +247,7 @@ public class FromAuxDialog extends JDialog {
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
             auxParser.clear();
-            List<String> list = auxParser.generate(auxName, refBase);
+            List<String> list = auxParser.generateBibDatabase(auxName, refBase);
             notFoundList.setListData(list.toArray(new String[list.size()]));
             statusInfos.append(auxParser.getInformation(false));
 
@@ -256,7 +256,7 @@ public class FromAuxDialog extends JDialog {
         }
 
         // the generated database contains no entries -> no active generate-button
-        if (auxParser.emptyGeneratedDatabase()) {
+        if (auxParser.getGeneratedBibDatabase().isEmpty()) {
             statusInfos.append("\n" + Localization.lang("empty database"));
             generateButton.setEnabled(false);
         }
@@ -269,7 +269,7 @@ public class FromAuxDialog extends JDialog {
     }
 
     public BibDatabase getGenerateDB() {
-        return auxParser.getGeneratedDatabase();
+        return auxParser.getGeneratedBibDatabase();
     }
 
     /**
