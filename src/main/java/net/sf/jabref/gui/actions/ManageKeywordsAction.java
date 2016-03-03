@@ -182,9 +182,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
             List<String> values = keywordList.getSelectedValuesList();
 
-            for (String val : values) {
-                keywordListModel.removeElement(val);
-            }
+            values.forEach(keywordListModel::removeElement);
         };
 
         remove.addActionListener(removeActionListenter);
@@ -413,9 +411,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         }
-        for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-            keywordListModel.addElement(s);
-        }
+        sortedKeywordsOfAllEntriesBeforeUpdateByUser.forEach(keywordListModel::addElement);
     }
 
 }

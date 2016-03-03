@@ -309,9 +309,9 @@ public class Util {
         // show a warning, then return
         StringBuilder message = new StringBuilder(
                 "This action will modify the following field(s)\n" + "in at least one entry each:\n");
-        for (String affectedField : affectedFields) {
-            message.append(affectedField).append('\n');
-        }
+
+        affectedFields.forEach(affectedField -> message.append(affectedField).append('\n'));
+
         message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
@@ -435,15 +435,11 @@ public class Util {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
                 List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
-                for (String dirs1 : dirsS) {
-                    dirs.add(new File(dirs1));
-                }
+                dirsS.forEach(dirs1 -> dirs.add(new File(dirs1)));
 
                 // determine extensions
                 Collection<String> extensions = new ArrayList<>();
-                for (final ExternalFileType type : types) {
-                    extensions.add(type.getExtension());
-                }
+                types.forEach(type -> extensions.add(type.getExtension()));
 
                 // Run the search operation:
                 Map<BibEntry, List<File>> result;

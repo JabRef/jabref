@@ -88,9 +88,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         Set<String> allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
 
-        for (String f : allFields) {
-            field.addItem(f);
-        }
+        allFields.forEach(field::addItem);
 
         set.addChangeListener(e ->
         // Entering a text is only relevant if we are setting, not clearing:

@@ -337,9 +337,7 @@ public final class ExternalFileTypes {
         }
 
         // Finally, build the list of types based on the modified defaults list:
-        for (ExternalFileType type : types) {
-            externalFileTypes.add(type);
-        }
+        types.forEach(externalFileTypes::add);
     }
 
 }

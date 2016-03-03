@@ -91,9 +91,7 @@ public class ExportFormats {
 
         // Now add custom export formats
         Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();
-        for (IExportFormat format : customFormats.values()) {
-            ExportFormats.putFormat(format);
-        }
+        customFormats.values().forEach(ExportFormats::putFormat);
     }
 
     /**
@@ -288,9 +286,7 @@ public class ExportFormats {
                 defaultFilter = format.getFileFilter();
             }
         }
-        for (FileFilter ff : filters) {
-            fc.addChoosableFileFilter(ff);
-        }
+        filters.forEach(fc::addChoosableFileFilter);
         fc.setAcceptAllFileFilterUsed(false);
         if (defaultFilter != null) {
             fc.setFileFilter(defaultFilter);

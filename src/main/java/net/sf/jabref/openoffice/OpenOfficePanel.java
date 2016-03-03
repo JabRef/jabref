@@ -341,9 +341,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
-            for (BasePanel basePanel : frame.getBasePanelList()) {
-                databases.add(basePanel.database());
-            }
+            frame.getBasePanelList().forEach(basePanel -> databases.add(basePanel.database()));
         } else {
             databases.add(frame.getCurrentBasePanel().database());
         }

@@ -128,9 +128,7 @@ public class AutoSaveManager {
      * if they exist.
      */
     public void clearAutoSaves() {
-        for (BasePanel panel : frame.getBasePanelList()) {
-            AutoSaveManager.deleteAutoSaveFile(panel);
-        }
+        frame.getBasePanelList().forEach(AutoSaveManager::deleteAutoSaveFile);
     }
 
     /**

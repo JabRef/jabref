@@ -1177,9 +1177,7 @@ public class VM implements Warn {
     private void iterate(Tree child) {
         BstFunction f = functions.get(child.getChild(0).getText());
 
-        for (BstEntry entry : entries) {
-            f.execute(entry);
-        }
+        entries.forEach(f::execute);
     }
 
     /**

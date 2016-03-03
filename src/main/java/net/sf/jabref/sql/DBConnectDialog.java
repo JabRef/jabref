@@ -86,9 +86,7 @@ public class DBConnectDialog extends JDialog {
         lblPassword.setText(Localization.lang("Password") + ':');
 
         // set label text alignment
-        for (JLabel label : lhs) {
-            label.setHorizontalAlignment(SwingConstants.RIGHT);
-        }
+        lhs.forEach(label -> label.setHorizontalAlignment(SwingConstants.RIGHT));
 
         // set button text
         JButton btnConnect = new JButton();
@@ -99,9 +97,7 @@ public class DBConnectDialog extends JDialog {
         // init input fields to current DB strings
         String srvSel = dbStrings.getServerType();
         List<String> srv = dbStrings.getServerTypes();
-        for (String aSrv : srv) {
-            cmbServerType.addItem(aSrv);
-        }
+        srv.forEach(cmbServerType::addItem);
 
         cmbServerType.setSelectedItem(srvSel);
         txtServerHostname.setText(dbStrings.getServerHostname());

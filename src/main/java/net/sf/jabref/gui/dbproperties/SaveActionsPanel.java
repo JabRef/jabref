@@ -60,9 +60,7 @@ public class SaveActionsPanel extends JPanel {
         builder.add(getSelectorPanel()).xy(3, 3);
 
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
-        for (FieldFormatterCleanup action : configuredActions) {
-            actionsToDisplay.add(action);
-        }
+        actionsToDisplay.addAll(configuredActions);
 
         actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

@@ -849,9 +849,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     public void updateAllContentSelectors() {
         if (!contentSelectors.isEmpty()) {
-            for (FieldContentSelector contentSelector : contentSelectors) {
-                contentSelector.rebuildComboBox();
-            }
+            contentSelectors.forEach(contentSelector -> contentSelector.rebuildComboBox());
         }
     }
 
