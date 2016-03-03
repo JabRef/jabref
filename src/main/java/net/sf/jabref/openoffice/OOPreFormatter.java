@@ -35,7 +35,7 @@ public class OOPreFormatter implements LayoutFormatter {
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
+        String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
@@ -48,8 +48,8 @@ public class OOPreFormatter implements LayoutFormatter {
         boolean escaped = false;
         boolean incommand = false;
 
-        for (i = 0; i < field.length(); i++) {
-            c = field.charAt(i);
+        for (i = 0; i < finalResult.length(); i++) {
+            c = finalResult.charAt(i);
             if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
@@ -82,20 +82,20 @@ public class OOPreFormatter implements LayoutFormatter {
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= (field.length() - 1)) {
+                        if (i >= (finalResult.length() - 1)) {
                             break testCharCom;
                         }
 
                         String command = currentCommand.toString();
                         i++;
-                        c = field.charAt(i);
+                        c = finalResult.charAt(i);
                         String combody;
                         if (c == '{') {
-                            String part = StringUtil.getPart(field, i, false);
+                            String part = StringUtil.getPart(finalResult, i, false);
                             i += part.length();
                             combody = part;
                         } else {
-                            combody = field.substring(i, i + 1);
+                            combody = finalResult.substring(i, i + 1);
                         }
                         String result = OOPreFormatter.CHARS.get(command + combody);
 
@@ -107,7 +107,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if ((i + 1) == field.length()) {
+                        if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
                             Object result = OOPreFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
@@ -136,11 +136,11 @@ public class OOPreFormatter implements LayoutFormatter {
                     // If so, handle.
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
-                        String part = StringUtil.getPart(field, i, true);
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
-                        String part = StringUtil.getPart(field, i, true);
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command

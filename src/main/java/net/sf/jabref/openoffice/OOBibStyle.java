@@ -295,6 +295,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 handleJournalsLine(line);
                 break;
             default:
+                break;
             }
 
         }
@@ -728,9 +729,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 if (fieldFormatter != null) {
 
                     if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
-                        content = fieldFormatter.format(content);
-                        content = "{" + content + "}";
-                        return content;
+                        return "{" + fieldFormatter.format(content) + "}";
                     }
                     return fieldFormatter.format(content);
                 }
