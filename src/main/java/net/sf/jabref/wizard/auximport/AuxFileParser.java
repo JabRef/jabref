@@ -119,7 +119,8 @@ public class AuxFileParser {
      */
     private void parseAuxFile(String filename) {
         // nested aux files
-        List<String> fileList = Arrays.asList(filename);
+        List<String> fileList = new ArrayList<>(1);
+        fileList.add(filename);
 
         int fileIndex = 0;
 
@@ -144,8 +145,13 @@ public class AuxFileParser {
                     Matcher inputMatch = INPUT_PATTERN.matcher(line);
 
                     while (inputMatch.find()) {
-                        String inputString = citeMatch.group(2);
-                        String inputFile = new File(filename).toPath().resolve(inputString).toString();
+                        String inputString = inputMatch.group(1);
+
+                        String inputFile = inputString;
+                        Path rootPath = new File(filename).toPath().getParent();
+                        if(rootPath != null) {
+                            inputFile = rootPath.resolve(inputString).toString();
+                        }
 
                         if (!fileList.contains(inputFile)) {
                             fileList.add(inputFile);
