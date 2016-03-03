@@ -334,15 +334,14 @@ public class AuthorListTest {
         Assert.assertFalse(AuthorList.getAuthorList("Bar").isEmpty());
     }
 
+    @Test(expected = Exception.class)
+    public void testGetEmptyAuthor() {
+        AuthorList.getAuthorList("").getAuthor(0);
+        Assert.fail();
+    }
+
     @Test
     public void testGetAuthor() {
-
-        try {
-            AuthorList.getAuthorList("").getAuthor(0);
-            Assert.fail();
-        } catch (Exception ignored) {
-            // Ignored
-        }
 
         AuthorList.Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John")
                 .getAuthor(0);
