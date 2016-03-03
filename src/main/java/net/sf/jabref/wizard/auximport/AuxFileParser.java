@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,21 +23,20 @@ import java.util.regex.Pattern;
 public class AuxFileParser {
     private static final Log LOGGER = LogFactory.getLog(AuxFileParser.class);
 
-    private static final Pattern TAG_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
-
     private BibDatabase masterDatabase;
+
     private BibDatabase auxDatabase;
-
     private final Set<String> uniqueKeys = new HashSet<>();
-    private final List<String> unresolvedKeys = new ArrayList<>();
 
+    private final List<String> unresolvedKeys = new ArrayList<>();
     private int nestedAuxCount;
+
     private int crossRefEntriesCount;
 
     /**
      * Generates a database based on the given aux file and BibTeX database
      *
-     * @param auxFile Path to the LaTeX aux file
+     * @param auxFile  Path to the LaTeX aux file
      * @param database BibTeX database
      */
     public AuxFileParser(String auxFile, BibDatabase database) {
@@ -101,135 +102,71 @@ public class AuxFileParser {
         return result.toString();
     }
 
+    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
+    private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
+
     /*
-     * parseAuxFile read the Aux file and fill up some intern data structures. Nested aux files (latex \\include)
-     * supported!
+     * Parses the aux file and extracts all bib keys.
+     * Also supports nested aux files (latex \\include).
      *
-     *     // found at comp.text.tex
-     //  > Can anyone tell be the information held within a .aux file?  Is there a
-     //  > specific format to this file?
-     //
-     // I don't think there is a particular format. Every package, class
-     // or document can write to the aux file. The aux file consists of LaTeX macros
-     // and is read at the \begin{document} and again at the \end{document}.
-     //
-     // It usually contains information about existing labels
-     //  \\newlabel{sec:Intro}{{1}{1}}
-     // and citations
-     //  \citation{hiri:conv:1993}
-     // and macros to write information to other files (like toc, lof or lot files)
-     //  \@writefile{toc}{\contentsline {section}{\numberline
-     // {1}Intro}{1}}
-     // but as I said, there can be a lot more
-
-     // aux file :
-     //
-     // \\citation{x}  x = used reference of bibtex library entry
-     //
-     // \\@input{x}  x = nested aux file
-     //
-     // the \\bibdata{x} directive contains information about the
-     // bibtex library file -> x = name of bib file
-     //
-     // \\bibcite{x}{y}
-     //   x is a label for an item and y is the index in bibliography
-     * @param filename String : Path to LatexAuxFile
-     * @return boolean, true = no error occurs
+     * There exists no specification of the aux file.
+     * Every package, class or document can write to the aux file.
+     * The aux file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
+     *
+     * BibTeX citation: \citation{x,y,z}
+     * Biblatex citation: \abx@aux@cite{x,y,z}
+     * Nested aux files: \@input{x}
      */
-    private boolean parseAuxFile(String filename) {
-        // regular expressions
-        Matcher matcher;
+    private void parseAuxFile(String filename) {
+        // nested aux files
+        List<String> fileList = Arrays.asList(filename);
 
-        // file list, used for nested aux files
-        List<String> fileList = new ArrayList<>(5);
-        fileList.add(filename);
-
-        // get the file path
-        File dummy = new File(filename);
-        String path = dummy.getParent();
-        if (path == null) {
-            path = "";
-        } else {
-            path = path + File.separator;
-        }
-
-        nestedAuxCount = -1; // count only the nested reads
-
-        // index of current file in list
         int fileIndex = 0;
 
-        // while condition
-        boolean cont;
         while (fileIndex < fileList.size()) {
-            String fName = fileList.get(fileIndex);
-            try (BufferedReader br = new BufferedReader(new FileReader(fName))) {
-                cont = true;
+            String file = fileList.get(fileIndex);
 
-                while (cont) {
-                    Optional<String> maybeLine;
-                    try {
-                        maybeLine = Optional.ofNullable(br.readLine());
-                    } catch (IOException ioe) {
-                        maybeLine = Optional.empty();
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+
+                while ((line = br.readLine()) != null) {
+                    Matcher citeMatch = CITE_PATTERN.matcher(line);
+
+                    while (citeMatch.find()) {
+                        String keyString = citeMatch.group(2);
+                        String[] keys = keyString.split(",");
+
+                        for (String key : keys) {
+                            uniqueKeys.add(key.trim());
+                        }
                     }
 
-                    if (maybeLine.isPresent()) {
-                        String line = maybeLine.get();
-                        matcher = TAG_PATTERN.matcher(line);
+                    Matcher inputMatch = INPUT_PATTERN.matcher(line);
 
-                        while (matcher.find()) {
-                            // extract the bibtex-key(s) XXX from \citation{XXX} string
-                            int len = matcher.end() - matcher.start();
-                            if (len > 11) {
-                                String str = matcher.group(2);
-                                // could be an comma separated list of keys
-                                String[] keys = str.split(",");
-                                for (String dummyStr : keys) {
-                                    // delete all unnecessary blanks and save key into an set
-                                    uniqueKeys.add(dummyStr.trim());
-                                }
-                            }
-                        }
-                        // try to find a nested aux file
-                        int index = line.indexOf("\\@input{");
-                        if (index >= 0) {
-                            int start = index + 8;
-                            int end = line.indexOf('}', start);
-                            if (end > start) {
-                                String str = path + line.substring(index + 8, end);
+                    while (inputMatch.find()) {
+                        String inputString = citeMatch.group(2);
+                        String inputFile = new File(filename).toPath().resolve(inputString).toString();
 
-                                // if filename already in file list
-                                if (!fileList.contains(str)) {
-                                    fileList.add(str); // insert file into file list
-                                }
-                            }
+                        if (!fileList.contains(inputFile)) {
+                            fileList.add(inputFile);
+                            nestedAuxCount++;
                         }
-                    } else {
-                        cont = false;
                     }
                 }
-                nestedAuxCount++;
             } catch (FileNotFoundException e) {
-                LOGGER.info("Cannot locate input file!", e);
+                LOGGER.info("Cannot locate input file", e);
             } catch (IOException e) {
-                LOGGER.warn("Problem opening file!", e);
+                LOGGER.warn("Problem opening file", e);
             }
 
-            fileIndex++; // load next file
+            fileIndex++;
         }
-
-        return true;
     }
 
     /*
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the aux file.
      */
     private void resolveTags() {
-        auxDatabase = new BibDatabase();
-        unresolvedKeys.clear();
-
-        // for all bibtex keys (found in aux-file) try to find an equivalent
-        // entry into reference database
         for (String key : uniqueKeys) {
             BibEntry entry = masterDatabase.getEntryByKey(key);
 
@@ -237,28 +174,40 @@ public class AuxFileParser {
                 unresolvedKeys.add(key);
             } else {
                 insertEntry(entry);
-                // Check if the entry we just found references another entry which
-                // we don't already have in our list of entries to include. If so,
-                // pull in that entry as well:
-                entry.getFieldOptional("crossref").ifPresent(crossref -> {
-                    if (!uniqueKeys.contains(crossref)) {
-                        BibEntry refEntry = masterDatabase.getEntryByKey(crossref);
-
-                        if (refEntry == null) {
-                            unresolvedKeys.add(crossref);
-                        } else {
-                            insertEntry(refEntry);
-                            crossRefEntriesCount++;
-                        }
-                    }
-                });
-
+                resolveCrossReferences(entry);
             }
         }
 
         if (auxDatabase.getEntryCount() > 0) {
             copyDatabaseConfiguration();
         }
+    }
+
+    /*
+     * Resolves and adds CrossRef entries
+     */
+    private void resolveCrossReferences(BibEntry entry) {
+        entry.getFieldOptional("crossref").ifPresent(crossref -> {
+            if (!uniqueKeys.contains(crossref)) {
+                BibEntry refEntry = masterDatabase.getEntryByKey(crossref);
+
+                if (refEntry == null) {
+                    unresolvedKeys.add(crossref);
+                } else {
+                    insertEntry(refEntry);
+                    crossRefEntriesCount++;
+                }
+            }
+        });
+    }
+
+    /*
+     * Insert a clone of the given entry. The clone is given a new unique ID.
+     */
+    private void insertEntry(BibEntry entry) {
+        BibEntry clonedEntry = (BibEntry) entry.clone();
+        clonedEntry.setId(IdGenerator.next());
+        auxDatabase.insertEntry(clonedEntry);
     }
 
     /*
@@ -271,15 +220,5 @@ public class AuxFileParser {
             BibtexString string = masterDatabase.getString(key);
             auxDatabase.addString(string);
         }
-    }
-
-    /*
-     * Insert a clone of the given entry.
-     * The clone is given a new unique ID.
-     */
-    private void insertEntry(BibEntry entry) {
-        BibEntry clonedEntry = (BibEntry) entry.clone();
-        clonedEntry.setId(IdGenerator.next());
-        auxDatabase.insertEntry(clonedEntry);
     }
 }

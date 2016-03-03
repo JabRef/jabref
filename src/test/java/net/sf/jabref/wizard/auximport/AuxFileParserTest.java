@@ -70,4 +70,5 @@ public class AuxFileParserTest {
 
     // TODO strings and preamble test
     // TODO return type of generate during error should be false
+    // TODO resolve nested aux files
 }
