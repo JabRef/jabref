@@ -76,7 +76,6 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FromAuxDialog extends JDialog {
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
-    private final JButton selectInDBButton = new JButton();
     private final JButton generateButton = new JButton();
     private final JButton cancelButton = new JButton();
     private final JButton parseButton = new JButton();
@@ -115,9 +114,6 @@ public class FromAuxDialog extends JDialog {
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
-        selectInDBButton.setText(Localization.lang("Select"));
-        selectInDBButton.setEnabled(false);
-        selectInDBButton.addActionListener(e -> selectActionPerformed());
         generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
         generateButton.addActionListener(e -> {
@@ -140,7 +136,6 @@ public class FromAuxDialog extends JDialog {
         bb.addGlue();
         bb.addButton(parseButton);
         bb.addRelatedGap();
-        bb.addButton(selectInDBButton);
         bb.addButton(generateButton);
         bb.addButton(cancelButton);
         bb.addGlue();
@@ -221,25 +216,9 @@ public class FromAuxDialog extends JDialog {
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    private void selectActionPerformed() {
-        BibDatabase db = getGenerateDB();
-        MainTable mainTable = parentFrame.getCurrentBasePanel().mainTable;
-        BibDatabase database = parentFrame.getCurrentBasePanel().getDatabase();
-        mainTable.clearSelection();
-        for (BibEntry newEntry : db.getEntries()) {
-            // the entries are not the same objects as in the original database
-            // therefore, we have to search for the entries in the original database
-            // to be able to find them in the maintable
-            BibEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
-            int row = mainTable.findEntry(origEntry);
-            mainTable.addSelection(row);
-        }
-    }
-
     private void parseActionPerformed() {
         parseButton.setEnabled(false);
-        BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
-                dbChooser.getSelectedIndex());
+        BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(dbChooser.getSelectedIndex());
         notFoundList.removeAll();
         statusInfos.setText(null);
         BibDatabase refBase = bp.getDatabase();
@@ -251,7 +230,6 @@ public class FromAuxDialog extends JDialog {
             notFoundList.setListData(list.toArray(new String[list.size()]));
             statusInfos.append(auxParser.getInformation(false));
 
-            selectInDBButton.setEnabled(true);
             generateButton.setEnabled(true);
         }
 
