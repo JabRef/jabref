@@ -14,12 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Latex Aux to Bibtex
- * <p>
- * Description: generates a sub-database which contains only bibtex entries
- * from input aux file</p>
- * Now - the unknown BibTeX entries cannot inserted into the reference
- * database without closing the dialog.
+ * LaTeX Aux to BibTeX Parser
+ *
+ * Extracts a subset of BibTeX entries from a BibDatabase that are included in an aux file.
  */
 public class AuxFileParser {
     private static final Log LOGGER = LogFactory.getLog(AuxFileParser.class);
@@ -32,41 +29,39 @@ public class AuxFileParser {
     private final Set<String> uniqueKeys = new HashSet<>();
     private final List<String> unresolvedKeys = new ArrayList<>();
 
-    private int nestedAuxCounter;
-    private int crossreferencedEntriesCount;
+    private int nestedAuxCount;
+    private int crossRefEntriesCount;
 
     /**
-     * generate Shortcut method for easy generation.
+     * Generates a database based on the given aux file and BibTeX database
      *
-     * @param auxFile String
-     * @param database BibDatabase - reference database
-     * @return Vector - contains all not resolved bibtex entries
+     * @param auxFile Path to the LaTeX aux file
+     * @param database BibTeX database
      */
-    public final List<String> generateBibDatabase(String auxFile, BibDatabase database) {
+    public AuxFileParser(String auxFile, BibDatabase database) {
+        auxDatabase = new BibDatabase();
         masterDatabase = database;
         parseAuxFile(auxFile);
         resolveTags();
-
-        return unresolvedKeys;
     }
 
     public BibDatabase getGeneratedBibDatabase() {
-        if (auxDatabase == null) {
-            auxDatabase = new BibDatabase();
-        }
-
         return auxDatabase;
     }
 
-    public final int getFoundKeysInAux() {
+    public List<String> getUnresolvedKeys() {
+        return unresolvedKeys;
+    }
+
+    public int getFoundKeysInAux() {
         return uniqueKeys.size();
     }
 
-    public final int getResolvedKeysCount() {
-        return auxDatabase.getEntryCount() - crossreferencedEntriesCount;
+    public int getResolvedKeysCount() {
+        return auxDatabase.getEntryCount() - crossRefEntriesCount;
     }
 
-    public final int getNotResolvedKeysCount() {
+    public int getUnresolvedKeysCount() {
         return unresolvedKeys.size();
     }
 
@@ -75,42 +70,38 @@ public class AuxFileParser {
      *
      * @return The number of additional entries pulled in due to crossref
      */
-    public final int getCrossreferencedEntriesCount() {
-        return crossreferencedEntriesCount;
+    public int getCrossRefEntriesCount() {
+        return crossRefEntriesCount;
     }
 
-    /** reset all used data structures */
-    public final void clear() {
-        uniqueKeys.clear();
-        unresolvedKeys.clear();
-        crossreferencedEntriesCount = 0;
-        nestedAuxCounter = 0;
-        masterDatabase = null;
-        auxDatabase = null;
-    }
-
+    /**
+     * Prints parsing statistics
+     *
+     * @param includeMissingEntries
+     * @return
+     */
     public String getInformation(boolean includeMissingEntries) {
         StringBuilder result = new StringBuilder();
-        // print statistics
+
         result.append(Localization.lang("keys_in_database")).append(' ').append(masterDatabase.getEntryCount()).append('\n')
                 .append(Localization.lang("found_in_aux_file")).append(' ').append(getFoundKeysInAux()).append('\n')
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
-                .append(Localization.lang("not_found")).append(' ').append(getNotResolvedKeysCount()).append('\n')
+                .append(Localization.lang("not_found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
-                .append(getCrossreferencedEntriesCount()).append('\n');
+                .append(getCrossRefEntriesCount()).append('\n');
 
-        if (includeMissingEntries && (getNotResolvedKeysCount() > 0)) {
+        if (includeMissingEntries && (getUnresolvedKeysCount() > 0)) {
             for (String entry : unresolvedKeys) {
                 result.append(entry).append('\n');
             }
         }
-        if (nestedAuxCounter > 0) {
-            result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCounter);
+        if (nestedAuxCount > 0) {
+            result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCount);
         }
         return result.toString();
     }
 
-    /**
+    /*
      * parseAuxFile read the Aux file and fill up some intern data structures. Nested aux files (latex \\include)
      * supported!
      *
@@ -162,7 +153,7 @@ public class AuxFileParser {
             path = path + File.separator;
         }
 
-        nestedAuxCounter = -1; // count only the nested reads
+        nestedAuxCount = -1; // count only the nested reads
 
         // index of current file in list
         int fileIndex = 0;
@@ -217,7 +208,7 @@ public class AuxFileParser {
                         cont = false;
                     }
                 }
-                nestedAuxCounter++;
+                nestedAuxCount++;
             } catch (FileNotFoundException e) {
                 LOGGER.info("Cannot locate input file!", e);
             } catch (IOException e) {
@@ -230,9 +221,8 @@ public class AuxFileParser {
         return true;
     }
 
-    /**
-     * resolveTags Try to find an equivalent bibtex entry into reference database for all keys (found in aux file).
-     * This method will fill up some intern data structures.
+    /*
+     * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the aux file.
      */
     private void resolveTags() {
         auxDatabase = new BibDatabase();
@@ -246,21 +236,19 @@ public class AuxFileParser {
             if (entry == null) {
                 unresolvedKeys.add(key);
             } else {
-                insertEntry(auxDatabase, entry);
+                insertEntry(entry);
                 // Check if the entry we just found references another entry which
                 // we don't already have in our list of entries to include. If so,
                 // pull in that entry as well:
                 entry.getFieldOptional("crossref").ifPresent(crossref -> {
                     if (!uniqueKeys.contains(crossref)) {
                         BibEntry refEntry = masterDatabase.getEntryByKey(crossref);
-                        /**
-                         * [ 1717849 ] Patch for aux import by Kai Eckert
-                         */
+
                         if (refEntry == null) {
                             unresolvedKeys.add(crossref);
                         } else {
-                            insertEntry(auxDatabase, refEntry);
-                            crossreferencedEntriesCount++;
+                            insertEntry(refEntry);
+                            crossRefEntriesCount++;
                         }
                     }
                 });
@@ -285,15 +273,13 @@ public class AuxFileParser {
         }
     }
 
-    /**
-     * Insert a clone of the given entry. The clone is given a new unique ID.
-     *
-     * @param database The database to insert into.
-     * @param entry The entry to insert a copy of.
+    /*
+     * Insert a clone of the given entry.
+     * The clone is given a new unique ID.
      */
-    private void insertEntry(BibDatabase database, BibEntry entry) {
+    private void insertEntry(BibEntry entry) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
-        database.insertEntry(clonedEntry);
+        auxDatabase.insertEntry(clonedEntry);
     }
 }

@@ -31,48 +31,19 @@ public class AuxFileParserTest {
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
-            AuxFileParser auxFileParser = new AuxFileParser();
-            List<String> unresolved = auxFileParser.generateBibDatabase(auxFile.getAbsolutePath(), result.getDatabase());
+            AuxFileParser auxFileParser = new AuxFileParser(auxFile.getAbsolutePath(), result.getDatabase());
             assertFalse(auxFileParser.getGeneratedBibDatabase().isEmpty());
-            assertEquals(0, unresolved.size());
-            assertEquals(0, auxFileParser.getNotResolvedKeysCount());
+            assertEquals(0, auxFileParser.getUnresolvedKeysCount());
             BibDatabase newDB = auxFileParser.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
             assertEquals(2, auxFileParser.getResolvedKeysCount());
             assertEquals(2, auxFileParser.getFoundKeysInAux());
             assertEquals(auxFileParser.getFoundKeysInAux(),
-                    auxFileParser.getResolvedKeysCount() + auxFileParser.getNotResolvedKeysCount());
-            assertEquals(0, auxFileParser.getCrossreferencedEntriesCount());
-
-            // Clear
-
-            auxFileParser.clear();
-            assertEquals(0, unresolved.size());
-            assertEquals(0, auxFileParser.getNotResolvedKeysCount());
-            newDB = auxFileParser.getGeneratedBibDatabase();
-            assertEquals(0, newDB.getEntries().size());
-            assertEquals(0, auxFileParser.getResolvedKeysCount());
-            assertEquals(0, auxFileParser.getFoundKeysInAux());
-            assertEquals(auxFileParser.getFoundKeysInAux(),
-                    auxFileParser.getResolvedKeysCount() + auxFileParser.getNotResolvedKeysCount());
-            assertEquals(0, auxFileParser.getCrossreferencedEntriesCount());
-
+                    auxFileParser.getResolvedKeysCount() + auxFileParser.getUnresolvedKeysCount());
+            assertEquals(0, auxFileParser.getCrossRefEntriesCount());
         } catch (IOException ex) {
             fail("Cannot open file");
         }
-    }
-
-    @Test
-    public void testNoInput() {
-        AuxFileParser auxFileParser = new AuxFileParser();
-        assertTrue(auxFileParser.getGeneratedBibDatabase().isEmpty());
-        assertEquals(0, auxFileParser.getNotResolvedKeysCount());
-        BibDatabase newDB = auxFileParser.getGeneratedBibDatabase();
-        assertEquals(0, newDB.getEntries().size());
-        assertEquals(0, auxFileParser.getResolvedKeysCount());
-        assertEquals(0, auxFileParser.getFoundKeysInAux());
-        assertEquals(auxFileParser.getFoundKeysInAux(),
-                auxFileParser.getResolvedKeysCount() + auxFileParser.getNotResolvedKeysCount());
     }
 
     @Test
@@ -82,18 +53,16 @@ public class AuxFileParserTest {
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
-            AuxFileParser auxFileParser = new AuxFileParser();
-            List<String> unresolved = auxFileParser.generateBibDatabase(auxFile.getAbsolutePath(), result.getDatabase());
+            AuxFileParser auxFileParser = new AuxFileParser(auxFile.getAbsolutePath(), result.getDatabase());
             assertFalse(auxFileParser.getGeneratedBibDatabase().isEmpty());
-            assertEquals(1, unresolved.size());
-            assertEquals(1, auxFileParser.getNotResolvedKeysCount());
+            assertEquals(1, auxFileParser.getUnresolvedKeysCount());
             BibDatabase newDB = auxFileParser.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
             assertEquals(2, auxFileParser.getResolvedKeysCount());
             assertEquals(3, auxFileParser.getFoundKeysInAux());
             assertEquals(auxFileParser.getFoundKeysInAux(),
-                    auxFileParser.getResolvedKeysCount() + auxFileParser.getNotResolvedKeysCount());
-            assertEquals(0, auxFileParser.getCrossreferencedEntriesCount());
+                    auxFileParser.getResolvedKeysCount() + auxFileParser.getUnresolvedKeysCount());
+            assertEquals(0, auxFileParser.getCrossRefEntriesCount());
         } catch (IOException ex) {
             fail("Cannot open file");
         }
@@ -101,5 +70,4 @@ public class AuxFileParserTest {
 
     // TODO strings and preamble test
     // TODO return type of generate during error should be false
-
 }

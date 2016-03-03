@@ -91,7 +91,7 @@ public class FromAuxDialog extends JDialog {
 
     private boolean generatePressed;
 
-    private final AuxFileParser auxParser;
+    private AuxFileParser auxParser;
 
     private final JabRefFrame parentFrame;
 
@@ -102,8 +102,6 @@ public class FromAuxDialog extends JDialog {
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
-
-        auxParser = new AuxFileParser();
 
         jbInit();
         pack();
@@ -225,9 +223,8 @@ public class FromAuxDialog extends JDialog {
         String auxName = auxFileField.getText();
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
-            auxParser.clear();
-            List<String> list = auxParser.generateBibDatabase(auxName, refBase);
-            notFoundList.setListData(list.toArray(new String[list.size()]));
+            auxParser = new AuxFileParser(auxName, refBase);
+            notFoundList.setListData(auxParser.getUnresolvedKeys().toArray(new String[auxParser.getUnresolvedKeys().size()]));
             statusInfos.append(auxParser.getInformation(false));
 
             generateButton.setEnabled(true);
