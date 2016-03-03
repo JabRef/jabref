@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -82,5 +83,20 @@ public class OOBibStyleTest {
         } catch (IOException e) {
             fail();
         }
+    }
+
+    @Test
+    public void testGetNumCitationMarker() throws IOException {
+        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
+        Reader r = new InputStreamReader(defPath.openStream());
+        OOBibStyle style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
+        assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), -1, true));
+        assertEquals("[1]", style.getNumCitationMarker(Arrays.asList(1), -1, false));
+        assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), 0, true));
+        assertEquals("[1-3] ", style.getNumCitationMarker(Arrays.asList(1, 2, 3), 1, true));
+        assertEquals("[1; 2; 3] ", style.getNumCitationMarker(Arrays.asList(1, 2, 3), 5, true));
+        assertEquals("[1; 2; 3] ", style.getNumCitationMarker(Arrays.asList(1, 2, 3), -1, true));
+        assertEquals("[1; 3; 12] ", style.getNumCitationMarker(Arrays.asList(1, 12, 3), 1, true));
+        assertEquals("[3-5; 7; 10-12] ", style.getNumCitationMarker(Arrays.asList(12, 7, 3, 4, 11, 10, 5), 1, true));
     }
 }
