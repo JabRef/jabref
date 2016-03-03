@@ -10,18 +10,20 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * LaTeX Aux to BibTeX Parser
- *
+ * <p>
  * Extracts a subset of BibTeX entries from a BibDatabase that are included in an aux file.
  */
 public class AuxFileParser {
     private static final Log LOGGER = LogFactory.getLog(AuxFileParser.class);
+
+    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
+    private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
 
     private BibDatabase masterDatabase;
 
@@ -102,9 +104,6 @@ public class AuxFileParser {
         return result.toString();
     }
 
-    private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
-    private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
-
     /*
      * Parses the aux file and extracts all bib keys.
      * Also supports nested aux files (latex \\include).
@@ -149,7 +148,7 @@ public class AuxFileParser {
 
                         String inputFile = inputString;
                         Path rootPath = new File(filename).toPath().getParent();
-                        if(rootPath != null) {
+                        if (rootPath != null) {
                             inputFile = rootPath.resolve(inputString).toString();
                         }
 

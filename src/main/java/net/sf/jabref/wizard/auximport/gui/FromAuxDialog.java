@@ -39,7 +39,6 @@ package net.sf.jabref.wizard.auximport.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -62,10 +61,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.wizard.auximport.AuxFileParser;
 
@@ -97,7 +94,7 @@ public class FromAuxDialog extends JDialog {
 
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
-            JTabbedPane viewedDBs) {
+                         JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
