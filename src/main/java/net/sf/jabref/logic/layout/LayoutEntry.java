@@ -54,14 +54,14 @@ class LayoutEntry {
 
     public LayoutEntry(StringInt si, JournalAbbreviationRepository repository) {
         type = si.i;
-
-        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
+        switch (type) {
+        case LayoutHelper.IS_LAYOUT_TEXT:
             text = si.s;
-        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
+            break;
+        case LayoutHelper.IS_SIMPLE_FIELD:
             text = si.s.trim();
-        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
-            // Do nothing
-        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
+            break;
+        case LayoutHelper.IS_OPTION_FIELD:
             List<String> v = StringUtil.tokenizeToList(si.s, "\n");
 
             if (v.size() == 1) {
@@ -80,6 +80,11 @@ class LayoutEntry {
                 }
 
             }
+            break;
+        case LayoutHelper.IS_FIELD_START:
+        case LayoutHelper.IS_FIELD_END:
+        default:
+            break;
         }
     }
 
@@ -97,27 +102,30 @@ class LayoutEntry {
         type = layoutType;
         text = blockEnd;
         for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
-            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
-                // Do nothing
-            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
-                    || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
+            switch (parsedEntry.i) {
+            case LayoutHelper.IS_FIELD_START:
+            case LayoutHelper.IS_GROUP_START:
                 blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
-            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                break;
+            case LayoutHelper.IS_FIELD_END:
+            case LayoutHelper.IS_GROUP_END:
                 if (blockStart.equals(parsedEntry.s)) {
                     blockEntries.add(parsedEntry);
-                    if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
-                    } else {
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
-                    }
+                    le = new LayoutEntry(blockEntries,
+                            parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START : LayoutHelper.IS_FIELD_START,
+                            repository);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
                     LOGGER.warn("Nested field entries are not implemented!");
                 }
-            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
+            case LayoutHelper.IS_LAYOUT_TEXT:
+            case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_OPTION_FIELD:
+            default:
                 // Do nothing
+                break;
             }
 
             if (blockEntries == null) {
@@ -140,7 +148,7 @@ class LayoutEntry {
     }
 
     private String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, null);
+        return doLayout(bibtex, database, Optional.empty());
     }
 
     public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
@@ -159,7 +167,7 @@ class LayoutEntry {
             }
             return value;
         case LayoutHelper.IS_FIELD_START:
-        case LayoutHelper.IS_GROUP_START: {
+        case LayoutHelper.IS_GROUP_START:
             String field;
             if (type == LayoutHelper.IS_GROUP_START) {
                 field = BibDatabase.getResolvedField(text, bibtex, database);
@@ -186,9 +194,8 @@ class LayoutEntry {
                 }
             }
 
-            if ((field == null)
-                    || ((type == LayoutHelper.IS_GROUP_START) && field.equalsIgnoreCase(LayoutHelper
-                            .getCurrentGroup()))) {
+            if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
+                    && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
                 return null;
             } else {
                 if (type == LayoutHelper.IS_GROUP_START) {
@@ -244,7 +251,6 @@ class LayoutEntry {
 
                 return sb.toString();
             }
-        }
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
@@ -256,13 +262,13 @@ class LayoutEntry {
             } else {
                 // changed section begin - arudert
                 // resolve field (recognized by leading backslash) or text
-                String field = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex, database)
-                        : BibDatabase.getText(text, database);
+                String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
+                        database) : BibDatabase.getText(text, database);
                 // changed section end - arudert
-                if (field == null) {
+                if (fieldText == null) {
                     fieldEntry = "";
                 } else {
-                    fieldEntry = field;
+                    fieldEntry = fieldText;
                 }
             }
 
@@ -278,12 +284,12 @@ class LayoutEntry {
             }
 
             return fieldEntry;
-            case LayoutHelper.IS_ENCODING_NAME:
-                // Printing the encoding name is not supported in entry layouts, only
-                // in begin/end layouts. This prevents breakage if some users depend
-                // on a field called "encoding". We simply return this field instead:
-                return BibDatabase.getResolvedField("encoding", bibtex, database);
-            default:
+        case LayoutHelper.IS_ENCODING_NAME:
+            // Printing the encoding name is not supported in entry layouts, only
+            // in begin/end layouts. This prevents breakage if some users depend
+            // on a field called "encoding". We simply return this field instead:
+            return BibDatabase.getResolvedField("encoding", bibtex, database);
+        default:
             return "";
         }
     }
