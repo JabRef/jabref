@@ -139,12 +139,10 @@ public class PdfImporter {
         boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
         int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
-        // Get a list of file directories:
-        List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         List<BibEntry> res = new ArrayList<>();
 
-        fileNameLoop: for (String fileName : fileNames) {
+        for (String fileName : fileNames) {
             List<BibEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
@@ -157,113 +155,23 @@ public class PdfImporter {
             }
             if (neverShow || (importDialog.getResult() == JOptionPane.OK_OPTION)) {
                 int choice = neverShow ? globalChoice : importDialog.getChoice();
-                DroppedFileHandler dfh;
-                BibEntry entry;
-                InputStream in = null;
-                List<BibEntry> localRes = null;
                 switch (choice) {
                 case ImportDialog.XMP:
-                    PdfXmpImporter importer = new PdfXmpImporter();
-                    try {
-                        in = new FileInputStream(fileName);
-                        localRes = importer.importEntries(in, frame);
-                    } catch (IOException ex) {
-                        LOGGER.warn("Cannot import entries", ex);
-                    } finally {
-                        try {
-                            if (in != null) {
-                                in.close();
-                            }
-                        } catch (IOException ignored) {
-                            // Ignored
-                        }
-                    }
-
-                    if ((localRes == null) || localRes.isEmpty()) {
-                        // import failed -> generate default entry
-                        LOGGER.info("Import failed");
-                        entry = createNewBlankEntry(fileName);
-                        res.add(entry);
-                        continue fileNameLoop;
-                    }
-
-                    // only one entry is imported
-                    entry = localRes.get(0);
-
-                    // insert entry to database and link file
-                    panel.database().insertEntry(entry);
-                    panel.markBaseChanged();
-                    FileListTableModel tm = new FileListTableModel();
-                    File toLink = new File(fileName);
-                    tm.addEntry(0, new FileListEntry(toLink.getName(),
-                            FileUtil.shortenFileName(toLink, dirsS).getPath(),
-                                    ExternalFileTypes.getInstance().getExternalFileTypeByName("pdf")));
-                    entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
-                    res.add(entry);
+                    doXMPImport(fileName, res);
                     break;
 
                 case ImportDialog.CONTENT:
-                    PdfContentImporter contentImporter = new PdfContentImporter();
-
-                    File file = new File(fileName);
-
-                    try {
-                        in = new FileInputStream(file);
-                    } catch (FileNotFoundException e) {
-                        // import failed -> generate default entry
-                        LOGGER.info("Import failed", e);
-                        entry = createNewBlankEntry(fileName);
-                        res.add(entry);
-                        continue fileNameLoop;
-                    }
-                    try {
-                        localRes = contentImporter.importEntries(in, status);
-                    } catch (IOException e) {
-                        // import failed -> generate default entry
-                        LOGGER.info("Import failed", e);
-                        entry = createNewBlankEntry(fileName);
-                        res.add(entry);
-                        continue fileNameLoop;
-                    } finally {
-                        try {
-                            in.close();
-                        } catch (IOException ignored) {
-                            // Ignored
-                        }
-                    }
-
-                    // import failed -> generate default entry
-                    if ((localRes == null) || localRes.isEmpty()) {
-                        entry = createNewBlankEntry(fileName);
-                        res.add(entry);
-                        continue fileNameLoop;
-                    }
-
-                    // only one entry is imported
-                    entry = localRes.get(0);
-
-                    // insert entry to database and link file
-
-                    panel.database().insertEntry(entry);
-                    panel.markBaseChanged();
-                    LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
-                    dfh = new DroppedFileHandler(frame, panel);
-                    dfh.linkPdfToEntry(fileName, entry);
-                    panel.highlightEntry(entry);
-                    if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                        EntryEditor editor = panel.getEntryEditor(entry);
-                        panel.showEntryEditor(editor);
-                        panel.adjustSplitter();
-                    }
-                    res.add(entry);
+                    doContentImport(fileName, res, status);
                     break;
                 case ImportDialog.NOMETA:
-                    entry = createNewBlankEntry(fileName);
+                    BibEntry entry = createNewBlankEntry(fileName);
                     res.add(entry);
                     break;
                 case ImportDialog.ONLYATTACH:
-                    dfh = new DroppedFileHandler(frame, panel);
+                    DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
                     dfh.linkPdfToEntry(fileName, entryTable, dropRow);
+                    break;
+                default:
                     break;
                 }
             }
@@ -272,6 +180,41 @@ public class PdfImporter {
         return res;
     }
 
+    private void doXMPImport(String fileName, List<BibEntry> res) {
+        BibEntry entry;
+        List<BibEntry> localRes = null;
+        PdfXmpImporter importer = new PdfXmpImporter();
+        try (InputStream in = new FileInputStream(fileName)) {
+            localRes = importer.importEntries(in, frame);
+        } catch (IOException ex) {
+            LOGGER.warn("Cannot import entries", ex);
+        }
+
+        if ((localRes == null) || localRes.isEmpty()) {
+            // import failed -> generate default entry
+            LOGGER.info("Import failed");
+            entry = createNewBlankEntry(fileName);
+            res.add(entry);
+            return;
+        }
+
+        // only one entry is imported
+        entry = localRes.get(0);
+
+        // insert entry to database and link file
+        panel.database().insertEntry(entry);
+        panel.markBaseChanged();
+        FileListTableModel tm = new FileListTableModel();
+        File toLink = new File(fileName);
+        // Get a list of file directories:
+        List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+
+        tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
+                ExternalFileTypes.getInstance().getExternalFileTypeByName("pdf")));
+        entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
+        res.add(entry);
+
+    }
     private BibEntry createNewBlankEntry(String fileName) {
         BibEntry newEntry = createNewEntry();
         if (newEntry != null) {
@@ -279,6 +222,66 @@ public class PdfImporter {
             dfh.linkPdfToEntry(fileName, newEntry);
         }
         return newEntry;
+    }
+
+    private void doContentImport(String fileName, List<BibEntry> res, OutputPrinter status) {
+
+        File file = new File(fileName);
+        InputStream in;
+        BibEntry entry;
+        try {
+            in = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            // import failed -> generate default entry
+            LOGGER.info("Import failed", e);
+            entry = createNewBlankEntry(fileName);
+            res.add(entry);
+            return;
+        }
+        PdfContentImporter contentImporter = new PdfContentImporter();
+        List<BibEntry> localRes = null;
+        try {
+            localRes = contentImporter.importEntries(in, status);
+        } catch (IOException e) {
+            // import failed -> generate default entry
+            LOGGER.info("Import failed", e);
+            entry = createNewBlankEntry(fileName);
+            res.add(entry);
+            return;
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                LOGGER.warn("Problem closing PDF", ex);
+                // Ignored
+            }
+        }
+
+        // import failed -> generate default entry
+        if ((localRes == null) || localRes.isEmpty()) {
+            entry = createNewBlankEntry(fileName);
+            res.add(entry);
+            return;
+        }
+
+        // only one entry is imported
+        entry = localRes.get(0);
+
+        // insert entry to database and link file
+
+        panel.database().insertEntry(entry);
+        panel.markBaseChanged();
+        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
+        DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
+        dfh.linkPdfToEntry(fileName, entry);
+        panel.highlightEntry(entry);
+        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+            EntryEditor editor = panel.getEntryEditor(entry);
+            panel.showEntryEditor(editor);
+            panel.adjustSplitter();
+        }
+        res.add(entry);
+
     }
 
     private BibEntry createNewEntry() {

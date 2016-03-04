@@ -48,42 +48,36 @@ public class Layout {
         String blockStart = null;
 
         for (StringInt parsedEntry : parsedEntries) {
-            // TODO: Rewrite using switch
-            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
+            switch (parsedEntry.i) {
+            case LayoutHelper.IS_LAYOUT_TEXT:
+            case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_OPTION_FIELD:
                 // Do nothing
-            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_START) {
+                break;
+            case LayoutHelper.IS_FIELD_START:
+            case LayoutHelper.IS_GROUP_START:
                 blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
-            } else if (parsedEntry.i == LayoutHelper.IS_FIELD_END) {
+                break;
+            case LayoutHelper.IS_FIELD_END:
+            case LayoutHelper.IS_GROUP_END:
                 if ((blockStart != null) && (blockEntries != null)) {
                     if (blockStart.equals(parsedEntry.s)) {
                         blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
+                        le = new LayoutEntry(blockEntries,
+                                parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
+                                repository);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
                         LOGGER.debug(blockStart + '\n' + parsedEntry.s);
-                        LOGGER.warn("Nested field entries are not implemented!");
+                        LOGGER.warn("Nested field/group entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }
-            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_START) {
-                blockEntries = new ArrayList<>();
-                blockStart = parsedEntry.s;
-            } else if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
-                if ((blockStart != null) && (blockEntries != null)) {
-                    if (blockStart.equals(parsedEntry.s)) {
-                        blockEntries.add(parsedEntry);
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
-                        tmpEntries.add(le);
-                        blockEntries = null;
-                    } else {
-                        LOGGER.warn("Nested field entries are not implemented!");
-                        Thread.dumpStack();
-                    }
-                }
-            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
-                // Do nothing
+                break;
+            default:
+                break;
             }
 
             if (blockEntries == null) {

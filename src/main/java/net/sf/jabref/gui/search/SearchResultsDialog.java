@@ -360,7 +360,8 @@ public class SearchResultsDialog {
                         }
                     });
                     break;
-
+                default:
+                    break;
                 }
             }
         }
@@ -462,10 +463,10 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            if(tmpModel.getEntry(0).type!=null) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
-                            } else {
+                            if (tmpModel.getEntry(0).type == null) {
                                 fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            } else {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
                             }
                         }
                         return fileLabel;
