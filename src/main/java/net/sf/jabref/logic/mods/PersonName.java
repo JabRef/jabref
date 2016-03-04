@@ -50,7 +50,7 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
+        String authorMod = AuthorList.fixAuthorLastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma
         //            XMLChars xmlChars = new XMLChars();

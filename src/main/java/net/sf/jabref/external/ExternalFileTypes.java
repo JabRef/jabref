@@ -40,7 +40,7 @@ public final class ExternalFileTypes {
         updateExternalFileTypes();
     }
 
-    public List<ExternalFileType> getDefaultExternalFileTypes() {
+    public static List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<>();
         list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall",
                 IconTheme.JabRefIcon.PDF_FILE.getSmallIcon()));

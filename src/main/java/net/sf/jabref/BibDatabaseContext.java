@@ -20,6 +20,10 @@ public class BibDatabaseContext {
     private final MetaData metaData;
     private final Defaults defaults;
 
+    public BibDatabaseContext() {
+        this(new Defaults());
+    }
+
     public BibDatabaseContext(Defaults defaults) {
         this(new BibDatabase(), defaults);
     }
@@ -42,7 +46,7 @@ public class BibDatabaseContext {
 
     public BibDatabaseMode getMode() {
         List<String> data = metaData.getData(MetaData.DATABASE_TYPE);
-        if (data == null) {
+        if (data == null || data.isEmpty()) {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
             if (defaults.mode == BibDatabaseMode.BIBLATEX || inferredMode == BibDatabaseMode.BIBLATEX) {
                 return BibDatabaseMode.BIBLATEX;

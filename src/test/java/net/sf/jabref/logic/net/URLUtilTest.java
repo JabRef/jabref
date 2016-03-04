@@ -3,8 +3,6 @@ package net.sf.jabref.logic.net;
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.logic.net.URLUtil;
-
 public class URLUtilTest {
     @Test
     public void cleanGoogleSearchURL() throws Exception {

@@ -81,6 +81,13 @@ public class BibDatabase {
     }
 
     /**
+     * Checks if the database contains no entries.
+     */
+    public boolean isEmpty() {
+        return entries.size() == 0;
+    }
+
+    /**
      * Returns a Set containing the keys to all entries.
      * Use getKeySet().iterator() to iterate over all entries.
      */

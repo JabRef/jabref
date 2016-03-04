@@ -35,7 +35,7 @@ public class SaveActions {
         setAvailableFormatters();
         this.enabled = enabled;
 
-        if (formatterString == null || "".equals(formatterString)) {
+        if ((formatterString == null) || "".equals(formatterString)) {
             // no save actions defined in the meta data
             return;
         } else {
@@ -58,21 +58,25 @@ public class SaveActions {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
 
         SaveActions that = (SaveActions) o;
 
-        if (enabled != that.enabled) return false;
+        if (enabled != that.enabled) {
+            return false;
+        }
         return actions.equals(that.actions);
 
     }
 
     @Override
     public int hashCode() {
-        int result = actions.hashCode();
-        result = 31 * result + (enabled ? 1 : 0);
-        return result;
+        return Objects.hash(actions, enabled);
     }
 
     private void parseSaveActions(String formatterString) {
@@ -95,7 +99,7 @@ public class SaveActions {
                 int tokenIndex = remainingString.indexOf(',');
                 do {
                     boolean doBreak = false;
-                    if (tokenIndex == -1 || tokenIndex > endIndex) {
+                    if ((tokenIndex == -1) || (tokenIndex > endIndex)) {
                         tokenIndex = remainingString.indexOf(']');
                         doBreak = true;
                     }

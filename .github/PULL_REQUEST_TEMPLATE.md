@@ -1,0 +1,4 @@
+- [ ] Change in CHANGELOG.md described?
+- [ ] Changes in pull request outlined? (What, why, ...)
+- [ ] Tests created for changes?
+- [ ] Tests green?

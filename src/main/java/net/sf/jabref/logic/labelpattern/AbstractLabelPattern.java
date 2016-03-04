@@ -17,7 +17,7 @@
 */
 package net.sf.jabref.logic.labelpattern;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,10 +30,7 @@ public abstract class AbstractLabelPattern {
 
     protected List<String> defaultPattern;
 
-    protected Map<String, List<String>> data = new Hashtable<>();
-
-    public AbstractLabelPattern() {
-    }
+    protected Map<String, List<String>> data = new HashMap<>();
 
     public void addLabelPattern(String type, String pattern) {
         data.put(type, LabelPatternUtil.split(pattern));

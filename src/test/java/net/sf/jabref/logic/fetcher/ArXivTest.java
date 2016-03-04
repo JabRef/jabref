@@ -10,11 +10,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class ArXivTest {
-    ArXiv finder;
-    BibEntry entry;
+
+    private ArXiv finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new ArXiv();
         entry = new BibEntry();
     }
@@ -27,6 +28,7 @@ public class ArXivTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test

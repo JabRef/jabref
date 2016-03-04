@@ -5,7 +5,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
+import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class SaveActionsPanel extends JPanel {
 
-    private JCheckBox enabled;
+    private final JCheckBox enabled;
 
     private SaveActions saveActions;
 
@@ -82,7 +82,7 @@ public class SaveActionsPanel extends JPanel {
 
     private void initializeSaveActions(List<String> saveActionsMetaList) {
 
-        if (saveActionsMetaList != null && saveActionsMetaList.size() >= 2) {
+        if ((saveActionsMetaList != null) && (saveActionsMetaList.size() >= 2)) {
             boolean enablementStatus = "enabled".equals(saveActionsMetaList.get(0));
             String formatterString = saveActionsMetaList.get(1);
             saveActions = new SaveActions(enablementStatus, formatterString);
@@ -140,17 +140,15 @@ public class SaveActionsPanel extends JPanel {
     public boolean hasChanged() {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
         String formatterString = SaveActions.getMetaDataString(newActions);
-        boolean hasChanged = !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
 
-        return hasChanged;
+        return !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
     }
 
     public boolean isDefaultSaveActions() {
         List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
         String formatterString = SaveActions.getMetaDataString(newActions);
-        boolean isDefault = SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
 
-        return isDefault;
+        return SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
     }
 
     class AddButtonListener implements ActionListener {
@@ -167,7 +165,7 @@ public class SaveActionsPanel extends JPanel {
             }
 
             String fieldKey = keyField.getText();
-            if (fieldKey == null || fieldKey.equals("")) {
+            if ((fieldKey == null) || fieldKey.isEmpty()) {
                 return;
             }
 

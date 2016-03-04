@@ -27,8 +27,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.exporter.layout.format.XMLChars;
+import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
@@ -122,7 +122,7 @@ class MODSEntry {
         if (bibtex.hasField("author")) {
             authors = getAuthors(bibtex.getField("author"));
         }
-        if ((bibtex.getType().equals("article")) || (bibtex.getType().equals("inproceedings"))) {
+        if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");
@@ -174,7 +174,7 @@ class MODSEntry {
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
-        bibtex.getFieldOptional("year").ifPresent(year -> result.append(year));
+        bibtex.getFieldOptional("year").ifPresent(result::append);
         bibtex.getFieldOptional("month").ifPresent(month -> result.append('-').append(month));
         return result.toString();
     }

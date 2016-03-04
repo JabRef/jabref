@@ -17,13 +17,10 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.*;
@@ -95,30 +92,18 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             field.addItem(f);
         }
 
-        set.addChangeListener(new ChangeListener() {
+        set.addChangeListener(e ->
+        // Entering a text is only relevant if we are setting, not clearing:
+        text.setEnabled(set.isSelected()));
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                // Entering a text is only relevant if we are setting, not clearing:
-                text.setEnabled(set.isSelected());
-            }
-        });
-        clear.addChangeListener(new ChangeListener() {
+        clear.addChangeListener(e ->
+        // Overwrite protection makes no sense if we are clearing the field:
+        overwrite.setEnabled(!clear.isSelected()));
 
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                // Overwrite protection makes no sense if we are clearing the field:
-                overwrite.setEnabled(!clear.isSelected());
-            }
-        });
-        rename.addChangeListener(new ChangeListener() {
+        rename.addChangeListener(e ->
+        // Entering a text is only relevant if we are renaming
+        renameTo.setEnabled(rename.isSelected()));
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                // Entering a text is only relevant if we are renaming
-                renameTo.setEnabled(rename.isSelected());
-            }
-        });
         overwrite = new JCheckBox(Localization.lang("Overwrite existing field values"), true);
         ButtonGroup bg = new ButtonGroup();
         bg.add(all);
@@ -154,22 +139,18 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Check if the user tries to rename multiple fields:
-                if (rename.isSelected()) {
-                    String[] fields = getFieldNames((String) field.getSelectedItem());
-                    if (fields.length > 1) {
-                        JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
-                                "", JOptionPane.ERROR_MESSAGE);
-                        return; // Do not close the dialog.
-                    }
+        ok.addActionListener(e -> {
+            // Check if the user tries to rename multiple fields:
+            if (rename.isSelected()) {
+                String[] fields = getFieldNames((String) field.getSelectedItem());
+                if (fields.length > 1) {
+                    JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
+                            "", JOptionPane.ERROR_MESSAGE);
+                    return; // Do not close the dialog.
                 }
-                cancelled = false;
-                diag.dispose();
             }
+            cancelled = false;
+            diag.dispose();
         });
 
         AbstractAction cancelAction = new AbstractAction() {

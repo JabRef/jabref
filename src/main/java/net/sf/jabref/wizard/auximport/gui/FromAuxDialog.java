@@ -38,7 +38,6 @@ package net.sf.jabref.wizard.auximport.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
@@ -68,7 +67,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.wizard.auximport.AuxSubGenerator;
+import net.sf.jabref.wizard.auximport.AuxFileParser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -77,7 +76,6 @@ import com.jgoodies.forms.layout.FormLayout;
 public class FromAuxDialog extends JDialog {
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
-    private final JButton selectInDBButton = new JButton();
     private final JButton generateButton = new JButton();
     private final JButton cancelButton = new JButton();
     private final JButton parseButton = new JButton();
@@ -93,7 +91,7 @@ public class FromAuxDialog extends JDialog {
 
     private boolean generatePressed;
 
-    private final AuxSubGenerator auxParser;
+    private final AuxFileParser auxParser;
 
     private final JabRefFrame parentFrame;
 
@@ -105,7 +103,7 @@ public class FromAuxDialog extends JDialog {
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
 
-        auxParser = new AuxSubGenerator();
+        auxParser = new AuxFileParser();
 
         jbInit();
         pack();
@@ -116,38 +114,17 @@ public class FromAuxDialog extends JDialog {
         JPanel panel1 = new JPanel();
 
         panel1.setLayout(new BorderLayout());
-        selectInDBButton.setText(Localization.lang("Select"));
-        selectInDBButton.setEnabled(false);
-        selectInDBButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                selectActionPerformed();
-            }
-        });
         generateButton.setText(Localization.lang("Generate"));
         generateButton.setEnabled(false);
-        generateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                generateActionPerformed();
-            }
+        generateButton.addActionListener(e -> {
+            generatePressed = true;
+            dispose();
         });
         cancelButton.setText(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(e -> dispose());
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                cancelActionPerformed();
-            }
-        });
         parseButton.setText(Localization.lang("Parse"));
-        parseButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                parseActionPerformed();
-            }
-        });
+        parseButton.addActionListener(e -> parseActionPerformed());
 
         initPanels();
 
@@ -159,7 +136,6 @@ public class FromAuxDialog extends JDialog {
         bb.addGlue();
         bb.addButton(parseButton);
         bb.addRelatedGap();
-        bb.addButton(selectInDBButton);
         bb.addButton(generateButton);
         bb.addButton(cancelButton);
         bb.addGlue();
@@ -240,34 +216,9 @@ public class FromAuxDialog extends JDialog {
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    private void generateActionPerformed() {
-        generatePressed = true;
-        dispose();
-    }
-
-    private void cancelActionPerformed() {
-        dispose();
-    }
-
-    private void selectActionPerformed() {
-        BibDatabase db = getGenerateDB();
-        MainTable mainTable = parentFrame.getCurrentBasePanel().mainTable;
-        BibDatabase database = parentFrame.getCurrentBasePanel().getDatabase();
-        mainTable.clearSelection();
-        for (BibEntry newEntry : db.getEntries()) {
-            // the entries are not the same objects as in the original database
-            // therefore, we have to search for the entries in the original database
-            // to be able to find them in the maintable
-            BibEntry origEntry = database.getEntryByKey(newEntry.getCiteKey());
-            int row = mainTable.findEntry(origEntry);
-            mainTable.addSelection(row);
-        }
-    }
-
     private void parseActionPerformed() {
         parseButton.setEnabled(false);
-        BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(
-                dbChooser.getSelectedIndex());
+        BasePanel bp = (BasePanel) parentTabbedPane.getComponentAt(dbChooser.getSelectedIndex());
         notFoundList.removeAll();
         statusInfos.setText(null);
         BibDatabase refBase = bp.getDatabase();
@@ -275,16 +226,15 @@ public class FromAuxDialog extends JDialog {
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
             auxParser.clear();
-            List<String> list = auxParser.generate(auxName, refBase);
+            List<String> list = auxParser.generateBibDatabase(auxName, refBase);
             notFoundList.setListData(list.toArray(new String[list.size()]));
             statusInfos.append(auxParser.getInformation(false));
 
-            selectInDBButton.setEnabled(true);
             generateButton.setEnabled(true);
         }
 
         // the generated database contains no entries -> no active generate-button
-        if (auxParser.emptyGeneratedDatabase()) {
+        if (auxParser.getGeneratedBibDatabase().isEmpty()) {
             statusInfos.append("\n" + Localization.lang("empty database"));
             generateButton.setEnabled(false);
         }
@@ -297,7 +247,7 @@ public class FromAuxDialog extends JDialog {
     }
 
     public BibDatabase getGenerateDB() {
-        return auxParser.getGeneratedDatabase();
+        return auxParser.getGeneratedBibDatabase();
     }
 
     /**

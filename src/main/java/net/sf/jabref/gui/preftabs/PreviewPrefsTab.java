@@ -26,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 class PreviewPrefsTab extends JPanel implements PrefsTab {
 
@@ -129,68 +127,50 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         add(secondPanel);
         layoutConstraints.weighty = 0;
 
-        defaultButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tmp = layout1.getText().replace("\n", "__NEWLINE__");
-                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
-                layout1.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
-                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
-            }
-        });
-        defaultButton2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tmp = layout2.getText().replace("\n", "__NEWLINE__");
-                PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
-                layout2.setText(
-                        PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
-                PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
-            }
+        defaultButton.addActionListener(e -> {
+            String tmp = layout1.getText().replace("\n", "__NEWLINE__");
+            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
+            layout1.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
+            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
         });
 
-        testButton.addActionListener(new ActionListener() {
+        defaultButton2.addActionListener(e -> {
+            String tmp = layout2.getText().replace("\n", "__NEWLINE__");
+            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
+            layout2.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
+            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
+        });
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PreviewPrefsTab.getTestEntry();
-                try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                            layout1.getText());
-                    testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"),
-                            JOptionPane.PLAIN_MESSAGE);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    LOGGER.warn("Parsing error.", ex);
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
-                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
-                }
+        testButton.addActionListener(e -> {
+            PreviewPrefsTab.getTestEntry();
+            try {
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                        layout1.getText());
+                testPanel.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+            } catch (StringIndexOutOfBoundsException ex) {
+                LOGGER.warn("Parsing error.", ex);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
+                                + ".\n" + ex.getMessage(),
+                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        testButton2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PreviewPrefsTab.getTestEntry();
-                try {
-                    PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                            layout2.getText());
-                    testPanel.setPreferredSize(new Dimension(800, 350));
-                    JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
-                            JOptionPane.PLAIN_MESSAGE);
-                } catch (StringIndexOutOfBoundsException ex) {
-                    LOGGER.warn("Parsing error.", ex);
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Parsing error") + ": "
-                                    + Localization.lang("illegal backslash expression") + ".\n" + ex.getMessage(),
-                            Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
-                }
+        testButton2.addActionListener(e -> {
+            PreviewPrefsTab.getTestEntry();
+            try {
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
+                        layout2.getText());
+                testPanel.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
+                        JOptionPane.PLAIN_MESSAGE);
+            } catch (StringIndexOutOfBoundsException ex) {
+                LOGGER.warn("Parsing error.", ex);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
+                                + ".\n" + ex.getMessage(),
+                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
     }

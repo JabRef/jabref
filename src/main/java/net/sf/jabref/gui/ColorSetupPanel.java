@@ -138,13 +138,9 @@ public class ColorSetupPanel extends JPanel {
 
         public JButton getDefaultButton() {
             JButton toDefault = new JButton(Localization.lang("Default"));
-            toDefault.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setColor(Globals.prefs.getDefaultColor(key));
-                    repaint();
-                }
+            toDefault.addActionListener(e -> {
+                setColor(Globals.prefs.getDefaultColor(key));
+                repaint();
             });
             return toDefault;
         }

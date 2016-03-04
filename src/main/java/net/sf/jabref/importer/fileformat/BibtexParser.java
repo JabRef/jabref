@@ -93,7 +93,7 @@ public class BibtexParser {
             return parser.parse().getDatabase().getEntries();
         } catch (Exception e) {
             LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 
@@ -219,7 +219,7 @@ public class BibtexParser {
     }
 
     private void parseJabRefComment(Map<String, String> meta) throws IOException {
-        StringBuffer buffer = parseBracketedTextExactly();
+        StringBuilder buffer = parseBracketedTextExactly();
         /**
          *
          * Metadata are used to store Bibkeeper-specific
@@ -534,9 +534,7 @@ public class BibtexParser {
             content = StringUtil.removeBracesAroundCapitals(content);
         }
         if (!content.isEmpty()) {
-            if (!entry.hasField(key)) {
-                entry.setField(key, content);
-            } else {
+            if (entry.hasField(key)) {
                 // The following hack enables the parser to deal with multiple
                 // author or
                 // editor lines, stringing them together instead of getting just
@@ -552,6 +550,8 @@ public class BibtexParser {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content);
                 }
+            } else {
+                entry.setField(key, content);
             }
         }
     }
@@ -567,13 +567,13 @@ public class BibtexParser {
                 throw new IOException("Error in line " + line + ": EOF in mid-string");
             }
             if (character == '"') {
-                StringBuffer text = parseQuotedFieldExactly();
+                StringBuilder text = parseQuotedFieldExactly();
                 value.append(fieldContentParser.format(text, key));
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside of a field, so we need to count the
                 // brackets to know when the string is finished.
-                StringBuffer text = parseBracketedTextExactly();
+                StringBuilder text = parseBracketedTextExactly();
                 value.append(fieldContentParser.format(text, key));
 
             } else if (Character.isDigit((char) character)) { // value is a number
@@ -605,7 +605,6 @@ public class BibtexParser {
 
         while (true) {
             int character = read();
-            // Util.pr(".. "+c);
             if (character == -1) {
                 eof = true;
 
@@ -838,8 +837,8 @@ public class BibtexParser {
         }
     }
 
-    private StringBuffer parseBracketedTextExactly() throws IOException {
-        StringBuffer value = new StringBuffer();
+    private StringBuilder parseBracketedTextExactly() throws IOException {
+        StringBuilder value = new StringBuilder();
 
         consume('{');
 
@@ -872,8 +871,8 @@ public class BibtexParser {
         return '\\' == character;
     }
 
-    private StringBuffer parseQuotedFieldExactly() throws IOException {
-        StringBuffer value = new StringBuffer();
+    private StringBuilder parseQuotedFieldExactly() throws IOException {
+        StringBuilder value = new StringBuilder();
 
         consume('"');
 
@@ -907,9 +906,9 @@ public class BibtexParser {
 
     private boolean consumeUncritically(char expected) throws IOException {
         int character;
-        while (((character = read()) != expected) && (character != -1) && (character != 65535)) {
-            // do nothing
-        }
+        do {
+            character = read();
+        } while ((character != expected) && (character != -1) && (character != 65535));
 
         if (isEOFCharacter(character)) {
             eof = true;

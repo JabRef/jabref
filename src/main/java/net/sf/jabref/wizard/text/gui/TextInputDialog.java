@@ -53,7 +53,6 @@ package net.sf.jabref.wizard.text.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -124,7 +123,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
 
     private void jbInit() {
         this.setModal(true);
-        //this.setResizable( false ) ;
         getContentPane().setLayout(new BorderLayout());
         StringBuilder typeStr = new StringBuilder(Localization.lang("for"));
         if ((entry != null) && (entry.getType() != null)) {
@@ -154,6 +152,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -227,7 +226,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
                         new Color(153, 153, 153), 2),
                 Localization.lang("Work_options"));
         inputPanel.setBorder(titledBorder1);
-        //inputPanel.setPreferredSize( new Dimension( 200, 255 ) ) ;
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
         fieldList = new JList<>(getAllFields());
@@ -240,8 +238,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
         JScrollPane fieldScroller = new JScrollPane(fieldList);
         fieldScroller.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        //fieldScroller.setPreferredSize( new Dimension( 180, 190 ) ) ;
-        //fieldScroller.setMinimumSize( new Dimension( 180, 190 ) ) ;
 
         // insert buttons
         insertButton.addActionListener(this);
@@ -298,12 +294,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        /*infoText.setEditable(false);
-        infoText.setBackground(GUIGlobals.infoField);
-        infoText.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        infoText.setPreferredSize( new Dimension(220, 50));
-        infoText.setMinimumSize( new Dimension(180, 50));*/
 
         rawPanel.add(desc, BorderLayout.SOUTH);
     }
@@ -385,8 +375,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     // erase old text selection
                     marked.setStyleForTag(type, "regular", doc); // delete all previous styles
                     marked.insertPosition(type, selStart, selEnd); // insert new selection style
-                }
-                else {
+                } else {
                     // memorize the selection for text highlighting
                     marked.appendPosition(type, selStart, selEnd);
 
@@ -398,8 +387,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
                         // "null"+"txt" Strings forbidden
                         entry.setField(type, txt);
                     } else {
-                        // insert a new author with an additional "and"
-                        if (type.hashCode() == "author".hashCode()) {
+                        // insert a new author or editor with an additional "and"
+                        if ("author".equals(type) || "editor".equals(type)) {
                             entry.setField(type, old + " and " + txt);
                         } else {
                             entry.setField(type, old + txt);
@@ -451,13 +440,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
         if (importedEntries == null) {
             return false;
         } else {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibEntry e : importedEntries) {
-                JabRef.jrf.getCurrentBasePanel().insertEntry(e);
+                frame.getCurrentBasePanel().insertEntry(e);
             }
             return true;
         }
@@ -537,7 +526,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                        try (FileInputStream fis = new FileInputStream(newFile)) {
                             eKit.read(fis, doc, 0);
                             doc.setLogicalStyle(0, doc.getStyle("regular"));
                         }
@@ -633,7 +622,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
             /* We additionally set the JLabels icon property here.
              */
             String s = value.toString();
-            //        setIcon((s.length > 10) ? longIcon : shortIcon);
             if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);

@@ -64,10 +64,10 @@ public class UrlDragDrop implements DropTargetListener {
     private final JabRefFrame frame;
 
 
-    public UrlDragDrop(final EntryEditor _editor, final JabRefFrame _frame, final FieldEditor _feditor) {
-        editor = _editor;
-        feditor = _feditor;
-        frame = _frame;
+    public UrlDragDrop(final EntryEditor editor, final JabRefFrame frame, final FieldEditor feditor) {
+        this.editor = editor;
+        this.feditor = feditor;
+        this.frame = frame;
     }
 
     /*
@@ -77,6 +77,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -86,6 +87,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -95,6 +97,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
+        // Do nothing
     }
 
     /*
@@ -104,6 +107,7 @@ public class UrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragExit(DropTargetEvent dte) {
+        // Do nothing
     }
 
 
@@ -114,9 +118,9 @@ public class UrlDragDrop implements DropTargetListener {
         private final int id;
 
 
-        public JOptionChoice(final String _label, final int _id) {
-            label = _label;
-            id = _id;
+        public JOptionChoice(final String label, final int id) {
+            this.label = label;
+            this.id = id;
         }
 
         @Override
@@ -185,6 +189,9 @@ public class UrlDragDrop implements DropTargetListener {
                                 Localization.lang("Error while downloading file:" + ioex.getMessage()),
                                 JOptionPane.ERROR_MESSAGE);
                     }
+                    break;
+                default:
+                    LOGGER.warn("Unknown selection (should not happen)");
                     break;
                 }
             }

@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -206,13 +205,7 @@ public class WriteXMPAction extends AbstractWorker {
             super(parent, Localization.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
-            okButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dispose();
-                }
-            });
+            okButton.addActionListener(e -> dispose());
 
             AbstractAction cancel = new AbstractAction() {
                 @Override

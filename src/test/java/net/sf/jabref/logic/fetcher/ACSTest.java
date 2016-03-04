@@ -12,11 +12,12 @@ import java.net.URL;
 import java.util.Optional;
 
 public class ACSTest {
-    ACS finder;
-    BibEntry entry;
+
+    private ACS finder;
+    private BibEntry entry;
 
     @Before
-    public void setup() {
+    public void setUp() {
         finder = new ACS();
         entry = new BibEntry();
     }
@@ -29,6 +30,7 @@ public class ACSTest {
     @Test(expected = NullPointerException.class)
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
+        Assert.fail();
     }
 
     @Test

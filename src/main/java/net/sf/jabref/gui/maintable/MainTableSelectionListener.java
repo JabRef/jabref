@@ -31,6 +31,7 @@ import javax.swing.Timer;
 
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -78,8 +79,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     private long lastPressedTime;
 
     private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
-
-    //private int lastCharPressed = -1;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
@@ -368,12 +367,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     private void processPopupTrigger(MouseEvent e, int row) {
         int selRow = table.getSelectedRow();
-        if ((selRow == -1) || // (getSelectedRowCount() == 0))
-        !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
+        if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
-            //panel.updateViewToSelected();
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(panel);
+        RightClickMenu rightClickMenu = new RightClickMenu(JabRef.jrf, panel);
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 

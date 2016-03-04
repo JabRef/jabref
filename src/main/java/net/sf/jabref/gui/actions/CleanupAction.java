@@ -15,14 +15,15 @@
  */
 package net.sf.jabref.gui.actions;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.CheckBoxMessage;
 import net.sf.jabref.gui.CleanupPresetPanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
@@ -156,8 +157,11 @@ public class CleanupAction extends AbstractWorker {
      * Runs the cleanup on the entry and records the change.
      */
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
-        // Run cleaner
-        CleanupWorker cleaner = new CleanupWorker(preset, panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD));
+        // Create and run cleaner
+        BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
+        CleanupWorker cleaner = new CleanupWorker(preset,
+                bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD), bibDatabaseContext.getDatabase(),
+                Globals.journalAbbreviationLoader.getRepository());
         List<FieldChange> changes = cleaner.cleanup(entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();

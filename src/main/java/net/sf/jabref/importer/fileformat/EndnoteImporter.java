@@ -25,9 +25,9 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -251,7 +251,7 @@ public class EndnoteImporter extends ImportFormat {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, Util
+                    hm.put(BibEntry.KEY_FIELD, LabelPatternUtil
                             .checkLegalKey(val));
                 }
             }
@@ -300,15 +300,15 @@ public class EndnoteImporter extends ImportFormat {
     private static String fixAuthor(String s) {
         int index = s.indexOf(" and ");
         if (index >= 0) {
-            return AuthorList.fixAuthor_lastNameFirst(s);
+            return AuthorList.fixAuthorLastNameFirst(s);
         }
         // Look for the comma at the end:
         index = s.lastIndexOf(',');
         if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replace(", ", " and ");
-            return AuthorList.fixAuthor_lastNameFirst(mod);
+            return AuthorList.fixAuthorLastNameFirst(mod);
         } else {
-            return AuthorList.fixAuthor_lastNameFirst(s);
+            return AuthorList.fixAuthorLastNameFirst(s);
         }
     }
 

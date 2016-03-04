@@ -360,7 +360,7 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = Util.getLinkedFileName(database, entry);
+        String targetName = Util.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 

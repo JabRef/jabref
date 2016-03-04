@@ -10,6 +10,17 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.FileField;
 
 public class StringUtilTest {
+
+    private static final String[][] STRING_ARRAY_1 = {{"a", "b"}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_1 = "a:b;c:d";
+    private static final String[][] STRING_ARRAY_2_WITH_NULL = {{"a", null}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2_WITH_NULL = "a:" + null + ";c:d";
+    private static final String[][] STRING_ARRAY_2 = {{"a", ""}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2 = "a:;c:d";
+    private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
+    private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
+
+
     @BeforeClass
     public static void loadPreferences() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -136,31 +147,22 @@ public class StringUtilTest {
     }
 
 
-    private static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
-    private static final String encStringArray1 = "a:b;c:d";
-    private static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
-    private static final String encStringArray2 = "a:;c:d";
-    private static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
-    private static final String encStringArray2null = "a:" + null + ";c:d";
-    private static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
-    private static final String encStringArray3 = "a:\\:b;c\\;:d";
-
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals(encStringArray1, FileField.encodeStringArray(stringArray1));
-        assertEquals(encStringArray2, FileField.encodeStringArray(stringArray2));
-        assertEquals(encStringArray2null, FileField.encodeStringArray(stringArray2null));
-        assertEquals(encStringArray3, FileField.encodeStringArray(stringArray3));
+        assertEquals(ENCODED_STRING_ARRAY_1, FileField.encodeStringArray(STRING_ARRAY_1));
+        assertEquals(ENCODED_STRING_ARRAY_2, FileField.encodeStringArray(STRING_ARRAY_2));
+        assertEquals(ENCODED_STRING_ARRAY_2_WITH_NULL, FileField.encodeStringArray(STRING_ARRAY_2_WITH_NULL));
+        assertEquals(ENCODED_STRING_ARRAY_3, FileField.encodeStringArray(STRING_ARRAY_3));
     }
 
     @Test
     public void testDecodeStringDoubleArray() {
-        assertArrayEquals(stringArray1, StringUtil.decodeStringDoubleArray(encStringArray1));
-        assertArrayEquals(stringArray2, StringUtil.decodeStringDoubleArray(encStringArray2));
+        assertArrayEquals(STRING_ARRAY_1, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_1));
+        assertArrayEquals(STRING_ARRAY_2, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_2));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(stringArray3, StringUtil.decodeStringDoubleArray(encStringArray3));
+        assertArrayEquals(STRING_ARRAY_3, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_3));
     }
 
     @Test
@@ -175,9 +177,13 @@ public class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets(null));
         assertTrue(StringUtil.isInCurlyBrackets("{}"));
         assertTrue(StringUtil.isInCurlyBrackets("{a}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{a{a}}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{{\\AA}sa {\\AA}Stor{\\aa}}"));
         assertFalse(StringUtil.isInCurlyBrackets("{"));
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
+        assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+
     }
 
     @Test
@@ -272,6 +278,12 @@ public class StringUtilTest {
     @Test
     public void testLimitStringLengthNullInput() {
         assertEquals("", StringUtil.limitStringLength(null, 10));
+    }
+
+    @Test
+    public void testReplaceSpecialCharacters() {
+        assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
+        assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
     }
 
 }

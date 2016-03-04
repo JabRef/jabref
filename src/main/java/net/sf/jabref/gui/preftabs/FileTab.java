@@ -28,9 +28,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
@@ -93,13 +90,9 @@ class FileTab extends JPanel implements PrefsTab {
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
 
-        autoSave.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                autoSaveInterval.setEnabled(autoSave.isSelected());
-                promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
-            }
+        autoSave.addChangeListener(e -> {
+            autoSaveInterval.setEnabled(autoSave.isSelected());
+            promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
         });
 
         FormLayout layout = new FormLayout("left:pref, 4dlu, fill:pref", "");
@@ -197,6 +190,7 @@ class FileTab extends JPanel implements PrefsTab {
             break;
         default:
             newline = "\r\n";
+            break;
         }
         prefs.put(JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant

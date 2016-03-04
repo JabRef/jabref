@@ -18,12 +18,12 @@ package net.sf.jabref.gui.preftabs;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.layout.format.NameFormatter;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.NameFormatter;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -32,16 +32,9 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
-
-    public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
-
-    public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-
 
     private boolean tableChanged;
 
@@ -50,25 +43,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     private int rowCount = -1;
 
     private final List<TableRow> tableRows = new ArrayList<>(10);
-
-
-    public static Map<String, String> getNameFormatters() {
-
-        Map<String, String> result = new HashMap<>();
-
-        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
-        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
-
-        for (int i = 0; i < names.size(); i++) {
-            if (i < formats.size()) {
-                result.put(names.get(i), formats.get(i));
-            } else {
-                result.put(names.get(i), NameFormatter.DEFAULT_FORMAT);
-            }
-        }
-
-        return result;
-    }
 
 
     static class TableRow {
@@ -223,8 +197,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
-        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
+        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -340,8 +314,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
         }
     }
 

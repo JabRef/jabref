@@ -51,7 +51,7 @@ public class GVKParserTest {
     }
 
     @Test
-    public void GMP() throws Exception {
+    public void testGMP() throws Exception {
         doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 

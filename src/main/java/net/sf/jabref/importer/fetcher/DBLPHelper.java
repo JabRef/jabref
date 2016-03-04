@@ -79,7 +79,6 @@ class DBLPHelper {
                 endIdx);
         entry1 = cleanEntry(entry1);
         bibtexList.add(BibtexParser.singleFromString(entry1));
-        // System.out.println("'" + entry1 + "'");
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr

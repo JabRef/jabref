@@ -30,12 +30,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private final String[] fields = {"note", "url", "ee"};
-
-
-    public DoiCleanup() {
-
-    }
+    private static final String[] FIELDS = {"note", "url", "ee"};
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -58,13 +53,13 @@ public class DoiCleanup implements CleanupJob {
                 }
 
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
-                for (String field : fields) {
+                for (String field : FIELDS) {
                     DOI.build(entry.getField((field))).ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-            for (String field : fields) {
+            for (String field : FIELDS) {
                 Optional<DOI> doi = DOI.build(entry.getField(field));
 
                 if (doi.isPresent()) {

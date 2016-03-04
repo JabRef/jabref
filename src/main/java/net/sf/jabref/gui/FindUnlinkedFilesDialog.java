@@ -554,7 +554,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         progressBarImporting.setValue(0);
         progressBarImporting.setString("");
 
-        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).entryType;
+        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).getEntryType();
 
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
@@ -1028,7 +1028,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     }
 
     /**
-     * Creates the ComboBox-View vor the Listbox that holds the Bibtex entry
+     * Creates the ComboBox-View for the Listbox that holds the Bibtex entry
      * types.
      */
     private void createEntryTypesCombobox() {
@@ -1052,7 +1052,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private static class BibtexEntryTypeWrapper {
 
-        final EntryType entryType;
+        private final EntryType entryType;
 
 
         BibtexEntryTypeWrapper(EntryType bibtexType) {
@@ -1065,6 +1065,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 return Localization.lang("<No selection>");
             }
             return entryType.getName();
+        }
+
+        public EntryType getEntryType() {
+            return entryType;
         }
     }
 

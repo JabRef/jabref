@@ -25,7 +25,6 @@ import net.sf.jabref.util.Util;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
 public class BibtexKeyPatternDialog extends JDialog {
@@ -75,14 +74,10 @@ public class BibtexKeyPatternDialog extends JDialog {
         getContentPane().setPreferredSize(new Dimension(500, 600));
         pack();
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                metaData.setLabelPattern(labelPatternPanel.getLabelPatternAsDatabaseLabelPattern());
-                panel.markNonUndoableBaseChanged();
-                dispose();
-            }
+        ok.addActionListener(e -> {
+            metaData.setLabelPattern(labelPatternPanel.getLabelPatternAsDatabaseLabelPattern());
+            panel.markNonUndoableBaseChanged();
+            dispose();
         });
 
         final JDialog dialog = this;

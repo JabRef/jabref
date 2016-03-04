@@ -31,7 +31,7 @@ public class CrossRef {
         // FIXME: this is way too less, e.g. service interaction patterns
         // need author last names at least
         String title = entry.getField("title");
-        if (title == null || title.equals("")) {
+        if ((title == null) || title.isEmpty()) {
             return doi;
         }
 
@@ -50,7 +50,7 @@ public class CrossRef {
                 return DOI.build(dataDOI);
             }
         } catch (UnirestException e) {
-            LOGGER.warn("Unable to query CrossRef API: " + e.getMessage());
+            LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);
         }
         return doi;
     }
