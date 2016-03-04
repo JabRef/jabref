@@ -107,7 +107,7 @@ public class Layout {
     }
 
     public String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, null);
+        return doLayout(bibtex, database, Optional.empty());
     }
 
     /**
