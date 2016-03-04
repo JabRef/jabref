@@ -1,5 +1,6 @@
-package net.sf.jabref.wizard.auximport;
+package net.sf.jabref.cli;
 
+import net.sf.jabref.logic.auxparser.AuxFileParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.util.strings.StringUtil;
 

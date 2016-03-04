@@ -1,4 +1,4 @@
-package net.sf.jabref.wizard.auximport;
+package net.sf.jabref.logic.auxparser;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;

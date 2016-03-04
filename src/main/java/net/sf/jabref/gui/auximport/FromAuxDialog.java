@@ -34,7 +34,7 @@
 // modified : 18.04.2006 r.nagel
 //            insert a "short info" section
 
-package net.sf.jabref.wizard.auximport.gui;
+package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.wizard.auximport.AuxFileParser;
+import net.sf.jabref.logic.auxparser.AuxFileParser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;

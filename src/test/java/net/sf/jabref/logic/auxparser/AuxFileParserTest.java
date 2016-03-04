@@ -1,4 +1,4 @@
-package net.sf.jabref.wizard.auximport;
+package net.sf.jabref.logic.auxparser;
 
 import static org.junit.Assert.*;
 
