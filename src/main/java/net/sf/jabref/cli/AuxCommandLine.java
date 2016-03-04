@@ -1,6 +1,7 @@
 package net.sf.jabref.cli;
 
-import net.sf.jabref.logic.auxparser.AuxFileParser;
+import net.sf.jabref.logic.auxparser.AuxParser;
+import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -17,10 +18,11 @@ public class AuxCommandLine {
         BibDatabase subDatabase = null;
 
         if (!auxFile.isEmpty() && (database != null)) {
-            AuxFileParser auxParser = new AuxFileParser(auxFile, database);
-            subDatabase = auxParser.getGeneratedBibDatabase();
+            AuxParser auxParser = new AuxParser(auxFile, database);
+            AuxParserResult result = auxParser.parse();
+            subDatabase = result.getGeneratedBibDatabase();
             // print statistics
-            System.out.println(auxParser.getInformation(true));
+            System.out.println(result.getInformation(true));
         }
         return subDatabase;
     }

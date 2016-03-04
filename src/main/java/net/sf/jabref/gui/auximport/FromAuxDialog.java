@@ -60,11 +60,12 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.auxparser.AuxFileParser;
+import net.sf.jabref.logic.auxparser.AuxParser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -88,7 +89,7 @@ public class FromAuxDialog extends JDialog {
 
     private boolean generatePressed;
 
-    private AuxFileParser auxParser;
+    private AuxParser auxParser;
 
     private final JabRefFrame parentFrame;
 
@@ -220,16 +221,19 @@ public class FromAuxDialog extends JDialog {
         String auxName = auxFileField.getText();
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
-            auxParser = new AuxFileParser(auxName, refBase);
-            notFoundList.setListData(auxParser.getUnresolvedKeys().toArray(new String[auxParser.getUnresolvedKeys().size()]));
-            statusInfos.append(auxParser.getInformation(false));
+            auxParser = new AuxParser(auxName, refBase);
+            AuxParserResult result = auxParser.parse();
+            notFoundList.setListData(result.getUnresolvedKeys().toArray(new String[result.getUnresolvedKeys().size()]));
+            statusInfos.append(result.getInformation(false));
 
             generateButton.setEnabled(true);
-        }
 
-        // the generated database contains no entries -> no active generate-button
-        if (auxParser.getGeneratedBibDatabase().isEmpty()) {
-            statusInfos.append("\n" + Localization.lang("empty database"));
+            // the generated database contains no entries -> no active generate-button
+            if (result.getGeneratedBibDatabase().isEmpty()) {
+                statusInfos.append("\n" + Localization.lang("empty database"));
+                generateButton.setEnabled(false);
+            }
+        } else {
             generateButton.setEnabled(false);
         }
 
@@ -241,7 +245,7 @@ public class FromAuxDialog extends JDialog {
     }
 
     public BibDatabase getGenerateDB() {
-        return auxParser.getGeneratedBibDatabase();
+        return auxParser.parse().getGeneratedBibDatabase();
     }
 
     /**
