@@ -3,7 +3,6 @@ package net.sf.jabref.logic.auxparser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -183,8 +182,10 @@ public class AuxFileParser {
             }
         }
 
+        // Copy database definitions
         if (auxDatabase.getEntryCount() > 0) {
-            copyDatabaseConfiguration();
+            auxDatabase.copyPreamble(masterDatabase);
+            auxDatabase.copyStrings(masterDatabase);
         }
     }
 
@@ -213,17 +214,5 @@ public class AuxFileParser {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
         auxDatabase.insertEntry(clonedEntry);
-    }
-
-    /*
-     *  Copy the database's configuration, i.e., preamble and strings.
-     */
-    private void copyDatabaseConfiguration() {
-        auxDatabase.setPreamble(masterDatabase.getPreamble());
-        Set<String> keys = masterDatabase.getStringKeySet();
-        for (String key : keys) {
-            BibtexString string = masterDatabase.getString(key);
-            auxDatabase.addString(string);
-        }
     }
 }
