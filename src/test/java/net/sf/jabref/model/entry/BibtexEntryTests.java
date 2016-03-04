@@ -60,20 +60,21 @@ public class BibtexEntryTests {
         Assert.assertFalse(e.allFieldsPresent(requiredFields, null));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void isNullCiteKey() {
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+
+        e.setField(BibEntry.KEY_FIELD, null);
+        Assert.fail();
+    }
+
     @Test
-    public void isNullOrEmptyCiteKey() {
+    public void isEmptyCiteKey() {
         BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         Assert.assertFalse(e.hasCiteKey());
 
         e.setField(BibEntry.KEY_FIELD, "");
         Assert.assertFalse(e.hasCiteKey());
-
-        try {
-            e.setField(BibEntry.KEY_FIELD, null);
-            Assert.fail();
-        } catch(NullPointerException asExpected) {
-
-        }
 
         e.setField(BibEntry.KEY_FIELD, "key");
         Assert.assertTrue(e.hasCiteKey());
@@ -108,6 +109,13 @@ public class BibtexEntryTests {
     }
 
 
+    @Test(expected = NullPointerException.class)
+    public void addNullKeyword() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+        be.addKeyword(null);
+        Assert.fail();
+    }
+
     @Test
     public void testKeywordMethods() {
         BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
@@ -130,12 +138,6 @@ public class BibtexEntryTests {
         be.addKeyword("");
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
 
-        try {
-            be.addKeyword(null);
-            Assert.fail();
-        } catch(NullPointerException asExpected){
-
-        }
 
         BibEntry be2 = new BibEntry();
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());

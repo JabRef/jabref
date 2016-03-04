@@ -37,7 +37,7 @@ public class JSONEntryParser {
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibEntry
      */
-    public BibEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {"year", "title", "abstract", "month"};
 
@@ -150,7 +150,7 @@ public class JSONEntryParser {
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
      */
-    public static BibEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+    public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
         String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
                 "publisher"};

@@ -9,7 +9,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -307,7 +306,7 @@ public class LabelPatternUtilTest {
      * Test the [authN_M] pattern
      */
     @Test
-    public void authN_M() {
+    public void authNM() {
         assertEquals(
                 "N",
                 LabelPatternUtil.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
@@ -337,7 +336,7 @@ public class LabelPatternUtilTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void authN_MThrowsNPE() {
+    public void authNMThrowsNPE() {
         LabelPatternUtil.authNofMth(null, 2, 4);
     }
 
@@ -578,7 +577,7 @@ public class LabelPatternUtilTest {
     @Test
     public void veryShortTitle() {
         // veryShortTitle is getTitleWords with "1" as count
-        final int count = 1;
+        int count = 1;
         assertEquals(
                 "application",
                 LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
@@ -611,7 +610,7 @@ public class LabelPatternUtilTest {
     @Test
     public void shortTitle() {
         // veryShortTitle is getTitleWords with "3" as count
-        final int count = 3;
+        int count = 3;
         assertEquals(
                 "applicationmigrationeffort",
                 LabelPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
@@ -639,7 +638,7 @@ public class LabelPatternUtilTest {
     }
 
     @Test
-    public void keywordN_keywordsSeparatedBySpace() {
+    public void keywordNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
@@ -656,7 +655,7 @@ public class LabelPatternUtilTest {
     }
 
     @Test
-    public void keywordsN_keywordsSeparatedBySpace() {
+    public void keywordsNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "w1, w2a w2b, w3");
 
