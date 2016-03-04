@@ -411,13 +411,13 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The text for the citation.
      */
     public String getNumCitationMarker(List<Integer> number, int minGroupingCount, boolean inList) {
-        String bracketBefore = (String) citProperties.get(BRACKET_BEFORE);
+        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
         if (inList && (citProperties.get(BRACKET_BEFORE_IN_LIST) != null)) {
-            bracketBefore = (String) citProperties.get(BRACKET_BEFORE_IN_LIST);
+            bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
         }
-        String bracketAfter = (String) citProperties.get(BRACKET_AFTER);
+        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
         if (inList && (citProperties.get(BRACKET_AFTER_IN_LIST) != null)) {
-            bracketAfter = (String) citProperties.get(BRACKET_AFTER_IN_LIST);
+            bracketAfter = getStringCitProperty(BRACKET_AFTER_IN_LIST);
         }
         // Sort the numbers:
         List<Integer> lNum = new ArrayList<>(number);
@@ -434,7 +434,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 } else {
                     // Add single entry:
                     if (i > 0) {
-                        sb.append((String) citProperties.get(CITATION_SEPARATOR));
+                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
                     }
                     sb.append(lNum.get(i) > 0 ? String.valueOf(lNum.get(i)) : OOBibStyle.UNDEFINED_CITATION_MARKER);
                     written++;
@@ -444,11 +444,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 // Check if it ends here:
                 if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
                     if (written > 0) {
-                        sb.append((String) citProperties.get(CITATION_SEPARATOR));
+                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
                     }
                     if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
                         sb.append(combineFrom);
-                        sb.append((String) citProperties.get(GROUPED_NUMBERS_SEPARATOR));
+                        sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
                         sb.append(i1);
                         written++;
                     } else {
@@ -457,7 +457,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         for (int jj = combineFrom; jj <= i1; jj++) {
                             sb.append(jj);
                             if (jj < i1) {
-                                sb.append((String) citProperties.get(CITATION_SEPARATOR));
+                                sb.append(getStringCitProperty(CITATION_SEPARATOR));
                             }
                             written++;
                         }
@@ -509,8 +509,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                                 tmpMap, null, unlimAuthors);
 
 
-                        String authorField = (String) citProperties.get(AUTHOR_FIELD);
-                        int maxAuthors = (Integer) citProperties.get(MAX_AUTHORS);
+                        String authorField = getStringCitProperty(AUTHOR_FIELD);
+                        int maxAuthors = getIntCitProperty(MAX_AUTHORS);
                         String author = getCitationMarkerField(entries.get(i), database.get(entries.get(i)),
                                 authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
@@ -562,7 +562,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @param to          The last index to group (inclusive)
      */
     private void group(List<BibEntry> entries, String[] uniquefiers, int from, int to) {
-        String separator = (String) citProperties.get(UNIQUEFIER_SEPARATOR);
+        String separator = getStringCitProperty(UNIQUEFIER_SEPARATOR);
         StringBuilder sb = new StringBuilder(uniquefiers[from]);
         for (int i = from + 1; i <= to; i++) {
             sb.append(separator);
@@ -583,17 +583,17 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private String getAuthorYearParenthesisMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
             String[] uniquifiers, int[] unlimAuthors) {
 
-        String authorField = (String) citProperties.get(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
-        int maxA = (Integer) citProperties.get(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
+        String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
+        int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
                                                              // -1 to always write out all authors.
-        String etAlString = (String) citProperties.get(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
-        String yearSep = (String) citProperties.get(YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
-        String startBrace = (String) citProperties.get(BRACKET_BEFORE); // The opening parenthesis.
-        String endBrace = (String) citProperties.get(BRACKET_AFTER); // The closing parenthesis.
-        String citationSeparator = (String) citProperties.get(CITATION_SEPARATOR); // The String to separate citations from each other.
-        String yearField = (String) citProperties.get(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
-        String authorSep = (String) citProperties.get(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
-        String andString = (String) citProperties.get(AUTHOR_LAST_SEPARATOR); // The String to add between the two last author names, e.g. " & ".
+        String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
+        String yearSep = getStringCitProperty(YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
+        String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
+        String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
+        String citationSeparator = getStringCitProperty(CITATION_SEPARATOR); // The String to separate citations from each other.
+        String yearField = getStringCitProperty(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
+        String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
+        String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR); // The String to add between the two last author names, e.g. " & ".
         StringBuilder sb = new StringBuilder(startBrace);
         for (int j = 0; j < entries.size(); j++) {
             BibEntry entry = entries.get(j);
@@ -647,21 +647,21 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private String getAuthorYearInTextMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
             String[] uniquefiers,
             int[] unlimAuthors) {
-        String authorField = (String) citProperties.get(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
-        int maxA = (Integer) citProperties.get(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
+        String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
+        int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
                                                              // -1 to always write out all authors.
-        String etAlString = (String) citProperties.get(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
-        String yearSep = (String) citProperties.get(IN_TEXT_YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
-        String startBrace = (String) citProperties.get(BRACKET_BEFORE); // The opening parenthesis.
-        String endBrace = (String) citProperties.get(BRACKET_AFTER); // The closing parenthesis.
-        String citationSeparator = (String) citProperties.get(CITATION_SEPARATOR); // The String to separate citations from each other.
-        String yearField = (String) citProperties.get(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
-        String authorSep = (String) citProperties.get(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
-        String andString = (String) citProperties.get(AUTHOR_LAST_SEPARATOR_IN_TEXT); // The String to add between the two last author names, e.g. " & ".
+        String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
+        String yearSep = getStringCitProperty(IN_TEXT_YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
+        String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
+        String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
+        String citationSeparator = getStringCitProperty(CITATION_SEPARATOR); // The String to separate citations from each other.
+        String yearField = getStringCitProperty(YEAR_FIELD); // The bibtex field providing the year, e.g. "year".
+        String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
+        String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR_IN_TEXT); // The String to add between the two last author names, e.g. " & ".
 
         if (andString == null) {
             // Use the default one if no explicit separator for text is defined
-            andString = (String) citProperties.get(AUTHOR_LAST_SEPARATOR);
+            andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR);
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entries.size(); i++) {
@@ -705,7 +705,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
-        String authorField = (String) citProperties.get(AUTHOR_FIELD);
+        String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split("/");
         for (String s : fields) {
             String content = BibDatabase.getResolvedField(s, entry, database);
@@ -842,7 +842,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public String getCitationCharacterFormat() {
-        return (String) citProperties.get(CITATION_CHARACTER_FORMAT);
+        return getStringCitProperty(CITATION_CHARACTER_FORMAT);
     }
 
     /**
