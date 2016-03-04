@@ -105,13 +105,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
             setItems();
             return;
         }
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                frame.getOpenDatabaseAction().openFile(fileToOpen, true);
-            }
-        });
+        JabRefExecutorService.INSTANCE.execute(() -> frame.getOpenDatabaseAction().openFile(fileToOpen, true));
 
     }
 

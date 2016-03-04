@@ -336,23 +336,17 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         public void actionPerformed(ActionEvent arg0) {
 
             // Background this, as it takes a while.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                try {
+                    PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+                    pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
+                    previewPane.print(null, null, true, null, pras, false);
 
-                @Override
-                public void run() {
-                    try {
-                        PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                        pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
-                        previewPane.print(null, null, true, null, pras, false);
-
-                    } catch (PrinterException e) {
-                        // Inform the user... we don't know what to do.
-                        JOptionPane.showMessageDialog(PreviewPanel.this,
-                                Localization.lang("Could not print preview") + ".\n"
-                                        + e.getMessage(),
-                                Localization.lang("Print entry preview"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
+                } catch (PrinterException e) {
+                    // Inform the user... we don't know what to do.
+                    JOptionPane.showMessageDialog(PreviewPanel.this,
+                            Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
+                            Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
                 }
             });
         }

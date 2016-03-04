@@ -28,8 +28,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -283,22 +281,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         JButton helpButton = new HelpAction(Localization.lang("Help on special fields"), HelpFiles.specialFieldsHelp).getHelpButton();
 
-        specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
-        specialFieldsEnabled.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                boolean isEnabled = specialFieldsEnabled.isSelected();
-                rankingColumn.setEnabled(isEnabled);
-                qualityColumn.setEnabled(isEnabled);
-                priorityColumn.setEnabled(isEnabled);
-                relevanceColumn.setEnabled(isEnabled);
-                printedColumn.setEnabled(isEnabled);
-                readStatusColumn.setEnabled(isEnabled);
-                syncKeywords.setEnabled(isEnabled);
-                writeSpecialFields.setEnabled(isEnabled);
-            }
-        });
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));
         priorityColumn = new JCheckBox(Localization.lang("Show priority"));
@@ -314,6 +296,19 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         ButtonGroup group = new ButtonGroup();
         group.add(syncKeywords);
         group.add(writeSpecialFields);
+
+        specialFieldsEnabled = new JCheckBox(Localization.lang("Enable special fields"));
+        specialFieldsEnabled.addChangeListener(event -> {
+            boolean isEnabled = specialFieldsEnabled.isSelected();
+            rankingColumn.setEnabled(isEnabled);
+            qualityColumn.setEnabled(isEnabled);
+            priorityColumn.setEnabled(isEnabled);
+            relevanceColumn.setEnabled(isEnabled);
+            printedColumn.setEnabled(isEnabled);
+            readStatusColumn.setEnabled(isEnabled);
+            syncKeywords.setEnabled(isEnabled);
+            writeSpecialFields.setEnabled(isEnabled);
+        });
 
         builder.appendSeparator(Localization.lang("Special table columns"));
         builder.nextLine();
@@ -616,17 +611,13 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                     map.put(name.toLowerCase(), i);
                 }
             }
-            Collections.sort(tableRows, new Comparator<TableRow>() {
-
-                @Override
-                public int compare(TableRow o1, TableRow o2) {
-                    Integer n1 = map.get(o1.getName());
-                    Integer n2 = map.get(o2.getName());
-                    if ((n1 == null) || (n2 == null)) {
-                        return 0;
-                    }
-                    return n1.compareTo(n2);
+            Collections.sort(tableRows, (o1, o2) -> {
+                Integer n1 = map.get(o1.getName());
+                Integer n2 = map.get(o2.getName());
+                if ((n1 == null) || (n2 == null)) {
+                    return 0;
                 }
+                return n1.compareTo(n2);
             });
 
             colSetup.revalidate();

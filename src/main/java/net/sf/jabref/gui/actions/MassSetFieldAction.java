@@ -153,7 +153,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             diag.dispose();
         });
 
-        AbstractAction cancelAction = new AbstractAction() {
+        Action cancelAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

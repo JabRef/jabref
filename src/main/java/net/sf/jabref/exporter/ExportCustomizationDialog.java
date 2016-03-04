@@ -115,7 +115,7 @@ public class ExportCustomizationDialog extends JDialog {
                 Globals.prefs.customExports.store();
         });
 
-        AbstractAction closeAction = new AbstractAction() {
+        Action closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

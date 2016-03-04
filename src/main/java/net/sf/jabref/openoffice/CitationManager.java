@@ -91,21 +91,16 @@ class CitationManager {
         diag.pack();
         diag.setSize(700, 400);
 
-        Action okAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    storeSettings();
-                } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException |
-                        IllegalTypeException | IllegalArgumentException ex) {
-                    LOGGER.warn("Problem modifying citation", ex);
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
-                }
-                diag.dispose();
+        ok.addActionListener(e -> {
+            try {
+                storeSettings();
+            } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
+                    IllegalArgumentException ex) {
+                LOGGER.warn("Problem modifying citation", ex);
+                JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
             }
-        };
-        ok.addActionListener(okAction);
+            diag.dispose();
+        });
 
         Action cancelAction = new AbstractAction() {
 
@@ -280,20 +275,15 @@ class CitationManager {
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             singleCiteDialog.add(bb.getPanel(), BorderLayout.SOUTH);
 
-            Action okAction = new AbstractAction() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    if (pageInfo.getText().trim().isEmpty()) {
-                        entry.setPageInfo(null);
-                    } else {
-                        entry.setPageInfo(pageInfo.getText().trim());
-                    }
-                    tableModel.fireTableDataChanged();
-                    singleCiteDialog.dispose();
+            okButton.addActionListener(e -> {
+                if (pageInfo.getText().trim().isEmpty()) {
+                    entry.setPageInfo(null);
+                } else {
+                    entry.setPageInfo(pageInfo.getText().trim());
                 }
-            };
-            okButton.addActionListener(okAction);
+                tableModel.fireTableDataChanged();
+                singleCiteDialog.dispose();
+            });
 
             Action cancelAction = new AbstractAction() {
 

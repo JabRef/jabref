@@ -110,7 +110,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                getSingleCitation(cit).ifPresent(entry -> dialog.addEntry(entry));
+                getSingleCitation(cit).ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }
 

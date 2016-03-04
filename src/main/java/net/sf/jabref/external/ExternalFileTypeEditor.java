@@ -96,7 +96,7 @@ public class ExternalFileTypeEditor extends JDialog {
             storeSettings();
             dispose();
         });
-        AbstractAction cancelAction = new AbstractAction() {
+        Action cancelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();

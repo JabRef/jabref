@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
@@ -116,7 +117,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
         // Key bindings:
-        AbstractAction closeAction = new AbstractAction() {
+        Action closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
