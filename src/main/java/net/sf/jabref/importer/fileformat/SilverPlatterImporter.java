@@ -60,22 +60,22 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        // This format is very similar to Inspec, so we have a two-fold strategy:
-        // If we see the flag signalling that it is an inspec file, return false.
-        // This flag should appear above the first entry and prevent us from
-        // accepting the Inspec format. Then we look for the title entry.
-        String str;
-        while ((str = in.readLine()) != null) {
+            // This format is very similar to Inspec, so we have a two-fold strategy:
+            // If we see the flag signaling that it is an Inspec file, return false.
+            // This flag should appear above the first entry and prevent us from
+            // accepting the Inspec format. Then we look for the title entry.
+            String str;
+            while ((str = in.readLine()) != null) {
 
-            if (START_PATTERN.matcher(str).find())
-            {
-                return false; // This is an inspec file, so return false.
-            }
+                if (START_PATTERN.matcher(str).find()) {
+                    return false; // This is an Inspec file, so return false.
+                }
 
-            if ((str.length() >= 5) && "TI:  ".equals(str.substring(0, 5))) {
-                return true;
+                if ((str.length() >= 5) && "TI:  ".equals(str.substring(0, 5))) {
+                    return true;
+                }
             }
         }
         return false;
@@ -87,7 +87,7 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
             boolean isChapter = false;
             String str;
@@ -106,14 +106,12 @@ public class SilverPlatterImporter extends ImportFormat {
                 if (entry.trim().length() < 6) {
                     continue;
                 }
-                //System.out.println("'"+entries[i]+"'");
                 h.clear();
                 String[] fields = entry.split("__NEWFIELD__");
                 for (String field : fields) {
                     if (field.length() < 6) {
                         continue;
                     }
-                    //System.out.println(">"+fields[j]+"<");
                     String f3 = field.substring(0, 2);
                     String frest = field.substring(5);
                     if ("TI".equals(f3)) {
@@ -204,8 +202,7 @@ public class SilverPlatterImporter extends ImportFormat {
                             h.put("title", title.substring(1, inPos));
                         }
                         if (pgPos > inPos) {
-                            h.put("pages", title.substring(pgPos)
-.replace("-", "--"));
+                            h.put("pages", title.substring(pgPos).replace("-", "--"));
                         }
 
                     }

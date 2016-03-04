@@ -62,18 +62,18 @@ public class MedlineImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            int i = 0;
+            while (((str = in.readLine()) != null) && (i < 50)) {
 
-            if (str.toLowerCase().contains("<pubmedarticle>")) {
-                return true;
+                if (str.toLowerCase().contains("<pubmedarticle>")) {
+                    return true;
+                }
+
+                i++;
             }
-
-            i++;
         }
-
         return false;
     }
 

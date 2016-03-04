@@ -62,15 +62,15 @@ public class RisImporter extends ImportFormat {
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "AU  - *" line.
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        String str;
-        while ((str = in.readLine()) != null) {
-            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
-                return true;
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -80,14 +80,16 @@ public class RisImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        while ((str = in.readLine()) != null) {
-            sb.append(str);
-            sb.append('\n');
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            while ((str = in.readLine()) != null) {
+                sb.append(str);
+                sb.append('\n');
+            }
         }
+
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("ER  -.*\\n");
 
@@ -264,7 +266,7 @@ public class RisImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {

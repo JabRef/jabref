@@ -58,7 +58,7 @@ public class MsBibImporter extends ImportFormat {
         } catch (Exception e) {
             return false;
         }
-        return ((docin == null) || docin.getDocumentElement().getTagName().contains("Sources"));
+        return (docin == null) || docin.getDocumentElement().getTagName().contains("Sources");
     }
 
     /**

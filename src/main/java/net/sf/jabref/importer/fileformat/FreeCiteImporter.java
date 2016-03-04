@@ -25,6 +25,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -86,10 +87,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return null;
+            return Collections.emptyList();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return null;
+            return Collections.emptyList();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -105,7 +106,7 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IOException e) {
             status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return null;
+            Collections.emptyList();
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
@@ -222,7 +223,7 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return null;
+            return Collections.emptyList();
         }
 
         return res;

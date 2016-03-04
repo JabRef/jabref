@@ -16,6 +16,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.model.entry.IdGenerator;
@@ -39,6 +40,9 @@ class BibTeXMLHandler extends DefaultHandler {
     private String currentChars;
 
     public List<BibEntry> getItems() {
+        if (bibitems == null) {
+            return Collections.emptyList();
+        }
         return bibitems;
     }
 
