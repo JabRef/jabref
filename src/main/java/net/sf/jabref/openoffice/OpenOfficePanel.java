@@ -160,13 +160,7 @@ public class OpenOfficePanel extends AbstractWorker {
         }
         JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
                 IconTheme.getImage("openoffice"));
-        item.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                manager.show(getName());
-            }
-        });
+        item.addActionListener(event -> manager.show(getName()));
         return item;
     }
 
@@ -189,6 +183,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     NoSuchElementException | NoDocumentException ex) {
                 JOptionPane.showMessageDialog(frame, ex.getMessage(), Localization.lang("Error"),
                         JOptionPane.ERROR_MESSAGE);
+                LOGGER.warn("Problem connecting", ex);
             }
 
         });
@@ -265,8 +260,9 @@ public class OpenOfficePanel extends AbstractWorker {
                                     "Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
-                } catch (Exception e1) {
-                    LOGGER.warn("Could not update bibliography", e1);
+                    LOGGER.debug("BibEntry not found", ex);
+                } catch (Exception ex) {
+                    LOGGER.warn("Could not update bibliography", ex);
                 }
             }
         };

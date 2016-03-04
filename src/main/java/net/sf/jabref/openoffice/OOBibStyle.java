@@ -496,22 +496,32 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         if (uniquefiers != null) {
             for (int i = 0; i < uniquefiers.length; i++) {
 
-                if ((uniquefiers[i] != null) && !uniquefiers[i].isEmpty()) {
+                if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
+                    // This entry has no uniquefier.
+                    // Check if we just passed a group of more than one entry with uniquefier:
+                    if ((piv > -1) && (i > (piv + 1))) {
+                        // Do the grouping:
+                        group(entries, uniquefiers, piv, i - 1);
+                    }
+
+                    piv = -1;
+                } else {
                     Map<BibEntry, BibDatabase> tmpMap = new HashMap<>(1);
-                    tmpMap.put(entries.get(i), database.get(entries.get(i)));
+                    BibEntry tmpEntry = entries.get(i);
+                    tmpMap.put(tmpEntry, database.get(tmpEntry));
                     if (piv == -1) {
                         piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(entries.get(i)), tmpMap,
+                        tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(tmpEntry), tmpMap,
                                 null, unlimAuthors);
                     } else {
                         // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(entries.get(i)),
+                        String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(tmpEntry),
                                 tmpMap, null, unlimAuthors);
 
 
                         String authorField = getStringCitProperty(AUTHOR_FIELD);
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
-                        String author = getCitationMarkerField(entries.get(i), database.get(entries.get(i)),
+                        String author = getCitationMarkerField(tmpEntry, database.get(tmpEntry),
                                 authorField);
                         AuthorList al = AuthorList.getAuthorList(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
@@ -527,15 +537,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                             piv = i;
                         }
                     }
-                } else {
-                    // This entry has no uniquefier.
-                    // Check if we just passed a group of more than one entry with uniquefier:
-                    if ((piv > -1) && (i > (piv + 1))) {
-                        // Do the grouping:
-                        group(entries, uniquefiers, piv, i - 1);
-                    }
-
-                    piv = -1;
                 }
 
             }

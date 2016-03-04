@@ -966,15 +966,14 @@ class OOBibBase {
 
         // Check if the section exists:
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
-        try {
+        if (supp.getTextSections().hasByName(OOBibBase.BIB_SECTION_NAME)) {
             XTextSection section = (XTextSection) ((Any) supp.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
                     .getObject();
             // Clear it:
             XTextCursor cursor = text.createTextCursorByRange(section.getAnchor());
             cursor.gotoRange(section.getAnchor(), false);
             cursor.setString("");
-
-        } catch (NoSuchElementException ex) {
+        } else {
             createBibTextSection2(atEnd);
         }
     }
