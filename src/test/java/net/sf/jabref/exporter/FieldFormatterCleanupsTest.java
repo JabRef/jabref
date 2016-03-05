@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -142,4 +143,11 @@ public class FieldFormatterCleanupsTest {
         assertEquals("1--7", entry.getField("pages"));
     }
 
+    @Test
+    public void eraseFormatterRemovesField() {
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[EraseFormatter]");
+        actions.applySaveActions(entry);
+
+        assertEquals(Optional.empty(), entry.getFieldOptional("mont"));
+    }
 }

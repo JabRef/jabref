@@ -2,6 +2,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
 
+import java.util.Objects;
+
 public class EraseFormatter implements Formatter {
 
     @Override
@@ -16,6 +18,7 @@ public class EraseFormatter implements Formatter {
 
     @Override
     public String format(String oldString) {
-        return null;
+        Objects.requireNonNull(oldString);
+        return "";
     }
 }

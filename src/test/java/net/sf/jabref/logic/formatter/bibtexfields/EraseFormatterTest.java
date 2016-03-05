@@ -7,12 +7,12 @@ import static org.junit.Assert.*;
 public class EraseFormatterTest {
 
     @Test
-    public void formatReturnsNullForEmptyString() throws Exception {
-        assertNull(new EraseFormatter().format(""));
+    public void formatReturnsEmptyForEmptyString() throws Exception {
+        assertEquals("", new EraseFormatter().format(""));
     }
 
     @Test
-    public void formatReturnsNullForSomeString() throws Exception {
-        assertNull(new EraseFormatter().format("test"));
+    public void formatReturnsEmptyForSomeString() throws Exception {
+        assertEquals("", new EraseFormatter().format("test"));
     }
 }

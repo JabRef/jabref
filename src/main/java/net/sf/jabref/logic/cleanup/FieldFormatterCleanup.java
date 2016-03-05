@@ -45,6 +45,14 @@ public class FieldFormatterCleanup implements CleanupJob {
         }
     }
 
+    /**
+     * Runs the formatter on the specified field in the given entry.
+     *
+     * If the formatter returns an empty string, then the field is removed.
+     * @param field the field on which to run the formatter
+     * @param entry the entry to be cleaned up
+     * @return a list of changes of the entry
+     */
     private List<FieldChange> cleanupSingleField(String field, BibEntry entry) {
         if (!entry.hasField(field)) {
             // Not set -> nothing to do
@@ -58,7 +66,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         if (oldValue.equals(newValue)) {
             return new ArrayList<>();
         } else {
-            if(newValue == null) {
+            if(newValue.isEmpty()) {
                 entry.clearField(field);
             } else {
                 entry.setField(field, newValue);
