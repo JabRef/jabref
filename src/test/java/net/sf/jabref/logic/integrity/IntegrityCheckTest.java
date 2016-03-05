@@ -21,6 +21,9 @@ import static org.junit.Assert.assertFalse;
 
 public class IntegrityCheckTest {
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -106,9 +109,6 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));
         assertWrong(createContext("file", ":asflakjfwofja:PDF", metaData));
     }
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void fileCheckFindsFilesRelativeToBibFile() throws IOException {

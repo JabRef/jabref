@@ -18,6 +18,13 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class FormatterTest {
 
+    public Formatter formatter;
+
+
+    public FormatterTest(Formatter formatter) {
+        this.formatter = formatter;
+    }
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -56,12 +63,6 @@ public class FormatterTest {
     @Test
     public void formatNotReturnsNull() {
         assertNotNull(formatter.format("string"));
-    }
-
-    public Formatter formatter;
-
-    public FormatterTest(Formatter formatter) {
-        this.formatter = formatter;
     }
 
     @Parameterized.Parameters(name = "{index}: {0}")
