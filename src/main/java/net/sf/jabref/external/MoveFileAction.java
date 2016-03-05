@@ -43,7 +43,7 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final boolean toFileDir;
 
-    private final String MOVE_RENAME = Localization.lang("Move/Rename file");
+    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     private static final Log LOGGER = LogFactory.getLog(MoveFileAction.class);
 

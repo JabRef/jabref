@@ -293,56 +293,54 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            if (!keywordsToAdd.isEmpty()) {
-                // we need to check whether a special field is added
-                // for each field:
-                //   check if something is added
-                //   if yes, add all keywords of that special fields to the keywords to be removed
+        if (SpecialFieldsUtils.keywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
+            // we need to check whether a special field is added
+            // for each field:
+            //   check if something is added
+            //   if yes, add all keywords of that special fields to the keywords to be removed
 
-                Set<String> clone;
+            Set<String> clone;
 
-                // Priority
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Priority.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
-                }
+            // Priority
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Priority.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
+            }
 
-                // Quality
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Quality.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
-                }
+            // Quality
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Quality.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
+            }
 
-                // Rank
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Rank.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
-                }
+            // Rank
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Rank.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
+            }
 
-                // Relevance
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Relevance.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
-                }
+            // Relevance
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Relevance.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
+            }
 
-                // Read status
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(ReadStatus.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
-                }
+            // Read status
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(ReadStatus.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
+            }
 
-                // Printed
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Printed.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
-                }
+            // Printed
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Printed.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
             }
         }
 
