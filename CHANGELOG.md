@@ -28,6 +28,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved default bibliography mode to general preferences tab
 - Add dialog to show all preferences in their raw form plus some filtering
 - Added Ordinal formatter (1 -> 1st etc)
+- [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
+- [#454](https://github.com/JabRef/jabref/issues/454) Add a tab that shows all remaining entry fields that are not displayed in any other tab
 - The LaTeX to Unicode/HTML functionality is much improved by covering many more cases
 - Ability to convert from LaTeX to Unicode in right-click field menu
 

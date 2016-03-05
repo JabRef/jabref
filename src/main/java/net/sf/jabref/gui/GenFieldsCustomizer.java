@@ -29,15 +29,6 @@ import com.jgoodies.forms.layout.Sizes;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
- * @author not attributable
- * @version 1.0
- */
-
 public class GenFieldsCustomizer extends JDialog {
 
     private final JPanel buttons = new JPanel();
@@ -55,8 +46,7 @@ public class GenFieldsCustomizer extends JDialog {
     private final JabRefFrame parentFrame;
     private final JButton revert = new JButton();
 
-
-    public GenFieldsCustomizer(JabRefFrame frame/*, EntryCustomizationDialog diag*/) {
+    public GenFieldsCustomizer(JabRefFrame frame) {
         super(frame, Localization.lang("Set general fields"), false);
         parentFrame = frame;
         helpBut = new HelpAction(HelpFiles.generalFieldsHelp).getHelpButton();
