@@ -734,7 +734,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
                 if (keys.isEmpty()) {
-                    output("None of the selected entries have BibTeX keys.");
+                    output(Localization.lang("None of the selected entries have BibTeX keys."));
                     return;
                 }
 
@@ -769,7 +769,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     }
                     if (keys.isEmpty()) {
-                        output("None of the selected entries have BibTeX keys.");
+                        output(Localization.lang("None of the selected entries have BibTeX keys."));
                         return;
                     }
 
@@ -822,7 +822,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
 
                     if (copied == 0) {
-                        output("None of the selected entries have BibTeX keys.");
+                        output(Localization.lang("None of the selected entries have BibTeX keys."));
                         return;
                     }
 

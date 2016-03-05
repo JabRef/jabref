@@ -341,7 +341,7 @@ public class DroppedFileHandler {
                 renameToTextBox.setEnabled(!linkInPlace.isSelected()
                         && !multipleEntries);
                 if (multipleEntries) {
-                    renameToTextBox.setText("Multiple entries");
+                    renameToTextBox.setText(Localization.lang("Multiple entries"));
                 }
             }
         };
