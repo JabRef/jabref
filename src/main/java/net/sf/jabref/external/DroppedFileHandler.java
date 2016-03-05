@@ -537,9 +537,9 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        toFile = new File(toFile).getName();
+        String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + toFile);
+        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + destinationFileName);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;
