@@ -34,12 +34,11 @@
 // modified : 18.04.2006 r.nagel
 //            insert a "short info" section
 
-package net.sf.jabref.wizard.auximport.gui;
+package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -61,13 +60,12 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.wizard.auximport.AuxFileParser;
+import net.sf.jabref.logic.auxparser.AuxParser;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -91,19 +89,17 @@ public class FromAuxDialog extends JDialog {
 
     private boolean generatePressed;
 
-    private final AuxFileParser auxParser;
+    private AuxParser auxParser;
 
     private final JabRefFrame parentFrame;
 
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
-            JTabbedPane viewedDBs) {
+                         JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
-
-        auxParser = new AuxFileParser();
 
         jbInit();
         pack();
@@ -225,17 +221,19 @@ public class FromAuxDialog extends JDialog {
         String auxName = auxFileField.getText();
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
-            auxParser.clear();
-            List<String> list = auxParser.generateBibDatabase(auxName, refBase);
-            notFoundList.setListData(list.toArray(new String[list.size()]));
-            statusInfos.append(auxParser.getInformation(false));
+            auxParser = new AuxParser(auxName, refBase);
+            AuxParserResult result = auxParser.parse();
+            notFoundList.setListData(result.getUnresolvedKeys().toArray(new String[result.getUnresolvedKeys().size()]));
+            statusInfos.append(result.getInformation(false));
 
             generateButton.setEnabled(true);
-        }
 
-        // the generated database contains no entries -> no active generate-button
-        if (auxParser.getGeneratedBibDatabase().isEmpty()) {
-            statusInfos.append("\n" + Localization.lang("empty database"));
+            // the generated database contains no entries -> no active generate-button
+            if (result.getGeneratedBibDatabase().isEmpty()) {
+                statusInfos.append("\n" + Localization.lang("empty database"));
+                generateButton.setEnabled(false);
+            }
+        } else {
             generateButton.setEnabled(false);
         }
 
@@ -247,7 +245,7 @@ public class FromAuxDialog extends JDialog {
     }
 
     public BibDatabase getGenerateDB() {
-        return auxParser.getGeneratedBibDatabase();
+        return auxParser.parse().getGeneratedBibDatabase();
     }
 
     /**

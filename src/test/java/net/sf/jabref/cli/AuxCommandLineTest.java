@@ -1,11 +1,11 @@
-package net.sf.jabref.wizard.auximport;
-
-import static org.junit.Assert.*;
+package net.sf.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class AuxCommandLineTest {
 
             AuxCommandLine auxCommandLine = new AuxCommandLine(auxFile.getAbsolutePath(), result.getDatabase());
             BibDatabase newDB = auxCommandLine.perform();
-            assertNotNull(newDB);
-            assertEquals(2, newDB.getEntries().size());
+            Assert.assertNotNull(newDB);
+            Assert.assertEquals(2, newDB.getEntries().size());
         } catch (IOException ex) {
-            fail("Cannot open file");
+            Assert.fail("Cannot open file");
         }
     }
 
