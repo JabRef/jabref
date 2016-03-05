@@ -25,7 +25,7 @@ public class SaveActionsPanel extends JPanel {
 
     private SaveActions saveActions;
 
-    private JList actionsList;
+    private JList<FieldFormatterCleanup> actionsList;
 
     private JTextFieldWithUnfocusedText keyField;
 
@@ -44,7 +44,6 @@ public class SaveActionsPanel extends JPanel {
         Objects.requireNonNull(metaData);
 
         List<String> saveActionsMetaList = metaData.getData(SaveActions.META_KEY);
-
         initializeSaveActions(saveActionsMetaList);
 
         // first clear existing content
@@ -64,12 +63,16 @@ public class SaveActionsPanel extends JPanel {
             actionsToDisplay.add(action);
         }
 
-        actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
+        actionsList = new JList<>(new SaveActionsListModel<>(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         builder.add(actionsList).xyw(3, 5, 2);
 
         deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
-        deleteButton.addActionListener(new DeleteButtonListener());
+        deleteButton.addActionListener(e -> {
+
+            ((SaveActionsListModel<FieldFormatterCleanup>) actionsList.getModel())
+                    .removeAtIndex(actionsList.getSelectedIndex());
+        });
         builder.add(deleteButton).xy(3, 7);
 
         this.setLayout(new BorderLayout());
@@ -102,7 +105,7 @@ public class SaveActionsPanel extends JPanel {
         builder.add(keyField).xy(1, 1);
 
         List<String> formatterNames = saveActions.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
-        formatters = new JComboBox(formatterNames.toArray());
+        formatters = new JComboBox<>((String[]) formatterNames.toArray());
         builder.add(formatters).xy(3, 1);
 
         addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
@@ -123,7 +126,8 @@ public class SaveActionsPanel extends JPanel {
             actions.add("disabled");
         }
 
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel<FieldFormatterCleanup>) actionsList.getModel())
+                .getAllActions();
 
         // if all actions have been removed, remove the save actions from the MetaData
         if (newActions.isEmpty()) {
@@ -138,14 +142,16 @@ public class SaveActionsPanel extends JPanel {
     }
 
     public boolean hasChanged() {
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel<FieldFormatterCleanup>) actionsList.getModel())
+                .getAllActions();
         String formatterString = SaveActions.getMetaDataString(newActions);
 
         return !saveActions.equals(new SaveActions(enabled.isSelected(), formatterString));
     }
 
     public boolean isDefaultSaveActions() {
-        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        List<FieldFormatterCleanup> newActions = ((SaveActionsListModel<FieldFormatterCleanup>) actionsList.getModel())
+                .getAllActions();
         String formatterString = SaveActions.getMetaDataString(newActions);
 
         return SaveActions.DEFAULT_ACTIONS.equals(new SaveActions(enabled.isSelected(), formatterString));
@@ -171,18 +177,12 @@ public class SaveActionsPanel extends JPanel {
 
             FieldFormatterCleanup newAction = new FieldFormatterCleanup(fieldKey, selectedFormatter);
 
-            ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
+            ((SaveActionsListModel<FieldFormatterCleanup>) actionsList.getModel()).addSaveAction(newAction);
             keyField.setText("");
         }
     }
 
-    class DeleteButtonListener implements ActionListener {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((SaveActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex());
-        }
-    }
 
     class EnablementStatusListener implements ActionListener {
 

@@ -16,9 +16,10 @@
 package net.sf.jabref.exporter;
 
 import java.util.List;
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class ExportComparator implements Comparator<List<String>> {
+public class ExportComparator implements Comparator<List<String>>, Serializable {
 
     @Override
     public int compare(List<String> s1, List<String> s2) {

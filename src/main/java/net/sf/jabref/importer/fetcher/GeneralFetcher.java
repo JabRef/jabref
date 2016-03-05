@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -293,7 +294,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     }
 
 
-    private static class EntryFetcherComparator implements Comparator<EntryFetcher> {
+    private static class EntryFetcherComparator implements Comparator<EntryFetcher>, Serializable {
 
         @Override
         public int compare(EntryFetcher entryFetcher, EntryFetcher entryFetcher1) {

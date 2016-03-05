@@ -17,6 +17,7 @@ package net.sf.jabref.bibtex.comparator;
 
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Comparator;
  * the purpose of always placing referenced entries after referring entries in
  * the .bib file. After this criterion comes comparisons of individual fields.
  */
-public class CrossRefEntryComparator implements Comparator<BibEntry> {
+public class CrossRefEntryComparator implements Comparator<BibEntry>, Serializable {
 
     private static final String CROSS_REF_FIELD = "crossref";
 

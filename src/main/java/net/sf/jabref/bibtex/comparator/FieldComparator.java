@@ -24,6 +24,7 @@ import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.YearUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.io.Serializable;
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
@@ -42,7 +43,7 @@ import java.util.Objects;
  * TODO: Testcases
  *
  */
-public class FieldComparator implements Comparator<BibEntry> {
+public class FieldComparator implements Comparator<BibEntry>, Serializable {
 
     private static Collator collator;
 

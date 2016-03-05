@@ -61,15 +61,14 @@ final public class MySQLExporter extends DBExporter {
         String url = SQLUtil.createJDBCurl(dbstrings, false);
         String drv = "com.mysql.jdbc.Driver";
 
-
         Class.forName(drv).newInstance();
-        Connection conn = DriverManager.getConnection(url,
-                dbstrings.getUsername(), dbstrings.getPassword());
-        SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `"
-                + dbStrings.getDatabase() + '`');
 
-        conn.setCatalog(dbStrings.getDatabase());
-        return conn;
+        try (Connection conn = DriverManager.getConnection(url, dbstrings.getUsername(), dbstrings.getPassword())) {
+            SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `" + dbStrings.getDatabase() + '`');
+
+            conn.setCatalog(dbStrings.getDatabase());
+            return conn;
+        }
     }
 
     /**

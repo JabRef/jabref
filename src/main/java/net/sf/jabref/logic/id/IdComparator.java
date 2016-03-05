@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,7 @@ package net.sf.jabref.logic.id;
 
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Comparator;
  * can be used to sort entries back into the order they were created,
  * provided the IDs given to entries are lexically monotonically increasing.
  */
-public class IdComparator implements Comparator<BibEntry> {
+public class IdComparator implements Comparator<BibEntry>, Serializable {
 
     @Override
     public int compare(BibEntry one, BibEntry two) {

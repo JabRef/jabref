@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * and each time a Comparator returns 0, the next one is attempted. If all comparators
  * return 0 the final result will be 0.
  */
-public class FieldComparatorStack<T> implements Comparator<T> {
+public class FieldComparatorStack<T> implements Comparator<T>, Serializable {
 
     private final List<? extends Comparator<? super T>> comparators;
 

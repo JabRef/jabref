@@ -30,6 +30,7 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -43,7 +44,7 @@ import net.sf.jabref.importer.fileformat.ImportFormat;
  *
  * <p>Is also responsible for instantiating the class loader.</p>
  */
-public class CustomImporter implements Comparable<CustomImporter> {
+public class CustomImporter implements Comparable<CustomImporter>, Serializable {
 
     private String name;
     private String cliId;
