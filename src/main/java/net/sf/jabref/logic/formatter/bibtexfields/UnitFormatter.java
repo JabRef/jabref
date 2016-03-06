@@ -111,21 +111,21 @@ public class UnitFormatter implements Formatter {
         Arrays.sort(listOfWords, new StringLengthComparator()); // LengthComparator from CaseKeeper.java
 
         // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
-        text = text.replaceAll("([0-9,\\.]+)-([Bb][Ii][Tt])", "$1\\\\mbox\\{-\\}$2");
+        String result = text.replaceAll("([0-9,\\.]+)-([Bb][Ii][Tt])", "$1\\\\mbox\\{-\\}$2");
 
         // Replace the space in 12 bit etc with a non-breaking space, will also avoid bad casing of 12 Bit
-        text = text.replaceAll("([0-9,\\.]+) ([Bb][Ii][Tt])", "$1~$2");
+        result = result.replaceAll("([0-9,\\.]+) ([Bb][Ii][Tt])", "$1~$2");
 
         // For each word in the list
         for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
-            text = text.replaceAll("([0-9])(" + listOfWord + ")", "$1\\{$2\\}"); // Only add brackets to keep case
-            text = text.replaceAll("([0-9])-(" + listOfWord + ")", "$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
-            text = text.replaceAll("([0-9]) (" + listOfWord + ")", "$1~\\{$2\\}"); // Replace space with a hard space
+            result = result.replaceAll("([0-9])(" + listOfWord + ")", "$1\\{$2\\}"); // Only add brackets to keep case
+            result = result.replaceAll("([0-9])-(" + listOfWord + ")", "$1\\\\mbox\\{-\\}\\{$2\\}"); // Replace hyphen with non-break hyphen
+            result = result.replaceAll("([0-9]) (" + listOfWord + ")", "$1~\\{$2\\}"); // Replace space with a hard space
 
         }
 
-        return text;
+        return result;
     }
 
     @Override

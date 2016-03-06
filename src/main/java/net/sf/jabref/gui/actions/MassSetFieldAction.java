@@ -219,9 +219,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
-                // TODO: message: can only rename a single field
-            }
-            else {
+                JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
+                        JOptionPane.ERROR_MESSAGE);
+                return; // Do not close the dialog.
+            } else {
                 ce.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
                         overwrite.isSelected()));
             }

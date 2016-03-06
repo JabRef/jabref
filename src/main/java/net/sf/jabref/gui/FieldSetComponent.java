@@ -232,8 +232,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * This method is called when a new field should be added to the list. Performs validation of the
      * field.
      */
-    protected void addField(String s) {
-        s = s.trim();
+    protected void addField(String str) {
+        String s = str.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
         }

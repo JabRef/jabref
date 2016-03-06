@@ -789,7 +789,6 @@ public class JabRefPreferences {
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
 
-        //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = '[' + get(DEFAULT_OWNER) + ']';
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
@@ -940,7 +939,7 @@ public class JabRefPreferences {
      * characters make the process transparent even if strings contain ';'.
      */
     public void putStringList(String key, List<String> value) {
-        if ((value == null)) {
+        if (value == null) {
             remove(key);
             return;
         }
@@ -1235,9 +1234,10 @@ public class JabRefPreferences {
      * @param number or higher.
      */
     public void purgeSeries(String prefix, int number) {
-        while (get(prefix + number) != null) {
-            remove(prefix + number);
-            number++;
+        int n = number;
+        while (get(prefix + n) != null) {
+            remove(prefix + n);
+            n++;
         }
     }
 

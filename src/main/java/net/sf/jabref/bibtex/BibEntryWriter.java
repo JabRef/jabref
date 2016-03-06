@@ -174,22 +174,20 @@ public class BibEntryWriter {
      * @return The display version of the field name.
      */
     private String getFieldDisplayName(String field, int intendation) {
-        if (field.isEmpty()) {
+        String actualField = field;
+        if (actualField.isEmpty()) {
             // hard coded "UNKNOWN" is assigned to a field without any name
-            field = "UNKNOWN";
+            actualField = "UNKNOWN";
         }
 
         StringBuilder suffixSB = new StringBuilder();
 
-        for (int i = (intendation - field.length()); i > 0; i--) {
+        for (int i = (intendation - actualField.length()); i > 0; i--) {
             suffixSB.append(' ');
         }
 
         String suffix = suffixSB.toString();
 
-        String result;
-        result = field.toLowerCase() + " = " + suffix;
-
-        return result;
+        return actualField.toLowerCase() + " = " + suffix;
     }
 }

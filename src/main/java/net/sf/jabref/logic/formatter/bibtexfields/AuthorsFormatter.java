@@ -47,8 +47,8 @@ public class AuthorsFormatter implements Formatter {
     public String format(String value) {
         boolean andSep = false;
         // String can contain newlines. Convert each to a space
-        value = value.replace("\n", " ");
-        String[] authors = value.split("( |,)and ", -1);
+        String noNewlineValue = value.replace("\n", " ");
+        String[] authors = noNewlineValue.split("( |,)and ", -1);
         if (authors.length > 1) {
             andSep = true;
         } else {
@@ -58,11 +58,11 @@ public class AuthorsFormatter implements Formatter {
             If there is a semicolon, we go by that. If not, we assume commas, and count the parts
             separated by commas to determine which it is.
             */
-            String[] authors2 = value.split("; ");
+            String[] authors2 = noNewlineValue.split("; ");
             if (authors2.length > 1) {
                 authors = authors2;
             } else {
-                authors2 = value.split(", ");
+                authors2 = noNewlineValue.split(", ");
                 if (authors2.length > 3) { // Probably more than a single author, so we split by commas.
                     authors = authors2;
                 } else {
@@ -102,7 +102,7 @@ public class AuthorsFormatter implements Formatter {
             } else {
                 // Check if there is a comma in the last name. If so, we can assume that comma
                 // is not used to separate the names:
-                boolean lnfn = authors[1].indexOf(',') > 0;
+                boolean lnfn = authors[1].indexOf(',') >= 1;
                 if (!lnfn) {
                     String[] cmSep = authors[0].split(", ");
                     if (cmSep.length > 1) {
@@ -132,7 +132,8 @@ public class AuthorsFormatter implements Formatter {
         return stringBuilder.toString();
     }
 
-    private static String normalizeName(String name) {
+    private static String normalizeName(String oldName) {
+        String name = oldName;
         Matcher matcher = AuthorsFormatter.LAST_F_F.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2);
