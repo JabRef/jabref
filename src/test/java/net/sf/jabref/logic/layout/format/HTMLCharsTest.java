@@ -73,6 +73,12 @@ public class HTMLCharsTest {
                 layout.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
+    @Test
+    public void testNewLine() {
+        LayoutFormatter layout = new HTMLChars();
+        Assert.assertEquals("a<br>b", layout.format("a\nb"));
+        Assert.assertEquals("a<p>b", layout.format("a\n\nb"));
+    }
     /*
      * Is missing a lot of test cases for the individual chars...
      */

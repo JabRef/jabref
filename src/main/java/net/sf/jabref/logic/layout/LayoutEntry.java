@@ -51,39 +51,30 @@ class LayoutEntry {
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
+    private final JournalAbbreviationRepository repository;
 
     public LayoutEntry(StringInt si, JournalAbbreviationRepository repository) {
+        this.repository = repository;
         type = si.i;
-
-        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
+        switch (type) {
+        case LayoutHelper.IS_LAYOUT_TEXT:
             text = si.s;
-        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
+            break;
+        case LayoutHelper.IS_SIMPLE_FIELD:
             text = si.s.trim();
-        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_FIELD_END)) {
-            // Do nothing
-        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
-            List<String> v = StringUtil.tokenizeToList(si.s, "\n");
-
-            if (v.size() == 1) {
-                text = v.get(0);
-            } else {
-                text = v.get(0).trim();
-
-                option = LayoutEntry.getOptionalLayout(v.get(1), repository);
-                // See if there was an undefined formatter:
-                for (LayoutFormatter anOption : option) {
-                    if (anOption instanceof NotFoundFormatter) {
-                        String notFound = ((NotFoundFormatter) anOption).getNotFound();
-
-                        invalidFormatter.add(notFound);
-                    }
-                }
-
-            }
+            break;
+        case LayoutHelper.IS_OPTION_FIELD:
+            doOptionField(si.s);
+            break;
+        case LayoutHelper.IS_FIELD_START:
+        case LayoutHelper.IS_FIELD_END:
+        default:
+            break;
         }
     }
 
     public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationRepository repository) {
+        this.repository = repository;
         List<StringInt> blockEntries = null;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         LayoutEntry le;
@@ -97,27 +88,31 @@ class LayoutEntry {
         type = layoutType;
         text = blockEnd;
         for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
-            if ((parsedEntry.i == LayoutHelper.IS_LAYOUT_TEXT) || (parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD)) {
-                // Do nothing
-            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_START)
-                    || (parsedEntry.i == LayoutHelper.IS_GROUP_START)) {
+            switch (parsedEntry.i) {
+            case LayoutHelper.IS_FIELD_START:
+            case LayoutHelper.IS_GROUP_START:
                 blockEntries = new ArrayList<>();
                 blockStart = parsedEntry.s;
-            } else if ((parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                break;
+            case LayoutHelper.IS_FIELD_END:
+            case LayoutHelper.IS_GROUP_END:
                 if (blockStart.equals(parsedEntry.s)) {
                     blockEntries.add(parsedEntry);
-                    if (parsedEntry.i == LayoutHelper.IS_GROUP_END) {
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_GROUP_START, repository);
-                    } else {
-                        le = new LayoutEntry(blockEntries, LayoutHelper.IS_FIELD_START, repository);
-                    }
+                    le = new LayoutEntry(blockEntries,
+                            parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START : LayoutHelper.IS_FIELD_START,
+                            repository);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
                     LOGGER.warn("Nested field entries are not implemented!");
                 }
-            } else if (parsedEntry.i == LayoutHelper.IS_OPTION_FIELD) {
+                break;
+            case LayoutHelper.IS_LAYOUT_TEXT:
+            case LayoutHelper.IS_SIMPLE_FIELD:
+            case LayoutHelper.IS_OPTION_FIELD:
+            default:
                 // Do nothing
+                break;
             }
 
             if (blockEntries == null) {
@@ -140,7 +135,7 @@ class LayoutEntry {
     }
 
     private String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, null);
+        return doLayout(bibtex, database, Optional.empty());
     }
 
     public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
@@ -159,7 +154,7 @@ class LayoutEntry {
             }
             return value;
         case LayoutHelper.IS_FIELD_START:
-        case LayoutHelper.IS_GROUP_START: {
+        case LayoutHelper.IS_GROUP_START:
             String field;
             if (type == LayoutHelper.IS_GROUP_START) {
                 field = BibDatabase.getResolvedField(text, bibtex, database);
@@ -186,9 +181,8 @@ class LayoutEntry {
                 }
             }
 
-            if ((field == null)
-                    || ((type == LayoutHelper.IS_GROUP_START) && field.equalsIgnoreCase(LayoutHelper
-                            .getCurrentGroup()))) {
+            if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
+                    && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
                 return null;
             } else {
                 if (type == LayoutHelper.IS_GROUP_START) {
@@ -244,7 +238,6 @@ class LayoutEntry {
 
                 return sb.toString();
             }
-        }
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
@@ -256,13 +249,13 @@ class LayoutEntry {
             } else {
                 // changed section begin - arudert
                 // resolve field (recognized by leading backslash) or text
-                String field = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex, database)
-                        : BibDatabase.getText(text, database);
+                String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
+                        database) : BibDatabase.getText(text, database);
                 // changed section end - arudert
-                if (field == null) {
+                if (fieldText == null) {
                     fieldEntry = "";
                 } else {
-                    fieldEntry = field;
+                    fieldEntry = fieldText;
                 }
             }
 
@@ -278,12 +271,12 @@ class LayoutEntry {
             }
 
             return fieldEntry;
-            case LayoutHelper.IS_ENCODING_NAME:
-                // Printing the encoding name is not supported in entry layouts, only
-                // in begin/end layouts. This prevents breakage if some users depend
-                // on a field called "encoding". We simply return this field instead:
-                return BibDatabase.getResolvedField("encoding", bibtex, database);
-            default:
+        case LayoutHelper.IS_ENCODING_NAME:
+            // Printing the encoding name is not supported in entry layouts, only
+            // in begin/end layouts. This prevents breakage if some users depend
+            // on a field called "encoding". We simply return this field instead:
+            return BibDatabase.getResolvedField("encoding", bibtex, database);
+        default:
             return "";
         }
     }
@@ -297,18 +290,22 @@ class LayoutEntry {
      * @return
      */
     public String doLayout(BibDatabase database, Charset encoding) {
-        if (type == LayoutHelper.IS_LAYOUT_TEXT) {
+        switch (type) {
+        case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
-        } else if (type == LayoutHelper.IS_SIMPLE_FIELD) {
-            throw new UnsupportedOperationException(
-                    "bibtex entry fields not allowed in begin or end layout");
-        } else if ((type == LayoutHelper.IS_FIELD_START) || (type == LayoutHelper.IS_GROUP_START)) {
-            throw new UnsupportedOperationException(
-                    "field and group starts not allowed in begin or end layout");
-        } else if ((type == LayoutHelper.IS_FIELD_END) || (type == LayoutHelper.IS_GROUP_END)) {
-            throw new UnsupportedOperationException(
-                    "field and group ends not allowed in begin or end layout");
-        } else if (type == LayoutHelper.IS_OPTION_FIELD) {
+
+        case LayoutHelper.IS_SIMPLE_FIELD:
+            throw new UnsupportedOperationException("bibtex entry fields not allowed in begin or end layout");
+
+        case LayoutHelper.IS_FIELD_START:
+        case LayoutHelper.IS_GROUP_START:
+            throw new UnsupportedOperationException("field and group starts not allowed in begin or end layout");
+
+        case LayoutHelper.IS_FIELD_END:
+        case LayoutHelper.IS_GROUP_END:
+            throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
+
+        case LayoutHelper.IS_OPTION_FIELD:
             String field = BibDatabase.getText(text, database);
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
@@ -321,19 +318,45 @@ class LayoutEntry {
             }
 
             return field;
-        } else if (type == LayoutHelper.IS_ENCODING_NAME) {
+
+        case LayoutHelper.IS_ENCODING_NAME:
             return encoding.displayName();
-        } else if (type == LayoutHelper.IS_FILENAME) {
+
+        case LayoutHelper.IS_FILENAME:
             File f = Globals.prefs.databaseFile;
             return f == null ? "" : f.getName();
-        } else if (type == LayoutHelper.IS_FILEPATH) {
-            File f = Globals.prefs.databaseFile;
-            return f == null ? "" : f.getPath();
+
+        case LayoutHelper.IS_FILEPATH:
+            File f2 = Globals.prefs.databaseFile;
+            return f2 == null ? "" : f2.getPath();
+
+        default:
+            break;
         }
         return "";
     }
 
+    private void doOptionField(String s) {
+        List<String> v = StringUtil.tokenizeToList(s, "\n");
 
+        if (v.size() == 1) {
+            text = v.get(0);
+        } else {
+            text = v.get(0).trim();
+
+            option = LayoutEntry.getOptionalLayout(v.get(1), repository);
+            // See if there was an undefined formatter:
+            for (LayoutFormatter anOption : option) {
+                if (anOption instanceof NotFoundFormatter) {
+                    String notFound = ((NotFoundFormatter) anOption).getNotFound();
+
+                    invalidFormatter.add(notFound);
+                }
+            }
+
+        }
+
+    }
     // added section - end (arudert)
 
     private static LayoutFormatter getLayoutFormatterByClassName(String className,
@@ -369,15 +392,15 @@ class LayoutEntry {
     private static List<LayoutFormatter> getOptionalLayout(String formatterName,
             JournalAbbreviationRepository repository) {
 
-        List<String[]> formatterStrings = parseMethodsCalls(formatterName);
+        List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
 
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
         Map<String, String> userNameFormatter = NameFormatter.getNameFormatters();
 
-        for (String[] strings : formatterStrings) {
+        for (List<String> strings : formatterStrings) {
 
-            String className = strings[0].trim();
+            String className = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
             if (Globals.prefs.customExportNameFormatters != null) {
@@ -395,13 +418,13 @@ class LayoutEntry {
                 LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, repository);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
-                if ((f instanceof ParamLayoutFormatter) && (strings.length >= 2)) {
-                        ((ParamLayoutFormatter) f).setArgument(strings[1]);
+                if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
+                    ((ParamLayoutFormatter) f).setArgument(strings.get(1));
                 }
                 results.add(f);
                 continue;
-            } catch (Exception ignored) {
-                // Ignored
+            } catch (Exception ex) {
+                LOGGER.info("Problem with formatter", ex);
             }
 
             // Then check whether this is a user defined formatter
@@ -427,9 +450,9 @@ class LayoutEntry {
         return invalidFormatter;
     }
 
-    public static List<String[]> parseMethodsCalls(String calls) {
+    public static List<List<String>> parseMethodsCalls(String calls) {
 
-        List<String[]> result = new ArrayList<>();
+        List<List<String>> result = new ArrayList<>();
 
         char[] c = calls.toCharArray();
 
@@ -472,7 +495,7 @@ class LayoutEntry {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[]{method, param});
+                            result.add(Arrays.asList(method, param));
                         } else {
                             // Parameter is in format xxx
 
@@ -484,16 +507,16 @@ class LayoutEntry {
 
                             String param = calls.substring(startParam, i);
 
-                            result.add(new String[]{method, param});
+                            result.add(Arrays.asList(method, param));
 
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(new String[]{method});
+                        result.add(Arrays.asList(method));
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(new String[]{method});
+                    result.add(Arrays.asList(method));
                 }
             }
             i++;
