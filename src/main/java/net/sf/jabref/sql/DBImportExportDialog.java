@@ -171,7 +171,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
             selectedInt = table.getSelectedRow();
             selectedDB = (String) table.getValueAt(selectedInt, 0);
             int areYouSure = JOptionPane.showConfirmDialog(diag,
-                    "Are you sure you want to remove the already\nexistent SQL DBs?");
+                    Localization.lang("Are you sure you want to remove the already existent SQL DBs?"));
             if (areYouSure == JOptionPane.YES_OPTION) {
                 removeAction = true;
                 diag.dispose();

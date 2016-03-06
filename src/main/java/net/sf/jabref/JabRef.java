@@ -262,9 +262,8 @@ public class JabRef {
                         formatName = "tablerefsabsbib";
                         break;
                     default:
-                        System.err.println(
-                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                        + JabRefCLI.getExportMatchesSyntax());
+                        System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                                .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
                         return Optional.empty();
                     } //end switch
 

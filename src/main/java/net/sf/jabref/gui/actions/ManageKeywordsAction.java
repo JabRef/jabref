@@ -108,8 +108,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         keywordList.setVisibleRowCount(10);
 
-        intersectKeywords = new JRadioButton("Display keywords appearing in ALL entries");
-        mergeKeywords = new JRadioButton("Display keywords appearing in ANY entry");
+        intersectKeywords = new JRadioButton(Localization.lang("Display keywords appearing in ALL entries"));
+        mergeKeywords = new JRadioButton(Localization.lang("Display keywords appearing in ANY entry"));
         ButtonGroup group = new ButtonGroup();
         group.add(intersectKeywords);
         group.add(mergeKeywords);

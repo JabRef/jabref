@@ -291,28 +291,22 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     if (!toSetIn.isEmpty()) {
                         int cp = comp.getCaretPosition();
                         //comp.setCaretPosition(cp+1-toSetIn.);
-                        //System.out.println(cp-toSetIn.length()+" - "+cp);
                         comp.select((cp + 1) - toSetIn.length(), cp);
                         lastBeginning = lastBeginning + ch;
 
                         e.consume();
                         lastCaretPosition = comp.getCaretPosition();
 
-                        //System.out.println("Added char: '"+toSetIn+"'");
-                        //System.out.println("LastBeginning: '"+lastBeginning+"'");
-
                         lastCompletions = findCompletions(lastBeginning);
                         lastShownCompletion = 0;
                         for (int i = 0; i < lastCompletions.size(); i++) {
                             String lastCompletion = lastCompletions.get(i);
-                            //System.out.println("Completion["+i+"] = "+lastCompletion);
                             if (lastCompletion.endsWith(toSetIn)) {
                                 lastShownCompletion = i;
                                 break;
                             }
 
                         }
-                        //System.out.println("Index now: "+lastShownCompletion);
                         if (toSetIn.length() < 2) {
                             // User typed the last character of the autocompleted word
                             // We have to replace the automcompletion word by the typed word.

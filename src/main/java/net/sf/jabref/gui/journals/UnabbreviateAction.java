@@ -40,7 +40,7 @@ public class UnabbreviateAction extends AbstractWorker {
 
     @Override
     public void init() {
-        panel.output("Unabbreviating...");
+        panel.output(Localization.lang("Unabbreviating..."));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UnabbreviateAction extends AbstractWorker {
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(
                 Globals.journalAbbreviationLoader.getRepository());
 
-        NamedCompound ce = new NamedCompound("Unabbreviate journal names");
+        NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
             if (undoableAbbreviator.unabbreviate(panel.database(), entry, "journal", ce)) {
