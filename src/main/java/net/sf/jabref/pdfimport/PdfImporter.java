@@ -190,15 +190,15 @@ public class PdfImporter {
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
         BibEntry entry;
-        List<BibEntry> localRes = null;
+        List<BibEntry> localRes = new ArrayList<>();
         PdfXmpImporter importer = new PdfXmpImporter();
         try (InputStream in = new FileInputStream(fileName)) {
-            localRes = importer.importEntries(in, frame);
+            localRes.addAll(importer.importEntries(in, frame));
         } catch (IOException ex) {
             LOGGER.warn("Cannot import entries", ex);
         }
 
-        if ((localRes == null) || localRes.isEmpty()) {
+        if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
             entry = createNewBlankEntry(fileName);
@@ -237,10 +237,9 @@ public class PdfImporter {
         BibEntry entry;
         try (InputStream in = new FileInputStream(file)) {
             PdfContentImporter contentImporter = new PdfContentImporter();
-            List<BibEntry> localRes = null;
-            localRes = contentImporter.importEntries(in, frame);
+            List<BibEntry> localRes = contentImporter.importEntries(in, frame);
 
-            if ((localRes == null) || localRes.isEmpty()) {
+            if (localRes.isEmpty()) {
                 // import failed -> generate default entry
                 entry = createNewBlankEntry(fileName);
                 res.add(entry);

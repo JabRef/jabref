@@ -104,9 +104,7 @@ public class ImportFormatReader {
         List<BibEntry> res = importer.get().importEntries(in, status);
 
         // Remove all empty entries
-        if (res != null) {
-            BibDatabases.purgeEmptyEntries(res);
-        }
+        BibDatabases.purgeEmptyEntries(res);
 
         return res;
     }
@@ -381,12 +379,8 @@ public class ImportFormatReader {
                 List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 int entryCount;
-                if (entries == null) {
-                    entryCount = 0;
-                } else {
-                    BibDatabases.purgeEmptyEntries(entries);
-                    entryCount = entries.size();
-                }
+                BibDatabases.purgeEmptyEntries(entries);
+                entryCount = entries.size();
 
                 if (entryCount > bestResultCount) {
                     bestResult = entries;
