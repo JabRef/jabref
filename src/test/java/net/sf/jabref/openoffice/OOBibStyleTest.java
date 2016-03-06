@@ -6,7 +6,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -16,7 +20,13 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import static org.mockito.Mockito.mock;
 
@@ -117,4 +127,51 @@ public class OOBibStyleTest {
         Set<String> journals = style.getJournals();
         assertTrue(journals.contains("Journal name 1"));
     }
+
+    @Test
+    public void testGetCitationMarker() throws IOException {
+        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
+        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
+        Reader r = new InputStreamReader(defPath.openStream());
+        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        BibDatabase db = result.getDatabase();
+        for (BibEntry entry : db.getEntries()) {
+            entryDBMap.put(entry, db);
+        }
+
+        BibEntry entry = db.getEntryByKey("1137631");
+        assertEquals("[Boström et al., 2006]",
+                style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, null));
+        assertEquals("Boström et al. [2006]",
+                style.getCitationMarker(Arrays.asList(entry), entryDBMap, false, null, new int[] {3}));
+        assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
+                style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, new int[] {5}));
+    }
+
+    @Test
+    public void testLayout() throws IOException {
+        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
+        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
+        Reader r = new InputStreamReader(defPath.openStream());
+        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        BibDatabase db = result.getDatabase();
+
+        Layout l = style.getReferenceFormat("default");
+        l.setPostFormatter(new OOPreFormatter());
+        BibEntry entry = db.getEntryByKey("1137631");
+        assertEquals(
+                "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>,   : 11-18.",
+                l.doLayout(entry, db));
+
+        l = style.getReferenceFormat("incollection");
+        l.setPostFormatter(new OOPreFormatter());
+        assertEquals(
+                "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>. In:  (Ed.), <i>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</i>, ACM.",
+                l.doLayout(entry, db));
+}
 }
