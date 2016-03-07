@@ -271,40 +271,16 @@ public class XMPUtil {
          * Contributor -> Editor
          */
         List<String> contributors = dcSchema.getContributors();
-        if (contributors != null) {
-            Iterator<String> it = contributors.iterator();
-            StringBuffer sb = null;
-            while (it.hasNext()) {
-                if (sb == null) {
-                    sb = new StringBuffer();
-                } else {
-                    sb.append(" and ");
-                }
-                sb.append(it.next());
-            }
-            if (sb != null) {
-                entry.setField("editor", sb.toString());
-            }
+        if ((contributors != null) && !contributors.isEmpty()) {
+            entry.setField("editor", String.join(" and ", contributors));
         }
 
         /**
          * Author -> Creator
          */
         List<String> creators = dcSchema.getCreators();
-        if (creators != null) {
-            Iterator<String> it = creators.iterator();
-            StringBuffer sb = null;
-            while (it.hasNext()) {
-                if (sb == null) {
-                    sb = new StringBuffer();
-                } else {
-                    sb.append(" and ");
-                }
-                sb.append(it.next());
-            }
-            if (sb != null) {
-                entry.setField("author", sb.toString());
-            }
+        if ((creators != null) && !creators.isEmpty()) {
+            entry.setField("author", String.join(" and ", creators));
         }
 
         /**
@@ -347,20 +323,8 @@ public class XMPUtil {
          * Publisher -> Publisher
          */
         List<String> publishers = dcSchema.getPublishers();
-        if (publishers != null) {
-            Iterator<String> it = dcSchema.getPublishers().iterator();
-            StringBuffer sb = null;
-            while (it.hasNext()) {
-                if (sb == null) {
-                    sb = new StringBuffer();
-                } else {
-                    sb.append(" and ");
-                }
-                sb.append(it.next());
-            }
-            if (sb != null) {
-                entry.setField("publishers", sb.toString());
-            }
+        if ((publishers != null) && !publishers.isEmpty()) {
+            entry.setField("publishers", String.join(" and ", publishers));
         }
 
         /**
@@ -403,19 +367,7 @@ public class XMPUtil {
          */
         List<String> subjects = dcSchema.getSubjects();
         if (subjects != null) {
-            Iterator<String> it = subjects.iterator();
-            StringBuffer sb = null;
-            while (it.hasNext()) {
-                if (sb == null) {
-                    sb = new StringBuffer();
-                } else {
-                    sb.append(',');
-                }
-                sb.append(it.next());
-            }
-            if (sb != null) {
-                entry.setField("keywords", sb.toString());
-            }
+            entry.addKeywords(subjects);
         }
 
         /**

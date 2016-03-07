@@ -37,6 +37,7 @@ public class PersonName {
 
 
     public PersonName() {
+        // Empty constuctor
     }
 
     public PersonName(String name) {
@@ -85,7 +86,7 @@ public class PersonName {
     }
 
     public String getGivenNames() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (givenName != null) {
             result.append(givenName);
         }
@@ -127,7 +128,7 @@ public class PersonName {
 
     public String getFullname()
     {
-        StringBuffer fullName = new StringBuffer();
+        StringBuilder fullName = new StringBuilder();
         if ((givenName != null) && !givenName.isEmpty()) {
             fullName.append(givenName).append(' ');
         }

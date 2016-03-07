@@ -59,7 +59,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
         //        </bibo:Contribution>
         //      </bibo:contribution>
 
-        StringBuffer sb = new StringBuffer(100);
+        StringBuilder sb = new StringBuilder(100);
 
         if (!fieldText.contains(" and ")) {
             singleAuthor(sb, fieldText, 1);
@@ -81,7 +81,7 @@ public class CreateBibORDFAuthors implements LayoutFormatter
      * @param author
      * @param position
      */
-    private static void singleAuthor(StringBuffer sb, String author, int position) {
+    private static void singleAuthor(StringBuilder sb, String author, int position) {
         sb.append("<bibo:contribution>\n");
         sb.append("  <bibo:Contribution>\n");
         sb.append("    <bibo:role rdf:resource=\"http://purl.org/ontology/bibo/roles/author\" />\n");
