@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Set;
 
 public class AuxParserResult {
-    public final BibDatabase masterDatabase;
-    public final Set<String> uniqueKeys = new HashSet<>();
-    public final List<String> unresolvedKeys = new ArrayList<>();
 
-    public BibDatabase auxDatabase = new BibDatabase();
-    public int nestedAuxCount;
-    public int crossRefEntriesCount;
+    private final BibDatabase masterDatabase;
+    private final Set<String> uniqueKeys = new HashSet<>();
+    private final List<String> unresolvedKeys = new ArrayList<>();
+
+    private final BibDatabase auxDatabase = new BibDatabase();
+    private int nestedAuxCount;
+    private int crossRefEntriesCount;
 
     public AuxParserResult(BibDatabase masterDatabase) {
         this.masterDatabase = masterDatabase;
@@ -50,6 +51,14 @@ public class AuxParserResult {
         return crossRefEntriesCount;
     }
 
+    public void countCrossRefEntry() {
+        crossRefEntriesCount++;
+    }
+
+    public void countNestedAuxFile() {
+        nestedAuxCount++;
+    }
+
     /**
      * Prints parsing statistics
      *
@@ -64,7 +73,7 @@ public class AuxParserResult {
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
                 .append(Localization.lang("not_found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
-                .append(getCrossRefEntriesCount()).append('\n');
+                .append(crossRefEntriesCount).append('\n');
 
         if (includeMissingEntries && (getUnresolvedKeysCount() > 0)) {
             for (String entry : unresolvedKeys) {
@@ -75,5 +84,9 @@ public class AuxParserResult {
             result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCount);
         }
         return result.toString();
+    }
+
+    public Set<String> getUniqueKeys() {
+        return uniqueKeys;
     }
 }

@@ -81,7 +81,7 @@ public class AuxParser {
                         String[] keys = keyString.split(",");
 
                         for (String key : keys) {
-                            result.uniqueKeys.add(key.trim());
+                            result.getUniqueKeys().add(key.trim());
                         }
                     }
 
@@ -98,7 +98,7 @@ public class AuxParser {
 
                         if (!fileList.contains(inputFile)) {
                             fileList.add(inputFile);
-                            result.nestedAuxCount++;
+                            result.countNestedAuxFile();
                         }
                     }
                 }
@@ -119,11 +119,11 @@ public class AuxParser {
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the aux file.
      */
     private void resolveTags(AuxParserResult result) {
-        for (String key : result.uniqueKeys) {
+        for (String key : result.getUniqueKeys()) {
             BibEntry entry = masterDatabase.getEntryByKey(key);
 
             if (entry == null) {
-                result.unresolvedKeys.add(key);
+                result.getUnresolvedKeys().add(key);
             } else {
                 insertEntry(entry, result);
                 resolveCrossReferences(entry, result);
@@ -131,9 +131,9 @@ public class AuxParser {
         }
 
         // Copy database definitions
-        if (result.auxDatabase.getEntryCount() > 0) {
-            result.auxDatabase.copyPreamble(masterDatabase);
-            result.auxDatabase.copyStrings(masterDatabase);
+        if (result.getGeneratedBibDatabase().getEntryCount() > 0) {
+            result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
+            result.getGeneratedBibDatabase().copyStrings(masterDatabase);
         }
     }
 
@@ -142,14 +142,14 @@ public class AuxParser {
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
         entry.getFieldOptional("crossref").ifPresent(crossref -> {
-            if (!result.uniqueKeys.contains(crossref)) {
+            if (!result.getUniqueKeys().contains(crossref)) {
                 BibEntry refEntry = masterDatabase.getEntryByKey(crossref);
 
                 if (refEntry == null) {
-                    result.unresolvedKeys.add(crossref);
+                    result.getUnresolvedKeys().add(crossref);
                 } else {
                     insertEntry(refEntry, result);
-                    result.crossRefEntriesCount++;
+                    result.countCrossRefEntry();
                 }
             }
         });
@@ -161,6 +161,6 @@ public class AuxParser {
     private void insertEntry(BibEntry entry, AuxParserResult result) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
-        result.auxDatabase.insertEntry(clonedEntry);
+        result.getGeneratedBibDatabase().insertEntry(clonedEntry);
     }
 }
