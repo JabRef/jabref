@@ -1286,16 +1286,6 @@ public class JabRefPreferences {
     }
 
     /**
-     * Determines whether the given field should be written without any sort of wrapping.
-     *
-     * @param fieldName The field name.
-     * @return true if the field should not be wrapped.
-     */
-    public boolean isNonWrappableField(String fieldName) {
-        return nonWrappableFields.contains(fieldName);
-    }
-
-    /**
      * ONLY FOR TESTING!
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
