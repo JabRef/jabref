@@ -16,7 +16,9 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class RepecNepImporterTest {
 
-    RepecNepImporter testImporter;
+    private RepecNepImporter testImporter;
+
+
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();

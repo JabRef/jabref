@@ -16,6 +16,10 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -32,14 +36,18 @@ import java.util.regex.Pattern;
  */
 public class JabRefDesktop {
 
+    private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
+
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(MetaData metaData, String link, String fieldName) throws IOException {
-
+    public static void openExternalViewer(MetaData metaData, String initialLink, String initialFieldName)
+            throws IOException {
+        String link = initialLink;
+        String fieldName = initialFieldName;
         if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
             // Find the default directory for this field type:
             List<String> dir = metaData.getFileDirectory(fieldName);
@@ -83,8 +91,7 @@ public class JabRefDesktop {
             try {
                 openBrowser(link);
             } catch (IOException e) {
-                System.err.println(Localization.lang("Error_opening_file_'%0'.", link));
-                e.printStackTrace();
+                LOGGER.error("Error opening file '" + link + "'", e);
                 // TODO: should we rethrow the exception?
                 // In BasePanel.java, the exception is catched and a text output to the frame
                 // throw e;
@@ -93,7 +100,7 @@ public class JabRefDesktop {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
+                    String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
@@ -105,20 +112,21 @@ public class JabRefDesktop {
                      */
                 } else {
                     ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
-                    String viewer = type != null ? type.getOpenWith() : "xdg-open";
+                    String viewer = type == null ? "xdg-open" : type.getOpenWith();
                     String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
                     cmdArray[1] = link;
                     Runtime.getRuntime().exec(cmdArray);
                 }
             } catch (IOException e) {
-                System.err.println("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PSVIEWER) + " " + link);
+                LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
+                        + link, e);
             }
         } else if ("pdf".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
                     ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
+                    String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
                     String[] cmd = {"/usr/bin/open", "-a", viewer, link};
                     Runtime.getRuntime().exec(cmd);
                 } else if (OS.WINDOWS) {
@@ -136,7 +144,7 @@ public class JabRefDesktop {
                      */
                 } else {
                     ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-                    String viewer = type != null ? type.getOpenWith() : Globals.prefs.get(JabRefPreferences.PSVIEWER);
+                    String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
                     String[] cmdArray = new String[2];
                     cmdArray[0] = viewer;
                     cmdArray[1] = link;
@@ -145,12 +153,11 @@ public class JabRefDesktop {
                     Runtime.getRuntime().exec(cmdArray);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #" + link);
-                System.err.println(e.getMessage());
+                LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
+                        + link, e);
             }
         } else {
-            System.err.println("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+            LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
     }
 
@@ -174,9 +181,9 @@ public class JabRefDesktop {
      * @throws IOException
      */
     private static void openFileWithApplicationOnWindows(String link, String application) throws IOException {
-        link = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
+        String escapedLink = link.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
 
-        Runtime.getRuntime().exec(application + " " + link);
+        Runtime.getRuntime().exec(application + " " + escapedLink);
     }
 
     /**
@@ -278,23 +285,19 @@ public class JabRefDesktop {
         try {
             temp = File.createTempFile("jabref-link", "." + fileType.getExtension());
             temp.deleteOnExit();
-            System.out.println("Downloading to '" + temp.getPath() + "'");
+            LOGGER.info("Downloading to '" + temp.getPath() + "'");
             new URLDownload(new URL(link)).downloadToFile(temp);
-            System.out.println("Done");
+            LOGGER.info("Done");
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem downloading", ex);
         }
         if (temp != null) {
             final String ln = temp.getPath();
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        openExternalFileAnyFormat(metaData, ln, fileType);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    openExternalFileAnyFormat(metaData, ln, fileType);
+                } catch (IOException ex) {
+                    LOGGER.error("Cannot open external file", ex);
                 }
             });
         }
@@ -335,8 +338,7 @@ public class JabRefDesktop {
                 frame.output(cancelMessage);
                 return false;
             }
-        }
-        else {
+        } else {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
@@ -413,9 +415,9 @@ public class JabRefDesktop {
     }
 
     private static void openFolderAndSelectFileOnWindows(String link) throws IOException {
-        link = link.replace("&", "\"&\"");
+        String escapedLink = link.replace("&", "\"&\"");
 
-        String cmd = "explorer.exe /select,\"" + link + "\"";
+        String cmd = "explorer.exe /select,\"" + escapedLink + "\"";
 
         Runtime.getRuntime().exec(cmd);
     }
