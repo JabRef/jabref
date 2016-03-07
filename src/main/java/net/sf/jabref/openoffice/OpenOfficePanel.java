@@ -218,7 +218,7 @@ public class OpenOfficePanel extends AbstractWorker {
         pushEntriesAdvanced.addActionListener(e -> pushEntries(false, true, true));
 
         update.setToolTipText(Localization.lang("Ensure that the bibliography is up-to-date"));
-        AbstractAction updateAction = new AbstractAction() {
+        Action updateAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

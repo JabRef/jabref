@@ -422,13 +422,7 @@ public class SearchResultsDialog {
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.scrollRectToVisible(toRect);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }

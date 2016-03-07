@@ -122,7 +122,7 @@ public class WriteXMPAction extends AbstractWorker {
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
             List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
-            FileUtil.expandFilename(pdf, dirs).ifPresent(f -> files.add(f));
+            FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
             // Then check the "file" field:
             dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
@@ -132,7 +132,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.type != null) && "pdf".equals(flEntry.type.getName().toLowerCase())) {
-                        FileUtil.expandFilename(flEntry.link, dirs).ifPresent(f -> files.add(f));
+                        FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
                     }
                 }
             }

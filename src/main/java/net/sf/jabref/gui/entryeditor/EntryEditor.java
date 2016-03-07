@@ -494,17 +494,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 // an autogeneration of a BibTeX key.
                 // - ILC (16/02/2010) -
                 //////////////////////////////////////////////////////////
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final int row = panel.mainTable.findEntry(entry);
-                        if (row >= 0) {
-                            if (panel.mainTable.getSelectedRowCount() == 0) {
-                                panel.mainTable.setRowSelectionInterval(row, row);
-                            }
-                            panel.mainTable.ensureVisible(row);
+                SwingUtilities.invokeLater(() -> {
+                    final int row = panel.mainTable.findEntry(entry);
+                    if (row >= 0) {
+                        if (panel.mainTable.getSelectedRowCount() == 0) {
+                            panel.mainTable.setRowSelectionInterval(row, row);
                         }
+                        panel.mainTable.ensureVisible(row);
                     }
                 });
                 //////////////////////////////////////////////////////////

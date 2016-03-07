@@ -82,7 +82,7 @@ public class FileListEntryEditor {
         this.entry = entry;
         this.metaData = metaData;
 
-        AbstractAction okAction = new AbstractAction() {
+        Action okAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // If OK button is disabled, ignore this event:

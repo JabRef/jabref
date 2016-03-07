@@ -320,7 +320,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
         });
         // Key bindings:
-        AbstractAction closeAction = new AbstractAction() {
+        Action closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

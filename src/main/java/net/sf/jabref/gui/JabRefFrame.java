@@ -69,8 +69,6 @@ import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -595,29 +593,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
-        tabbedPane.addChangeListener(new ChangeListener() {
+        tabbedPane.addChangeListener(e -> {
+            markActiveBasePanel();
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                markActiveBasePanel();
-
-                BasePanel bp = getCurrentBasePanel();
-                if (bp == null) {
-                    return;
-                }
-
-                groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
-                fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-                Globals.focusListener.setFocused(bp.mainTable);
-                setWindowTitle();
-                editModeAction.initName();
-                // Update search autocompleter with information for the correct database:
-                bp.updateSearchManager();
-                // Set correct enabled state for Back and Forward actions:
-                bp.setBackAndForwardEnabledState();
-                new FocusRequester(bp.mainTable);
+            BasePanel bp = getCurrentBasePanel();
+            if (bp == null) {
+                return;
             }
+
+            groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+            previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+            fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
+            Globals.focusListener.setFocused(bp.mainTable);
+            setWindowTitle();
+            editModeAction.initName();
+            // Update search autocompleter with information for the correct database:
+            bp.updateSearchManager();
+            // Set correct enabled state for Back and Forward actions:
+            bp.setBackAndForwardEnabledState();
+            new FocusRequester(bp.mainTable);
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
@@ -1462,13 +1456,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     public void output(final String s) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                statusLine.setText(s);
-                statusLine.repaint();
-            }
+        SwingUtilities.invokeLater(() -> {
+            statusLine.setText(s);
+            statusLine.repaint();
         });
     }
 
@@ -1724,19 +1714,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param openInNew Should the entries be imported into a new database?
      */
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                        panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
-                        openInNew);
-                diag.addEntries(entries);
-                diag.entryListComplete();
-                PositionWindow.placeDialog(diag, JabRefFrame.this);
-                diag.setVisible(true);
-                diag.toFront();
-            }
+        SwingUtilities.invokeLater(() -> {
+            ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
+                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+            diag.addEntries(entries);
+            diag.entryListComplete();
+            PositionWindow.placeDialog(diag, JabRefFrame.this);
+            diag.setVisible(true);
+            diag.toFront();
         });
     }
 
@@ -1788,13 +1773,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setVisible(visible);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    progressBar.setVisible(visible);
-                }
-            });
+            SwingUtilities.invokeLater(() -> progressBar.setVisible(visible));
         }
     }
 
@@ -1808,13 +1787,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setValue(value);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    progressBar.setValue(value);
-                }
-            });
+            SwingUtilities.invokeLater(() -> progressBar.setValue(value));
         }
 
     }
