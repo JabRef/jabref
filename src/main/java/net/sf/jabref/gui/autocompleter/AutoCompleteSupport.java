@@ -45,10 +45,10 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
  */
 public class AutoCompleteSupport<E> {
 
-    AutoCompleteRenderer<E> renderer;
+    private final AutoCompleteRenderer<E> renderer;
     private AutoCompleter<E> autoCompleter;
-    JTextComponent textComp;
-    JPopupMenu popup = new JPopupMenu();
+    private final JTextComponent textComp;
+    private final JPopupMenu popup = new JPopupMenu();
     private boolean selectsTextOnFocusGain = true;
 
 

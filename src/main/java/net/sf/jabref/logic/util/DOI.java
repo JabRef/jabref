@@ -69,26 +69,26 @@ public class DOI {
         Objects.requireNonNull(doi);
 
         // Remove whitespace
-        doi = doi.trim();
+        String trimmedDoi = doi.trim();
 
         // HTTP URL decoding
         if(doi.matches(HTTP_EXP)) {
             try {
                 // decodes path segment
-                URI url = new URI(doi);
-                doi = url.getScheme() + "://" + url.getHost() + url.getPath();
+                URI url = new URI(trimmedDoi);
+                trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
             } catch(URISyntaxException e) {
                 throw new IllegalArgumentException(doi + " is not a valid HTTP DOI.");
             }
         }
 
         // Extract DOI
-        Matcher matcher = DOI_PATT.matcher(doi);
+        Matcher matcher = DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {
             // match only group \1
             this.doi = matcher.group(1);
         } else {
-            throw new IllegalArgumentException(doi + " is not a valid DOI.");
+            throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI.");
         }
     }
 

@@ -161,24 +161,25 @@ public class OAI2Fetcher implements EntryFetcher {
      */
     public static String fixKey(String key) {
 
-        if (key.toLowerCase().startsWith("arxiv:")) {
-            key = key.substring(6);
+        String resultingKey = key;
+        if (resultingKey.toLowerCase().startsWith("arxiv:")) {
+            resultingKey = resultingKey.substring(6);
         }
 
-        int dot = key.indexOf('.');
-        int slash = key.indexOf('/');
+        int dot = resultingKey.indexOf('.');
+        int slash = resultingKey.indexOf('/');
 
         if ((dot > -1) && (dot < slash)) {
-            key = key.substring(0, dot) + key.substring(slash, key.length());
+            resultingKey = resultingKey.substring(0, dot) + resultingKey.substring(slash, resultingKey.length());
         }
 
-        return key;
+        return resultingKey;
     }
 
     public static String correctLineBreaks(String s) {
-        s = s.replaceAll("\\n(?!\\s*\\n)", " ");
-        s = s.replaceAll("\\s*\\n\\s*", "\n");
-        return s.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+        String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
+        result = result.replaceAll("\\s*\\n\\s*", "\n");
+        return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
     }
 
     /**
@@ -194,9 +195,9 @@ public class OAI2Fetcher implements EntryFetcher {
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
-        key = OAI2Fetcher.fixKey(key);
+        String fixedKey = OAI2Fetcher.fixKey(key);
 
-        String url = constructUrl(key);
+        String url = constructUrl(fixedKey);
         try {
             URL oai2Url = new URL(url);
             HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
@@ -204,7 +205,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
             /* create an empty BibEntry and set the oai2identifier field */
             BibEntry be = new BibEntry(IdGenerator.next(), "article");
-            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
+            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
             DefaultHandler handlerBase = new OAI2Handler(be);
 
             try (InputStream inputStream = oai2Connection.getInputStream()) {
@@ -217,10 +218,10 @@ public class OAI2Fetcher implements EntryFetcher {
                     be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
                 }
 
-                if (key.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField("year", "20" + key.substring(0, 2));
+                if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
+                    be.setField("year", "20" + fixedKey.substring(0, 2));
 
-                    int monthNumber = Integer.parseInt(key.substring(2, 4));
+                    int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                     if (month.isValid()) {
                         be.setField("month", month.bibtexFormat);
@@ -271,8 +272,7 @@ public class OAI2Fetcher implements EntryFetcher {
             shouldContinue = true;
 
             /* multiple keys can be delimited by ; or space */
-            query = query.replace(" ", ";");
-            String[] keys = query.split(";");
+            String[] keys = query.replace(" ", ";").split(";");
             for (int i = 0; i < keys.length; i++) {
                 String key = keys[i];
 
