@@ -17,6 +17,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 import java.util.Set;
+
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,6 +76,11 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
             }
         }
         return result;
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Converts unicode characters in %s to their LaTeX equivalent.");
     }
 
     @Override

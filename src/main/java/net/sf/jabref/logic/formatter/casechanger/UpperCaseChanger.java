@@ -26,4 +26,10 @@ public class UpperCaseChanger implements Formatter {
 
         return title.toString();
     }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang(
+                "Converts all characters in %s to upper case, but does not change words starting with \"{\".");
+    }
 }

@@ -115,4 +115,13 @@ public class FieldFormatterCleanup implements CleanupJob {
     public String toString() {
         return field + ": " + formatter.getKey();
     }
+
+    /**
+     * Returns a description of what this cleanup operation does.
+     *
+     * @return the description of this cleanup
+     */
+    public String getDescription() {
+        return String.format(formatter.getDescription(), field);
+    }
 }

@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 
@@ -20,5 +21,10 @@ public class EraseFormatter implements Formatter {
     public String format(String oldString) {
         Objects.requireNonNull(oldString);
         return "";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Completely erases %s.");
     }
 }

@@ -65,6 +65,11 @@ public class FormatterTest {
         assertNotNull(formatter.format("string"));
     }
 
+    @Test
+    public void getDescriptionAlwaysNonEmpty() {
+        assertFalse(formatter.getDescription().isEmpty());
+    }
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
         return Arrays.asList(
@@ -86,6 +91,7 @@ public class FormatterTest {
                 new Object[]{new SuperscriptFormatter()},
                 new Object[]{new UnitFormatter()},
                 new Object[]{new RemoveBracesFormatter()},
+                new Object[]{new UnicodeToLatexFormatter()},
                 new Object[]{new EraseFormatter()}
         );
     }

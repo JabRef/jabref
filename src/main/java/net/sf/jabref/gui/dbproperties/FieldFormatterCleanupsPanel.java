@@ -1,5 +1,6 @@
 package net.sf.jabref.gui.dbproperties;
 
+import com.jgoodies.common.base.Strings;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
@@ -14,6 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -73,6 +76,18 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         actionsList = new JList(new SaveActionsListModel(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        actionsList.addMouseMotionListener(new MouseMotionAdapter() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                SaveActionsListModel m = (SaveActionsListModel) actionsList.getModel();
+                int index = actionsList.locationToIndex(e.getPoint());
+                if (index > -1) {
+                    actionsList.setToolTipText(m.getElementAt(index).getDescription());
+                }
+            }
+        });
         builder.add(actionsList).xyw(3, 5, 5);
 
         deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
@@ -99,8 +114,21 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         keyField.setColumns(25);
         builder.add(keyField).xy(1, 1);
 
-        List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream().map(formatter -> formatter.getKey()).collect(Collectors.toList());
+        List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream().map(
+                formatter -> formatter.getKey()).collect(Collectors.toList());
+        List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream().map(
+                formatter -> formatter.getDescription()).collect(Collectors.toList());
         formatters = new JComboBox(formatterNames.toArray());
+        formatters.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+                    boolean cellHasFocus) {
+                if (-1 < index && index < formatterDescriptions.size() && value != null) {
+                    setToolTipText(String.format(formatterDescriptions.get(index), keyField.getText()));
+                }
+                return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            }
+        });
         builder.add(formatters).xy(3, 1);
 
         addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());

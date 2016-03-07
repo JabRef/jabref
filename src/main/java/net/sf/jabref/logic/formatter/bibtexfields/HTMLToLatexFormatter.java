@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -130,7 +131,10 @@ public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
         return result.trim();
     }
 
-
+    @Override
+    public String getDescription() {
+        return Localization.lang("Changes HTML expressions in %s to their LaTeX equivalent.");
+    }
 
     private int readTag(String text, int position) {
         // Have just read the < character that starts the tag.
