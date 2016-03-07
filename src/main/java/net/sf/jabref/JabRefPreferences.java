@@ -821,7 +821,7 @@ public class JabRefPreferences {
             // saved as CUSTOMTABNAME_def{number} and ; separated
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            if(fields == null || fields.isEmpty()) {
+            if((fields == null) || fields.isEmpty()) {
                 break;
             }
 
@@ -1210,7 +1210,9 @@ public class JabRefPreferences {
         if (priOpt.isEmpty()) {
             return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        List<String> secondary = EntryUtil.getRemainder(opt, priOpt);
+        List<String> secondary = new ArrayList<>(opt);
+        secondary.removeAll(priOpt);
+
         return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
 
     }

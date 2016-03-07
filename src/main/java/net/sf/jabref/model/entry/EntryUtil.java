@@ -33,41 +33,8 @@ public class EntryUtil {
     }
 
     /**
-     * Build a String array containing all those elements of all that are not
-     * in subset.
-     *
-     * @param all The array of all values.
-     * @param subset The subset of values.
-     * @return The remainder that is not part of the subset. - The result MUST NOT be modified
-     */
-    public static List<String> getRemainder(List<String> all, List<String> subset) {
-        if (subset.isEmpty()) {
-            // ensure that "all" does not get modified
-            return Collections.unmodifiableList(all);
-        }
-        if (all.equals(subset)) {
-            return Collections.emptyList();
-        }
-
-        List<String> al = new ArrayList<>();
-        for (String anAll : all) {
-            boolean found = false;
-            for (String aSubset : subset) {
-                if (aSubset.equals(anAll)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                al.add(anAll);
-            }
-        }
-        return al;
-    }
-
-    /**
      * @param keywords a String of keywords
-     * @return an List containing the keywords. An emtpy list if keywords are null or empty
+     * @return an List containing the keywords. An empty list if keywords are null or empty
      */
     public static List<String> getSeparatedKeywords(String keywords) {
         List<String> res = new ArrayList<>();

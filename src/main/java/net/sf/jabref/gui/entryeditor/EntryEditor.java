@@ -229,8 +229,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 deprecatedFields.add("year");
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
-                List<String> optionalFieldsNotPrimaryOrDeprecated = EntryUtil.getRemainder(secondaryOptionalFields,
-                        new ArrayList<>(deprecatedFields));
+                List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(secondaryOptionalFields);
+                optionalFieldsNotPrimaryOrDeprecated.removeAll(deprecatedFields);
 
                 // Get list of all optional fields of this entry and their aliases
                 Set<String> optionalFieldsAndAliases = new HashSet<>();
