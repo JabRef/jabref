@@ -2,6 +2,7 @@ package net.sf.jabref.gui;
 
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -11,6 +12,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.dbproperties.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
@@ -52,7 +54,8 @@ public class CleanupPresetPanel {
         cleanUpUnicode = new JCheckBox(Localization.lang("Run Unicode converter on title, author(s), and abstract"));
         cleanUpBibLatex = new JCheckBox(Localization
                 .lang("Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
-        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"));
+        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
+                JabRefPreferences.CLEANUP_DEFAULT_PRESET.getFormatterCleanups());
 
         updateDisplay(cleanupPreset);
 

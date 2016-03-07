@@ -20,7 +20,7 @@ public class FieldFormatterCleanups {
 
     private boolean enabled;
 
-    public static final FieldFormatterCleanups DEFAULT_ACTIONS;
+    public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
 
     static {
         availableFormatters = new ArrayList<>();
@@ -28,7 +28,7 @@ public class FieldFormatterCleanups {
         availableFormatters.addAll(CaseChangers.ALL);
 
         String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
-        DEFAULT_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
+        DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
     }
 
     public FieldFormatterCleanups(boolean enabled, String formatterString) {
@@ -210,7 +210,7 @@ public class FieldFormatterCleanups {
             return new FieldFormatterCleanups(enablementStatus, formatterString);
         } else {
             // return default actions
-            return FieldFormatterCleanups.DEFAULT_ACTIONS;
+            return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS;
         }
 
     }

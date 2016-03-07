@@ -35,7 +35,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private JButton deleteButton;
 
-    public FieldFormatterCleanupsPanel(String description) {
+    private JButton resetButton;
+    private FieldFormatterCleanups defaultFormatters;
+
+    public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
+        this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
 
         enabled = new JCheckBox(description);
     }
@@ -56,23 +60,28 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 13dlu, left:pref, 4dlu, pref:grow",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
-        builder.add(enabled).xyw(1, 1, 3);
-        builder.add(getSelectorPanel()).xy(3, 3);
+        FormBuilder builder = FormBuilder.create().layout(
+                new FormLayout("left:pref, 13dlu, left:pref, 4dlu, left:pref, 4dlu, pref:grow",
+                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
+        builder.add(enabled).xyw(1, 1, 5);
+        builder.add(getSelectorPanel()).xyw(3, 3, 5);
 
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
         for (FieldFormatterCleanup action : configuredActions) {
             actionsToDisplay.add(action);
         }
 
-        actionsList = new JList(new SaveActionsListModel<>(actionsToDisplay));
+        actionsList = new JList(new SaveActionsListModel(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        builder.add(actionsList).xyw(3, 5, 2);
+        builder.add(actionsList).xyw(3, 5, 5);
 
         deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         deleteButton.addActionListener(new DeleteButtonListener());
         builder.add(deleteButton).xy(3, 7);
+
+        resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> ((SaveActionsListModel) actionsList.getModel()).reset(defaultFormatters));
+        builder.add(resetButton).xy(5, 7);
 
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
@@ -125,7 +134,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     public boolean isDefaultSaveActions() {
-        return FieldFormatterCleanups.DEFAULT_ACTIONS.equals(getFormatterCleanups());
+        return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
     }
 
     class AddButtonListener implements ActionListener {
@@ -180,6 +189,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             formatters.setEnabled(status);
             addButton.setEnabled(status);
             deleteButton.setEnabled(status);
+            resetButton.setEnabled(status);
         }
     }
 
