@@ -455,22 +455,25 @@ public abstract class DBExporter extends DBImporterExporter {
             if (dialogo.hasDBSelected) {
                 dbName = dialogo.selectedDB;
                 if ((dialogo.selectedInt == 0) && (!dialogo.removeAction)) {
-                    dbName = JOptionPane.showInputDialog(dialogo.getDiag(), "Please enter the desired name:",
-                            "SQL Export", JOptionPane.INFORMATION_MESSAGE);
+                    dbName = JOptionPane.showInputDialog(dialogo.getDiag(),
+                            Localization.lang("Please enter the desired name:"), Localization.lang("SQL Export"),
+                            JOptionPane.INFORMATION_MESSAGE);
                     if (dbName == null) {
                         getDBName(matrix, databaseStrings, frame,
                                 new DBImportExportDialog(frame, matrix, DBImportExportDialog.DialogType.EXPORTER));
                     } else {
                         while (!isValidDBName(dbNames, dbName)) {
                             dbName = JOptionPane.showInputDialog(dialogo.getDiag(),
-                                    "You have entered an invalid or already existent DB name.\n Please enter the desired name:",
-                                    "SQL Export", JOptionPane.ERROR_MESSAGE);
+                                    Localization.lang("You have entered an invalid or already existent DB name.") + '\n'
+                                            + Localization.lang("Please enter the desired name:"),
+                                    Localization.lang("SQL Export"), JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
             }
         } else {
-            dbName = JOptionPane.showInputDialog(frame, "Please enter the desired name:", "SQL Export",
+            dbName = JOptionPane.showInputDialog(frame, Localization.lang("Please enter the desired name:"),
+                    Localization.lang("SQL Export"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         return dbName;
