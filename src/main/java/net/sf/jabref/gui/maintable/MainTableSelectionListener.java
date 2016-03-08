@@ -47,6 +47,7 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
@@ -144,7 +145,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
 
                 // Show the new editor unless it was already visible:
-                if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
+                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
 
                     if (visName != null) {
                         newEditor.setVisiblePanel(visName);

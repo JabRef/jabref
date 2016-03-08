@@ -1077,12 +1077,12 @@ public class VM implements Warn {
         private final Tree localTree;
 
 
-        public Tree getTree() {
-            return localTree;
-        }
-
         public StackFunction(Tree stack) {
             localTree = stack;
+        }
+
+        public Tree getTree() {
+            return localTree;
         }
 
         @Override

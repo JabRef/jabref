@@ -157,7 +157,7 @@ public class MergeEntries {
         mainPanel.add(label, cc.xyw(4, 1, 7, "center, bottom"));
 
         // Set headings
-        JLabel headingLabels[] = new JLabel[6];
+        JLabel[] headingLabels = new JLabel[6];
         for (int i = 0; i < 6; i++) {
             headingLabels[i] = new JLabel(columnHeadings[i]);
             font = headingLabels[i].getFont();
@@ -290,7 +290,7 @@ public class MergeEntries {
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
 
         // Synchronize column widths
-        String rbAlign[] = {"right", "center", "left"};
+        String[] rbAlign = {"right", "center", "left"};
         mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
         Integer maxRBWidth = -1;
         Integer tmpRBWidth;

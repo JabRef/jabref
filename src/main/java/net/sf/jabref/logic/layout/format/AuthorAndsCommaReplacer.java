@@ -45,13 +45,13 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
         default:
             int i;
             int x = authors.length;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
-            for (i = 0; i < x - 2; i++) {
+            for (i = 0; i < (x - 2); i++) {
                 sb.append(authors[i]).append(", ");
             }
             sb.append(authors[i]).append(" & ").append(authors[i + 1]);
-            s = new String(sb);
+            s = sb.toString();
             break;
         }
 

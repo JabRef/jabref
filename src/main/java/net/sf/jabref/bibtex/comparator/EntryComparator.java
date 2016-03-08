@@ -20,6 +20,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
@@ -57,7 +58,7 @@ public class EntryComparator implements Comparator<BibEntry> {
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
 
-        if (e1 == e2) {
+        if (Objects.equals(e1, e2)) {
             return 0;
         }
 

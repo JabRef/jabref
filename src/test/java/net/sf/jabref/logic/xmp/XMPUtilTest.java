@@ -70,11 +70,10 @@ public class XMPUtilTest {
      */
     public static String bibtexXPacket(String bibtexDescriptions) {
 
-        StringBuffer xmp = new StringBuffer();
+        StringBuilder xmp = new StringBuilder();
 
         xmp.append("<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>\n" + "  <x:xmpmeta xmlns:x='adobe:ns:meta/'>\n"
-                +
- "    <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/' xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'>\n")
+                + "    <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#' xmlns:iX='http://ns.adobe.com/iX/1.0/' xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'>\n")
                 .append(bibtexDescriptions).append("    </rdf:RDF>\n" + "  </x:xmpmeta>\n" + "<?xpacket end='r'?>");
 
         return xmp.toString();
@@ -169,7 +168,7 @@ public class XMPUtilTest {
         e.setField("booktitle", "Catch-22");
         e.setField("editor", "Huey Duck and Dewey Duck and Louie Duck");
         e.setField("pdf", "YeKis03 - Towards.pdf");
-        e.setField("keywords", "peanut,butter,jelly");
+        e.setField("keywords", "peanut, butter, jelly");
         e.setField("year", "1982");
         e.setField("month", "#jul#");
         e.setField("abstract",
@@ -189,7 +188,7 @@ public class XMPUtilTest {
                 + "</rdf:Seq></bibtex:editor>" + "<bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>"
                 + "<bibtex:journal>International Journal of High Fidelity</bibtex:journal>"
                 + "<bibtex:booktitle>Catch-22</bibtex:booktitle>" + "<bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>"
-                + "<bibtex:keywords>peanut,butter,jelly</bibtex:keywords>"
+                + "<bibtex:keywords>peanut, butter, jelly</bibtex:keywords>"
                 + "<bibtex:entrytype>Inproceedings</bibtex:entrytype>" + "<bibtex:year>1982</bibtex:year>"
                 + "<bibtex:month>#jul#</bibtex:month>"
                 + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
@@ -889,7 +888,7 @@ public class XMPUtilTest {
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/editor"));
             Assert.assertEquals("Clarkson06",
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/bibtexkey"));
-            Assert.assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
+            Assert.assertEquals("peanut, butter, jelly", document.getDocumentInformation().getKeywords());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
                     XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());
@@ -955,7 +954,7 @@ public class XMPUtilTest {
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/editor"));
             Assert.assertEquals("Clarkson06",
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/bibtexkey"));
-            Assert.assertEquals("peanut,butter,jelly", document.getDocumentInformation().getKeywords());
+            Assert.assertEquals("peanut, butter, jelly", document.getDocumentInformation().getKeywords());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
                     XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());

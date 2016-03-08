@@ -78,6 +78,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The main window of the application.
@@ -2176,7 +2177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             final Component[] panels = tabbedPane.getComponents();
 
             for (Component p : panels) {
-                if (p != active) {
+                if (!Objects.equals(p, active)) {
                     closeTab((BasePanel) p);
                 }
             }

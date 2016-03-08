@@ -77,9 +77,7 @@ public class FileUtil {
             stackList.add(stack);
         }
 
-        String[] arr = new String[paths.size()];
-        Arrays.fill(arr, "");
-        List<String> pathSubstrings = Arrays.asList(arr);
+        List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
         // compute shortest folder substrings
         while (!stackList.stream().allMatch(Vector::isEmpty)) {

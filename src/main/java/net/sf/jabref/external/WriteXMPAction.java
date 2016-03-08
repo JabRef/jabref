@@ -131,7 +131,7 @@ public class WriteXMPAction extends AbstractWorker {
                 tm.setContent(entry.getField(Globals.FILE_FIELD));
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.type != null) && "pdf".equals(flEntry.type.getName().toLowerCase())) {
+                    if ((flEntry.type != null) && "pdf".equalsIgnoreCase(flEntry.type.getName())) {
                         FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
                     }
                 }
@@ -144,25 +144,22 @@ public class WriteXMPAction extends AbstractWorker {
                 optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
             } else {
                 for (File file : files) {
-                    if (!file.exists()) {
-                        skipped++;
-                        optDiag.getProgressArea()
-                                .append("  " + Localization.lang("Skipped - PDF does not exist")
-                                + ":\n");
-                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
-
-                    } else {
+                    if (file.exists()) {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
                             optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
                             optDiag.getProgressArea().append(
-                                    "  " + Localization.lang("Error while writing") + " '"
-                                    + file.getPath() + "':\n");
+                                    "  " + Localization.lang("Error while writing") + " '" + file.getPath() + "':\n");
                             optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             errors++;
                         }
+                    } else {
+                        skipped++;
+                        optDiag.getProgressArea()
+                                .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
                     }
                 }
             }

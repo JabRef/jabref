@@ -41,23 +41,6 @@ public class DOI {
     private static final Pattern DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
 
     /**
-     * Creates an Optional<DOI> from various schemes including URL, URN, and plain DOIs.
-     *
-     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor
-     * and checking for Optional.isPresent() instead.
-     *
-     * @param doi the DOI string
-     * @return an Optional containing the DOI or an empty Optional
-     */
-    public static Optional<DOI> build(String doi) {
-        try {
-            return Optional.ofNullable(new DOI(doi));
-        } catch(IllegalArgumentException | NullPointerException e) {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs.
      *
      * @param doi the DOI string
@@ -89,6 +72,23 @@ public class DOI {
             this.doi = matcher.group(1);
         } else {
             throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI.");
+        }
+    }
+
+    /**
+     * Creates an Optional<DOI> from various schemes including URL, URN, and plain DOIs.
+     *
+     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor
+     * and checking for Optional.isPresent() instead.
+     *
+     * @param doi the DOI string
+     * @return an Optional containing the DOI or an empty Optional
+     */
+    public static Optional<DOI> build(String doi) {
+        try {
+            return Optional.ofNullable(new DOI(doi));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return Optional.empty();
         }
     }
 
