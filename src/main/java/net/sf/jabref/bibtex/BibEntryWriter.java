@@ -154,9 +154,16 @@ public class BibEntryWriter {
         }
     }
 
+    /**
+     * Determine length of longest field key.
+     * Only displayable fields are regarded as writable-only fields are not shown in the UI, but the user expects the entry to be rendered as shown in the UI
+     * This is a quick fix for https://github.com/JabRef/jabref/issues/834
+     * TODO: Long term fix: Fix https://github.com/JabRef/jabref/issues/574
+     */
     private int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<String> isNotBibtexKey = field -> !"bibtexkey".equals(field);
-        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(field -> field.length()).max().orElse(0);
+        Predicate<String> isDisplayableField = field -> InternalBibtexFields.isDisplayableField(field);
+        return entry.getFieldNames().stream().filter(isDisplayableField).mapToInt(field -> field.length()).max()
+                .orElse(0);
     }
 
     /**

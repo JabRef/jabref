@@ -42,10 +42,10 @@ public class BibEntryWriterTest {
         writer = new BibEntryWriter(new LatexFieldFormatter(), true);
     }
 
-    @Test
-    public void testSerialization() throws IOException {
-        StringWriter stringWriter = new StringWriter();
-
+    /**
+     * Generates a BibEntry with type "article", key "1234", and some test data
+     */
+    private static BibEntry generateArticle1234() {
         BibEntry entry = new BibEntry("1234", "article");
         //set a required field
         entry.setField("author", "Foo Bar");
@@ -54,7 +54,14 @@ public class BibEntryWriterTest {
         entry.setField("number", "1");
         entry.setField("note", "some note");
 
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        return entry;
+    }
+
+    @Test
+    public void testSerialization() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        writer.write(generateArticle1234(), stringWriter, BibDatabaseMode.BIBTEX);
 
         String actual = stringWriter.toString();
 
@@ -67,6 +74,31 @@ public class BibEntryWriterTest {
                 "}" + Globals.NEWLINE;
         // @formatter:on
 
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSerializationOfNonDisplayableFields() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = generateArticle1234();
+        // mark entry; __markedentry is a writable field, but not a displayable
+        // we cannot use `EntryMarker.markEntry(entry, 1, false, nc);`, because even though Globals.DEFAEULT_OWNER is "jabref", the entry is marked by "travis" on TravisCI
+        entry.setField("__markedentry", "[[jabref]:1]");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
+                "  author =  {Foo Bar}," + Globals.NEWLINE +
+                "  journal = {International Journal of Something}," + Globals.NEWLINE +
+                "  number =  {1}," + Globals.NEWLINE +
+                "  note =    {some note}," + Globals.NEWLINE +
+                "  __markedentry = {[[jabref]:1]}" + Globals.NEWLINE +
+                "}" + Globals.NEWLINE;
+        // @formatter:on
         assertEquals(expected, actual);
     }
 
