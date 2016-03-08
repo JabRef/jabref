@@ -41,12 +41,10 @@ import net.sf.jabref.model.entry.AuthorList;
 /**
  * Create DocBook editors formatter.
  */
-public class CreateDocBookEditors extends CreateDocBookAuthors
-{
+public class CreateDocBookEditors extends CreateDocBookAuthors {
 
     @Override
-    public String format(String fieldText)
-    {
+    public String format(String fieldText) {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
         StringBuilder sb = new StringBuilder(100);
         AuthorList al = AuthorList.getAuthorList(fieldText);

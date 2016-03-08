@@ -271,8 +271,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                     String message = "<html>" + errorMessage + "<p>"
                             + (tryingAutosave ? Localization.lang(
-                            "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                            file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
                             + "</html>";
                     JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                             JOptionPane.ERROR_MESSAGE);

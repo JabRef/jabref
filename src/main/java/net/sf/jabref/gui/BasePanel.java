@@ -750,90 +750,79 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for copying a cite for the selected entry.
-        actions.put(Actions.COPY_CITE_KEY, new BaseAction() {
-
-            @Override
-            public void action() {
-                List<BibEntry> bes = mainTable.getSelectedEntries();
-                if ((bes != null) && (!bes.isEmpty())) {
-                    storeCurrentEdit();
-                    List<String> keys = new ArrayList<>(bes.size());
-                    // Collect all non-null keys.
-                    for (BibEntry be : bes) {
-                        if (be.getCiteKey() != null) {
-                            keys.add(be.getCiteKey());
-                        }
+        actions.put(Actions.COPY_CITE_KEY, (BaseAction) () -> {
+            List<BibEntry> bes = mainTable.getSelectedEntries();
+            if ((bes != null) && (!bes.isEmpty())) {
+                storeCurrentEdit();
+                List<String> keys = new ArrayList<>(bes.size());
+                // Collect all non-null keys.
+                for (BibEntry be : bes) {
+                    if (be.getCiteKey() != null) {
+                        keys.add(be.getCiteKey());
                     }
-                    if (keys.isEmpty()) {
-                        output(Localization.lang("None of the selected entries have BibTeX keys."));
-                        return;
-                    }
+                }
+                if (keys.isEmpty()) {
+                    output(Localization.lang("None of the selected entries have BibTeX keys."));
+                    return;
+                }
 
-                    String sb = String.join(",", keys);
-                    StringSelection ss = new StringSelection("\\cite{" + sb + '}');
-                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+                String sb = String.join(",", keys);
+                StringSelection ss = new StringSelection("\\cite{" + sb + '}');
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
 
-                    if (keys.size() == bes.size()) {
-                        // All entries had keys.
-                        output(bes.size() > 1 ? Localization.lang("Copied keys") :
-                            Localization.lang("Copied key") + '.');
-                    } else {
-                        output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
-                                Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
-                    }
+                if (keys.size() == bes.size()) {
+                    // All entries had keys.
+                    output(bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key") + '.');
+                } else {
+                    output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                            Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
                 }
             }
         });
 
         // The action for copying the BibTeX key and the title for the first selected entry
-        actions.put(Actions.COPY_KEY_AND_TITLE, new BaseAction() {
+        actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> {
+            List<BibEntry> bes = mainTable.getSelectedEntries();
+            if ((bes != null) && (!bes.isEmpty())) {
+                storeCurrentEdit();
 
-            @Override
-            public void action() {
-                List<BibEntry> bes = mainTable.getSelectedEntries();
-                if ((bes != null) && (!bes.isEmpty())) {
-                    storeCurrentEdit();
+                // OK: in a future version, this string should be configurable to allow arbitrary exports
+                StringReader sr = new StringReader(
+                        "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
+                Layout layout;
+                try {
+                    layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
+                            .getLayoutFromText();
+                } catch (IOException e) {
+                    LOGGER.info("Could not get layout", e);
+                    return;
+                }
 
-                    // OK: in a future version, this string should be configurable to allow arbitrary exports
-                    StringReader sr = new StringReader(
-                            "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
-                    Layout layout;
-                    try {
-                        layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
-                                .getLayoutFromText();
-                    } catch (IOException e) {
-                        LOGGER.info("Could not get layout", e);
-                        return;
+                StringBuilder sb = new StringBuilder();
+
+                int copied = 0;
+                // Collect all non-null keys.
+                for (BibEntry be : bes) {
+                    if (be.getCiteKey() != null) {
+                        copied++;
+                        sb.append(layout.doLayout(be, database));
                     }
+                }
 
-                    StringBuilder sb = new StringBuilder();
+                if (copied == 0) {
+                    output(Localization.lang("None of the selected entries have BibTeX keys."));
+                    return;
+                }
 
-                    int copied = 0;
-                    // Collect all non-null keys.
-                    for (BibEntry be : bes) {
-                        if (be.getCiteKey() != null) {
-                            copied++;
-                            sb.append(layout.doLayout(be, database));
-                        }
-                    }
+                final StringSelection ss = new StringSelection(sb.toString());
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
 
-                    if (copied == 0) {
-                        output(Localization.lang("None of the selected entries have BibTeX keys."));
-                        return;
-                    }
-
-                    final StringSelection ss = new StringSelection(sb.toString());
-                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
-
-                    if (copied == bes.size()) {
-                        // All entries had keys.
-                        output((bes.size() > 1 ?
-                            Localization.lang("Copied keys") :
-                            Localization.lang("Copied key")) + '.');
-                    } else {
-                        output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
-                                Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
-                    }
+                if (copied == bes.size()) {
+                    // All entries had keys.
+                    output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+                } else {
+                    output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                            Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
                 }
             }
         });
@@ -842,207 +831,179 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
 
-        actions.put(Actions.OPEN_EXTERNAL_FILE, new BaseAction() {
-
-            @Override
-            public void action() {
-                JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        final List<BibEntry> bes = mainTable.getSelectedEntries();
-                        if (bes.size() != 1) {
-                            output(Localization.lang("No entries or multiple entries selected."));
-                            return;
-                        }
-
-                        final BibEntry entry = bes.get(0);
-                        if (!entry.hasField(Globals.FILE_FIELD)) {
-                            // no bibtex field
-                            new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                            return;
-                        }
-                        FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
-                        if (tableModel.getRowCount() == 0) {
-                            // content in bibtex field is not readable
-                            new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                            return;
-                        }
-                        FileListEntry flEntry = tableModel.getEntry(0);
-                        ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                                flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
-                        item.openLink();
-                    }
-                });
-            }
-        });
-
-        actions.put(Actions.OPEN_FOLDER, new BaseAction() {
-
-            @Override
-            public void action() {
-                JabRefExecutorService.INSTANCE.execute(() -> {
-                    final List<BibEntry> bes = mainTable.getSelectedEntries();
-                    final List<File> files = FileUtil.getListOfLinkedFiles(bes,
-                            bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
-                    for (final File f : files) {
-                        try {
-                            JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
-                        } catch (IOException e) {
-                            LOGGER.info("Could not open folder", e);
-                        }
-                    }
-                });
-            }
-        });
-
-        actions.put(Actions.OPEN_URL, new BaseAction() {
-
-            private final static String URL_FIELD = "url";
-            private final static String DOI_FIELD = "doi";
-            private final static String PS_FIELD = "ps";
-            @Override
-            public void action() {
+        actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> {
+            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
                 final List<BibEntry> bes = mainTable.getSelectedEntries();
-                String field = DOI_FIELD;
-                if ((bes != null) && (bes.size() == 1)) {
-                    Object link = bes.get(0).getField(DOI_FIELD);
-                    if (bes.get(0).hasField(URL_FIELD)) {
-                        link = bes.get(0).getField(URL_FIELD);
-                        field = URL_FIELD;
+                if (bes.size() != 1) {
+                    output(Localization.lang("No entries or multiple entries selected."));
+                    return;
+                }
+
+                final BibEntry entry = bes.get(0);
+                if (!entry.hasField(Globals.FILE_FIELD)) {
+                    // no bibtex field
+                    new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
+                    return;
+                }
+                FileListTableModel tableModel = new FileListTableModel();
+                tableModel.setContent(entry.getField(Globals.FILE_FIELD));
+                if (tableModel.getRowCount() == 0) {
+                    // content in bibtex field is not readable
+                    new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
+                    return;
+                }
+                FileListEntry flEntry = tableModel.getEntry(0);
+                ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
+                        flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
+                item.openLink();
+            });
+        });
+
+        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                final List<BibEntry> bes = mainTable.getSelectedEntries();
+                final List<File> files = FileUtil.getListOfLinkedFiles(bes,
+                        bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
+                for (final File f : files) {
+                    try {
+                        JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                    } catch (IOException e) {
+                        LOGGER.info("Could not open folder", e);
                     }
-                    if (link == null) {
-                        // No URL or DOI found in the "url" and "doi" fields.
-                        // Look for web links in the "file" field as a fallback:
-                        FileListEntry entry = null;
-                        FileListTableModel tm = new FileListTableModel();
-                        tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
-                        for (int i = 0; i < tm.getRowCount(); i++) {
-                            FileListEntry flEntry = tm.getEntry(i);
-                            if (URL_FIELD.equals(flEntry.type.getName().toLowerCase())
-                                    || PS_FIELD.equals(flEntry.type.getName().toLowerCase())) {
-                                entry = flEntry;
-                                break;
-                            }
+                }
+            });
+        });
+
+        actions.put(Actions.OPEN_URL, (BaseAction) () -> {
+            String URL_FIELD = "url";
+            String DOI_FIELD = "doi";
+            String PS_FIELD = "ps";
+            final List<BibEntry> bes = mainTable.getSelectedEntries();
+            String field = DOI_FIELD;
+            if ((bes != null) && (bes.size() == 1)) {
+                Object link = bes.get(0).getField(DOI_FIELD);
+                if (bes.get(0).hasField(URL_FIELD)) {
+                    link = bes.get(0).getField(URL_FIELD);
+                    field = URL_FIELD;
+                }
+                if (link == null) {
+                    // No URL or DOI found in the "url" and "doi" fields.
+                    // Look for web links in the "file" field as a fallback:
+                    FileListEntry entry = null;
+                    FileListTableModel tm = new FileListTableModel();
+                    tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
+                    for (int i = 0; i < tm.getRowCount(); i++) {
+                        FileListEntry flEntry = tm.getEntry(i);
+                        if (URL_FIELD.equals(flEntry.type.getName().toLowerCase())
+                                || PS_FIELD.equals(flEntry.type.getName().toLowerCase())) {
+                            entry = flEntry;
+                            break;
                         }
-                        if (entry == null) {
-                            output(Localization.lang("No url defined") + '.');
-                        } else {
-                            try {
-                                JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link, entry.type);
-                                output(Localization.lang("External viewer called") + '.');
-                            } catch (IOException e) {
-                                output(Localization.lang("Could not open link"));
-                                LOGGER.info("Could not open link", e);
-                            }
-                        }
+                    }
+                    if (entry == null) {
+                        output(Localization.lang("No url defined") + '.');
                     } else {
                         try {
-                            JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link,
+                                    entry.type);
                             output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException ex) {
-                            output(Localization.lang("Error") + ": " + ex.getMessage());
+                        } catch (IOException e) {
+                            output(Localization.lang("Could not open link"));
+                            LOGGER.info("Could not open link", e);
                         }
                     }
                 } else {
-                    output(Localization.lang("No entries or multiple entries selected."));
+                    try {
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
+                        output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                    }
                 }
+            } else {
+                output(Localization.lang("No entries or multiple entries selected."));
             }
         });
 
         actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
 
-        actions.put(Actions.REPLACE_ALL, new BaseAction() {
+        actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
+            final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
+            rsd.setVisible(true);
+            if (!rsd.okPressed()) {
+                return;
+            }
+            int counter = 0;
+            final NamedCompound ce = new NamedCompound(Localization.lang("Replace string"));
+            if (rsd.selOnly()) {
+                for (BibEntry be : mainTable.getSelectedEntries()) {
+                    counter += rsd.replace(be, ce);
+                }
+            } else {
+                for (BibEntry entry : database.getEntries()) {
+                    counter += rsd.replace(entry, ce);
+                }
+            }
 
-            @Override
-            public void action() {
-                final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
-                rsd.setVisible(true);
-                if (!rsd.okPressed()) {
-                    return;
-                }
-                int counter = 0;
-                final NamedCompound ce = new NamedCompound(Localization.lang("Replace string"));
-                if (rsd.selOnly()) {
-                    for (BibEntry be : mainTable.getSelectedEntries()) {
-                        counter += rsd.replace(be, ce);
-                    }
-                } else {
-                    for (BibEntry entry : database.getEntries()) {
-                        counter += rsd.replace(entry, ce);
-                    }
-                }
-
-                output(Localization.lang("Replaced") + ' ' + counter + ' ' + (counter == 1 ?
-                     Localization.lang("occurrence") :
-                     Localization.lang("occurrences")) + '.');
-                if (counter > 0) {
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                }
+            output(Localization.lang("Replaced") + ' ' + counter + ' '
+                    + (counter == 1 ? Localization.lang("occurrence") : Localization.lang("occurrences")) + '.');
+            if (counter > 0) {
+                ce.end();
+                undoManager.addEdit(ce);
+                markBaseChanged();
             }
         });
 
         actions.put(Actions.DUPLI_CHECK,
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(new DuplicateSearch(BasePanel.this)));
 
-        actions.put(Actions.PLAIN_TEXT_IMPORT, new BaseAction() {
+        actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
+            // get Type of new entry
+            EntryTypeDialog etd = new EntryTypeDialog(frame);
+            PositionWindow.placeDialog(etd, BasePanel.this);
+            etd.setVisible(true);
+            EntryType tp = etd.getChoice();
+            if (tp == null) {
+                return;
+            }
 
-            @Override
-            public void action() {
-                // get Type of new entry
-                EntryTypeDialog etd = new EntryTypeDialog(frame);
-                PositionWindow.placeDialog(etd, BasePanel.this);
-                etd.setVisible(true);
-                EntryType tp = etd.getChoice();
-                if (tp == null) {
-                    return;
-                }
+            String id = IdGenerator.next();
+            BibEntry bibEntry = new BibEntry(id, tp.getName());
+            TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
+            PositionWindow.placeDialog(tidialog, BasePanel.this);
+            tidialog.setVisible(true);
 
-                String id = IdGenerator.next();
-                BibEntry bibEntry = new BibEntry(id, tp.getName());
-                TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
-                PositionWindow.placeDialog(tidialog, BasePanel.this);
-                tidialog.setVisible(true);
-
-                if (tidialog.okPressed()) {
-                    Util.setAutomaticFields(Collections.singletonList(bibEntry), false, false, false);
-                    insertEntry(bibEntry);
-                }
+            if (tidialog.okPressed()) {
+                Util.setAutomaticFields(Collections.singletonList(bibEntry), false, false, false);
+                insertEntry(bibEntry);
             }
         });
 
         actions.put(Actions.MARK_ENTRIES, new MarkEntriesAction(frame, 0));
 
-        actions.put(Actions.UNMARK_ENTRIES, new BaseAction() {
-
-            @Override
-            public void action() {
-                try {
-                    List<BibEntry> bes = mainTable.getSelectedEntries();
-                    if (bes.isEmpty()) {
-                        output(Localization.lang("No entries selected."));
-                        return;
-                    }
-                    NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
-                    for (BibEntry be : bes) {
-                        EntryMarker.unmarkEntry(be, false, database, ce);
-                    }
-                    ce.end();
-                    undoManager.addEdit(ce);
-                    markBaseChanged();
-                    String outputStr;
-                    if (bes.size() == 1) {
-                        outputStr = Localization.lang("Unmarked selected entry");
-                    } else {
-                        outputStr = Localization.lang("Unmarked all %0 selected entries", Integer.toString(bes.size()));
-                    }
-                    output(outputStr);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not unmark", ex);
+        actions.put(Actions.UNMARK_ENTRIES, (BaseAction) () -> {
+            try {
+                List<BibEntry> bes = mainTable.getSelectedEntries();
+                if (bes.isEmpty()) {
+                    output(Localization.lang("No entries selected."));
+                    return;
                 }
+                NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
+                for (BibEntry be : bes) {
+                    EntryMarker.unmarkEntry(be, false, database, ce);
+                }
+                ce.end();
+                undoManager.addEdit(ce);
+                markBaseChanged();
+                String outputStr;
+                if (bes.size() == 1) {
+                    outputStr = Localization.lang("Unmarked selected entry");
+                } else {
+                    outputStr = Localization.lang("Unmarked all %0 selected entries", Integer.toString(bes.size()));
+                }
+                output(outputStr);
+            } catch (Throwable ex) {
+                LOGGER.warn("Could not unmark", ex);
             }
         });
 

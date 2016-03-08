@@ -26,6 +26,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Dialog for adding citation with page number info.
@@ -77,14 +78,11 @@ class AdvancedCiteDialog {
 
         diag.pack();
 
-        Action okAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ActionListener okAction = actionEvent -> {
                 okPressed = true;
                 diag.dispose();
-            }
         };
+
         ok.addActionListener(okAction);
         pageInfo.addActionListener(okAction);
         inPar.addActionListener(okAction);

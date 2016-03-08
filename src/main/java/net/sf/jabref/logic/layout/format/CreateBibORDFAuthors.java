@@ -42,8 +42,7 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
  * @author $author$
  * @version $Revision: 2268 $
  */
-public class CreateBibORDFAuthors implements LayoutFormatter
-{
+public class CreateBibORDFAuthors implements LayoutFormatter {
 
     //~ Methods ////////////////////////////////////////////////////////////////
 

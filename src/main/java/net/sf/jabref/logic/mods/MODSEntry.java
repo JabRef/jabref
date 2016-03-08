@@ -299,8 +299,7 @@ class MODSEntry {
                 mods.appendChild(extension);
             }
             return mods;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.warn("Exception caught...", e);
             throw new Error(e);
         }

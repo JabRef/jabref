@@ -136,8 +136,7 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibDatabase database, Charset encoding)
-    {
+    public String doLayout(BibDatabase database, Charset encoding) {
         StringBuilder sb = new StringBuilder(100);
         String fieldText;
 

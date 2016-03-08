@@ -37,7 +37,7 @@ public class PersonName {
 
 
     public PersonName() {
-        // Empty constuctor
+        // Empty constructor
     }
 
     public PersonName(String name) {
@@ -96,38 +96,31 @@ public class PersonName {
         return result.toString();
     }
 
-    public String getSurname()
-    {
+    public String getSurname() {
         return surname;
     }
 
-    public void setSurname(String lastName)
-    {
+    public void setSurname(String lastName) {
         surname = lastName;
     }
 
-    public String getFirstname()
-    {
+    public String getFirstname() {
         return givenName;
     }
 
-    public void setFirstname(String firstName)
-    {
+    public void setFirstname(String firstName) {
         givenName = firstName;
     }
 
-    public String getMiddlename()
-    {
+    public String getMiddlename() {
         return middleName;
     }
 
-    public void setMiddlename(String middleName)
-    {
+    public void setMiddlename(String middleName) {
         this.middleName = middleName;
     }
 
-    public String getFullname()
-    {
+    public String getFullname() {
         StringBuilder fullName = new StringBuilder();
         if ((givenName != null) && !givenName.isEmpty()) {
             fullName.append(givenName).append(' ');

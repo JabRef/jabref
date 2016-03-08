@@ -319,12 +319,16 @@ public class Util {
 
         // show a warning, then return
         StringBuilder message = new StringBuilder(
-                "This action will modify the following field(s)\n" + "in at least one entry each:\n");
+                Localization.lang("This action will modify the following field(s) in at least one entry each:"))
+                        .append('\n');
         for (String affectedField : affectedFields) {
             message.append(affectedField).append('\n');
         }
-        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        message.append(Localization.lang("This could cause undesired changes to your entries.")).append('\n')
+                .append("It is recommended that you change the grouping field in your group definition to \"keywords\" or a non-standard name.")
+                .append("\n\n").append(Localization.lang("Do you still want to continue?"));
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
 
         // if (groups instanceof KeywordGroup) {

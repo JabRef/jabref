@@ -1,9 +1,9 @@
-/* 
+/*
  * Copyright (C) 2006 Jabref-Team
  *               2005 Dept. Computer Architecture, University of Tuebingen, Germany
  *               2005 Joerg K. Wegner
  *               2003 Morten O. Alver, Nizar N. Batada
- *               
+ *
  * All programs in this directory and subdirectories are published under the GNU
  * General Public License as described below.
  *
@@ -32,14 +32,12 @@ import net.sf.jabref.model.entry.AuthorList;
 
 /**
  * Author First First prints ....
- * 
+ *
  */
-public class AuthorFirstFirst implements LayoutFormatter
-{
+public class AuthorFirstFirst implements LayoutFormatter {
 
     @Override
-    public String format(String fieldText)
-    {
+    public String format(String fieldText) {
         return AuthorList.fixAuthorFirstNameFirst(fieldText);
     }
 }
