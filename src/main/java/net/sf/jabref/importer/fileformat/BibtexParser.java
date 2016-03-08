@@ -264,7 +264,12 @@ public class BibtexParser {
             // A custom entry type can also be stored in a
             // "@comment"
             CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-            entryTypes.put(typ.getName(), typ);
+            if(typ == null) {
+                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
+                        comment);
+            } else {
+                entryTypes.put(typ.getName(), typ);
+            }
 
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();

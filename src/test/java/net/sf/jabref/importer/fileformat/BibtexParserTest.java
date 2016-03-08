@@ -6,6 +6,7 @@ import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -13,10 +14,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -1311,5 +1309,20 @@ public class BibtexParserTest {
 
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[LowerCaseChanger]", saveActions.get(1));
+    }
+
+    @Test
+    public void parseRecognizesCustomEntryType() throws IOException {
+        ParserResult result = BibtexParser.parse(
+                new StringReader("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
+
+        Map<String, EntryType> customEntryTypes = result.getEntryTypes();
+
+        assertEquals(1, customEntryTypes.size());
+        assertEquals("Lecturenotes", customEntryTypes.keySet().toArray()[0]);
+        EntryType entryType = customEntryTypes.get("Lecturenotes");
+        assertEquals("Lecturenotes", entryType.getName());
+        assertEquals(Arrays.asList("author", "title"), entryType.getRequiredFields());
+        assertEquals(Arrays.asList("language", "url"), entryType.getOptionalFields());
     }
 }
