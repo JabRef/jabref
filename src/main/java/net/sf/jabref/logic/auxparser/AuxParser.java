@@ -98,7 +98,7 @@ public class AuxParser {
 
                         if (!fileList.contains(inputFile)) {
                             fileList.add(inputFile);
-                            result.countNestedAuxFile();
+                            result.increaseNestedAuxFilesCounter();
                         }
                     }
                 }
@@ -149,7 +149,7 @@ public class AuxParser {
                     result.getUnresolvedKeys().add(crossref);
                 } else {
                     insertEntry(refEntry, result);
-                    result.countCrossRefEntry();
+                    result.increaseCrossRefEntiresCounter();
                 }
             }
         });

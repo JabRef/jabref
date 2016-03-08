@@ -237,26 +237,37 @@ public class Util {
     }
 
     /**
+     * Undoable change of field value
+     *
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
-        String oldValue = be.getField(field);
-        if (nullFieldIfValueIsTheSame && (oldValue != null) && oldValue.equals(newValue)) {
-            // if oldValue == newValue then reset field if required by parameter
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            if (newValue == null) {
+        String writtenValue = null;
+        String oldValue = null;
+        if (be.hasField(field)) {
+            oldValue = be.getField(field);
+            if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
+                // If the new field value is null or the old and the new value are the same and flag is set
+                // Clear the field
                 be.clearField(field);
-            } else {
+            } else if (!oldValue.equals(newValue)) {
+                // Update
+                writtenValue = newValue;
                 be.setField(field, newValue);
             }
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+        } else {
+            // old field value not set
+            if (newValue == null) {
+                // Do nothing
+                return;
+            } else {
+                // Set new value
+                writtenValue = newValue;
+                be.setField(field, newValue);
             }
+        }
+        if (ce != null) {
+            ce.addEdit(new UndoableFieldChange(be, field, oldValue, writtenValue));
         }
     }
 

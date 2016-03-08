@@ -447,13 +447,16 @@ public class XMPUtil {
             BibDatabase database, OutputStream outputStream)
                     throws IOException, TransformerException {
 
-        if (database != null) {
-            bibtexEntries = database.resolveForStrings(bibtexEntries, true);
+        Collection<BibEntry> resolvedEntries;
+        if (database == null) {
+            resolvedEntries = bibtexEntries;
+        } else {
+            resolvedEntries = database.resolveForStrings(bibtexEntries, true);
         }
 
         XMPMetadata x = new XMPMetadata();
 
-        for (BibEntry e : bibtexEntries) {
+        for (BibEntry e : resolvedEntries) {
             XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
             x.addSchema(schema);
             schema.setBibtexEntry(e);
@@ -545,8 +548,11 @@ public class XMPUtil {
     private static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
             BibEntry entry, BibDatabase database) {
 
-        if (database != null) {
-            entry = database.resolveForStrings(entry, false);
+        BibEntry resolvedEntry;
+        if (database == null) {
+            resolvedEntry = entry;
+        } else {
+            resolvedEntry = database.resolveForStrings(entry, false);
         }
 
         // Query privacy filter settings
@@ -558,14 +564,14 @@ public class XMPUtil {
 
         // Set all the values including key and entryType
 
-        for (String field : entry.getFieldNames()) {
+        for (String field : resolvedEntry.getFieldNames()) {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 continue;
             }
 
             if ("editor".equals(field)) {
-                String authors = entry.getField(field);
+                String authors = resolvedEntry.getField(field);
 
                 /**
                  * Editor -> Contributor
@@ -613,7 +619,7 @@ public class XMPUtil {
              * Bibtex-Fields used: author
              */
             if ("author".equals(field)) {
-                String authors = entry.getField(field);
+                String authors = resolvedEntry.getField(field);
                 AuthorList list = AuthorList.getAuthorList(authors);
 
                 int n = list.size();
@@ -665,7 +671,7 @@ public class XMPUtil {
              * Bibtex-Fields used: abstract
              */
             if ("abstract".equals(field)) {
-                String o = entry.getField(field);
+                String o = resolvedEntry.getField(field);
                 dcSchema.setDescription(o);
                 continue;
             }
@@ -684,7 +690,7 @@ public class XMPUtil {
              * Bibtex-Fields used: doi
              */
             if ("doi".equals(field)) {
-                String o = entry.getField(field);
+                String o = resolvedEntry.getField(field);
                 dcSchema.setIdentifier(o);
                 continue;
             }
@@ -840,9 +846,9 @@ public class XMPUtil {
      * @param document
      *            The pdf document to write to.
      * @param entry
-     *            The Bibtex entry that is written as a schema.
+     *            The BibTeX entry that is written as a schema.
      * @param database
-     *            maybenull An optional database which the given bibtex entries
+     *            maybenull An optional database which the given BibTeX entries
      *            belong to, which will be used to resolve strings. If the
      *            database is null the strings will not be resolved.
      * @throws IOException
@@ -865,9 +871,9 @@ public class XMPUtil {
      * @param document
      *            The pdf document to write to.
      * @param entries
-     *            The Bibtex entries that are written as schemas
+     *            The BibTeX entries that are written as schemas
      * @param database
-     *            maybenull An optional database which the given bibtex entries
+     *            maybenull An optional database which the given BibTeX entries
      *            belong to, which will be used to resolve strings. If the
      *            database is null the strings will not be resolved.
      * @throws IOException
@@ -877,8 +883,11 @@ public class XMPUtil {
             Collection<BibEntry> entries, BibDatabase database)
                     throws IOException, TransformerException {
 
-        if (database != null) {
-            entries = database.resolveForStrings(entries, false);
+        Collection<BibEntry> resolvedEntries;
+        if (database == null) {
+            resolvedEntries = entries;
+        } else {
+            resolvedEntries = database.resolveForStrings(entries, false);
         }
 
         PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -898,7 +907,7 @@ public class XMPUtil {
             schema.getElement().getParentNode().removeChild(schema.getElement());
         }
 
-        for (BibEntry entry : entries) {
+        for (BibEntry entry : resolvedEntries) {
             XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
             XMPUtil.writeToDCSchema(dcSchema, entry, null);
             meta.addSchema(dcSchema);
@@ -933,8 +942,11 @@ public class XMPUtil {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
-        if (database != null) {
-            entry = database.resolveForStrings(entry, false);
+        BibEntry resolvedEntry;
+        if (database == null) {
+            resolvedEntry = entry;
+        } else {
+            resolvedEntry = database.resolveForStrings(entry, false);
         }
 
         // Query privacy filter settings
@@ -945,7 +957,7 @@ public class XMPUtil {
         Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
 
         // Set all the values including key and entryType
-        Set<String> fields = entry.getFieldNames();
+        Set<String> fields = resolvedEntry.getFieldNames();
 
         for (String field : fields) {
 
@@ -960,26 +972,24 @@ public class XMPUtil {
                 } else if ("abstract".equals(field)) {
                     di.setSubject(null);
                 } else {
-                    di.setCustomMetadataValue("bibtex/" + field,
-                            null);
+                    di.setCustomMetadataValue("bibtex/" + field, null);
                 }
                 continue;
             }
 
             if ("author".equals(field)) {
-                di.setAuthor(entry.getField("author"));
+                di.setAuthor(resolvedEntry.getField("author"));
             } else if ("title".equals(field)) {
-                di.setTitle(entry.getField("title"));
+                di.setTitle(resolvedEntry.getField("title"));
             } else if ("keywords".equals(field)) {
-                di.setKeywords(entry.getField("keywords"));
+                di.setKeywords(resolvedEntry.getField("keywords"));
             } else if ("abstract".equals(field)) {
-                di.setSubject(entry.getField("abstract"));
+                di.setSubject(resolvedEntry.getField("abstract"));
             } else {
-                di.setCustomMetadataValue("bibtex/" + field,
-                        entry.getField(field));
+                di.setCustomMetadataValue("bibtex/" + field, resolvedEntry.getField(field));
             }
         }
-        di.setCustomMetadataValue("bibtex/entrytype", EntryUtil.capitalizeFirst(entry.getType()));
+        di.setCustomMetadataValue("bibtex/entrytype", EntryUtil.capitalizeFirst(resolvedEntry.getType()));
     }
 
     /**
@@ -1011,8 +1021,11 @@ public class XMPUtil {
             Collection<BibEntry> bibtexEntries, BibDatabase database,
             boolean writePDFInfo) throws IOException, TransformerException {
 
-        if (database != null) {
-            bibtexEntries = database.resolveForStrings(bibtexEntries, false);
+        Collection<BibEntry> resolvedEntries;
+        if (database == null) {
+            resolvedEntries = bibtexEntries;
+        } else {
+            resolvedEntries = database.resolveForStrings(bibtexEntries, false);
         }
 
         try (PDDocument document = PDDocument.load(file.getAbsoluteFile())) {
@@ -1021,10 +1034,10 @@ public class XMPUtil {
                         "Error: Cannot add metadata to encrypted document.");
             }
 
-            if (writePDFInfo && (bibtexEntries.size() == 1)) {
-                XMPUtil.writeDocumentInformation(document, bibtexEntries
+            if (writePDFInfo && (resolvedEntries.size() == 1)) {
+                XMPUtil.writeDocumentInformation(document, resolvedEntries
                         .iterator().next(), null);
-                XMPUtil.writeDublinCore(document, bibtexEntries, null);
+                XMPUtil.writeDublinCore(document, resolvedEntries, null);
             }
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1047,7 +1060,7 @@ public class XMPUtil {
                 bib.getElement().getParentNode().removeChild(bib.getElement());
             }
 
-            for (BibEntry e : bibtexEntries) {
+            for (BibEntry e : resolvedEntries) {
                 XMPSchemaBibtex bibtex = new XMPSchemaBibtex(meta);
                 meta.addSchema(bibtex);
                 bibtex.setBibtexEntry(e, null);

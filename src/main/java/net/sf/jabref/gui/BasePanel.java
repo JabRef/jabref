@@ -2433,7 +2433,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return;
         }
         nextEntries.clear();
-        if (entry != showing) {
+        if (!Objects.equals(entry, showing)) {
             // Add the entry we are leaving to the history:
             if (showing != null) {
                 previousEntries.add(showing);

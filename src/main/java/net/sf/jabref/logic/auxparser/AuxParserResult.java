@@ -51,11 +51,11 @@ public class AuxParserResult {
         return crossRefEntriesCount;
     }
 
-    public void countCrossRefEntry() {
+    public void increaseCrossRefEntiresCounter() {
         crossRefEntriesCount++;
     }
 
-    public void countNestedAuxFile() {
+    public void increaseNestedAuxFilesCounter() {
         nestedAuxCount++;
     }
 

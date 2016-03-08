@@ -1032,9 +1032,9 @@ public class AuthorList {
 
             if (o instanceof Author) {
                 Author a = (Author) o;
-                return EntryUtil.equals(firstPart, a.firstPart) && EntryUtil.equals(firstAbbr, a.firstAbbr)
-                        && EntryUtil.equals(vonPart, a.vonPart) && EntryUtil.equals(lastPart, a.lastPart)
-                        && EntryUtil.equals(jrPart, a.jrPart);
+                return Objects.equals(firstPart, a.firstPart) && Objects.equals(firstAbbr, a.firstAbbr)
+                        && Objects.equals(vonPart, a.vonPart) && Objects.equals(lastPart, a.lastPart)
+                        && Objects.equals(jrPart, a.jrPart);
             }
             return false;
         }
