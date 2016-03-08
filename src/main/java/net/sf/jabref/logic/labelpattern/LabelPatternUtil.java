@@ -230,7 +230,7 @@ public class LabelPatternUtil {
      * <ul>
      * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
      * <li>Department: will be an abbreviation of all words beginning with the
-     * uppercase letter except of words: <code>d[ei]part.*</code>, school,
+     * uppercase letter except of words: <code>d[ei]p.*</code>, school,
      * faculty</li>
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
@@ -301,22 +301,20 @@ public class LabelPatternUtil {
 
             // Deciding about a part type...
             for (String k : part) {
-                if ((k.length() >= 5) && "univ".equalsIgnoreCase(k.substring(0, 5))) {
+                if (k.matches("^[Uu][Nn][Ii].*")) { // Starts with "uni" case and locale independent
                     isUniversity = true;
                 }
-                if ((k.length() >= 6) && "techn".equalsIgnoreCase(k.substring(0, 6))) {
+                if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
                 if ("school".equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
-                if (((k.length() >= 7) && k.toLowerCase().substring(0, 7).matches("d[ei]part"))
-                        || ((k.length() >= 4) && "lab".equalsIgnoreCase(k.substring(0, 4)))) {
+                if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
                     isDepartment = true;
                 }
             }
-            if (isTechnology)
-             {
+            if (isTechnology) {
                 isUniversity = false; // technology institute isn't university :-)
             }
 
@@ -328,7 +326,7 @@ public class LabelPatternUtil {
                 StringBuilder universitySB = new StringBuilder();
                 universitySB.append("Uni");
                 for (String k : part) {
-                    if ((k.length() >= 5) && !"univ".equalsIgnoreCase(k.substring(0, 5))) {
+                    if (!k.matches("^[Uu][Nn][Ii].*")) {
                         universitySB.append(k);
                     }
                 }
@@ -346,8 +344,8 @@ public class LabelPatternUtil {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if ((k.length() >= 7) && !k.toLowerCase().substring(0, 7).matches("d[ei]part")
-                            && !"school".equalsIgnoreCase(k) && !"faculty".equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !"school".equalsIgnoreCase(k)
+                            && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {
                             schoolSB.append(k.replaceAll(STARTING_CAPITAL_PATTERN, ""));

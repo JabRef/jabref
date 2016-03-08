@@ -64,7 +64,7 @@ public class MoveFileAction extends AbstractAction {
         FileListEntry flEntry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
         String ln = flEntry.link;
-        boolean httpLink = ln.toLowerCase().startsWith("http");
+        boolean httpLink = ln.matches("^[Hh][Tt][Tt][Pp].*"); // Starts with http, case insensitive and locale independent
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
 

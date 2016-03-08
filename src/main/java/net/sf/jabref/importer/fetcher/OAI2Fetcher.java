@@ -145,7 +145,7 @@ public class OAI2Fetcher implements EntryFetcher {
     public static String fixKey(String key) {
 
         String resultingKey = key;
-        if (resultingKey.toLowerCase().startsWith("arxiv:")) {
+        if (resultingKey.matches("^[Aa][Rr][Xx][Ii][Vv]:.*")) { // Starts with arxiv:, case and locale independent
             resultingKey = resultingKey.substring(6);
         }
 

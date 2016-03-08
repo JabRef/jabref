@@ -86,8 +86,24 @@ public class PdfImporter {
 
     public class ImportPdfFilesResult {
 
-        public String[] noPdfFiles;
-        public List<BibEntry> entries;
+        private final List<String> noPdfFiles;
+        private final List<BibEntry> entries;
+
+
+        public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
+            this.noPdfFiles = noPdfFiles;
+            this.entries = entries;
+        }
+
+
+        public List<String> getNoPdfFiles() {
+            return noPdfFiles;
+        }
+
+
+        public List<BibEntry> getEntries() {
+            return entries;
+        }
     }
 
 
@@ -116,13 +132,7 @@ public class PdfImporter {
         // import the files
         List<BibEntry> entries = importPdfFiles(files, status);
 
-        String[] noPdfFilesArray = new String[noPdfFiles.size()];
-        noPdfFiles.toArray(noPdfFilesArray);
-
-        ImportPdfFilesResult res = new ImportPdfFilesResult();
-        res.noPdfFiles = noPdfFilesArray;
-        res.entries = entries;
-        return res;
+        return new ImportPdfFilesResult(noPdfFiles, entries);
     }
 
     /**

@@ -616,8 +616,7 @@ public class BibtexParser {
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) character) || (character == ':') || (character == '-') || (character == '_')
-                    || (character == '*') || (character == '+') || (character == '.') || (character == '/') || (character == '\'')) {
+            if (Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0)) {
                 token.append((char) character);
             } else {
                 unread(character);
@@ -652,7 +651,6 @@ public class BibtexParser {
         // Restore if possible:
         switch (currentChar) {
             case '=':
-
                 // Get entryfieldname, push it back and take rest as key
                 key = key.reverse();
 
@@ -691,16 +689,13 @@ public class BibtexParser {
                 break;
 
             case ',':
-
                 parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
                         String.valueOf(line)));
                 break;
 
             case '\n':
-
                 parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
                         String.valueOf(line)));
-
                 break;
 
             default:
@@ -758,9 +753,8 @@ public class BibtexParser {
                 return token.toString();
             }
 
-            if (!Character.isWhitespace((char) character)
-                    && (Character.isLetterOrDigit((char) character) || (character == ':') || ((character != '#') && (character != '{') && (character != '}')
-                    && (character != '\uFFFD') && (character != '~') && (character != ',') && (character != '=')))) {
+            if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
+                    || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
             } else {
 
