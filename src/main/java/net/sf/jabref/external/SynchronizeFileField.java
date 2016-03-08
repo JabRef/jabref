@@ -138,8 +138,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
                         boolean httpLink = flEntry.link.toLowerCase().startsWith("http");
-                        if (httpLink)
-                        {
+                        if (httpLink) {
                             continue; // Don't check the remote file.
                             // TODO: should there be an option to check remote links?
                         }

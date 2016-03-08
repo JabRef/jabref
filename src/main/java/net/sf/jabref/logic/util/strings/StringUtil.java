@@ -524,8 +524,7 @@ public class StringUtil {
      * @param  delimstr  Delimiter string
      * @return list      {@link java.util.List} of <tt>String</tt>
      */
-    public static List<String> tokenizeToList(String buf, String delimstr)
-    {
+    public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
         String buffer = buf + '\n';
 

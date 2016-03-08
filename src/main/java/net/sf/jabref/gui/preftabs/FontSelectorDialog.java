@@ -340,8 +340,7 @@ public class FontSelectorDialog extends JDialog {
     private class ListHandler implements ListSelectionListener {
 
         @Override
-        public void valueChanged(ListSelectionEvent evt)
-        {
+        public void valueChanged(ListSelectionEvent evt) {
             Object source = evt.getSource();
             if (familyList.equals(source)) {
                 String family = familyList.getSelectedValue();

@@ -42,15 +42,13 @@ import net.sf.jabref.model.entry.AuthorList;
 /**
  * Create DocBook authors formatter.
  */
-public class CreateDocBookAuthors implements LayoutFormatter
-{
+public class CreateDocBookAuthors implements LayoutFormatter {
 
     private static final XMLChars XML_CHARS = new XMLChars();
 
 
     @Override
-    public String format(String fieldText)
-    {
+    public String format(String fieldText) {
 
         StringBuilder sb = new StringBuilder(100);
 
