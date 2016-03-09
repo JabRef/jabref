@@ -163,6 +163,25 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
 
         add(scrollPane, BorderLayout.CENTER);
+
+        this.createKeyBindings();
+    }
+
+    private void createKeyBindings(){
+        ActionMap actionMap = this.getActionMap();
+        InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        final String close = "close";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), close);
+        actionMap.put(close, this.closeAction);
+
+        final String copy = "copy";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
+        actionMap.put(copy, this.copyPreviewAction);
+
+        final String print = "print";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), print);
+        actionMap.put(print, this.printAction);
     }
 
     private JPopupMenu createPopupMenu() {
@@ -175,23 +194,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private JToolBar createToolBar() {
         JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-
         toolBar.setMargin(new Insets(0, 0, 0, 2));
-
-        // The toolbar carries all the key bindings that are valid for the whole
-        // window.
-        ActionMap actionMap = toolBar.getActionMap();
-        InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        actionMap.put("close", this.closeAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), "copy");
-        actionMap.put("copy", this.copyPreviewAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), "print");
-        actionMap.put("print", this.printAction);
-
         toolBar.setFloatable(false);
 
         // Add actions (and thus buttons)

@@ -65,6 +65,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#685](https://github.com/JabRef/jabref/issues/685): Fixed MySQL exporting for more than one entry
 - Fixed [#815](https://github.com/JabRef/jabref/issues/815): Curly Braces no longer ignored in OpenOffice/LibreOffice citation
 - Fixed [#855](https://github.com/JabRef/jabref/issues/856): Fixed OpenOffice Manual connect - Clicking on browse does now work correctly
+- Fixed [#649](https://github.com/JabRef/jabref/issues/649): Key bindings are now working in the preview panel
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
