@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.dbproperties;
 
-import com.jgoodies.common.base.Strings;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
@@ -12,6 +11,8 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class FieldFormatterCleanupsPanel extends JPanel {
 
+    private static final String DESCRIPTION = Localization.lang("Description") + ": ";
     private final JCheckBox enabled;
 
     private FieldFormatterCleanups fieldFormatterCleanups;
@@ -36,9 +38,12 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private JButton addButton;
 
+    private JLabel descriptionText;
+
     private JButton deleteButton;
 
     private JButton resetButton;
+
     private FieldFormatterCleanups defaultFormatters;
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
@@ -65,7 +70,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         FormBuilder builder = FormBuilder.create().layout(
                 new FormLayout("left:pref, 13dlu, left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
+                        "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
         builder.add(enabled).xyw(1, 1, 5);
         builder.add(getSelectorPanel()).xyw(3, 3, 5);
 
@@ -73,6 +78,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         for (FieldFormatterCleanup action : configuredActions) {
             actionsToDisplay.add(action);
         }
+
+        descriptionText = new JLabel(DESCRIPTION);
+        builder.add(descriptionText).xyw(3, 5, 5);
 
         actionsList = new JList(new SaveActionsListModel(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -88,15 +96,15 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 }
             }
         });
-        builder.add(actionsList).xyw(3, 5, 5);
+        builder.add(actionsList).xyw(3, 7, 5);
 
         deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         deleteButton.addActionListener(new DeleteButtonListener());
-        builder.add(deleteButton).xy(3, 7);
+        builder.add(deleteButton).xy(3, 9);
 
         resetButton = new JButton("Reset");
         resetButton.addActionListener(e -> ((SaveActionsListModel) actionsList.getModel()).reset(defaultFormatters));
-        builder.add(resetButton).xy(5, 7);
+        builder.add(resetButton).xy(5, 9);
 
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
@@ -106,12 +114,38 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         enabled.setSelected(fieldFormatterCleanups.isEnabled());
     }
 
+    private void updateDescription() {
+        FieldFormatterCleanup formatterCleanup = getFieldFormatterCleanup();
+        if(formatterCleanup != null) {
+            descriptionText.setText(DESCRIPTION + formatterCleanup.getDescription());
+        } else {
+            descriptionText.setText(DESCRIPTION);
+        }
+    }
+
     private JPanel getSelectorPanel() {
         FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
                 "pref, 2dlu,"));
 
         keyField = new JTextFieldWithUnfocusedText(Localization.lang("Enter field name (e.g., title, author)"));
         keyField.setColumns(25);
+        keyField.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateDescription();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateDescription();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateDescription();
+            }
+        });
         builder.add(keyField).xy(1, 1);
 
         List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream().map(
@@ -129,6 +163,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
         });
+        formatters.addItemListener(e -> updateDescription());
         builder.add(formatters).xy(3, 1);
 
         addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
@@ -169,25 +204,33 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Formatter selectedFormatter = null;
-            String selectedFormatterKey = formatters.getSelectedItem().toString();
-            for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
-                if (formatter.getKey().equals(selectedFormatterKey)) {
-                    selectedFormatter = formatter;
-                    break;
-                }
-            }
-
-            String fieldKey = keyField.getText();
-            if ((fieldKey == null) || fieldKey.isEmpty()) {
+            FieldFormatterCleanup newAction = getFieldFormatterCleanup();
+            if (newAction == null) {
                 return;
             }
-
-            FieldFormatterCleanup newAction = new FieldFormatterCleanup(fieldKey, selectedFormatter);
 
             ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
             keyField.setText("");
         }
+    }
+
+    private FieldFormatterCleanup getFieldFormatterCleanup() {
+        Formatter selectedFormatter = null;
+        String selectedFormatterKey = formatters.getSelectedItem().toString();
+        for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
+            if (formatter.getKey().equals(selectedFormatterKey)) {
+                selectedFormatter = formatter;
+                break;
+            }
+        }
+
+        String fieldKey = keyField.getText();
+        if ((fieldKey == null) || fieldKey.isEmpty()) {
+            return null;
+        }
+
+        FieldFormatterCleanup newAction = new FieldFormatterCleanup(fieldKey, selectedFormatter);
+        return newAction;
     }
 
     class DeleteButtonListener implements ActionListener {

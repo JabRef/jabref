@@ -487,17 +487,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setSaveActions(FieldFormatterCleanups saveActions) {
-        List<String> actionsSerialized = new ArrayList<>();
-
-        if (saveActions.isEnabled()) {
-            actionsSerialized.add("enabled");
-        } else {
-            actionsSerialized.add("disabled");
-        }
-
-        String formatterString = FieldFormatterCleanups.getMetaDataString(saveActions.getConfiguredActions());
-        actionsSerialized.add(formatterString);
-
+        List<String> actionsSerialized = saveActions.convertToString();
         putData(SAVE_ACTIONS, actionsSerialized);
     }
 
