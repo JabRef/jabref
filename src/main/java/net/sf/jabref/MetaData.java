@@ -20,10 +20,12 @@ import java.util.*;
 
 import net.sf.jabref.exporter.SaveActions;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
@@ -36,6 +38,7 @@ public class MetaData implements Iterable<String> {
     public static final String GROUPSVERSION = "groupsversion";
     public static final String GROUPSTREE = "groupstree";
     public static final String GROUPS = "groups";
+    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
@@ -110,6 +113,14 @@ public class MetaData implements Iterable<String> {
      * The MetaData object can be constructed with no data in it.
      */
     public MetaData() {
+    }
+
+    public Optional<SaveOrderConfig> getSaveOrderConfig() {
+        List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
+        if(storedSaveOrderConfig != null) {
+            return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
+        }
+        return Optional.empty();
     }
 
     /**
@@ -384,4 +395,42 @@ public class MetaData implements Iterable<String> {
         }
     }
 
+    public Optional<BibDatabaseMode> getMode() {
+        List<String> data = getData(MetaData.DATABASE_TYPE);
+        if (data == null || data.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase()));
+    }
+
+    public boolean isProtected() {
+        List<String> data = getData(Globals.PROTECTED_FLAG_META);
+        if (data == null || data.isEmpty()) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(data.get(0));
+        }
+    }
+
+    public List<String> getContentSelectors(String fieldName) {
+        return getData(Globals.SELECTOR_META_PREFIX + fieldName);
+    }
+
+    public Optional<String> getDefaultFileDirectory() {
+        List<String> fileDirectory = getData(FILE_DIRECTORY);
+        if (fileDirectory == null || fileDirectory.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(fileDirectory.get(0).trim());
+        }
+    }
+
+    public Optional<String> getUserFileDirectory(String user) {
+        List<String> fileDirectory = getData(FILE_DIRECTORY + '-' + user);
+        if (fileDirectory == null || fileDirectory.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(fileDirectory.get(0).trim());
+        }
+    }
 }

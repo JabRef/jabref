@@ -31,6 +31,20 @@ public class SaveOrderConfig {
             this.descending = Boolean.parseBoolean(descending);
         }
 
+        public SortCriterion(String field, boolean descending) {
+            this.field = field;
+            this.descending = descending;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("SortCriterion{");
+            sb.append("field='").append(field).append('\'');
+            sb.append(", descending=").append(descending);
+            sb.append('}');
+            return sb.toString();
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -50,6 +64,13 @@ public class SaveOrderConfig {
         }
     }
 
+    public SaveOrderConfig(boolean saveInOriginalOrder, SortCriterion first, SortCriterion second,
+            SortCriterion third) {
+        this.saveInOriginalOrder = saveInOriginalOrder;
+        sortCriteria[0] = first;
+        sortCriteria[1] = second;
+        sortCriteria[2] = third;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -77,6 +98,15 @@ public class SaveOrderConfig {
         sortCriteria[0] = new SortCriterion();
         sortCriteria[1] = new SortCriterion();
         sortCriteria[2] = new SortCriterion();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("SaveOrderConfig{");
+        sb.append("saveInOriginalOrder=").append(saveInOriginalOrder);
+        sb.append(", sortCriteria=").append(Arrays.toString(sortCriteria));
+        sb.append('}');
+        return sb.toString();
     }
 
     public SaveOrderConfig(List<String> data) {

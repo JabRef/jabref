@@ -3,7 +3,17 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseChanger;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
@@ -17,6 +27,7 @@ import java.io.StringReader;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the BibtexParser
@@ -319,7 +330,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void assertCorrectnessOfParsedSerialization() throws IOException {
+    public void parseSetsParsedSerialization() throws IOException {
         String firstEntry = "@article{canh05," + "  author = {Crowston, K. and Annabi, H.}," + Globals.NEWLINE
                 + "  title = {Title A}}" + Globals.NEWLINE;
         String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
@@ -1289,7 +1300,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void checkSaveActionsParsing() throws IOException {
+    public void parseRecognizesSaveActionsAfterEntry() throws IOException {
         BibtexParser parser = new BibtexParser(new StringReader("@InProceedings{6055279,\n" +
                 "  Title                    = {Educational session 1},\n" +
                 "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n" +
@@ -1312,7 +1323,21 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseRecognizesCustomEntryType() throws IOException {
+    public void integrationTestSaveActions() throws IOException {
+        BibtexParser parser = new BibtexParser(
+                new StringReader("@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger]}"));
+
+        ParserResult parserResult = parser.parse();
+        SaveActions saveActions = parserResult.getMetaData().getSaveActions();
+
+        assertTrue(saveActions.isEnabled());
+        assertEquals(
+                Arrays.asList(new FieldFormatterCleanup("title", new LowerCaseChanger())),
+                saveActions.getConfiguredActions());
+    }
+
+    @Test
+    public void integrationTestCustomEntryType() throws IOException {
         ParserResult result = BibtexParser.parse(
                 new StringReader("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
 
@@ -1324,5 +1349,91 @@ public class BibtexParserTest {
         assertEquals("Lecturenotes", entryType.getName());
         assertEquals(Arrays.asList("author", "title"), entryType.getRequiredFields());
         assertEquals(Arrays.asList("language", "url"), entryType.getOptionalFields());
+    }
+
+    @Test
+    public void integrationTestSaveOrderConfig() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
+
+        Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
+
+        assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+                        new SaveOrderConfig.SortCriterion("year", true),
+                        new SaveOrderConfig.SortCriterion("abstract", false)),
+                saveOrderConfig.get());
+    }
+
+    @Test
+    public void integrationTestCustomKeyPattern() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: keypattern_article:articleTest;}" + Globals.NEWLINE
+                        + "@comment{jabref-meta: keypatterndefault:test;}"));
+
+        AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
+
+        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern();
+        expectedPattern.setDefaultValue("test");
+        expectedPattern.addLabelPattern("article", "articleTest");
+
+        assertEquals(expectedPattern, labelPattern);
+    }
+
+    @Test
+    public void integrationTestBiblatexMode() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: DATABASE_TYPE:BibLaTeX;}"));
+
+        Optional<BibDatabaseMode> mode = result.getMetaData().getMode();
+
+        assertEquals(BibDatabaseMode.BIBLATEX, mode.get());
+    }
+
+    @Test
+    public void integrationTestGroupTree() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE +
+                "@comment{jabref-meta: groupstree:" + Globals.NEWLINE
+                        + "0 AllEntriesGroup:;" + Globals.NEWLINE
+                        + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;" + Globals.NEWLINE
+                        + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
+                        + "}"));
+
+        GroupTreeNode root = result.getMetaData().getGroups();
+
+        assertEquals(new AllEntriesGroup(), root.getGroup());
+        assertEquals(2, root.getChildCount());
+        assertEquals(
+                new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
+                ((GroupTreeNode) root.getChildAt(0)).getGroup());
+        assertEquals(
+                new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
+                ((GroupTreeNode) root.getChildAt(1)).getGroup());
+    }
+
+    @Test
+    public void integrationTestProtectedFlag() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: protectedFlag:true;}"));
+
+        assertTrue(result.getMetaData().isProtected());
+    }
+
+    @Test
+    public void integrationTestContentSelectors() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: selector_title:testWord;word2;}"));
+
+        assertEquals(Arrays.asList("testWord", "word2"), result.getMetaData().getContentSelectors("title"));
+    }
+
+    @Test
+    public void integrationTestFileDirectory() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" +
+                "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));
+
+        assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
+        assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
     }
 }

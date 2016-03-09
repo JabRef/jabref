@@ -120,10 +120,7 @@ public class BibDatabaseWriter {
         }
 
         if(preferences.getTakeMetadataSaveOrderInAccount()) {
-            List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
-            if(storedSaveOrderConfig != null) {
-                return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
-            }
+            return metaData.getSaveOrderConfig();
         }
 
         return Optional.ofNullable(preferences.getSaveOrder());
