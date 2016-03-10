@@ -62,7 +62,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields"));
+        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields") + "...");
         this.frame = frame;
     }
 

@@ -86,6 +86,7 @@ import java.util.Objects;
 public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+    private static final String ELLIPSES = "...";
 
     final JSplitPane contentPane = new JSplitPane();
 
@@ -104,7 +105,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PositionWindow pw;
 
-    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity")) {
+    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity") + ELLIPSES) {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -282,7 +283,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
-            Localization.menuTitle("Replace string"), Globals.getKeyPrefs().getKey(KeyBinding.REPLACE_STRING));
+            Localization.menuTitle("Replace string") + ELLIPSES, Globals.getKeyPrefs().getKey(KeyBinding.REPLACE_STRING));
 
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
             Localization.menuTitle("Edit preamble"),
@@ -311,10 +312,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Toggle groups interface"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
-    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
+    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
-            Localization.lang("Remove from group"));
-    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
+            Localization.lang("Remove from group") + ELLIPSES);
+    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
 
     private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
             Localization.menuTitle("Toggle entry preview"),
@@ -357,7 +358,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
             Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
-            Localization.menuTitle("New entry from plain text"),
+            Localization.menuTitle("New entry from plain text") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.NEW_FROM_PLAIN_TEXT));
 
     private final AbstractAction customExpAction = new CustomizeExportsAction();
@@ -367,7 +368,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Export selected entries to clipboard"),
             IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
-            Localization.lang("Synchronize file links"),
+            Localization.lang("Synchronize file links") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
 
     private final AbstractAction abbreviateMedline = new GeneralAction(Actions.ABBREVIATE_MEDLINE,
@@ -396,13 +397,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Export to external SQL database"));
 
     private final AbstractAction cleanupEntries = new GeneralAction(Actions.CLEANUP,
-            Localization.menuTitle("Cleanup entries"),
+            Localization.menuTitle("Cleanup entries") + ELLIPSES,
             Localization.lang("Cleanup entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.CLEANUP),
             IconTheme.JabRefIcon.CLEANUP_ENTRIES.getIcon());
 
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
-            Localization.menuTitle("Merge entries"),
+            Localization.menuTitle("Merge entries") + ELLIPSES,
             Localization.lang("Merge entries"),
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
 

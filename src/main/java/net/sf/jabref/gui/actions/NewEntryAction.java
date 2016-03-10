@@ -23,7 +23,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         // This action leads to a dialog asking for entry type.
         super(IconTheme.JabRefIcon.ADD_ENTRY.getIcon());
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, Localization.menuTitle("New entry"));
+        putValue(Action.NAME, Localization.menuTitle("New entry") + "...");
         putValue(Action.ACCELERATOR_KEY, key);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX entry"));
     }
