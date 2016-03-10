@@ -2025,10 +2025,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         stringDialog = null;
     }
 
-    public void changeType(BibEntry bes, String type) {
-        changeType(Arrays.asList(bes), type);
-    }
-
     public void changeType(String type) {
         List<BibEntry> bes = mainTable.getSelectedEntries();
         changeType(bes, type);
