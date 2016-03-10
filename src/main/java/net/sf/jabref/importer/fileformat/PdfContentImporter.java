@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -209,12 +210,11 @@ public class PdfContentImporter extends ImportFormat {
 
     @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibEntry> res = new ArrayList<>(1);
+        final ArrayList<BibEntry> result = new ArrayList<>(1);
 
         try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
                 LOGGER.error("Encrypted documents are not supported");
-                //return res;
             }
 
             PDFTextStripper stripper = new PDFTextStripper();
@@ -226,12 +226,9 @@ public class PdfContentImporter extends ImportFormat {
             stripper.writeText(document, writer);
             String textResult = writer.toString();
 
-            String doi = new DOI(textResult).getDOI();
-            if (doi.length() < textResult.length()) {
-                // A Doi was found in the text
-                // We do NO parsing of the text, but use the Doi fetcher
-
-                ImportInspector iI = new ImportInspector() {
+            Optional<DOI> doi = DOI.build(textResult);
+            if (doi.isPresent()) {
+                ImportInspector inspector = new ImportInspector() {
 
                     @Override
                     public void toFront() {
@@ -246,15 +243,13 @@ public class PdfContentImporter extends ImportFormat {
                     @Override
                     public void addEntry(BibEntry entry) {
                         // add the entry to the result object
-                        res.add(entry);
+                        result.add(entry);
                     }
                 };
-                PdfContentImporter.doiToBibTeXFetcher.processQuery(doi, iI, status);
-                if (!res.isEmpty()) {
-                    // if something has been found, return the result
-                    return res;
-                } else {
-                    // otherwise, we just parse the PDF
+
+                doiToBibTeXFetcher.processQuery(doi.get().getDOI(), inspector, status);
+                if (!result.isEmpty()) {
+                    return result;
                 }
             }
 
@@ -275,7 +270,7 @@ public class PdfContentImporter extends ImportFormat {
             if (i >= split.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return res;
+                return result;
             }
 
             curString = split[i];
@@ -530,7 +525,7 @@ public class PdfContentImporter extends ImportFormat {
 
             entry.setField("review", textResult);
 
-            res.add(entry);
+            result.add(entry);
         } catch (NoClassDefFoundError e) {
             if ("org/bouncycastle/jce/provider/BouncyCastleProvider".equals(e.getMessage())) {
                 status.showMessage(Localization.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
@@ -540,7 +535,7 @@ public class PdfContentImporter extends ImportFormat {
         } catch (IOException e) {
             LOGGER.error("Could not load document", e);
         }
-        return res;
+        return result;
     }
 
     /**
