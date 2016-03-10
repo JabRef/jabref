@@ -1387,26 +1387,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
     }
 
-    class ChangeTypeAction extends AbstractAction {
-
-        private final String changeType;
-
-        private final BasePanel changeTypePanel;
-
-
-        public ChangeTypeAction(EntryType type, BasePanel bp) {
-            super(type.getName());
-            this.changeType = type.getName();
-            changeTypePanel = bp;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            changeTypePanel.changeType(entry, changeType);
-        }
-    }
-
-
     private void warnDuplicateBibtexkey() {
         panel.output(Localization.lang("Duplicate BibTeX key.")+" "+Localization.lang("Grouping may not work for this entry."));
     }
