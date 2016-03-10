@@ -323,12 +323,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Toggle entry preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_ENTRY_PREVIEW),
             IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon()));
-    private final Action toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
+    private final Action toggleHighlightAny = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             Localization.menuTitle("Highlight groups matching any selected entry"),
-            Localization.lang("Highlight groups matching any selected entry"));
-    private final Action toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
+            Localization.lang("Highlight groups matching any selected entry")));
+    private final Action toggleHighlightAll = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             Localization.menuTitle("Highlight groups matching all selected entries"),
-            Localization.lang("Highlight groups matching all selected entries"));
+            Localization.lang("Highlight groups matching all selected entries")));
     private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             Localization.menuTitle("Switch preview layout"),
             Globals.getKeyPrefs().getKey(KeyBinding.SWITCH_PREVIEW_LAYOUT));
@@ -1254,8 +1254,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         groups.add(removeFromGroup);
         groups.add(moveToGroup);
         groups.addSeparator();
-        groups.add(toggleHighlightAny);
-        groups.add(toggleHighlightAll);
+        JRadioButtonMenuItem toggleHighlightAnyItem = new JRadioButtonMenuItem(toggleHighlightAny);
+        groups.add(toggleHighlightAnyItem);
+        JRadioButtonMenuItem toggleHighlightAllItem = new JRadioButtonMenuItem(toggleHighlightAll);
+        groups.add(toggleHighlightAllItem);
+        ButtonGroup highlightButtonGroup = new ButtonGroup();
+        highlightButtonGroup.add(toggleHighlightAnyItem);
+        highlightButtonGroup.add(toggleHighlightAllItem);
         mb.add(groups);
 
         view.add(getBackAction());
