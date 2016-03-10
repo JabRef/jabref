@@ -109,13 +109,12 @@ public class BibEntry {
         }
 
         String oldType = this.type;
-        type = type.toLowerCase();
 
         try {
             // We set the type before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            this.type = type;
+            this.type = type.toLowerCase();
             changed = true;
             firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType, type);
         } catch (PropertyVetoException pve) {

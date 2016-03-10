@@ -90,6 +90,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     // A reference to the entry this object works on.
     private BibEntry entry;
+    // The currently displayed type
+    private final String displayedBibEntryType;
 
     // The action concerned with closing the window.
     private final CloseAction closeAction;
@@ -168,6 +170,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         this.entry.addPropertyChangeListener(this);
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
+        displayedBibEntryType = entry.getType();
 
         helpAction = new HelpAction(HelpFiles.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
@@ -305,8 +308,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         srcPanel.setFocusCycleRoot(true);
     }
 
-    public String getType() {
-        return entry.getType();
+    public String getDisplayedBibEntryType() {
+        return displayedBibEntryType;
     }
 
     /**
@@ -1386,26 +1389,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
         }
     }
-
-    class ChangeTypeAction extends AbstractAction {
-
-        private final String changeType;
-
-        private final BasePanel changeTypePanel;
-
-
-        public ChangeTypeAction(EntryType type, BasePanel bp) {
-            super(type.getName());
-            this.changeType = type.getName();
-            changeTypePanel = bp;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            changeTypePanel.changeType(entry, changeType);
-        }
-    }
-
 
     private void warnDuplicateBibtexkey() {
         panel.output(Localization.lang("Duplicate BibTeX key.")+" "+Localization.lang("Grouping may not work for this entry."));
