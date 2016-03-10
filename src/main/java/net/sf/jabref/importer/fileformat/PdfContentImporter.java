@@ -1,80 +1,51 @@
-/* Copyright (C) 2011 Oliver Kopp
-   Copyright (C) 2015 JabRef contributors.
-PdfContentImporter is part of JabRef.
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-or see http://www.gnu.org/licenses/gpl-2.0.html
-*/
-
 package net.sf.jabref.importer.fileformat;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.EntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
- *
+ * <p>
  * Currently, Springer and IEEE formats are supported.
- *
+ * <p>
  * Integrating XMP support is future work
- *
- * @author koppor
- *
  */
 public class PdfContentImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(PdfContentImporter.class);
 
-    // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
+    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+
     private static final DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
 
-    /* global variables holding the state of the current parse run
-     * needed to be able to generate methods such as "fillCurStringWithNonEmptyLines"
-     */
+    // input lines into several lines
+    private String[] lines;
 
-    // input split into several lines
-    private String[] split;
-
-    // current index in split
+    // current index in lines
     private int i;
 
-    // curent "line" in split.
-    // sometimes, a "line" is several lines in split
+    // curent "line" in lines.
+    // sometimes, a "line" is several lines in lines
     private String curString;
 
     private String year;
-
-    private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d\\d\\d\\d");
-
 
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
@@ -83,12 +54,11 @@ public class PdfContentImporter extends ImportFormat {
 
     /**
      * Removes all non-letter characters at the end
-     *
+     * <p>
      * EXCEPTION: a closing bracket is NOT removed
      *
      * @param input
-     * @return
-     * TODO Additionally replace multiple subsequent spaces by one space
+     * @return TODO Additionally replace multiple subsequent spaces by one space
      */
     private static String removeNonLettersAtEnd(String input) {
         input = input.trim();
@@ -109,6 +79,7 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     private static String streamlineNames(String names) {
+        // TODO: replace with AuthorsFormatter?!
         String res;
         // supported formats:
         //   Matthias Schrepfer1, Johannes Wolf1, Jan Mendling1, and Hajo A. Reijers2
@@ -209,29 +180,19 @@ public class PdfContentImporter extends ImportFormat {
 
     @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibEntry> res = new ArrayList<>(1);
+        final ArrayList<BibEntry> result = new ArrayList<>(1);
 
         try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
                 LOGGER.error("Encrypted documents are not supported");
-                //return res;
+                return result;
             }
 
-            PDFTextStripper stripper = new PDFTextStripper();
-            stripper.setStartPage(1);
-            stripper.setEndPage(1);
-            stripper.setSortByPosition(true);
-            stripper.setParagraphEnd(System.lineSeparator());
-            StringWriter writer = new StringWriter();
-            stripper.writeText(document, writer);
-            String textResult = writer.toString();
+            String firstPageContents = getFirstPageContents(document);
 
-            String doi = new DOI(textResult).getDOI();
-            if (doi.length() < textResult.length()) {
-                // A Doi was found in the text
-                // We do NO parsing of the text, but use the Doi fetcher
-
-                ImportInspector iI = new ImportInspector() {
+            Optional<DOI> doi = DOI.findInText(firstPageContents);
+            if (doi.isPresent()) {
+                ImportInspector inspector = new ImportInspector() {
 
                     @Override
                     public void toFront() {
@@ -246,21 +207,15 @@ public class PdfContentImporter extends ImportFormat {
                     @Override
                     public void addEntry(BibEntry entry) {
                         // add the entry to the result object
-                        res.add(entry);
+                        result.add(entry);
                     }
                 };
-                PdfContentImporter.doiToBibTeXFetcher.processQuery(doi, iI, status);
-                if (!res.isEmpty()) {
-                    // if something has been found, return the result
-                    return res;
-                } else {
-                    // otherwise, we just parse the PDF
+
+                doiToBibTeXFetcher.processQuery(doi.get().getDOI(), inspector, status);
+                if (!result.isEmpty()) {
+                    return result;
                 }
             }
-
-            final String lineBreak = System.lineSeparator();
-
-            split = textResult.split(lineBreak);
 
             // idea: split[] contains the different lines
             // blocks are separated by empty lines
@@ -270,20 +225,20 @@ public class PdfContentImporter extends ImportFormat {
             // i points to the current line
             // curString (mostly) contains the current block
             //   the different lines are joined into one and thereby separated by " "
+            lines = firstPageContents.split(System.lineSeparator());
 
             proceedToNextNonEmptyLine();
-            if (i >= split.length) {
+            if (i >= lines.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return res;
+                return result;
             }
 
-            curString = split[i];
+            curString = lines[i];
             i = i + 1;
 
             String author;
             String editor = null;
-            String institution = null;
             String abstractT = null;
             String keywords = null;
             String title;
@@ -295,6 +250,7 @@ public class PdfContentImporter extends ImportFormat {
             String pages = null;
             // year is a class variable as the method extractYear() uses it;
             String publisher = null;
+
             EntryType type = BibtexEntryTypes.INPROCEEDINGS;
             if (curString.length() > 4) {
                 // special case: possibly conference as first line on the page
@@ -323,15 +279,15 @@ public class PdfContentImporter extends ImportFormat {
 
             // after title: authors
             author = null;
-            while ((i < split.length) && !"".equals(split[i])) {
-                // author names are unlikely to be split among different lines
+            while ((i < lines.length) && !"".equals(lines[i])) {
+                // author names are unlikely to be lines among different lines
                 // treat them line by line
-                curString = streamlineNames(split[i]);
+                curString = streamlineNames(lines[i]);
                 if (author == null) {
                     author = curString;
                 } else {
                     if ("".equals(curString)) {
-                        // if split[i] is "and" then "" is returned by streamlineNames -> do nothing
+                        // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
                     } else {
                         author = author.concat(" and ").concat(curString);
                     }
@@ -342,20 +298,20 @@ public class PdfContentImporter extends ImportFormat {
             i++;
 
             // then, abstract and keywords follow
-            while (i < split.length) {
-                curString = split[i];
+            while (i < lines.length) {
+                curString = lines[i];
                 if ((curString.length() >= "Abstract".length()) && "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))) {
                     if (curString.length() == "Abstract".length()) {
                         // only word "abstract" found -- skip line
                         curString = "";
                     } else {
-                        curString = curString.substring("Abstract".length() + 1).trim().concat(lineBreak);
+                        curString = curString.substring("Abstract".length() + 1).trim().concat(System.lineSeparator());
                     }
                     i++;
                     // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
                     // whereas we need linebreak as separator
-                    while ((i < split.length) && !"".equals(split[i])) {
-                        curString = curString.concat(split[i]).concat(lineBreak);
+                    while ((i < lines.length) && !"".equals(lines[i])) {
+                        curString = curString.concat(lines[i]).concat(System.lineSeparator());
                         i++;
                     }
                     abstractT = curString;
@@ -389,7 +345,7 @@ public class PdfContentImporter extends ImportFormat {
                 }
             }
 
-            i = split.length - 1;
+            i = lines.length - 1;
 
             // last block: DOI, detailed information
             // sometimes, this information is in the third last block etc...
@@ -472,12 +428,6 @@ public class PdfContentImporter extends ImportFormat {
                             }
                         }
                     }
-
-                    //					String lower = curString.toLowerCase();
-                    //					if (institution == null) {
-                    //
-                    //					}
-
                 }
             }
 
@@ -489,10 +439,6 @@ public class PdfContentImporter extends ImportFormat {
             }
             if (editor != null) {
                 entry.setField("editor", editor);
-            }
-            // TODO: Set the institution field during parsing
-            if (institution != null) {
-                entry.setField("institution", institution);
             }
             if (abstractT != null) {
                 entry.setField("abstract", abstractT);
@@ -528,19 +474,26 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField("publisher", publisher);
             }
 
-            entry.setField("review", textResult);
+            entry.setField("review", firstPageContents);
 
-            res.add(entry);
-        } catch (NoClassDefFoundError e) {
-            if ("org/bouncycastle/jce/provider/BouncyCastleProvider".equals(e.getMessage())) {
-                status.showMessage(Localization.lang("Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
-            } else {
-                LOGGER.error("Could not find class", e);
-            }
+            result.add(entry);
         } catch (IOException e) {
             LOGGER.error("Could not load document", e);
         }
-        return res;
+        return result;
+    }
+
+    private String getFirstPageContents(PDDocument document) throws IOException {
+        PDFTextStripper stripper = new PDFTextStripper();
+
+        stripper.setStartPage(1);
+        stripper.setEndPage(1);
+        stripper.setSortByPosition(true);
+        stripper.setParagraphEnd(System.lineSeparator());
+        StringWriter writer = new StringWriter();
+        stripper.writeText(document, writer);
+
+        return writer.toString();
     }
 
     /**
@@ -564,7 +517,7 @@ public class PdfContentImporter extends ImportFormat {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((i < split.length) && "".equals(split[i].trim())) {
+        while ((i < lines.length) && "".equals(lines[i].trim())) {
             i++;
         }
     }
@@ -573,23 +526,23 @@ public class PdfContentImporter extends ImportFormat {
      * Fill curString with lines until "" is found
      * No trailing space is added
      * i is advanced to the next non-empty line (ignoring white space)
-     *
+     * <p>
      * Lines containing only white spaces are ignored,
      * but NOT considered as ""
-     *
-     * Uses GLOBAL variables split, curLine, i
+     * <p>
+     * Uses GLOBAL variables lines, curLine, i
      */
     private void fillCurStringWithNonEmptyLines() {
         // ensure that curString does not end with " "
         curString = curString.trim();
-        while ((i < split.length) && !"".equals(split[i])) {
-            String curLine = split[i].trim();
+        while ((i < lines.length) && !"".equals(lines[i])) {
+            String curLine = lines[i].trim();
             if (!"".equals(curLine)) {
                 if (!curString.isEmpty()) {
                     // insert separating space if necessary
                     curString = curString.concat(" ");
                 }
-                curString = curString.concat(split[i]);
+                curString = curString.concat(lines[i]);
             }
             i++;
         }
@@ -601,11 +554,11 @@ public class PdfContentImporter extends ImportFormat {
      * resets curString
      * curString now contains the last block (until "" reached)
      * Trailing space is added
-     *
+     * <p>
      * invariant before/after: i points to line before the last handled block
      */
     private void readLastBlock() {
-        while ((i >= 0) && "".equals(split[i].trim())) {
+        while ((i >= 0) && "".equals(lines[i].trim())) {
             i--;
         }
         // i is now at the end of a block
@@ -613,7 +566,7 @@ public class PdfContentImporter extends ImportFormat {
         int end = i;
 
         // find beginning
-        while ((i >= 0) && !"".equals(split[i])) {
+        while ((i >= 0) && !"".equals(lines[i])) {
             i--;
         }
         // i is now the line before the beginning of the block
@@ -621,7 +574,7 @@ public class PdfContentImporter extends ImportFormat {
 
         curString = "";
         for (int j = i + 1; j <= end; j++) {
-            curString = curString.concat(split[j].trim());
+            curString = curString.concat(lines[j].trim());
             if (j != end) {
                 curString = curString.concat(" ");
             }

@@ -3,6 +3,8 @@ package net.sf.jabref.logic.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 
 public class DOITest {
     @Test
@@ -110,5 +112,15 @@ public class DOITest {
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("10.1006/jmbi.1998.2354").getURLAsASCIIString());
         Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354", new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURLAsASCIIString());
         Assert.assertEquals("http://doi.org/10.1109/VLHCC.2004.20", new DOI("doi:10.1109/VLHCC.2004.20").getURLAsASCIIString());
+    }
+
+    @Test
+    public void findDoiInsideArbitraryText() {
+        Assert.assertEquals("10.1006/jmbi.1998.2354", DOI.findInText("other stuff 10.1006/jmbi.1998.2354 end").get().getDOI());
+    }
+
+    @Test
+    public void noDOIFoundInsideArbitraryText() {
+        Assert.assertEquals(Optional.empty(), DOI.findInText("text without 28282 a doi"));
     }
 }
