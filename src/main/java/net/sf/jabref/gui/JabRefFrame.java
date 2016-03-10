@@ -295,7 +295,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
             IconTheme.JabRefIcon.EDIT_STRINGS.getIcon());
     private final AbstractAction customizeAction = new CustomizeEntryTypeAction();
-    private final AbstractAction toggleToolbar = new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
+    private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
         {
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.HIDE_SHOW_TOOLBAR));
@@ -306,26 +306,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             tlb.setVisible(!tlb.isVisible());
         }
-    };
-    private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
+    });
+
+    private final Action toggleGroups = enableToggle(new GeneralAction(Actions.TOGGLE_GROUPS,
             Localization.menuTitle("Toggle groups interface"),
             Localization.lang("Toggle groups interface"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
-            IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
+            IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon()));
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
     private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
 
-    private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
+    private final Action togglePreview = enableToggle(new GeneralAction(Actions.TOGGLE_PREVIEW,
             Localization.menuTitle("Toggle entry preview"),
             Localization.lang("Toggle entry preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_ENTRY_PREVIEW),
-            IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon());
-    private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
+            IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon()));
+    private final Action toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             Localization.menuTitle("Highlight groups matching any selected entry"),
             Localization.lang("Highlight groups matching any selected entry"));
-    private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
+    private final Action toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             Localization.menuTitle("Highlight groups matching all selected entries"),
             Localization.lang("Highlight groups matching all selected entries"));
     private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
@@ -1057,6 +1058,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
+    private static Action enableToggle(Action a) {
+        // toggle only works correctly when the SELECTED_KEY is set to false or true explicitly upon start
+        a.putValue(Action.SELECTED_KEY, "false");
+
+        return a;
+    }
+
     class GeneralAction extends MnemonicAwareAction {
 
         private final String command;
@@ -1233,14 +1241,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(replaceAll);
         search.add(getMassSetField());
         search.addSeparator();
-        search.add(generalFetcher.getAction());
+        search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
             sidePaneManager.show(generalFetcher.getTitle());
         }
         mb.add(search);
 
-        groups.add(toggleGroups);
+        groups.add(new JCheckBoxMenuItem(toggleGroups));
         groups.addSeparator();
         groups.add(addToGroup);
         groups.add(removeFromGroup);
@@ -1260,10 +1268,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(increaseFontSize);
         view.add(decreseFontSize);
         view.addSeparator();
-        view.add(toggleToolbar);
-        view.add(generalFetcher.getAction());
-        view.add(toggleGroups);
-        view.add(togglePreview);
+        view.add(new JCheckBoxMenuItem(toggleToolbar));
+        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
+        view.add(new JCheckBoxMenuItem(toggleGroups));
+        view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(getSwitchPreviewAction());
 
         mb.add(view);
