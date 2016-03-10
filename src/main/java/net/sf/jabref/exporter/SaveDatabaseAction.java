@@ -346,6 +346,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     public void save() throws Throwable {
         runCommand();
+        frame.updateEnabledState();
     }
 
     /**
@@ -389,7 +390,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().getPath());
         }
-
+        frame.updateEnabledState();
     }
 
     /**
