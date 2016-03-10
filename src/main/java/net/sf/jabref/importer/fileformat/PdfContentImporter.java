@@ -1,7 +1,9 @@
 package net.sf.jabref.importer.fileformat;
 
+import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -15,6 +17,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -187,7 +190,34 @@ public class PdfContentImporter extends ImportFormat {
 
             String firstPageContents = getFirstPageContents(document);
 
-            // idea: paragraphs[] contains the different lines
+            Optional<DOI> doi = DOI.findInText(firstPageContents);
+            if (doi.isPresent()) {
+                ImportInspector inspector = new ImportInspector() {
+
+                    @Override
+                    public void toFront() {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void setProgress(int current, int max) {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void addEntry(BibEntry entry) {
+                        // add the entry to the result object
+                        result.add(entry);
+                    }
+                };
+
+                doiToBibTeXFetcher.processQuery(doi.get().getDOI(), inspector, status);
+                if (!result.isEmpty()) {
+                    return result;
+                }
+            }
+
+            // idea: split[] contains the different lines
             // blocks are separated by empty lines
             // treat each block
             //   or do special treatment at authors (which are not broken)
