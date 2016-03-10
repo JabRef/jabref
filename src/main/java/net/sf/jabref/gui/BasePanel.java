@@ -2027,10 +2027,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void changeTypeOfSelectedEntries(String newType) {
         List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeTypeOfSelectedEntries(bes, newType);
+        changeType(bes, newType);
     }
 
-    private void changeTypeOfSelectedEntries(List<BibEntry> entries, String newType) {
+    private void changeType(List<BibEntry> entries, String newType) {
         if ((entries == null) || (entries.isEmpty())) {
             LOGGER.error("At least one entry must be selected to be able to change the type.");
             return;
