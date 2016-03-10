@@ -1859,7 +1859,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanel.SHOWING_EDITOR) {
-            if (currentEditor.getType().equals(currentEditor.getEntry().getType())) {
+            if (currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
                 currentEditor.updateAllFields();
                 currentEditor.updateSource();
             } else {
@@ -2025,36 +2025,36 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         stringDialog = null;
     }
 
-    public void changeType(String type) {
+    public void changeTypeOfSelectedEntries(String newType) {
         List<BibEntry> bes = mainTable.getSelectedEntries();
-        changeType(bes, type);
+        changeTypeOfSelectedEntries(bes, newType);
     }
 
-    private void changeType(List<BibEntry> bes, String type) {
-
-        if ((bes == null) || (bes.isEmpty())) {
+    private void changeTypeOfSelectedEntries(List<BibEntry> entries, String newType) {
+        if ((entries == null) || (entries.isEmpty())) {
             LOGGER.error("At least one entry must be selected to be able to change the type.");
             return;
         }
-        if (bes.size() > 1) {
+
+        if (entries.size() > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
                     Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?",
-                            type),
+                            newType),
                     Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (choice == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Change entry type"));
-        for (BibEntry be : bes) {
-            ce.addEdit(new UndoableChangeType(be, be.getType(), type));
-            be.setType(type);
+        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
+        for (BibEntry entry : entries) {
+            compound.addEdit(new UndoableChangeType(entry, entry.getType(), newType));
+            entry.setType(newType);
         }
 
-        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", type), bes.size()));
-        ce.end();
-        undoManager.addEdit(ce);
+        output(formatOutputMessage(Localization.lang("Changed type to '%0' for", newType), entries.size()));
+        compound.end();
+        undoManager.addEdit(compound);
         markBaseChanged();
         updateEntryEditorIfShowing();
     }
