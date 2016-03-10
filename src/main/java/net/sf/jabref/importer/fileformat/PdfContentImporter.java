@@ -191,33 +191,6 @@ public class PdfContentImporter extends ImportFormat {
 
             String firstPageContents = getFirstPageContents(document);
 
-            Optional<DOI> doi = DOI.build(firstPageContents);
-            if (doi.isPresent()) {
-                ImportInspector inspector = new ImportInspector() {
-
-                    @Override
-                    public void toFront() {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void setProgress(int current, int max) {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void addEntry(BibEntry entry) {
-                        // add the entry to the result object
-                        result.add(entry);
-                    }
-                };
-
-                doiToBibTeXFetcher.processQuery(doi.get().getDOI(), inspector, status);
-                if (!result.isEmpty()) {
-                    return result;
-                }
-            }
-
             split = firstPageContents.split(System.lineSeparator());
 
             // idea: split[] contains the different lines
