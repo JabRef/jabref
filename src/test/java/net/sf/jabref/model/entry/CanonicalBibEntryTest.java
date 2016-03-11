@@ -26,4 +26,14 @@ public class CanonicalBibEntryTest {
         Assert.assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
     }
 
+    @Test
+    public void canonicalRepresentationOfAnAuthor() {
+        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        e.setField(BibEntry.KEY_FIELD, "key");
+        e.setField("author", "K. Crowston and H. Annabi and J. Howison and C. Masango");
+        String canonicalRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(e);
+        Assert.assertEquals(
+                "@article{key,\n  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}\n}",
+                canonicalRepresentation);
+    }
 }
