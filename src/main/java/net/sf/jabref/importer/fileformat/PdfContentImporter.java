@@ -46,11 +46,6 @@ public class PdfContentImporter extends ImportFormat {
 
     private String year;
 
-    @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        return false;
-    }
-
     /**
      * Removes all non-letter characters at the end
      * <p>
@@ -179,12 +174,17 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
+    public boolean isRecognizedFormat(InputStream in) throws IOException {
+        return false;
+    }
+
+    @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
 
         try (PDDocument document = PDDocument.load(in)) {
             if (document.isEncrypted()) {
-                LOGGER.error("Encrypted documents are not supported");
+                LOGGER.info("Encrypted documents are not supported");
                 return result;
             }
 
@@ -481,19 +481,7 @@ public class PdfContentImporter extends ImportFormat {
             entry.setField("review", firstPageContents);
 
             result.add(entry);
-        } catch (NoClassDefFoundError e) {
-            // FIXME: The following statement has to be proven.
-            // This catch has to be here as this exception might be risen when an encrypted PDF is found, but no appropriate cipher suite.
-            // See https://sourceforge.net/p/jabref/bugs/1257/
-            // More background is provided at http://stackoverflow.com/a/2929228/873282
-            if ("org/bouncycastle/jce/provider/BouncyCastleProvider".equals(e.getMessage())) {
-                status.showMessage(Localization.lang(
-                        "Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
-            } else {
-                LOGGER.error("Could not find class", e);
-            }
         }
-        // IOException doesn't need to be catched as this method throws this exception
         return result;
     }
 
