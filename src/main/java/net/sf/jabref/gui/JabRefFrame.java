@@ -329,6 +329,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final Action toggleHighlightAll = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             Localization.menuTitle("Highlight groups matching all selected entries"),
             Localization.lang("Highlight groups matching all selected entries")));
+    private final Action toggleHighlightDisable = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE,
+            Localization.menuTitle("Disable Highlight groups matching entries"),
+            Localization.lang("Disable Highlight groups matching entries")));
+
+
     private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             Localization.menuTitle("Switch preview layout"),
             Globals.getKeyPrefs().getKey(KeyBinding.SWITCH_PREVIEW_LAYOUT));
@@ -1058,11 +1063,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
-    private static Action enableToggle(Action a) {
+    private static Action enableToggle(Action a, boolean initialValue) {
         // toggle only works correctly when the SELECTED_KEY is set to false or true explicitly upon start
-        a.putValue(Action.SELECTED_KEY, "false");
+        a.putValue(Action.SELECTED_KEY, String.valueOf(initialValue));
 
         return a;
+    }
+
+    private static Action enableToggle(Action a) {
+        return enableToggle(a, false);
     }
 
     class GeneralAction extends MnemonicAwareAction {
@@ -1258,9 +1267,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         groups.add(toggleHighlightAnyItem);
         JRadioButtonMenuItem toggleHighlightAllItem = new JRadioButtonMenuItem(toggleHighlightAll);
         groups.add(toggleHighlightAllItem);
+        JRadioButtonMenuItem toggleHighlightDisableItem = new JRadioButtonMenuItem(toggleHighlightDisable);
+        groups.add(toggleHighlightDisableItem);
         ButtonGroup highlightButtonGroup = new ButtonGroup();
+        highlightButtonGroup.add(toggleHighlightDisableItem);
         highlightButtonGroup.add(toggleHighlightAnyItem);
         highlightButtonGroup.add(toggleHighlightAllItem);
+
+        String toggleHighlightStatus = Globals.prefs.get(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING);
+        if("all".equals(toggleHighlightStatus)) {
+            toggleHighlightAllItem.setSelected(true);
+        } else if("any".equals(toggleHighlightStatus)) {
+            toggleHighlightAnyItem.setSelected(true);
+        } else {
+            toggleHighlightDisableItem.setSelected(true);
+        }
+
         mb.add(groups);
 
         view.add(getBackAction());
@@ -1498,7 +1520,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getSwitchPreviewAction(), checkIntegrity,
-                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline,
+                toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
