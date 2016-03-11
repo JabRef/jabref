@@ -51,7 +51,7 @@ public class AuxParserResult {
         return crossRefEntriesCount;
     }
 
-    public void increaseCrossRefEntiresCounter() {
+    public void increaseCrossRefEntriesCounter() {
         crossRefEntriesCount++;
     }
 

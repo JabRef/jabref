@@ -149,7 +149,7 @@ public class AuxParser {
                     result.getUnresolvedKeys().add(crossref);
                 } else {
                     insertEntry(refEntry, result);
-                    result.increaseCrossRefEntiresCounter();
+                    result.increaseCrossRefEntriesCounter();
                 }
             }
         });
