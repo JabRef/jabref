@@ -77,7 +77,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private final JButton help = new HelpAction("OpenOfficeIntegration.html").getHelpButton();
+    private final JButton help = new HelpAction("OpenOfficeIntegration").getHelpButton();
     private String styleFile;
     private OOBibBase ooBase;
     private JabRefFrame frame;
