@@ -225,7 +225,6 @@ public class PdfImporter {
     }
 
     private void doContentImport(String fileName, List<BibEntry> res, OutputPrinter status) {
-
         File file = new File(fileName);
         InputStream in;
         BibEntry entry;
