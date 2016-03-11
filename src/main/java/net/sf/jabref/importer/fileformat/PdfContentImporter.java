@@ -3,6 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -41,8 +42,6 @@ public class PdfContentImporter extends ImportFormat {
     // current index in lines
     private int i;
 
-    // curent "line" in lines.
-    // sometimes, a "line" is several lines in lines
     private String curString;
 
     private String year;
@@ -56,9 +55,10 @@ public class PdfContentImporter extends ImportFormat {
      * Removes all non-letter characters at the end
      * <p>
      * EXCEPTION: a closing bracket is NOT removed
-     *
-     * @param input
-     * @return TODO Additionally replace multiple subsequent spaces by one space
+     * </p>
+     * <p>
+     * TODO: Additionally replace multiple subsequent spaces by one space, which will cause a rename of this method
+     * </p>
      */
     private static String removeNonLettersAtEnd(String input) {
         input = input.trim();
@@ -234,7 +234,9 @@ public class PdfContentImporter extends ImportFormat {
                 return result;
             }
 
+            // we start at the current line
             curString = lines[i];
+            // i might get incremented later and curString modified, too
             i = i + 1;
 
             String author;
@@ -434,6 +436,8 @@ public class PdfContentImporter extends ImportFormat {
             BibEntry entry = new BibEntry();
             entry.setType(type);
 
+            // TODO: institution parsing missing
+
             if (author != null) {
                 entry.setField("author", author);
             }
@@ -477,9 +481,19 @@ public class PdfContentImporter extends ImportFormat {
             entry.setField("review", firstPageContents);
 
             result.add(entry);
-        } catch (IOException e) {
-            LOGGER.error("Could not load document", e);
+        } catch (NoClassDefFoundError e) {
+            // FIXME: The following statement has to be proven.
+            // This catch has to be here as this exception might be risen when an encrypted PDF is found, but no appropriate cipher suite.
+            // See https://sourceforge.net/p/jabref/bugs/1257/
+            // More background is provided at http://stackoverflow.com/a/2929228/873282
+            if ("org/bouncycastle/jce/provider/BouncyCastleProvider".equals(e.getMessage())) {
+                status.showMessage(Localization.lang(
+                        "Java Bouncy Castle library not found. Please download and install it. For more information see http://www.bouncycastle.org/."));
+            } else {
+                LOGGER.error("Could not find class", e);
+            }
         }
+        // IOException doesn't need to be catched as this method throws this exception
         return result;
     }
 
