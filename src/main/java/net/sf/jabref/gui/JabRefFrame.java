@@ -330,8 +330,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Highlight groups matching all selected entries"),
             Localization.lang("Highlight groups matching all selected entries")));
     private final Action toggleHighlightDisable = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE,
-            Localization.menuTitle("Disable Highlight groups matching entries"),
-            Localization.lang("Disable Highlight groups matching entries")));
+            Localization.menuTitle("Disable highlight groups matching entries"),
+            Localization.lang("Disable highlight groups matching entries")));
 
 
     private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
