@@ -346,6 +346,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 ce.end();
                 undoManager.addEdit(ce);
                 markBaseChanged();
+
+                //no entry is selected anymore, thus hide the preview panel
+                hideBottomComponent();
             }
         });
 
@@ -371,6 +374,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ce.end();
                     undoManager.addEdit(ce);
                 }
+
+                //no entry is selected anymore, thus hide the preview panel
+                hideBottomComponent();
             }
         });
 
