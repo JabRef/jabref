@@ -118,7 +118,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Localization.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
+            status.showMessage(Localization.lang("Error while fetching from %0", "JSTOR") + ": " + e.getMessage());
         }
         return false;
     }

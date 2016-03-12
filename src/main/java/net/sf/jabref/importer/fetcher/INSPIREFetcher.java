@@ -174,7 +174,7 @@ public class INSPIREFetcher implements EntryFetcher {
             }
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
+            frame.showMessage(Localization.lang("Error while fetching from %0", "Inspire") + ": " + e.getMessage());
             LOGGER.warn("Error while fetching from Inspire", e);
         }
         return true;

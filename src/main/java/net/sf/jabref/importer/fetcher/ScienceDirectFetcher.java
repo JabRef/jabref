@@ -99,7 +99,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
-            status.showMessage(Localization.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
+            status.showMessage(
+                    Localization.lang("Error while fetching from %0", "ScienceDirect") + ": " + e.getMessage());
         }
         return false;
     }
