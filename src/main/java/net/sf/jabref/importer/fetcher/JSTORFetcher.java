@@ -118,7 +118,7 @@ public class JSTORFetcher implements EntryFetcher {
             if (entries.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                                 query),
-                        Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 

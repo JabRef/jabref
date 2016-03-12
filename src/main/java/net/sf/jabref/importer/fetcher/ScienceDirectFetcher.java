@@ -63,7 +63,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Search ScienceDirect");
+        return ("ScienceDirect");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
             if (citations.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         query),
-                        Localization.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
