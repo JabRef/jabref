@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,9 @@ package net.sf.jabref.logic.xmp;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 import javax.xml.transform.TransformerException;
@@ -30,6 +33,9 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.database.BibDatabase;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jempbox.impl.DateConverter;
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -43,14 +49,16 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
+import org.w3c.dom.Document;
 
 /**
  * XMPUtils provide support for reading and writing BibTex data as XMP-Metadata
  * in PDF-documents.
- *
- * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class XMPUtil {
+
+    private static final Log LOGGER = LogFactory.getLog(XMPUtil.class);
+
 
     /**
      * Convenience method for readXMP(File).
@@ -105,9 +113,11 @@ public class XMPUtil {
      *             than remove a lock or cancel the operation.
      */
     public static List<BibEntry> readXMP(File file) throws IOException {
+        List<BibEntry> res = Collections.EMPTY_LIST;
         try (FileInputStream is = new FileInputStream(file)) {
-            return XMPUtil.readXMP(is);
+            res = XMPUtil.readXMP(is);
         }
+        return res;
     }
 
     /**
@@ -120,6 +130,8 @@ public class XMPUtil {
      * @throws IOException
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
+     *
+     * @return list of BibEntries retrieved from the stream. May be empty, but never null
      */
     public static List<BibEntry> readXMP(InputStream inputStream)
             throws IOException {
@@ -128,8 +140,7 @@ public class XMPUtil {
 
         try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException(
-                        "Error: Cannot read metadata from encrypted document.");
+                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
             }
 
             XMPMetadata meta = XMPUtil.getXMPMetadata(document);
@@ -137,14 +148,13 @@ public class XMPUtil {
             // If we did not find any XMP metadata, search for non XMP metadata
             if (meta != null) {
 
-                List<XMPSchema> schemas = meta
-                        .getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+                List<XMPSchema> schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
 
                 for (XMPSchema schema : schemas) {
                     XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
 
                     BibEntry entry = bib.getBibtexEntry();
-                    if(entry.getType() == null) {
+                    if (entry.getType() == null) {
                         entry.setType("misc");
                     }
                     result.add(entry);
@@ -152,8 +162,7 @@ public class XMPUtil {
 
                 // If we did not find anything have a look if a Dublin Core exists
                 if (result.isEmpty()) {
-                    schemas = meta
-                            .getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+                    schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
@@ -169,20 +178,15 @@ public class XMPUtil {
                 }
             }
             if (result.isEmpty()) {
-                Optional<BibEntry> entry = XMPUtil
-                        .getBibtexEntryFromDocumentInformation(document
-                        .getDocumentInformation());
-
+                PDDocumentInformation documentInformation = document.getDocumentInformation();
+                Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDocumentInformation(documentInformation);
                 if (entry.isPresent()) {
-                    if (entry.get().getType() == null) {
-                        entry.get().setType("misc");
-                    }
                     result.add(entry.get());
                 }
             }
         }
 
-        // return null, if no metadata was found
+        // return empty list, if no metadata was found
         if (result.isEmpty()) {
             return Collections.emptyList();
         }
@@ -515,6 +519,9 @@ public class XMPUtil {
         }
     }
 
+    /**
+     * @return null if no metadata has been found
+     */
     private static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
@@ -523,8 +530,11 @@ public class XMPUtil {
             return null;
         }
 
-        XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw
-                .createInputStream()));
+        Document parseResult;
+        try (InputStream is = metaRaw.createInputStream()) {
+            parseResult = XMLUtil.parse(is);
+        }
+        XMPMetadata meta = new XMPMetadata(parseResult);
         meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
         return meta;
     }
@@ -1233,6 +1243,18 @@ public class XMPUtil {
     }
 
     /**
+     * see XMPUtil.hasMetadata(InputStream is)
+     */
+    public static boolean hasMetadata(Path p) {
+        try (InputStream is = Files.newInputStream(p, StandardOpenOption.READ)) {
+            return hasMetadata(is);
+        } catch (IOException e) {
+            LOGGER.error("XMP reading failed", e);
+            return false;
+        }
+    }
+
+    /**
      * Will try to read XMP metadata from the given file, returning whether
      * metadata was found.
      *
@@ -1247,7 +1269,11 @@ public class XMPUtil {
         try {
             List<BibEntry> l = XMPUtil.readXMP(is);
             return !l.isEmpty();
+        } catch (EncryptionNotSupportedException ex) {
+            LOGGER.info("Encryption not supported by XMPUtil");
+            return false;
         } catch (IOException e) {
+            LOGGER.error("XMP reading failed", e);
             return false;
         }
     }
