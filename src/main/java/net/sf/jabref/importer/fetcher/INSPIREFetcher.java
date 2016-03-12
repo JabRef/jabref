@@ -147,7 +147,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Fetch INSPIRE");
+        return "INSPIRE";
     }
 
     @Override
