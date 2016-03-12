@@ -400,4 +400,22 @@ public class BibDatabaseWriterTest {
                 Globals.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                 + Globals.NEWLINE, stringWriter.toString());
     }
+
+    @Test
+    public void writeNotEmptyContentSelectors() throws Exception {
+        metaData.setContentSelectors("title", Arrays.asList(""));
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals("", stringWriter.toString());
+    }
+
+    @Test
+    public void writeNotCompletelyEmptyContentSelectors() throws Exception {
+        metaData.setContentSelectors("title", Collections.emptyList());
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals("", stringWriter.toString());
+    }
 }

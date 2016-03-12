@@ -455,7 +455,11 @@ public class MetaData implements Iterable<String> {
                 }
             }
 
-            serializedMetaData.put(metaItem.getKey(), stringBuilder.toString());
+            String serializedItem = stringBuilder.toString();
+            // Only add non-empty values
+            if (!serializedItem.isEmpty() && !serializedItem.equals(";")) {
+                serializedMetaData.put(metaItem.getKey(), serializedItem);
+            }
         }
 
         // write groups if present. skip this if only the root node exists
