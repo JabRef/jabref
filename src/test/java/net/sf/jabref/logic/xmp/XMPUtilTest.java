@@ -1015,13 +1015,13 @@ public class XMPUtilTest {
 
         XMPUtil.writeXMP(pdfFile, e, null);
 
-        XMPMetadata metadata = XMPUtil.readRawXMP(pdfFile);
+        Optional<XMPMetadata> metadata = XMPUtil.readRawXMP(pdfFile);
 
-        Assert.assertNotNull(metadata);
+        Assert.assertTrue(metadata.isPresent());
 
-        List<XMPSchema> schemas = metadata.getSchemas();
+        List<XMPSchema> schemas = metadata.get().getSchemas();
         Assert.assertEquals(2, schemas.size());
-        schemas = metadata.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+        schemas = metadata.get().getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
         Assert.assertEquals(1, schemas.size());
         XMPSchemaBibtex bib = (XMPSchemaBibtex) schemas.get(0);
 
