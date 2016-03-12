@@ -113,11 +113,11 @@ public class XMPUtil {
      *             than remove a lock or cancel the operation.
      */
     public static List<BibEntry> readXMP(File file) throws IOException {
-        List<BibEntry> res = Collections.EMPTY_LIST;
-        try (FileInputStream is = new FileInputStream(file)) {
-            res = XMPUtil.readXMP(is);
+        List<BibEntry> result = Collections.EMPTY_LIST;
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            result = XMPUtil.readXMP(inputStream);
         }
-        return res;
+        return result;
     }
 
     /**
@@ -550,8 +550,8 @@ public class XMPUtil {
      * @throws IOException
      */
     public static XMPMetadata readRawXMP(File file) throws IOException {
-        try (FileInputStream is = new FileInputStream(file)) {
-            return XMPUtil.readRawXMP(is);
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return XMPUtil.readRawXMP(inputStream);
         }
     }
 
@@ -1225,13 +1225,13 @@ public class XMPUtil {
 
             ParserResult result = BibtexParser.parse(new FileReader(args[1]));
 
-            BibEntry e = result.getDatabase().getEntryByKey(args[0]);
+            BibEntry bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
-            if (e == null) {
+            if (bibEntry == null) {
                 System.err.println("Could not find BibEntry " + args[0]
                         + " in " + args[0]);
             } else {
-                XMPUtil.writeXMP(new File(args[2]), e, result.getDatabase());
+                XMPUtil.writeXMP(new File(args[2]), bibEntry, result.getDatabase());
 
                 System.out.println("XMP written.");
             }
@@ -1243,11 +1243,11 @@ public class XMPUtil {
     }
 
     /**
-     * see XMPUtil.hasMetadata(InputStream is)
+     * see XMPUtil.hasMetadata(InputStream)
      */
-    public static boolean hasMetadata(Path p) {
-        try (InputStream is = Files.newInputStream(p, StandardOpenOption.READ)) {
-            return hasMetadata(is);
+    public static boolean hasMetadata(Path path) {
+        try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
+            return hasMetadata(inputStream);
         } catch (IOException e) {
             LOGGER.error("XMP reading failed", e);
             return false;
@@ -1261,14 +1261,14 @@ public class XMPUtil {
      * Caution: This method is as expensive as it is reading the actual metadata
      * itself from the PDF.
      *
-     * @param is
-     *            The inputstream to read the PDF from.
+     * @param inputsStream
+     *            The inputStream to read the PDF from.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(InputStream is) {
+    public static boolean hasMetadata(InputStream inputsStream) {
         try {
-            List<BibEntry> l = XMPUtil.readXMP(is);
-            return !l.isEmpty();
+            List<BibEntry> bibEntries = XMPUtil.readXMP(inputsStream);
+            return !bibEntries.isEmpty();
         } catch (EncryptionNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
