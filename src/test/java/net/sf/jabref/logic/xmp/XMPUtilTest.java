@@ -11,6 +11,9 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jempbox.xmp.*;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -24,6 +27,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+
 import javax.xml.transform.TransformerException;
 
 import java.io.*;
@@ -32,12 +38,10 @@ import java.util.*;
 
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
- *
- * @author Christopher Oezbek <oezi@oezi.de>
  */
 public class XMPUtilTest {
 
-    public static final String SRC_TEST_RESOURCES_ENCRYPTED_PDF = "src/test/resources/encrypted.pdf";
+    private static final Log LOGGER = LogFactory.getLog(XMPUtilTest.class);
 
     /**
      * The PDF file that basically all operations are done upon.
@@ -89,9 +93,10 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(tempFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                System.err.println("Error: Cannot add metadata to encrypted document.");
-                //System.exit(1);
+                LOGGER.error("Cannot add metadata to encrypted document.");
+                Assert.fail();
             }
+
             PDDocumentCatalog catalog = document.getDocumentCatalog();
 
             // Convert to UTF8 and make available for metadata.
@@ -122,7 +127,6 @@ public class XMPUtilTest {
         return sw.getBuffer().toString();
     }
 
-    /* TEST DATA */
     public String t1BibtexString() {
         return "@article{canh05,\n" + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
                 + "  title = {Effective work practices for floss development: A model and propositions},\n"
@@ -232,8 +236,7 @@ public class XMPUtilTest {
     @After
     public void tearDown() {
         if (!pdfFile.delete()) {
-            System.err
-                    .println("Note: Cannot delete temporary file (already deleted so the corresponding test passed).");
+            LOGGER.info("Note: Cannot delete temporary file (already deleted so the corresponding test passed).");
         }
 
         prefs.putBoolean("useXmpPrivacyFilter", use);
@@ -242,8 +245,6 @@ public class XMPUtilTest {
 
     /**
      * Most basic test for reading.
-     *
-     * @throws Exception
      */
     @Test
     public void testReadXMPSimple() throws Exception {
@@ -384,11 +385,9 @@ public class XMPUtilTest {
     }
 
     public static String readManually(File tempFile) throws IOException {
-
         try (PDDocument document = PDDocument.load(tempFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                System.err.println("Error: Cannot add metadata to encrypted document.");
-                //System.exit(1);
+                Assert.fail("Cannot add metadata to encrypted document.");
             }
             PDDocumentCatalog catalog = document.getDocumentCatalog();
             PDMetadata meta = catalog.getMetadata();
@@ -396,11 +395,10 @@ public class XMPUtilTest {
             if (meta == null) {
                 return null;
             } else {
-                // PDMetadata.getInputStreamAsString() does not work
-
-                // Convert to UTF8 and make available for metadata.
-                try (InputStreamReader is = new InputStreamReader(meta.createInputStream(), StandardCharsets.UTF_8)) {
-                    return XMPUtilTest.slurp(is).trim(); // Trim to kill padding end-newline.
+                try (InputStream is = meta.createInputStream();
+                        InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+                    // trim() for killing padding end-newline
+                    return CharStreams.toString(reader).trim();
                 }
             }
         }
@@ -878,8 +876,8 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                System.err.println("Error: Cannot add metadata to encrypted document.");
-                //System.exit(1);
+                LOGGER.error("Cannot add metadata to encrypted document.");
+                Assert.fail();
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation().getAuthor());
@@ -944,8 +942,8 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                System.err.println("Error: Cannot add metadata to encrypted document.");
-                //System.exit(1);
+                LOGGER.error("Cannot add metadata to encrypted document.");
+                Assert.fail();
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation().getAuthor());
@@ -1272,39 +1270,16 @@ public class XMPUtilTest {
                 AuthorList.getAuthorList(x.getField("author")));
     }
 
-    /**
-     * Test that we cannot use encrypted PDFs.
-     */
-    @Test
-    public void testEncryption() throws Exception {
-
-        // // PDF was created using:
-        //
-        // PDDocument pdf = null;
-        // try {
-        // pdf = new PDDocument();
-        // pdf.addPage(new PDPage()); // Need page to open in Acrobat
-        // pdf.encrypt("hello", "world");
-        // pdf.save("d:/download/encrypted.pdf");
-        // } finally {
-        // if (pdf != null)
-        // pdf.close();
-        // }
-        //
-
-        try {
-            XMPUtil.readXMP(XMPUtilTest.SRC_TEST_RESOURCES_ENCRYPTED_PDF);
-            Assert.fail();
-        } catch (EncryptionNotSupportedException ignored) {
-            // Ignored
+    @Test(expected = EncryptionNotSupportedException.class)
+    public void expectedEncryptionNotSupportedExceptionAtRead() throws IOException {
+        try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
+            XMPUtil.readXMP(is);
         }
+    }
 
-        try {
-            XMPUtil.writeXMP(XMPUtilTest.SRC_TEST_RESOURCES_ENCRYPTED_PDF, t1BibtexEntry(), null);
-            Assert.fail();
-        } catch (EncryptionNotSupportedException ignored) {
-            // Ignored
-        }
+    @Test(expected = EncryptionNotSupportedException.class)
+    public void expectedEncryptionNotSupportedExceptionAtWrite() throws IOException, TransformerException {
+        XMPUtil.writeXMP("src/test/resources/pdfs/encrypted.pdf", t1BibtexEntry(), null);
     }
 
     /**
@@ -1378,24 +1353,4 @@ public class XMPUtilTest {
         }
     }
 
-    /**
-     * Read the contents of a reader as one string
-     *
-     * @param reader
-     * @return
-     * @throws IOException
-     */
-    public static String slurp(Reader reader) throws IOException {
-        char[] chars = new char[4092];
-        StringBuilder totalBuffer = new StringBuilder();
-        int bytesRead;
-        while ((bytesRead = reader.read(chars)) != -1) {
-            if (bytesRead == 4092) {
-                totalBuffer.append(chars);
-            } else {
-                totalBuffer.append(new String(chars, 0, bytesRead));
-            }
-        }
-        return totalBuffer.toString();
-    }
 }
