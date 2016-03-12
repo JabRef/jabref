@@ -19,9 +19,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,7 +46,6 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
@@ -143,10 +142,9 @@ public class PdfImporter {
         List<BibEntry> res = new ArrayList<>();
 
         for (String fileName : fileNames) {
-            List<BibEntry> xmpEntriesInFile = readXmpEntries(fileName);
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!hasXmpEntries(xmpEntriesInFile)) {
+                if (!XMPUtil.hasMetadata(Paths.get(fileName))) {
                     importDialog.disableXMPChoice();
                 }
                 centerRelativeToWindow(importDialog, frame);
@@ -226,48 +224,30 @@ public class PdfImporter {
 
     private void doContentImport(String fileName, List<BibEntry> res, OutputPrinter status) {
         File file = new File(fileName);
-        InputStream in;
         BibEntry entry;
-        try {
-            in = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            // import failed -> generate default entry
-            LOGGER.info("Import failed", e);
-            entry = createNewBlankEntry(fileName);
-            res.add(entry);
-            return;
-        }
-        PdfContentImporter contentImporter = new PdfContentImporter();
-        List<BibEntry> localRes = null;
-        try {
+        try (InputStream in = new FileInputStream(file)) {
+            PdfContentImporter contentImporter = new PdfContentImporter();
+            List<BibEntry> localRes = null;
             localRes = contentImporter.importEntries(in, status);
+
+            if ((localRes == null) || localRes.isEmpty()) {
+                // import failed -> generate default entry
+                entry = createNewBlankEntry(fileName);
+                res.add(entry);
+                return;
+            }
+
+            // only one entry is imported
+            entry = localRes.get(0);
         } catch (IOException e) {
             // import failed -> generate default entry
             LOGGER.info("Import failed", e);
             entry = createNewBlankEntry(fileName);
             res.add(entry);
             return;
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ex) {
-                LOGGER.warn("Problem closing PDF", ex);
-                // Ignored
-            }
         }
-
-        // import failed -> generate default entry
-        if ((localRes == null) || localRes.isEmpty()) {
-            entry = createNewBlankEntry(fileName);
-            res.add(entry);
-            return;
-        }
-
-        // only one entry is imported
-        entry = localRes.get(0);
 
         // insert entry to database and link file
-
         panel.database().insertEntry(entry);
         panel.markBaseChanged();
         LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
@@ -280,12 +260,10 @@ public class PdfImporter {
             panel.adjustSplitter();
         }
         res.add(entry);
-
     }
 
     private BibEntry createNewEntry() {
-
-        // Find out what type is wanted.
+        // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
         PositionWindow.placeDialog(etd, frame);
@@ -316,47 +294,17 @@ public class PdfImporter {
                     panel.setMode(BasePanel.WILL_SHOW_EDITOR);
                 }
 
-                /*int row = entryTable.findEntry(be);
-                if (row >= 0)
-                    // Selects the entry. The selection listener will open the editor.
-                     if (row >= 0) {
-                        try{
-                            entryTable.setRowSelectionInterval(row, row);
-                        }catch(IllegalArgumentException e){
-                            System.out.println("RowCount: " + entryTable.getRowCount());
-                        }
-
-                        //entryTable.setActiveRow(row);
-                        entryTable.ensureVisible(row);
-                     }
-                else {
-                    // The entry is not visible in the table, perhaps due to a filtering search
-                    // or group selection. Show the entry editor anyway:
-                    panel.showEntry(be);
-                }   */
                 panel.showEntry(be);
-                panel.markBaseChanged(); // The database just changed.
-                new FocusRequester(panel.getEntryEditor(be));
+
+                // The database just changed.
+                panel.markBaseChanged();
+
                 return be;
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Key collision occurred", ex);
             }
         }
         return null;
-    }
-
-    private static List<BibEntry> readXmpEntries(String fileName) {
-        List<BibEntry> xmpEntriesInFile = null;
-        try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName);
-        } catch (IOException e) {
-            LOGGER.error("XMPUtil.readXMP failed", e);
-        }
-        return xmpEntriesInFile;
-    }
-
-    private static boolean hasXmpEntries(List<BibEntry> xmpEntriesInFile) {
-        return !((xmpEntriesInFile == null) || xmpEntriesInFile.isEmpty());
     }
 
     public MainTable getEntryTable() {

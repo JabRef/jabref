@@ -104,7 +104,7 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(String type) {
-        if(type == null) {
+        if (type == null) {
             type = DEFAULT_TYPE;
         }
 
@@ -120,7 +120,6 @@ public class BibEntry {
         } catch (PropertyVetoException pve) {
             LOGGER.warn(pve);
         }
-
     }
 
     /**
