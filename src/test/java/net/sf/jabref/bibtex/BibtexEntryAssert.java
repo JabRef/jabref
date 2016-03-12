@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.Assert;
 
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fetcher.GVKParser;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CanonicalBibtexEntry;
@@ -26,7 +25,7 @@ public class BibtexEntryAssert {
      * @param resourceName the resource to read
      * @param entry the entry to compare with
      */
-    public static void assertEquals(Class<GVKParser> clazz, String resourceName, BibEntry entry)
+    public static void assertEquals(Class<? extends Object> clazz, String resourceName, BibEntry entry)
             throws IOException {
         Assert.assertNotNull(clazz);
         Assert.assertNotNull(resourceName);
