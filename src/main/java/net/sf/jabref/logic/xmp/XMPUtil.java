@@ -143,12 +143,11 @@ public class XMPUtil {
                 throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
             }
 
-            XMPMetadata meta = XMPUtil.getXMPMetadata(document);
+            Optional<XMPMetadata> meta = XMPUtil.getXMPMetadata(document);
 
-            // If we did not find any XMP metadata, search for non XMP metadata
-            if (meta != null) {
+            if (meta.isPresent()) {
 
-                List<XMPSchema> schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
+                List<XMPSchema> schemas = meta.get().getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
 
                 for (XMPSchema schema : schemas) {
                     XMPSchemaBibtex bib = (XMPSchemaBibtex) schema;
@@ -162,7 +161,7 @@ public class XMPUtil {
 
                 // If we did not find anything have a look if a Dublin Core exists
                 if (result.isEmpty()) {
-                    schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
+                    schemas = meta.get().getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
@@ -178,6 +177,7 @@ public class XMPUtil {
                 }
             }
             if (result.isEmpty()) {
+                // If we did not find any XMP metadata, search for non XMP metadata
                 PDDocumentInformation documentInformation = document.getDocumentInformation();
                 Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDocumentInformation(documentInformation);
                 if (entry.isPresent()) {
@@ -248,7 +248,7 @@ public class XMPUtil {
             }
         }
 
-        // Return null if no values were found
+        // Return empty Optional if no values were found
         return entry.getFieldNames().isEmpty() ? Optional.empty() : Optional.of(entry);
     }
 
@@ -504,11 +504,9 @@ public class XMPUtil {
      * @param inputStream
      *            The inputStream representing a PDF-file to read the
      *            XMPMetadata from.
-     * @return The XMPMetadata object found in the file or null if none is
-     *         found.
-     * @throws IOException
+     * @return The XMPMetadata object found in the file
      */
-    private static XMPMetadata readRawXMP(InputStream inputStream) throws IOException {
+    private static Optional<XMPMetadata> readRawXMP(InputStream inputStream) throws IOException {
         try (PDDocument document = PDDocument.load(inputStream)) {
             if (document.isEncrypted()) {
                 throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
@@ -520,14 +518,14 @@ public class XMPUtil {
     }
 
     /**
-     * @return null if no metadata has been found
+     * @return empty Optional if no metadata has been found
      */
-    private static XMPMetadata getXMPMetadata(PDDocument document) throws IOException {
+    private static Optional<XMPMetadata> getXMPMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
         PDMetadata metaRaw = catalog.getMetadata();
 
         if (metaRaw == null) {
-            return null;
+            return Optional.empty();
         }
 
         Document parseResult;
@@ -536,7 +534,7 @@ public class XMPUtil {
         }
         XMPMetadata meta = new XMPMetadata(parseResult);
         meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
-        return meta;
+        return Optional.of(meta);
     }
 
     /**
@@ -545,11 +543,9 @@ public class XMPUtil {
      *
      * @param file
      *            The file to read the XMPMetadata from.
-     * @return The XMPMetadata object found in the file or null if none is
-     *         found.
-     * @throws IOException
+     * @return The XMPMetadata object found in the file
      */
-    public static XMPMetadata readRawXMP(File file) throws IOException {
+    public static Optional<XMPMetadata> readRawXMP(File file) throws IOException {
         try (FileInputStream inputStream = new FileInputStream(file)) {
             return XMPUtil.readRawXMP(inputStream);
         }
@@ -1186,13 +1182,13 @@ public class XMPUtil {
         case 2:
             if ("-x".equals(args[0]) && args[1].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                XMPMetadata meta = XMPUtil.readRawXMP(new File(args[1]));
+                Optional<XMPMetadata> meta = XMPUtil.readRawXMP(new File(args[1]));
 
-                if (meta == null) {
+                if (meta.isPresent()) {
+                    XMLUtil.save(meta.get().getXMPDocument(), System.out, StandardCharsets.UTF_8.name());
+                } else {
                     System.err
                     .println("The given pdf does not contain any XMP-metadata.");
-                } else {
-                    XMLUtil.save(meta.getXMPDocument(), System.out, StandardCharsets.UTF_8.name());
                 }
                 break;
             }
