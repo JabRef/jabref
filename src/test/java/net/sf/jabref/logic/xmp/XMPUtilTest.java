@@ -93,8 +93,7 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(tempFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                LOGGER.error("Cannot add metadata to encrypted document.");
-                Assert.fail();
+                Assert.fail("Cannot add metadata to encrypted document.");
             }
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -876,8 +875,7 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                LOGGER.error("Cannot add metadata to encrypted document.");
-                Assert.fail();
+                Assert.fail("Cannot add metadata to encrypted document.");
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation().getAuthor());
@@ -942,8 +940,7 @@ public class XMPUtilTest {
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                LOGGER.error("Cannot add metadata to encrypted document.");
-                Assert.fail();
+                Assert.fail("Cannot add metadata to encrypted document.");
             }
 
             Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", document.getDocumentInformation().getAuthor());
