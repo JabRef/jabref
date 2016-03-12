@@ -207,6 +207,9 @@ public class XMPUtilTest {
 
         pdfFile = File.createTempFile("JabRef", ".pdf");
 
+        // ensure that the file will be deleted upon exit
+        pdfFile.deleteOnExit();
+
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
             pdf.save(pdfFile.getAbsolutePath());
@@ -220,25 +223,16 @@ public class XMPUtilTest {
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
 
-        use = prefs.getBoolean("useXmpPrivacyFilter");
+        use = prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
         privacyFilters = prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
 
         // The code assumes privacy filters to be off
         prefs.putBoolean("useXmpPrivacyFilter", false);
     }
 
-
-
-    /**
-     * Delete the temporary file.
-     */
     @After
     public void tearDown() {
-        if (!pdfFile.delete()) {
-            LOGGER.info("Note: Cannot delete temporary file (already deleted so the corresponding test passed).");
-        }
-
-        prefs.putBoolean("useXmpPrivacyFilter", use);
+        prefs.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, use);
         prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
     }
 
