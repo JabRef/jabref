@@ -463,7 +463,7 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
 
             // write version first
-            serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION));
+            serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
 
             // now write actual groups
             StringBuilder stringBuilder = new StringBuilder();

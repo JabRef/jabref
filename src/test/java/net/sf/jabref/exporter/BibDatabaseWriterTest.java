@@ -179,13 +179,13 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         // @formatter:off
-        Assert.assertEquals(Globals.NEWLINE +
-                "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE
-                + Globals.NEWLINE
+        Assert.assertEquals(Globals.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE
+                + Globals.NEWLINE
+                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
@@ -202,13 +202,13 @@ public class BibDatabaseWriterTest {
         // @formatter:off
         Assert.assertEquals(
                 "% Encoding: US-ASCII" + Globals.NEWLINE +
-                Globals.NEWLINE +
-                "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE
-                + Globals.NEWLINE
+                Globals.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE
+                + Globals.NEWLINE
+                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
