@@ -98,7 +98,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             return true;
         } catch (IOException e) {
             LOGGER.warn("Error fetching from Google Scholar", e);
-            status.showMessage(Localization.lang("Error fetching from Google Scholar"));
+            status.showMessage(Localization.lang("Error while fetching from %0", "Google Scholar"));
             return false;
         }
     }
