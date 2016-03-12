@@ -1428,7 +1428,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestFileDirectory() throws IOException {
+    public void integrationTestFileDirectories() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" +
                 "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));

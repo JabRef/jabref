@@ -2,6 +2,8 @@ package net.sf.jabref.exporter;
 
 import com.google.common.base.Charsets;
 import net.sf.jabref.*;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.*;
@@ -13,85 +15,86 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
 public class BibDatabaseWriterTest {
 
+    private BibDatabaseWriter databaseWriter;
+    private StringWriter stringWriter;
+    private BibDatabase database;
+    private MetaData metaData;
+    private BibDatabaseContext bibtexContext;
+
     @BeforeClass
-    public static void setUp() {
+    public static void setUpClass() {
         Globals.prefs = JabRefPreferences.getInstance();
+    }
+
+    @Before
+    public void setUp() {
+        databaseWriter = new BibDatabaseWriter();
+        stringWriter = new StringWriter();
+        database = new BibDatabase();
+        metaData = new MetaData();
+        bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
     }
 
     @Test(expected = NullPointerException.class)
     public void writeWithNullWriterThrowsException() throws IOException {
-        BibDatabaseWriter writer = new BibDatabaseWriter();
-        writer.writePartOfDatabase(null, new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX)),
-                Collections.emptyList(), mock(SavePreferences.class));
+        databaseWriter.writePartOfDatabase(null, bibtexContext, Collections.emptyList(), mock(SavePreferences.class));
     }
 
     @Test(expected = NullPointerException.class)
     public void writeWithNullContextThrowsException() throws IOException {
-        BibDatabaseWriter writer = new BibDatabaseWriter();
-        writer.writePartOfDatabase(mock(Writer.class), null, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(mock(Writer.class), null, Collections.emptyList(), new SavePreferences());
     }
 
     @Test(expected = NullPointerException.class)
     public void writeWithNullEntriesThrowsException() throws IOException {
-        BibDatabaseWriter writer = new BibDatabaseWriter();
-        writer.writePartOfDatabase(mock(Writer.class), new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX)),
-                null, new SavePreferences());
+        databaseWriter.writePartOfDatabase(mock(Writer.class), bibtexContext, null, new SavePreferences());
     }
 
     @Test(expected = NullPointerException.class)
     public void writeWithNullPreferencesThrowsException() throws IOException {
-        BibDatabaseWriter writer = new BibDatabaseWriter();
-        writer.writePartOfDatabase(mock(Writer.class), new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX)),
-                Collections.emptyList(), null);
+        databaseWriter.writePartOfDatabase(mock(Writer.class), bibtexContext, Collections.emptyList(), null);
     }
 
     @Test
     public void writeEncoding() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX)),
-                Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
     public void writePreamble() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        BibDatabase database = new BibDatabase();
         database.setPreamble("Test preamble");
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE + "@Preamble{Test preamble}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
     public void writePreambleAndEncoding() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        BibDatabase database = new BibDatabase();
         database.setPreamble("Test preamble");
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Preamble{Test preamble}" + Globals.NEWLINE, stringWriter.toString());
@@ -99,15 +102,11 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEntry() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry),
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE +
@@ -116,16 +115,12 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEncodingAndEntry() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE, stringWriter.toString());
@@ -133,27 +128,19 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEpilogue() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        BibDatabase database = new BibDatabase();
         database.setEpilog("Test epilog");
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE + "Test epilog" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
     public void writeEpilogueAndEncoding() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        BibDatabase database = new BibDatabase();
         database.setEpilog("Test epilog");
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "Test epilog" + Globals.NEWLINE, stringWriter.toString());
@@ -161,15 +148,11 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeMetadata() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        MetaData metaData = new MetaData();
         DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE, stringWriter.toString());
     }
@@ -177,15 +160,11 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeMetadataAndEncoding() throws IOException {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        MetaData metaData = new MetaData();
         DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE, stringWriter.toString());
@@ -193,15 +172,11 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeGroups() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        MetaData metaData = new MetaData();
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
         groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         // @formatter:off
         Assert.assertEquals(Globals.NEWLINE +
@@ -217,15 +192,12 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeGroupsAndEncoding() throws IOException {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        MetaData metaData = new MetaData();
+
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
         groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         // @formatter:off
         Assert.assertEquals(
@@ -242,27 +214,19 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeString() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        BibDatabase database = new BibDatabase();
         database.addString(new BibtexString("id", "name", "content"));
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
     public void writeStringAndEncoding() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        BibDatabase database = new BibDatabase();
         database.addString(new BibtexString("id", "name", "content"));
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
@@ -270,16 +234,12 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
         BibEntry entry = new BibEntry();
         entry.setType("customizedType");
-        BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry),
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
         Assert.assertEquals(Globals.NEWLINE +
@@ -294,11 +254,10 @@ public class BibDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
 
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
-        StringWriter stringWriter = new StringWriter();
+
         databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
         try (Scanner scanner = new Scanner(testBibtexFile)) {
             Assert.assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
@@ -307,18 +266,14 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("presaved serialization");
         entry.setChanged(false);
-        BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry),
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
         Assert.assertEquals("presaved serialization", stringWriter.toString());
@@ -326,19 +281,15 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void reformatEntryIfAskedToDoSo() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("wrong serialization");
         entry.setChanged(false);
-        BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.singletonList(entry), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         Assert.assertEquals(Globals.NEWLINE +
                         "@Article{," + Globals.NEWLINE + "  author = {Mr. author}" + Globals.NEWLINE + "}" + Globals.NEWLINE,
@@ -347,34 +298,106 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeSavedSerializationOfStringIfUnchanged() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString("id", "name", "content");
         string.setParsedSerialization("serialization");
         database.addString(string);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         Assert.assertEquals("serialization", stringWriter.toString());
     }
 
     @Test
     public void reformatStringIfAskedToDoSo() throws IOException {
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString("id", "name", "content");
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
-        BibDatabaseContext context = new BibDatabaseContext(database, new Defaults(BibDatabaseMode.BIBTEX));
 
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
-
-        StringWriter stringWriter = new StringWriter();
-        databaseWriter.writePartOfDatabase(stringWriter, context, Collections.emptyList(), preferences);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         Assert.assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
 
+    }
+
+    @Test
+    public void writeSaveActions() throws Exception {
+        SaveActions saveActions = new SaveActions(true, "title[LowerCaseChanger]");
+        metaData.setSaveActions(saveActions);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + Globals.NEWLINE
+                + "title[LowerCaseChanger]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    public void writeSaveOrderConfig() throws Exception {
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+                new SaveOrderConfig.SortCriterion("year", true),
+                new SaveOrderConfig.SortCriterion("abstract", false));
+        metaData.setSaveOrderConfig(saveOrderConfig);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE
+                + "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"
+                + Globals.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    public void writeCustomKeyPattern() throws Exception {
+        AbstractLabelPattern pattern = new DatabaseLabelPattern();
+        pattern.setDefaultValue("test");
+        pattern.addLabelPattern("article", "articleTest");
+        metaData.setLabelPattern(pattern);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypattern_article:articleTest;}" + Globals.NEWLINE
+                        + Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    public void writeBiblatexMode() throws Exception {
+        metaData.setMode(BibDatabaseMode.BIBLATEX);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: DATABASE_TYPE:BibLaTeX;}" + Globals.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    public void writeProtectedFlag() throws Exception {
+        metaData.markAsProtected();
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: protectedFlag:true;}" + Globals.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    public void writeContentSelectors() throws Exception {
+        metaData.setContentSelectors("title", Arrays.asList("testWord", "word2"));
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: selector_title:testWord;word2;}" + Globals.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
+    public void writeFileDirectories() throws Exception {
+        metaData.setDefaultFileDirectory("\\Literature\\");
+        metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
+
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + Globals.NEWLINE +
+                Globals.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
+                + Globals.NEWLINE, stringWriter.toString());
     }
 }
