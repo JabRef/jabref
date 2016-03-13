@@ -1059,21 +1059,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, (BaseAction) () -> {
-            boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY);
-            Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, enabled);
-            if (enabled) {
-                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, false);
-            }
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToAny();
             // ping the listener so it updates:
             groupsHighlightListener.listChanged(null);
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL, (BaseAction) () -> {
-            boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL);
-            Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL, enabled);
-            if (enabled) {
-                Globals.prefs.putBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY, false);
-            }
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToAll();
+            // ping the listener so it updates:
+            groupsHighlightListener.listChanged(null);
+        });
+
+        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE, (BaseAction) () -> {
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToDisabled();
             // ping the listener so it updates:
             groupsHighlightListener.listChanged(null);
         });
@@ -1440,9 +1438,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void listChanged(ListEvent<BibEntry> listEvent) {
-                if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ANY)) {
+                HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(Globals.prefs);
+                if(highlightMatchingGroupPreferences.isAny()) {
                     getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), false);
-                } else if (Globals.prefs.getBoolean(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING_ALL)) {
+                } else if (highlightMatchingGroupPreferences.isAll()) {
                     getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), true);
                 } else {
                     // no highlight
