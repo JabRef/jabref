@@ -106,17 +106,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         private final BasePanel basePanel;
         private final boolean raisePanel;
-        private final File file;
 
-        OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
+        OpenItSwingHelper(BasePanel basePanel, boolean raisePanel) {
             this.basePanel = basePanel;
             this.raisePanel = raisePanel;
-            this.file = file;
         }
 
         @Override
         public void run() {
-            frame.addTab(basePanel, file, raisePanel);
+            frame.addTab(basePanel, raisePanel);
 
         }
     }
@@ -342,7 +340,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
+        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
                 + database.getEntryCount() + " " + Localization.lang("entries") + ".");
