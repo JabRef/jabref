@@ -36,9 +36,9 @@ public class PdfXmpImporterTest {
 
     @Test
     public void importEncryptedFileThrowsException() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("src/test/resources/encrypted.pdf")) {
+        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
             thrown.expect(IOException.class);
-            thrown.expectMessage("Stream closed");
+            thrown.expectMessage("Error: Cannot read metadata from encrypted document.");
             importer.importEntries(is, new OutputPrinterToNull());
         }
     }
