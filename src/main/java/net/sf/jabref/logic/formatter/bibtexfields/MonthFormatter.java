@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.MonthUtil;
 
 import java.util.Objects;
@@ -26,5 +27,10 @@ public class MonthFormatter implements Formatter {
         } else {
             return value;
         }
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Normalizes content of %s to the format #mon#.");
     }
 }

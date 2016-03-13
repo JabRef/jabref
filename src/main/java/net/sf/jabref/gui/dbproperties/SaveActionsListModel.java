@@ -1,5 +1,8 @@
 package net.sf.jabref.gui.dbproperties;
 
+import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -7,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldFormatterCleanup> {
+class SaveActionsListModel implements ListModel<FieldFormatterCleanup> {
 
     private List<FieldFormatterCleanup> saveActions;
 
@@ -64,5 +67,12 @@ class SaveActionsListModel<FieldFormatterCleanup> implements ListModel<FieldForm
     @Override
     public void removeListDataListener(ListDataListener l) {
         listeners.remove(l);
+    }
+
+    public void reset(FieldFormatterCleanups defaultFormatters) {
+        saveActions = new ArrayList<>(defaultFormatters.getConfiguredActions());
+        for (ListDataListener listener : listeners) {
+            listener.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, saveActions.size()));
+        }
     }
 }

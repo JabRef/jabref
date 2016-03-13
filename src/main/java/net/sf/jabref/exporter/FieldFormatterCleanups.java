@@ -12,36 +12,32 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.*;
 
-public class SaveActions {
+public class FieldFormatterCleanups {
 
     private final List<FieldFormatterCleanup> actions;
 
-    private List<Formatter> availableFormatters;
-
-    public static final String META_KEY = "saveActions";
+    private static List<Formatter> availableFormatters;
 
     private boolean enabled;
 
-    public static final SaveActions DEFAULT_ACTIONS;
+    public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
 
     static {
+        availableFormatters = new ArrayList<>();
+        availableFormatters.addAll(BibtexFieldFormatters.ALL);
+        availableFormatters.addAll(CaseChangers.ALL);
+
         String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
-        DEFAULT_ACTIONS = new SaveActions(false, defaultFormatterString);
+        DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
     }
 
-    public SaveActions(boolean enabled, String formatterString) {
+    public FieldFormatterCleanups(boolean enabled, String formatterString) {
+        this(enabled, parse(formatterString));
+    }
 
-        actions = new ArrayList<>();
-        setAvailableFormatters();
+    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
-
-        if ((formatterString == null) || "".equals(formatterString)) {
-            // no save actions defined in the meta data
-            return;
-        } else {
-            parseSaveActions(formatterString);
-        }
-
+        this.actions = Objects.requireNonNull(actions);
     }
 
     public boolean isEnabled() {
@@ -65,7 +61,7 @@ public class SaveActions {
             return false;
         }
 
-        SaveActions that = (SaveActions) o;
+        FieldFormatterCleanups that = (FieldFormatterCleanups) o;
 
         if (enabled != that.enabled) {
             return false;
@@ -79,7 +75,15 @@ public class SaveActions {
         return Objects.hash(actions, enabled);
     }
 
-    private void parseSaveActions(String formatterString) {
+    private static List<FieldFormatterCleanup> parse(String formatterString) {
+
+        if ((formatterString == null) || formatterString.isEmpty()) {
+            // no save actions defined in the meta data
+            return new ArrayList<>();
+        }
+
+        List<FieldFormatterCleanup> actions = new ArrayList<>();
+
         //read concrete actions
         int startIndex = 0;
 
@@ -121,15 +125,9 @@ public class SaveActions {
         } catch (StringIndexOutOfBoundsException ignore) {
             // if this exception occurs, the remaining part of the save actions string is invalid.
             // Thus we stop parsing and take what we have parsed until now
-            return;
+            return actions;
         }
-    }
-
-    private void setAvailableFormatters() {
-        availableFormatters = new ArrayList<>();
-
-        availableFormatters.addAll(BibtexFieldFormatters.ALL);
-        availableFormatters.addAll(CaseChangers.ALL);
+        return actions;
     }
 
     public List<FieldChange> applySaveActions(BibEntry entry) {
@@ -150,7 +148,7 @@ public class SaveActions {
         return result;
     }
 
-    private Formatter getFormatterFromString(String formatterName) {
+    private static Formatter getFormatterFromString(String formatterName) {
         for (Formatter formatter : availableFormatters) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
@@ -159,7 +157,7 @@ public class SaveActions {
         return new IdentityFormatter();
     }
 
-    public static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
+    private static String getMetaDataString(List<FieldFormatterCleanup> actionList) {
         //first, group all formatters by the field for which they apply
         Map<String, List<String>> groupedByField = new HashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
@@ -190,5 +188,30 @@ public class SaveActions {
         return result.toString();
     }
 
+    public List<String> convertToString() {
+        List<String> stringRepresentation = new ArrayList<>();
 
+        if (enabled) {
+            stringRepresentation.add("enabled");
+        } else {
+            stringRepresentation.add("disabled");
+        }
+
+        String formatterString = FieldFormatterCleanups.getMetaDataString(actions);
+        stringRepresentation.add(formatterString);
+        return stringRepresentation;
+    }
+
+    public static FieldFormatterCleanups parseFromString(List<String> formatterMetaList) {
+
+        if (formatterMetaList != null && formatterMetaList.size() >= 2) {
+            boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));
+            String formatterString = formatterMetaList.get(1);
+            return new FieldFormatterCleanups(enablementStatus, formatterString);
+        } else {
+            // return default actions
+            return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS;
+        }
+
+    }
 }

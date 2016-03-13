@@ -5,26 +5,26 @@ import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 
-public class TrimFormatter implements Formatter {
+public class EraseFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Trim whitespace";
+        return "Erase all";
     }
 
     @Override
     public String getKey() {
-        return "TrimFormatter";
+        return "EraseFormatter";
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-        return value.trim();
+    public String format(String oldString) {
+        Objects.requireNonNull(oldString);
+        return "";
     }
 
     @Override
     public String getDescription() {
-        return Localization.lang("Removes any leading and trailing whitespace in %s.");
+        return Localization.lang("Completely erases %s.");
     }
 }

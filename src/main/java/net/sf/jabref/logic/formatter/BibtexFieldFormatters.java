@@ -16,8 +16,9 @@ public class BibtexFieldFormatters {
     public static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
     public static final HTMLToLatexFormatter HTML_TO_LATEX = new HTMLToLatexFormatter();
     public static final UnicodeToLatexFormatter UNICODE_TO_LATEX = new UnicodeToLatexFormatter();
+    public static final EraseFormatter ERASE = new EraseFormatter();
 
     public static final List<Formatter> ALL = Arrays.asList(PAGE_NUMBERS, SUPERSCRIPTS, DATE, AUTHORS_FORMATTER,
             LATEX_FORMATTER, MONTH_FORMATTER, UNIT_FORMATTER, TRIM_FORMATTER, REMOVE_BRACES_FORMATTER, HTML_TO_LATEX,
-            UNICODE_TO_LATEX);
+            UNICODE_TO_LATEX, ERASE);
 }

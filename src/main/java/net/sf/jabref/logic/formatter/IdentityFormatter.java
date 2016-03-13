@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.formatter;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.util.Objects;
 
 /**
@@ -21,5 +23,10 @@ public class IdentityFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
         return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Does nothing.");
     }
 }

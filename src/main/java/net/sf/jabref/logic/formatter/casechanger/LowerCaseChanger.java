@@ -40,4 +40,10 @@ public class LowerCaseChanger implements Formatter {
             return false;
         }
     }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang(
+                "Converts all characters in %s to lower case, but does not change words starting with \"{\"");
+    }
 }
