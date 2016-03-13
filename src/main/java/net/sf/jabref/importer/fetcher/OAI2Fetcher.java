@@ -221,7 +221,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url) + "\n\n"
+                    Localization.lang("Error while fetching from %0", "OAI2 source (" + url + "):") + "\n\n"
                             + e.getMessage() + "\n\n" + Localization
                                     .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -275,7 +275,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     }
                 }
 
-                status.setStatus(Localization.lang("Processing") + " " + key);
+                status.setStatus(Localization.lang("Processing %0", key));
 
                 /* the cancel button has been hit */
                 if (!shouldContinue) {
