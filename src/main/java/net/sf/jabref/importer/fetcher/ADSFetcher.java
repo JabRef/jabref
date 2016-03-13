@@ -95,7 +95,7 @@ public class ADSFetcher implements EntryFetcher {
                 return false;
             }
         } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
+            status.setStatus(Localization.lang("Error while fetching from %0", "ADS") + ": " + e.getMessage());
             LOGGER.warn("Error while fetching from ADS", e);
         }
         return true;

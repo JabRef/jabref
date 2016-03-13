@@ -149,13 +149,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (hits == 0) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         terms),
-                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             } else if (hits > 20) {
                 status.showMessage(
                         Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                                 String.valueOf(hits), String.valueOf(PER_PAGE)),
-                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
             }
 
             hits = getNumberOfHits(page, PAGE_RANGE_PATTERN, ACMPortalFetcher.MAX_HITS_PATTERN);
@@ -170,11 +170,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             LOGGER.warn("Problem with ACM fetcher URL", e);
         } catch (ConnectException e) {
             status.showMessage(Localization.lang("Connection to ACM Portal failed"),
-                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM connection", e);
         } catch (IOException e) {
             status.showMessage(e.getMessage(),
-                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM Portal", e);
         }
         return false;
