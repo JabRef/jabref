@@ -102,7 +102,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         deleteButton.addActionListener(new DeleteButtonListener());
         builder.add(deleteButton).xy(3, 9);
 
-        resetButton = new JButton("Reset");
+        resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((SaveActionsListModel) actionsList.getModel()).reset(defaultFormatters));
         builder.add(resetButton).xy(5, 9);
 
@@ -119,7 +119,15 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         if(formatterCleanup != null) {
             descriptionText.setText(DESCRIPTION + formatterCleanup.getDescription());
         } else {
-            descriptionText.setText(DESCRIPTION);
+            Formatter selectedFormatter = getFieldFormatter();
+            if(selectedFormatter != null) {
+                // Create dummy FieldFormatterCleanup just for displaying the description
+                FieldFormatterCleanup displayFormatterCleanup = new FieldFormatterCleanup(
+                        Localization.lang("the given field"), selectedFormatter);
+                descriptionText.setText(DESCRIPTION + displayFormatterCleanup.getDescription());
+            } else {
+                descriptionText.setText(DESCRIPTION);
+            }
         }
     }
 
@@ -215,14 +223,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
-        Formatter selectedFormatter = null;
-        String selectedFormatterKey = formatters.getSelectedItem().toString();
-        for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
-            if (formatter.getKey().equals(selectedFormatterKey)) {
-                selectedFormatter = formatter;
-                break;
-            }
-        }
+        Formatter selectedFormatter = getFieldFormatter();
 
         String fieldKey = keyField.getText();
         if ((fieldKey == null) || fieldKey.isEmpty()) {
@@ -231,6 +232,18 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         FieldFormatterCleanup newAction = new FieldFormatterCleanup(fieldKey, selectedFormatter);
         return newAction;
+    }
+
+    private Formatter getFieldFormatter() {
+        Formatter selectedFormatter = null;
+        String selectedFormatterKey = formatters.getSelectedItem().toString();
+        for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
+            if (formatter.getKey().equals(selectedFormatterKey)) {
+                selectedFormatter = formatter;
+                break;
+            }
+        }
+        return selectedFormatter;
     }
 
     class DeleteButtonListener implements ActionListener {
