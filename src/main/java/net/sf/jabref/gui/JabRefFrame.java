@@ -1274,10 +1274,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         highlightButtonGroup.add(toggleHighlightAnyItem);
         highlightButtonGroup.add(toggleHighlightAllItem);
 
-        String toggleHighlightStatus = Globals.prefs.get(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING);
-        if("all".equals(toggleHighlightStatus)) {
+        HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(Globals.prefs);
+        if(highlightMatchingGroupPreferences.isAll()) {
             toggleHighlightAllItem.setSelected(true);
-        } else if("any".equals(toggleHighlightStatus)) {
+        } else if(highlightMatchingGroupPreferences.isAny()) {
             toggleHighlightAnyItem.setSelected(true);
         } else {
             toggleHighlightDisableItem.setSelected(true);

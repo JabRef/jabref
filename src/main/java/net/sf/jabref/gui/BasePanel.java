@@ -1053,19 +1053,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, (BaseAction) () -> {
-            Globals.prefs.put(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING, "any");
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToAny();
             // ping the listener so it updates:
             groupsHighlightListener.listChanged(null);
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL, (BaseAction) () -> {
-            Globals.prefs.put(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING, "all");
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToAll();
             // ping the listener so it updates:
             groupsHighlightListener.listChanged(null);
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE, (BaseAction) () -> {
-            Globals.prefs.put(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING, "");
+            new HighlightMatchingGroupPreferences(Globals.prefs).setToDisabled();
             // ping the listener so it updates:
             groupsHighlightListener.listChanged(null);
         });
@@ -1432,10 +1432,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             @Override
             public void listChanged(ListEvent<BibEntry> listEvent) {
-                String highlightGroupsMatchingOption = Globals.prefs.get(JabRefPreferences.HIGHLIGHT_GROUPS_MATCHING);
-                if ("any".equals(highlightGroupsMatchingOption)) {
+                HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(Globals.prefs);
+                if(highlightMatchingGroupPreferences.isAny()) {
                     getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), false);
-                } else if ("all".equals(highlightGroupsMatchingOption)) {
+                } else if (highlightMatchingGroupPreferences.isAll()) {
                     getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), true);
                 } else {
                     // no highlight
