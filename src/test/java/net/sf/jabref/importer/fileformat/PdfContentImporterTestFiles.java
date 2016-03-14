@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,8 +46,7 @@ public class PdfContentImporterTestFiles {
         PdfContentImporter importer = new PdfContentImporter();
         try (InputStream is = PdfContentImporter.class.getResourceAsStream(pdfFileName)) {
             List<BibEntry> result = importer.importEntries(is, null);
-            Assert.assertEquals(1, result.size());
-            BibtexEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result.get(0));
+            BibtexEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
         }
     }
 

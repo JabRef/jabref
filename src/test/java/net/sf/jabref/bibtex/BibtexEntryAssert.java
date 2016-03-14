@@ -33,22 +33,54 @@ public class BibtexEntryAssert {
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
             BibtexEntryAssert.assertEquals(shouldBeIs, entry);
         }
+    }
 
+    /**
+     * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
+     * contain a single entry
+     *
+     * @param clazz the class where to call `getResourceAsStream`
+     * @param resourceName the resource to read
+     * @param asIsEntries a list containing a single entry to compare with
+     */
+    public static void assertEquals(Class<? extends Object> clazz, String resourceName, List<BibEntry> asIsEntries)
+            throws IOException {
+        Assert.assertNotNull(clazz);
+        Assert.assertNotNull(resourceName);
+        Assert.assertNotNull(asIsEntries);
+        try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
+            BibtexEntryAssert.assertEquals(shouldBeIs, asIsEntries);
+        }
+    }
+
+    /**
+     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry.
+     * This entry is compared to the given entry. The given entry is contained in a list to ease using of the compare method
+     *
+     * @param shouldBeInputStream the inputStream reading the entry from
+     * @param asIsEntries a list containing a single entry to compare with
+     */
+    public static void assertEquals(InputStream shouldBeInputStream, List<BibEntry> asIsEntries)
+            throws UnsupportedEncodingException, IOException {
+        Assert.assertNotNull(shouldBeInputStream);
+        Assert.assertNotNull(asIsEntries);
+        Assert.assertEquals(1, asIsEntries.size());
+        assertEquals(shouldBeInputStream, asIsEntries.get(0));
     }
 
     /**
      * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
      * compared to the given entry
      *
-     * @param shouldBeIs the inputStream reading the entry from
+     * @param shouldBeInputStream the inputStream reading the entry from
      * @param entry the entry to compare with
      */
-    public static void assertEquals(InputStream shouldBeIs, BibEntry entry)
+    public static void assertEquals(InputStream shouldBeInputStream, BibEntry entry)
             throws UnsupportedEncodingException, IOException {
-        Assert.assertNotNull(shouldBeIs);
+        Assert.assertNotNull(shouldBeInputStream);
         Assert.assertNotNull(entry);
         ParserResult result;
-        try (Reader reader = new InputStreamReader(shouldBeIs, StandardCharsets.UTF_8)) {
+        try (Reader reader = new InputStreamReader(shouldBeInputStream, StandardCharsets.UTF_8)) {
             BibtexParser parser = new BibtexParser(reader);
             result = parser.parse();
         }
