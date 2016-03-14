@@ -18,8 +18,6 @@ package net.sf.jabref.logic.search.rules;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.model.entry.BibEntry;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -47,11 +45,9 @@ public class RegexBasedSearchRule implements SearchRule {
         if (!caseSensitive) {
             searchString = searchString.toLowerCase();
         }
-        List<String> words = new SentenceAnalyzer(searchString).getWords();
+
         try {
-            for (String word : words) {
-                Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
-            }
+            Pattern.compile(searchString, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
@@ -60,53 +56,26 @@ public class RegexBasedSearchRule implements SearchRule {
 
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
+        Pattern pattern;
 
-        String searchString = query;
-        if (!caseSensitive) {
-            searchString = searchString.toLowerCase();
-        }
-
-        List<String> words = new SentenceAnalyzer(searchString).getWords();
-
-        List<Pattern> patterns = new ArrayList<>();
         try {
-            for (String word : words) {
-                patterns.add(Pattern.compile(word, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE));
-            }
+            pattern = Pattern.compile(query, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
 
-        //print(words);
-        // We need match for all words:
-        boolean[] matchFound = new boolean[words.size()];
-
         for (String field : bibEntry.getFieldNames()) {
             if (bibEntry.hasField(field)) {
                 String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
-                if (!caseSensitive) {
-                    fieldContent = fieldContent.toLowerCase();
-                }
-
-                int index = 0;
-                // Check if we have a match for each of the query words, ignoring
-                // those words for which we already have a match:
-                for (Pattern pattern : patterns) {
-                    String fieldContentNoBrackets = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
-                    Matcher m = pattern.matcher(fieldContentNoBrackets);
-                    matchFound[index] = matchFound[index] || m.find();
-
-                    index++;
+                String fieldContentNoBrackets = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
+                Matcher m = pattern.matcher(fieldContentNoBrackets);
+                if (m.find()) {
+                    return true;
                 }
             }
 
         }
-        for (boolean aMatchFound : matchFound) {
-            if (!aMatchFound) {
-                return false; // Didn't match all words.
-            }
-        }
-        return true; // Matched all words.
+        return false;
     }
 
 }
