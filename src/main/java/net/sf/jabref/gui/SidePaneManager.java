@@ -57,8 +57,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.tabbedPane.addChangeListener(event -> SwingUtilities.invokeLater(
-                () -> setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane.getSelectedComponent())));
+        frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
+                () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }

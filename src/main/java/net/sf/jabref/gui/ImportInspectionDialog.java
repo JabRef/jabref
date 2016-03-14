@@ -756,7 +756,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             dispose();
             SwingUtilities.invokeLater(() -> {
                 if (newDatabase) {
-                    frame.addTab(panel, null, true);
+                    frame.addTab(panel, true);
                 }
                 panel.markBaseChanged();
 

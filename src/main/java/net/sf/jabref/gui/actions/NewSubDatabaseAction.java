@@ -31,17 +31,17 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
 
-        FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.tabbedPane);
+        FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
 
         PositionWindow.placeDialog(dialog, jabRefFrame);
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {
-            Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-            BasePanel bp = new BasePanel(jabRefFrame,
-                    new BibDatabaseContext(dialog.getGenerateDB(), defaults), Globals.prefs.getDefaultEncoding()); // meta data
-            jabRefFrame.tabbedPane.add(GUIGlobals.untitledTitle, bp);
-            jabRefFrame.tabbedPane.setSelectedComponent(bp);
+            Defaults defaults = new Defaults(
+                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+            BasePanel bp = new BasePanel(jabRefFrame, new BibDatabaseContext(dialog.getGenerateDB(), defaults),
+                    Globals.prefs.getDefaultEncoding()); // meta data
+            jabRefFrame.addTab(bp, true);
             jabRefFrame.output(Localization.lang("New database created."));
         }
     }

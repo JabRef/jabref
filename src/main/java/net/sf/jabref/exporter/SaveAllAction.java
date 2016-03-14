@@ -36,7 +36,6 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
     private final JabRefFrame frame;
     private int databases;
-    private int saved;
 
 
     /** Creates a new instance of SaveAllAction */
@@ -50,8 +49,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        databases = frame.getTabbedPane().getTabCount();
-        saved = 0;
+        databases = frame.getBasePanelCount();
         frame.output(Localization.lang("Saving all databases..."));
         Spin.off(this);
         run();
@@ -61,14 +59,13 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
     @Override
     public void run() {
         for (int i = 0; i < databases; i++) {
-            if (i < frame.getTabbedPane().getTabCount()) {
+            if (i < frame.getBasePanelCount()) {
                 BasePanel panel = frame.getBasePanelAt(i);
                 if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
                     frame.showBasePanelAt(i);
                 }
                 panel.runCommand(Actions.SAVE);
                 // TODO: can we find out whether the save was actually done or not?
-                saved++;
             }
         }
     }

@@ -98,7 +98,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    public JTabbedPane tabbedPane; // initialized at constructor
+    private JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -994,7 +994,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Returns a list of BasePanel.
      *
-     * @param i Index of base
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
@@ -1609,7 +1608,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
-        addTab(bp, file, raisePanel);
+        addTab(bp, raisePanel);
         return bp;
     }
 
@@ -1651,13 +1650,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // set original filename (again)
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
+            tabbedPane.setToolTipTextAt(i, file == null ? null : file.getAbsolutePath());
         }
     }
 
-    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+    public void addTab(BasePanel bp, boolean raisePanel) {
         // add tab
         tabbedPane.add(bp.getTabTitle(), bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file == null ? null : file.getAbsolutePath());
+
         // update all tab titles
         updateAllTabTitles();
 
