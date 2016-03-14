@@ -65,97 +65,96 @@ public class IconTheme {
 
     public enum JabRefIcon {
 
-        ADD("\uf4c0") /*css: mdi-plus-box*/,
-        ADD_NOBOX("\uf4bf") /*css: plus */,
-        ADD_ENTRY("\uf5b0") /*css: tooltip-outline-plus */,
-        EDIT_ENTRY("\uf5ad") /*css: tooltip-edit */,
-        EDIT_STRINGS("\uf5b1") /*css: tooltip-text */,
-        FOLDER("\uf316"), /*css: folder */
-        REMOVE("\uf429"), /*css: minus-box */
-        REMOVE_NOBOX("\uf428") /*css: minus */,
-        FILE("\uf2e0"), /* css: file*/
-        PDF_FILE("\uf2f0"), /* css: file-pdf*/
-        DOI("\uf61c") /*css: web*/,
-        DUPLICATE("\uf261") /*css: content-duplicate */,
-        EDIT("\uf499") /*css: pencil */,
-        NEW("\uf2ef") /* css: file-outline */,
-        SAVE("\uf263") /*css: content-save*/,
-        SAVE_ALL("\uf264") /*css: content-save-all*/,
-        CLOSE("\uf22b") /* css: close */,
-        PASTE("\uf262") /*css: content-paste*/,
-        CUT("\uf260") /*css: content-cut*/,
-        COPY("\uf25f") /*css: content-copy */,
-        REDO("\uf4ed") /*css: redo*/,
-        UNDO("\uf5d0") /*css: undo*/,
-        MARK_ENTRIES("\uf1a6") /*css: bookmark */,
-        UNMARK_ENTRIES("\uf1a9") /*css: bookmark-outline */,
-        REFRESH("\uf4ef") /*css: refresh */,
-        DELETE_ENTRY("\uf28d") /*css: delete */,
-        SEARCH("\uf401") /*css: magnify */,
-        PREFERENCES("\uf529") /*css: settings */,
-        HELP("\uf396") /*css: help-circle*/,
-        HELP_CONTENTS("\uf1a4") /*css: book-open */,
-        UP("\uf21c") /*css: chevron-up */,
-        DOWN("\uf219") /*css: chevron-down */,
-        LEFT("\uf145") /* css; arrow-left-bold */,
-        RIGHT("\uf14a") /*css: arrow-right-bold */,
-        SOURCE("\uf23c") /*css: code-braces*/,
-        MAKE_KEY("\uf3c5") /*css: key-variant */,
-        CLEANUP_ENTRIES("\uf1c6") /*css: broom */,
-        PRIORITY("\uf306") /*css: flag */,
-        PRIORITY_HIGH("\uf306", Color.RED) /*css: flag */,
-        PRIORITY_MEDIUM("\uf306", Color.ORANGE) /*css: flag */,
-        PRIORITY_LOW("\uf306", new Color(111, 204, 117)) /*css: flag */,
-        PRINTED("\uf4d2") /*css: printer */,
-        RANKING("\uf55e") /*css: star + star-outline: f561*/,
-        RANK1("\uf55e\uf561\uf561\uf561\uf561"),
-        RANK2("\uf55e\uf55e\uf561\uf561\uf561"),
-        RANK3("\uf55e\uf55e\uf55e\uf561\uf561"),
-        RANK4("\uf55e\uf55e\uf55e\uf55e\uf561"),
-        RANK5("\uf55e\uf55e\uf55e\uf55e\uf55e"),
-        WWW("\uf61c") /*css: web*/,
-        GROUP_INCLUDING("\uf2fe") /*css: filter-outline*/,
-        GROUP_REFINING("\uf2fe") /*css: filter*/,
-        AUTO_GROUP("\uf158"), /*css: auto-fix*/
-        EMAIL("\uf2ba") /*css: email*/,
-        EXPORT_TO_CLIPBOARD("\uf224") /*css: clipboard-arrow-left */,
-        ATTACH_FILE("\uf490") /*css: paperclip*/,
-        AUTO_FILE_LINK("\uf2e9") /*css: file-find */,
-        QUALITY_ASSURED("\uf1fe"), /*css: certificate */
-        QUALITY("\uf1fe"),/*css: certificate */
-        OPEN("\uf316") /*css: folder */,
-        ADD_ROW("\uf526") /* css: server-plus*/,
-        REMOVE_ROW("\uf522") /*css: server-minus */,
-        PICTURE("\uf2ea") /*css: file-image */,
-        READ_STATUS_READ("\uf2d4", new Color(111, 204, 117)), /*css: eye */
-        READ_STATUS_SKIMMED("\uf2d4", Color.ORANGE), /*css: eye */
-        READ_STATUS("\uf2d4"),/*css: eye */
-        RELEVANCE("\uf55f"),/*css: star-circle */
-        MERGE_ENTRIES("\uf25b"), /* css: compare */
-        CONNECT_OPEN_OFFICE("\uf47a") /*css: open-in-app */,
-        PLAIN_TEXT_IMPORT_TODO("\uf20a") /* css: checkbox-blank-circle-outline*/,
-        PLAIN_TEXT_IMPORT_DONE("\uf20e") /* checkbox-marked-circle-outline */,
-        DONATE("\uf367"), /* css: gift */
-        MOVE_TAB_ARROW("\uf151"), /*css:  arrow-up-bold */
-        OPTIONAL("\uf3cf"), /*css: label-outline */
-        REQUIRED("\uf3ce"), /*css: label */
-        INTEGRITY_FAIL("\uf22e", Color.RED), /*css: close-circle */
-        INTEGRITY_INFO("\uf3b7"), /*css: information */
-        INTEGRITY_WARN("\uf124"), /*css alert-circle */
-        INTEGRITY_SUCCESS("\uf20e") /*css: checkbox-marked-circle-outline */,
-        GITHUB("\uf36a"), /*css: github-circle*/
-        TOGGLE_ENTRY_PREVIEW("\uf3ea"), /*css: library-books */
-        TOGGLE_GROUPS("\uf5f1"), /*css: view-list */
-        WRITE_XMP("\uf3b5"), /* css: import */
-        FILE_WORD("\uf2f7"), /*css: file-word */
-        FILE_EXCEL("\uf2e7"), /*css: file-excel */
-        FILE_POWERPOINT("\uf2f2"), /*css: file-powerpoint */
-        FILE_TEXT("\uf2e5"), /*css: file-document */
-        FILE_MULTIPLE("\uf2ed"), /*css: file-multiple */
-        KEY_BINDINGS("\uf3c6"), /*css: keyboard */
-        FIND_DUPLICATES("\uf23e"), /*css: code-equal */
+        ADD("\uf416") /*css: mdi-plus-box*/,
+        ADD_NOBOX("\uf415") /*css: plus */,
+        ADD_ENTRY("\uf527") /*css: tooltip-outline-plus */,
+        EDIT_ENTRY("\uf524") /*css: tooltip-edit */,
+        EDIT_STRINGS("\uf528") /*css: tooltip-text */,
+        FOLDER("\uf24b"), /*css: folder */
+        REMOVE("\uf375"), /*css: minus-box */
+        REMOVE_NOBOX("\uf374") /*css: minus */,
+        FILE("\uf214"), /* css: file*/
+        PDF_FILE("\uf225"), /* css: file-pdf*/
+        DOI("\uf59f") /*css: web*/,
+        DUPLICATE("\uf191") /*css: content-duplicate */,
+        EDIT("\uf3eb") /*css: pencil */,
+        NEW("\uf224") /* css: file-outline */,
+        SAVE("\uf193") /*css: content-save*/,
+        SAVE_ALL("\uf194") /*css: content-save-all*/,
+        CLOSE("\uf156") /* css: close */,
+        PASTE("\uf192") /*css: content-paste*/,
+        CUT("\uf190") /*css: content-cut*/,
+        COPY("\uf18f") /*css: content-copy */,
+        REDO("\uf44e") /*css: redo*/,
+        UNDO("\uf54c") /*css: undo*/,
+        MARK_ENTRIES("\uf0c0") /*css: bookmark */,
+        UNMARK_ENTRIES("\uf0c3") /*css: bookmark-outline */,
+        REFRESH("\uf450") /*css: refresh */,
+        DELETE_ENTRY("\uf1c0") /*css: delete */,
+        SEARCH("\uf349") /*css: magnify */,
+        PREFERENCES("\uf493") /*css: settings */,
+        HELP("\uf2d7") /*css: help-circle*/,
+        UP("\uf143") /*css: chevron-up */,
+        DOWN("\uf140") /*css: chevron-down */,
+        LEFT("\uf04e") /* css; arrow-left-bold */,
+        RIGHT("\uf055") /*css: arrow-right-bold */,
+        SOURCE("\uf169") /*css: code-braces*/,
+        MAKE_KEY("\uf30b") /*css: key-variant */,
+        CLEANUP_ENTRIES("\uf0e2") /*css: broom */,
+        PRIORITY("\uf23b") /*css: flag */,
+        PRIORITY_HIGH("\uF23B", Color.RED) /*css: flag */,
+        PRIORITY_MEDIUM("\uF23B", Color.ORANGE) /*css: flag */,
+        PRIORITY_LOW("\uF23B", new Color(111, 204, 117)) /*css: flag */,
+        PRINTED("\uf42a") /*css: printer */,
+        RANKING("\uf4ce") /*css: star + star-outline: f4d2*/,
+        RANK1("\uF4CE\uF4D2\uF4D2\uF4D2\uf4d2"),
+        RANK2("\uF4CE\uF4CE\uF4D2\uF4D2\uF4D2"),
+        RANK3("\uF4CE\uF4CE\uF4CE\uF4D2\uF4D2"),
+        RANK4("\uF4CE\uF4CE\uF4CE\uF4CE\uF4D2"),
+        RANK5("\uF4CE\uF4CE\uF4CE\uF4CE\uF4CE"),
+        WWW("\uf59f") /*css: web*/,
+        GROUP_INCLUDING("\uf233") /*css: filter-outline*/,
+        GROUP_REFINING("\uf232") /*css: filter*/,
+        AUTO_GROUP("\uf068"), /*css: auto-fix*/
+        EMAIL("\uf1ee") /*css: email*/,
+        EXPORT_TO_CLIPBOARD("\uf14b") /*css: clipboard-arrow-left */,
+        ATTACH_FILE("\uf3e2") /*css: paperclip*/,
+        AUTO_FILE_LINK("\uf21e") /*css: file-find */,
+        QUALITY_ASSURED("\uf124"), /*css: certificate */
+        QUALITY("\uF124"),/*css: certificate */
+        OPEN("\uf24b") /*css: folder */,
+        ADD_ROW("\uf490") /* css: server-plus*/,
+        REMOVE_ROW("\uf48c") /*css: server-minus */,
+        PICTURE("\uf21f") /*css: file-image */,
+        READ_STATUS_READ("\uf208", new Color(111, 204, 117)), /*css: eye */
+        READ_STATUS_SKIMMED("\uF208", Color.ORANGE), /*css: eye */
+        READ_STATUS("\uF208"),/*css: eye */
+        RELEVANCE("\uf4cf"),/*css: star-circle */
+        MERGE_ENTRIES("\uf18a"), /* css: compare */
+        CONNECT_OPEN_OFFICE("\uf3cb") /*css: open-in-app */,
+        PLAIN_TEXT_IMPORT_TODO("\uf130") /* css: checkbox-blank-circle-outline*/,
+        PLAIN_TEXT_IMPORT_DONE("\uf134") /* checkbox-marked-circle-outline */,
+        DONATE("\uf2a1"), /* css: gift */
+        MOVE_TAB_ARROW("\uf05e"), /*css:  arrow-up-bold */
+        OPTIONAL("\uf316"), /*css: label-outline */
+        REQUIRED("\uf315"), /*css: label */
+        INTEGRITY_FAIL("\uf159", Color.RED), /*css: close-circle */
+        INTEGRITY_INFO("\uf2fc"), /*css: information */
+        INTEGRITY_WARN("\uf028"), /*css alert-circle */
+        INTEGRITY_SUCCESS("\uF134") /*css: checkbox-marked-circle-outline */,
+        GITHUB("\uf2a4"), /*css: github-circle*/
+        TOGGLE_ENTRY_PREVIEW("\uf332"), /*css: library-books */
+        TOGGLE_GROUPS("\uf572"), /*css: view-list */
+        WRITE_XMP("\uf2fa"), /* css: import */
+        FILE_WORD("\uf22c"), /*css: file-word */
+        FILE_EXCEL("\uf21b"), /*css: file-excel */
+        FILE_POWERPOINT("\uf227"), /*css: file-powerpoint */
+        FILE_TEXT("\uf219"), /*css: file-document */
+        FILE_MULTIPLE("\uf222"), /*css: file-multiple */
+        KEY_BINDINGS("\uf30c"), /*css: keyboard */
+        FIND_DUPLICATES("\uf16b"), /*css: code-equal */
 
-        OPEN_IN_NEW_WINDOW("\uf47b"), /*css: open-in-new */
+        OPEN_IN_NEW_WINDOW("\uf3cc"), /*css: open-in-new */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
