@@ -26,6 +26,9 @@ This page provides some development support in the form of howtos. See also [[Hi
 
 Please read https://github.com/cxxr/better-java
 
+- try not to abbreviate names of variables, classes or methods
+- use lowerCamelCase instead of snake_case
+
 ## Error Handling in JabRef
 
 ### Throwing and Catching Exceptions
