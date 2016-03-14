@@ -157,7 +157,7 @@ public class IconTheme {
         OPEN_IN_NEW_WINDOW("\uf3cc"), /*css: open-in-new */
         CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
         REG_EX("\uf451"), /*css: mdi-regex */
-
+        CONSOLE("\uf18d"), /*css: console */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 

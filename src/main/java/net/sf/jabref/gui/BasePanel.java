@@ -880,6 +880,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             });
         });
 
+        actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> {
+            JabRefDesktop.openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile());
+        });
+
         actions.put(Actions.OPEN_URL, (BaseAction) () -> {
             String URL_FIELD = "url";
             String DOI_FIELD = "doi";
@@ -2139,6 +2143,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     splitPane.getHeight() - splitPane.getDividerLocation());
         }
     }
+
 
     class UndoAction implements BaseAction {
 

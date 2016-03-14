@@ -243,6 +243,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcon.PASTE.getIcon());
     private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
             Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcon.CUT.getIcon());
+    private final AbstractAction openConsole = new GeneralAction(Actions.OPEN_CONSOLE,
+            Localization.menuTitle("Open terminal here"),
+            Localization.lang("Open terminal here"),
+            Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
+            IconTheme.JabRefIcon.CONSOLE.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
@@ -1344,6 +1349,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(openFolder);
         tools.add(openFile);
         tools.add(openUrl);
+        tools.add(openConsole);
         tools.addSeparator();
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
@@ -1443,6 +1449,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
+        tlb.addAction(openConsole);
         tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
@@ -1508,6 +1515,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
     private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+    private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
+
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
@@ -1532,6 +1541,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
+
+        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1572,6 +1583,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
         }
+
+        boolean saved = false;
+
+        if (tabCount > 0) {
+            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+        }
+        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**
