@@ -19,6 +19,9 @@ import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.DialogPane;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.*;
@@ -31,7 +34,7 @@ import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.AboutAction;
-import net.sf.jabref.gui.help.AboutDialog;
+import net.sf.jabref.gui.help.FXAlert;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
@@ -76,6 +79,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -178,7 +182,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
     // The help window.
-    private final AboutDialog aboutDiag = new AboutDialog(this);
+    private FXAlert aboutDialog = null;
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -205,8 +209,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction donationAction = new DonateAction();
     private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
             HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
-            Localization.lang("About JabRef"), IconTheme.getImage("about"));
+    private AbstractAction about = null;
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
@@ -565,12 +568,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
                 if (OS.OS_X) {
                     JabRefFrame.this.setVisible(false);
+                    Platform.runLater(() -> JabRef.jrf.aboutDialog.hide());
                 } else {
                     new CloseAction().actionPerformed(null);
                 }
             }
         });
 
+        initAboutDialog();
+        
         initSidePane();
 
         initLayout();
@@ -640,6 +646,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 LOGGER.fatal("Could not interface with Mac OS X methods.", e);
             }
         }
+    }
+    
+    private void initAboutDialog() {
+        Platform.runLater(() -> {
+            FXMLLoader loader = new FXMLLoader();
+            try (InputStream imageStream = JabRef.class.getResourceAsStream("/images/external/JabRef-icon-48.png");
+                    InputStream fxmlStream = JabRef.class.getResourceAsStream("/gui/help/AboutDialogLayout.fxml");) {
+                DialogPane dialogContentPane = (DialogPane) loader.load(fxmlStream);
+                javafx.scene.image.Image img = new javafx.scene.image.Image(imageStream);
+                aboutDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("About JabRef"), img);
+                aboutDialog.setDialogPane(dialogContentPane);
+                aboutDialog.setDialogStyle(JabRefMain.class.getResource("/gui/help/AboutDialog.css").toExternalForm());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            about = new AboutAction(Localization.menuTitle("About JabRef"), this.aboutDialog,
+                    Localization.lang("About JabRef"), IconTheme.getImage("about"));
+        });
     }
 
     private void positionWindowOnScreen() {

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<DialogPane id="paneAbout" prefHeight="600.0" prefWidth="750.0" styleClass="white-background" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.help.AboutDialogController">
+   <content>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <ImageView fx:id="jabrefLogo" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" styleClass="logo" BorderPane.alignment="CENTER" />
+         </top>
+         <bottom>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0" styleClass="white-background" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button fx:id="copyButton" mnemonicParsing="false" onAction="#copyVersionToClipboard" wrapText="true" />
+                  <Button fx:id="closeButton" cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#closeAboutDialog" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
+         <center>
+            <VBox alignment="CENTER" styleClass="white-background" BorderPane.alignment="CENTER">
+               <children>
+                  <Label fx:id="aboutYear" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="content" textAlignment="CENTER" wrapText="true" />
+                  <Hyperlink fx:id="aboutWebsite" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" onAction="#openJabrefWebsite" styleClass="link" textAlignment="CENTER" />
+                  <Label fx:id="aboutLicense" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" textAlignment="CENTER" wrapText="true">
+                     <VBox.margin>
+                        <Insets bottom="25.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ScrollPane fitToHeight="true" fitToWidth="true" focusTraversable="false">
+                    <content>
+                      <AnchorPane styleClass="white-background">
+                           <children>
+                              <VBox alignment="TOP_CENTER" styleClass="white-background" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                 <children>
+                                    <Label fx:id="developersHeading" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="about-small-heading" textAlignment="CENTER" wrapText="true">
+                                       <VBox.margin>
+                                           <Insets bottom="10.0"/>
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="developersContent" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="content" textAlignment="CENTER" wrapText="true" />
+                                    <Label fx:id="authorsHeading" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="about-small-heading" textAlignment="CENTER" wrapText="true">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" top="20.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="authorsContent" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="content" textAlignment="CENTER" wrapText="true" />
+                                    <Label fx:id="librariesHeading" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="about-small-heading" textAlignment="CENTER" wrapText="true">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" top="20.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Hyperlink fx:id="librariesContent" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" onAction="#openExternalLibrariesWebsite" styleClass="link" textAlignment="CENTER" />
+                                    <Label fx:id="codeHeading" alignment="CENTER" contentDisplay="CENTER" prefWidth="700.0" styleClass="about-small-heading" textAlignment="CENTER" wrapText="true">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" top="20.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                     <Hyperlink fx:id="codeContent" alignment="CENTER" contentDisplay="CENTER"
+                                                focusTraversable="false" onAction="#openGithub" styleClass="link"
+                                                textAlignment="CENTER">
+                                         <VBox.margin>
+                                             <Insets bottom="20.0"/>
+                                         </VBox.margin>
+                                     </Hyperlink>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                     <styleClass>
+                        <String fx:value="white-background" />
+                        <String fx:value="content" />
+                     </styleClass>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </ScrollPane>
+               </children>
+               <BorderPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </BorderPane.margin>
+                <padding>
+                    <Insets left="10.0"/>
+                </padding>
+            </VBox>
+         </center>
+      </BorderPane>
+   </content>
+   <header>
+      <GridPane styleClass="white-background">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints fillHeight="false" maxHeight="15.0" minHeight="10.0" prefHeight="15.0" valignment="CENTER" vgrow="NEVER" />
+          <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="NEVER" />
+        </rowConstraints>
+         <children>
+            <Label fx:id="aboutHeading" alignment="CENTER" onMouseClicked="#copyVersionToClipboard" prefWidth="700.0" styleClass="about-heading" wrapText="true" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <GridPane.margin>
+                  <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+               </GridPane.margin>
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Label>
+         </children>
+      </GridPane>
+   </header>
+</DialogPane>

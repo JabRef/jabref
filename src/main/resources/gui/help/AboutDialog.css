@@ -1,0 +1,49 @@
+.about-heading {
+	-fx-font-family: Arial, sans-serif;
+	-fx-font-size: 18px;
+	-fx-color: #3D3C5E;
+	-fx-background-color: #D8D4EC;
+	-fx-background-color: linear-gradient(#F0EEF7, #D8D4EC);
+    -fx-background-radius: 10;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10;
+    -fx-border-style: solid;
+    -fx-border-color: #3D3C5E;
+}
+
+.about-heading:pressed {
+	-fx-text-fill: #CC0000;
+}
+
+.about-small-heading {
+	-fx-font-family: Arial, sans-serif;
+	-fx-font-size: 14pt;
+	-fx-color: #3D3C5E;
+}
+
+.white-background {
+	-fx-background-color: #FFFFFF;
+}
+
+.content {
+	-fx-font-family: Arial, sans-serif; 
+	-fx-font-size: 12pt;
+	-fx-color: #393939;
+	-fx-box-border: transparent;
+}
+
+.logo {
+	-fx-margin-bottom: 10px;
+	-fx-padding: 5px 20px;
+}
+
+.link, link:selected, .link:visited, .link:focused {
+	-fx-text-fill: #000000;
+	-fx-underline: false;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+
+.link:hover {
+	-fx-underline: false;
+}
