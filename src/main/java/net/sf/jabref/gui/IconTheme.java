@@ -155,6 +155,8 @@ public class IconTheme {
         FIND_DUPLICATES("\uf16b"), /*css: code-equal */
 
         OPEN_IN_NEW_WINDOW("\uf3cc"), /*css: open-in-new */
+        CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
+        REG_EX("\uf451"), /*css: mdi-regex */
 
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
