@@ -248,8 +248,6 @@ public class JabRefPreferences {
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String PSVIEWER = "psviewer";
-    public static final String PDFVIEWER = "pdfviewer";
     public static final String BINDINGS = "bindings";
     public static final String BIND_NAMES = "bindNames";
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
