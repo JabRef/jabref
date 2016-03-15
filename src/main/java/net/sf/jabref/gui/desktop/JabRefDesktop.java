@@ -101,15 +101,13 @@ public class JabRefDesktop {
             try {
                 NATIVE_DESKTOP.openFile(link, "ps");
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
-                        + link, e);
+                LOGGER.error("An error occured on the command: " + link, e);
             }
         } else if ("pdf".equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, "pdf");
             } catch (IOException e) {
-                LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
-                        + link, e);
+                LOGGER.error("An error occured on the command: " + link, e);
             }
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
@@ -155,7 +153,12 @@ public class JabRefDesktop {
     }
 
     private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
-        NATIVE_DESKTOP.openFileWithApplication(filePath, fileType.getOpenWith());
+        String application = fileType.getOpenWith();
+        if("".equals(application)) {
+            NATIVE_DESKTOP.openFile(filePath, fileType.getExtension());
+        } else {
+            NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+        }
     }
 
     public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
