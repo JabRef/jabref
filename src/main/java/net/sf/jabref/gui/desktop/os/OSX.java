@@ -1,10 +1,7 @@
 package net.sf.jabref.gui.desktop.os;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.io.File;
@@ -14,8 +11,9 @@ public class OSX implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
-        String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
-        String[] cmd = {"/usr/bin/open", "-a", viewer, filePath};
+        String[] cmd = type != null ?
+                new String[] {"/usr/bin/open", "-a", type.getOpenWith(), filePath} :
+                new String[] {"/usr/bin/open", filePath};
         Runtime.getRuntime().exec(cmd);
     }
 

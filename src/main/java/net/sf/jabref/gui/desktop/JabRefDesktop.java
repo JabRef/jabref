@@ -6,7 +6,7 @@ import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.desktop.os.NativeDesktop;
+import net.sf.jabref.gui.desktop.os.*;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
@@ -33,11 +33,15 @@ import java.util.regex.Pattern;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+    public static final NativeDesktop ND_LINUX = new Linux();
+    public static final NativeDesktop ND_WINDOWS = new Windows();
+    public static final NativeDesktop ND_MAC = new OSX();
+    public static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
+    private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
+
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
-    private static final NativeDesktop NATIVE_DESKTOP = OS.getNativeDesktop();
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -257,5 +261,17 @@ public class JabRefDesktop {
         String absolutePath = file.getAbsolutePath();
         absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
         NATIVE_DESKTOP.openConsole(absolutePath);
+    }
+
+    // TODO: Move to OS.java
+    public static NativeDesktop getNativeDesktop() {
+        if(OS.WINDOWS) {
+            return ND_WINDOWS;
+        } else if(OS.OS_X) {
+            return ND_MAC;
+        } else if(OS.LINUX) {
+            return ND_LINUX;
+        }
+        return ND_DEFAULT;
     }
 }
