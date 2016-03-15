@@ -365,7 +365,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: DATABASE_TYPE:BibLaTeX;}" + Globals.NEWLINE,
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: databaseType:BibLaTeX;}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
 
