@@ -1,12 +1,11 @@
 package net.sf.jabref.gui.desktop.os;
 
-import net.sf.jabref.logic.util.OS;
-
 import java.io.File;
 import java.io.IOException;
 
 public class Windows implements NativeDesktop {
-    public static String detectProgramPath(String programName, String directoryName) {
+    @Override
+    public String detectProgramPath(String programName, String directoryName) {
         String progFiles = System.getenv("ProgramFiles(x86)");
         if (progFiles == null) {
             progFiles = System.getenv("ProgramFiles");

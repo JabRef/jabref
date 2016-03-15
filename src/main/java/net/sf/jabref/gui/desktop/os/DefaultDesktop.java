@@ -30,4 +30,9 @@ public class DefaultDesktop implements NativeDesktop {
     public void openConsole(String absolutePath) throws IOException {
         LOGGER.error("This feature is not supported by your Operating System.");
     }
+
+    @Override
+    public String detectProgramPath(String programName, String directoryName) {
+        return programName;
+    }
 }

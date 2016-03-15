@@ -39,4 +39,9 @@ public class OSX implements NativeDesktop {
         Runtime runtime = Runtime.getRuntime();
         runtime.exec("open -a Terminal " + absolutePath, null, new File(absolutePath));
     }
+
+    @Override
+    public String detectProgramPath(String programName, String directoryName) {
+        return programName;
+    }
 }

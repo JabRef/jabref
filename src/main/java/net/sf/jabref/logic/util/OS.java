@@ -47,12 +47,4 @@ public class OS {
         return ND_DEFAULT;
     }
 
-    public static String guessProgramPath(String programName, String windowsDirectory) {
-        if (WINDOWS) {
-            return Windows.detectProgramPath(programName, windowsDirectory);
-        } else {
-            return programName;
-        }
-    }
-
 }

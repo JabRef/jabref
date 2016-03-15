@@ -77,4 +77,9 @@ public class Linux implements NativeDesktop {
             }
         }
     }
+
+    @Override
+    public String detectProgramPath(String programName, String directoryName) {
+        return programName;
+    }
 }

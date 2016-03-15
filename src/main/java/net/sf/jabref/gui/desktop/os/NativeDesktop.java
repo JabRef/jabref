@@ -17,4 +17,6 @@ public interface NativeDesktop {
     void openFolderAndSelectFile(String filePath) throws IOException;
 
     void openConsole(String absolutePath) throws IOException;
+
+    String detectProgramPath(String programName, String directoryName);
 }
