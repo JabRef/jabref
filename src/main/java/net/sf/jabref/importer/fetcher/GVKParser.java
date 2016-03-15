@@ -220,15 +220,15 @@ public class GVKParser {
 
             //isbn
             if ("004A".equals(tag)) {
-                final String isbn_10 = getSubfield("0", datafield);
-                final String isbn_13 = getSubfield("A", datafield);
+                final String isbn10 = getSubfield("0", datafield);
+                final String isbn13 = getSubfield("A", datafield);
 
-                if (isbn_10 != null) {
-                    isbn = isbn_10;
+                if (isbn10 != null) {
+                    isbn = isbn10;
                 }
 
-                if (isbn_13 != null) {
-                    isbn = isbn_13;
+                if (isbn13 != null) {
+                    isbn = isbn13;
                 }
 
             }
@@ -244,10 +244,8 @@ public class GVKParser {
                 }
 
                 String st = getSubfield("a", datafield);
-                if (st != null) {
-                    if (st.contains("Diss")) {
-                        entryType = "phdthesis";
-                    }
+                if ((st != null) && st.contains("Diss")) {
+                    entryType = "phdthesis";
                 }
             }
 
@@ -292,10 +290,8 @@ public class GVKParser {
             }
 
             // Wenn eine Verlagsdiss vorliegt
-            if ("phdthesis".equals(entryType)) {
-                if (isbn != null) {
-                    entryType = "book";
-                }
+            if ("phdthesis".equals(entryType) && (isbn != null)) {
+                entryType = "book";
             }
 
             //Hilfskategorien zur Entscheidung @article
@@ -308,20 +304,14 @@ public class GVKParser {
             if ("039B".equals(tag)) {
                 quelle = getSubfield("8", datafield);
             }
-            if ("046R".equals(tag)) {
-                if ((quelle == null) || quelle.isEmpty()) {
-                    quelle = getSubfield("a", datafield);
-                }
+            if ("046R".equals(tag) && ((quelle == null) || quelle.isEmpty())) {
+                quelle = getSubfield("a", datafield);
             }
 
             // URLs behandeln
-            if ("009P".equals(tag)) {
-                if ("03".equals(datafield.getAttribute("occurrence"))
-                        || "05".equals(datafield.getAttribute("occurrence"))) {
-                    if (url == null) {
-                        url = getSubfield("a", datafield);
-                    }
-                }
+            if ("009P".equals(tag) && ("03".equals(datafield.getAttribute("occurrence"))
+                    || "05".equals(datafield.getAttribute("occurrence"))) && (url == null)) {
+                url = getSubfield("a", datafield);
             }
         }
 
@@ -363,6 +353,7 @@ public class GVKParser {
             //entryType = "online";
         }
 
+
         /*
          * Wahrscheinlichkeit, dass ZDB-ID
          * vorhanden ist, ist größer als ISBN bei
@@ -385,12 +376,13 @@ public class GVKParser {
         if (!Strings.isNullOrEmpty(subtitle)) {
             // ensure that first letter is an upper case letter
             // there could be the edge case that the string is only one character long, therefore, this special treatment
-            // this is apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don't want to add an additional dependency  ('org.apache.commons:commons-lang3:3.4')
-            String newSubtitle = Character.toString(Character.toUpperCase(subtitle.charAt(0)));
+            // this is Apache commons lang StringUtils.capitalize (https://commons.apache.org/proper/commons-lang/javadocs/api-release/org/apache/commons/lang3/StringUtils.html#capitalize%28java.lang.String%29), but we don't want to add an additional dependency  ('org.apache.commons:commons-lang3:3.4')
+            StringBuilder newSubtitle = new StringBuilder(
+                    Character.toString(Character.toUpperCase(subtitle.charAt(0))));
             if (subtitle.length() > 1) {
-                newSubtitle += subtitle.substring(1);
+                newSubtitle.append(subtitle.substring(1));
             }
-            result.setField("subtitle", newSubtitle);
+            result.setField("subtitle", newSubtitle.toString());
         }
         if (publisher != null) {
             result.setField("publisher", publisher);
@@ -438,14 +430,10 @@ public class GVKParser {
             result.setField("note", note);
         }
 
-        if ("article".equals(entryType)) {
-            if (journal != null) {
-                result.setField("journal", journal);
-            }
-        } else if ("incollection".equals(entryType)) {
-            if (booktitle != null) {
-                result.setField("booktitle", booktitle);
-            }
+        if ("article".equals(entryType) && (journal != null)) {
+            result.setField("journal", journal);
+        } else if ("incollection".equals(entryType) && (booktitle != null)) {
+            result.setField("booktitle", booktitle);
         }
 
         return result;
@@ -497,8 +485,7 @@ public class GVKParser {
     }
 
     private String removeSortCharacters(String input) {
-        input = input.replaceAll("\\@", "");
-        return input;
+        return input.replaceAll("\\@", "");
     }
 
 }

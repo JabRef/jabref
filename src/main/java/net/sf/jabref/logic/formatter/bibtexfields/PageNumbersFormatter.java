@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -68,5 +69,10 @@ public class PageNumbersFormatter implements Formatter {
             return newValue;
         }
         return value;
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Ensures that pages numbers in %s are of the form num--num.");
     }
 }

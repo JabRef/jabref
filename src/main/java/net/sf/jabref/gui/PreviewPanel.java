@@ -20,12 +20,12 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -163,35 +163,38 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
 
         add(scrollPane, BorderLayout.CENTER);
+
+        this.createKeyBindings();
+    }
+
+    private void createKeyBindings(){
+        ActionMap actionMap = this.getActionMap();
+        InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        final String close = "close";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), close);
+        actionMap.put(close, this.closeAction);
+
+        final String copy = "copy";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
+        actionMap.put(copy, this.copyPreviewAction);
+
+        final String print = "print";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), print);
+        actionMap.put(print, this.printAction);
     }
 
     private JPopupMenu createPopupMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(this.printAction);
         menu.add(this.copyPreviewAction);
-        this.panel.ifPresent(p -> menu.add(p.frame().switchPreview));
+        this.panel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
         return menu;
     }
 
     private JToolBar createToolBar() {
         JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-
         toolBar.setMargin(new Insets(0, 0, 0, 2));
-
-        // The toolbar carries all the key bindings that are valid for the whole
-        // window.
-        ActionMap actionMap = toolBar.getActionMap();
-        InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        actionMap.put("close", this.closeAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), "copy");
-        actionMap.put("copy", this.copyPreviewAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), "print");
-        actionMap.put("print", this.printAction);
-
         toolBar.setFloatable(false);
 
         // Add actions (and thus buttons)
@@ -255,8 +258,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private void updateLayout() {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(
-                    new LayoutHelper(sr).getLayoutFromText());
+            layout = Optional
+                    .of(new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository()).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);
@@ -336,23 +339,17 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         public void actionPerformed(ActionEvent arg0) {
 
             // Background this, as it takes a while.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                try {
+                    PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+                    pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
+                    previewPane.print(null, null, true, null, pras, false);
 
-                @Override
-                public void run() {
-                    try {
-                        PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                        pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
-                        previewPane.print(null, null, true, null, pras, false);
-
-                    } catch (PrinterException e) {
-                        // Inform the user... we don't know what to do.
-                        JOptionPane.showMessageDialog(PreviewPanel.this,
-                                Localization.lang("Could not print preview") + ".\n"
-                                        + e.getMessage(),
-                                Localization.lang("Print entry preview"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
+                } catch (PrinterException e) {
+                    // Inform the user... we don't know what to do.
+                    JOptionPane.showMessageDialog(PreviewPanel.this,
+                            Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
+                            Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
                 }
             });
         }

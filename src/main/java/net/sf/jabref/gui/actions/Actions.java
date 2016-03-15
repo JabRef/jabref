@@ -36,6 +36,7 @@ public class Actions {
     public static final String MERGE_ENTRIES = "mergeEntries";
     public static final String MERGE_DOI = "mergeWithDOI";
     public static final String MOVE_TO_GROUP = "moveToGroup";
+    public static final String OPEN_CONSOLE = "openConsole";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
     public static final String OPEN_FOLDER = "openFolder";
     public static final String OPEN_URL = "openUrl";
@@ -55,6 +56,7 @@ public class Actions {
     public static final String SWITCH_PREVIEW = "switchPreview";
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL = "toggleHighlightGroupsMatchingAll";
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY = "toggleHighlightGroupsMatchingAny";
+    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE = "toggleHighlightGroupsMatchingDisable";
     public static final String TOGGLE_GROUPS = "toggleGroups";
     public static final String TOGGLE_PREVIEW = "togglePreview";
     public static final String TOGGLE_TOOLBAR = "toggleToolbar";

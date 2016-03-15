@@ -23,8 +23,6 @@ package net.sf.jabref.util;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.layout.Layout;
-import net.sf.jabref.exporter.layout.LayoutHelper;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.RegExpFileSearch;
@@ -39,8 +37,11 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -76,81 +77,6 @@ public class Util {
 
     private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
 
-
-    public static List<String[]> parseMethodsCalls(String calls) throws RuntimeException {
-
-        List<String[]> result = new ArrayList<>();
-
-        char[] c = calls.toCharArray();
-
-        int i = 0;
-
-        while (i < c.length) {
-
-            int start = i;
-            if (Character.isJavaIdentifierStart(c[i])) {
-                i++;
-                while ((i < c.length) && (Character.isJavaIdentifierPart(c[i]) || (c[i] == '.'))) {
-                    i++;
-                }
-                if ((i < c.length) && (c[i] == '(')) {
-
-                    String method = calls.substring(start, i);
-
-                    // Skip the brace
-                    i++;
-
-                    if (i < c.length) {
-                        if (c[i] == '"') {
-                            // Parameter is in format "xxx"
-
-                            // Skip "
-                            i++;
-
-                            int startParam = i;
-                            i++;
-                            boolean escaped = false;
-                            while (((i + 1) < c.length) && !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
-                                if (c[i] == '\\') {
-                                    escaped = !escaped;
-                                } else {
-                                    escaped = false;
-                                }
-                                i++;
-
-                            }
-
-                            String param = calls.substring(startParam, i);
-
-                            result.add(new String[]{method, param});
-                        } else {
-                            // Parameter is in format xxx
-
-                            int startParam = i;
-
-                            while ((i < c.length) && (c[i] != ')')) {
-                                i++;
-                            }
-
-                            String param = calls.substring(startParam, i);
-
-                            result.add(new String[]{method, param});
-
-                        }
-                    } else {
-                        // Incorrectly terminated open brace
-                        result.add(new String[]{method});
-                    }
-                } else {
-                    String method = calls.substring(start, i);
-                    result.add(new String[]{method});
-                }
-            }
-            i++;
-        }
-
-        return result;
-    }
 
     /**
      * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
@@ -269,14 +195,16 @@ public class Util {
      *
      * @param database the database, where the entry is located
      * @param entry    the entry to which the file should be linked to
+     * @param repository
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibDatabase database, BibEntry entry) {
+    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
+            JournalAbbreviationRepository repository) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr).getLayoutFromText();
+            layout = new LayoutHelper(sr, repository).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }
@@ -309,26 +237,37 @@ public class Util {
     }
 
     /**
+     * Undoable change of field value
+     *
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
-        String oldValue = be.getField(field);
-        if (nullFieldIfValueIsTheSame && (oldValue != null) && oldValue.equals(newValue)) {
-            // if oldValue == newValue then reset field if required by parameter
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            if (newValue == null) {
+        String writtenValue = null;
+        String oldValue = null;
+        if (be.hasField(field)) {
+            oldValue = be.getField(field);
+            if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
+                // If the new field value is null or the old and the new value are the same and flag is set
+                // Clear the field
                 be.clearField(field);
-            } else {
+            } else if (!oldValue.equals(newValue)) {
+                // Update
+                writtenValue = newValue;
                 be.setField(field, newValue);
             }
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+        } else {
+            // old field value not set
+            if (newValue == null) {
+                // Do nothing
+                return;
+            } else {
+                // Set new value
+                writtenValue = newValue;
+                be.setField(field, newValue);
             }
+        }
+        if (ce != null) {
+            ce.addEdit(new UndoableFieldChange(be, field, oldValue, writtenValue));
         }
     }
 
@@ -379,12 +318,17 @@ public class Util {
         }
 
         // show a warning, then return
-        StringBuffer message = new StringBuffer("This action will modify the following field(s)\n" + "in at least one entry each:\n");
+        StringBuilder message = new StringBuilder(
+                Localization.lang("This action will modify the following field(s) in at least one entry each:"))
+                        .append('\n');
         for (String affectedField : affectedFields) {
             message.append(affectedField).append('\n');
         }
-        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        message.append(Localization.lang("This could cause undesired changes to your entries.")).append('\n')
+                .append("It is recommended that you change the grouping field in your group definition to \"keywords\" or a non-standard name.")
+                .append("\n\n").append(Localization.lang("Do you still want to continue?"));
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
 
         // if (groups instanceof KeywordGroup) {
@@ -426,8 +370,8 @@ public class Util {
         NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
         ce.addEdit(undoableEdit);
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
-        net.sf.jabref.util.Util.updateField(entry, timeStampField, timestamp, ce);
+        String timestamp = DATE_FORMATTER.getCurrentDate();
+        updateField(entry, timeStampField, timestamp, ce);
         return ce;
     }
 

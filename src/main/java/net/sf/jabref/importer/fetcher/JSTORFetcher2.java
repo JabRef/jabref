@@ -96,11 +96,11 @@ public class JSTORFetcher2 implements EntryFetcher {
                 if (!noAccessFound) {
                     status.showMessage(Localization.lang("No entries found for the search string '%0'",
                                     query),
-                            Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                            Localization.lang("Search %0", "JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     status.showMessage(Localization.lang("No entries found. It looks like you do not have access to search JStor.",
                                     query),
-                            Localization.lang("Search JSTOR"), JOptionPane.INFORMATION_MESSAGE);
+                            Localization.lang("Search %0", "JSTOR"), JOptionPane.INFORMATION_MESSAGE);
                 }
                 return false;
             }
@@ -110,7 +110,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                getSingleCitation(cit).ifPresent(entry -> dialog.addEntry(entry));
+                getSingleCitation(cit).ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }
 
@@ -118,7 +118,7 @@ public class JSTORFetcher2 implements EntryFetcher {
 
         } catch (IOException e) {
             e.printStackTrace();
-            status.showMessage(Localization.lang("Error while fetching from JSTOR") + ": " + e.getMessage());
+            status.showMessage(Localization.lang("Error while fetching from %0", "JSTOR") + ": " + e.getMessage());
         }
         return false;
     }

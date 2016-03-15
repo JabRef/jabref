@@ -37,7 +37,7 @@ public class JSONEntryParserTest {
                         + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
                 + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"";
         JSONObject jo = new JSONObject(jsonString);
-        BibEntry be = jc.BibJSONtoBibtex(jo);
+        BibEntry be = jc.parseBibJSONtoBibtex(jo);
 
         Assert.assertEquals("article", be.getType());
         Assert.assertEquals("VLSI Design", be.getField("journal"));
@@ -62,7 +62,7 @@ public class JSONEntryParserTest {
                 + "        }";
 
         JSONObject jo = new JSONObject(jsonString);
-        BibEntry be = JSONEntryParser.SpringerJSONtoBibtex(jo);
+        BibEntry be = JSONEntryParser.parseSpringerJSONtoBibtex(jo);
         Assert.assertEquals("1992", be.getField("year"));
         Assert.assertEquals("5", be.getField("number"));
         Assert.assertEquals("#sep#", be.getField("month"));

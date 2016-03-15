@@ -20,6 +20,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
@@ -42,7 +43,7 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final boolean toFileDir;
 
-    private final String MOVE_RENAME = Localization.lang("Move/Rename file");
+    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     private static final Log LOGGER = LogFactory.getLog(MoveFileAction.class);
 
@@ -102,7 +103,8 @@ public class MoveFileAction extends AbstractAction {
                 if (toFileDir) {
                     // Determine which name to suggest:
                     String suggName = Util
-                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry())
+                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
+                                    Globals.journalAbbreviationLoader.getRepository())
                             .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),

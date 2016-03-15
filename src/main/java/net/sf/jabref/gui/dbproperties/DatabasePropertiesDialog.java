@@ -36,7 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -81,7 +81,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
 
-    private SaveActionsPanel saveActionsPanel;
+    private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
 
     public DatabasePropertiesDialog(JFrame parent) {
@@ -116,7 +116,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
         builder.add(Localization.lang("General file directory")).xy(1, 5);
-        builder.add(fileDir).xy(3, 1);
+        builder.add(fileDir).xy(3, 5);
         builder.add(browseFile).xy(5, 5);
         builder.add(Localization.lang("User-specific file directory")).xy(1, 7);
         builder.add(fileDirIndv).xy(3, 7);
@@ -132,9 +132,10 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
-        saveActionsPanel = new SaveActionsPanel();
+        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
+                FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS);
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
-        builder.add(saveActionsPanel).xyw(1, 29, 5);
+        builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -158,23 +159,12 @@ public class DatabasePropertiesDialog extends JDialog {
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                storeSettings();
-                dispose();
-            }
+        ok.addActionListener(e -> {
+            storeSettings();
+            dispose();
         });
 
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
+        cancel.addActionListener(e -> dispose());
     }
 
     private void setupSortOrderConfiguration() {
@@ -184,13 +174,9 @@ public class DatabasePropertiesDialog extends JDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(saveInOriginalOrder);
         bg.add(saveInSpecifiedOrder);
-        ActionListener listener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean selected = e.getSource() == saveInSpecifiedOrder;
-                saveOrderPanel.setEnabled(selected);
-            }
+        ActionListener listener = e -> {
+            boolean selected = e.getSource() == saveInSpecifiedOrder;
+            saveOrderPanel.setEnabled(selected);
         };
 
         saveInOriginalOrder.addActionListener(listener);
@@ -277,7 +263,7 @@ public class DatabasePropertiesDialog extends JDialog {
         oldProtectVal = protect.isSelected();
 
         //set save actions
-        saveActionsPanel.setValues(metaData);
+        fieldFormatterCleanupsPanel.setValues(metaData);
     }
 
     private void storeSettings() {
@@ -330,12 +316,12 @@ public class DatabasePropertiesDialog extends JDialog {
             }
         }
 
-        boolean saveActionsChanged = saveActionsPanel.hasChanged();
+        boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
         if (saveActionsChanged) {
-            if (saveActionsPanel.isDefaultSaveActions()) {
-                metaData.remove(SaveActions.META_KEY);
+            if (fieldFormatterCleanupsPanel.isDefaultSaveActions()) {
+                metaData.remove(MetaData.SAVE_ACTIONS);
             } else {
-                saveActionsPanel.storeSettings(metaData);
+                fieldFormatterCleanupsPanel.storeSettings(metaData);
             }
         }
 

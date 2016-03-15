@@ -61,8 +61,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     }
 
     @Override
-    protected void addField(String s) {
-        s = s.trim();
+    protected void addField(String str) {
+        String s = str.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
         }
@@ -121,7 +121,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
         if (EntryTypes.getStandardType(typeName, mode).isPresent()) {
             Optional<EntryType> entryType = EntryTypes.getType(typeName, mode);
-            if (isChanged || (entryType.isPresent() && entryType.get() instanceof CustomEntryType)) {
+            if (isChanged || (entryType.isPresent() && (entryType.get() instanceof CustomEntryType))) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);

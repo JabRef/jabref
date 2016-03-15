@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -232,8 +233,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * This method is called when a new field should be added to the list. Performs validation of the
      * field.
      */
-    protected void addField(String s) {
-        s = s.trim();
+    protected void addField(String str) {
+        String s = str.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
         }
@@ -329,7 +330,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
 
-        if (src == add) {
+        if (Objects.equals(src, add)) {
             // Selection has been made, or add button pressed:
             if ((sel != null) && (sel.getSelectedItem() != null)) {
                 String s = sel.getSelectedItem().toString();
@@ -337,12 +338,12 @@ class FieldSetComponent extends JPanel implements ActionListener {
             } else if ((input != null) && !"".equals(input.getText())) {
                 addField(input.getText());
             }
-        } else if (src == input) {
+        } else if (Objects.equals(src, input)) {
             addField(input.getText());
-        } else if (src == remove) {
+        } else if (Objects.equals(src, remove)) {
             // Remove button pressed:
             removeSelected();
-        } else if (src == sel) {
+        } else if (Objects.equals(src, sel)) {
             if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
                 // These conditions signify arrow key navigation in the dropdown list, so we should
                 // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
@@ -352,9 +353,9 @@ class FieldSetComponent extends JPanel implements ActionListener {
             String s = sel.getSelectedItem().toString();
             addField(s);
             sel.getEditor().selectAll();
-        } else if (src == up) {
+        } else if (Objects.equals(src, up)) {
             move(-1);
-        } else if (src == down) {
+        } else if (Objects.equals(src, down)) {
             move(1);
         }
     }

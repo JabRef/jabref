@@ -11,8 +11,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
  * Renders possible autocomplete items in form of a simple list.
@@ -23,13 +21,12 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 
     private final DefaultListModel<E> model = new DefaultListModel<>();
     private final JList<E> list = new JList<>(model);
-    ActionListener acceptAction;
 
     /**
      * Every selection change by the user is interpreted as accepting the new item as autocompletion. Thus we need this
      * helper variable to prevent that also programmatically trigger an autocompletion.
      */
-    Boolean interpretSelectionChangeAsAccept = true;
+    private Boolean interpretSelectionChangeAsAccept = true;
 
 
     @Override
@@ -44,20 +41,14 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
 
     @Override
     public Component init(ActionListener newAcceptAction) {
-        this.acceptAction = newAcceptAction;
-
         // Init list
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setFocusable(false);
         list.setRequestFocusEnabled(false);
         list.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        list.addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (interpretSelectionChangeAsAccept && (acceptAction != null)) {
-                    acceptAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-                }
+        list.addListSelectionListener(e -> {
+            if (interpretSelectionChangeAsAccept && (newAcceptAction != null)) {
+                newAcceptAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
             }
         });
 

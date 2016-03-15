@@ -81,6 +81,13 @@ public class BibDatabase {
     }
 
     /**
+     * Checks if the database contains no entries.
+     */
+    public boolean isEmpty() {
+        return entries.size() == 0;
+    }
+
+    /**
      * Returns a Set containing the keys to all entries.
      * Use getKeySet().iterator() to iterate over all entries.
      */
@@ -274,6 +281,27 @@ public class BibDatabase {
      */
     public int getStringCount() {
         return bibtexStrings.size();
+    }
+
+    /**
+     * Copies the preamble of another BibDatabase.
+     *
+     * @param database another BibDatabase
+     */
+    public void copyPreamble(BibDatabase database) {
+        setPreamble(database.getPreamble());
+    }
+
+    /**
+     * Copies all Strings from another BibDatabase.
+     *
+     * @param database another BibDatabase
+     */
+    public void copyStrings(BibDatabase database) {
+        for (String key : database.getStringKeySet()) {
+            BibtexString string = database.getString(key);
+            addString(string);
+        }
     }
 
     /**

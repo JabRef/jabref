@@ -28,15 +28,15 @@ public class MainTableNameFormatter {
         if (namesAsIs) {
             return nameToFormat;
         } else if (namesNatbib) {
-            return AuthorList.fixAuthor_Natbib(nameToFormat);
+            return AuthorList.fixAuthorNatbib(nameToFormat);
         } else if (namesLastOnly) {
-            return AuthorList.fixAuthor_lastNameOnlyCommas(nameToFormat, false);
+            return AuthorList.fixAuthorLastNameOnlyCommas(nameToFormat, false);
         } else if (namesFf) {
-            return AuthorList.fixAuthor_firstNameFirstCommas(nameToFormat, abbrAuthorNames, false);
+            return AuthorList.fixAuthorFirstNameFirstCommas(nameToFormat, abbrAuthorNames, false);
         }
 
         // None of namesAsIs, namesNatbib, namesAsIs, namesFf
-        return AuthorList.fixAuthor_lastNameFirstCommas(nameToFormat, abbrAuthorNames, false);
+        return AuthorList.fixAuthorLastNameFirstCommas(nameToFormat, abbrAuthorNames, false);
     }
 
 }

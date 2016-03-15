@@ -45,7 +45,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.wizard.auximport.AuxCommandLine;
+import net.sf.jabref.cli.AuxCommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -262,9 +262,8 @@ public class JabRef {
                         formatName = "tablerefsabsbib";
                         break;
                     default:
-                        System.err.println(
-                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                        + JabRefCLI.getExportMatchesSyntax());
+                        System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                                .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
                         return Optional.empty();
                     } //end switch
 

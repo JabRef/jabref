@@ -15,13 +15,9 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -30,9 +26,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileTypeEditor;
@@ -77,27 +70,14 @@ class ExternalTab extends JPanel implements PrefsTab {
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the bib file location rather than the file directory set above"));
-        bibLocationAsFileDir.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
-            }
-        });
+        bibLocationAsFileDir.addChangeListener(e -> bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected()));
         JButton editFileTypes = new JButton(Localization.lang("Manage external file types"));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         citeCommand = new JTextField(25);
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Localization.lang("Use Regular Expression Search"));
-        ItemListener regExpListener = new ItemListener() {
-
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                regExpTextField.setEditable(useRegExpComboBox.isSelected());
-            }
-        };
+        ItemListener regExpListener = e -> regExpTextField.setEditable(useRegExpComboBox.isSelected());
         useRegExpComboBox.addItemListener(regExpListener);
 
         editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
@@ -197,13 +177,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void addSettingsButton(final PushToApplication pt, JPanel p) {
         JButton button = new JButton(Localization.lang("Settings for %0", pt.getApplicationName()),
                 pt.getIcon());
-        button.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                PushToApplicationButton.showSettingsDialog(frame, pt, pt.getSettingsPanel());
-            }
-        });
+        button.addActionListener(e -> PushToApplicationButton.showSettingsDialog(frame, pt, pt.getSettingsPanel()));
         p.add(button);
     }
 

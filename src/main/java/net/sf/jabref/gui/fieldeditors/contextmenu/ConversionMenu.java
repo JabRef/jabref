@@ -1,5 +1,5 @@
-/*  Copyright (C) 2015 JabRef contributors.
-    Copyright (C) 2015 Oscar Gustafsson.
+/*  Copyright (C) 2015-2016 JabRef contributors.
+    Copyright (C) 2015-2016 Oscar Gustafsson.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import net.sf.jabref.logic.util.strings.Converters;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author Oscar Gustafsson
@@ -32,23 +30,13 @@ import java.awt.event.ActionListener;
  * Menu to show up on right-click in a text field for converting text formats
  */
 public class ConversionMenu extends JMenu {
-    private final JTextComponent parent;
-
 
     public ConversionMenu(JTextComponent opener) {
         super(Localization.lang("Convert"));
-        parent = opener;
-
         // create menu items, one for each case changer
         for (final Converters.Converter converter : Converters.ALL) {
             JMenuItem menuItem = new JMenuItem(converter.getName());
-            menuItem.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    parent.setText(converter.convert(parent.getText()));
-                }
-            });
+            menuItem.addActionListener(e -> opener.setText(converter.convert(opener.getText())));
             this.add(menuItem);
         }
     }

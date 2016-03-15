@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,10 +24,9 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Dialog for adding citation with page number info.
@@ -37,31 +36,23 @@ class AdvancedCiteDialog {
     private static boolean defaultInPar = true;
     private boolean okPressed;
     private final JDialog diag;
-    private final JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries between parenthesis"));
-    private final JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
     private final JTextField pageInfo = new JTextField(15);
-    private final JButton ok = new JButton(Localization.lang("OK"));
-    private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
 
     public AdvancedCiteDialog(JabRefFrame parent) {
         diag = new JDialog(parent, Localization.lang("Cite special"), true);
         ButtonGroup bg = new ButtonGroup();
+        JRadioButton inPar = new JRadioButton(Localization.lang("Cite selected entries between parenthesis"));
+        JRadioButton inText = new JRadioButton(Localization.lang("Cite selected entries with in-text citation"));
         bg.add(inPar);
         bg.add(inText);
-        if (AdvancedCiteDialog.defaultInPar) {
+        if (defaultInPar) {
             inPar.setSelected(true);
         } else {
             inText.setSelected(true);
         }
 
-        inPar.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                AdvancedCiteDialog.defaultInPar = inPar.isSelected();
-            }
-        });
+        inPar.addChangeListener(changeEvent -> defaultInPar = inPar.isSelected());
 
         DefaultFormBuilder b = new DefaultFormBuilder
                 (new FormLayout("left:pref, 4dlu, fill:pref", ""));
@@ -77,6 +68,8 @@ class AdvancedCiteDialog {
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
@@ -85,14 +78,11 @@ class AdvancedCiteDialog {
 
         diag.pack();
 
-        Action okAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ActionListener okAction = actionEvent -> {
                 okPressed = true;
                 diag.dispose();
-            }
         };
+
         ok.addActionListener(okAction);
         pageInfo.addActionListener(okAction);
         inPar.addActionListener(okAction);
@@ -126,6 +116,6 @@ class AdvancedCiteDialog {
     }
 
     public boolean isInParenthesisCite() {
-        return inPar.isSelected();
+        return defaultInPar;
     }
 }

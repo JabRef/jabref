@@ -1,12 +1,20 @@
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +26,17 @@ public class CleanupWorkerTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+
+    @Before
+    public void setUp() {
+        if (Globals.prefs == null) {
+            Globals.prefs = JabRefPreferences.getInstance();
+        }
+        if (Globals.journalAbbreviationLoader == null) {
+            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        }
+    }
 
 
     @SuppressWarnings("unused")
@@ -121,7 +140,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupMonthChangesNumberToBibtex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_MONTH);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "month[MonthFormatter]"));
         BibEntry entry = new BibEntry();
         entry.setField("month", "01");
 
@@ -132,7 +151,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupPageNumbersConvertsSingleDashToDouble() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_PAGE_NUMBERS);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "pages[PageNumbersFormatter]"));
         BibEntry entry = new BibEntry();
         entry.setField("pages", "1-2");
 
@@ -143,7 +162,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupDatesConvertsToCorrectFormat() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DATE);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "date[DateFormatter]"));
         BibEntry entry = new BibEntry();
         entry.setField("date", "01/1999");
 
@@ -190,7 +209,8 @@ public class CleanupWorkerTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         CleanupWorker worker = new CleanupWorker(preset,
-                Collections.singletonList(testFolder.getRoot().getAbsolutePath()));
+                Collections.singletonList(testFolder.getRoot().getAbsolutePath()), null,
+                mock(JournalAbbreviationRepository.class));
         worker.cleanup(entry);
         FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", "Toot.tmp", "");
         Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
@@ -198,7 +218,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupHtmlStripsHtmlTag() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_HTML_TO_LATEX);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "title[HtmlConverter]"));
         BibEntry entry = new BibEntry();
         entry.setField("title", "<b>hallo</b>");
 
@@ -209,7 +229,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupUnitsConvertsOneAmpereToLatex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_UNITS);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "title[UnitFormatter]"));
         BibEntry entry = new BibEntry();
         entry.setField("title", "1 A");
 
@@ -220,7 +240,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_CASE);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "title[CaseKeeper]"));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
@@ -231,7 +251,7 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupLatexMergesTwoLatexMathEnvironments() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_LATEX);
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, "title[LatexFormatter]"));
         BibEntry entry = new BibEntry();
         entry.setField("title", "$\\alpha$$\\beta$");
 

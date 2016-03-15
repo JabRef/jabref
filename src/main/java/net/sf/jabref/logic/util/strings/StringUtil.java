@@ -46,11 +46,11 @@ public class StringUtil {
         if ((toShave == null) || (toShave.isEmpty())) {
             return "";
         }
-        toShave = toShave.trim();
-        if (isInCurlyBrackets(toShave) || isInCitationMarks(toShave)) {
-            return toShave.substring(1, toShave.length() - 1);
+        String shaved = toShave.trim();
+        if (isInCurlyBrackets(shaved) || isInCitationMarks(shaved)) {
+            return shaved.substring(1, shaved.length() - 1);
         }
-        return toShave;
+        return shaved;
     }
 
     /**
@@ -73,14 +73,14 @@ public class StringUtil {
             return "";
         }
 
-        from = Math.max(from, 0);
-        to = Math.min(strings.length, to);
+        int updatedFrom = Math.max(from, 0);
+        int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = from; i < (to - 1); i++) {
+        for (int i = updatedFrom; i < (updatedTo - 1); i++) {
             stringBuilder.append(strings[i]).append(separator);
         }
-        return stringBuilder.append(strings[to - 1]).toString();
+        return stringBuilder.append(strings[updatedTo - 1]).toString();
     }
 
     /**
@@ -105,13 +105,14 @@ public class StringUtil {
             return "";
         }
 
+
         if (orgName.toLowerCase().endsWith("." + defaultExtension.toLowerCase())) {
             return orgName;
         }
 
         int hiddenChar = orgName.indexOf('.', 1); // hidden files Linux/Unix (?)
         if (hiddenChar < 1) {
-            orgName = orgName + "." + defaultExtension;
+            return orgName + "." + defaultExtension;
         }
 
         return orgName;
@@ -121,18 +122,18 @@ public class StringUtil {
      * Creates a substring from a text
      *
      * @param text
-     * @param index
+     * @param startIndex
      * @param terminateOnEndBraceOnly
      * @return
      */
-    public static String getPart(String text, int index, boolean terminateOnEndBraceOnly) {
+    public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
         int count = 0;
 
         StringBuilder part = new StringBuilder();
 
         // advance to first char and skip whitespace
-        index++;
+        int index = startIndex + 1;
         while ((index < text.length()) && Character.isWhitespace(text.charAt(index))) {
             index++;
         }
@@ -353,16 +354,6 @@ public class StringUtil {
         }
 
         return buf.toString();
-
-        /*
-         * if (s.isEmpty()) return s; // Protect against ArrayIndexOutOf....
-         * StringBuffer buf = new StringBuffer();
-         *
-         * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while
-         * (mcr.find()) { String replaceStr = mcr.group();
-         * mcr.appendReplacement(buf, "{" + replaceStr + "}"); }
-         * mcr.appendTail(buf); return s.substring(0, 1) + buf.toString();
-         */
     }
 
     /**
@@ -375,11 +366,12 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     public static String removeBracesAroundCapitals(String s) {
+        String current = s;
         String previous = s;
-        while ((s = removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
-            previous = s;
+        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
+            previous = current;
         }
-        return s;
+        return current;
     }
 
     /**
@@ -419,12 +411,35 @@ public class StringUtil {
         return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
 
+    /**
+     * Checks if the given String has exactly one pair of surrounding curly braces <br>
+     * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     * @param toCheck The string to check
+     * @return True, if the check was succesful. False otherwise.
+     */
     public static boolean isInCurlyBrackets(String toCheck) {
+        int count = 0;
+        int brackets = 0;
         if ((toCheck == null) || toCheck.isEmpty()) {
-            return false; // In case of null or empty string
+            return false;
         } else {
-            return (toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}');
+            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
+                for (char c : toCheck.toCharArray()) {
+                    if (c == '{') {
+                        if (brackets == 0) {
+                            count++;
+                        }
+                        brackets++;
+                    } else if (c == '}') {
+                        brackets--;
+                    }
+                }
+
+                return count == 1;
+            }
+            return false;
         }
+
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
@@ -509,12 +524,11 @@ public class StringUtil {
      * @param  delimstr  Delimiter string
      * @return list      {@link java.util.List} of <tt>String</tt>
      */
-    public static List<String> tokenizeToList(String buf, String delimstr)
-    {
+    public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
-        buf = buf + '\n';
+        String buffer = buf + '\n';
 
-        StringTokenizer st = new StringTokenizer(buf, delimstr);
+        StringTokenizer st = new StringTokenizer(buffer, delimstr);
 
         while (st.hasMoreTokens()) {
             list.add(st.nextToken());

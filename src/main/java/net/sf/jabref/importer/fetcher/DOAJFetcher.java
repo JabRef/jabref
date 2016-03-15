@@ -44,10 +44,6 @@ public class DOAJFetcher implements EntryFetcher {
 
     private final JSONEntryParser jsonConverter = new JSONEntryParser();
 
-    public DOAJFetcher() {
-        super();
-    }
-
     @Override
     public void stopFetching() {
         shouldContinue = false;
@@ -102,7 +98,7 @@ public class DOAJFetcher implements EntryFetcher {
                         JSONArray results = jo.getJSONArray("results");
                         for (int i = 0; i < results.length(); i++) {
                             JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                            BibEntry entry = jsonConverter.BibJSONtoBibtex(bibJsonEntry);
+                            BibEntry entry = jsonConverter.parseBibJSONtoBibtex(bibJsonEntry);
                             inspector.addEntry(entry);
                             fetched++;
                             inspector.setProgress(fetched, numberToFetch);

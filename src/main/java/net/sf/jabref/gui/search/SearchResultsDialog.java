@@ -56,7 +56,7 @@ import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
-import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -360,7 +360,8 @@ public class SearchResultsDialog {
                         }
                     });
                     break;
-
+                default:
+                    break;
                 }
             }
         }
@@ -421,13 +422,7 @@ public class SearchResultsDialog {
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.scrollRectToVisible(toRect);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -462,7 +457,11 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            if (tmpModel.getEntry(0).type == null) {
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            } else {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            }
                         }
                         return fileLabel;
                     } else {

@@ -15,15 +15,12 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -34,8 +31,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.ExportFormats;
@@ -66,37 +61,29 @@ public class PreferencesDialog extends JDialog {
 
     private final JabRefFrame frame;
 
-    private final JList<String> chooser;
-
-    private final JabRefPreferences prefs;
-
-    private final JButton importPrefs = new JButton(Localization.lang("Import preferences"));
-    private final JButton exportPrefs = new JButton(Localization.lang("Export preferences"));
+    private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
+    private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
+    private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
+    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
-
-
     public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
         super(parent, Localization.lang("JabRef preferences"), false);
-        prefs = JabRefPreferences.getInstance();
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 
-
         main = new JPanel();
-        JPanel upper = new JPanel();
+        JPanel mainPanel = new JPanel();
         JPanel lower = new JPanel();
 
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(upper, BorderLayout.CENTER);
+        getContentPane().add(mainPanel, BorderLayout.CENTER);
         getContentPane().add(lower, BorderLayout.SOUTH);
 
         final CardLayout cardLayout = new CardLayout();
         main.setLayout(cardLayout);
 
-        // ----------------------------------------------------------------
-        // Add tabs to tabbed here. Remember, tabs must implement PrefsTab.
-        // ----------------------------------------------------------------
         List<PrefsTab> tabs = new ArrayList<>();
         tabs.add(new GeneralTab(prefs));
         tabs.add(new NetworkTab(prefs));
@@ -115,20 +102,13 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new XmpPrefsTab());
         tabs.add(new AdvancedTab(prefs, jabRef));
 
-        Iterator<PrefsTab> prefTabs = tabs.iterator();
-        String[] names = new String[tabs.size()];
-        int index = 0;
+        // add all tabs
+        tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));
 
-        while (prefTabs.hasNext()) {
-            PrefsTab tab = prefTabs.next();
-            names[index] = tab.getTabName();
-            index++;
-            main.add((Component) tab, tab.getTabName());
-        }
+        mainPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        upper.setBorder(BorderFactory.createEtchedBorder());
-
-        chooser = new JList<>(names);
+        String[] tabNames = tabs.stream().map(PrefsTab::getTabName).toArray(String[]::new);
+        JList<String> chooser = new JList<>(tabNames);
         chooser.setBorder(BorderFactory.createEtchedBorder());
         // Set a prototype value to control the width of the list:
         chooser.setPrototypeCellValue("This should be wide enough");
@@ -137,29 +117,29 @@ public class PreferencesDialog extends JDialog {
 
         // Add the selection listener that will show the correct panel when
         // selection changes:
-        chooser.addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (e.getValueIsAdjusting()) {
-                    return;
-                }
-                String o = chooser.getSelectedValue();
-                cardLayout.show(main, o);
+        chooser.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) {
+                return;
             }
+            String o = chooser.getSelectedValue();
+            cardLayout.show(main, o);
         });
 
-        JPanel one = new JPanel();
-        JPanel two = new JPanel();
-        one.setLayout(new BorderLayout());
-        two.setLayout(new BorderLayout());
-        one.add(chooser, BorderLayout.CENTER);
-        one.add(importPrefs, BorderLayout.SOUTH);
-        two.add(one, BorderLayout.CENTER);
-        two.add(exportPrefs, BorderLayout.SOUTH);
-        upper.setLayout(new BorderLayout());
-        upper.add(two, BorderLayout.WEST);
-        upper.add(main, BorderLayout.CENTER);
+
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new GridLayout(4, 1));
+        buttons.add(importPreferences, 0);
+        buttons.add(exportPreferences, 1);
+        buttons.add(showPreferences, 2);
+        buttons.add(resetPreferences, 3);
+
+        JPanel westPanel = new JPanel();
+        westPanel.setLayout(new BorderLayout());
+        westPanel.add(chooser, BorderLayout.CENTER);
+        westPanel.add(buttons, BorderLayout.SOUTH);
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(main, BorderLayout.CENTER);
+        mainPanel.add(westPanel, BorderLayout.WEST);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -177,58 +157,68 @@ public class PreferencesDialog extends JDialog {
         Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
         // Import and export actions:
-        exportPrefs.setToolTipText(Localization.lang("Export preferences to file"));
-        importPrefs.setToolTipText(Localization.lang("Import preferences from file"));
-        exportPrefs.addActionListener(new ActionListener() {
+        exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
+        exportPreferences.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
+                    JFileChooser.SAVE_DIALOG, false);
+            if (filename == null) {
+                return;
+            }
+            File file = new File(filename);
+            if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                    Localization.lang("'%0' exists. Overwrite file?", file.getName()),
+                    Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.SAVE_DIALOG, false);
-                if (filename == null) {
-                    return;
+                try {
+                    prefs.exportPreferences(filename);
+                } catch (JabRefException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
                 }
-                File file = new File(filename);
-                if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
-                        Localization.lang("'%0' exists. Overwrite file?", file.getName()),
-                        Localization.lang("Export preferences"),
-                        JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
-
-                    try {
-                        prefs.exportPreferences(filename);
-                    } catch (JabRefException ex) {
-                        LOGGER.warn(ex.getMessage(), ex);
-                        JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                                Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
             }
         });
 
-        importPrefs.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String filename = FileDialogs.getNewFile(frame, new File(System
-                        .getProperty("user.home")), ".xml", JFileChooser.OPEN_DIALOG, false);
-                if (filename == null) {
-                    return;
-                }
-
+        importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
+        importPreferences.addActionListener(e -> {
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
+                    JFileChooser.OPEN_DIALOG, false);
+            if (filename != null) {
                 try {
                     prefs.importPreferences(filename);
-                    setValues();
-                    ExportFormats.initAllExports();
-                    frame.removeCachedEntryEditors();
-                    Globals.prefs.updateEntryEditorTabList();
+                    updateAfterPreferenceChanges();
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
+                            Localization.lang("You must restart JabRef for this to come into effect."),
+                            Localization.lang("Import preferences"),
+                            JOptionPane.WARNING_MESSAGE);
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
                 }
             }
+        });
 
+        showPreferences.addActionListener(
+                e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
+                        .setVisible(true));
+        resetPreferences.addActionListener(e -> {
+            if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                    Localization.lang("Are you sure you want to reset all settings to default values?"),
+                    Localization.lang("Reset preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    prefs.clear();
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
+                            Localization.lang("You must restart JabRef for this to come into effect."),
+                            Localization.lang("Reset preferences"),
+                            JOptionPane.WARNING_MESSAGE);
+                } catch (BackingStoreException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
+                }
+                updateAfterPreferenceChanges();
+            }
         });
 
         setValues();
@@ -237,6 +227,12 @@ public class PreferencesDialog extends JDialog {
 
     }
 
+    private void updateAfterPreferenceChanges() {
+        setValues();
+        ExportFormats.initAllExports();
+        frame.removeCachedEntryEditors();
+        Globals.prefs.updateEntryEditorTabList();
+    }
 
     class OkAction extends AbstractAction {
 

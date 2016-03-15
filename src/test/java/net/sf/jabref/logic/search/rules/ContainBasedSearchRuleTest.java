@@ -28,7 +28,7 @@ public class ContainBasedSearchRuleTest {
         Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
         Assert.assertEquals(true, bsCaseInsensitive.applyRule(query, be));
         Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(true, bsCaseInsensitiveRegexp.applyRule(query, be));
+        Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "\"marine larviculture\"";
 
@@ -37,7 +37,7 @@ public class ContainBasedSearchRuleTest {
         Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
         Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
 
-        query = "\"marine [A-Za-z]* larviculture\"";
+        query = "marine [A-Za-z]* larviculture";
 
         Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
         Assert.assertEquals(false, bsCaseInsensitive.applyRule(query, be));

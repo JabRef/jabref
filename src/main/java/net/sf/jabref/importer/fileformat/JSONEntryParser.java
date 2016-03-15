@@ -31,18 +31,13 @@ public class JSONEntryParser {
 
     private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
 
-
-    public JSONEntryParser() {
-
-    }
-
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry
      *
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibEntry
      */
-    public BibEntry BibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {"year", "title", "abstract", "month"};
 
@@ -155,7 +150,7 @@ public class JSONEntryParser {
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
      */
-    public static BibEntry SpringerJSONtoBibtex(JSONObject springerJsonEntry) {
+    public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
         String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
                 "publisher"};
@@ -231,7 +226,7 @@ public class JSONEntryParser {
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
             entry.setField("date", date); // For BibLatex
-            String dateparts[] = date.split("-");
+            String[] dateparts = date.split("-");
             entry.setField("year", dateparts[0]);
             entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }

@@ -34,7 +34,7 @@ public abstract class SpecialField {
     private HashMap<String, SpecialFieldValue> map;
 
 
-    void setValues(List<SpecialFieldValue> values) {
+    protected void setValues(List<SpecialFieldValue> values) {
         this.values = values;
         this.keywords = new ArrayList<>();
         this.map = new HashMap<>();

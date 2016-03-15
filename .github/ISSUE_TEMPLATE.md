@@ -1,5 +1,5 @@
 * JabRef version (available in the About box):
-* Operation system and version:
+* Operating system and version:
 * Steps to reproduce:
   1. ...
   2. ...

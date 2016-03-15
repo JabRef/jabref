@@ -53,7 +53,6 @@ package net.sf.jabref.wizard.text.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -153,6 +152,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         InputMap im = buttons.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -440,13 +440,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, JabRef.jrf);
+        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
         if (importedEntries == null) {
             return false;
         } else {
             Util.setAutomaticFields(importedEntries, false, false, true);
             for (BibEntry e : importedEntries) {
-                JabRef.jrf.getCurrentBasePanel().insertEntry(e);
+                frame.getCurrentBasePanel().insertEntry(e);
             }
             return true;
         }
@@ -518,15 +518,13 @@ public class TextInputDialog extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, null,
-                        ".txt",
-                        JFileChooser.OPEN_DIALOG, false);
+                String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
                     doc.remove(0, doc.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try(FileInputStream fis = new FileInputStream(newFile)) {
+                        try (FileInputStream fis = new FileInputStream(newFile)) {
                             eKit.read(fis, doc, 0);
                             doc.setLogicalStyle(0, doc.getStyle("regular"));
                         }
@@ -622,7 +620,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
             /* We additionally set the JLabels icon property here.
              */
             String s = value.toString();
-            //        setIcon((s.length > 10) ? longIcon : shortIcon);
             if (entry.hasField(s)) {
                 this.setForeground(Color.gray);
                 this.setFont(usedFont);

@@ -82,34 +82,27 @@ public class FileListEntryEditor {
         this.entry = entry;
         this.metaData = metaData;
 
-        AbstractAction okAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // If OK button is disabled, ignore this event:
-                if (!ok.isEnabled()) {
+        ActionListener okAction = e -> {
+            // If OK button is disabled, ignore this event:
+            if (!ok.isEnabled()) {
+                return;
+            }
+            // If necessary, ask the external confirm object whether we are ready to close.
+            if (externalConfirm != null) {
+                // Construct an updated FileListEntry:
+                storeSettings(entry);
+                if (!externalConfirm.confirmClose(entry)) {
                     return;
                 }
-                // If necessary, ask the external confirm object whether we are ready to close.
-                if (externalConfirm != null) {
-                    // Construct an updated FileListEntry:
-                    storeSettings(entry);
-                    if (!externalConfirm.confirmClose(entry)) {
-                        return;
-                    }
-                }
-                diag.dispose();
-                storeSettings(FileListEntryEditor.this.entry);
-                okPressed = true;
             }
+            diag.dispose();
+            storeSettings(FileListEntryEditor.this.entry);
+            okPressed = true;
         };
         types = new JComboBox<>();
-        types.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) {
-                if (!okDisabledExternally) {
-                    ok.setEnabled(types.getSelectedItem() != null);
-                }
+        types.addItemListener(itemEvent -> {
+            if (!okDisabledExternally) {
+                ok.setEnabled(types.getSelectedItem() != null);
             }
         });
 
@@ -150,13 +143,7 @@ public class FileListEntryEditor {
         link.addActionListener(okAction);
         description.addActionListener(okAction);
 
-        open.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openFile();
-            }
-        });
+        open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
             @Override
@@ -298,7 +285,7 @@ public class FileListEntryEditor {
     }
 
     private void storeSettings(FileListEntry entry) {
-        String description = this.description.getText().trim();
+        String descriptionText = this.description.getText().trim();
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
@@ -331,7 +318,7 @@ public class FileListEntryEditor {
 
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
-        entry.description = description;
+        entry.description = descriptionText;
         entry.type = type;
         entry.link = link;
     }

@@ -9,8 +9,8 @@ import net.sf.jabref.model.entry.IdGenerator;
 
 public class BibtexStringComparatorTest {
 
-    BibtexStringComparator bsc1 = new BibtexStringComparator(false);
-    BibtexStringComparator bsc2 = new BibtexStringComparator(true);
+    private final BibtexStringComparator bsc1 = new BibtexStringComparator(false);
+    private final BibtexStringComparator bsc2 = new BibtexStringComparator(true);
 
 
     @Test

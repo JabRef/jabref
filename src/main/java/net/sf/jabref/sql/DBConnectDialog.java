@@ -225,6 +225,7 @@ public class DBConnectDialog extends JDialog {
             break;
         default: // Will be 3 at most
             errMsg.append(errors[0]).append(", ").append(errors[1]).append(", and ").append(errors[2]).append('.');
+            break;
         }
 
         if (errMsg.toString().isEmpty()) {

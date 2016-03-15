@@ -4,8 +4,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.importer.ParserResult;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,35 +59,6 @@ public class UtilTest {
     }
 
     @Test
-    public void testParseMethodCalls() {
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("bla").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla").get(0))[0]);
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("bla,").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla,").get(0))[0]);
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("_bla.bla.blub,").size());
-        Assert.assertEquals("_bla.bla.blub", (net.sf.jabref.util.Util.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").get(1))[0]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
-        Assert.assertEquals("test", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
-        Assert.assertEquals("fark", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
-        Assert.assertEquals("test", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
-        Assert.assertEquals("fark", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
-    }
-
-    @Test
     @Ignore
     public void testFieldAndFormat() {
         Assert.assertEquals("Eric von Hippel and Georg von Krogh", net.sf.jabref.util.Util.getFieldAndFormat("[author]", entry, database));
@@ -111,9 +82,9 @@ public class UtilTest {
     @Ignore
     public void testUserFieldAndFormat() {
 
-        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
 
-        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
 
         try {
 
@@ -123,14 +94,14 @@ public class UtilTest {
             n.add("testMe123454321");
             f.add("*@*@test");
 
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, n);
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, f);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, n);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, f);
 
             Assert.assertEquals("testtest", net.sf.jabref.util.Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
 
         } finally {
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
         }
     }
 

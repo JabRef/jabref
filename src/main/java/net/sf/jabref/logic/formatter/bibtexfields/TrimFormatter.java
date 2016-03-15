@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 
@@ -20,5 +21,10 @@ public class TrimFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
         return value.trim();
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Removes any leading and trailing whitespace in %s.");
     }
 }

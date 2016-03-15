@@ -19,6 +19,6 @@ public class ChangeTypeAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        panel.changeType(type);
+        panel.changeTypeOfSelectedEntries(type);
     }
 }

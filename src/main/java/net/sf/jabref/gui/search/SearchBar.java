@@ -23,8 +23,8 @@ import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.util.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -65,9 +65,9 @@ public class SearchBar extends JPanel {
 
     private SearchMode searchMode = getSearchModeFromSettings();
 
-    private final JCheckBox caseSensitive;
+    private final JToggleButton caseSensitive;
+    private final JToggleButton regularExp;
 
-    private final JCheckBox regularExp;
     private final JLabel currentResults = new JLabel("");
 
     private AutoCompleteSupport<String> autoCompleteSupport;
@@ -86,12 +86,21 @@ public class SearchBar extends JPanel {
 
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
 
-        caseSensitive = new JCheckBox(Localization.lang("Case sensitive"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
-        caseSensitive.addItemListener(ae -> performSearch());
-        caseSensitive.addItemListener(ae -> updatePreferences());
-        regularExp = new JCheckBox(Localization.lang("regular expression"), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-        regularExp.addItemListener(ae -> performSearch());
-        regularExp.addItemListener(ae -> updatePreferences());
+        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
+        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
+        caseSensitive.addActionListener(e -> {
+            performSearch();
+            updatePreferences();
+        });
+
+
+        regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        regularExp.setToolTipText(Localization.lang("regular expression"));
+        regularExp.addActionListener(e -> {
+            performSearch();
+            updatePreferences();
+        });
+
 
         openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
@@ -118,13 +127,13 @@ public class SearchBar extends JPanel {
 
         JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
-        clearSearchButton.addActionListener((l) -> endSearch());
+        clearSearchButton.addActionListener(l -> endSearch());
 
         this.add(clearSearchButton);
 
         searchModeButton = new JButton();
         updateSearchModeButtonText();
-        searchModeButton.addActionListener((l) -> toggleSearchModeAndSearch());
+        searchModeButton.addActionListener(l -> toggleSearchModeAndSearch());
 
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);

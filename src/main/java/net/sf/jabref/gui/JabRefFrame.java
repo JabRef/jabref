@@ -36,6 +36,8 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
+import net.sf.jabref.gui.menus.FileHistoryMenu;
+import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
@@ -67,10 +69,6 @@ import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -80,6 +78,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The main window of the application.
@@ -87,6 +86,7 @@ import java.util.List;
 public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
+    private static final String ELLIPSES = "...";
 
     final JSplitPane contentPane = new JSplitPane();
 
@@ -98,20 +98,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    public JTabbedPane tabbedPane; // initialized at constructor
+    private JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
 
     private PositionWindow pw;
 
-    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity")) {
+    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity") + ELLIPSES) {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            IntegrityCheck check = new IntegrityCheck();
-            List<IntegrityMessage> messages = check.checkBibtexDatabase(getCurrentBasePanel().database(),
-                    getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode());
+            IntegrityCheck check = new IntegrityCheck(getCurrentBasePanel().getBibDatabaseContext());
+            List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
             if (messages.isEmpty()) {
                 JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
@@ -135,15 +134,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 ListSelectionModel selectionModel = table.getSelectionModel();
 
-                selectionModel.addListSelectionListener(new ListSelectionListener() {
-
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-                        if (!e.getValueIsAdjusting()) {
-                            String citeKey = (String) model[table.getSelectedRow()][0];
-                            String fieldName = (String) model[table.getSelectedRow()][1];
-                            getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
-                        }
+                selectionModel.addListSelectionListener(event -> {
+                    if (!event.getValueIsAdjusting()) {
+                        String citeKey = (String) model[table.getSelectedRow()][0];
+                        String fieldName = (String) model[table.getSelectedRow()][1];
+                        getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
                     }
                 });
 
@@ -171,7 +166,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
 
-    final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
+    private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
             Localization.lang("Status")
                     + ':', SwingConstants.LEFT);
@@ -195,43 +190,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JToggleButton previewToggle;
     public JToggleButton fetcherToggle;
 
-    private class EditModeAction extends AbstractAction {
 
-        public EditModeAction() {
-            initName();
-        }
-
-        public void initName() {
-            if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));
-            } else {
-                BibDatabaseMode mode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode();
-                String modeName = mode.getOppositeMode().getFormattedName();
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", modeName));
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent evt) {
-            if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                return;
-            }
-
-            BibDatabaseMode newMode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode().getOppositeMode();
-            JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().setMode(newMode);
-            JabRefFrame.this.refreshTitleAndTabs();
-
-            initName();
-
-            // update all elements in current base panel
-            JabRefFrame.this.getCurrentBasePanel().hideBottomComponent();
-            JabRefFrame.this.getCurrentBasePanel().rebuildAllEntryEditors();
-            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
-        }
-
-    }
-
-    final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
+    private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
     private final AbstractAction quit = new CloseAction();
     private final AbstractAction selectKeys = new SelectKeysAction();
@@ -271,9 +231,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Undo"), Globals.getKeyPrefs().getKey(KeyBinding.UNDO), IconTheme.JabRefIcon.UNDO.getIcon());
     private final AbstractAction redo = new GeneralAction(Actions.REDO, Localization.menuTitle("Redo"),
             Localization.lang("Redo"), Globals.getKeyPrefs().getKey(KeyBinding.REDO), IconTheme.JabRefIcon.REDO.getIcon());
-    final AbstractAction forward = new GeneralAction(Actions.FORWARD, Localization.menuTitle("Forward"),
+    private final AbstractAction forward = new GeneralAction(Actions.FORWARD, Localization.menuTitle("Forward"),
             Localization.lang("Forward"), Globals.getKeyPrefs().getKey(KeyBinding.FORWARD), IconTheme.JabRefIcon.RIGHT.getIcon());
-    final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
+    private final AbstractAction back = new GeneralAction(Actions.BACK, Localization.menuTitle("Back"),
             Localization.lang("Back"), Globals.getKeyPrefs().getKey(KeyBinding.BACK), IconTheme.JabRefIcon.LEFT.getIcon());
     private final AbstractAction deleteEntry = new GeneralAction(Actions.DELETE, Localization.menuTitle("Delete entry"),
             Localization.lang("Delete entry"), Globals.getKeyPrefs().getKey(KeyBinding.DELETE_ENTRY), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
@@ -283,6 +243,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcon.PASTE.getIcon());
     private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
             Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcon.CUT.getIcon());
+    private final AbstractAction openConsole = new GeneralAction(Actions.OPEN_CONSOLE,
+            Localization.menuTitle("Open terminal here"),
+            Localization.lang("Open terminal here"),
+            Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
+            IconTheme.JabRefIcon.CONSOLE.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
@@ -323,7 +288,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
-            Localization.menuTitle("Replace string"), Globals.getKeyPrefs().getKey(KeyBinding.REPLACE_STRING));
+            Localization.menuTitle("Replace string") + ELLIPSES, Globals.getKeyPrefs().getKey(KeyBinding.REPLACE_STRING));
 
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
             Localization.menuTitle("Edit preamble"),
@@ -335,7 +300,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Globals.getKeyPrefs().getKey(KeyBinding.EDIT_STRINGS),
             IconTheme.JabRefIcon.EDIT_STRINGS.getIcon());
     private final AbstractAction customizeAction = new CustomizeEntryTypeAction();
-    private final AbstractAction toggleToolbar = new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
+    private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
         {
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.HIDE_SHOW_TOOLBAR));
@@ -346,29 +311,35 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public void actionPerformed(ActionEvent e) {
             tlb.setVisible(!tlb.isVisible());
         }
-    };
-    private final AbstractAction toggleGroups = new GeneralAction(Actions.TOGGLE_GROUPS,
+    });
+
+    private final Action toggleGroups = enableToggle(new GeneralAction(Actions.TOGGLE_GROUPS,
             Localization.menuTitle("Toggle groups interface"),
             Localization.lang("Toggle groups interface"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
-            IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon());
-    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group"));
+            IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon()));
+    private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
-            Localization.lang("Remove from group"));
-    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group"));
+            Localization.lang("Remove from group") + ELLIPSES);
+    private final AbstractAction moveToGroup = new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group") + ELLIPSES);
 
-    private final AbstractAction togglePreview = new GeneralAction(Actions.TOGGLE_PREVIEW,
+    private final Action togglePreview = enableToggle(new GeneralAction(Actions.TOGGLE_PREVIEW,
             Localization.menuTitle("Toggle entry preview"),
             Localization.lang("Toggle entry preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_ENTRY_PREVIEW),
-            IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon());
-    private final AbstractAction toggleHighlightAny = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
+            IconTheme.JabRefIcon.TOGGLE_ENTRY_PREVIEW.getIcon()));
+    private final Action toggleHighlightAny = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY,
             Localization.menuTitle("Highlight groups matching any selected entry"),
-            Localization.lang("Highlight groups matching any selected entry"));
-    private final AbstractAction toggleHighlightAll = new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
+            Localization.lang("Highlight groups matching any selected entry")));
+    private final Action toggleHighlightAll = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL,
             Localization.menuTitle("Highlight groups matching all selected entries"),
-            Localization.lang("Highlight groups matching all selected entries"));
-    final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
+            Localization.lang("Highlight groups matching all selected entries")));
+    private final Action toggleHighlightDisable = enableToggle(new GeneralAction(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE,
+            Localization.menuTitle("Disable highlight groups matching entries"),
+            Localization.lang("Disable highlight groups matching entries")));
+
+
+    private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
             Localization.menuTitle("Switch preview layout"),
             Globals.getKeyPrefs().getKey(KeyBinding.SWITCH_PREVIEW_LAYOUT));
     private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY,
@@ -398,7 +369,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction dupliCheck = new GeneralAction(Actions.DUPLI_CHECK,
             Localization.menuTitle("Find duplicates"), IconTheme.JabRefIcon.FIND_DUPLICATES.getIcon());
     private final AbstractAction plainTextImport = new GeneralAction(Actions.PLAIN_TEXT_IMPORT,
-            Localization.menuTitle("New entry from plain text"),
+            Localization.menuTitle("New entry from plain text") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.NEW_FROM_PLAIN_TEXT));
 
     private final AbstractAction customExpAction = new CustomizeExportsAction();
@@ -408,7 +379,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Export selected entries to clipboard"),
             IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getIcon());
     private final AbstractAction autoSetFile = new GeneralAction(Actions.AUTO_SET_FILE,
-            Localization.lang("Synchronize file links"),
+            Localization.lang("Synchronize file links") + ELLIPSES,
             Globals.getKeyPrefs().getKey(KeyBinding.SYNCHRONIZE_FILES));
 
     private final AbstractAction abbreviateMedline = new GeneralAction(Actions.ABBREVIATE_MEDLINE,
@@ -437,13 +408,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Export to external SQL database"));
 
     private final AbstractAction cleanupEntries = new GeneralAction(Actions.CLEANUP,
-            Localization.menuTitle("Cleanup entries"),
+            Localization.menuTitle("Cleanup entries") + ELLIPSES,
             Localization.lang("Cleanup entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.CLEANUP),
             IconTheme.JabRefIcon.CLEANUP_ENTRIES.getIcon());
 
     private final AbstractAction mergeEntries = new GeneralAction(Actions.MERGE_ENTRIES,
-            Localization.menuTitle("Merge entries"),
+            Localization.menuTitle("Merge entries") + ELLIPSES,
             Localization.lang("Merge entries"),
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
 
@@ -461,8 +432,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction sendAsEmail = new GeneralAction(Actions.SEND_AS_EMAIL,
             Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
 
-    final MassSetFieldAction massSetField = new MassSetFieldAction(this);
-    final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
+    private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
+    private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
@@ -483,6 +454,45 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
+
+
+    private class EditModeAction extends AbstractAction {
+
+        public EditModeAction() {
+            initName();
+        }
+
+        public void initName() {
+            if (JabRefFrame.this.getCurrentBasePanel() == null) {
+                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));
+            } else {
+                BibDatabaseMode mode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode();
+                String modeName = mode.getOppositeMode().getFormattedName();
+                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", modeName));
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent evt) {
+            if (JabRefFrame.this.getCurrentBasePanel() == null) {
+                return;
+            }
+
+            BibDatabaseMode newMode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode()
+                    .getOppositeMode();
+            JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().setMode(newMode);
+            JabRefFrame.this.refreshTitleAndTabs();
+
+            initName();
+
+            // update all elements in current base panel
+            JabRefFrame.this.getCurrentBasePanel().hideBottomComponent();
+            JabRefFrame.this.getCurrentBasePanel().rebuildAllEntryEditors();
+            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
+        }
+
+    }
+
 
     private List<NewEntryAction> getNewEntryActions() {
         // only Bibtex
@@ -596,29 +606,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
-        tabbedPane.addChangeListener(new ChangeListener() {
+        tabbedPane.addChangeListener(e -> {
+            markActiveBasePanel();
 
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                markActiveBasePanel();
-
-                BasePanel bp = getCurrentBasePanel();
-                if (bp == null) {
-                    return;
-                }
-
-                groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-                previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
-                fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-                Globals.focusListener.setFocused(bp.mainTable);
-                setWindowTitle();
-                editModeAction.initName();
-                // Update search autocompleter with information for the correct database:
-                bp.updateSearchManager();
-                // Set correct enabled state for Back and Forward actions:
-                bp.setBackAndForwardEnabledState();
-                new FocusRequester(bp.mainTable);
+            BasePanel bp = getCurrentBasePanel();
+            if (bp == null) {
+                return;
             }
+
+            groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+            previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+            fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
+            Globals.focusListener.setFocused(bp.mainTable);
+            setWindowTitle();
+            editModeAction.initName();
+            // Update search autocompleter with information for the correct database:
+            bp.updateSearchManager();
+            // Set correct enabled state for Back and Forward actions:
+            bp.setBackAndForwardEnabledState();
+            new FocusRequester(bp.mainTable);
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
@@ -703,7 +709,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void openAction(String filePath) {
         File file = new File(filePath);
         // all the logic is done in openIt. Even raising an existing panel
-        open.openFile(file, true);
+        getOpenDatabaseAction().openFile(file, true);
     }
 
     // General info dialog.  The MacAdapter calls this method when "About"
@@ -980,7 +986,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Returns a list of BasePanel.
      *
-     * @param i Index of base
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
@@ -1049,6 +1054,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.setToolTipTextAt(index, toolTip);
     }
 
+    private static Action enableToggle(Action a, boolean initialValue) {
+        // toggle only works correctly when the SELECTED_KEY is set to false or true explicitly upon start
+        a.putValue(Action.SELECTED_KEY, String.valueOf(initialValue));
+
+        return a;
+    }
+
+    private static Action enableToggle(Action a) {
+        return enableToggle(a, false);
+    }
+
     class GeneralAction extends MnemonicAwareAction {
 
         private final String command;
@@ -1107,7 +1123,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 try {
                     ((BasePanel) tabbedPane.getSelectedComponent()).runCommand(command);
                 } catch (Throwable ex) {
-                    ex.printStackTrace();
+                    LOGGER.error("Problem with executing command: " + command, ex);
                 }
             } else {
                 LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
@@ -1132,7 +1148,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         file.add(newBibtexDatabaseAction);
         file.add(newBiblatexDatabaseAction);
-        file.add(open); //opendatabaseaction
+        file.add(getOpenDatabaseAction()); //opendatabaseaction
         file.add(mergeDatabaseAction);
         file.add(save);
         file.add(saveAs);
@@ -1216,34 +1232,52 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             edit.addSeparator();
         }
 
-        edit.add(manageKeywords);
+        edit.add(getManageKeywords());
         edit.addSeparator();
         edit.add(selectAll);
         mb.add(edit);
 
         search.add(normalSearch);
         search.add(replaceAll);
-        search.add(massSetField);
+        search.add(getMassSetField());
         search.addSeparator();
-        search.add(generalFetcher.getAction());
+        search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
             sidePaneManager.show(generalFetcher.getTitle());
         }
         mb.add(search);
 
-        groups.add(toggleGroups);
+        groups.add(new JCheckBoxMenuItem(toggleGroups));
         groups.addSeparator();
         groups.add(addToGroup);
         groups.add(removeFromGroup);
         groups.add(moveToGroup);
         groups.addSeparator();
-        groups.add(toggleHighlightAny);
-        groups.add(toggleHighlightAll);
+        JRadioButtonMenuItem toggleHighlightAnyItem = new JRadioButtonMenuItem(toggleHighlightAny);
+        groups.add(toggleHighlightAnyItem);
+        JRadioButtonMenuItem toggleHighlightAllItem = new JRadioButtonMenuItem(toggleHighlightAll);
+        groups.add(toggleHighlightAllItem);
+        JRadioButtonMenuItem toggleHighlightDisableItem = new JRadioButtonMenuItem(toggleHighlightDisable);
+        groups.add(toggleHighlightDisableItem);
+        ButtonGroup highlightButtonGroup = new ButtonGroup();
+        highlightButtonGroup.add(toggleHighlightDisableItem);
+        highlightButtonGroup.add(toggleHighlightAnyItem);
+        highlightButtonGroup.add(toggleHighlightAllItem);
+
+        HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(Globals.prefs);
+        if(highlightMatchingGroupPreferences.isAll()) {
+            toggleHighlightAllItem.setSelected(true);
+        } else if(highlightMatchingGroupPreferences.isAny()) {
+            toggleHighlightAnyItem.setSelected(true);
+        } else {
+            toggleHighlightDisableItem.setSelected(true);
+        }
+
         mb.add(groups);
 
-        view.add(back);
-        view.add(forward);
+        view.add(getBackAction());
+        view.add(getForwardAction());
         view.add(focusTable);
         view.add(nextTab);
         view.add(prevTab);
@@ -1252,11 +1286,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(increaseFontSize);
         view.add(decreseFontSize);
         view.addSeparator();
-        view.add(toggleToolbar);
-        view.add(generalFetcher.getAction());
-        view.add(toggleGroups);
-        view.add(togglePreview);
-        view.add(switchPreview);
+        view.add(new JCheckBoxMenuItem(toggleToolbar));
+        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
+        view.add(new JCheckBoxMenuItem(toggleGroups));
+        view.add(new JCheckBoxMenuItem(togglePreview));
+        view.add(getSwitchPreviewAction());
 
         mb.add(view);
 
@@ -1302,6 +1336,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(openFolder);
         tools.add(openFile);
         tools.add(openUrl);
+        tools.add(openConsole);
         tools.addSeparator();
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
@@ -1374,7 +1409,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             tlb.addAction(newBibtexDatabaseAction);
         }
-        tlb.addAction(open);
+        tlb.addAction(getOpenDatabaseAction());
         tlb.addAction(save);
         tlb.addAction(saveAll);
 
@@ -1386,8 +1421,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(redo);
 
         tlb.addSeparator();
-        tlb.addAction(back);
-        tlb.addAction(forward);
+        tlb.addAction(getBackAction());
+        tlb.addAction(getForwardAction());
         tlb.addSeparator();
         tlb.addAction(newEntryAction);
         tlb.addAction(editEntry);
@@ -1401,6 +1436,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
+        tlb.addAction(openConsole);
         tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
@@ -1466,6 +1502,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
     private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+    private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
+
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
@@ -1475,9 +1513,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, writeXmpAction, findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
-                dupliCheck, autoSetFile, newEntryAction, plainTextImport, massSetField, manageKeywords,
-                pushExternalButton.getMenuAction(), closeDatabaseAction, switchPreview, checkIntegrity,
-                toggleHighlightAny, toggleHighlightAll, databaseProperties, abbreviateIso, abbreviateMedline,
+                dupliCheck, autoSetFile, newEntryAction, plainTextImport, getMassSetField(), getManageKeywords(),
+                pushExternalButton.getMenuAction(), closeDatabaseAction, getSwitchPreviewAction(), checkIntegrity,
+                toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
@@ -1490,6 +1528,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
+
+        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1527,9 +1567,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             JabRefFrame.setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
         if (tabCount == 0) {
-            back.setEnabled(false);
-            forward.setEnabled(false);
+            getBackAction().setEnabled(false);
+            getForwardAction().setEnabled(false);
         }
+
+        boolean saved = false;
+
+        if (tabCount > 0) {
+            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+        }
+        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**
@@ -1566,7 +1613,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
-        addTab(bp, file, raisePanel);
+        addTab(bp, raisePanel);
         return bp;
     }
 
@@ -1608,13 +1655,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // set original filename (again)
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
+            tabbedPane.setToolTipTextAt(i, file == null ? null : file.getAbsolutePath());
         }
     }
 
-    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+    public void addTab(BasePanel bp, boolean raisePanel) {
         // add tab
         tabbedPane.add(bp.getTabTitle(), bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file == null ? null : file.getAbsolutePath());
+
         // update all tab titles
         updateAllTabTitles();
 
@@ -1708,19 +1756,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param openInNew Should the entries be imported into a new database?
      */
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this,
-                        panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"),
-                        openInNew);
-                diag.addEntries(entries);
-                diag.entryListComplete();
-                PositionWindow.placeDialog(diag, JabRefFrame.this);
-                diag.setVisible(true);
-                diag.toFront();
-            }
+        SwingUtilities.invokeLater(() -> {
+            ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
+                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+            diag.addEntries(entries);
+            diag.entryListComplete();
+            PositionWindow.placeDialog(diag, JabRefFrame.this);
+            diag.setVisible(true);
+            diag.toFront();
         });
     }
 
@@ -1772,13 +1815,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setVisible(visible);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    progressBar.setVisible(visible);
-                }
-            });
+            SwingUtilities.invokeLater(() -> progressBar.setVisible(visible));
         }
     }
 
@@ -1792,13 +1829,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (SwingUtilities.isEventDispatchThread()) {
             progressBar.setValue(value);
         } else {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    progressBar.setValue(value);
-                }
-            });
+            SwingUtilities.invokeLater(() -> progressBar.setValue(value));
         }
 
     }
@@ -2140,6 +2171,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         updateAllTabTitles();
     }
 
+    public ManageKeywordsAction getManageKeywords() {
+        return manageKeywords;
+    }
+
+    public MassSetFieldAction getMassSetField() {
+        return massSetField;
+    }
+
+    public OpenDatabaseAction getOpenDatabaseAction() {
+        return open;
+    }
+
     public class CloseDatabaseAction extends MnemonicAwareAction {
 
         public CloseDatabaseAction() {
@@ -2175,7 +2218,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             final Component[] panels = tabbedPane.getComponents();
 
             for (Component p : panels) {
-                if (p != active) {
+                if (!Objects.equals(p, active)) {
                     closeTab((BasePanel) p);
                 }
             }
@@ -2211,4 +2254,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
+
+    public String getStatusLineText() {
+        return statusLine.getText();
+    }
+
+    public AbstractAction getForwardAction() {
+        return forward;
+    }
+
+    public AbstractAction getBackAction() {
+        return back;
+    }
+
+    public AbstractAction getSwitchPreviewAction() {
+        return switchPreview;
+    }
 }

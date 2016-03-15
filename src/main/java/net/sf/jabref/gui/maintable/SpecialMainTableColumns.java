@@ -104,6 +104,8 @@ public class SpecialMainTableColumns {
                 ExternalFileType type = fileList.getEntry(0).type;
                 if (type != null) {
                     return type.getIconLabel();
+                } else {
+                    return new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
                 }
             }
 

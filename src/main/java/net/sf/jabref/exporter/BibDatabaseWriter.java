@@ -120,10 +120,7 @@ public class BibDatabaseWriter {
         }
 
         if(preferences.getTakeMetadataSaveOrderInAccount()) {
-            List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
-            if(storedSaveOrderConfig != null) {
-                return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
-            }
+            return metaData.getSaveOrderConfig();
         }
 
         return Optional.ofNullable(preferences.getSaveOrder());
@@ -231,9 +228,9 @@ public class BibDatabaseWriter {
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         List<FieldChange> changes = new ArrayList<>();
 
-        if (metaData.getData(SaveActions.META_KEY) != null) {
+        if (metaData.getData(MetaData.SAVE_ACTIONS) != null) {
             // save actions defined -> apply for every entry
-            SaveActions saveActions = metaData.getSaveActions();
+            FieldFormatterCleanups saveActions = metaData.getSaveActions();
 
             for (BibEntry entry : toChange) {
                 changes.addAll(saveActions.applySaveActions(entry));
@@ -274,52 +271,18 @@ public class BibDatabaseWriter {
             return;
         }
 
-        // first write all meta data except groups
-        for (String key : metaData) {
+        Map<String, String> serializedMetaData = metaData.serialize();
+
+        for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
-
-            for (String metaItem : metaData.getData(key)) {
-                stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
-
-                //in case of save actions, add an additional newline after the enabled flag
-                if (key.equals(SaveActions.META_KEY) && "enabled".equals(metaItem)) {
-                    stringBuilder.append(Globals.NEWLINE);
-                }
-            }
+            stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(metaItem.getKey()).append(":");
+            stringBuilder.append(metaItem.getValue());
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);
 
             out.write(stringBuilder.toString());
-        }
-        // write groups if present. skip this if only the root node exists
-        // (which is always the AllEntriesGroup).
-        GroupTreeNode groupsRoot = metaData.getGroups();
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
-            StringBuilder sb = new StringBuilder();
-            // write version first
-            sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
-            sb.append(VersionHandling.CURRENT_VERSION).append(";");
-            sb.append("}");
-            sb.append(Globals.NEWLINE);
-
-            // now write actual groups
-            sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
-            sb.append(Globals.NEWLINE);
-            // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
-            while (tok.hasMoreTokens()) {
-                sb.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
-                sb.append(";");
-                sb.append(Globals.NEWLINE);
-            }
-            sb.append("}");
-            sb.append(Globals.NEWLINE);
-            out.write(sb.toString());
         }
     }
 

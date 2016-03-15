@@ -21,15 +21,14 @@ import java.util.List;
  */
 public class IsiImporterTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
-
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
 
     @Test
     public void testImportEntriesException() throws IOException {

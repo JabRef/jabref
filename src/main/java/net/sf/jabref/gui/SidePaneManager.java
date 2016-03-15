@@ -26,9 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,20 +57,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.tabbedPane.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
-                                .getSelectedComponent());
-                    }
-                });
-            }
-        });
+        frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
+                () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }

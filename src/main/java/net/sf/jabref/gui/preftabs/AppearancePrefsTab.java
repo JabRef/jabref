@@ -18,8 +18,6 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
@@ -112,21 +110,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         namesp.setLayout(gbl);
         iconCol.setLayout(gbl);
 
-        overrideFonts.addActionListener(new ActionListener() {
+        overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                fontSize.setEnabled(overrideFonts.isSelected());
-            }
-        });
-
-        fontButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x);
-            }
-        });
+        fontButton.addActionListener(
+                e -> new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -185,8 +172,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
     }
 
-    private boolean validateIntegerField(String fieldName, String fieldValue, String errorTitle)
-    {
+    private boolean validateIntegerField(String fieldName, String fieldValue, String errorTitle) {
         try {
             // Test if the field value is a number:
             Integer.parseInt(fieldValue);

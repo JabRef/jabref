@@ -52,7 +52,6 @@ public class DuplicateResolverDialog extends JDialog {
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
     private final JabRefFrame frame;
-    private JButton removeExact;
     private final JPanel options = new JPanel();
     private int status = DuplicateResolverDialog.NOT_CHOSEN;
     private MergeEntries me;
@@ -74,6 +73,7 @@ public class DuplicateResolverDialog extends JDialog {
         JButton both;
         JButton second;
         JButton first;
+        JButton removeExact = null;
         switch (type) {
         case DUPLICATE_SEARCH:
             first = new JButton(Localization.lang("Keep left"));
@@ -101,6 +101,7 @@ public class DuplicateResolverDialog extends JDialog {
             both = new JButton(Localization.lang("Import and keep old entry"));
             me = new MergeEntries(one, two, Localization.lang("Old entry"),
                     Localization.lang("From import"), frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            break;
         }
 
         if (removeExact != null) {

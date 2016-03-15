@@ -40,7 +40,7 @@ public class ArXiv implements FullTextFinder {
         // Try unique DOI first
         Optional<DOI> doi = DOI.build(entry.getField("doi"));
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             String doiString = doi.get().getDOI();
             // Available in catalog?
             try {
@@ -57,21 +57,19 @@ public class ArXiv implements FullTextFinder {
                 NodeList nodes = doc.getElementsByTagName("arxiv:doi");
                 Node doiTag = nodes.item(0);
 
-                if(doiTag != null) {
-                    if(doiTag.getTextContent().equals(doiString)) {
-                        // Lookup PDF link
-                        NodeList links = doc.getElementsByTagName("link");
+                if ((doiTag != null) && doiTag.getTextContent().equals(doiString)) {
+                    // Lookup PDF link
+                    NodeList links = doc.getElementsByTagName("link");
 
-                        for (int i = 0; i < links.getLength(); i++) {
-                            Node link = links.item(i);
-                            NamedNodeMap attr = link.getAttributes();
-                            String rel = attr.getNamedItem("rel").getNodeValue();
-                            String href = attr.getNamedItem("href").getNodeValue();
+                    for (int i = 0; i < links.getLength(); i++) {
+                        Node link = links.item(i);
+                        NamedNodeMap attr = link.getAttributes();
+                        String rel = attr.getNamedItem("rel").getNodeValue();
+                        String href = attr.getNamedItem("href").getNodeValue();
 
-                            if ("related".equals(rel) && "pdf".equals(attr.getNamedItem("title").getNodeValue())) {
-                                pdfLink = Optional.of(new URL(href));
-                                LOGGER.info("Fulltext PDF found @ arXiv.");
-                            }
+                        if ("related".equals(rel) && "pdf".equals(attr.getNamedItem("title").getNodeValue())) {
+                            pdfLink = Optional.of(new URL(href));
+                            LOGGER.info("Fulltext PDF found @ arXiv.");
                         }
                     }
                 }

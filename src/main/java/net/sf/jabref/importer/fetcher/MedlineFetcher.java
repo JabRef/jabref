@@ -27,6 +27,9 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.fileformat.MedlineImporter;
@@ -40,9 +43,10 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class MedlineFetcher implements EntryFetcher {
 
+    private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
+
     private static final Pattern PART1_PATTERN = Pattern.compile(", ");
     private static final Pattern PART2_PATTERN = Pattern.compile(",");
-    private static final Pattern PART3_PATTERN = Pattern.compile(" ");
 
     private static final Pattern ID_PATTERN = Pattern.compile("<Id>(\\d+)</Id>");
     private static final Pattern COUNT_PATTERN = Pattern.compile("<Count>(\\d+)<\\/Count>");
@@ -57,23 +61,16 @@ public class MedlineFetcher implements EntryFetcher {
     private static final int PACING = 20;
 
     private boolean shouldContinue;
-
-    OutputPrinter frame;
-
-    ImportInspector dialog;
-
-
     private static String toSearchTerm(String in) {
         // This can probably be simplified using simple String.replace()...
+        String result = in;
         Matcher matcher;
-        matcher = PART1_PATTERN.matcher(in);
-        in = matcher.replaceAll("\\+AND\\+");
-        matcher = PART2_PATTERN.matcher(in);
-        in = matcher.replaceAll("\\+AND\\+");
-        matcher = PART3_PATTERN.matcher(in);
-        in = matcher.replaceAll("+");
-
-        return in;
+        matcher = PART1_PATTERN.matcher(result);
+        result = matcher.replaceAll("\\+AND\\+");
+        matcher = PART2_PATTERN.matcher(result);
+        result = matcher.replaceAll("\\+AND\\+");
+        result = result.replace(" ", "+");
+        return result;
     }
 
     /**
@@ -115,12 +112,9 @@ public class MedlineFetcher implements EntryFetcher {
                 }
             }
         } catch (MalformedURLException e) { // new URL() failed
-            System.out.println("bad url");
-            e.printStackTrace();
+            LOGGER.warn("Bad url", e);
         } catch (IOException e) { // openConnection() failed
-            System.out.println("connection failed");
-            e.printStackTrace();
-
+            LOGGER.warn("Connection failed", e);
         }
         return result;
     }
@@ -151,12 +145,12 @@ public class MedlineFetcher implements EntryFetcher {
 
         shouldContinue = true;
 
-        query = query.trim().replace(';', ',');
+        String cleanQuery = query.trim().replace(';', ',');
 
-        if (query.matches("\\d+[,\\d+]*")) {
+        if (cleanQuery.matches("\\d+[,\\d+]*")) {
             frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-            List<BibEntry> bibs = MedlineImporter.fetchMedline(query, frameOP);
+            List<BibEntry> bibs = MedlineImporter.fetchMedline(cleanQuery, frameOP);
 
             if (bibs.isEmpty()) {
                 frameOP.showMessage(Localization.lang("No references found"));
@@ -198,7 +192,7 @@ public class MedlineFetcher implements EntryFetcher {
                     try {
                         numberToFetch = Integer.parseInt(strCount.trim());
                         break;
-                    } catch (RuntimeException ex) {
+                    } catch (NumberFormatException ex) {
                         frameOP.showMessage(Localization.lang("Please enter a valid number"));
                     }
                 }

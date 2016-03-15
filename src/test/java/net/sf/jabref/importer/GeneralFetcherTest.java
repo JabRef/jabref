@@ -26,10 +26,10 @@ import java.util.ArrayList;
  */
 public class GeneralFetcherTest {
 
-    static JabRefFrame jrf;
-    static SidePaneManager spm;
-    static GeneralFetcher gf;
-    static ACMPortalFetcher acmpf;
+    private static JabRefFrame jrf;
+    private static SidePaneManager spm;
+    private static GeneralFetcher gf;
+    private static ACMPortalFetcher acmpf;
 
 
     /**

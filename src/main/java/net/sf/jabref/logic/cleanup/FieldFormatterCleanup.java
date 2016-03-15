@@ -19,14 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.logic.formatter.bibtexfields.LatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.MonthFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -36,16 +30,6 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     private final String field;
     private final Formatter formatter;
-
-    public static final CleanupJob PAGE_NUMBERS = new FieldFormatterCleanup("pages",
-            BibtexFieldFormatters.PAGE_NUMBERS);
-    public static final CleanupJob DATES = new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE);
-    public static final CleanupJob MONTH = new FieldFormatterCleanup("month", new MonthFormatter());
-    public static final CleanupJob TITLE_CASE = new FieldFormatterCleanup("title", new CaseKeeper());
-    public static final CleanupJob TITLE_UNITS = new FieldFormatterCleanup("title", new UnitFormatter());
-    public static final CleanupJob TITLE_LATEX = new FieldFormatterCleanup("title", new LatexFormatter());
-    public static final CleanupJob TITLE_HTML = new FieldFormatterCleanup("title", new HTMLConverter());
-
 
     public FieldFormatterCleanup(String field, Formatter formatter) {
         this.field = field;
@@ -57,11 +41,19 @@ public class FieldFormatterCleanup implements CleanupJob {
         if ("all".equals(field)) {
             return cleanupAllFields(entry);
         } else {
-            return cleanupSingleField(entry);
+            return cleanupSingleField(field, entry);
         }
     }
 
-    private List<FieldChange> cleanupSingleField(BibEntry entry) {
+    /**
+     * Runs the formatter on the specified field in the given entry.
+     *
+     * If the formatter returns an empty string, then the field is removed.
+     * @param field the field on which to run the formatter
+     * @param entry the entry to be cleaned up
+     * @return a list of changes of the entry
+     */
+    private List<FieldChange> cleanupSingleField(String field, BibEntry entry) {
         if (!entry.hasField(field)) {
             // Not set -> nothing to do
             return new ArrayList<>();
@@ -74,7 +66,11 @@ public class FieldFormatterCleanup implements CleanupJob {
         if (oldValue.equals(newValue)) {
             return new ArrayList<>();
         } else {
-            entry.setField(field, newValue);
+            if(newValue.isEmpty()) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, newValue);
+            }
             FieldChange change = new FieldChange(entry, field, oldValue, newValue);
             return Collections.singletonList(change);
         }
@@ -84,14 +80,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         ArrayList<FieldChange> fieldChanges = new ArrayList<>();
 
         for (String fieldKey : entry.getFieldNames()) {
-            String oldValue = entry.getField(fieldKey);
-            String newValue = formatter.format(oldValue);
-
-            if (!oldValue.equals(newValue)) {
-                entry.setField(fieldKey, newValue);
-                FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
-                fieldChanges.add(change);
-            }
+            fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
         }
 
         return fieldChanges;
@@ -125,5 +114,14 @@ public class FieldFormatterCleanup implements CleanupJob {
     @Override
     public String toString() {
         return field + ": " + formatter.getKey();
+    }
+
+    /**
+     * Returns a description of what this cleanup operation does.
+     *
+     * @return the description of this cleanup
+     */
+    public String getDescription() {
+        return String.format(formatter.getDescription(), field);
     }
 }

@@ -341,7 +341,7 @@ public class DroppedFileHandler {
                 renameToTextBox.setEnabled(!linkInPlace.isSelected()
                         && !multipleEntries);
                 if (multipleEntries) {
-                    renameToTextBox.setText("Multiple entries");
+                    renameToTextBox.setText(Localization.lang("Multiple entries"));
                 }
             }
         };
@@ -360,7 +360,7 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = Util.getLinkedFileName(database, entry);
+        String targetName = Util.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
@@ -537,9 +537,9 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        toFile = new File(toFile).getName();
+        String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + toFile);
+        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + destinationFileName);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;

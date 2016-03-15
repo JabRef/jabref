@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.formatter.bibtexfields.EraseFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -30,12 +31,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private final String[] fields = {"note", "url", "ee"};
-
-
-    public DoiCleanup() {
-
-    }
+    private static final String[] FIELDS = {"note", "url", "ee"};
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -58,13 +54,13 @@ public class DoiCleanup implements CleanupJob {
                 }
 
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
-                for (String field : fields) {
+                for (String field : FIELDS) {
                     DOI.build(entry.getField((field))).ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
-            for (String field : fields) {
+            for (String field : FIELDS) {
                 Optional<DOI> doi = DOI.build(entry.getField(field));
 
                 if (doi.isPresent()) {
@@ -86,7 +82,7 @@ public class DoiCleanup implements CleanupJob {
     }
 
     private void removeFieldValue(BibEntry entry, String field, List<FieldChange> changes) {
-        RemoveFieldCleanup cleaner = new RemoveFieldCleanup(field);
-        changes.addAll(cleaner.cleanup(entry));
+        CleanupJob eraser = new FieldFormatterCleanup(field, new EraseFormatter());
+        changes.addAll(eraser.cleanup(entry));
     }
 }

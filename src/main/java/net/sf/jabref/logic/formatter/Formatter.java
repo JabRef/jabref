@@ -30,7 +30,15 @@ public interface Formatter {
      * Calling this method with a null argument results in a NullPointerException.
      *
      * @param value the input String
-     * @return the formatted output String, always not null
+     * @return the formatted output String
      */
     String format(String value);
+
+    /**
+     * Returns a description of the formatter.
+     * The string "%s" serves as a placeholder for the field name, see java.util.Formatter.
+     *
+     * @return the description string, always non empty
+     */
+    String getDescription();
 }

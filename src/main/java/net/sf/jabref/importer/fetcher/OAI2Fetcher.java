@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -51,37 +51,21 @@ import java.util.Date;
 public class OAI2Fetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(OAI2Fetcher.class);
-
     private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
-
     private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
-
     private static final String OAI2_ARXIV_SCRIPT = "oai2";
-
     private static final String OAI2_ARXIV_METADATAPREFIX = "arXiv";
-
     private static final String OAI2_ARXIV_ARCHIVENAME = "ArXiv.org";
-
     private static final String OAI2_IDENTIFIER_FIELD = "oai2identifier";
-
     private SAXParser saxParser;
-
     private final String oai2Host;
-
     private final String oai2Script;
-
     private final String oai2MetaDataPrefix;
-
     private final String oai2PrefixIdentifier;
-
     private final String oai2ArchiveName;
-
     private boolean shouldContinue = true;
-
     private OutputPrinter status;
-
     private long waitTime = -1;
-
     private Date lastCall;
 
 
@@ -91,7 +75,6 @@ public class OAI2Fetcher implements EntryFetcher {
     private boolean shouldWait() {
         return waitTime > 0;
     }
-
 
 
     /**
@@ -109,8 +92,8 @@ public class OAI2Fetcher implements EntryFetcher {
      * @param waitTimeMs
      *            Time to wait in milliseconds between query-requests.
      */
-    public OAI2Fetcher(String oai2Host, String oai2Script, String oai2Metadataprefix,
-            String oai2Prefixidentifier, String oai2ArchiveName, long waitTimeMs) {
+    public OAI2Fetcher(String oai2Host, String oai2Script, String oai2Metadataprefix, String oai2Prefixidentifier,
+            String oai2ArchiveName, long waitTimeMs) {
         this.oai2Host = oai2Host;
         this.oai2Script = oai2Script;
         this.oai2MetaDataPrefix = oai2Metadataprefix;
@@ -161,24 +144,25 @@ public class OAI2Fetcher implements EntryFetcher {
      */
     public static String fixKey(String key) {
 
-        if (key.toLowerCase().startsWith("arxiv:")) {
-            key = key.substring(6);
+        String resultingKey = key;
+        if (resultingKey.toLowerCase().startsWith("arxiv:")) {
+            resultingKey = resultingKey.substring(6);
         }
 
-        int dot = key.indexOf('.');
-        int slash = key.indexOf('/');
+        int dot = resultingKey.indexOf('.');
+        int slash = resultingKey.indexOf('/');
 
         if ((dot > -1) && (dot < slash)) {
-            key = key.substring(0, dot) + key.substring(slash, key.length());
+            resultingKey = resultingKey.substring(0, dot) + resultingKey.substring(slash, resultingKey.length());
         }
 
-        return key;
+        return resultingKey;
     }
 
     public static String correctLineBreaks(String s) {
-        s = s.replaceAll("\\n(?!\\s*\\n)", " ");
-        s = s.replaceAll("\\s*\\n\\s*", "\n");
-        return s.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+        String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
+        result = result.replaceAll("\\s*\\n\\s*", "\n");
+        return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
     }
 
     /**
@@ -194,9 +178,9 @@ public class OAI2Fetcher implements EntryFetcher {
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
          */
-        key = OAI2Fetcher.fixKey(key);
+        String fixedKey = OAI2Fetcher.fixKey(key);
 
-        String url = constructUrl(key);
+        String url = constructUrl(fixedKey);
         try {
             URL oai2Url = new URL(url);
             HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
@@ -204,7 +188,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
             /* create an empty BibEntry and set the oai2identifier field */
             BibEntry be = new BibEntry(IdGenerator.next(), "article");
-            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, key);
+            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
             DefaultHandler handlerBase = new OAI2Handler(be);
 
             try (InputStream inputStream = oai2Connection.getInputStream()) {
@@ -217,10 +201,10 @@ public class OAI2Fetcher implements EntryFetcher {
                     be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
                 }
 
-                if (key.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField("year", "20" + key.substring(0, 2));
+                if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
+                    be.setField("year", "20" + fixedKey.substring(0, 2));
 
-                    int monthNumber = Integer.parseInt(key.substring(2, 4));
+                    int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                     if (month.isValid()) {
                         be.setField("month", month.bibtexFormat);
@@ -237,7 +221,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from OAI2 source (%0):", url) + "\n\n"
+                    Localization.lang("Error while fetching from %0", "OAI2 source (" + url + "):") + "\n\n"
                             + e.getMessage() + "\n\n" + Localization
                                     .lang("Note: A full text search is currently not supported for %0", getTitle()),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -259,7 +243,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Fetch ArXiv.org");
+        return "ArXiv.org";
     }
 
     @Override
@@ -271,8 +255,7 @@ public class OAI2Fetcher implements EntryFetcher {
             shouldContinue = true;
 
             /* multiple keys can be delimited by ; or space */
-            query = query.replace(" ", ";");
-            String[] keys = query.split(";");
+            String[] keys = query.replace(" ", ";").split(";");
             for (int i = 0; i < keys.length; i++) {
                 String key = keys[i];
 
@@ -285,13 +268,14 @@ public class OAI2Fetcher implements EntryFetcher {
                     long elapsed = new Date().getTime() - lastCall.getTime();
 
                     while (elapsed < waitTime) {
-                        status.setStatus(Localization.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
+                        status.setStatus(
+                                Localization.lang("Waiting for ArXiv...") + ((waitTime - elapsed) / 1000) + " s");
                         Thread.sleep(1000);
                         elapsed = new Date().getTime() - lastCall.getTime();
                     }
                 }
 
-                status.setStatus(Localization.lang("Processing") + " " + key);
+                status.setStatus(Localization.lang("Processing %0", key));
 
                 /* the cancel button has been hit */
                 if (!shouldContinue) {
@@ -316,7 +300,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return true;
         } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from OAI2"));
+            status.setStatus(Localization.lang("Error while fetching from %0", "OAI2"));
             LOGGER.error("Error whil fetching from OAI2", e);
         }
         return false;

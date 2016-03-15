@@ -67,6 +67,8 @@ public class SearchQueryHighlightObservable {
         // Parse the search string to words
         if (searchQuery.isGrammarBasedSearch()) {
             pattern = Optional.empty();
+        } else if (searchQuery.isRegularExpression()) {
+            pattern = getPatternForWords(Arrays.asList(searchQuery.getQuery()), true, searchQuery.isCaseSensitive());
         } else {
             pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
         }

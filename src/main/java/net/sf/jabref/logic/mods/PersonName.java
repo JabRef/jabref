@@ -37,6 +37,7 @@ public class PersonName {
 
 
     public PersonName() {
+        // Empty constructor
     }
 
     public PersonName(String name) {
@@ -50,7 +51,7 @@ public class PersonName {
     }
 
     private void parseName(String author) {
-        String authorMod = AuthorList.fixAuthor_lastNameFirst(author, false);
+        String authorMod = AuthorList.fixAuthorLastNameFirst(author, false);
 
         //Formating names and replacing escape Char for ',' back to a comma
         //            XMLChars xmlChars = new XMLChars();
@@ -85,7 +86,7 @@ public class PersonName {
     }
 
     public String getGivenNames() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (givenName != null) {
             result.append(givenName);
         }
@@ -95,39 +96,32 @@ public class PersonName {
         return result.toString();
     }
 
-    public String getSurname()
-    {
+    public String getSurname() {
         return surname;
     }
 
-    public void setSurname(String lastName)
-    {
+    public void setSurname(String lastName) {
         surname = lastName;
     }
 
-    public String getFirstname()
-    {
+    public String getFirstname() {
         return givenName;
     }
 
-    public void setFirstname(String firstName)
-    {
+    public void setFirstname(String firstName) {
         givenName = firstName;
     }
 
-    public String getMiddlename()
-    {
+    public String getMiddlename() {
         return middleName;
     }
 
-    public void setMiddlename(String middleName)
-    {
+    public void setMiddlename(String middleName) {
         this.middleName = middleName;
     }
 
-    public String getFullname()
-    {
-        StringBuffer fullName = new StringBuffer();
+    public String getFullname() {
+        StringBuilder fullName = new StringBuilder();
         if ((givenName != null) && !givenName.isEmpty()) {
             fullName.append(givenName).append(' ');
         }

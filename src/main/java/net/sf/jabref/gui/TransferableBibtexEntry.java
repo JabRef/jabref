@@ -16,6 +16,7 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -67,9 +68,9 @@ public class TransferableBibtexEntry implements Transferable {
                 }
                 return sw.toString();
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog
-                        (null, "Could not paste entry as text:\n" + ex.getMessage(),
-                                "Clipboard", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("Could not paste entry as text:") + "\n" + ex.getLocalizedMessage(),
+                        Localization.lang("Clipboard"), JOptionPane.ERROR_MESSAGE);
                 return "";
             }
         } else {

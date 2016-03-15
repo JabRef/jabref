@@ -27,7 +27,7 @@ public class EntryEditorTest {
         EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
-        editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
+        editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
         AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
@@ -48,7 +48,7 @@ public class EntryEditorTest {
         EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
-        editor.storeFieldAction.actionPerformed(new ActionEvent(authorTextField, 0, ""));
+        editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
         AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");

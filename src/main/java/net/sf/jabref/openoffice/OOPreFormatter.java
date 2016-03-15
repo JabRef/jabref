@@ -16,9 +16,10 @@
 package net.sf.jabref.openoffice;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.strings.LatexToUnicodeCharMap;
+import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
+
 import java.util.Map;
 
 /**
@@ -29,12 +30,16 @@ import java.util.Map;
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final Map<String, String> CHARS = new LatexToUnicodeCharMap();
+    private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
     @Override
     public String format(String field) {
         int i;
-        field = field.replaceAll("&|\\\\&", "&");
+        String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
+                .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+
+
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -43,8 +48,8 @@ public class OOPreFormatter implements LayoutFormatter {
         boolean escaped = false;
         boolean incommand = false;
 
-        for (i = 0; i < field.length(); i++) {
-            c = field.charAt(i);
+        for (i = 0; i < finalResult.length(); i++) {
+            c = finalResult.charAt(i);
             if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
@@ -52,18 +57,19 @@ public class OOPreFormatter implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = OOPreFormatter.CHARS.get(command);
+                    String result = OOPreFormatter.CHARS.get(command);
                     if (result == null) {
                         sb.append(command);
                     } else {
-                        sb.append((String) result);
+                        sb.append(result);
                     }
                 }
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
-                // Swallow the brace.
+                //Swallow braces, necessary for replacing encoded characters
+
             } else if (Character.isLetter(c) || (c == '%')
                     || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
@@ -76,34 +82,32 @@ public class OOPreFormatter implements LayoutFormatter {
                             && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= (field.length() - 1)) {
+                        if (i >= (finalResult.length() - 1)) {
                             break testCharCom;
                         }
 
                         String command = currentCommand.toString();
                         i++;
-                        c = field.charAt(i);
-                        // System.out.println("next: "+(char)c);
+                        c = finalResult.charAt(i);
                         String combody;
                         if (c == '{') {
-                            String part = StringUtil.getPart(field, i, false);
+                            String part = StringUtil.getPart(finalResult, i, false);
                             i += part.length();
                             combody = part;
                         } else {
-                            combody = field.substring(i, i + 1);
-                            // System.out.println("... "+combody);
+                            combody = finalResult.substring(i, i + 1);
                         }
-                        Object result = OOPreFormatter.CHARS.get(command + combody);
+                        String result = OOPreFormatter.CHARS.get(command + combody);
 
                         if (result != null) {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
 
                         incommand = false;
                         escaped = false;
                     } else {
                         //	Are we already at the end of the string?
-                        if ((i + 1) == field.length()) {
+                        if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
                             Object result = OOPreFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
@@ -125,55 +129,47 @@ public class OOPreFormatter implements LayoutFormatter {
                 if (!incommand) {
                     sb.append(c);
                 } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
-                    // First test if we are already at the end of the string.
-                    // if (i >= field.length()-1)
-                    // break testContent;
-
                     String command = currentCommand.toString();
 
-                    // Then test if we are dealing with a italics or bold
+                    // Test if we are dealing with a formatting
                     // command.
                     // If so, handle.
-                    if ("em".equals(command) || "emph".equals(command) || "textit".equals(command)) {
-                        String part = StringUtil.getPart(field, i, true);
-
+                    String tag = getHTMLTag(command);
+                    if (!tag.isEmpty()) {
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
-                        sb.append("<em>").append(part).append("</em>");
-                    } else if ("textbf".equals(command)) {
-                        String part = StringUtil.getPart(field, i, true);
-                        i += part.length();
-                        sb.append("<b>").append(part).append("</b>");
+                        sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
-                        String part = StringUtil.getPart(field, i, true);
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command
-                        Object result = OOPreFormatter.CHARS.get(command + argument);
+                        String result = OOPreFormatter.CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
                         // the
                         // text of the parameter intact.
                         if (result == null) {
                             sb.append(argument);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = OOPreFormatter.CHARS.get(command);
+                        String result = OOPreFormatter.CHARS.get(command);
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                     } else {
-                        Object result = OOPreFormatter.CHARS.get(command);
+                        String result = OOPreFormatter.CHARS.get(command);
                         if (result == null) {
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                         sb.append(' ');
                     }
@@ -198,7 +194,52 @@ public class OOPreFormatter implements LayoutFormatter {
             }
         }
 
-        return sb.toString();
+        return sb.toString().replace("&dollar;", "$"); // Replace &dollar; with $
+    }
+
+    private String getHTMLTag(String latexCommand) {
+        String result = "";
+        switch (latexCommand) {
+        // Italic
+        case "textit":
+        case "it":
+        case "emph": // Should really separate between emphasized and italic but since in later stages both are converted to italic...
+        case "em":
+            result = "i";
+            break;
+        // Bold font
+        case "textbf":
+        case "bf":
+            result = "b";
+            break;
+        // Small capitals
+        case "textsc":
+            result = "smallcaps"; // Not a proper HTML tag, but used here for convenience
+            break;
+        // Underline
+        case "underline":
+            result = "u";
+            break;
+        // Strikeout, sout is the "standard" command, although it is actually based on the package ulem
+        case "sout":
+            result = "s";
+            break;
+        // Monospace font
+        case "texttt":
+            result = "tt";
+            break;
+        // Superscript
+        case "textsuperscript":
+            result = "sup";
+            break;
+        // Subscript
+        case "textsubscript":
+            result = "sub";
+            break;
+        default:
+            break;
+        }
+        return result;
     }
 
 }

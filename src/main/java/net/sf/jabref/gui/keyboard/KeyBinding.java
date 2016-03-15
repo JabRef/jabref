@@ -55,6 +55,7 @@ public enum KeyBinding {
     NEW_PROCEEDINGS("New proceedings", Localization.lang("New proceedings"), "ctrl shift P"),
     NEW_UNPUBLISHED("New unpublished", Localization.lang("New unpublished"), "ctrl shift U"),
     NEXT_TAB("Next tab", Localization.lang("Next tab"), "ctrl PAGE_DOWN"),
+    OPEN_CONSOLE("Open terminal here", Localization.lang("Open terminal here"), "ctrl shift J"),
     OPEN_DATABASE("Open database", Localization.lang("Open database"), "ctrl O"),
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4"),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O"),
