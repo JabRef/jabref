@@ -86,7 +86,6 @@ public class FormatterTest {
                 new Object[]{new CaseKeeper()},
                 new Object[]{new PageNumbersFormatter()},
                 new Object[]{new LowerCaseChanger()},
-                new Object[]{new TrimFormatter()},
                 new Object[]{new HTMLToLatexFormatter()},
                 new Object[]{new SuperscriptFormatter()},
                 new Object[]{new UnitFormatter()},
