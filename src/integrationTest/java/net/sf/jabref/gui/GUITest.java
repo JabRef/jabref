@@ -4,10 +4,9 @@ import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
-import org.assertj.swing.fixture.Containers;
 import org.assertj.swing.fixture.FrameFixture;
-import org.assertj.swing.timing.Pause;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
+import org.assertj.swing.timing.Pause;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -32,8 +31,6 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         robot().settings().timeoutToFindSubMenu(1_000);
         robot().settings().delayBetweenEvents(50);
     }
-
-
 
     @Test
     public void testExit() {
@@ -114,5 +111,5 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         mainFrame.menuItemWithPath("File", "Close database").click();
         exitJabRef(mainFrame);
     }
-    
+
 }

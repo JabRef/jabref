@@ -1,8 +1,5 @@
 package net.sf.jabref.gui;
 
-import junit.framework.AssertionFailedError;
-import org.junit.Assert;
-
 import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,7 +16,7 @@ public class AWTExceptionHandler {
     }
 
     public void assertNoExceptions() {
-        if(!list.isEmpty()) {
+        if (!list.isEmpty()) {
             throw new AssertionError("Uncaught exception in EDT", list.get(0));
         }
     }
