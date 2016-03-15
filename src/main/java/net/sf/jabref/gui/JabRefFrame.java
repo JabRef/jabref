@@ -723,29 +723,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
     // is selected from the application menu.
     public void preferences() {
-        //PrefsDialog.showPrefsDialog(JabRefFrame.this, prefs);
-        AbstractWorker worker = new AbstractWorker() {
+        output(Localization.lang("Opening preferences..."));
+        if (prefsDialog == null) {
+            prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
+            PositionWindow.placeDialog(prefsDialog, JabRefFrame.this);
+        } else {
+            prefsDialog.setValues();
+        }
 
-            @Override
-            public void run() {
-                output(Localization.lang("Opening preferences..."));
-                if (prefsDialog == null) {
-                    prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
-                    PositionWindow.placeDialog(prefsDialog, JabRefFrame.this);
-                } else {
-                    prefsDialog.setValues();
-                }
-
-            }
-
-            @Override
-            public void update() {
-                prefsDialog.setVisible(true);
-                output("");
-            }
-        };
-        worker.getWorker().run();
-        worker.getCallBack().update();
+        prefsDialog.setVisible(true);
+        output("");
     }
 
     public JabRefPreferences prefs() {
@@ -1156,7 +1143,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
         JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
         JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
-        JMenu newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry..."));
+        JMenu newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
         JMenu helpMenu = JabRefFrame.subMenu(Localization.menuTitle("Help"));
 
         file.add(newBibtexDatabaseAction);

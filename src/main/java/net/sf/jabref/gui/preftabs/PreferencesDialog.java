@@ -243,46 +243,33 @@ public class PreferencesDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            AbstractWorker worker = new AbstractWorker() {
+            boolean ready = true;
 
-                boolean ready = true;
-
-
-                @Override
-                public void run() {
-                    // First check that all tabs are ready to close:
-                    int count = main.getComponentCount();
-                    Component[] comps = main.getComponents();
-                    for (int i = 0; i < count; i++) {
-                        if (!((PrefsTab) comps[i]).validateSettings()) {
-                            ready = false;
-                            return; // If not, break off.
-                        }
-                    }
-                    // Then store settings and close:
-                    for (int i = 0; i < count; i++) {
-                        ((PrefsTab) comps[i]).storeSettings();
-                    }
-                    Globals.prefs.flush();
+            // First check that all tabs are ready to close:
+            int count = main.getComponentCount();
+            Component[] comps = main.getComponents();
+            for (int i = 0; i < count; i++) {
+                if (!((PrefsTab) comps[i]).validateSettings()) {
+                    ready = false;
+                    return; // If not, break off.
                 }
+            }
+            // Then store settings and close:
+            for (int i = 0; i < count; i++) {
+                ((PrefsTab) comps[i]).storeSettings();
+            }
+            Globals.prefs.flush();
 
-                @Override
-                public void update() {
-                    if (!ready) {
-                        return;
-                    }
-                    setVisible(false);
-                    MainTable.updateRenderers();
-                    GUIGlobals.updateEntryEditorColors();
-                    frame.setupAllTables();
-                    frame.groupSelector.revalidateGroups(); // icons may have
-                    // changed
-                    frame.output(Localization.lang("Preferences recorded."));
-                }
-            };
-            worker.getWorker().run();
-            worker.getCallBack().update();
-
+            if (!ready) {
+                return;
+            }
+            setVisible(false);
+            MainTable.updateRenderers();
+            GUIGlobals.updateEntryEditorColors();
+            frame.setupAllTables();
+            frame.groupSelector.revalidateGroups(); // icons may have
+            // changed
+            frame.output(Localization.lang("Preferences recorded."));
         }
     }
 
