@@ -228,6 +228,9 @@ task integrationTest(type: Test) {
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
+    jacoco {
+        append = true
+    }
 }
 
 jacocoTestReport {
