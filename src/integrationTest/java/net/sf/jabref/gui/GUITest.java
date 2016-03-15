@@ -63,7 +63,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
         newDatabase(mainFrame);
 
-        mainFrame.menuItemWithPath("BibTeX", "New entry").click();
+        mainFrame.menuItemWithPath("BibTeX", "New entry...").click();
         findDialog(EntryTypeDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
 
             @Override protected boolean isMatching(@Nonnull JButton jButton) {
