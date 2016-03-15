@@ -1,7 +1,7 @@
-* JabRef version (available in the About box):
-* Operating system and version:
 * Steps to reproduce:
   1. ...
   2. ...
   3. ...
-  * If applicable, excerpt of the bibliography file, screenshot, and excerpt of log (available in the error console)
+* If applicable, excerpt of the bibliography file, screenshot, and excerpt of log (available in the error console)
+* JabRef version (available in the About box):
+* Operating system and version:
