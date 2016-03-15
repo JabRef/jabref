@@ -34,7 +34,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#454](https://github.com/JabRef/jabref/issues/454) Add a tab that shows all remaining entry fields that are not displayed in any other tab
 - The LaTeX to Unicode/HTML functionality is much improved by covering many more cases
 - Ability to convert from LaTeX to Unicode in right-click field menu
-
+- Regex-based search is know only applied entirely and not split up to different Regexes on whitespaces
 - [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
 - Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 - PdfContentImporter does not write the content of the first page into the review field any more
