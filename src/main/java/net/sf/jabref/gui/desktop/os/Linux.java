@@ -14,6 +14,7 @@ public class Linux implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        // TODO: use "xdg-open" instead?
         String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
         String[] cmdArray = new String[2];
         cmdArray[0] = viewer;

@@ -1,9 +1,22 @@
 package net.sf.jabref.gui.desktop.os;
 
+import net.sf.jabref.logic.util.OS;
+
 import java.io.File;
 import java.io.IOException;
 
 public class Windows implements NativeDesktop {
+    public static String detectProgramPath(String programName, String directoryName) {
+        String progFiles = System.getenv("ProgramFiles(x86)");
+        if (progFiles == null) {
+            progFiles = System.getenv("ProgramFiles");
+        }
+        if ((directoryName != null) && !directoryName.isEmpty()) {
+            return progFiles + "\\" + directoryName + "\\" + programName + ".exe";
+        }
+        return progFiles + "\\" + programName + ".exe";
+    }
+
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         // escape & and spaces

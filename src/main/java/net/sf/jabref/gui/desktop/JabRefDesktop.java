@@ -41,9 +41,7 @@ public class JabRefDesktop {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private static final NativeDesktop WINDOWS = new Windows();
-    private static final NativeDesktop MAC_OS = new OSX();
-    private static final NativeDesktop LINUX = new Linux();
+    private static final NativeDesktop NATIVE_DESKTOP = OS.getNativeDesktop();
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -101,31 +99,14 @@ public class JabRefDesktop {
             }
         } else if ("ps".equals(fieldName)) {
             try {
-                if (OS.OS_X) {
-                    MAC_OS.openFile(link, "ps");
-                } else if (OS.WINDOWS) {
-                    WINDOWS.openFile(link, "ps");
-                } else {
-                    ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
-                    String viewer = type == null ? "xdg-open" : type.getOpenWith();
-                    String[] cmdArray = new String[2];
-                    cmdArray[0] = viewer;
-                    cmdArray[1] = link;
-                    Runtime.getRuntime().exec(cmdArray);
-                }
+                NATIVE_DESKTOP.openFile(link, "ps");
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
                         + link, e);
             }
         } else if ("pdf".equals(fieldName)) {
             try {
-                if (OS.OS_X) {
-                    MAC_OS.openFile(link, "pdf");
-                } else if (OS.WINDOWS) {
-                    WINDOWS.openFile(link, "pdf");
-                } else {
-                    LINUX.openFile(link, "pdf");
-                }
+                NATIVE_DESKTOP.openFile(link, "pdf");
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
                         + link, e);
@@ -145,7 +126,6 @@ public class JabRefDesktop {
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final MetaData metaData, String link, final ExternalFileType fileType) throws IOException {
-
         boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
@@ -168,31 +148,14 @@ public class JabRefDesktop {
             String filePath = httpLink ? link : file.getPath();
             openExternalFilePlatformIndependent(fileType, filePath);
             return true;
-
         } else {
-            return false;
             // No file matched the name, or we didn't know the file type.
+            return false;
         }
-
     }
 
-    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath)
-            throws IOException {
-        // For URLs, other solutions are
-        //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
-        //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
-        if (OS.OS_X) {
-            MAC_OS.openFileWithApplication(filePath, fileType.getOpenWith());
-        } else if (OS.WINDOWS) {
-            if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
-                // Application is specified. Use it:
-                WINDOWS.openFileWithApplication(filePath, fileType.getOpenWith());
-            } else {
-                WINDOWS.openFile(filePath, fileType.getExtension());
-            }
-        } else {
-            LINUX.openFileWithApplication(filePath, fileType.getOpenWith());
-        }
+    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
+        NATIVE_DESKTOP.openFileWithApplication(filePath, fileType.getOpenWith());
     }
 
     public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
@@ -276,14 +239,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openFolderAndSelectFile(String fileLink) throws IOException {
-        if (OS.WINDOWS) {
-            WINDOWS.openFolderAndSelectFile(fileLink);
-        } else if (OS.LINUX) {
-            LINUX.openFolderAndSelectFile(fileLink);
-        } else {
-            File f = new File(fileLink);
-            Desktop.getDesktop().open(f.getParentFile());
-        }
+        NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
     }
 
     /**
@@ -304,15 +260,6 @@ public class JabRefDesktop {
 
         String absolutePath = file.getAbsolutePath();
         absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
-
-        if (OS.LINUX) {
-            LINUX.openConsole(absolutePath);
-        } else if (OS.WINDOWS) {
-            WINDOWS.openConsole(absolutePath);
-        } else if (OS.OS_X) {
-            MAC_OS.openConsole(absolutePath);
-        } else {
-            LOGGER.info("Operating system is not supported by this feature.");
-        }
+        NATIVE_DESKTOP.openConsole(absolutePath);
     }
 }

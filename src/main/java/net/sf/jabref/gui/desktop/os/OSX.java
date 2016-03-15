@@ -6,6 +6,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,7 +30,8 @@ public class OSX implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(String filePath) throws IOException {
-        throw new NotImplementedException();
+        File file = new File(filePath);
+        Desktop.getDesktop().open(file.getParentFile());
     }
 
     @Override

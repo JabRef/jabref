@@ -15,6 +15,11 @@
  */
 package net.sf.jabref.logic.util;
 
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.desktop.os.*;
+
+import java.util.Optional;
+
 /***
  * Operating system (OS) detection
  */
@@ -26,17 +31,28 @@ public class OS {
     public static final boolean WINDOWS = OS_NAME.startsWith("win");
     public static final boolean OS_X = OS_NAME.startsWith("mac");
 
+    public static final NativeDesktop ND_LINUX = new Linux();
+    public static final NativeDesktop ND_WINDOWS = new Windows();
+    public static final NativeDesktop ND_MAC = new OSX();
+    public static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
+
+    public static NativeDesktop getNativeDesktop() {
+        if(WINDOWS) {
+            return ND_WINDOWS;
+        } else if(OS_X) {
+            return ND_MAC;
+        } else if(LINUX) {
+            return ND_LINUX;
+        }
+        return ND_DEFAULT;
+    }
+
     public static String guessProgramPath(String programName, String windowsDirectory) {
         if (WINDOWS) {
-            String progFiles = System.getenv("ProgramFiles(x86)");
-            if (progFiles == null) {
-                progFiles = System.getenv("ProgramFiles");
-            }
-            if ((windowsDirectory != null) && !windowsDirectory.isEmpty()) {
-                return progFiles + "\\" + windowsDirectory + "\\" + programName + ".exe";
-            }
-            return progFiles + "\\" + programName + ".exe";
+            return Windows.detectProgramPath(programName, windowsDirectory);
+        } else {
+            return programName;
         }
-        return programName;
     }
+
 }
