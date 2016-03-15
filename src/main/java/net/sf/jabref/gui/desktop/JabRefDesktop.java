@@ -7,6 +7,7 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.desktop.os.Linux;
+import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.gui.desktop.os.OSX;
 import net.sf.jabref.gui.desktop.os.Windows;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -39,6 +40,10 @@ public class JabRefDesktop {
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+
+    private static final NativeDesktop WINDOWS = new Windows();
+    private static final NativeDesktop MAC_OS = new OSX();
+    private static final NativeDesktop LINUX = new Linux();
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -97,9 +102,9 @@ public class JabRefDesktop {
         } else if ("ps".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
-                    OSX.openFile(link);
+                    MAC_OS.openFile(link, "ps");
                 } else if (OS.WINDOWS) {
-                    Windows.openFile(link);
+                    WINDOWS.openFile(link, "ps");
                 } else {
                     ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
                     String viewer = type == null ? "xdg-open" : type.getOpenWith();
@@ -115,22 +120,11 @@ public class JabRefDesktop {
         } else if ("pdf".equals(fieldName)) {
             try {
                 if (OS.OS_X) {
-                    OSX.openFile(link, "pdf");
+                    MAC_OS.openFile(link, "pdf");
                 } else if (OS.WINDOWS) {
-                    Windows.openFile(link);
-                    /*
-                     * String[] spl = link.split("\\\\"); StringBuffer sb = new
-                     * StringBuffer(); for (int i = 0; i < spl.length; i++) { if
-                     * (i > 0) sb.append("\\"); if (spl[i].indexOf(" ") >= 0)
-                     * spl[i] = "\"" + spl[i] + "\""; sb.append(spl[i]); }
-                     * //pr(sb.toString()); link = sb.toString();
-                     *
-                     * String cmd = "cmd.exe /c start " + link;
-                     *
-                     * Process child = Runtime.getRuntime().exec(cmd);
-                     */
+                    WINDOWS.openFile(link, "pdf");
                 } else {
-                    Linux.openFile(link, "pdf");
+                    LINUX.openFile(link, "pdf");
                 }
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + Globals.prefs.get(JabRefPreferences.PDFVIEWER) + " #"
@@ -176,10 +170,8 @@ public class JabRefDesktop {
             return true;
 
         } else {
-
             return false;
             // No file matched the name, or we didn't know the file type.
-
         }
 
     }
@@ -190,31 +182,16 @@ public class JabRefDesktop {
         //  * https://github.com/rajing/browserlauncher2, but it is not available in maven
         //  * a the solution combining http://stackoverflow.com/a/5226244/873282 and http://stackoverflow.com/a/28807079/873282
         if (OS.OS_X) {
-            // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
-            String[] cmd = (fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty() ?
-                    new String[] {"/usr/bin/open", "-a", fileType.getOpenWith(), filePath} :
-                    new String[] {"/usr/bin/open", filePath};
-            Runtime.getRuntime().exec(cmd);
+            MAC_OS.openFileWithApplication(filePath, fileType.getOpenWith());
         } else if (OS.WINDOWS) {
             if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
                 // Application is specified. Use it:
-                Windows.openFileWithApplication(filePath, fileType.getOpenWith());
+                WINDOWS.openFileWithApplication(filePath, fileType.getOpenWith());
             } else {
-                Windows.openFile(filePath);
+                WINDOWS.openFile(filePath, fileType.getExtension());
             }
         } else {
-            // Use the given app if specified, and the universal "xdg-open" otherwise:
-            String[] openWith;
-            if ((fileType.getOpenWith() != null) && !fileType.getOpenWith().isEmpty()) {
-                openWith = fileType.getOpenWith().split(" ");
-            } else {
-                openWith = new String[] {"xdg-open"};
-            }
-
-            String[] cmdArray = new String[openWith.length + 1];
-            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-            cmdArray[cmdArray.length - 1] = filePath;
-            Runtime.getRuntime().exec(cmdArray);
+            LINUX.openFileWithApplication(filePath, fileType.getOpenWith());
         }
     }
 
@@ -300,9 +277,9 @@ public class JabRefDesktop {
      */
     public static void openFolderAndSelectFile(String fileLink) throws IOException {
         if (OS.WINDOWS) {
-            Windows.openFolderAndSelectFile(fileLink);
+            WINDOWS.openFolderAndSelectFile(fileLink);
         } else if (OS.LINUX) {
-            Linux.openFolderAndSelectFile(fileLink);
+            LINUX.openFolderAndSelectFile(fileLink);
         } else {
             File f = new File(fileLink);
             Desktop.getDesktop().open(f.getParentFile());
@@ -329,11 +306,11 @@ public class JabRefDesktop {
         absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
 
         if (OS.LINUX) {
-            Linux.openConsole(absolutePath);
+            LINUX.openConsole(absolutePath);
         } else if (OS.WINDOWS) {
-            Windows.openConsole(absolutePath);
+            WINDOWS.openConsole(absolutePath);
         } else if (OS.OS_X) {
-            OSX.openConsole(absolutePath);
+            MAC_OS.openConsole(absolutePath);
         } else {
             LOGGER.info("Operating system is not supported by this feature.");
         }

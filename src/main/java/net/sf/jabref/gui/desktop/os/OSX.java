@@ -4,26 +4,36 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.IOException;
 
-public class OSX {
-    public static void openFile(String link, String fileType) throws IOException {
+public class OSX implements NativeDesktop {
+    @Override
+    public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
         String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
-        String[] cmd = {"/usr/bin/open", "-a", viewer, link};
+        String[] cmd = {"/usr/bin/open", "-a", viewer, filePath};
         Runtime.getRuntime().exec(cmd);
     }
 
-    public static void openFile(String link) throws IOException {
-        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("ps");
-        String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
-        String[] cmd = {"/usr/bin/open", "-a", viewer, link};
+    @Override
+    public void openFileWithApplication(String filePath, String application) throws IOException {
+        // Use "-a <application>" if the app is specified, and just "open <filename>" otherwise:
+        String[] cmd = (application != null) && !application.isEmpty() ?
+                new String[] {"/usr/bin/open", "-a", application, filePath} :
+                new String[] {"/usr/bin/open", filePath};
         Runtime.getRuntime().exec(cmd);
     }
 
-    public static void openConsole(String absolutePath) throws IOException {
+    @Override
+    public void openFolderAndSelectFile(String filePath) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void openConsole(String absolutePath) throws IOException {
         Runtime runtime = Runtime.getRuntime();
         runtime.exec("open -a Terminal " + absolutePath, null, new File(absolutePath));
     }

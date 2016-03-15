@@ -10,24 +10,52 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class Linux {
-    public static void openFolderAndSelectFile(String fileLink) throws IOException {
+public class Linux implements NativeDesktop {
+    @Override
+    public void openFile(String filePath, String fileType) throws IOException {
+        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
+        String[] cmdArray = new String[2];
+        cmdArray[0] = viewer;
+        cmdArray[1] = filePath;
+        Runtime.getRuntime().exec(cmdArray);
+    }
+
+    @Override
+    public void openFileWithApplication(String filePath, String application) throws IOException {
+        // Use the given app if specified, and the universal "xdg-open" otherwise:
+        String[] openWith;
+        if ((application != null) && !application.isEmpty()) {
+            openWith = application.split(" ");
+        } else {
+            openWith = new String[] {"xdg-open"};
+        }
+
+        String[] cmdArray = new String[openWith.length + 1];
+        System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+        cmdArray[cmdArray.length - 1] = filePath;
+        Runtime.getRuntime().exec(cmdArray);
+    }
+
+    @Override
+    public void openFolderAndSelectFile(String filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
 
         String cmd;
 
         if (desktopSession.contains("gnome")) {
-            cmd = "nautilus " + fileLink;
+            cmd = "nautilus " + filePath;
         } else if (desktopSession.contains("kde")) {
-            cmd = "dolphin --select " + fileLink;
+            cmd = "dolphin --select " + filePath;
         } else {
-            cmd = "xdg-open " + fileLink.substring(0, fileLink.lastIndexOf(File.separator));
+            cmd = "xdg-open " + filePath.substring(0, filePath.lastIndexOf(File.separator));
         }
 
         Runtime.getRuntime().exec(cmd);
     }
 
-    public static void openConsole(String absolutePath) throws IOException {
+    @Override
+    public void openConsole(String absolutePath) throws IOException {
         Runtime runtime = Runtime.getRuntime();
         Process p = runtime.exec("readlink /etc/alternatives/x-terminal-emulator");
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -47,14 +75,5 @@ public class Linux {
                 runtime.exec(emulatorName, null, new File(absolutePath));
             }
         }
-    }
-
-    public static void openFile(String link, String fileType) throws IOException {
-        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
-        String viewer = type == null ? Globals.prefs.get(JabRefPreferences.PSVIEWER) : type.getOpenWith();
-        String[] cmdArray = new String[2];
-        cmdArray[0] = viewer;
-        cmdArray[1] = link;
-        Runtime.getRuntime().exec(cmdArray);
     }
 }
