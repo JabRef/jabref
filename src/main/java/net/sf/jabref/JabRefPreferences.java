@@ -36,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
 
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
@@ -43,6 +44,10 @@ import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
+import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -62,6 +67,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
+
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -313,28 +319,32 @@ public class JabRefPreferences {
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
-    public static final String CLEANUP_MONTH = "CleanUpMonth";
-    public static final String CLEANUP_PAGE_NUMBERS = "CleanUpPageNumbers";
-    public static final String CLEANUP_DATE = "CleanUpDate";
     public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
     public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
     public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
     public static final String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
-    public static final String CLEANUP_HTML = "CleanUpHTML";
-    public static final String CLEANUP_CASE = "CleanUpCase";
-    public static final String CLEANUP_LATEX = "CleanUpLaTeX";
-    public static final String CLEANUP_UNITS = "CleanUpUnits";
     public static final String CLEANUP_UNICODE = "CleanUpUnicode";
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
+    public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
     static {
         EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
-        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs));
+
+        List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
+        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new MonthFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new CaseKeeper()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HTMLToLatexFormatter()));
+        FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
+        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
 
 
@@ -942,9 +952,12 @@ public class JabRefPreferences {
             return;
         }
 
-        put(key, value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
+        put(key, convertListToString(value));
     }
 
+    private static String convertListToString(List<String> value) {
+        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+    }
 
     /**
      * Returns a List of Strings containing the chosen columns.
@@ -1306,19 +1319,13 @@ public class JabRefPreferences {
 
         storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
-        storage.put(CLEANUP_MONTH, preset.isCleanUpMonth());
-        storage.put(CLEANUP_PAGE_NUMBERS, preset.isCleanUpPageNumbers());
-        storage.put(CLEANUP_DATE, preset.isCleanUpDate());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
         storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
-        storage.put(CLEANUP_HTML, preset.isConvertHTMLToLatex());
-        storage.put(CLEANUP_CASE, preset.isConvertCase());
-        storage.put(CLEANUP_LATEX, preset.isConvertLaTeX());
-        storage.put(CLEANUP_UNITS, preset.isConvertUnits());
         storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
+        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));
     }
 }

@@ -279,9 +279,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
                 (oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected()) ||
                 (oldAutoCompFModeFull != firstNameModeFull.isSelected())) {
-            for (int j = 0; j < frame.getTabbedPane().getTabCount(); j++) {
-                BasePanel bp = (BasePanel) frame.getTabbedPane().getComponentAt(j);
-                bp.entryEditors.clear();
+            for (BasePanel panel : frame.getBasePanelList()) {
+                panel.entryEditors.clear();
             }
         }
     }

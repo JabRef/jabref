@@ -1,6 +1,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Test;
 
 import java.io.IOException;
@@ -20,4 +21,5 @@ public class PdfContentImporterTest {
             assertEquals(Collections.emptyList(), result);
         }
     }
+
 }

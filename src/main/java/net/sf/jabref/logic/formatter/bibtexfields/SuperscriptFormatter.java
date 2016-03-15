@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -64,5 +65,10 @@ public class SuperscriptFormatter implements Formatter {
 
         // adds superscript tag
         return matcher.replaceAll(SUPERSCRIPT_REPLACE_PATTERN);
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Transforms ordinal numbers in %s into LaTex superscripts.");
     }
 }

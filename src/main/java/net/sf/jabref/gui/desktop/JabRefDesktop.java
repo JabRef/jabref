@@ -21,8 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -431,5 +433,42 @@ public class JabRefDesktop {
     public static void openBrowser(String url) throws IOException {
         ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
+    }
+
+    public static void openConsole(File file) throws IOException {
+        if (file == null) {
+            return;
+        }
+
+        Runtime runtime = Runtime.getRuntime();
+        String absolutePath = file.getAbsolutePath();
+        absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
+
+        if (OS.LINUX) {
+            Process p = runtime.exec("readlink /etc/alternatives/x-terminal-emulator");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String emulatorName = reader.readLine();
+
+            if (emulatorName != null) {
+                emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
+
+                if (emulatorName.contains("gnome")) {
+                    runtime.exec("gnome-terminal --working-directory=" + absolutePath);
+                } else if (emulatorName.contains("xfce4")) {
+                    runtime.exec("xfce4-terminal --working-directory=" + absolutePath);
+                } else if (emulatorName.contains("konsole")) {
+                    runtime.exec("konsole --workdir=" + absolutePath);
+                } else {
+                    runtime.exec(emulatorName, null, new File(absolutePath));
+                }
+            }
+        } else if (OS.WINDOWS) {
+            runtime.exec("cmd.exe /c start", null, new File(absolutePath));
+        } else if (OS.OS_X) {
+            runtime.exec("open -a Terminal " + absolutePath, null, new File(absolutePath));
+        } else {
+            LOGGER.info("Operating system is not supported by this feature.");
+        }
     }
 }

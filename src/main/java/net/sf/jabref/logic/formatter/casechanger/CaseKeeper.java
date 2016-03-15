@@ -46,6 +46,12 @@ public class CaseKeeper implements Formatter {
     }
 
     @Override
+    public String getDescription() {
+        return Localization.lang(
+                "Adds {} brackets around acronyms, month names and countries in %s to preserve their case.");
+    }
+
+    @Override
     public String getName() {
         return Localization.lang("CaseKeeper");
     }

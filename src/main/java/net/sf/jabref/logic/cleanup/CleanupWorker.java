@@ -86,15 +86,6 @@ public class CleanupWorker {
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
         }
-        if (preset.isCleanUpMonth()) {
-            jobs.add(FieldFormatterCleanup.MONTH);
-        }
-        if (preset.isCleanUpPageNumbers()) {
-            jobs.add(FieldFormatterCleanup.PAGE_NUMBERS);
-        }
-        if (preset.isCleanUpDate()) {
-            jobs.add(FieldFormatterCleanup.DATES);
-        }
         if (preset.isFixFileLinks()) {
             jobs.add(new FileLinksCleanup());
         }
@@ -107,24 +98,15 @@ public class CleanupWorker {
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }
-        if (preset.isConvertHTMLToLatex()) {
-            jobs.add(FieldFormatterCleanup.TITLE_HTML);
-        }
-        if (preset.isConvertUnits()) {
-            jobs.add(FieldFormatterCleanup.TITLE_UNITS);
-        }
-        if (preset.isConvertCase()) {
-            jobs.add(FieldFormatterCleanup.TITLE_CASE);
-        }
-        if (preset.isConvertLaTeX()) {
-            jobs.add(FieldFormatterCleanup.TITLE_LATEX);
-        }
         if (preset.isConvertUnicodeToLatex()) {
             jobs.add(new UnicodeCleanup());
         }
         if (preset.isConvertToBiblatex()) {
             jobs.add(new BiblatexCleanup());
         }
+
+        jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
+
         return jobs;
     }
 }

@@ -1,9 +1,13 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 
+/**
+ * Removes all matching braces around the string.
+ */
 public class RemoveBracesFormatter implements Formatter {
 
     @Override
@@ -35,6 +39,11 @@ public class RemoveBracesFormatter implements Formatter {
             }
         }
         return formatted;
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Removes all matching braces around the contents of %s.");
     }
 
     /**

@@ -3,15 +3,17 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+
+import com.google.common.base.Strings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -316,7 +318,7 @@ public class PdfContentImporter extends ImportFormat {
                         curString = curString.concat(lines[i]).concat(System.lineSeparator());
                         i++;
                     }
-                    abstractT = curString;
+                    abstractT = curString.trim();
                     i++;
                 } else if ((curString.length() >= "Keywords".length()) && "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))) {
                     if (curString.length() == "Keywords".length()) {
@@ -447,7 +449,7 @@ public class PdfContentImporter extends ImportFormat {
             if (abstractT != null) {
                 entry.setField("abstract", abstractT);
             }
-            if (keywords != null) {
+            if (!Strings.isNullOrEmpty(keywords)) {
                 entry.setField("keywords", keywords);
             }
             if (title != null) {
@@ -477,8 +479,6 @@ public class PdfContentImporter extends ImportFormat {
             if (publisher != null) {
                 entry.setField("publisher", publisher);
             }
-
-            entry.setField("review", firstPageContents);
 
             result.add(entry);
         }

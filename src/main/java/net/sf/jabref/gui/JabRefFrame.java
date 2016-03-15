@@ -98,7 +98,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // The sidepane manager takes care of populating the sidepane.
     public SidePaneManager sidePaneManager;
 
-    public JTabbedPane tabbedPane; // initialized at constructor
+    private JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
     private final JabRef jabRef;
@@ -243,6 +243,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Paste"), Globals.getKeyPrefs().getKey(KeyBinding.PASTE), IconTheme.JabRefIcon.PASTE.getIcon());
     private final AbstractAction cut = new EditAction(Actions.CUT, Localization.menuTitle("Cut"),
             Localization.lang("Cut"), Globals.getKeyPrefs().getKey(KeyBinding.CUT), IconTheme.JabRefIcon.CUT.getIcon());
+    private final AbstractAction openConsole = new GeneralAction(Actions.OPEN_CONSOLE,
+            Localization.menuTitle("Open terminal here"),
+            Localization.lang("Open terminal here"),
+            Globals.getKeyPrefs().getKey(KeyBinding.OPEN_CONSOLE),
+            IconTheme.JabRefIcon.CONSOLE.getIcon());
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
@@ -994,7 +999,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Returns a list of BasePanel.
      *
-     * @param i Index of base
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
@@ -1345,6 +1349,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(openFolder);
         tools.add(openFile);
         tools.add(openUrl);
+        tools.add(openConsole);
         tools.addSeparator();
         tools.add(abbreviateIso);
         tools.add(abbreviateMedline);
@@ -1444,6 +1449,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
+        tlb.addAction(openConsole);
         tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
@@ -1509,6 +1515,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> specialFieldButtons = new LinkedList<>();
     private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
     private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+    private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
+
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
@@ -1533,6 +1541,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.clear();
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
+
+        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1573,6 +1583,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
         }
+
+        boolean saved = false;
+
+        if (tabCount > 0) {
+            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+        }
+        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**
@@ -1609,7 +1626,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
-        addTab(bp, file, raisePanel);
+        addTab(bp, raisePanel);
         return bp;
     }
 
@@ -1651,13 +1668,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // set original filename (again)
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
+            tabbedPane.setToolTipTextAt(i, file == null ? null : file.getAbsolutePath());
         }
     }
 
-    public void addTab(BasePanel bp, File file, boolean raisePanel) {
+    public void addTab(BasePanel bp, boolean raisePanel) {
         // add tab
         tabbedPane.add(bp.getTabTitle(), bp);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount() - 1, file == null ? null : file.getAbsolutePath());
+
         // update all tab titles
         updateAllTabTitles();
 

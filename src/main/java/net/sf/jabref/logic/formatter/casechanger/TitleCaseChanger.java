@@ -38,4 +38,10 @@ public class TitleCaseChanger implements Formatter {
 
         return title.toString();
     }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang(
+                "Converts all words in %s to upper case, but converts articles, prepositions, and conjunctions to lower case.");
+    }
 }

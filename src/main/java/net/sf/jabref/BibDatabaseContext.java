@@ -58,7 +58,7 @@ public class BibDatabaseContext {
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {
-        metaData.putData(MetaData.DATABASE_TYPE, Collections.singletonList(bibDatabaseMode.getFormattedName()));
+        metaData.setMode(bibDatabaseMode);
     }
 
     /**

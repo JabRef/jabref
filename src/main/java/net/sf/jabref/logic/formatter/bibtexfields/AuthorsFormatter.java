@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,6 +131,11 @@ public class AuthorsFormatter implements Formatter {
             }
         }
         return stringBuilder.toString();
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Normalizes lists of persons in %s to the BibTeX standard.");
     }
 
     private static String normalizeName(String oldName) {

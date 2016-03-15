@@ -2,7 +2,8 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.SaveActions;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
@@ -1316,7 +1317,7 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse();
 
-        List<String> saveActions = parserResult.getMetaData().getData(SaveActions.META_KEY);
+        List<String> saveActions = parserResult.getMetaData().getData(MetaData.SAVE_ACTIONS);
 
         assertEquals("enabled", saveActions.get(0));
         assertEquals("title[LowerCaseChanger]", saveActions.get(1));
@@ -1328,11 +1329,10 @@ public class BibtexParserTest {
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger]}"));
 
         ParserResult parserResult = parser.parse();
-        SaveActions saveActions = parserResult.getMetaData().getSaveActions();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions();
 
         assertTrue(saveActions.isEnabled());
-        assertEquals(
-                Arrays.asList(new FieldFormatterCleanup("title", new LowerCaseChanger())),
+        assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseChanger())),
                 saveActions.getConfiguredActions());
     }
 
@@ -1395,7 +1395,7 @@ public class BibtexParserTest {
                 "@comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE +
                 "@comment{jabref-meta: groupstree:" + Globals.NEWLINE
                         + "0 AllEntriesGroup:;" + Globals.NEWLINE
-                        + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;" + Globals.NEWLINE
+                        + "1 KeywordGroup:Fr�chet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;" + Globals.NEWLINE
                         + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
                         + "}"));
 
@@ -1404,7 +1404,7 @@ public class BibtexParserTest {
         assertEquals(new AllEntriesGroup(), root.getGroup());
         assertEquals(2, root.getChildCount());
         assertEquals(
-                new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
+                new KeywordGroup("Fr�chet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
                 ((GroupTreeNode) root.getChildAt(0)).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
@@ -1428,7 +1428,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestFileDirectory() throws IOException {
+    public void integrationTestFileDirectories() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" +
                 "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));

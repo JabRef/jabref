@@ -113,7 +113,7 @@ public class XMPUtil {
      *             than remove a lock or cancel the operation.
      */
     public static List<BibEntry> readXMP(File file) throws IOException {
-        List<BibEntry> result = Collections.EMPTY_LIST;
+        List<BibEntry> result = Collections.emptyList();
         try (FileInputStream inputStream = new FileInputStream(file)) {
             result = XMPUtil.readXMP(inputStream);
         }
@@ -1257,13 +1257,13 @@ public class XMPUtil {
      * Caution: This method is as expensive as it is reading the actual metadata
      * itself from the PDF.
      *
-     * @param inputsStream
+     * @param inputStream
      *            The inputStream to read the PDF from.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(InputStream inputsStream) {
+    public static boolean hasMetadata(InputStream inputStream) {
         try {
-            List<BibEntry> bibEntries = XMPUtil.readXMP(inputsStream);
+            List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream);
             return !bibEntries.isEmpty();
         } catch (EncryptionNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
