@@ -15,10 +15,7 @@
  */
 package net.sf.jabref.logic.util;
 
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.desktop.os.*;
-
-import java.util.Optional;
 
 /***
  * Operating system (OS) detection
