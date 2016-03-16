@@ -49,64 +49,64 @@ public class BibtexParserTest {
 
     @Test
     public void fromStringRecognizesEntry() throws Exception {
-        Collection<BibEntry> c = BibtexParser.fromString("@article{test,author={Ed von Test}}");
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={Ed von Test}}");
 
-        BibEntry e = c.iterator().next();
-        assertEquals("article", e.getType());
-        assertEquals("test", e.getCiteKey());
-        assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        BibEntry expected = new BibEntry();
+        expected.setType("article");
+        expected.setCiteKey("test");
+        expected.setField("author", "Ed von Test");
+        BibtexEntryAssert.assertEquals(Arrays.asList(expected), parsed);
     }
 
     @Test
     public void fromStringReturnsEmptyListFromEmptyString() {
-        Collection<BibEntry> c = BibtexParser.fromString("");
-        Assert.assertNotNull(c);
-        assertEquals(0, c.size());
+        Collection<BibEntry> parsed = BibtexParser.fromString("");
+        Assert.assertNotNull(parsed);
+        assertEquals(Collections.emptyList(), parsed);
     }
 
     @Test
     public void fromStringReturnsEmptyListIfNoEntryRecognized() {
-        Collection<BibEntry> c = BibtexParser.fromString("@@article@@{{{{{{}");
-        Assert.assertNotNull(c);
-        assertEquals(0, c.size());
+        Collection<BibEntry> parsed = BibtexParser.fromString("@@article@@{{{{{{}");
+        Assert.assertNotNull(parsed);
+        assertEquals(Collections.emptyList(), parsed);
     }
 
     @Test
     public void singleFromStringRecognizesEntry() {
-        BibEntry e = BibtexParser.singleFromString(
+        BibEntry parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n");
 
-        assertEquals("article", e.getType());
-        assertEquals("canh05", e.getCiteKey());
-        assertEquals("Crowston, K. and Annabi, H.", e.getField("author"));
-        assertEquals("Title A", e.getField("title"));
+        BibEntry expected = new BibEntry();
+        expected.setType("article");
+        expected.setCiteKey("canh05");
+        expected.setField("author", "Crowston, K. and Annabi, H.");
+        expected.setField("title", "Title A");
+        BibtexEntryAssert.assertEquals(expected, parsed);
     }
 
     @Test
     public void singleFromStringRecognizesEntryInMultiple() {
-        BibEntry e = BibtexParser.singleFromString("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
+        BibEntry parsed = BibtexParser.singleFromString("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                 + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}");
 
-        Assert.assertTrue(e.getCiteKey().equals("canh05") || e.getCiteKey().equals("foo"));
+        Assert.assertTrue(parsed.getCiteKey().equals("canh05") || parsed.getCiteKey().equals("foo"));
     }
 
     @Test
     public void singleFromStringReturnsNullFromEmptyString() {
-        BibEntry e = BibtexParser.singleFromString("");
-        Assert.assertNull(e);
+        BibEntry parsed = BibtexParser.singleFromString("");
+        Assert.assertNull(parsed);
     }
 
     @Test
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
-        BibEntry e = BibtexParser.singleFromString("@@article@@{{{{{{}");
-        Assert.assertNull(e);
+        BibEntry parsed = BibtexParser.singleFromString("@@article@@{{{{{{}");
+        Assert.assertNull(parsed);
     }
 
     @Test
     public void parseTwoTimesReturnsSameResult() throws IOException {
-
         BibtexParser parser = new BibtexParser(new StringReader("@article{test,author={Ed von Test}}"));
         ParserResult result = parser.parse();
 
@@ -115,14 +115,13 @@ public class BibtexParserTest {
 
     @Test
     public void parseRecognizesEntry() throws IOException {
-
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{test,author={Ed von Test}}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
 
-        BibEntry e = c.iterator().next();
+        BibEntry e = parsed.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
@@ -135,10 +134,10 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{test,author=\"Ed von Test\"}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
 
-        BibEntry e = c.iterator().next();
+        BibEntry e = parsed.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
@@ -152,10 +151,10 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{test}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
 
-        BibEntry e = c.iterator().next();
+        BibEntry e = parsed.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
     }
@@ -165,10 +164,10 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader(" @article{test,author={Ed von Test}}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
 
-        BibEntry e = c.iterator().next();
+        BibEntry e = parsed.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
@@ -180,10 +179,10 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article { test,author={Ed von Test}}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
 
-        BibEntry e = c.iterator().next();
+        BibEntry e = parsed.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
@@ -307,28 +306,23 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"));
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(2, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        Iterator<BibEntry> i = c.iterator();
-        BibEntry a = i.next();
-        BibEntry b = i.next();
+        List<BibEntry> expected = new ArrayList<>();
+        BibEntry firstEntry = new BibEntry();
+        firstEntry.setType("article");
+        firstEntry.setCiteKey("canh05");
+        firstEntry.setField("author", "Crowston, K. and Annabi, H.");
+        firstEntry.setField("title", "Title A");
+        expected.add(firstEntry);
 
-        // Sort them because we can't be sure about the order
-        if (a.getCiteKey().equals("foo")) {
-            BibEntry tmp = a;
-            a = b;
-            b = tmp;
-        }
+        BibEntry secondEntry = new BibEntry();
+        secondEntry.setType("inproceedings");
+        secondEntry.setCiteKey("foo");
+        secondEntry.setField("author", "Norton Bar");
+        expected.add(secondEntry);
 
-        assertEquals("article", a.getType());
-        assertEquals("canh05", a.getCiteKey());
-        assertEquals("Crowston, K. and Annabi, H.", a.getField("author"));
-        assertEquals("Title A", a.getField("title"));
-
-        assertEquals("inproceedings", b.getType());
-        assertEquals("foo", b.getCiteKey());
-        assertEquals("Norton Bar", b.getField("author"));
+        BibtexEntryAssert.assertEquals(expected, parsed);
     }
 
     @Test
@@ -352,25 +346,20 @@ public class BibtexParserTest {
     public void parseRecognizesMultipleEntriesOnSameLine() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{canh05}" + "@inProceedings{foo}"));
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(2, c.size());
+        List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        Iterator<BibEntry> i = c.iterator();
-        BibEntry a = i.next();
-        BibEntry b = i.next();
+        List<BibEntry> expected = new ArrayList<>();
+        BibEntry firstEntry = new BibEntry();
+        firstEntry.setType("article");
+        firstEntry.setCiteKey("canh05");
+        expected.add(firstEntry);
 
-        // Sort them because we can't be sure about the order
-        if (a.getCiteKey().equals("foo")) {
-            BibEntry tmp = a;
-            a = b;
-            b = tmp;
-        }
+        BibEntry secondEntry = new BibEntry();
+        secondEntry.setType("inproceedings");
+        secondEntry.setCiteKey("foo");
+        expected.add(secondEntry);
 
-        assertEquals("article", a.getType());
-        assertEquals("canh05", a.getCiteKey());
-
-        assertEquals("inproceedings", b.getType());
-        assertEquals("foo", b.getCiteKey());
+        BibtexEntryAssert.assertEquals(expected, parsed);
     }
 
     @Test
@@ -1462,6 +1451,5 @@ public class BibtexParserTest {
         expected.add(c);
 
         BibtexEntryAssert.assertEquals(expected, result.getDatabase().getEntries());
-
     }
 }

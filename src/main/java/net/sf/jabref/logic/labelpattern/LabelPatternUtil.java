@@ -499,7 +499,7 @@ public class LabelPatternUtil {
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.
             if (!key.equals(oldKey)) {
-                if (! database.containsEntryWithId(entry.getId())) {
+                if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
                     entry.setField(BibEntry.KEY_FIELD, key);
                 } else {

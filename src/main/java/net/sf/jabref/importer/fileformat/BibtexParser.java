@@ -85,7 +85,7 @@ public class BibtexParser {
      * @param bibtexString
      * @return Returns returns an empty collection if no entries where found or if an error occurred.
      */
-    public static Collection<BibEntry> fromString(String bibtexString) {
+    public static List<BibEntry> fromString(String bibtexString) {
         StringReader reader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(reader);
 
