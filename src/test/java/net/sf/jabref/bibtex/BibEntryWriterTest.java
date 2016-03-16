@@ -366,4 +366,41 @@ public class BibEntryWriterTest {
         // @formatter:on
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void doNotWriteEmptyFields() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry("1234", "article");
+        entry.setField("author", "  ");
+        entry.setField("note", "some note");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        String actual = stringWriter.toString();
+
+        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
+                "  note =   {some note}" + Globals.NEWLINE +
+                "}" + Globals.NEWLINE;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void trimFieldContents() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry("1234", "article");
+        entry.setField("note", "        some note    \t");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        String actual = stringWriter.toString();
+
+        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
+                "  note = {some note}" + Globals.NEWLINE +
+                "}" + Globals.NEWLINE;
+
+        assertEquals(expected, actual);
+    }
 }

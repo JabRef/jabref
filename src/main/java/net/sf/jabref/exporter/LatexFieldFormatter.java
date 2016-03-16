@@ -106,6 +106,8 @@ public class LatexFieldFormatter {
             return formatWithoutResolvingStrings(result, fieldName);
         }
 
+        // Trim whitespace
+        result = result.trim();
         return formatAndResolveStrings(result, fieldName);
     }
 
