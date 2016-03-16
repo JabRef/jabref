@@ -45,12 +45,12 @@ import org.w3c.dom.Text;
  */
 class OOCalcDatabase {
 
-    private final Collection<BibEntry> entries;
+    private final List<BibEntry> entries;
 
     private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
 
 
-    public OOCalcDatabase(BibDatabase bibtex, Set<String> keySet) {
+    public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator("author"));
@@ -60,15 +60,13 @@ class OOCalcDatabase {
         List<BibEntry> entryList = new ArrayList<>();
         // Set up a list of all entries, if keySet==null, or the entries whose
         // ids are in keySet, otherwise:
-        if (keySet == null) {
+        if (entries == null) {
             entryList.addAll(bibtex.getEntries());
         } else {
-            for (String key : keySet) {
-                entryList.add(bibtex.getEntryById(key));
-            }
+            entryList.addAll(entries);
         }
         Collections.sort(entryList, new FieldComparatorStack<>(comparators));
-        entries = entryList;
+        this.entries = entryList;
     }
 
     public Document getDOMrepresentation() {

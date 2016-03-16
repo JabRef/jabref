@@ -3,6 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
@@ -1435,5 +1436,32 @@ public class BibtexParserTest {
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
+    }
+
+    @Test
+    public void parseReturnsEntriesInSameOrder() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(
+                "@article{a}" + Globals.NEWLINE +
+                "@article{b}" + Globals.NEWLINE +
+                "@inProceedings{c}"));
+
+        List<BibEntry> expected = new ArrayList<>();
+        BibEntry a = new BibEntry();
+        a.setType("article");
+        a.setCiteKey("a");
+        expected.add(a);
+
+        BibEntry b = new BibEntry();
+        b.setType("article");
+        b.setCiteKey("b");
+        expected.add(b);
+
+        BibEntry c = new BibEntry();
+        c.setType("inproceedings");
+        c.setCiteKey("c");
+        expected.add(c);
+
+        BibtexEntryAssert.assertEquals(expected, result.getDatabase().getEntries());
+
     }
 }

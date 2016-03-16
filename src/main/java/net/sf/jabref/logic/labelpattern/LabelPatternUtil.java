@@ -250,7 +250,7 @@ public class LabelPatternUtil {
      * Rest part is only the first part which do not match any other type. All
      * other parts (address, ...) are ignored.
      *
-     * @param result the institution to generate a Bibtex key for
+     * @param content the institution to generate a Bibtex key for
      * @return <ul>
      *         <li>the institution key</li>
      *         <li>"" in the case of a failure</li>
@@ -499,11 +499,11 @@ public class LabelPatternUtil {
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.
             if (!key.equals(oldKey)) {
-                if (database.getEntryById(entry.getId()) == null) {
+                if (! database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
                     entry.setField(BibEntry.KEY_FIELD, key);
                 } else {
-                    database.setCiteKeyForEntry(entry.getId(), key);
+                    database.setCiteKeyForEntry(entry, key);
                 }
             }
 
@@ -532,11 +532,11 @@ public class LabelPatternUtil {
             }
 
             if (!moddedKey.equals(oldKey)) {
-                if (database.getEntryById(entry.getId()) == null) {
+                if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
                     entry.setField(BibEntry.KEY_FIELD, moddedKey);
                 } else {
-                    database.setCiteKeyForEntry(entry.getId(), moddedKey);
+                    database.setCiteKeyForEntry(entry, moddedKey);
                 }
             }
         }
@@ -544,7 +544,7 @@ public class LabelPatternUtil {
 
     /**
      * Applies modifiers to a label generated based on a field marker.
-     * @param resultingLabel The generated label.
+     * @param label The generated label.
      * @param parts String array containing the modifiers.
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.

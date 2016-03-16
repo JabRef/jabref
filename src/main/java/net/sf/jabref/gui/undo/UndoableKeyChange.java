@@ -19,6 +19,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -27,16 +28,16 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class UndoableKeyChange extends AbstractUndoableEdit {
 
-    private final String entryId;
+    private final BibEntry entry;
     private final BibDatabase base;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableKeyChange(BibDatabase base, String entryId,
+    public UndoableKeyChange(BibDatabase base, BibEntry entry,
             String oldValue, String newValue) {
         this.base = base;
-        this.entryId = entryId;
+        this.entry = entry;
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
@@ -75,7 +76,7 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
     }
 
     private void set(String to) {
-        base.setCiteKeyForEntry(entryId, to);
+        base.setCiteKeyForEntry(entry, to);
     }
 
 }

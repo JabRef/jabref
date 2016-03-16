@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
@@ -33,6 +34,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * ExportFormat for exporting in MSBIB XML format.
@@ -45,11 +47,11 @@ class MSBibExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encoding, Set<String> keySet) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws IOException {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
-        MSBibDatabase md = new MSBibDatabase(database, keySet);
+        MSBibDatabase md = new MSBibDatabase(database, entries);
         try (VerifyingWriter ps = ss.getWriter()) {
 
         // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
