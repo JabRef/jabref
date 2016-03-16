@@ -20,13 +20,15 @@ import net.sf.jabref.exporter.FieldFormatterCleanups;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class CleanupPreset {
 
-    private final EnumSet<CleanupStep> activeJobs;
+    private final Set<CleanupStep> activeJobs;
     private final FieldFormatterCleanups formatterCleanups;
 
-    public CleanupPreset(EnumSet<CleanupStep> activeJobs) {
+
+    public CleanupPreset(Set<CleanupStep> activeJobs) {
         this(activeJobs, new FieldFormatterCleanups(false, new ArrayList<>()));
     }
 
@@ -38,7 +40,7 @@ public class CleanupPreset {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreset(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
+    public CleanupPreset(Set<CleanupStep> activeJobs, FieldFormatterCleanups formatterCleanups) {
         this.activeJobs = activeJobs;
         this.formatterCleanups = Objects.requireNonNull(formatterCleanups);
     }

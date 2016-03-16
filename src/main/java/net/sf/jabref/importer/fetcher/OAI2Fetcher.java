@@ -39,6 +39,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  *
@@ -145,7 +146,7 @@ public class OAI2Fetcher implements EntryFetcher {
     public static String fixKey(String key) {
 
         String resultingKey = key;
-        if (resultingKey.matches("^[Aa][Rr][Xx][Ii][Vv]:.*")) { // Starts with arxiv:, case and locale independent
+        if (resultingKey.toLowerCase(Locale.ENGLISH).startsWith("arxiv:")) {
             resultingKey = resultingKey.substring(6);
         }
 
