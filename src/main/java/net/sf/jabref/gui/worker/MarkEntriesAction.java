@@ -25,6 +25,9 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -39,6 +42,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     private final JMenuItem menuItem;
     private int besLength;
 
+    private static final Log LOGGER = LogFactory.getLog(MarkEntriesAction.class);
 
     public MarkEntriesAction(JabRefFrame frame, int level) {
         this.frame = frame;
@@ -63,7 +67,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
             getWorker().run();
             getCallBack().update();
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOGGER.warn("Problem marking entries", t);
         }
     }
 

@@ -17,6 +17,9 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibDatabase;
@@ -34,6 +37,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
     private final BibEntry entry;
     private final BasePanel panel;
 
+    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveEntry.class);
 
     public UndoableRemoveEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {
@@ -72,7 +76,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowing(entry);
         } catch (Throwable ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem to redo `remove entry`", ex);
         }
     }
 
