@@ -218,6 +218,34 @@ public class LabelPatternUtilTest {
     }
 
     @Test
+    public void testUniversity() {
+        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}");
+        assertEquals("UniLinkoeping", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+    }
+
+    @Test
+    public void testDepartment() {
+        BibEntry entry = BibtexParser
+                .singleFromString(
+                        "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}");
+        assertEquals("UniLinkoepingEE", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+    }
+
+    @Test
+    public void testSchool() {
+        BibEntry entry = BibtexParser.singleFromString(
+                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}");
+        assertEquals("UniLinkoepingCE", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+    }
+
+    @Test
+    public void testInstituteOfTechnology() {
+        BibEntry entry = BibtexParser
+                .singleFromString("@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}");
+        assertEquals("MIT", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+    }
+
+    @Test
     public void testAuthIniN() {
         assertEquals(
                 "NMEB",
