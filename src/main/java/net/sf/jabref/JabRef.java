@@ -160,7 +160,7 @@ public class JabRef {
                     Globals.prefs.clear();
                 } catch (BackingStoreException e) {
                     System.err.println(Localization.lang("Unable to clear preferences."));
-                    e.printStackTrace();
+                    LOGGER.error("Unable to clear preferences", e);
                 }
             } else {
                 String[] keys = value.split(",");
@@ -816,7 +816,7 @@ public class JabRef {
             pr.setFile(file);
             pr.setInvalid(true);
             pr.setErrorMessage(ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.info("Problem opening .bib-file", ex);
             return pr;
         }
 

@@ -22,6 +22,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -33,6 +37,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JSTORFetcher2 implements EntryFetcher {
+
+    private static final Log LOGGER = LogFactory.getLog(JSTORFetcher2.class);
 
     private static final String CANCELLED = "__CANCELLED__";
     private static final int MAX_PAGES_TO_LOAD = 8;
@@ -117,7 +123,7 @@ public class JSTORFetcher2 implements EntryFetcher {
             return true;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Problem fetching from JSTOR", e);
             status.showMessage(Localization.lang("Error while fetching from %0", "JSTOR") + ": " + e.getMessage());
         }
         return false;

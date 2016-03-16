@@ -3,8 +3,12 @@ package net.sf.jabref;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.cli.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class JabRefCLI {
+
+    private static final Log LOGGER = LogFactory.getLog(JabRefCLI.class);
 
     private String[] leftOver;
     private final CommandLine cl;
@@ -38,7 +42,7 @@ public class JabRefCLI {
             this.cl = new DefaultParser().parse(options, args);
             this.leftOver = cl.getArgs();
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.warn("Problem parsing arguments", e);
 
             this.printUsage();
             throw new RuntimeException();
