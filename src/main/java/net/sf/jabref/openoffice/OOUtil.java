@@ -16,7 +16,8 @@
 package net.sf.jabref.openoffice;
 
 import java.util.List;
-import java.util.BitSet;
+import java.util.Set;
+import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,16 +57,17 @@ class OOUtil {
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
 
-    public static final int TOTAL_FORMAT_COUNT = 8;
 
-    private static final int FORMAT_BOLD = 0;
-    private static final int FORMAT_ITALIC = 1;
-    private static final int FORMAT_SMALLCAPS = 2;
-    private static final int FORMAT_SUPERSCRIPT = 3;
-    private static final int FORMAT_SUBSCRIPT = 4;
-    private static final int FORMAT_UNDERLINE = 5;
-    private static final int FORMAT_STRIKEOUT = 6;
-    private static final int FORMAT_MONOSPACE = 7;
+    enum Formatting {
+        BOLD,
+        ITALIC,
+        SMALLCAPS,
+        SUPERSCRIPT,
+        SUBSCRIPT,
+        UNDERLINE,
+        STRIKEOUT,
+        MONOSPACE
+    }
 
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
@@ -141,7 +143,7 @@ class OOUtil {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 
-        BitSet formatting = new BitSet(TOTAL_FORMAT_COUNT);
+        Set<Formatting> formatting = EnumSet.noneOf(Formatting.class);
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
         Matcher m = OOUtil.HTML_TAG.matcher(lText);
@@ -153,37 +155,37 @@ class OOUtil {
             String tag = m.group();
             // Handle tags:
             if ("<b>".equals(tag)) {
-                formatting.set(FORMAT_BOLD);
+                formatting.add(Formatting.BOLD);
             } else if ("</b>".equals(tag)) {
-                formatting.clear(FORMAT_BOLD);
+                formatting.remove(Formatting.BOLD);
             } else if ("<i>".equals(tag) || "<em>".equals(tag)) {
-                formatting.set(FORMAT_ITALIC);
+                formatting.add(Formatting.ITALIC);
             } else if ("</i>".equals(tag) || "</em>".equals(tag)) {
-                formatting.clear(FORMAT_ITALIC);
+                formatting.remove(Formatting.ITALIC);
             } else if ("<tt>".equals(tag)) {
-                formatting.set(FORMAT_MONOSPACE);
+                formatting.add(Formatting.MONOSPACE);
             } else if ("</tt>".equals(tag)) {
-                formatting.clear(FORMAT_MONOSPACE);
+                formatting.remove(Formatting.MONOSPACE);
             } else if ("<smallcaps>".equals(tag)) {
-                formatting.set(FORMAT_SMALLCAPS);
+                formatting.add(Formatting.SMALLCAPS);
             } else if ("</smallcaps>".equals(tag)) {
-                formatting.clear(FORMAT_SMALLCAPS);
+                formatting.remove(Formatting.SMALLCAPS);
             } else if ("<sup>".equals(tag)) {
-                formatting.set(FORMAT_SUPERSCRIPT);
+                formatting.add(Formatting.SUPERSCRIPT);
             } else if ("</sup>".equals(tag)) {
-                formatting.clear(FORMAT_SUPERSCRIPT);
+                formatting.remove(Formatting.SUPERSCRIPT);
             } else if ("<sub>".equals(tag)) {
-                formatting.set(FORMAT_SUBSCRIPT);
+                formatting.add(Formatting.SUBSCRIPT);
             } else if ("</sub>".equals(tag)) {
-                formatting.clear(FORMAT_SUBSCRIPT);
+                formatting.remove(Formatting.SUBSCRIPT);
             } else if ("<u>".equals(tag)) {
-                formatting.set(FORMAT_UNDERLINE);
+                formatting.add(Formatting.UNDERLINE);
             } else if ("</u>".equals(tag)) {
-                formatting.clear(FORMAT_UNDERLINE);
+                formatting.remove(Formatting.UNDERLINE);
             } else if ("<s>".equals(tag)) {
-                formatting.set(FORMAT_STRIKEOUT);
+                formatting.add(Formatting.STRIKEOUT);
             } else if ("</s>".equals(tag)) {
-                formatting.clear(FORMAT_STRIKEOUT);
+                formatting.remove(Formatting.STRIKEOUT);
             }
 
             piv = m.end();
@@ -202,7 +204,8 @@ class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, BitSet formatting)
+    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
+            Set<Formatting> formatting)
                     throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
                     IllegalArgumentException {
         text.insertString(cursor, string, true);
@@ -210,7 +213,7 @@ class OOUtil {
         // (which is the string we just inserted) to be bold
         XPropertySet xCursorProps = UnoRuntime.queryInterface(
                 XPropertySet.class, cursor);
-        if (formatting.get(FORMAT_BOLD)) {
+        if (formatting.contains(Formatting.BOLD)) {
             xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.BOLD);
         } else {
@@ -218,7 +221,7 @@ class OOUtil {
                     com.sun.star.awt.FontWeight.NORMAL);
         }
 
-        if (formatting.get(FORMAT_ITALIC)) {
+        if (formatting.contains(Formatting.ITALIC)) {
             xCursorProps.setPropertyValue(CHAR_POSTURE,
                     com.sun.star.awt.FontSlant.ITALIC);
         } else {
@@ -226,7 +229,7 @@ class OOUtil {
                     com.sun.star.awt.FontSlant.NONE);
         }
 
-        if (formatting.get(FORMAT_SMALLCAPS)) {
+        if (formatting.contains(Formatting.SMALLCAPS)) {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
         }        else {
@@ -236,7 +239,7 @@ class OOUtil {
 
         // TODO: the <monospace> tag doesn't work
         /*
-        if (formatting.get(FORMAT_MONOSPACE)) {
+        if (formatting.contains(Formatting.MONOSPACE)) {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.FIXED);
         }
@@ -244,12 +247,12 @@ class OOUtil {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.VARIABLE);
         } */
-        if (formatting.get(FORMAT_SUBSCRIPT)) {
+        if (formatting.contains(Formatting.SUBSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) -101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
-        } else if (formatting.get(FORMAT_SUPERSCRIPT)) {
+        } else if (formatting.contains(Formatting.SUPERSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) 101);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
@@ -261,13 +264,13 @@ class OOUtil {
                     (byte) 100);
         }
 
-        if (formatting.get(FORMAT_UNDERLINE)) {
+        if (formatting.contains(Formatting.UNDERLINE)) {
             xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.SINGLE);
         } else {
             xCursorProps.setPropertyValue(CHAR_UNDERLINE, com.sun.star.awt.FontUnderline.NONE);
         }
 
-        if (formatting.get(FORMAT_STRIKEOUT)) {
+        if (formatting.contains(Formatting.STRIKEOUT)) {
             xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.SINGLE);
         } else {
             xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.NONE);
