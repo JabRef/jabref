@@ -92,19 +92,8 @@ public class GUIGlobals {
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
 
-    // some fieldname constants
-    public static final double DEFAULT_FIELD_WEIGHT = 1;
-    public static final double MAX_FIELD_WEIGHT = 2;
-
-    // constants for editor types:
-    public static final int STANDARD_EDITOR = 1;
-    public static final int FILE_LIST_EDITOR = 2;
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
-
-    public static final double SMALL_W = 0.30;
-    public static final double MEDIUM_W = 0.5;
-    public static final double LARGE_W = 1.5;
 
     public static final double PE_HEIGHT = 2;
 

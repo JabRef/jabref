@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
@@ -137,13 +138,10 @@ class EntryEditorTab {
         for (int i = 0; i < fields.size(); i++) {
             String field = fields.get(i);
 
-            // Create the text area:
-            int editorType = InternalBibtexFields.getEditorType(field);
-
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (editorType == GUIGlobals.FILE_LIST_EDITOR) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.FILE_EDITOR)) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext().getMetaData(), field,
                         null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;

@@ -28,6 +28,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
+import net.sf.jabref.bibtex.BibtexSingleField;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -77,8 +78,8 @@ public class FieldWeightDialog extends JDialog {
 
         for (String field : fields) {
             builder.append(field);
-            int weight = (int) ((100 * InternalBibtexFields.getFieldWeight(field)) / GUIGlobals.MAX_FIELD_WEIGHT);
-            //System.out.println(weight);
+            int weight = (int) ((100 * InternalBibtexFields.getFieldWeight(field))
+                    / BibtexSingleField.MAX_FIELD_WEIGHT);
             JSlider slider = new JSlider(0, 100, weight);//,);
             sliders.put(slider, new SliderInfo(field, weight));
             builder.append(slider);
@@ -120,7 +121,7 @@ public class FieldWeightDialog extends JDialog {
             SliderInfo sInfo = sliders.get(slider);
             // Only list the value if it has changed:
             if (sInfo.originalValue != slider.getValue()) {
-                double weight = (GUIGlobals.MAX_FIELD_WEIGHT * slider.getValue()) / 100d;
+                double weight = (BibtexSingleField.MAX_FIELD_WEIGHT * slider.getValue()) / 100d;
                 InternalBibtexFields.setFieldWeight(sInfo.fieldName, weight);
             }
         }
