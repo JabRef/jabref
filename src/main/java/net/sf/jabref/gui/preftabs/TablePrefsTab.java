@@ -19,6 +19,8 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -294,9 +296,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal.isEmpty()) {
             newVal = null;
         }
-        if (((newVal != null) && (oldVal == null))
-                || ((newVal == null) && (oldVal != null))
-                || ((newVal != null) && !newVal.equals(oldVal))) {
+        if (!Objects.equals(oldVal, newVal)) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             InternalBibtexFields.setNumericFieldsFromPrefs();
         }
