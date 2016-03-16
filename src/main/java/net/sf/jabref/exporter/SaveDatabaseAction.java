@@ -372,7 +372,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         }
 
-        if (chosenFile != null) {
+        if (f != null) {
             File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
             panel.getBibDatabaseContext().getMetaData().setFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
@@ -384,7 +384,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             // Register so we get notifications about outside changes to the file.
             try {
-                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getBibDatabaseContext().getDatabaseFile()));
+                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel,
+                        panel.getBibDatabaseContext().getDatabaseFile()));
             } catch (IOException ex) {
                 LOGGER.error("Problem registering file change notifications", ex);
             }

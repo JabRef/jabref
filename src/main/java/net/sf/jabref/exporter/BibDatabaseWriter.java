@@ -35,11 +35,8 @@ import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
-import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibDatabaseWriter {
@@ -247,8 +244,9 @@ public class BibDatabaseWriter {
      * @param encoding String the name of the encoding, which is part of the file header.
      */
     private void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
-        if(encoding == null)
+        if(encoding == null) {
             return;
+        }
 
         out.write("% ");
         out.write(Globals.encPrefix + encoding);

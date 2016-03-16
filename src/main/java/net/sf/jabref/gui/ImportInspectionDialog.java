@@ -401,25 +401,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         return Optional.empty();
     }
 
-    /**
-     * Removes all selected entries from the table. Synchronizes on this.entries
-     * to prevent conflict with addition of new entries.
-     */
-    private void removeSelectedEntries() {
-        int row = glTable.getSelectedRow();
-        List<Object> toRemove = new ArrayList<>();
-        toRemove.addAll(selectionModel.getSelected());
-        entries.getReadWriteLock().writeLock().lock();
-        for (Object o : toRemove) {
-            entries.remove(o);
-        }
-        entries.getReadWriteLock().writeLock().unlock();
-        glTable.clearSelection();
-        if ((row >= 0) && (!entries.isEmpty())) {
-            row = Math.min(entries.size() - 1, row);
-            glTable.addRowSelectionInterval(row, row);
-        }
-    }
 
     /* (non-Javadoc)
      * @see net.sf.jabref.gui.ImportInspection#entryListComplete()
@@ -440,22 +421,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    /**
-     * This method returns a List containing all entries that are selected
-     * (checkbox checked).
-     *
-     * @return a List containing the selected entries.
-     */
-    private List<BibEntry> getSelectedEntries() {
-        List<BibEntry> selected = new ArrayList<>();
-        for (BibEntry entry : entries) {
-            if (entry.isSearchHit()) {
-                selected.add(entry);
-            }
-        }
-
-        return selected;
-    }
 
     /**
      * Generate key for the selected entry only.
@@ -767,6 +732,24 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             });
         }
+
+        /**
+         * This method returns a List containing all entries that are selected
+         * (checkbox checked).
+         *
+         * @return a List containing the selected entries.
+         */
+        private List<BibEntry> getSelectedEntries() {
+            List<BibEntry> selected = new ArrayList<>();
+            for (BibEntry entry : entries) {
+                if (entry.isSearchHit()) {
+                    selected.add(entry);
+                }
+            }
+
+            return selected;
+        }
+
     }
 
     private void signalStopFetching() {
@@ -800,6 +783,26 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         @Override
         public void actionPerformed(ActionEvent event) {
             removeSelectedEntries();
+        }
+
+        /**
+         * Removes all selected entries from the table. Synchronizes on this.entries
+         * to prevent conflict with addition of new entries.
+         */
+        private void removeSelectedEntries() {
+            int row = glTable.getSelectedRow();
+            List<Object> toRemove = new ArrayList<>();
+            toRemove.addAll(selectionModel.getSelected());
+            entries.getReadWriteLock().writeLock().lock();
+            for (Object o : toRemove) {
+                entries.remove(o);
+            }
+            entries.getReadWriteLock().writeLock().unlock();
+            glTable.clearSelection();
+            if ((row >= 0) && (!entries.isEmpty())) {
+                row = Math.min(entries.size() - 1, row);
+                glTable.addRowSelectionInterval(row, row);
+            }
         }
     }
 

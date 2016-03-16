@@ -395,37 +395,33 @@ public class JabRef {
                     boolean notSavedMsg = false;
 
                     // write an output, if something could be resolved
-                    if (newBase != null) {
-                        if (newBase.getEntryCount() > 0) {
-                            String subName = StringUtil.getCorrectFileName(data[1], "bib");
+                    if ((newBase != null) && !newBase.isEmpty()) {
+                        String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
-                            try {
-                                System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                                Defaults defaults = new Defaults(BibDatabaseMode
-                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                                SaveSession session = databaseWriter.saveDatabase(
-                                        new BibDatabaseContext(newBase, defaults), prefs);
+                        try {
+                            System.out.println(Localization.lang("Saving") + ": " + subName);
+                            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                            Defaults defaults = new Defaults(BibDatabaseMode
+                                    .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                            SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
+                                    prefs);
 
-
-                                // Show just a warning message if encoding didn't work for all characters:
-                                if (!session.getWriter().couldEncodeAll()) {
-                                    System.err.println(Localization.lang("Warning") + ": "
-                                            + Localization.lang(
-                                            "The chosen encoding '%0' could not encode the following characters:",
-                                            session.getEncoding().displayName())
-                                            + " "
-                                            + session.getWriter().getProblemCharacters());
-                                }
-                                session.commit(new File(subName));
-                            } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file.") + "\n"
-                                        + ex.getLocalizedMessage());
+                            // Show just a warning message if encoding didn't work for all characters:
+                            if (!session.getWriter().couldEncodeAll()) {
+                                System.err.println(Localization.lang("Warning") + ": "
+                                        + Localization.lang(
+                                                "The chosen encoding '%0' could not encode the following characters:",
+                                                session.getEncoding().displayName())
+                                        + " " + session.getWriter().getProblemCharacters());
                             }
-
-                            notSavedMsg = true;
+                            session.commit(new File(subName));
+                        } catch (SaveException ex) {
+                            System.err.println(
+                                    Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                         }
+
+                        notSavedMsg = true;
                     }
 
                     if (!notSavedMsg) {

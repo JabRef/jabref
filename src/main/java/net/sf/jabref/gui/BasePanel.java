@@ -176,12 +176,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private ContentAutoCompleters autoCompleters;
 
 
-    // Returns a collection of AutoCompleters, which are populated from the current database
-    public ContentAutoCompleters getAutoCompleters() {
-        return autoCompleters;
-    }
-
-
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext, Charset encoding) {
         Objects.requireNonNull(frame);
         Objects.requireNonNull(encoding);
@@ -223,6 +217,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         filterSearchToggle = new StartStopListAction<>(searchFilterList, SearchMatcher.INSTANCE, EverythingMatcher.INSTANCE);
         filterGroupToggle = new StartStopListAction<>(groupFilterList, GroupMatcher.INSTANCE, EverythingMatcher.INSTANCE);
+    }
+
+    // Returns a collection of AutoCompleters, which are populated from the current database
+    public ContentAutoCompleters getAutoCompleters() {
+        return autoCompleters;
     }
 
     public String getTabTitle() {
@@ -837,7 +836,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
 
-        actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> {
+        actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () ->
             JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
                 final List<BibEntry> bes = mainTable.getSelectedEntries();
                 if (bes.size() != 1) {
@@ -862,8 +861,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
                         flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
                 item.openLink();
-            });
-        });
+        }));
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
             JabRefExecutorService.INSTANCE.execute(() -> {
@@ -880,9 +878,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             });
         });
 
-        actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> {
-            JabRefDesktop.openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile());
-        });
+        actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
+                .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
 
         actions.put(Actions.OPEN_URL, (BaseAction) () -> {
             String URL_FIELD = "url";
@@ -904,8 +901,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
-                        if (URL_FIELD.equals(flEntry.type.getName().toLowerCase())
-                                || PS_FIELD.equals(flEntry.type.getName().toLowerCase())) {
+                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.getName())
+                                || PS_FIELD.equalsIgnoreCase(flEntry.type.getName())) {
                             entry = flEntry;
                             break;
                         }

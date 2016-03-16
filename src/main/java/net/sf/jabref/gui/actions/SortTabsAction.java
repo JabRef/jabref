@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.Action;
-import javax.swing.JTabbedPane;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;

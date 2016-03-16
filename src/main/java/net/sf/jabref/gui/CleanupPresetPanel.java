@@ -2,7 +2,6 @@ package net.sf.jabref.gui;
 
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;

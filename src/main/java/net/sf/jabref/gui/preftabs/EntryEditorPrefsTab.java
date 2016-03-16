@@ -66,18 +66,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final AutoCompletePreferences autoCompletePreferences;
     private final JabRefFrame frame;
 
-
-    private void setAutoCompleteElementsEnabled(boolean enabled) {
-        autoCompFields.setEnabled(enabled);
-        autoCompLF.setEnabled(enabled);
-        autoCompFF.setEnabled(enabled);
-        autoCompBoth.setEnabled(enabled);
-        firstNameModeAbbr.setEnabled(enabled);
-        firstNameModeFull.setEnabled(enabled);
-        firstNameModeBoth.setEnabled(enabled);
-        shortestToComplete.setEnabled(enabled);
-    }
-
     public EntryEditorPrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = new AutoCompletePreferences(prefs);
@@ -174,6 +162,17 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
+    }
+
+    private void setAutoCompleteElementsEnabled(boolean enabled) {
+        autoCompFields.setEnabled(enabled);
+        autoCompLF.setEnabled(enabled);
+        autoCompFF.setEnabled(enabled);
+        autoCompBoth.setEnabled(enabled);
+        firstNameModeAbbr.setEnabled(enabled);
+        firstNameModeFull.setEnabled(enabled);
+        firstNameModeBoth.setEnabled(enabled);
+        shortestToComplete.setEnabled(enabled);
     }
 
     @Override

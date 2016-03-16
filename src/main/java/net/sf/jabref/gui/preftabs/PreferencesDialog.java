@@ -35,7 +35,6 @@ import javax.swing.ListSelectionModel;
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.maintable.MainTable;
@@ -243,14 +242,11 @@ public class PreferencesDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            boolean ready = true;
-
             // First check that all tabs are ready to close:
             int count = main.getComponentCount();
             Component[] comps = main.getComponents();
             for (int i = 0; i < count; i++) {
                 if (!((PrefsTab) comps[i]).validateSettings()) {
-                    ready = false;
                     return; // If not, break off.
                 }
             }
@@ -260,9 +256,6 @@ public class PreferencesDialog extends JDialog {
             }
             Globals.prefs.flush();
 
-            if (!ready) {
-                return;
-            }
             setVisible(false);
             MainTable.updateRenderers();
             GUIGlobals.updateEntryEditorColors();
