@@ -253,7 +253,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
-        String[] lines = s.replaceAll("\r", "").split("\n");
+        String[] lines = s.replace("\r", "").split("\n");
         List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;

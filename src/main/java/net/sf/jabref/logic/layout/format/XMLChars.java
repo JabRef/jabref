@@ -81,7 +81,7 @@ public class XMLChars implements LayoutFormatter {
     }
 
     private static String firstFormat(String s) {
-        return s.replaceAll("&|\\\\&", "&#x0026;").replaceAll("--", "&#x2013;");
+        return s.replaceAll("&|\\\\&", "&#x0026;").replace("--", "&#x2013;");
     }
 
 
@@ -130,12 +130,7 @@ public class XMLChars implements LayoutFormatter {
 
         // use common abbreviations for <, > instead of code
         for (Map.Entry<String, String> entry : ASCII_TO_XML_CHARS.entrySet()) {
-            String s = entry.getKey();
-            String repl = entry.getValue();
-
-            if (repl != null) {
-                fieldText = fieldText.replaceAll(s, repl);
-            }
+            fieldText = fieldText.replace(entry.getKey(), entry.getValue());
         }
 
         return fieldText;

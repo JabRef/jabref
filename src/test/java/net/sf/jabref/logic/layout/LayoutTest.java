@@ -52,7 +52,7 @@ public class LayoutTest {
     public String layout(String layoutFile, String entry) throws Exception {
 
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
-        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(be, null);

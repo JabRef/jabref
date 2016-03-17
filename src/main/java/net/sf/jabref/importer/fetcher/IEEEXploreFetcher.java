@@ -368,7 +368,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
                     entry.setField("pages", pageNumbers[0]);
                 } else {
-                    entry.setField("pages", pages.replaceAll("-", "--"));
+                    entry.setField("pages", pages.replace("-", "--"));
                 }
             }
         }

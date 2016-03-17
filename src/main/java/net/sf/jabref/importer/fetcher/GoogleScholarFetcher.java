@@ -256,8 +256,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
         /*m = NEXT_PAGE_PATTERN.matcher(cont);
         if (m.find()) {
-            System.out.println("NEXT: "+URL_START+m.group(1).replaceAll("&amp;", "&"));
-            return URL_START+m.group(1).replaceAll("&amp;", "&");
+            System.out.println("NEXT: "+URL_START+m.group(1).replace("&amp;", "&"));
+            return URL_START+m.group(1).replace("&amp;", "&");
         }
         else*/
         return null;

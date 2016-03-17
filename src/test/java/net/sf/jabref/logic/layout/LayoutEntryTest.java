@@ -83,7 +83,7 @@ public class LayoutEntryTest {
     // helper Methods
 
     public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
-        StringReader sr = new StringReader(layoutFile.replaceAll("__NEWLINE__", "\n"));
+        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(entry, null, highlightPattern);

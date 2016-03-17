@@ -501,7 +501,7 @@ public class JabRef {
         EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
         EntryFetcher fetcher = null;
         for (EntryFetcher e : fetchers.getEntryFetchers()) {
-            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
+            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replace("Fetcher", ""))) {
                 fetcher = e;
             }
         }
@@ -511,7 +511,8 @@ public class JabRef {
             System.out.println(Localization.lang("The following fetchers are available:"));
 
             for (EntryFetcher e : fetchers.getEntryFetchers()) {
-                System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
+                System.out.println(
+                        "  " + e.getClass().getSimpleName().replace("Fetcher", "").toLowerCase(Locale.ENGLISH));
             }
             return Optional.empty();
         }
@@ -833,7 +834,7 @@ public class JabRef {
                         entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
                     } else {
                         entries = Globals.importFormatReader.importFromFile(data[1],
-                                data[0].replaceAll("~", System.getProperty("user.home")), JabRef.jrf);
+                                data[0].replace("~", System.getProperty("user.home")), JabRef.jrf);
                     }
                     return Optional.of(new ParserResult(entries));
                 } catch (IllegalArgumentException ex) {
@@ -849,7 +850,7 @@ public class JabRef {
                     importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
                 } else {
                     importResult = Globals.importFormatReader
-                            .importUnknownFormat(data[0].replaceAll("~", System.getProperty("user.home")));
+                            .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
                 }
 
                 if (importResult == null) {
