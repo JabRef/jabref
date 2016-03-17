@@ -19,12 +19,12 @@ public class Windows implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         // escape & and spaces
-        Runtime.getRuntime().exec("cmd.exe /c start " + filePath.replaceAll("&", "\"&\"").replaceAll(" ", "\" \""));
+        Runtime.getRuntime().exec("cmd.exe /c start " + filePath.replace("&", "\"&\"").replace(" ", "\" \""));
     }
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        String escapedLink = filePath.replaceAll("&", "\"&\"").replaceAll(" ", "\" \"");
+        String escapedLink = filePath.replace("&", "\"&\"").replace(" ", "\" \"");
 
         Runtime.getRuntime().exec(application + " " + escapedLink);
     }

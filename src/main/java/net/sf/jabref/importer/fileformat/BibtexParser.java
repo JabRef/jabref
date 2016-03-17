@@ -809,7 +809,7 @@ public class BibtexParser {
                 String whitespacesReduced = skipAndRecordWhitespace(character);
 
                 if (!(whitespacesReduced.isEmpty()) && !"\n\t".equals(whitespacesReduced)) { // &&
-                    whitespacesReduced = whitespacesReduced.replaceAll("\t", ""); // Remove tabulators.
+                    whitespacesReduced = whitespacesReduced.replace("\t", ""); // Remove tabulators.
                     value.append(whitespacesReduced);
                 } else {
                     value.append(' ');

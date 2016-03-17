@@ -191,7 +191,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry ->  {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
                     entry.getFieldOptional("title").ifPresent(title -> {
-                        title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#", "#");
+                        title = title.replace("\\&", "&").replace("\\#", "#");
                         title = convertHTMLChars(title);
 
                         // Unit formatting

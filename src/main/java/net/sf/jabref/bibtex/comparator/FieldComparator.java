@@ -49,8 +49,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     static {
         try {
             FieldComparator.collator = new RuleBasedCollator(
-                    ((RuleBasedCollator) Collator.getInstance()).getRules()
-                            .replaceAll("<'\u005f'", "<' '<'\u005f'"));
+                    ((RuleBasedCollator) Collator.getInstance()).getRules().replace("<'\u005f'", "<' '<'\u005f'"));
         } catch (ParseException e) {
             FieldComparator.collator = Collator.getInstance();
         }

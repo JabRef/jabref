@@ -25,7 +25,7 @@ public class FieldContentParserTest {
     @Test
     public void unifiesLineBreaks() throws Exception {
         String original = "I\r\nunify\nline\rbreaks.";
-        String expected = "I\nunify\nline\nbreaks.".replaceAll("\n", Globals.NEWLINE);
+        String expected = "I\nunify\nline\nbreaks.".replace("\n", Globals.NEWLINE);
         String processed = parser.format(new StringBuilder(original), "abstract").toString();
 
         assertEquals(expected, processed);
@@ -34,7 +34,7 @@ public class FieldContentParserTest {
     @Test
     public void retainsWhitespaceForMultiLineFields() throws Exception {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
-        String formatted = original.replaceAll("\n", Globals.NEWLINE);
+        String formatted = original.replace("\n", Globals.NEWLINE);
 
         String abstrakt = parser.format(new StringBuilder(original), "abstract").toString();
         String review = parser.format(new StringBuilder(original), "review").toString();
