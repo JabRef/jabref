@@ -185,7 +185,7 @@ public class MedlineFetcher implements EntryFetcher {
                             .toString(numberToFetch));
 
                     if (strCount == null) {
-                        frameOP.setStatus(Localization.lang("Medline import canceled"));
+                        frameOP.setStatus(Localization.lang("%0 import canceled", "Medline"));
                         return false;
                     }
 

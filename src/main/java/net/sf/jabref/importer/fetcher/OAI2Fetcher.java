@@ -300,7 +300,7 @@ public class OAI2Fetcher implements EntryFetcher {
             return true;
         } catch (Exception e) {
             status.setStatus(Localization.lang("Error while fetching from %0", "OAI2"));
-            LOGGER.error("Error whil fetching from OAI2", e);
+            LOGGER.error("Error while fetching from OAI2", e);
         }
         return false;
     }
