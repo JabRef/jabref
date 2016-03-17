@@ -69,15 +69,6 @@ public class OAI2Fetcher implements EntryFetcher {
     private long waitTime = -1;
     private Date lastCall;
 
-
-    /**
-     * some archives - like ArXiv.org - might expect of you to wait some time
-     */
-    private boolean shouldWait() {
-        return waitTime > 0;
-    }
-
-
     /**
      *
      *
@@ -135,6 +126,13 @@ public class OAI2Fetcher implements EntryFetcher {
         }
         return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier
                 + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
+    }
+
+    /**
+     * some archives - like ArXiv.org - might expect of you to wait some time
+     */
+    private boolean shouldWait() {
+        return waitTime > 0;
     }
 
     /**

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PushToApplications {
-    public static final List<PushToApplication> APPLICATIONS;
+    private static final List<PushToApplication> APPLICATIONS;
 
     /**
      * Set up the current available choices:
@@ -35,5 +35,9 @@ public class PushToApplications {
         PushToApplications.APPLICATIONS.add(new PushToTeXstudio());
         PushToApplications.APPLICATIONS.add(new PushToVim());
         PushToApplications.APPLICATIONS.add(new PushToWinEdt());
+    }
+
+    public static List<PushToApplication> getApplications() {
+        return APPLICATIONS;
     }
 }

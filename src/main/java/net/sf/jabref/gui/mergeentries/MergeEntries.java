@@ -201,7 +201,7 @@ public class MergeEntries {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
         int maxLabelWidth = -1;
-        int tmpLabelWidth = 0;
+        int tmpLabelWidth;
         for (String field : joint) {
             jointStrings[row - 2] = field;
             label = new JLabel(CaseChangers.UPPER_FIRST.format(field));

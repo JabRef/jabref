@@ -115,6 +115,7 @@ public class MetaData implements Iterable<String> {
      * The MetaData object can be constructed with no data in it.
      */
     public MetaData() {
+        // No data
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
@@ -399,7 +400,7 @@ public class MetaData implements Iterable<String> {
 
     public Optional<BibDatabaseMode> getMode() {
         List<String> data = getData(MetaData.DATABASE_TYPE);
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase()));
@@ -407,7 +408,7 @@ public class MetaData implements Iterable<String> {
 
     public boolean isProtected() {
         List<String> data = getData(Globals.PROTECTED_FLAG_META);
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return false;
         } else {
             return Boolean.parseBoolean(data.get(0));
@@ -420,7 +421,7 @@ public class MetaData implements Iterable<String> {
 
     public Optional<String> getDefaultFileDirectory() {
         List<String> fileDirectory = getData(FILE_DIRECTORY);
-        if (fileDirectory == null || fileDirectory.isEmpty()) {
+        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(fileDirectory.get(0).trim());
@@ -429,7 +430,7 @@ public class MetaData implements Iterable<String> {
 
     public Optional<String> getUserFileDirectory(String user) {
         List<String> fileDirectory = getData(FILE_DIRECTORY + '-' + user);
-        if (fileDirectory == null || fileDirectory.isEmpty()) {
+        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.of(fileDirectory.get(0).trim());

@@ -107,7 +107,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         if ((f1 != null) && (f2 == null)) {
             return -1;
         }
-        if ((f1 == null) && (f2 != null)) {
+        if (f1 == null) { // f2 != null here automatically
             return 1;
         }
 
