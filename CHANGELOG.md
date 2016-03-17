@@ -225,6 +225,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Swedish is added as a language option (still not a complete translation)
 - [#969](https://github.com/JabRef/jabref/issues/969) Adding and replacing old event system mechanisms with Google Guava EventBus.
 
+
 ### Fixed
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
