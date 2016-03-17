@@ -169,7 +169,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Problem with ACM fetcher URL", e);
         } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to ACM Portal failed"),
+            status.showMessage(Localization.lang("Could not connect to %0", "ACM Portal"),
                     Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM connection", e);
         } catch (IOException e) {

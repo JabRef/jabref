@@ -67,14 +67,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
 
+    private static final String SUB_DETECTION_1 = "/sub ([^/]+)/";
+    private static final String SUB_DETECTION_2 = "\\(sub\\)([^(]+)\\(/sub\\)";
     private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
-    private static final String SUP_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
     private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
-    private static final String SUP_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
-    private static final String SUB2 = "\\(sub\\)([^(]+)\\(/sub\\)";
-    private static final String SUP2 = "\\(sup\\)([^(]+)\\(/sup\\)";
-    private static final String SUP1 = "/sup ([^/]+)/";
-    private static final String SUB1 = "/sub ([^/]+)/";
+    private static final String SUPER_DETECTION_1 = "/sup ([^/]+)/";
+    private static final String SUPER_DETECTION_2 = "\\(sup\\)([^(]+)\\(/sup\\)";
+    private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
+    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -181,7 +181,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
         } catch (ConnectException | UnknownHostException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
+            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
@@ -281,15 +281,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = title.replaceAll(SUP1, SUP_EQ_RESULT);
-                title = title.replaceAll(SUB1, SUB_EQ_RESULT);
-                title = title.replaceAll(SUP2, SUP_EQ_RESULT);
-                title = title.replaceAll(SUB2, SUB_EQ_RESULT);
+                title = title.replaceAll(SUPER_DETECTION_1, SUPER_EQ_RESULT);
+                title = title.replaceAll(SUB_DETECTION_1, SUB_EQ_RESULT);
+                title = title.replaceAll(SUPER_DETECTION_2, SUPER_EQ_RESULT);
+                title = title.replaceAll(SUB_DETECTION_2, SUB_EQ_RESULT);
             } else {
-                title = title.replaceAll(SUP1, SUP_TEXT_RESULT);
-                title = title.replaceAll(SUB1, SUB_TEXT_RESULT);
-                title = title.replaceAll(SUP2, SUP_TEXT_RESULT);
-                title = title.replaceAll(SUB2, SUB_TEXT_RESULT);
+                title = title.replaceAll(SUPER_DETECTION_1, SUPER_TEXT_RESULT);
+                title = title.replaceAll(SUB_DETECTION_1, SUB_TEXT_RESULT);
+                title = title.replaceAll(SUPER_DETECTION_2, SUPER_TEXT_RESULT);
+                title = title.replaceAll(SUB_DETECTION_2, SUB_TEXT_RESULT);
             }
 
             // Replace \infin with \infty
@@ -500,15 +500,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = abstr.replaceAll(SUP1, SUP_EQ_RESULT);
-                abstr = abstr.replaceAll(SUB1, SUB_EQ_RESULT);
-                abstr = abstr.replaceAll(SUP2, SUP_EQ_RESULT);
-                abstr = abstr.replaceAll(SUB2, SUB_EQ_RESULT);
+                abstr = abstr.replaceAll(SUPER_DETECTION_1, SUPER_EQ_RESULT);
+                abstr = abstr.replaceAll(SUB_DETECTION_1, SUB_EQ_RESULT);
+                abstr = abstr.replaceAll(SUPER_DETECTION_2, SUPER_EQ_RESULT);
+                abstr = abstr.replaceAll(SUB_DETECTION_2, SUB_EQ_RESULT);
             } else {
-                abstr = abstr.replaceAll(SUP1, SUP_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUB1, SUB_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUP2, SUP_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUB2, SUB_TEXT_RESULT);
+                abstr = abstr.replaceAll(SUPER_DETECTION_1, SUPER_TEXT_RESULT);
+                abstr = abstr.replaceAll(SUB_DETECTION_1, SUB_TEXT_RESULT);
+                abstr = abstr.replaceAll(SUPER_DETECTION_2, SUPER_TEXT_RESULT);
+                abstr = abstr.replaceAll(SUB_DETECTION_2, SUB_TEXT_RESULT);
             }
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
