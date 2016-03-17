@@ -111,11 +111,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             // file, and read the contents afterwards:
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
-            List<BibEntry> bes = panel.getSelectedEntries();
-            Set<String> entries = new HashSet<>(bes.size());
-            for (BibEntry be : bes) {
-                entries.add(be.getId());
-            }
+            List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
             format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
@@ -134,7 +130,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
-            message = Localization.lang("Entries exported to clipboard") + ": " + bes.size();
+            message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.

@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +33,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -53,8 +55,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encoding, Set<String> keySet) throws Exception {
-        OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, keySet);
+            final Charset encoding, List<BibEntry> entries) throws Exception {
+        OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, entries);
     }
 
     private static void storeOpenOfficeFile(File file, InputStream source) throws Exception {
@@ -77,10 +79,10 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenOfficeCalc(File file, BibDatabase database, Set<String> keySet) throws Exception {
+    private static void exportOpenOfficeCalc(File file, BibDatabase database, List<BibEntry> entries) throws Exception {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
-        OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, keySet);
+        OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
         try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
@@ -93,8 +95,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, Set<String> keySet) {
-        OOCalcDatabase od = new OOCalcDatabase(database, keySet);
+    private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
+        OOCalcDatabase od = new OOCalcDatabase(database, entries);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());

@@ -12,7 +12,7 @@ public class BibtexTestData {
 
     public static BibEntry getBibtexEntry() {
         BibDatabase database = getBibtexDatabase();
-        return database.getEntriesByKey("HipKro03")[0];
+        return database.getEntryByKey("HipKro03");
     }
 
     public static BibDatabase getBibtexDatabase() {

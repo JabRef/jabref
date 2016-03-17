@@ -16,11 +16,13 @@
 package net.sf.jabref.exporter;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
 
 /**
@@ -38,16 +40,16 @@ public class MySQLExport extends ExportFormat {
      * @param database The bibtex database from which to export.
      * @param file The filename to which the export should be writtten.
      * @param encodingToUse The encoding to use.
-     * @param keySet The set of IDs of the entries to export.
+     * @param entries The entries to export.
      * @throws java.lang.Exception If something goes wrong, feel free to throw an exception. The error message is shown
      *             to the user.
      */
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encodingToUse, Set<String> keySet)
+            final Charset encodingToUse, List<BibEntry> entries)
                     throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file,
+        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, entries, file,
                 encodingToUse);
 
     }

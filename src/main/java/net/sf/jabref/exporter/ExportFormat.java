@@ -167,16 +167,16 @@ public class ExportFormat implements IExportFormat {
      * @param metaData   The database's meta data.
      * @param file       the file to write the resulting export to
      * @param encoding   The encoding of the database
-     * @param entryIds   Contains the IDs of all entries that should be exported. If
+     * @param entries    Contains all entries that should be exported. If
      *                   <code>null</code>, all entries will be exported.
      * @throws IOException if a problem occurred while trying to write to {@code writer}
      *                     or read from required resources.
      * @throws Exception   if any other error occurred during export.
-     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase, MetaData, String, Charset, Set)
+     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase, MetaData, String, Charset, List)
      */
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encoding, Set<String> entryIds) throws Exception {
+            final Charset encoding, List<BibEntry> entries) throws Exception {
 
         File outFile = new File(file);
         SaveSession ss = null;
@@ -228,7 +228,7 @@ public class ExportFormat implements IExportFormat {
                     BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
-                    new BibDatabaseContext(database, metaData, defaults), entryIds, savePrefs);
+                    new BibDatabaseContext(database, metaData, defaults), entries, savePrefs);
 
             // Load default layout
             Layout defLayout;

@@ -52,7 +52,7 @@ public class UtilTest {
             Assert.fail();
         }
         database = result.getDatabase();
-        entry = database.getEntriesByKey("HipKro03")[0];
+        entry = database.getEntryByKey("HipKro03");
 
         Assert.assertNotNull(database);
         Assert.assertNotNull(entry);

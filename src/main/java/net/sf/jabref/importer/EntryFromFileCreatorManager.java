@@ -158,7 +158,7 @@ public final class EntryFromFileCreatorManager {
                  * does 'true' mean "There were duplicates", while 'false' means
                  * "Everything alright"?
                  */
-                if (database.getEntryById(entry.getId()) == null) {
+                if (!database.containsEntryWithId(entry.getId())) {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
                     if (database.insertEntry(entry)) {

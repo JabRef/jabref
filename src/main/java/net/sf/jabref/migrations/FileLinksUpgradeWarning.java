@@ -244,7 +244,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
         UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup(Arrays.asList(fields));
-        for (BibEntry entry : database.getEntryMap().values()) {
+        for (BibEntry entry : database.getEntries()) {
             List<FieldChange> changes = cleanupJob.cleanup(entry);
 
             for (FieldChange change : changes) {

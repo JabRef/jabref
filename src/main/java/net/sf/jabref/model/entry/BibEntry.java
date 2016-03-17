@@ -46,7 +46,7 @@ public class BibEntry {
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
-    public static final String ID_FIELD = "id";
+    protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
 
     private String id;
@@ -292,6 +292,10 @@ public class BibEntry {
      */
     public String getCiteKey() {
         return fields.get(KEY_FIELD);
+    }
+
+    public void setCiteKey(String newCiteKey) {
+        setField(KEY_FIELD, newCiteKey);
     }
 
     public boolean hasCiteKey() {

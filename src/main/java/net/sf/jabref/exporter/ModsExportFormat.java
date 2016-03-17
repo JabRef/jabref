@@ -19,6 +19,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.mods.MODSDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -27,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.OutputKeys;
+import java.util.List;
 import java.util.Set;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -44,10 +46,10 @@ class ModsExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encoding, Set<String> keySet) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws IOException {
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
-            MODSDatabase md = new MODSDatabase(database, keySet);
+            MODSDatabase md = new MODSDatabase(database, entries);
 
             try {
                 DOMSource source = new DOMSource(md.getDOMrepresentation());

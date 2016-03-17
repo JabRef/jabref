@@ -750,15 +750,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntryById(database.getKeySet().iterator().next());
-            String id = entry.getId();
+            BibEntry newEntry = database.getEntries().iterator().next();
             String newKey = newEntry.getCiteKey();
             boolean anyChanged = false;
             boolean changedType = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
-            if (panel.getDatabase().setCiteKeyForEntry(id, newKey)) {
+            if (panel.getDatabase().setCiteKeyForEntry(entry, newKey)) {
                 duplicateWarning = true;
 
                 // First, remove fields that the user have removed.
@@ -1079,7 +1078,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     return;
                 }
 
-                boolean isDuplicate = panel.getDatabase().setCiteKeyForEntry(entry.getId(), newValue);
+                boolean isDuplicate = panel.getDatabase().setCiteKeyForEntry(entry, newValue);
 
                 if (newValue == null) {
                     warnEmptyBibtexkey();
@@ -1092,7 +1091,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
-                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry.getId(), oldValue, newValue);
+                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
                 if (net.sf.jabref.util.Util.updateTimeStampIsSet()) {
                     NamedCompound ce = net.sf.jabref.util.Util.doUpdateTimeStamp(entry, undoableKeyChange);
                     panel.undoManager.addEdit(ce);
@@ -1326,7 +1325,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
 
             // Store undo information:
-            panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry.getId(), (String) oldValue, entry.getCiteKey()));
+            panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
 
             // here we update the field
             String bibtexKeyData = entry.getCiteKey();

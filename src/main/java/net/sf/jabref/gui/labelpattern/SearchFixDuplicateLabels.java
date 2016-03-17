@@ -107,8 +107,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();
                 LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
-                ce.addEdit(new UndoableKeyChange(panel.database(), entry.getId(), oldKey,
- entry.getCiteKey()));
+                ce.addEdit(new UndoableKeyChange(panel.database(), entry, oldKey, entry.getCiteKey()));
             }
             ce.end();
             panel.undoManager.addEdit(ce);

@@ -200,13 +200,9 @@ public class ExportFormats {
                         }
                     }
                     final IExportFormat format = eff.getExportFormat();
-                    Set<String> entryIds = null;
+                    List<BibEntry> entries = null;
                     if (selectedOnly) {
-                        List<BibEntry> selected = frame.getCurrentBasePanel().getSelectedEntries();
-                        entryIds = new HashSet<>();
-                        for (BibEntry bibtexEntry : selected) {
-                            entryIds.add(bibtexEntry.getId());
-                        }
+                        entries = frame.getCurrentBasePanel().getSelectedEntries();
                     }
 
                     // Set the global variable for this database's file directory before exporting,
@@ -223,7 +219,7 @@ public class ExportFormats {
                     Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent());
 
                     final File finFile = file;
-                    final Set<String> finEntryIDs = entryIds;
+                    final List<BibEntry> finEntries = entries;
                     AbstractWorker exportWorker = new AbstractWorker() {
 
                         String errorMessage;
@@ -235,7 +231,7 @@ public class ExportFormats {
                                 format.performExport(frame.getCurrentBasePanel().database(),
                                         frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
                                         finFile.getPath(), frame
-                                                .getCurrentBasePanel().getEncoding(), finEntryIDs);
+                                                .getCurrentBasePanel().getEncoding(), finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {
