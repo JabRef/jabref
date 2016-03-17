@@ -395,7 +395,7 @@ public class JabRef {
                     boolean notSavedMsg = false;
 
                     // write an output, if something could be resolved
-                    if ((newBase != null) && !newBase.isEmpty()) {
+                    if ((newBase != null) && !newBase.hasNoEntries()) {
                         String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
                         try {
