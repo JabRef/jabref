@@ -16,27 +16,29 @@
 
 package net.sf.jabref.sql.importer;
 
+import net.sf.jabref.MetaData;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.Database;
+import net.sf.jabref.sql.SQLUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.sql.DBImporterExporter;
-import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * @author ifsteinm.
@@ -47,40 +49,52 @@ import net.sf.jabref.logic.util.strings.StringUtil;
  *         database, entries and related stuff from a DB to bib. Each exported database is imported as a new JabRef
  *         (bib) database, presented on a new tab
  */
-public abstract class DBImporter extends DBImporterExporter {
+public class DatabaseImporter {
 
-    private static final Log LOGGER = LogFactory.getLog(DBImporter.class);
+    private static final Log LOGGER = LogFactory.getLog(DatabaseImporter.class);
 
-    private final List<String> columnsNotConsideredForEntries = new ArrayList<>(
-            Arrays.asList("cite_key", "entry_types_id", "database_id", "jabref_eid", "entries_id"));
+    private static final List<String> COLUMNS_NOT_CONSIDERED_FOR_ENTRIES = Arrays.asList(
+            "cite_key",
+            "entry_types_id",
+            "database_id",
+            "jabref_eid",
+            "entries_id"
+    );
 
 
-    /**
-     * Given a DBStrings it connects to the DB and returns the java.sql.Connection object
-     *
-     * @param dbstrings The DBStrings to use to make the connection
-     * @return java.sql.Connection to the DB chosen
-     * @throws Exception
-     */
-    protected abstract Connection connectToDB(DBStrings dbstrings) throws Exception;
+    private final Database database;
+
+    public DatabaseImporter(Database database) {
+        this.database = database;
+    }
 
     /**
      * @param conn Connection object to the database
      * @return A ResultSet with column name for the entries table
      * @throws SQLException
      */
-    protected abstract List<String> readColumnNames(Connection conn) throws SQLException;
+    private List<String> readColumnNames(Connection conn) throws SQLException {
+        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, database.getReadColumnNamesQuery());
+                ResultSet rsColumns = statement.getResultSet()) {
+            List<String> colNames = new ArrayList<>();
+            while (rsColumns.next()) {
+                colNames.add(rsColumns.getString(1));
+            }
+            return colNames;
+        }
+    }
 
     /**
      * Worker method to perform the import from a database
      *
-     * @param dbs The necessary database connection information
+     * @param dbs  The necessary database connection information
      * @param mode
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
      * @throws Exception
      */
-    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode mode) throws Exception {
+    public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode mode)
+            throws Exception {
         List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
@@ -103,14 +117,13 @@ public abstract class DBImporter extends DBImporterExporter {
                             ResultSet rsEntryType = entryTypes.getResultSet()) {
                         while (rsEntryType.next()) {
                             Optional<EntryType> entryType = EntryTypes.getType(rsEntryType.getString("label"), mode);
-                            if(entryType.isPresent()) {
+                            if (entryType.isPresent()) {
                                 types.put(rsEntryType.getString("entry_types_id"), entryType.get());
                             }
                         }
-                        rsEntryType.getStatement().close();
                     }
 
-                    List<String> colNames = this.readColumnNames(conn).stream().filter(column -> !columnsNotConsideredForEntries.contains(column)).collect(Collectors.toList());
+                    List<String> colNames = this.readColumnNames(conn).stream().filter(column -> !COLUMNS_NOT_CONSIDERED_FOR_ENTRIES.contains(column)).collect(Collectors.toList());
 
                     final String database_id = rsDatabase.getString("database_id");
                     // Read the entries and create BibEntry instances:
@@ -133,7 +146,6 @@ public abstract class DBImporter extends DBImporterExporter {
                             entries.put(id, entry);
                             database.insertEntry(entry);
                         }
-                        rsEntries.getStatement().close();
                     }
                     // Import strings and preamble:
                     try (Statement stringStatement = SQLUtil.queryAllFromTable(conn,
@@ -149,7 +161,6 @@ public abstract class DBImporter extends DBImporterExporter {
                                 database.addString(string);
                             }
                         }
-                        rsStrings.getStatement().close();
                     }
                     MetaData metaData = new MetaData();
                     metaData.initializeNewDatabase();
@@ -239,11 +250,22 @@ public abstract class DBImporter extends DBImporterExporter {
                             expGroup.addEntry(entries.get(entryId));
                         }
                     }
-                    rsEntryGroup.getStatement().close();
                 }
                 metaData.setGroups(rootNode);
             }
-            rsGroups.getStatement().close();
         }
     }
+
+    /**
+     * Given a DBStrings it connects to the DB and returns the java.sql.Connection object
+     *
+     * @param dbstrings The DBStrings to use to make the connection
+     * @return java.sql.Connection to the DB chosen
+     * @throws Exception
+     */
+    public Connection connectToDB(DBStrings dbstrings) throws Exception {
+        String url = SQLUtil.createJDBCurl(dbstrings, true);
+        return database.connect(url, dbstrings.getDbPreferences().getUsername(), dbstrings.getPassword());
+    }
+
 }

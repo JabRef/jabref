@@ -8,10 +8,12 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.MetaData;
+import net.sf.jabref.sql.DBImportExportDialog;
+import net.sf.jabref.sql.SQLUtil;
 
-public class DBImporterExporter {
+public class DatabaseUtil {
 
-    public void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata)
+    public static void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata)
             throws SQLException {
         if (dialogo.removeAction) {
             if ((dialogo.selectedInt <= 0) && dialogo.isExporter()) {
@@ -33,7 +35,7 @@ public class DBImporterExporter {
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
-    protected int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
+    public static int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
 
         if (out instanceof Connection) {
             try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
@@ -54,7 +56,7 @@ public class DBImporterExporter {
         }
     }
 
-    private void removeAGivenDB(Object out, final int database_id) throws SQLException {
+    private static void removeAGivenDB(Object out, final int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
         SQLUtil.processQuery(out, "DELETE FROM jabref_database WHERE database_id='" + database_id + "';");
     }
@@ -66,7 +68,7 @@ public class DBImporterExporter {
      * @param database_id Id of the database being exported.
      * @throws SQLException
      */
-    protected void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
+    public static void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
         SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='" + database_id + "';");
@@ -80,7 +82,7 @@ public class DBImporterExporter {
      *
      * @throws SQLException
      */
-    private void insertJabRefDatabase(final MetaData metaData, Object out, String dbName) throws SQLException {
+    private static void insertJabRefDatabase(final MetaData metaData, Object out, String dbName) throws SQLException {
         String path;
         if (metaData.getFile() == null) {
             path = dbName;

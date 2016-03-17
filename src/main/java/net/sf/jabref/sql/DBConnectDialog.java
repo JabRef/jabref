@@ -15,20 +15,18 @@
  */
 package net.sf.jabref.sql;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-
-import javax.swing.*;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 /**
  * Dialog box for collecting database connection strings from the user
@@ -45,11 +43,11 @@ public class DBConnectDialog extends JDialog {
     private final JPasswordField pwdPassword = new JPasswordField(40);
 
     private DBStrings dbStrings = new DBStrings();
-
     private boolean connectedToDB;
 
-
-    /** Creates a new instance of DBConnectDialog */
+    /**
+     * Creates a new instance of DBConnectDialog
+     */
     public DBConnectDialog(JFrame parent, DBStrings dbs) {
         super(Objects.requireNonNull(parent), Localization.lang("Connect to SQL database"), true);
 
@@ -97,16 +95,15 @@ public class DBConnectDialog extends JDialog {
         btnCancel.setText(Localization.lang("Cancel"));
 
         // init input fields to current DB strings
-        String srvSel = dbStrings.getServerType();
-        List<String> srv = dbStrings.getServerTypes();
-        for (String aSrv : srv) {
+        String srvSel = dbStrings.getDbPreferences().getServerType();
+        for (String aSrv : DatabaseType.SERVER_TYPES) {
             cmbServerType.addItem(aSrv);
         }
 
         cmbServerType.setSelectedItem(srvSel);
-        txtServerHostname.setText(dbStrings.getServerHostname());
-        txtDatabase.setText(dbStrings.getDatabase());
-        txtUsername.setText(dbStrings.getUsername());
+        txtServerHostname.setText(dbStrings.getDbPreferences().getServerHostname());
+        txtDatabase.setText(dbStrings.getDbPreferences().getDatabase());
+        txtUsername.setText(dbStrings.getDbPreferences().getUsername());
         pwdPassword.setText(dbStrings.getPassword());
 
         // construct dialog
@@ -167,6 +164,7 @@ public class DBConnectDialog extends JDialog {
         pwdPassword.addActionListener(connectAction);
 
         AbstractAction cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -186,8 +184,7 @@ public class DBConnectDialog extends JDialog {
     /**
      * Checks the user input, and ensures that required fields have entries
      *
-     * @return
-     *      Appropriate error message to be displayed to user
+     * @return Appropriate error message to be displayed to user
      */
     private Optional<String> checkInput() {
 
@@ -239,13 +236,16 @@ public class DBConnectDialog extends JDialog {
      * Save user input.
      */
     private void storeSettings() {
-        dbStrings.setServerType(cmbServerType.getSelectedItem().toString());
-        dbStrings.setServerHostname(txtServerHostname.getText());
-        dbStrings.setDatabase(txtDatabase.getText());
-        dbStrings.setUsername(txtUsername.getText());
+        DBStringsPreferences preferences = new DBStringsPreferences(
+                cmbServerType.getSelectedItem().toString(),
+                txtServerHostname.getText(),
+                txtUsername.getText(),
+                txtDatabase.getText());
 
         // Store these settings so they appear as default next time:
-        dbStrings.storeToPreferences();
+        preferences.storeToPreferences(Globals.prefs);
+
+        dbStrings.setDbPreferences(preferences);
 
         char[] pwd = pwdPassword.getPassword();
         String tmp = new String(pwd);

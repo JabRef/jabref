@@ -47,7 +47,7 @@ public class MySQLExport extends ExportFormat {
             final Charset encodingToUse, Set<String> keySet)
                     throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, keySet, file,
+        new DBExporterAndImporterFactory().getExporter("MYSQL").get().exportDatabaseAsFile(database, metaData, keySet, file,
                 encodingToUse);
 
     }

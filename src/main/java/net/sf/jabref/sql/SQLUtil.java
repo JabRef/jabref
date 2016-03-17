@@ -39,7 +39,7 @@ import net.sf.jabref.gui.InternalBibtexFields;
 
 final public class SQLUtil {
 
-    private static final List<String> RESERVED_DB_WORDS = new ArrayList<>(Collections.singletonList("key"));
+    private static final List<String> RESERVED_DB_WORDS = Collections.singletonList("key");
 
     private static List<String> allFields;
 
@@ -184,18 +184,31 @@ final public class SQLUtil {
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out The output (PrintStream or Connection) object to which the DML should be sent
+     * @param out The output object to which the DML should be sent
      * @param dml The DML statements to be processed
      */
     public static void processQuery(Object out, String dml) throws SQLException {
-        if (out instanceof PrintStream) {
-            PrintStream fout = (PrintStream) out;
-            fout.println(dml);
-        }
-        if (out instanceof Connection) {
-            Connection conn = (Connection) out;
-            SQLUtil.executeQuery(conn, dml);
-        }
+        LOGGER.error("Cannot process the query " + dml + " on the given output");
+    }
+
+    /**
+     * Utility method for processing DML with proper output
+     *
+     * @param out The output Connection object to which the DML should be sent
+     * @param dml The DML statements to be processed
+     */
+    public static void processQuery(Connection out, String dml) throws SQLException {
+        SQLUtil.executeQuery(out, dml);
+    }
+
+    /**
+     * Utility method for processing DML with proper output
+     *
+     * @param out The output PrintStream to which the DML should be sent
+     * @param dml The DML statements to be processed
+     */
+    public static void processQuery(PrintStream out, String dml) throws SQLException {
+        out.println(dml);
     }
 
     /**
@@ -226,10 +239,9 @@ final public class SQLUtil {
      * @return The JDBC url corresponding to the input DBStrings
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
-        String url;
-        url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://" + dbStrings.getServerHostname()
-                + (withDBName ? '/' + dbStrings.getDatabase() : "") + dbStrings.getDbParameters();
-        return url;
+        DBStringsPreferences preferences = dbStrings.getDbPreferences();
+        return "jdbc:" + preferences.getServerType().toLowerCase() + "://" + preferences.getServerHostname()
+                + (withDBName ? '/' + preferences.getDatabase() : "") + dbStrings.getDbParameters();
     }
 
     /**
@@ -244,9 +256,7 @@ final public class SQLUtil {
     public static String processQueryWithSingleResult(Connection conn, String query) throws SQLException {
         try (Statement sm = SQLUtil.executeQueryWithResults(conn, query); ResultSet rs = sm.getResultSet()) {
             rs.next();
-            String result = rs.getString(1);
-            rs.getStatement().close();
-            return result;
+            return rs.getString(1);
         }
     }
 
@@ -273,22 +283,12 @@ final public class SQLUtil {
      * @param qry  The DML statements to be executed
      */
     private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
-        Statement stmnt = null;
-        try {
-            stmnt = conn.createStatement();
-            stmnt.executeQuery(qry);
+        try (Statement stmnt = conn.createStatement(); ResultSet resultSet = stmnt.executeQuery(qry)) {
             SQLWarning warn = stmnt.getWarnings();
             if (warn != null) {
                 LOGGER.warn(warn);
             }
             return stmnt;
-        } catch (SQLException rethrow) {
-            // in case of exception, try to close the statement to avoid a resource leak...
-            if (stmnt != null) {
-                stmnt.close();
-            }
-            //... and rethrow the exception
-            throw rethrow;
         }
     }
 

@@ -15,34 +15,27 @@
  */
 package net.sf.jabref.sql.importer;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.sql.*;
+import net.sf.jabref.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Vector;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.sql.DBConnectDialog;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
-import net.sf.jabref.sql.DBImportExportDialog;
-import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.SQLUtil;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:09:08 PM To change this template use File | Settings
@@ -62,7 +55,6 @@ public class DbImportAction extends AbstractWorker {
     private DBStrings dbs;
     private List<DBImporterResult> databases;
 
-
     public DbImportAction(JabRefFrame frame) {
         this.frame = frame;
     }
@@ -70,7 +62,6 @@ public class DbImportAction extends AbstractWorker {
     public AbstractAction getAction() {
         return new DbImpAction();
     }
-
 
     class DbImpAction extends MnemonicAwareAction {
 
@@ -90,8 +81,6 @@ public class DbImportAction extends AbstractWorker {
         }
     }
 
-
-    // run first, in EDT:
     @Override
     public void init() {
 
@@ -126,27 +115,28 @@ public class DbImportAction extends AbstractWorker {
 
     }
 
-    // run second, on a different thread:
     @Override
     public void run() {
         performImport();
     }
 
     private void performImport() {
-        if (connectedToDB) {
+        if (!connectedToDB) {
+            return;
+        }
+
+        frame.output(Localization.lang("Attempting SQL import..."));
+        DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
+        factory.getImporter(dbs.getDbPreferences().getServerType()).ifPresent(importer -> {
             try {
-                frame.output(Localization.lang("Attempting SQL import..."));
-                DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                DBImporter importer = factory.getImporter(dbs.getServerType());
                 try (Connection conn = importer.connectToDB(dbs);
                         Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database");
                         ResultSet rs = statement.getResultSet()) {
 
-                    Vector<String> v;
                     Vector<Vector<String>> matrix = new Vector<>();
 
                     while (rs.next()) {
-                        v = new Vector<>();
+                        Vector<String> v = new Vector<>();
                         v.add(rs.getString("database_name"));
                         matrix.add(v);
                     }
@@ -160,7 +150,7 @@ public class DbImportAction extends AbstractWorker {
                                 DBImportExportDialog.DialogType.IMPORTER);
                         if (dialogo.removeAction) {
                             String dbName = dialogo.selectedDB;
-                            importer.removeDB(dialogo, dbName, conn, metaData);
+                            DatabaseUtil.removeDB(dialogo, dbName, conn, metaData);
                             performImport();
                         } else if (dialogo.moreThanOne) {
                             databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
@@ -185,10 +175,9 @@ public class DbImportAction extends AbstractWorker {
                 frame.output(Localization.lang("Error importing from database"));
                 LOGGER.error("Error importing from databae", ex);
             }
-        }
+        });
     }
 
-    // run third, on EDT:
     @Override
     public void update() {
         if (databases == null) {
