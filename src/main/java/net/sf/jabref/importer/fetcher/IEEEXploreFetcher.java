@@ -67,12 +67,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
 
-    private static final String SUB_DETECTION_1 = "/sub ([^/]+)/";
-    private static final String SUB_DETECTION_2 = "\\(sub\\)([^(]+)\\(/sub\\)";
+    private static final Pattern PREPROCESSING_PATTERN = Pattern.compile("(?<!&)(#[x]*[0]*\\p{XDigit}+;)");
+
+    private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
+    private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
     private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
     private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
-    private static final String SUPER_DETECTION_1 = "/sup ([^/]+)/";
-    private static final String SUPER_DETECTION_2 = "\\(sup\\)([^(]+)\\(/sup\\)";
+    private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
+    private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
     private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
@@ -250,8 +252,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
         //add the ampersands back in before passing to the HTML formatter so they can be properly converted
         //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
-        //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
-        String result = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+        String result = PREPROCESSING_PATTERN.matcher(bibtexPage).replaceAll("&$1");
 
         //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
         //TODO: Maybe find a better spot for this if it applies more universally
@@ -281,15 +282,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = title.replaceAll(SUPER_DETECTION_1, SUPER_EQ_RESULT);
-                title = title.replaceAll(SUB_DETECTION_1, SUB_EQ_RESULT);
-                title = title.replaceAll(SUPER_DETECTION_2, SUPER_EQ_RESULT);
-                title = title.replaceAll(SUB_DETECTION_2, SUB_EQ_RESULT);
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
             } else {
-                title = title.replaceAll(SUPER_DETECTION_1, SUPER_TEXT_RESULT);
-                title = title.replaceAll(SUB_DETECTION_1, SUB_TEXT_RESULT);
-                title = title.replaceAll(SUPER_DETECTION_2, SUPER_TEXT_RESULT);
-                title = title.replaceAll(SUB_DETECTION_2, SUB_TEXT_RESULT);
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
             }
 
             // Replace \infin with \infty
@@ -500,15 +501,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = abstr.replaceAll(SUPER_DETECTION_1, SUPER_EQ_RESULT);
-                abstr = abstr.replaceAll(SUB_DETECTION_1, SUB_EQ_RESULT);
-                abstr = abstr.replaceAll(SUPER_DETECTION_2, SUPER_EQ_RESULT);
-                abstr = abstr.replaceAll(SUB_DETECTION_2, SUB_EQ_RESULT);
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
             } else {
-                abstr = abstr.replaceAll(SUPER_DETECTION_1, SUPER_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUB_DETECTION_1, SUB_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUPER_DETECTION_2, SUPER_TEXT_RESULT);
-                abstr = abstr.replaceAll(SUB_DETECTION_2, SUB_TEXT_RESULT);
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             }
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
