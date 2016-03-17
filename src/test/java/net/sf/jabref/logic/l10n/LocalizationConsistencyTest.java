@@ -21,7 +21,10 @@ public class LocalizationConsistencyTest {
 
                 List<String> missing = new LinkedList<>(englishKeys);
                 missing.removeAll(nonEnglishKeys);
+                List<String> obsolete = new LinkedList<>(nonEnglishKeys);
+                obsolete.removeAll(englishKeys);
                 assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
+                assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
             }
         }
     }
@@ -90,6 +93,11 @@ public class LocalizationConsistencyTest {
             System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
             System.out.println();
             fail("Obsolete keys found in menu properties file which should be removed");
+            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
+            System.out.println(
+                    "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
+            System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
+
         }
     }
 
