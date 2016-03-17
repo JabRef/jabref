@@ -167,7 +167,7 @@ public class ImportCustomizationDialog extends JDialog {
             }
         });
 
-        AbstractAction closeAction = new AbstractAction() {
+        Action closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

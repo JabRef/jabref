@@ -17,7 +17,6 @@ import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.logic.xmp.EncryptionNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
@@ -64,16 +63,16 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), JabRef.jrf.getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
-        assert res.entries.size() == 1;
-        return Optional.of(res.entries.get(0));
+        assert res.getEntries().size() == 1;
+        return Optional.of(res.getEntries().get(0));
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
-        addEntyDataFromXMP(pdfFile, entry);
-
+        addEntryDataFromXMP(pdfFile, entry);
+        
         if (entry.getField("title") == null) {
         	entry.setField("title", pdfFile.getName());
         }
-
+        
         return entry;*/
     }
 
@@ -119,12 +118,10 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      * @param aFile
      * @param entry
      */
-    private void addEntyDataFromXMP(File aFile, BibEntry entry) {
+    private void addEntryDataFromXMP(File aFile, BibEntry entry) {
         try {
             List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
             addEntrysToEntry(entry, entrys);
-        } catch (EncryptionNotSupportedException e) {
-            // no canceling here, just no data added.
         } catch (IOException e) {
             // no canceling here, just no data added.
         }

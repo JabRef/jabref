@@ -102,22 +102,13 @@ public class SaveDatabaseAction extends AbstractWorker {
                             ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getBibDatabaseContext().getDatabaseFile());
                             JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
-                                scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
-
-                                    @Override
-                                    public void scanResultsResolved(boolean resolved) {
-                                        if (resolved) {
-                                            panel.setUpdatedExternally(false);
-                                            SwingUtilities.invokeLater(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    panel.getSidePaneManager().hide("fileUpdate");
-                                                }
-                                            });
-                                        } else {
-                                            cancelled = true;
-                                        }
+                                scanner.displayResult(resolved -> {
+                                    if (resolved) {
+                                        panel.setUpdatedExternally(false);
+                                        SwingUtilities.invokeLater(
+                                                (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                                    } else {
+                                        cancelled = true;
                                     }
                                 });
                             }
@@ -346,6 +337,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     public void save() throws Throwable {
         runCommand();
+        frame.updateEnabledState();
     }
 
     /**
@@ -371,7 +363,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         }
 
-        if (chosenFile != null) {
+        if (f != null) {
             File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
             panel.getBibDatabaseContext().getMetaData().setFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
@@ -383,13 +375,14 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             // Register so we get notifications about outside changes to the file.
             try {
-                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel, panel.getBibDatabaseContext().getDatabaseFile()));
+                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel,
+                        panel.getBibDatabaseContext().getDatabaseFile()));
             } catch (IOException ex) {
                 LOGGER.error("Problem registering file change notifications", ex);
             }
             frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().getPath());
         }
-
+        frame.updateEnabledState();
     }
 
     /**

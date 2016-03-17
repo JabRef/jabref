@@ -98,7 +98,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             return true;
         } catch (IOException e) {
             LOGGER.warn("Error fetching from Google Scholar", e);
-            status.showMessage(Localization.lang("Error fetching from Google Scholar"));
+            status.showMessage(Localization.lang("Error while fetching from %0", "Google Scholar"));
             return false;
         }
     }
@@ -256,8 +256,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
         /*m = NEXT_PAGE_PATTERN.matcher(cont);
         if (m.find()) {
-            System.out.println("NEXT: "+URL_START+m.group(1).replaceAll("&amp;", "&"));
-            return URL_START+m.group(1).replaceAll("&amp;", "&");
+            System.out.println("NEXT: "+URL_START+m.group(1).replace("&amp;", "&"));
+            return URL_START+m.group(1).replace("&amp;", "&");
         }
         else*/
         return null;

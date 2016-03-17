@@ -39,13 +39,12 @@ import java.util.Map;
 
 import javax.swing.text.StyledDocument;
 
-public class TagToMarkedTextStore
-{
+public class TagToMarkedTextStore {
 
     private final Map<String, LinkedList<TMarkedStoreItem>> tagMap;
 
-    private static class TMarkedStoreItem
-    {
+
+    private static class TMarkedStoreItem {
 
         int start;
         int end;
@@ -54,8 +53,7 @@ public class TagToMarkedTextStore
 
 
 
-    public TagToMarkedTextStore()
-    {
+    public TagToMarkedTextStore() {
         tagMap = new HashMap<>(10);
     }
 

@@ -77,7 +77,7 @@ public class VM implements Warn {
 
     private final CommonTree tree;
 
-    private StringBuffer bbl;
+    private StringBuilder bbl;
 
     private String preamble;
 
@@ -112,6 +112,7 @@ public class VM implements Warn {
         }
     }
 
+    @FunctionalInterface
     public interface BstFunction {
         void execute(BstEntry context);
     }
@@ -135,481 +136,385 @@ public class VM implements Warn {
 
         this.buildInFunctions = new HashMap<>(37);
 
-        buildInFunctions.put(">", new BstFunction() {
+        /**
+         * Pops the top two (integer) literals, compares them, and pushes
+         * the integer 1 if the second is greater than the first, 0
+         * otherwise.
+         */
+        buildInFunctions.put(">", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation >");
+            }
+            Object o2 = stack.pop();
+            Object o1 = stack.pop();
 
-            /**
-             * Pops the top two (integer) literals, compares them, and pushes
-             * the integer 1 if the second is greater than the first, 0
-             * otherwise.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation >");
+            if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
+                throw new VMException("Can only compare two integers with >");
+            }
+
+            stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
+        });
+
+        /** Analogous. */
+        buildInFunctions.put("<", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation <");
+            }
+            Object o2 = stack.pop();
+            Object o1 = stack.pop();
+
+            if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
+                throw new VMException("Can only compare two integers with <");
+            }
+
+            stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
+        });
+
+        /**
+         * Pops the top two (both integer or both string) literals, compares
+         * them, and pushes the integer 1 if they're equal, 0 otherwise.
+         */
+        buildInFunctions.put("=", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation =");
+            }
+            Object o1 = stack.pop();
+            Object o2 = stack.pop();
+
+            if ((o1 == null) ^ (o2 == null)) {
+                stack.push(VM.FALSE);
+                return;
+            }
+
+            if ((o1 == null) && (o2 == null)) {
+                stack.push(VM.TRUE);
+                return;
+            }
+
+            stack.push(o1.equals(o2) ? VM.TRUE : VM.FALSE);
+        });
+
+        /** Pops the top two (integer) literals and pushes their sum. */
+        buildInFunctions.put("+", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation +");
+            }
+            Object o2 = stack.pop();
+            Object o1 = stack.pop();
+
+            if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
+                throw new VMException("Can only compare two integers with +");
+            }
+
+            stack.push((Integer) o1 + (Integer) o2);
+        });
+
+        /**
+         * Pops the top two (integer) literals and pushes their difference
+         * (the first subtracted from the second).
+         */
+        buildInFunctions.put("-", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation -");
+            }
+            Object o2 = stack.pop();
+            Object o1 = stack.pop();
+
+            if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
+                throw new VMException("Can only subtract two integers with -");
+            }
+
+            stack.push((Integer) o1 - (Integer) o2);
+        });
+
+        /**
+         * Pops the top two (string) literals, concatenates them (in reverse
+         * order, that is, the order in which pushed), and pushes the
+         * resulting string.
+         */
+        buildInFunctions.put("*", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation *");
+            }
+            Object o2 = stack.pop();
+            Object o1 = stack.pop();
+
+            if (!((o1 instanceof String) && (o2 instanceof String))) {
+                throw new VMException("Can only concatenate two String with *");
+            }
+
+            stack.push(o1.toString() + o2);
+        });
+
+        /**
+         * Pops the top two literals and assigns to the first (which must be
+         * a global or entry variable) the value of the second.
+         */
+        buildInFunctions.put(":=", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Invalid call to operation :=");
+            }
+            Object o1 = stack.pop();
+            Object o2 = stack.pop();
+            assign(context, o1, o2);
+        });
+
+        /**
+         * Pops the top (string) literal, adds a `.' to it if the last non
+         * '}' character isn't a `.', `?', or `!', and pushes this resulting
+         * string.
+         */
+        buildInFunctions.put("add.period$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation add.period$");
+            }
+            Object o1 = stack.pop();
+
+            if (!(o1 instanceof String)) {
+                throw new VMException("Can only add a period to a string for add.period$");
+            }
+
+            String s = (String) o1;
+            Matcher m = ADD_PERIOD_PATTERN.matcher(s);
+
+            if (m.find()) {
+                StringBuffer sb = new StringBuffer();
+                m.appendReplacement(sb, m.group(1));
+                sb.append('.');
+                String group2 = m.group(2);
+                if (group2 != null) {
+                    sb.append(m.group(2));
                 }
-                Object o2 = stack.pop();
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-                    throw new VMException("Can only compare two integers with >");
-                }
-
-                stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
+                stack.push(sb.toString());
+            } else {
+                stack.push(s);
             }
         });
 
-        buildInFunctions.put("<", new BstFunction() {
-
-            /** Analogous. */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation <");
-                }
-                Object o2 = stack.pop();
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-                    throw new VMException("Can only compare two integers with <");
-                }
-
-                stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? VM.TRUE : VM.FALSE);
-
+        /**
+         * Executes the function whose name is the entry type of an entry.
+         * For example if an entry is of type book, this function executes
+         * the book function. When given as an argument to the ITERATE
+         * command, call.type$ actually produces the output for the entries.
+         * For an entry with an unknown type, it executes the function
+         * default.type. Thus you should define (before the READ command)
+         * one function for each standard entry type as well as a
+         * default.type function.
+         */
+        buildInFunctions.put("call.type$", context -> {
+            if (context == null) {
+                throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
             }
-        });
-
-        buildInFunctions.put("=", new BstFunction() {
-
-            /**
-             * Pops the top two (both integer or both string) literals, compares
-             * them, and pushes the integer 1 if they're equal, 0 otherwise.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation =");
-                }
-                Object o1 = stack.pop();
-                Object o2 = stack.pop();
-
-                if ((o1 == null) ^ (o2 == null)) {
-                    stack.push(VM.FALSE);
-                    return;
-                }
-
-                if ((o1 == null) && (o2 == null)) {
-                    stack.push(VM.TRUE);
-                    return;
-                }
-
-                stack.push(o1.equals(o2) ? VM.TRUE : VM.FALSE);
-            }
-        });
-
-        buildInFunctions.put("+", new BstFunction() {
-
-            /** Pops the top two (integer) literals and pushes their sum. */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation +");
-                }
-                Object o2 = stack.pop();
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-                    throw new VMException("Can only compare two integers with +");
-                }
-
-                stack.push((Integer) o1 + (Integer) o2);
-            }
-        });
-
-        buildInFunctions.put("-", new BstFunction() {
-
-            /**
-             * Pops the top two (integer) literals and pushes their difference
-             * (the first subtracted from the second).
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation -");
-                }
-                Object o2 = stack.pop();
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof Integer) && (o2 instanceof Integer))) {
-                    throw new VMException("Can only subtract two integers with -");
-                }
-
-                stack.push((Integer) o1 - (Integer) o2);
-            }
-        });
-
-        buildInFunctions.put("*", new BstFunction() {
-
-            /**
-             * Pops the top two (string) literals, concatenates them (in reverse
-             * order, that is, the order in which pushed), and pushes the
-             * resulting string.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation *");
-                }
-                Object o2 = stack.pop();
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof String) && (o2 instanceof String))) {
-                    throw new VMException("Can only concatenate two String with *");
-                }
-
-                stack.push(o1.toString() + o2);
-            }
-        });
-
-        buildInFunctions.put(":=", new BstFunction() {
-
-            /**
-             * Pops the top two literals and assigns to the first (which must be
-             * a global or entry variable) the value of the second.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Invalid call to operation :=");
-                }
-                Object o1 = stack.pop();
-                Object o2 = stack.pop();
-                assign(context, o1, o2);
-
-            }
-        });
-
-        buildInFunctions.put("add.period$", new BstFunction() {
-
-            /**
-             * Pops the top (string) literal, adds a `.' to it if the last non
-             * '}' character isn't a `.', `?', or `!', and pushes this resulting
-             * string.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation add.period$");
-                }
-                Object o1 = stack.pop();
-
-                if (!(o1 instanceof String)) {
-                    throw new VMException("Can only add a period to a string for add.period$");
-                }
-
-                String s = (String) o1;
-                Matcher m = ADD_PERIOD_PATTERN.matcher(s);
-
-                if (m.find()) {
-                    StringBuffer sb = new StringBuffer();
-                    m.appendReplacement(sb, m.group(1));
-                    sb.append('.');
-                    String group2 = m.group(2);
-                    if (group2 != null) {
-                        sb.append(m.group(2));
-                    }
-                    stack.push(sb.toString());
-                } else {
-                    stack.push(s);
-                }
-            }
-        });
-
-        buildInFunctions.put("call.type$", new BstFunction() {
-
-            /**
-             * Executes the function whose name is the entry type of an entry.
-             * For example if an entry is of type book, this function executes
-             * the book function. When given as an argument to the ITERATE
-             * command, call.type$ actually produces the output for the entries.
-             * For an entry with an unknown type, it executes the function
-             * default.type. Thus you should define (before the READ command)
-             * one function for each standard entry type as well as a
-             * default.type function.
-             */
-            @Override
-            public void execute(BstEntry context) {
-
-                if (context == null) {
-                    throw new VMException(
-                            "Call.type$ can only be called from within a context (ITERATE or REVERSE).");
-                }
-                VM.this.execute(context.getBibtexEntry().getType(), context);
-            }
+            VM.this.execute(context.getBibtexEntry().getType(), context);
         });
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));
 
-        buildInFunctions.put("chr.to.int$", new BstFunction() {
-
-            /**
-             * Pops the top (string) literal, makes sure it's a single
-             * character, converts it to the corresponding ASCII integer, and
-             * pushes this integer.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation chr.to.int$");
-                }
-                Object o1 = stack.pop();
-
-                if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
-                    throw new VMException("Can only perform chr.to.int$ on string with length 1");
-                }
-
-                String s = (String) o1;
-
-                stack.push((int) s.charAt(0));
+        /**
+         * Pops the top (string) literal, makes sure it's a single
+         * character, converts it to the corresponding ASCII integer, and
+         * pushes this integer.
+         */
+        buildInFunctions.put("chr.to.int$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation chr.to.int$");
             }
+            Object o1 = stack.pop();
+
+            if (!((o1 instanceof String) && (((String) o1).length() == 1))) {
+                throw new VMException("Can only perform chr.to.int$ on string with length 1");
+            }
+
+            String s = (String) o1;
+
+            stack.push((int) s.charAt(0));
         });
 
-        buildInFunctions.put("cite$", new BstFunction() {
-
-            /**
-             * Pushes the string that was the \cite-command argument for this
-             * entry.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (context == null) {
-                    throw new VMException("Must have an entry to cite$");
-                }
-                stack.push(context.getBibtexEntry().getCiteKey());
+        /**
+         * Pushes the string that was the \cite-command argument for this
+         * entry.
+         */
+        buildInFunctions.put("cite$", context -> {
+            if (context == null) {
+                throw new VMException("Must have an entry to cite$");
             }
+            stack.push(context.getBibtexEntry().getCiteKey());
         });
 
-        buildInFunctions.put("duplicate$", new BstFunction() {
-
-            /**
-             * Pops the top literal from the stack and pushes two copies of it.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation duplicate$");
-                }
-                Object o1 = stack.pop();
-
-                stack.push(o1);
-                stack.push(o1);
+        /**
+         * Pops the top literal from the stack and pushes two copies of it.
+         */
+        buildInFunctions.put("duplicate$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation duplicate$");
             }
+            Object o1 = stack.pop();
+
+            stack.push(o1);
+            stack.push(o1);
         });
 
-        buildInFunctions.put("empty$", new BstFunction() {
-
-            /**
-             * Pops the top literal and pushes the integer 1 if it's a missing
-             * field or a string having no non-white-space characters, 0
-             * otherwise.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation empty$");
-                }
-                Object o1 = stack.pop();
-
-                if (o1 == null) {
-                    stack.push(VM.TRUE);
-                    return;
-                }
-
-                if (!(o1 instanceof String)) {
-                    throw new VMException("Operand does not match function empty$");
-                }
-
-                String s = (String) o1;
-
-                stack.push("".equals(s.trim()) ? VM.TRUE : VM.FALSE);
+        /**
+         * Pops the top literal and pushes the integer 1 if it's a missing
+         * field or a string having no non-white-space characters, 0
+         * otherwise.
+         */
+        buildInFunctions.put("empty$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation empty$");
             }
+            Object o1 = stack.pop();
+
+            if (o1 == null) {
+                stack.push(VM.TRUE);
+                return;
+            }
+
+            if (!(o1 instanceof String)) {
+                throw new VMException("Operand does not match function empty$");
+            }
+
+            String s = (String) o1;
+
+            stack.push("".equals(s.trim()) ? VM.TRUE : VM.FALSE);
         });
 
         buildInFunctions.put("format.name$", new FormatNameFunction(this));
 
-        buildInFunctions.put("if$", new BstFunction() {
+        /**
+         * Pops the top three literals (they are two function literals and
+         * an integer literal, in that order); if the integer is greater
+         * than 0, it executes the second literal, else it executes the
+         * first.
+         */
+        buildInFunctions.put("if$", context -> {
+            if (stack.size() < 3) {
+                throw new VMException("Not enough operands on stack for operation =");
+            }
+            Object f1 = stack.pop();
+            Object f2 = stack.pop();
+            Object i = stack.pop();
 
-            /**
-             * Pops the top three literals (they are two function literals and
-             * an integer literal, in that order); if the integer is greater
-             * than 0, it executes the second literal, else it executes the
-             * first.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 3) {
-                    throw new VMException("Not enough operands on stack for operation =");
-                }
-                Object f1 = stack.pop();
-                Object f2 = stack.pop();
-                Object i = stack.pop();
+            if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
+                    && ((f2 instanceof Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
+                throw new VMException("Expecting two functions and an integer for if$.");
+            }
 
-                if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
-                        && ((f2 instanceof Identifier) || (f2 instanceof Tree)) && (i instanceof Integer)) {
-                    throw new VMException("Expecting two functions and an integer for if$.");
-                }
-
-                Object toExe;
-                if ((Integer) i > 0) {
-                    toExe = f2;
-                } else {
-                    toExe = f1;
-                }
-                VM.this.executeInContext(toExe, context);
+            if ((Integer) i > 0) {
+                VM.this.executeInContext(f2, context);
+            } else {
+                VM.this.executeInContext(f1, context);
             }
         });
 
-        buildInFunctions.put("int.to.chr$", new BstFunction() {
-
-            /**
-             * Pops the top (integer) literal, interpreted as the ASCII integer
-             * value of a single character, converts it to the corresponding
-             * single-character string, and pushes this string.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation int.to.chr$");
-                }
-                Object o1 = stack.pop();
-
-                if (!(o1 instanceof Integer)) {
-                    throw new VMException("Can only perform operation int.to.chr$ on an Integer");
-                }
-
-                Integer i = (Integer) o1;
-
-                stack.push(String.valueOf((char) i.intValue()));
+        /**
+         * Pops the top (integer) literal, interpreted as the ASCII integer
+         * value of a single character, converts it to the corresponding
+         * single-character string, and pushes this string.
+         */
+        buildInFunctions.put("int.to.chr$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation int.to.chr$");
             }
+            Object o1 = stack.pop();
+
+            if (!(o1 instanceof Integer)) {
+                throw new VMException("Can only perform operation int.to.chr$ on an Integer");
+            }
+
+            Integer i = (Integer) o1;
+
+            stack.push(String.valueOf((char) i.intValue()));
         });
 
-        buildInFunctions.put("int.to.str$", new BstFunction() {
-
-            /**
-             * Pops the top (integer) literal, converts it to its (unique)
-             * string equivalent, and pushes this string.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation int.to.str$");
-                }
-                Object o1 = stack.pop();
-
-                if (!(o1 instanceof Integer)) {
-                    throw new VMException(
-                            "Can only transform an integer to an string using int.to.str$");
-                }
-
-                stack.push(o1.toString());
+        /**
+         * Pops the top (integer) literal, converts it to its (unique)
+         * string equivalent, and pushes this string.
+         */
+        buildInFunctions.put("int.to.str$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation int.to.str$");
             }
+            Object o1 = stack.pop();
+
+            if (!(o1 instanceof Integer)) {
+                throw new VMException("Can only transform an integer to an string using int.to.str$");
+            }
+
+            stack.push(o1.toString());
         });
 
-        buildInFunctions.put("missing$", new BstFunction() {
-
-            /**
-             * Pops the top literal and pushes the integer 1 if it's a missing
-             * field, 0 otherwise.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation missing$");
-                }
-                Object o1 = stack.pop();
-
-                if (o1 == null) {
-                    stack.push(VM.TRUE);
-                    return;
-                }
-
-                if (!(o1 instanceof String)) {
-                    warn("Not a string or missing field in operation missing$");
-                    stack.push(VM.TRUE);
-                    return;
-                }
-
-                stack.push(VM.FALSE);
+        /**
+         * Pops the top literal and pushes the integer 1 if it's a missing
+         * field, 0 otherwise.
+         */
+        buildInFunctions.put("missing$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation missing$");
             }
+            Object o1 = stack.pop();
+
+            if (o1 == null) {
+                stack.push(VM.TRUE);
+                return;
+            }
+
+            if (!(o1 instanceof String)) {
+                warn("Not a string or missing field in operation missing$");
+                stack.push(VM.TRUE);
+                return;
+            }
+
+            stack.push(VM.FALSE);
         });
 
-        buildInFunctions.put("newline$", new BstFunction() {
+        /**
+         * Writes onto the bbl file what's accumulated in the output buffer.
+         * It writes a blank line if and only if the output buffer is empty.
+         * Since write$ does reasonable line breaking, you should use this
+         * function only when you want a blank line or an explicit line
+         * break.
+         */
+        buildInFunctions.put("newline$", context -> VM.this.bbl.append('\n'));
 
-            /**
-             * Writes onto the bbl file what's accumulated in the output buffer.
-             * It writes a blank line if and only if the output buffer is empty.
-             * Since write$ does reasonable line breaking, you should use this
-             * function only when you want a blank line or an explicit line
-             * break.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                VM.this.bbl.append('\n');
+        /**
+         * Pops the top (string) literal and pushes the number of names the
+         * string represents one plus the number of occurrences of the
+         * substring "and" (ignoring case differences) surrounded by
+         * non-null white-space at the top brace level.
+         */
+        buildInFunctions.put("num.names$", context -> {
+            if (stack.isEmpty()) {
+                throw new VMException("Not enough operands on stack for operation num.names$");
             }
+            Object o1 = stack.pop();
+
+            if (!(o1 instanceof String)) {
+                throw new VMException("Need a string at the top of the stack for num.names$");
+            }
+            String s = (String) o1;
+
+            stack.push(AuthorList.getAuthorList(s).size());
         });
 
-        buildInFunctions.put("num.names$", new BstFunction() {
+        /**
+         * Pops the top of the stack but doesn't print it; this gets rid of
+         * an unwanted stack literal.
+         */
+        buildInFunctions.put("pop$", context -> stack.pop());
 
-            /**
-             * Pops the top (string) literal and pushes the number of names the
-             * string represents one plus the number of occurrences of the
-             * substring "and" (ignoring case differences) surrounded by
-             * non-null white-space at the top brace level.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation num.names$");
-                }
-                Object o1 = stack.pop();
-
-                if (!(o1 instanceof String)) {
-                    throw new VMException("Need a string at the top of the stack for num.names$");
-                }
-                String s = (String) o1;
-
-                stack.push(AuthorList.getAuthorList(s).size());
-            }
-        });
-
-        buildInFunctions.put("pop$", new BstFunction() {
-
-            /**
-             * Pops the top of the stack but doesn't print it; this gets rid of
-             * an unwanted stack literal.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                stack.pop();
-            }
-        });
-
-        buildInFunctions.put("preamble$", new BstFunction() {
-
-            /**
-             * The |built_in| function {\.{preamble\$}} pushes onto the stack
-             * the concatenation of all the \.{preamble} strings read from the
-             * database files. (or the empty string if there where none)
-             *
-             * @PREAMBLE strings read from the database files.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (preamble == null) {
-                    stack.push("");
-                } else {
-                    stack.push(preamble);
-                }
-
+        /**
+         * The |built_in| function {\.{preamble\$}} pushes onto the stack
+         * the concatenation of all the \.{preamble} strings read from the
+         * database files. (or the empty string if there where none)
+         *
+         * @PREAMBLE strings read from the database files.
+         */
+        buildInFunctions.put("preamble$", context -> {
+            if (preamble == null) {
+                stack.push("");
+            } else {
+                stack.push(preamble);
             }
         });
 
@@ -622,39 +527,25 @@ public class VM implements Warn {
          */
         buildInFunctions.put("purify$", new PurifyFunction(this));
 
-        buildInFunctions.put("quote$", new BstFunction() {
+        /**
+         * Pushes the string consisting of the double-quote character.
+         */
+        buildInFunctions.put("quote$", context -> stack.push("\""));
 
-            /**
-             * Pushes the string consisting of the double-quote character.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                stack.push("\"");
-            }
-        });
-
-        buildInFunctions.put("skip$", new BstFunction() {
-
-            /**
-             * Is a no-op.
-             */
-            @Override
-            public void execute(BstEntry context) {
+        /**
+         * Is a no-op.
+         */
+        buildInFunctions.put("skip$", context -> {
                 // Nothing to do! Yeah!
-            }
         });
 
-        buildInFunctions.put("stack$", new BstFunction() {
-
-            /**
-             * Pops and prints the whole stack; it's meant to be used for style
-             * designers while debugging.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                while (!stack.empty()) {
-                    LOGGER.debug(stack.pop());
-                }
+        /**
+         * Pops and prints the whole stack; it's meant to be used for style
+         * designers while debugging.
+         */
+        buildInFunctions.put("stack$", context -> {
+            while (!stack.empty()) {
+                LOGGER.debug(stack.pop());
             }
         });
 
@@ -710,27 +601,23 @@ public class VM implements Warn {
             }
         });
 
-        buildInFunctions.put("swap$", new BstFunction() {
-
-            /**
-             * Swaps the top two literals on the stack. text.length$ Pops the
-             * top (string) literal, and pushes the number of text char- acters
-             * it contains, where an accented character (more precisely, a
-             * \special character", defined in Section 4) counts as a single
-             * text character, even if it's missing its matching right brace,
-             * and where braces don't count as text characters.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation swap$");
-                }
-                Object f1 = stack.pop();
-                Object f2 = stack.pop();
-
-                stack.push(f1);
-                stack.push(f2);
+        /**
+         * Swaps the top two literals on the stack. text.length$ Pops the
+         * top (string) literal, and pushes the number of text char- acters
+         * it contains, where an accented character (more precisely, a
+         * \special character", defined in Section 4) counts as a single
+         * text character, even if it's missing its matching right brace,
+         * and where braces don't count as text characters.
+         */
+        buildInFunctions.put("swap$", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation swap$");
             }
+            Object f1 = stack.pop();
+            Object f2 = stack.pop();
+
+            stack.push(f1);
+            stack.push(f2);
         });
 
         buildInFunctions.put("text.length$", new BstFunction() {
@@ -782,8 +669,7 @@ public class VM implements Warn {
                         // incr(sp_brace_level);
                         braceLevel++;
                         // if ((sp_brace_level = 1) and (sp_ptr < sp_end)) then
-                        if ((braceLevel == 1) && (i < n))
-                         {
+                        if ((braceLevel == 1) && (i < n)) {
                             // if (str_pool[sp_ptr] = backslash) then
                             // begin
                             if (c[i] == '\\') {
@@ -815,15 +701,12 @@ public class VM implements Warn {
                     // begin
                     else if (c[i - 1] == '}') {
                         // if (sp_brace_level > 0) then
-                        if (braceLevel > 0)
-                         {
+                        if (braceLevel > 0) {
                             // decr(sp_brace_level);
                             braceLevel--;
                         // end
                         }
-                    }
-                    // else
-                    else {
+                    } else { // else
                         // incr(num_text_chars);
                         result++;
                     }
@@ -845,42 +728,31 @@ public class VM implements Warn {
          */
         buildInFunctions.put("text.prefix$", new TextPrefixFunction(this));
 
-        buildInFunctions.put("top$", new BstFunction() {
+        /**
+         * Pops and prints the top of the stack to the log file. It's useful for debugging.
+         */
+        buildInFunctions.put("top$", context -> LOGGER.debug(stack.pop()));
 
-            /**
-             * Pops and prints the top of the stack to the log file. It's useful for debugging.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                LOGGER.debug(stack.pop());
+        /**
+         * Pushes the current entry's type (book, article, etc.), but pushes
+         * the null string if the type is either unknown or undefined.
+         */
+        buildInFunctions.put("type$", context -> {
+            if (context == null) {
+                throw new VMException("type$ need a context.");
             }
+
+            stack.push(context.getBibtexEntry().getType());
         });
 
-        buildInFunctions.put("type$", new BstFunction() {
-
-            /**
-             * Pushes the current entry's type (book, article, etc.), but pushes
-             * the null string if the type is either unknown or undefined.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (context == null) {
-                    throw new VMException("type$ need a context.");
-                }
-
-                stack.push(context.getBibtexEntry().getType());
-            }
-        });
-
+        /**
+         * Pops the top (string) literal and prints it following a warning
+         * message. This also increments a count of the number of warning
+         * messages issued.
+         */
         buildInFunctions.put("warning$", new BstFunction() {
 
-            /**
-             * Pops the top (string) literal and prints it following a warning
-             * message. This also increments a count of the number of warning
-             * messages issued.
-             */
             int warning = 1;
-
 
             @Override
             public void execute(BstEntry context) {
@@ -888,56 +760,47 @@ public class VM implements Warn {
             }
         });
 
-        buildInFunctions.put("while$", new BstFunction() {
-
-            /**
-             * Pops the top two (function) literals, and keeps executing the
-             * second as long as the (integer) literal left on the stack by
-             * executing the first is greater than 0.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 2) {
-                    throw new VMException("Not enough operands on stack for operation while$");
-                }
-                Object f2 = stack.pop();
-                Object f1 = stack.pop();
-
-                if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
-                        && ((f2 instanceof Identifier) || (f2 instanceof Tree))) {
-                    throw new VMException("Expecting two functions for while$.");
-                }
-
-                do {
-                    VM.this.executeInContext(f1, context);
-
-                    Object i = stack.pop();
-                    if (!(i instanceof Integer)) {
-                        throw new VMException(
-                                "First parameter to while has to return an integer but was " + i);
-                    }
-                    if ((Integer) i <= 0) {
-                        break;
-                    }
-                    VM.this.executeInContext(f2, context);
-                } while (true);
+        /**
+         * Pops the top two (function) literals, and keeps executing the
+         * second as long as the (integer) literal left on the stack by
+         * executing the first is greater than 0.
+         */
+        buildInFunctions.put("while$", context -> {
+            if (stack.size() < 2) {
+                throw new VMException("Not enough operands on stack for operation while$");
             }
+            Object f2 = stack.pop();
+            Object f1 = stack.pop();
+
+            if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
+                    && ((f2 instanceof Identifier) || (f2 instanceof Tree))) {
+                throw new VMException("Expecting two functions for while$.");
+            }
+
+            do {
+                VM.this.executeInContext(f1, context);
+
+                Object i = stack.pop();
+                if (!(i instanceof Integer)) {
+                    throw new VMException("First parameter to while has to return an integer but was " + i);
+                }
+                if ((Integer) i <= 0) {
+                    break;
+                }
+                VM.this.executeInContext(f2, context);
+            } while (true);
         });
 
         buildInFunctions.put("width$", new WidthFunction(this));
 
-        buildInFunctions.put("write$", new BstFunction() {
-
-            /**
-             * Pops the top (string) literal and writes it on the output buffer
-             * (which will result in stuff being written onto the bbl file when
-             * the buffer fills up).
-             */
-            @Override
-            public void execute(BstEntry context) {
-                String s = (String) stack.pop();
-                VM.this.bbl.append(s);
-            }
+        /**
+         * Pops the top (string) literal and writes it on the output buffer
+         * (which will result in stuff being written onto the bbl file when
+         * the buffer fills up).
+         */
+        buildInFunctions.put("write$", context -> {
+            String s = (String) stack.pop();
+            VM.this.bbl.append(s);
         });
 
     }
@@ -994,7 +857,7 @@ public class VM implements Warn {
     public String run(Collection<BibEntry> bibtex) {
 
         // Reset
-        bbl = new StringBuffer();
+        bbl = new StringBuilder();
 
         strings = new HashMap<>();
 
@@ -1007,12 +870,11 @@ public class VM implements Warn {
 
         stack = new Stack<>();
 
-        { // Create entries
-            entries = new ArrayList<>(bibtex.size());
-            ListIterator<BstEntry> i = entries.listIterator();
-            for (BibEntry entry : bibtex) {
-                i.add(new BstEntry(entry));
-            }
+        // Create entries
+        entries = new ArrayList<>(bibtex.size());
+        ListIterator<BstEntry> listIter = entries.listIterator();
+        for (BibEntry entry : bibtex) {
+            listIter.add(new BstEntry(entry));
         }
 
         // Go
@@ -1215,12 +1077,12 @@ public class VM implements Warn {
         private final Tree localTree;
 
 
-        public Tree getTree() {
-            return localTree;
-        }
-
         public StackFunction(Tree stack) {
             localTree = stack;
+        }
+
+        public Tree getTree() {
+            return localTree;
         }
 
         @Override
@@ -1247,6 +1109,7 @@ public class VM implements Warn {
                         break;
                     default:
                         VM.this.execute(c.getText(), context);
+                        break;
                     }
                 } catch (VMException e) {
                     if (file == null) {

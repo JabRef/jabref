@@ -32,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
@@ -43,7 +44,7 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final boolean toFileDir;
 
-    private final String MOVE_RENAME = Localization.lang("Move/Rename file");
+    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     private static final Log LOGGER = LogFactory.getLog(MoveFileAction.class);
 
@@ -64,7 +65,7 @@ public class MoveFileAction extends AbstractAction {
         FileListEntry flEntry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
         String ln = flEntry.link;
-        boolean httpLink = ln.toLowerCase().startsWith("http");
+        boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
 

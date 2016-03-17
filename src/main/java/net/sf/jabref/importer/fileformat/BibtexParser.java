@@ -264,7 +264,12 @@ public class BibtexParser {
             // A custom entry type can also be stored in a
             // "@comment"
             CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-            entryTypes.put(typ.getName(), typ);
+            if(typ == null) {
+                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
+                        comment);
+            } else {
+                entryTypes.put(typ.getName(), typ);
+            }
 
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
@@ -611,8 +616,7 @@ public class BibtexParser {
                 return token.toString();
             }
 
-            if (Character.isLetterOrDigit((char) character) || (character == ':') || (character == '-') || (character == '_')
-                    || (character == '*') || (character == '+') || (character == '.') || (character == '/') || (character == '\'')) {
+            if (Character.isLetterOrDigit((char) character) || (":-_*+./'".indexOf(character) >= 0)) {
                 token.append((char) character);
             } else {
                 unread(character);
@@ -647,7 +651,6 @@ public class BibtexParser {
         // Restore if possible:
         switch (currentChar) {
             case '=':
-
                 // Get entryfieldname, push it back and take rest as key
                 key = key.reverse();
 
@@ -686,16 +689,13 @@ public class BibtexParser {
                 break;
 
             case ',':
-
                 parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
                         String.valueOf(line)));
                 break;
 
             case '\n':
-
                 parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
                         String.valueOf(line)));
-
                 break;
 
             default:
@@ -753,9 +753,8 @@ public class BibtexParser {
                 return token.toString();
             }
 
-            if (!Character.isWhitespace((char) character)
-                    && (Character.isLetterOrDigit((char) character) || (character == ':') || ((character != '#') && (character != '{') && (character != '}')
-                    && (character != '\uFFFD') && (character != '~') && (character != ',') && (character != '=')))) {
+            if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
+                    || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
             } else {
 
@@ -810,7 +809,7 @@ public class BibtexParser {
                 String whitespacesReduced = skipAndRecordWhitespace(character);
 
                 if (!(whitespacesReduced.isEmpty()) && !"\n\t".equals(whitespacesReduced)) { // &&
-                    whitespacesReduced = whitespacesReduced.replaceAll("\t", ""); // Remove tabulators.
+                    whitespacesReduced = whitespacesReduced.replace("\t", ""); // Remove tabulators.
                     value.append(whitespacesReduced);
                 } else {
                     value.append(' ');

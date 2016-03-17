@@ -56,8 +56,7 @@ public class Replace extends AbstractParamLayoutFormatter {
     public void setArgument(String arg) {
         String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
 
-        if (parts.length < 2)
-         {
+        if (parts.length < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
         regex = parts[0];

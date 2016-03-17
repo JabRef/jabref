@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,9 +17,7 @@ package net.sf.jabref.gui.maintable;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -36,17 +34,14 @@ import java.util.Enumeration;
  * @author Fabian Bieker
  * @since 12/2008
  */
-class PreventDraggingJTableHeader extends JTableHeader implements TableCellRenderer {
+class PreventDraggingJTableHeader extends JTableHeader {
 
     private final MainTableFormat tableFormat;
-
-    private final TableCellRenderer delegate;
 
     public PreventDraggingJTableHeader(JTable table, MainTableFormat tableFormat) {
         super(table.getColumnModel());
         this.setTable(table);
         this.tableFormat = tableFormat;
-        this.delegate = table.getTableHeader().getDefaultRenderer();
         setupTableHeaderIcons();
     }
 
@@ -54,7 +49,6 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
 
         Enumeration<TableColumn> columns = columnModel.getColumns();
         for (TableColumn column : Collections.list(columns)) {
-            column.setHeaderRenderer(this);
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(column.getModelIndex());
             column.setHeaderValue(mainTableColumn.getHeaderLabel());
         }
@@ -76,7 +70,7 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
     public void setDraggedColumn(TableColumn column) {
 
         if ((column != null) && (column.getModelIndex() == 0)) {
-                return;
+            return;
         }
         super.setDraggedColumn(column);
     }
@@ -92,28 +86,6 @@ class PreventDraggingJTableHeader extends JTableHeader implements TableCellRende
         }
 
         return column;
-    }
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-
-        // delegate to previously used TableCellRenderer which styles the component
-        Component resultFromDelegate = delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-        // Changing style is only possible if both value and resultFromDelegate are JLabels
-        if ((value instanceof JLabel) && (resultFromDelegate instanceof JLabel)) {
-            String text = ((JLabel) value).getText();
-            Icon icon = ((JLabel) value).getIcon();
-            if (icon == null) {
-                ((JLabel) resultFromDelegate).setText(text);
-            } else {
-                ((JLabel) resultFromDelegate).setIcon(icon);
-                ((JLabel) resultFromDelegate).setText(null);
-            }
-        }
-
-        return resultFromDelegate;
     }
 
     /**

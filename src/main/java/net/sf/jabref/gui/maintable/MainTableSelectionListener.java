@@ -47,6 +47,7 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
@@ -139,12 +140,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 // Get an old or new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(toShow);
 
-                if ((oldEditor != null)) {
+                if (oldEditor != null) {
                     oldEditor.setMovingToDifferentEntry();
                 }
 
                 // Show the new editor unless it was already visible:
-                if ((newEditor != oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
+                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
 
                     if (visName != null) {
                         newEditor.setVisiblePanel(visName);
@@ -278,17 +279,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             final List<String> fieldNames = modelColumn.getBibtexFields();
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    panel.output(Localization.lang("External viewer called") + '.');
-                    // check for all field names whether a link is present
-                    // (is relevant for combinations such as "url/doi")
-                    for(String fieldName : fieldNames) {
-                        if (!entry.hasField(fieldName)) {
-                            continue; // There is no content for this field continue with the next one
-                        }
+            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+                panel.output(Localization.lang("External viewer called") + '.');
+                // check for all field names whether a link is present
+                // (is relevant for combinations such as "url/doi")
+                for (String fieldName : fieldNames) {
+                    // Check if field is present, if not skip this field
+                    if (entry.hasField(fieldName)) {
                         String link = entry.getField(fieldName);
 
                         // See if this is a simple file link field, or if it is a file-list
@@ -314,8 +311,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(),
-                                        flEntry.type);
+                                        flEntry.link, flEntry.type.getIcon(),
+                                        panel.getBibDatabaseContext().getMetaData(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
                                     panel.output(Localization.lang("Unable to open link."));
@@ -323,9 +320,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                         } else {
                             try {
-                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, fieldName);
+                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link,
+                                        fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
+                                LOGGER.info("Unable to open link", ex);
                             }
                         }
                         break; // only open the first link

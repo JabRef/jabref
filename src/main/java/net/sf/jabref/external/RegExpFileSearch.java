@@ -261,7 +261,7 @@ public class RegExpFileSearch {
         }
 
         // Last step: check if the given file can be found in this directory
-        String filePart = fileParts[fileParts.length - 1].replaceAll("\\[extension\\]", RegExpFileSearch.EXT_MARKER);
+        String filePart = fileParts[fileParts.length - 1].replace("[extension]", RegExpFileSearch.EXT_MARKER);
         String filenameToLookFor = Util.expandBrackets(filePart, entry, null)
                 .replaceAll(RegExpFileSearch.EXT_MARKER, extensionRegExp);
         final Pattern toMatch = Pattern.compile('^'

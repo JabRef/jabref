@@ -106,17 +106,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         private final BasePanel basePanel;
         private final boolean raisePanel;
-        private final File file;
 
-        OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
+        OpenItSwingHelper(BasePanel basePanel, boolean raisePanel) {
             this.basePanel = basePanel;
             this.raisePanel = raisePanel;
-            this.file = file;
         }
 
         @Override
         public void run() {
-            frame.addTab(basePanel, file, raisePanel);
+            frame.addTab(basePanel, raisePanel);
 
         }
     }
@@ -173,13 +171,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openTheFile(theFile, raisePanel);
-                    }
+            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+                for (File theFile : theFiles) {
+                    openTheFile(theFile, raisePanel);
                 }
             });
             for (File theFile : theFiles) {
@@ -271,8 +265,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                     String message = "<html>" + errorMessage + "<p>"
                             + (tryingAutosave ? Localization.lang(
-                            "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                            file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
                             + "</html>";
                     JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -342,7 +336,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
+        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
                 + database.getEntryCount() + " " + Localization.lang("entries") + ".");

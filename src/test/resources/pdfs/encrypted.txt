@@ -1,0 +1,14 @@
+PDF was created using:
+
+```
+PDDocument pdf = null;
+try {
+  pdf = new PDDocument();
+  pdf.addPage(new PDPage()); // Need page to open in Acrobat
+  pdf.encrypt("hello", "world");
+  pdf.save("d:/download/encrypted.pdf");
+} finally {
+  if (pdf != null)
+    pdf.close();
+}
+```

@@ -19,7 +19,7 @@ test:
   override:
     - ./gradlew test
   post:
-    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then ./gradlew coverityCheck ; fi
+    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then ./gradlew coverityCheck || true ; fi
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     # We use JaCoCo instead of Cobertura for measuring code coverage

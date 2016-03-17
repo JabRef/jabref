@@ -5,7 +5,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,9 +45,9 @@ public class BibDatabaseContext {
 
     public BibDatabaseMode getMode() {
         List<String> data = metaData.getData(MetaData.DATABASE_TYPE);
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
-            if (defaults.mode == BibDatabaseMode.BIBLATEX || inferredMode == BibDatabaseMode.BIBLATEX) {
+            if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
                 return BibDatabaseMode.BIBLATEX;
             } else {
                 return BibDatabaseMode.BIBTEX;
@@ -58,7 +57,7 @@ public class BibDatabaseContext {
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {
-        metaData.putData(MetaData.DATABASE_TYPE, Collections.singletonList(bibDatabaseMode.getFormattedName()));
+        metaData.setMode(bibDatabaseMode);
     }
 
     /**

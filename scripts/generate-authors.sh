@@ -41,6 +41,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 	John Relph
 	Hannes Restel
 	Moritz Ringler
+	Christoph Schwentker
 	Rudolf Seemann
 	Toralf Senger
 	Manuel Siebeneicher

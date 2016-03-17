@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -34,7 +35,6 @@ import javax.swing.ListSelectionModel;
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.maintable.MainTable;
@@ -63,6 +63,7 @@ public class PreferencesDialog extends JDialog {
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
     private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
+    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
@@ -125,10 +126,11 @@ public class PreferencesDialog extends JDialog {
 
 
         JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(3, 1));
+        buttons.setLayout(new GridLayout(4, 1));
         buttons.add(importPreferences, 0);
         buttons.add(exportPreferences, 1);
         buttons.add(showPreferences, 2);
+        buttons.add(resetPreferences, 3);
 
         JPanel westPanel = new JPanel();
         westPanel.setLayout(new BorderLayout());
@@ -183,10 +185,11 @@ public class PreferencesDialog extends JDialog {
             if (filename != null) {
                 try {
                     prefs.importPreferences(filename);
-                    setValues();
-                    ExportFormats.initAllExports();
-                    frame.removeCachedEntryEditors();
-                    Globals.prefs.updateEntryEditorTabList();
+                    updateAfterPreferenceChanges();
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
+                            Localization.lang("You must restart JabRef for this to come into effect."),
+                            Localization.lang("Import preferences"),
+                            JOptionPane.WARNING_MESSAGE);
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -195,7 +198,27 @@ public class PreferencesDialog extends JDialog {
             }
         });
 
-        showPreferences.addActionListener(e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
+        showPreferences.addActionListener(
+                e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
+                        .setVisible(true));
+        resetPreferences.addActionListener(e -> {
+            if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
+                    Localization.lang("Are you sure you want to reset all settings to default values?"),
+                    Localization.lang("Reset preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    prefs.clear();
+                    JOptionPane.showMessageDialog(PreferencesDialog.this,
+                            Localization.lang("You must restart JabRef for this to come into effect."),
+                            Localization.lang("Reset preferences"),
+                            JOptionPane.WARNING_MESSAGE);
+                } catch (BackingStoreException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
+                }
+                updateAfterPreferenceChanges();
+            }
+        });
 
         setValues();
 
@@ -203,6 +226,12 @@ public class PreferencesDialog extends JDialog {
 
     }
 
+    private void updateAfterPreferenceChanges() {
+        setValues();
+        ExportFormats.initAllExports();
+        frame.removeCachedEntryEditors();
+        Globals.prefs.updateEntryEditorTabList();
+    }
 
     class OkAction extends AbstractAction {
 
@@ -213,46 +242,27 @@ public class PreferencesDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            AbstractWorker worker = new AbstractWorker() {
-
-                boolean ready = true;
-
-
-                @Override
-                public void run() {
-                    // First check that all tabs are ready to close:
-                    int count = main.getComponentCount();
-                    Component[] comps = main.getComponents();
-                    for (int i = 0; i < count; i++) {
-                        if (!((PrefsTab) comps[i]).validateSettings()) {
-                            ready = false;
-                            return; // If not, break off.
-                        }
-                    }
-                    // Then store settings and close:
-                    for (int i = 0; i < count; i++) {
-                        ((PrefsTab) comps[i]).storeSettings();
-                    }
-                    Globals.prefs.flush();
+            // First check that all tabs are ready to close:
+            int count = main.getComponentCount();
+            Component[] comps = main.getComponents();
+            for (int i = 0; i < count; i++) {
+                if (!((PrefsTab) comps[i]).validateSettings()) {
+                    return; // If not, break off.
                 }
+            }
+            // Then store settings and close:
+            for (int i = 0; i < count; i++) {
+                ((PrefsTab) comps[i]).storeSettings();
+            }
+            Globals.prefs.flush();
 
-                @Override
-                public void update() {
-                    if (!ready) {
-                        return;
-                    }
-                    setVisible(false);
-                    MainTable.updateRenderers();
-                    GUIGlobals.updateEntryEditorColors();
-                    frame.setupAllTables();
-                    frame.groupSelector.revalidateGroups(); // icons may have
-                    // changed
-                    frame.output(Localization.lang("Preferences recorded."));
-                }
-            };
-            worker.getWorker().run();
-            worker.getCallBack().update();
-
+            setVisible(false);
+            MainTable.updateRenderers();
+            GUIGlobals.updateEntryEditorColors();
+            frame.setupAllTables();
+            frame.groupSelector.revalidateGroups(); // icons may have
+            // changed
+            frame.output(Localization.lang("Preferences recorded."));
         }
     }
 

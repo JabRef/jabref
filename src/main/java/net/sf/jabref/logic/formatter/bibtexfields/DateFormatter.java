@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -38,6 +39,11 @@ public class DateFormatter implements Formatter {
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM[-dd]");
         return dateFormatter.format(parsedDate.get());
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Normalizes dates in %s to the BibLaTeX standard yyyy-mm-dd or yyyy-mm.");
     }
 
     /*

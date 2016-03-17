@@ -18,13 +18,13 @@ package net.sf.jabref.gui.autocompleter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -45,10 +45,10 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
  */
 public class AutoCompleteSupport<E> {
 
-    AutoCompleteRenderer<E> renderer;
+    private final AutoCompleteRenderer<E> renderer;
     private AutoCompleter<E> autoCompleter;
-    JTextComponent textComp;
-    JPopupMenu popup = new JPopupMenu();
+    private final JTextComponent textComp;
+    private final JPopupMenu popup = new JPopupMenu();
     private boolean selectsTextOnFocusGain = true;
 
 
@@ -94,51 +94,41 @@ public class AutoCompleteSupport<E> {
      * autocompleted.
      */
     public void install() {
-        // Actions for navigating the suggested autocomplete items with the arrow keys
-        final Action upAction = new MoveAction(-1);
-        final Action downAction = new MoveAction(1);
-        // Action hiding the autocomplete popup
-        final Action hidePopupAction = new AbstractAction() {
+        // ActionListeners for navigating the suggested autocomplete items with the arrow keys
+        final ActionListener upAction = new MoveAction(-1);
+        final ActionListener downAction = new MoveAction(1);
+        // ActionListener hiding the autocomplete popup
+        final ActionListener hidePopupAction = e -> popup.setVisible(false);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                popup.setVisible(false);
+        // ActionListener accepting the currently selected item as the autocompletion
+        final ActionListener acceptAction = e -> {
+            E itemToInsert = renderer.getSelectedItem();
+            if (itemToInsert == null) {
+                return;
             }
-        };
-        // Action accepting the currently selected item as the autocompletion
-        final Action acceptAction = new AbstractAction() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                E itemToInsert = renderer.getSelectedItem();
-                if (itemToInsert == null) {
-                    return;
+            String toInsert = autoCompleter.getAutoCompleteText(itemToInsert);
+
+            // TODO: The following should be refactored. For example, the autocompleter shouldn't know whether we want to complete one word or multiple.
+            // In most fields, we are only interested in the currently edited word, so we
+            // seek from the caret backward to the closest space:
+            if (!autoCompleter.isSingleUnitField()) {
+                // Get position of last word separator (whitespace or comma)
+                int priv = textComp.getText().length() - 1;
+                while ((priv >= 0) && !Character.isWhitespace(textComp.getText().charAt(priv))
+                        && (textComp.getText().charAt(priv) != ',')) {
+                    priv--;
                 }
-
-                String toInsert = autoCompleter.getAutoCompleteText(itemToInsert);
-
-                // TODO: The following should be refactored. For example, the autocompleter shouldn't know whether we want to complete one word or multiple.
-                // In most fields, we are only interested in the currently edited word, so we
-                // seek from the caret backward to the closest space:
-                if (!autoCompleter.isSingleUnitField()) {
-                    // Get position of last word separator (whitespace or comma)
-                    int priv = textComp.getText().length() - 1;
-                    while ((priv >= 0) && !Character.isWhitespace(textComp.getText().charAt(priv))
-                            && (textComp.getText().charAt(priv) != ',')) {
-                        priv--;
-                    }
-                    // priv points to whitespace char or priv is -1
-                    // copy everything from the next char up to the end of "upToCaret"
-                    textComp.setText(textComp.getText().substring(0, priv + 1) + toInsert);
-                } else {
-                    // For fields such as "journal" it is more reasonable to try to complete on the entire
-                    // text field content, so we skip the searching and keep the entire part up to the caret:
-                    textComp.setText(toInsert);
-                }
-                textComp.setCaretPosition(textComp.getText().length());
-                popup.setVisible(false);
-
+                // priv points to whitespace char or priv is -1
+                // copy everything from the next char up to the end of "upToCaret"
+                textComp.setText(textComp.getText().substring(0, priv + 1) + toInsert);
+            } else {
+                // For fields such as "journal" it is more reasonable to try to complete on the entire
+                // text field content, so we skip the searching and keep the entire part up to the caret:
+                textComp.setText(toInsert);
             }
+            textComp.setCaretPosition(textComp.getText().length());
+            popup.setVisible(false);
         };
 
         // Create popup

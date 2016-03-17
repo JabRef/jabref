@@ -36,13 +36,19 @@ import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
 
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
+import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.util.OS;
@@ -62,6 +68,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
+
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -219,8 +226,7 @@ public class JabRefPreferences {
     public static final String GROUPS_VISIBLE_ROWS = "groupsVisibleRows";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
     public static final String TOOLBAR_VISIBLE = "toolbarVisible";
-    public static final String HIGHLIGHT_GROUPS_MATCHING_ALL = "highlightGroupsMatchingAll";
-    public static final String HIGHLIGHT_GROUPS_MATCHING_ANY = "highlightGroupsMatchingAny";
+    public static final String HIGHLIGHT_GROUPS_MATCHING = "highlightGroupsMatching";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
@@ -242,8 +248,6 @@ public class JabRefPreferences {
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String PSVIEWER = "psviewer";
-    public static final String PDFVIEWER = "pdfviewer";
     public static final String BINDINGS = "bindings";
     public static final String BIND_NAMES = "bindNames";
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
@@ -314,28 +318,32 @@ public class JabRefPreferences {
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
-    public static final String CLEANUP_MONTH = "CleanUpMonth";
-    public static final String CLEANUP_PAGE_NUMBERS = "CleanUpPageNumbers";
-    public static final String CLEANUP_DATE = "CleanUpDate";
     public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
     public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
     public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
     public static final String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
-    public static final String CLEANUP_HTML = "CleanUpHTML";
-    public static final String CLEANUP_CASE = "CleanUpCase";
-    public static final String CLEANUP_LATEX = "CleanUpLaTeX";
-    public static final String CLEANUP_UNITS = "CleanUpUnits";
     public static final String CLEANUP_UNICODE = "CleanUpUnicode";
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
+    public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
     static {
         EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
-        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs));
+
+        List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
+        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new MonthFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new CaseKeeper()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HTMLToLatexFormatter()));
+        FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
+        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
 
 
@@ -428,10 +436,10 @@ public class JabRefPreferences {
         // load user preferences
         prefs = Preferences.userNodeForPackage(JabRef.class);
 
-        defaults.put(TEXMAKER_PATH, OS.guessProgramPath("texmaker", "Texmaker"));
-        defaults.put(WIN_EDT_PATH, OS.guessProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(LATEX_EDITOR_PATH, OS.guessProgramPath("LEd", "LEd"));
-        defaults.put(TEXSTUDIO_PATH, OS.guessProgramPath("texstudio", "TeXstudio"));
+        defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(LATEX_EDITOR_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("LEd", "LEd"));
+        defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
         defaults.put(BIBLATEX_DEFAULT_MODE, false);
 
@@ -590,8 +598,7 @@ public class JabRefPreferences {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
-        defaults.put(HIGHLIGHT_GROUPS_MATCHING_ANY, Boolean.FALSE);
-        defaults.put(HIGHLIGHT_GROUPS_MATCHING_ALL, Boolean.FALSE);
+        defaults.put(HIGHLIGHT_GROUPS_MATCHING, "");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
@@ -789,7 +796,6 @@ public class JabRefPreferences {
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
 
-        //defaults.put("oooWarning", Boolean.TRUE);
         updateSpecialFieldHandling();
         WRAPPED_USERNAME = '[' + get(DEFAULT_OWNER) + ']';
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
@@ -812,6 +818,24 @@ public class JabRefPreferences {
             defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
             defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
         }
+    }
+
+    public List<String> getCustomTabFieldNames() {
+        List<String> customFields = new ArrayList<>();
+
+        int defNumber = 0;
+        while(true) {
+            // saved as CUSTOMTABNAME_def{number} and ; separated
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            if((fields == null) || fields.isEmpty()) {
+                break;
+            }
+
+            customFields.addAll(Arrays.asList(fields.split(";")));
+            defNumber++;
+        }
+        return customFields;
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -922,14 +946,17 @@ public class JabRefPreferences {
      * characters make the process transparent even if strings contain ';'.
      */
     public void putStringList(String key, List<String> value) {
-        if ((value == null)) {
+        if (value == null) {
             remove(key);
             return;
         }
 
-        put(key, value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";")));
+        put(key, convertListToString(value));
     }
 
+    private static String convertListToString(List<String> value) {
+        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+    }
 
     /**
      * Returns a List of Strings containing the chosen columns.
@@ -1193,7 +1220,9 @@ public class JabRefPreferences {
         if (priOpt.isEmpty()) {
             return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
         }
-        List<String> secondary = EntryUtil.getRemainder(opt, priOpt);
+        List<String> secondary = new ArrayList<>(opt);
+        secondary.removeAll(priOpt);
+
         return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
 
     }
@@ -1217,9 +1246,10 @@ public class JabRefPreferences {
      * @param number or higher.
      */
     public void purgeSeries(String prefix, int number) {
-        while (get(prefix + number) != null) {
-            remove(prefix + number);
-            number++;
+        int n = number;
+        while (get(prefix + n) != null) {
+            remove(prefix + n);
+            n++;
         }
     }
 
@@ -1266,16 +1296,6 @@ public class JabRefPreferences {
     }
 
     /**
-     * Determines whether the given field should be written without any sort of wrapping.
-     *
-     * @param fieldName The field name.
-     * @return true if the field should not be wrapped.
-     */
-    public boolean isNonWrappableField(String fieldName) {
-        return nonWrappableFields.contains(fieldName);
-    }
-
-    /**
      * ONLY FOR TESTING!
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
@@ -1298,19 +1318,13 @@ public class JabRefPreferences {
 
         storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
-        storage.put(CLEANUP_MONTH, preset.isCleanUpMonth());
-        storage.put(CLEANUP_PAGE_NUMBERS, preset.isCleanUpPageNumbers());
-        storage.put(CLEANUP_DATE, preset.isCleanUpDate());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
         storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
-        storage.put(CLEANUP_HTML, preset.isConvertHTMLToLatex());
-        storage.put(CLEANUP_CASE, preset.isConvertCase());
-        storage.put(CLEANUP_LATEX, preset.isConvertLaTeX());
-        storage.put(CLEANUP_UNITS, preset.isConvertUnits());
         storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
+        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));
     }
 }

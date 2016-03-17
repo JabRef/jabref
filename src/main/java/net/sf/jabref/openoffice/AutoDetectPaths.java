@@ -26,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
@@ -339,13 +337,9 @@ public class AutoDetectPaths extends AbstractWorker {
         fileSearchCancelled = false;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
+        cancel.addActionListener(event -> {
                 fileSearchCancelled = true;
                 ((JButton) event.getSource()).setEnabled(false);
-            }
         });
         final JDialog progressDialog = new JDialog(progressParent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

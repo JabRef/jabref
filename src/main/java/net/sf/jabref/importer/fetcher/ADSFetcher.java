@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 JabRef Contributors
+/* Copyright (C) 2003-2016 JabRef Contributors
  * Copyright (c) 2009, Ryo IGARASHI <rigarash@gmail.com>
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
@@ -60,19 +60,17 @@ public class ADSFetcher implements EntryFetcher {
 
     @Override
     public JPanel getOptionsPanel() {
-        // No option panel
         return null;
     }
 
     @Override
     public String getHelpPage() {
-        // TODO: No help page
         return null;
     }
 
     @Override
     public String getTitle() {
-        return Localization.lang("ADS from ADS-DOI");
+        return "ADS from ADS-DOI";
     }
 
     @Override
@@ -83,9 +81,9 @@ public class ADSFetcher implements EntryFetcher {
             /* Allow fetching only 1 key */
             String key = query;
             /* Query ADS and load the results into the BibDatabase */
-            status.setStatus(Localization.lang("Processing") + " " + key);
+            status.setStatus(Localization.lang("Processing %0", key));
             BibDatabase bd = importADSEntries(key, status);
-            if ((bd != null) && (bd.getEntryCount() > 0)) {
+            if ((bd != null) && (!bd.hasNoEntries())) {
                 /* Add the entry to the inspection dialog */
                 for (BibEntry entry : bd.getEntries()) {
                     importADSAbstract(key, entry, status);
@@ -95,7 +93,7 @@ public class ADSFetcher implements EntryFetcher {
                 return false;
             }
         } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from ADS") + ": " + e.getMessage());
+            status.setStatus(Localization.lang("Error while fetching from %0", "ADS") + ": " + e.getMessage());
             LOGGER.warn("Error while fetching from ADS", e);
         }
         return true;

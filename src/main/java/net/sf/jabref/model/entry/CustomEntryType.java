@@ -15,9 +15,7 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,7 +60,7 @@ public class CustomEntryType implements EntryType {
     @Override
     public boolean equals(Object o) {
         if (o instanceof CustomEntryType) {
-            return (this.compareTo(((CustomEntryType) o)) == 0);
+            return this.compareTo((CustomEntryType) o) == 0;
         } else {
             return false;
         }
@@ -90,7 +88,9 @@ public class CustomEntryType implements EntryType {
 
     @Override
     public List<String> getSecondaryOptionalFields() {
-        return Collections.unmodifiableList(EntryUtil.getRemainder(optional, primaryOptional));
+        List<String> result = new ArrayList<>(optional);
+        result.removeAll(primaryOptional);
+        return Collections.unmodifiableList(result);
     }
 
     /**

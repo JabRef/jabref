@@ -237,26 +237,37 @@ public class Util {
     }
 
     /**
+     * Undoable change of field value
+     *
      * @param ce indicates the undo named compound. May be null
      */
     public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
-        String oldValue = be.getField(field);
-        if (nullFieldIfValueIsTheSame && (oldValue != null) && oldValue.equals(newValue)) {
-            // if oldValue == newValue then reset field if required by parameter
-            newValue = null;
-        }
-        if ((oldValue == null) && (newValue == null)) {
-            return;
-        }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
-            if (newValue == null) {
+        String writtenValue = null;
+        String oldValue = null;
+        if (be.hasField(field)) {
+            oldValue = be.getField(field);
+            if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
+                // If the new field value is null or the old and the new value are the same and flag is set
+                // Clear the field
                 be.clearField(field);
-            } else {
+            } else if (!oldValue.equals(newValue)) {
+                // Update
+                writtenValue = newValue;
                 be.setField(field, newValue);
             }
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(be, field, oldValue, newValue));
+        } else {
+            // old field value not set
+            if (newValue == null) {
+                // Do nothing
+                return;
+            } else {
+                // Set new value
+                writtenValue = newValue;
+                be.setField(field, newValue);
             }
+        }
+        if (ce != null) {
+            ce.addEdit(new UndoableFieldChange(be, field, oldValue, writtenValue));
         }
     }
 
@@ -308,12 +319,16 @@ public class Util {
 
         // show a warning, then return
         StringBuilder message = new StringBuilder(
-                "This action will modify the following field(s)\n" + "in at least one entry each:\n");
+                Localization.lang("This action will modify the following field(s) in at least one entry each:"))
+                        .append('\n');
         for (String affectedField : affectedFields) {
             message.append(affectedField).append('\n');
         }
-        message.append("This could cause undesired changes to " + "your entries, so it is\nrecommended that you change the grouping field " + "in your group\ndefinition to \"keywords\" or a non-standard name." + "\n\nDo you still want to continue?");
-        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        message.append(Localization.lang("This could cause undesired changes to your entries.")).append('\n')
+                .append("It is recommended that you change the grouping field in your group definition to \"keywords\" or a non-standard name.")
+                .append("\n\n").append(Localization.lang("Do you still want to continue?"));
+        int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
 
         // if (groups instanceof KeywordGroup) {

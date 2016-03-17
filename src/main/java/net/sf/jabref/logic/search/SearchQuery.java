@@ -32,6 +32,7 @@ public class SearchQuery implements SearchMatcher {
         return String.format("\"%s\" (%s, %s)", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription());
     }
 
+    @Override
     public boolean isMatch(BibEntry entry) {
         return this.getRule().applyRule(getQuery(), entry);
     }

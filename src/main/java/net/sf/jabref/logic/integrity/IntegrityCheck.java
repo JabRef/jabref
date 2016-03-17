@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -58,8 +57,9 @@ public class IntegrityCheck {
         return result;
     }
 
-    public interface Checker {
 
+    @FunctionalInterface
+    public interface Checker {
         List<IntegrityMessage> check(BibEntry entry);
     }
 
@@ -123,16 +123,12 @@ public class IntegrityCheck {
                     .collect(Collectors.toList());
 
             for (FileField.ParsedFileField p : parsedFileFields) {
-
-                List<String> fileDirectories = context.getMetaData().getFileDirectory(Globals.FILE_FIELD);
-
-                for (String fileDirectory : fileDirectories) {
-                    Optional<File> file = FileUtil.expandFilename(p.link, fileDirectory);
-                    if ((!file.isPresent()) || !file.get().exists()) {
-                        return Collections.singletonList(new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry, "file"));
-                    }
+                Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.link);
+                if ((!file.isPresent()) || !file.get().exists()) {
+                    return Collections.singletonList(
+                            new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
+                                    "file"));
                 }
-
             }
 
             return Collections.emptyList();

@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 public class EndnoteImporterTest {
 
-    EndnoteImporter importer;
+    private EndnoteImporter importer;
 
     @Before
     public void setUp() {

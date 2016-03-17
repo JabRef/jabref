@@ -90,12 +90,12 @@ public class SearchResultsDialog {
     private final JabRefFrame frame;
 
     private JDialog diag;
-    private final String[] fields = new String[] {
+    private static final String[] FIELDS = new String[] {
             "author", "title", "year", "journal"
     };
-    private final static int FILE_COL = 0;
-    private final static int URL_COL = 1;
-    private final static int PAD = 2;
+    private static final int FILE_COL = 0;
+    private static final int URL_COL = 1;
+    private static final int PAD = 2;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -240,10 +240,10 @@ public class SearchResultsDialog {
 
         }
         // Remaining columns:
-        for (int i = PAD; i < (PAD + fields.length); i++) {
+        for (int i = PAD; i < (PAD + FIELDS.length); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            comparators.add(new FieldComparator(fields[i - PAD]));
+            comparators.add(new FieldComparator(FIELDS[i - PAD]));
         }
 
         sortedEntries.getReadWriteLock().writeLock().lock();
@@ -264,8 +264,8 @@ public class SearchResultsDialog {
             cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
-        for (int i = 0; i < fields.length; i++) {
-            int width = InternalBibtexFields.getFieldLength(fields[i]);
+        for (int i = 0; i < FIELDS.length; i++) {
+            int width = InternalBibtexFields.getFieldLength(FIELDS[i]);
             cm.getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -360,7 +360,8 @@ public class SearchResultsDialog {
                         }
                     });
                     break;
-
+                default:
+                    break;
                 }
             }
         }
@@ -421,13 +422,7 @@ public class SearchResultsDialog {
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.scrollRectToVisible(toRect);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -440,13 +435,13 @@ public class SearchResultsDialog {
 
         @Override
         public int getColumnCount() {
-            return PAD + fields.length;
+            return PAD + FIELDS.length;
         }
 
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return EntryUtil.capitalizeFirst(fields[column - PAD]);
+                return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else {
                 return "";
             }
@@ -462,10 +457,10 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            if(tmpModel.getEntry(0).type!=null) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
-                            } else {
+                            if (tmpModel.getEntry(0).type == null) {
                                 fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            } else {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
                             }
                         }
                         return fileLabel;
@@ -484,7 +479,7 @@ public class SearchResultsDialog {
                 }
             }
             else {
-                String field = fields[column - PAD];
+                String field = FIELDS[column - PAD];
                 if ("author".equals(field) || "editor".equals(field)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:

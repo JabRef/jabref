@@ -45,7 +45,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.wizard.auximport.AuxCommandLine;
+import net.sf.jabref.cli.AuxCommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -160,7 +160,7 @@ public class JabRef {
                     Globals.prefs.clear();
                 } catch (BackingStoreException e) {
                     System.err.println(Localization.lang("Unable to clear preferences."));
-                    e.printStackTrace();
+                    LOGGER.error("Unable to clear preferences", e);
                 }
             } else {
                 String[] keys = value.split(",");
@@ -249,7 +249,7 @@ public class JabRef {
                 BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
-                if ((newBase != null) && (newBase.getEntryCount() > 0)) {
+                if ((newBase != null) && (!newBase.hasNoEntries())) {
                     String formatName;
 
                     //read in the export format, take default format if no format entered
@@ -262,9 +262,8 @@ public class JabRef {
                         formatName = "tablerefsabsbib";
                         break;
                     default:
-                        System.err.println(
-                                Localization.lang("Output file missing").concat(". \n \t ").concat("Usage").concat(": ")
-                                        + JabRefCLI.getExportMatchesSyntax());
+                        System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                                .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
                         return Optional.empty();
                     } //end switch
 
@@ -396,37 +395,33 @@ public class JabRef {
                     boolean notSavedMsg = false;
 
                     // write an output, if something could be resolved
-                    if (newBase != null) {
-                        if (newBase.getEntryCount() > 0) {
-                            String subName = StringUtil.getCorrectFileName(data[1], "bib");
+                    if ((newBase != null) && !newBase.hasNoEntries()) {
+                        String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
-                            try {
-                                System.out.println(Localization.lang("Saving") + ": " + subName);
-                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                                Defaults defaults = new Defaults(BibDatabaseMode
-                                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                                SaveSession session = databaseWriter.saveDatabase(
-                                        new BibDatabaseContext(newBase, defaults), prefs);
+                        try {
+                            System.out.println(Localization.lang("Saving") + ": " + subName);
+                            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                            Defaults defaults = new Defaults(BibDatabaseMode
+                                    .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                            SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
+                                    prefs);
 
-
-                                // Show just a warning message if encoding didn't work for all characters:
-                                if (!session.getWriter().couldEncodeAll()) {
-                                    System.err.println(Localization.lang("Warning") + ": "
-                                            + Localization.lang(
-                                            "The chosen encoding '%0' could not encode the following characters:",
-                                            session.getEncoding().displayName())
-                                            + " "
-                                            + session.getWriter().getProblemCharacters());
-                                }
-                                session.commit(new File(subName));
-                            } catch (SaveException ex) {
-                                System.err.println(Localization.lang("Could not save file.") + "\n"
-                                        + ex.getLocalizedMessage());
+                            // Show just a warning message if encoding didn't work for all characters:
+                            if (!session.getWriter().couldEncodeAll()) {
+                                System.err.println(Localization.lang("Warning") + ": "
+                                        + Localization.lang(
+                                                "The chosen encoding '%0' could not encode the following characters:",
+                                                session.getEncoding().displayName())
+                                        + " " + session.getWriter().getProblemCharacters());
                             }
-
-                            notSavedMsg = true;
+                            session.commit(new File(subName));
+                        } catch (SaveException ex) {
+                            System.err.println(
+                                    Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                         }
+
+                        notSavedMsg = true;
                     }
 
                     if (!notSavedMsg) {
@@ -502,7 +497,7 @@ public class JabRef {
         EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
         EntryFetcher fetcher = null;
         for (EntryFetcher e : fetchers.getEntryFetchers()) {
-            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replaceAll("Fetcher", ""))) {
+            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replace("Fetcher", ""))) {
                 fetcher = e;
             }
         }
@@ -512,7 +507,8 @@ public class JabRef {
             System.out.println(Localization.lang("The following fetchers are available:"));
 
             for (EntryFetcher e : fetchers.getEntryFetchers()) {
-                System.out.println("  " + e.getClass().getSimpleName().replaceAll("Fetcher", "").toLowerCase());
+                System.out.println(
+                        "  " + e.getClass().getSimpleName().replace("Fetcher", "").toLowerCase(Locale.ENGLISH));
             }
             return Optional.empty();
         }
@@ -817,7 +813,7 @@ public class JabRef {
             pr.setFile(file);
             pr.setInvalid(true);
             pr.setErrorMessage(ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.info("Problem opening .bib-file", ex);
             return pr;
         }
 
@@ -834,7 +830,7 @@ public class JabRef {
                         entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
                     } else {
                         entries = Globals.importFormatReader.importFromFile(data[1],
-                                data[0].replaceAll("~", System.getProperty("user.home")), JabRef.jrf);
+                                data[0].replace("~", System.getProperty("user.home")), JabRef.jrf);
                     }
                     return Optional.of(new ParserResult(entries));
                 } catch (IllegalArgumentException ex) {
@@ -850,7 +846,7 @@ public class JabRef {
                     importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
                 } else {
                     importResult = Globals.importFormatReader
-                            .importUnknownFormat(data[0].replaceAll("~", System.getProperty("user.home")));
+                            .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
                 }
 
                 if (importResult == null) {

@@ -129,6 +129,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     @Override
     public String getTitle() {
         return "ISBN to BibTeX";
+
     }
 
     @Override

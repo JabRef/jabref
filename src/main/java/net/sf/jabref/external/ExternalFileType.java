@@ -219,11 +219,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
         if (object instanceof ExternalFileType) {
             ExternalFileType other = (ExternalFileType) object;
-            return (name == null ? other.name == null : name.equals(other.name))
-                    && (extension == null ? other.extension == null : extension.equals(other.extension))
-                    && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
-                    && (openWith == null ? other.openWith == null : openWith.equals(other.openWith))
-                    && (iconName == null ? other.iconName == null : iconName.equals(other.iconName));
+            return Objects.equals(name, other.name) && Objects.equals(extension, other.extension) &&
+                    Objects.equals(mimeType, other.mimeType) && Objects.equals(openWith, other.openWith) && Objects.equals(iconName,  other.iconName);
         }
         return false;
     }

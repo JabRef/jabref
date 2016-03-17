@@ -77,9 +77,7 @@ public class FileUtil {
             stackList.add(stack);
         }
 
-        String[] arr = new String[paths.size()];
-        Arrays.fill(arr, "");
-        List<String> pathSubstrings = Arrays.asList(arr);
+        List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
         // compute shortest folder substrings
         while (!stackList.stream().allMatch(Vector::isEmpty)) {
@@ -208,7 +206,7 @@ public class FileUtil {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
      */
-    public static Optional<File> expandFilename(String filename, String dir) {
+    private static Optional<File> expandFilename(String filename, String dir) {
 
         if ((filename == null) || filename.isEmpty()) {
             return Optional.empty();

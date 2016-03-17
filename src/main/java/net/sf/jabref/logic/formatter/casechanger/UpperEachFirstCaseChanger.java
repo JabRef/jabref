@@ -26,4 +26,10 @@ public class UpperEachFirstCaseChanger implements Formatter {
 
         return title.toString();
     }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang(
+                "Converts the first character of each word in %s to upper case (and all others to lower case), but does not change words starting with \"{\".");
+    }
 }

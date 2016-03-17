@@ -42,7 +42,7 @@ public class AbbreviateAction extends AbstractWorker {
 
     @Override
     public void init() {
-        panel.output("Abbreviating...");
+        panel.output(Localization.lang("Abbreviating..."));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AbbreviateAction extends AbstractWorker {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(), iso);
 
-        NamedCompound ce = new NamedCompound("Abbreviate journal names");
+        NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
             if (undoableAbbreviator.abbreviate(panel.database(), entry, "journal", ce)) {

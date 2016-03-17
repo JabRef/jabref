@@ -253,7 +253,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
-        String[] lines = s.replaceAll("\r", "").split("\n");
+        String[] lines = s.replace("\r", "").split("\n");
         List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
@@ -326,8 +326,8 @@ public class EntryTableTransferHandler extends TransferHandler {
             @Override
             public void run() {
                 final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
-                if (importRes.noPdfFiles.length > 0) {
-                    loadOrImportFiles(importRes.noPdfFiles, dropRow);
+                if (!importRes.getNoPdfFiles().isEmpty()) {
+                    loadOrImportFiles(importRes.getNoPdfFiles(), dropRow);
                 }
             }
         });
@@ -342,7 +342,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @param fileNames The names of the files to open.
      * @param dropRow success status for the operation
      */
-    private void loadOrImportFiles(String[] fileNames, int dropRow) {
+    private void loadOrImportFiles(List<String> fileNames, int dropRow) {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
         List<String> notBibFiles = new ArrayList<>();

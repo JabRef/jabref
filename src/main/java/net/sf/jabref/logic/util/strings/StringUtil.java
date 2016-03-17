@@ -411,12 +411,35 @@ public class StringUtil {
         return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
 
+    /**
+     * Checks if the given String has exactly one pair of surrounding curly braces <br>
+     * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     * @param toCheck The string to check
+     * @return True, if the check was succesful. False otherwise.
+     */
     public static boolean isInCurlyBrackets(String toCheck) {
+        int count = 0;
+        int brackets = 0;
         if ((toCheck == null) || toCheck.isEmpty()) {
-            return false; // In case of null or empty string
+            return false;
         } else {
-            return (toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}');
+            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
+                for (char c : toCheck.toCharArray()) {
+                    if (c == '{') {
+                        if (brackets == 0) {
+                            count++;
+                        }
+                        brackets++;
+                    } else if (c == '}') {
+                        brackets--;
+                    }
+                }
+
+                return count == 1;
+            }
+            return false;
         }
+
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
@@ -501,8 +524,7 @@ public class StringUtil {
      * @param  delimstr  Delimiter string
      * @return list      {@link java.util.List} of <tt>String</tt>
      */
-    public static List<String> tokenizeToList(String buf, String delimstr)
-    {
+    public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
         String buffer = buf + '\n';
 

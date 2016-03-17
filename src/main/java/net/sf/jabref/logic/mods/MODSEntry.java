@@ -175,7 +175,7 @@ class MODSEntry {
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
         bibtex.getFieldOptional("year").ifPresent(result::append);
-        bibtex.getFieldOptional("month").ifPresent(month -> result.append('-').append(month));
+        bibtex.getFieldOptional("month").ifPresent(result.append('-')::append);
         return result.toString();
     }
 
@@ -299,8 +299,7 @@ class MODSEntry {
                 mods.appendChild(extension);
             }
             return mods;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             LOGGER.warn("Exception caught...", e);
             throw new Error(e);
         }

@@ -205,7 +205,7 @@ class ManageJournalsPanel extends JPanel {
             }
         });
 
-        AbstractAction cancelAction = new AbstractAction() {
+        Action cancelAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

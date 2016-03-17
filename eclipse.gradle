@@ -19,6 +19,11 @@ tasks.cleanEclipse.doLast {
     delete("${project.projectDir}/.settings/org.eclipse.jdt.ui.prefs")
 }
 
+// Currently, the eclipse task is not intelligent enough to replace generated lines:
+// It just adds the lines.
+// To avoid broken configurations, the existing configuration is deleted completely.
+tasks.eclipse.dependsOn(cleanEclipse)
+
 tasks.eclipse.doFirst {
     File jdt_core_prefs = file("${project.projectDir}/.settings/org.eclipse.jdt.core.prefs")
     // existence check doesn't work as gradle generates the file on its own

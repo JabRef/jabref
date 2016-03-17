@@ -172,8 +172,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
     }
 
-    private boolean validateIntegerField(String fieldName, String fieldValue, String errorTitle)
-    {
+    private boolean validateIntegerField(String fieldName, String fieldValue, String errorTitle) {
         try {
             // Test if the field value is a number:
             Integer.parseInt(fieldValue);

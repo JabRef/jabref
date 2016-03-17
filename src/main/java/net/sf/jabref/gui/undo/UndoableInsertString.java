@@ -17,6 +17,9 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.logic.l10n.Localization;
@@ -24,6 +27,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibtexString;
 
 public class UndoableInsertString extends AbstractUndoableEdit {
+
+    private static final Log LOGGER = LogFactory.getLog(UndoableInsertString.class);
 
     private final BibDatabase base;
     private final BasePanel panel;
@@ -66,7 +71,7 @@ public class UndoableInsertString extends AbstractUndoableEdit {
         try {
             base.addString(string);
         } catch (KeyCollisionException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem to redo `insert entry`", ex);
         }
 
         panel.updateStringDialog();

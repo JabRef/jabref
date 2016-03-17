@@ -79,7 +79,7 @@ public final class Word {
 
     public boolean isSmallerWord() {
         // "word:" is still a small "word"
-        return SMALLER_WORDS.contains(this.toString().replaceAll("[:]", "").toLowerCase());
+        return SMALLER_WORDS.contains(this.toString().replace(":", "").toLowerCase());
     }
 
     public boolean isLargerWord() {

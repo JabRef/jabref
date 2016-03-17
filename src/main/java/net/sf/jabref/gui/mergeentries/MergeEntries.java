@@ -157,7 +157,7 @@ public class MergeEntries {
         mainPanel.add(label, cc.xyw(4, 1, 7, "center, bottom"));
 
         // Set headings
-        JLabel headingLabels[] = new JLabel[6];
+        JLabel[] headingLabels = new JLabel[6];
         for (int i = 0; i < 6; i++) {
             headingLabels[i] = new JLabel(columnHeadings[i]);
             font = headingLabels[i].getFont();
@@ -201,7 +201,7 @@ public class MergeEntries {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
         int maxLabelWidth = -1;
-        int tmpLabelWidth = 0;
+        int tmpLabelWidth;
         for (String field : joint) {
             jointStrings[row - 2] = field;
             label = new JLabel(CaseChangers.UPPER_FIRST.format(field));
@@ -290,7 +290,7 @@ public class MergeEntries {
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
 
         // Synchronize column widths
-        String rbAlign[] = {"right", "center", "left"};
+        String[] rbAlign = {"right", "center", "left"};
         mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
         Integer maxRBWidth = -1;
         Integer tmpRBWidth;
@@ -352,12 +352,7 @@ public class MergeEntries {
 
         // Show what we've got
         mainPanel.setVisible(true);
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollPane.getVerticalScrollBar().setValue(0);
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
     }
 
     /**

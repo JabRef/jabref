@@ -136,7 +136,7 @@ public class INSPIREFetcher implements EntryFetcher {
      */
     @Override
     public String getHelpPage() {
-        return "Spires";
+        return "INSPIRE";
     }
 
     @Override
@@ -147,7 +147,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Fetch INSPIRE");
+        return "INSPIRE";
     }
 
     @Override
@@ -161,11 +161,11 @@ public class INSPIREFetcher implements EntryFetcher {
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
         try {
-            frame.setStatus("Fetching entries from Inspire");
+            frame.setStatus(Localization.lang("Fetching entries from Inspire"));
             /* query the archive and load the results into the BibEntry */
             BibDatabase bd = importInspireEntries(query, frame);
 
-            frame.setStatus("Adding fetched entries");
+            frame.setStatus(Localization.lang("Adding fetched entries"));
             /* add the entry to the inspection dialog */
             if (bd == null) {
                 LOGGER.warn("Error while fetching from Inspire");
@@ -174,7 +174,7 @@ public class INSPIREFetcher implements EntryFetcher {
             }
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
+            frame.showMessage(Localization.lang("Error while fetching from %0", "Inspire") + ": " + e.getMessage());
             LOGGER.warn("Error while fetching from Inspire", e);
         }
         return true;

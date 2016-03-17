@@ -5,7 +5,6 @@
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Coverity Status](https://badges.ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)](https://ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)
 [![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=jabrefmail%40gmail.com)
-[![Download JabRef](https://img.shields.io/sourceforge/dw/jabref.svg)](http://sourceforge.net/projects/jabref/files/)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/327430c894e04086a5bfef618fa44f36)](https://www.codacy.com/app/simonharrer/jabref)
@@ -72,13 +71,9 @@ Try to double click the `jar` file or execute the following command:
 
 ## Documentation
 
-JabRef comes with an online help function, accessed by pressing `F1` or
-clicking on a question mark icon. The help files are probably not
-exhaustive enough to satisfy everyone yet, but they should help sort
-out the most important issues about using the program. The help files
-can also be viewed outside the program with a standard HTML browser.
-If you choose languages other than English, some or all help pages may
-appear in your chosen languages.
+JabRef comes with an [online help](http://help.jabref.org/), accessed by pressing `F1` or clicking on a question mark icon.
+The help is are probably not exhaustive enough to satisfy everyone yet, but it should help sort out the most important issues about using the program. 
+If you choose languages other than English, some or all help pages may appear in your chosen languages.
 
 
 ## Building JabRef From Source

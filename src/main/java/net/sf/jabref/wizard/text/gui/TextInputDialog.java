@@ -518,9 +518,7 @@ public class TextInputDialog extends JDialog implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, null,
-                        ".txt",
-                        JFileChooser.OPEN_DIALOG, false);
+                String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
                     doc.remove(0, doc.getLength());

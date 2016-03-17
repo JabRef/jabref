@@ -18,6 +18,13 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class FormatterTest {
 
+    public Formatter formatter;
+
+
+    public FormatterTest(Formatter formatter) {
+        this.formatter = formatter;
+    }
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -58,10 +65,9 @@ public class FormatterTest {
         assertNotNull(formatter.format("string"));
     }
 
-    public Formatter formatter;
-
-    public FormatterTest(Formatter formatter) {
-        this.formatter = formatter;
+    @Test
+    public void getDescriptionAlwaysNonEmpty() {
+        assertFalse(formatter.getDescription().isEmpty());
     }
 
     @Parameterized.Parameters(name = "{index}: {0}")
@@ -80,11 +86,12 @@ public class FormatterTest {
                 new Object[]{new CaseKeeper()},
                 new Object[]{new PageNumbersFormatter()},
                 new Object[]{new LowerCaseChanger()},
-                new Object[]{new TrimFormatter()},
                 new Object[]{new HTMLToLatexFormatter()},
                 new Object[]{new SuperscriptFormatter()},
                 new Object[]{new UnitFormatter()},
-                new Object[]{new RemoveBracesFormatter()}
+                new Object[]{new RemoveBracesFormatter()},
+                new Object[]{new UnicodeToLatexFormatter()},
+                new Object[]{new EraseFormatter()}
         );
     }
 }

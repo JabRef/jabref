@@ -15,10 +15,10 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 Id:      material-design-icons.font
 Project: Material Design Icons
-Version: v1.3.41
+Version: v1.5.54
 URL:     https://materialdesignicons.com/
 License: SIL Open Font License, Version 1.1
-Note:    Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
+Note:    It is important to include v1.5.54 or later as v1.5.54 is the first version offering fixed code points. Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
 
 # Libraries

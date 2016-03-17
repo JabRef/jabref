@@ -79,6 +79,8 @@ class SearchWorker extends AbstractWorker {
             basePanel.stopShowingFloatSearch();
             basePanel.getFilterSearchToggle().start();
             break;
+        default:
+            break;
         }
 
         // select first match (i.e., row) if there is any

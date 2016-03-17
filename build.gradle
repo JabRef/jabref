@@ -54,7 +54,7 @@ install4j {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.11'
+    gradleVersion = '2.12'
 }
 
 
@@ -65,6 +65,9 @@ repositories {
 configurations {
     antlr3
     antlr4
+	
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -111,6 +114,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'com.github.tomakehurst:wiremock:1.58'
+	testCompile 'org.assertj:assertj-swing-junit:3.0.2'
 }
 
 sourceSets {
@@ -118,6 +122,14 @@ sourceSets {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
         }
+    }	
+	integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/java')
+        }
+        resources.srcDir file('src/integrationTest/resources')
     }
 }
 
@@ -205,6 +217,19 @@ javadoc {
 test {
     testLogging {
         exceptionFormat "full" // default is "short"
+    }
+}
+
+  
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+    jacoco {
+        append = true
     }
 }
 

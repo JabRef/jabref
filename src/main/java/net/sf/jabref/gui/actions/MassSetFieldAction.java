@@ -62,7 +62,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
 
     public MassSetFieldAction(JabRefFrame frame) {
-        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields"));
+        putValue(Action.NAME, Localization.menuTitle("Set/clear/rename fields") + "...");
         this.frame = frame;
     }
 
@@ -153,7 +153,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             diag.dispose();
         });
 
-        AbstractAction cancelAction = new AbstractAction() {
+        Action cancelAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -219,9 +219,10 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {
-                // TODO: message: can only rename a single field
-            }
-            else {
+                JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"), "",
+                        JOptionPane.ERROR_MESSAGE);
+                return; // Do not close the dialog.
+            } else {
                 ce.addEdit(MassSetFieldAction.massRenameField(entryList, fields[0], renameTo.getText(),
                         overwrite.isSelected()));
             }
