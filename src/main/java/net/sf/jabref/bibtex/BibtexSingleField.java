@@ -3,20 +3,22 @@ package net.sf.jabref.bibtex;
 import java.util.EnumSet;
 import java.util.Set;
 
-import net.sf.jabref.gui.GUIGlobals;
-
-// --------------------------------------------------------------------------
-// a container class for all properties of a bibtex-field
-// --------------------------------------------------------------------------
+/**
+ *
+ * Class for keeping properties of a single BibTeX/BibLatex field
+ *
+ */
 public class BibtexSingleField {
 
-    // some fieldname constants
+    // some field constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;
     public static final double MAX_FIELD_WEIGHT = 2;
 
     public static final double SMALL_W = 0.30;
     public static final double MEDIUM_W = 0.5;
     public static final double LARGE_W = 1.5;
+
+    public static final int DEFAULT_FIELD_LENGTH = 100;
 
 
     private enum Flag {
@@ -32,9 +34,9 @@ public class BibtexSingleField {
 
     // contains the standard, private, displayable, writable infos
     // default is: not standard, public, displayable and writable
-    private final Set<Flag> flag = EnumSet.of(Flag.DISPLAYABLE, Flag.WRITEABLE);
+    private final Set<Flag> flags = EnumSet.of(Flag.DISPLAYABLE, Flag.WRITEABLE);
 
-    private int length = GUIGlobals.DEFAULT_FIELD_LENGTH;
+    private int length = DEFAULT_FIELD_LENGTH;
     private double weight = DEFAULT_FIELD_WEIGHT;
 
     // the extras data
@@ -45,11 +47,6 @@ public class BibtexSingleField {
     // a comma separated list of alternative bibtex-fieldnames, e.g.
     // "LCCN" is the same like "lib-congress"
     // private String otherNames = null ;
-
-
-    // a Hashmap for a lot of additional "not standard" properties
-    // todo: add the handling in a key=value manner
-    // private HashMap props = new HashMap() ;
 
     public BibtexSingleField(String fieldName, boolean pStandard) {
         name = fieldName;
@@ -75,9 +72,6 @@ public class BibtexSingleField {
         length = pLength;
     }
 
-    // -----------------------------------------------------------------------
-    // -----------------------------------------------------------------------
-
     /**
      * Sets or onsets the given flag
      * @param setToOn if true, set the flag; if false, unset the flat
@@ -86,24 +80,23 @@ public class BibtexSingleField {
     private void setFlag(boolean setToOn, Flag flagID) {
         if (setToOn) {
             // set the flag
-            flag.add(flagID);
+            flags.add(flagID);
         } else {
             // unset the flag
-            flag.remove(flagID);
+            flags.remove(flagID);
         }
     }
 
-    // -----------------------------------------------------------------------
     public boolean isStandard() {
-        return flag.contains(Flag.STANDARD);
+        return flags.contains(Flag.STANDARD);
     }
 
     public void setPrivate() {
-        flag.add(Flag.PRIVATE);
+        flags.add(Flag.PRIVATE);
     }
 
     public boolean isPrivate() {
-        return flag.contains(Flag.PRIVATE);
+        return flags.contains(Flag.PRIVATE);
     }
 
     public void setDisplayable(boolean value) {
@@ -111,7 +104,7 @@ public class BibtexSingleField {
     }
 
     public boolean isDisplayable() {
-        return flag.contains(Flag.DISPLAYABLE);
+        return flags.contains(Flag.DISPLAYABLE);
     }
 
     public void setWriteable(boolean value) {
@@ -119,10 +112,8 @@ public class BibtexSingleField {
     }
 
     public boolean isWriteable() {
-        return flag.contains(Flag.WRITEABLE);
+        return flags.contains(Flag.WRITEABLE);
     }
-
-    // -----------------------------------------------------------------------
 
     public void setExtras(Set<BibtexSingleFieldProperties> pExtras) {
         extras = pExtras;
@@ -133,8 +124,6 @@ public class BibtexSingleField {
     public Set<BibtexSingleFieldProperties> getExtras() {
         return extras;
     }
-
-    // -----------------------------------------------------------------------
 
     public void setWeight(double value) {
         this.weight = value;
@@ -150,8 +139,6 @@ public class BibtexSingleField {
     public int getLength() {
         return this.length;
     }
-
-    // -----------------------------------------------------------------------
 
     public String getFieldName() {
         return name;

@@ -31,12 +31,14 @@
 package net.sf.jabref.gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
@@ -67,7 +69,7 @@ public class InternalBibtexFields {
     private final Map<String, BibtexSingleField> fieldSet;
 
     // contains all known (and public) bibtex fieldnames
-    private final String[] PUBLIC_FIELDS;
+    private final List<String> PUBLIC_FIELDS = new ArrayList<>();
 
 
     private InternalBibtexFields() {
@@ -243,18 +245,16 @@ public class InternalBibtexFields {
         }
 
         // collect all public fields for the PUBLIC_FIELDS array
-        List<String> pFields = new ArrayList<>(fieldSet.size());
         for (BibtexSingleField sField : fieldSet.values()) {
             if (!sField.isPrivate()) {
-                pFields.add(sField.getFieldName());
+                PUBLIC_FIELDS.add(sField.getFieldName());
                 // or export the complete BibtexSingleField ?
                 // BibtexSingleField.toString() { return fieldname ; }
             }
         }
 
-        PUBLIC_FIELDS = pFields.toArray(new String[pFields.size()]);
         // sort the entries
-        Arrays.sort(PUBLIC_FIELDS);
+        Collections.sort(PUBLIC_FIELDS);
     }
 
     /**
@@ -299,53 +299,53 @@ public class InternalBibtexFields {
     // --------------------------------------------------------------------------
     //  the "static area"
     // --------------------------------------------------------------------------
-    private static BibtexSingleField getField(String name) {
+    private static Optional<BibtexSingleField> getField(String name) {
         if (name != null) {
-            return InternalBibtexFields.RUNTIME.fieldSet.get(name.toLowerCase());
+            return Optional.ofNullable(InternalBibtexFields.RUNTIME.fieldSet.get(name.toLowerCase(Locale.ENGLISH)));
         }
 
-        return null;
+        return Optional.empty();
     }
 
     public static Set<BibtexSingleFieldProperties> getFieldExtras(String name) {
-        BibtexSingleField sField = InternalBibtexFields.getField(name);
-        if (sField != null) {
-            return sField.getExtras();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(name);
+        if (sField.isPresent()) {
+            return sField.get().getExtras();
         }
         return EnumSet.noneOf(BibtexSingleFieldProperties.class);
     }
 
     public static double getFieldWeight(String name) {
-        BibtexSingleField sField = InternalBibtexFields.getField(name);
-        if (sField != null) {
-            return sField.getWeight();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(name);
+        if (sField.isPresent()) {
+            return sField.get().getWeight();
         }
         return BibtexSingleField.DEFAULT_FIELD_WEIGHT;
     }
 
     public static void setFieldWeight(String fieldName, double weight) {
-        BibtexSingleField sField = InternalBibtexFields.getField(fieldName);
-        if (sField != null) {
-            sField.setWeight(weight);
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(fieldName);
+        if (sField.isPresent()) {
+            sField.get().setWeight(weight);
         }
     }
 
     public static int getFieldLength(String name) {
-        BibtexSingleField sField = InternalBibtexFields.getField(name);
-        if (sField != null) {
-            return sField.getLength();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(name);
+        if (sField.isPresent()) {
+            return sField.get().getLength();
         }
-        return GUIGlobals.DEFAULT_FIELD_LENGTH;
+        return BibtexSingleField.DEFAULT_FIELD_LENGTH;
     }
 
     public static boolean isWriteableField(String field) {
-        BibtexSingleField sField = InternalBibtexFields.getField(field);
-        return (sField == null) || sField.isWriteable();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
+        return !sField.isPresent() || sField.get().isWriteable();
     }
 
     public static boolean isDisplayableField(String field) {
-        BibtexSingleField sField = InternalBibtexFields.getField(field);
-        return (sField == null) || sField.isDisplayable();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
+        return !sField.isPresent() || sField.get().isDisplayable();
     }
 
     /**
@@ -355,20 +355,20 @@ public class InternalBibtexFields {
      * @return a <code>boolean</code> value
      */
     public static boolean isStandardField(String field) {
-        BibtexSingleField sField = InternalBibtexFields.getField(field);
-        return (sField != null) && sField.isStandard();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
+        return sField.isPresent() && sField.get().isStandard();
     }
 
     public static boolean isNumeric(String field) {
-        BibtexSingleField sField = InternalBibtexFields.getField(field);
-        return (sField != null) && sField.isNumeric();
+        Optional<BibtexSingleField> sField = InternalBibtexFields.getField(field);
+        return sField.isPresent() && sField.get().isNumeric();
     }
 
     /**
      * returns a List with all fieldnames
      */
     public static List<String> getAllFieldNames() {
-        return Arrays.asList(InternalBibtexFields.RUNTIME.PUBLIC_FIELDS);
+        return new ArrayList<>(InternalBibtexFields.RUNTIME.PUBLIC_FIELDS);
     }
 
     /**
@@ -389,14 +389,14 @@ public class InternalBibtexFields {
      * returns the fieldname of the entry at index t
      */
     public static String getFieldName(int t) {
-        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS[t];
+        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS.get(t);
     }
 
     /**
      * returns the number of available fields
      */
     public static int numberOfPublicFields() {
-        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS.length;
+        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS.size();
     }
 
 

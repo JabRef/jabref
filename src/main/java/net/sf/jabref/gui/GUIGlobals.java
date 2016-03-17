@@ -105,7 +105,6 @@ public class GUIGlobals {
     public static final int INDENT = 4;
     public static final int LINE_LENGTH = 65; // Maximum
 
-    public static final int DEFAULT_FIELD_LENGTH = 100;
     public static final int NUMBER_COL_LENGTH = 32;
 
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
