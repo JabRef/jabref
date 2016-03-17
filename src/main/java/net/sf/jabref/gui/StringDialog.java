@@ -97,7 +97,7 @@ class StringDialog extends JDialog {
 
         StringTableModel stm = new StringTableModel(this, base);
         table = new StringTable(stm);
-        if (base.getStringCount() > 0) {
+        if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
 
@@ -445,7 +445,7 @@ class StringDialog extends JDialog {
                     panel.undoManager.addEdit(ce);
 
                     refreshTable();
-                    if (base.getStringCount() > 0) {
+                    if (!base.hasNoStrings()) {
                         table.setRowSelectionInterval(0, 0);
                     }
                 }

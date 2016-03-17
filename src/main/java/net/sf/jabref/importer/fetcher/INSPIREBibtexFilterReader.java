@@ -45,9 +45,9 @@ class INSPIREBibtexFilterReader extends FilterReader {
 
     private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
 
-    INSPIREBibtexFilterReader(final Reader _in) {
-        super(_in);
-        inReader = new BufferedReader(_in);
+    INSPIREBibtexFilterReader(final Reader initialReader) {
+        super(initialReader);
+        inReader = new BufferedReader(initialReader);
         pos = -1;
         pre = false;
     }

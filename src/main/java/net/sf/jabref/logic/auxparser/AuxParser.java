@@ -131,7 +131,7 @@ public class AuxParser {
         }
 
         // Copy database definitions
-        if (result.getGeneratedBibDatabase().getEntryCount() > 0) {
+        if (!result.getGeneratedBibDatabase().hasNoEntries()) {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
             result.getGeneratedBibDatabase().copyStrings(masterDatabase);
         }

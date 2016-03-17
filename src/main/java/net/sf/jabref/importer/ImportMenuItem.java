@@ -215,7 +215,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
-                        || (pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0);
+                        || (!pr.getDatabase().hasNoEntries()) || (!pr.getDatabase().hasNoStrings());
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {

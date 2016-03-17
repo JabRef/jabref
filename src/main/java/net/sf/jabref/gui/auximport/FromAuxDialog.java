@@ -229,7 +229,7 @@ public class FromAuxDialog extends JDialog {
             generateButton.setEnabled(true);
 
             // the generated database contains no entries -> no active generate-button
-            if (result.getGeneratedBibDatabase().isEmpty()) {
+            if (result.getGeneratedBibDatabase().hasNoEntries()) {
                 statusInfos.append("\n" + Localization.lang("empty database"));
                 generateButton.setEnabled(false);
             }

@@ -83,8 +83,8 @@ public class BibDatabase {
     /**
      * Checks if the database contains no entries.
      */
-    public boolean isEmpty() {
-        return entries.size() == 0;
+    public boolean hasNoEntries() {
+        return entries.isEmpty();
     }
 
     /**
@@ -281,6 +281,13 @@ public class BibDatabase {
      */
     public int getStringCount() {
         return bibtexStrings.size();
+    }
+
+    /**
+     * Check if there are strings.
+     */
+    public boolean hasNoStrings() {
+        return bibtexStrings.isEmpty();
     }
 
     /**

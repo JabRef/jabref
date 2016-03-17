@@ -57,8 +57,9 @@ public class IntegrityCheck {
         return result;
     }
 
-    public interface Checker {
 
+    @FunctionalInterface
+    public interface Checker {
         List<IntegrityMessage> check(BibEntry entry);
     }
 

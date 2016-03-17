@@ -171,13 +171,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openTheFile(theFile, raisePanel);
-                    }
+            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+                for (File theFile : theFiles) {
+                    openTheFile(theFile, raisePanel);
                 }
             });
             for (File theFile : theFiles) {

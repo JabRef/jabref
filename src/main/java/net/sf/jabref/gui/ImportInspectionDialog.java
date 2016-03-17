@@ -1151,18 +1151,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, metaData, new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (e.getID() > 0) {
-                        entries.getReadWriteLock().writeLock().lock();
-                        entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
-                        entries.getReadWriteLock().writeLock().unlock();
-                        glTable.repaint();
-                    }
-                }
-            }, diag));
+            JabRefExecutorService.INSTANCE
+                    .execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, metaData, e -> {
+                        if (e.getID() > 0) {
+                            entries.getReadWriteLock().writeLock().lock();
+                            entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
+                            entries.getReadWriteLock().writeLock().unlock();
+                            glTable.repaint();
+                        }
+                    }, diag));
 
         }
     }

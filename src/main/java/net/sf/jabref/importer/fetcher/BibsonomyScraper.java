@@ -55,7 +55,7 @@ class BibsonomyScraper {
             String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
-            if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
+            if ((pr != null) && (!pr.getDatabase().hasNoEntries())) {
                 return Optional.of(pr.getDatabase().getEntries().iterator().next());
             } else {
                 return Optional.empty();
