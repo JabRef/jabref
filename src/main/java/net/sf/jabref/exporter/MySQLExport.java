@@ -22,6 +22,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.DatabaseType;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -47,7 +48,7 @@ public class MySQLExport extends ExportFormat {
             final Charset encodingToUse, Set<String> keySet)
                     throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("MYSQL").get().exportDatabaseAsFile(database, metaData, keySet, file,
+        new DBExporterAndImporterFactory().getExporter(DatabaseType.MYSQL).exportDatabaseAsFile(database, metaData, keySet, file,
                 encodingToUse);
 
     }

@@ -27,6 +27,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Dialog box for collecting database connection strings from the user
@@ -34,6 +36,11 @@ import java.util.*;
  * @author pattonlk
  */
 public class DBConnectDialog extends JDialog {
+
+    private static List<String> FORMATTED_NAMES = Arrays
+            .stream(DatabaseType.values())
+            .map(DatabaseType::getFormattedName)
+            .collect(Collectors.toList());
 
     // input fields
     private final JComboBox<String> cmbServerType = new JComboBox<>();
@@ -95,12 +102,11 @@ public class DBConnectDialog extends JDialog {
         btnCancel.setText(Localization.lang("Cancel"));
 
         // init input fields to current DB strings
-        String srvSel = dbStrings.getDbPreferences().getServerType();
-        for (String aSrv : DatabaseType.SERVER_TYPES) {
+        for (String aSrv : FORMATTED_NAMES) {
             cmbServerType.addItem(aSrv);
         }
 
-        cmbServerType.setSelectedItem(srvSel);
+        cmbServerType.setSelectedItem(dbStrings.getDbPreferences().getServerType().getFormattedName());
         txtServerHostname.setText(dbStrings.getDbPreferences().getServerHostname());
         txtDatabase.setText(dbStrings.getDbPreferences().getDatabase());
         txtUsername.setText(dbStrings.getDbPreferences().getUsername());
@@ -138,22 +144,16 @@ public class DBConnectDialog extends JDialog {
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         pack();
 
-        ActionListener connectAction = new ActionListener() {
+        ActionListener connectAction = e -> {
+            Optional<String> errorMessage = checkInput();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                Optional<String> errorMessage = checkInput();
-
-                if (errorMessage.isPresent()) {
-                    JOptionPane.showMessageDialog(null, errorMessage.get(), Localization.lang("Input error"),
-                            JOptionPane.ERROR_MESSAGE);
-                } else {
-                    storeSettings();
-                    setVisible(false);
-                    setConnectToDB(true);
-                }
-
+            if (errorMessage.isPresent()) {
+                JOptionPane.showMessageDialog(null, errorMessage.get(), Localization.lang("Input error"),
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                storeSettings();
+                setVisible(false);
+                setConnectToDB(true);
             }
         };
 

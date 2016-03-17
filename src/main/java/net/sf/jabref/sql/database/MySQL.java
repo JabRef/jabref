@@ -3,6 +3,7 @@ package net.sf.jabref.sql.database;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.Database;
+import net.sf.jabref.sql.DatabaseType;
 import net.sf.jabref.sql.SQLUtil;
 
 import java.sql.Connection;
@@ -124,6 +125,11 @@ public class MySQL implements Database {
         conn.setCatalog(dbStrings.getDbPreferences().getDatabase());
 
         return conn;
+    }
+
+    @Override
+    public DatabaseType getType() {
+        return DatabaseType.MYSQL;
     }
 }
 

@@ -22,6 +22,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.DatabaseType;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -52,7 +53,7 @@ public class PostgreSQLExport extends ExportFormat {
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, Set<String> keySet) throws Exception {
 
-        new DBExporterAndImporterFactory().getExporter("POSTGRESQL").get().exportDatabaseAsFile(database, metaData, keySet,
+        new DBExporterAndImporterFactory().getExporter(DatabaseType.POSTGRESQL).exportDatabaseAsFile(database, metaData, keySet,
                 file, encoding);
 
     }

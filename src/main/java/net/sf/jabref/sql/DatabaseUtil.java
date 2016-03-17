@@ -8,8 +8,6 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.sql.DBImportExportDialog;
-import net.sf.jabref.sql.SQLUtil;
 
 public class DatabaseUtil {
 

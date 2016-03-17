@@ -77,6 +77,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.*;
+import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.gui.TextInputDialog;
 import org.apache.commons.logging.Log;
@@ -555,20 +556,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 frame.output(Localization.lang("Attempting SQL export..."));
                 final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                factory.getExporter(dbs.getDbPreferences().getServerType()).ifPresent(exporter -> {
-                    try {
-                        exporter.exportDatabaseToDBMS(database, bibDatabaseContext.getMetaData(), null, dbs, frame);
-                        dbs.isConfigValid(true);
-                    } catch (Exception ex) {
-                        final String preamble = Localization
-                                .lang("Could not export to SQL database for the following reason:");
-                        errorMessage = SQLUtil.getExceptionMessage(ex);
-                        LOGGER.info("Could not export to SQL database", ex);
-                        dbs.isConfigValid(false);
-                        JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                                Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-                    }
-                });
+                DatabaseExporter exporter = factory.getExporter(dbs.getDbPreferences().getServerType());
+
+                try {
+                    exporter.exportDatabaseToDBMS(database, bibDatabaseContext.getMetaData(), null, dbs, frame);
+                    dbs.isConfigValid(true);
+                } catch (Exception ex) {
+                    final String preamble = Localization
+                            .lang("Could not export to SQL database for the following reason:");
+                    errorMessage = SQLUtil.getExceptionMessage(ex);
+                    LOGGER.info("Could not export to SQL database", ex);
+                    dbs.isConfigValid(false);
+                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
+                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
+                }
 
                 bibDatabaseContext.getMetaData().setDBStrings(dbs);
             }
@@ -838,31 +839,31 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
 
         actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () ->
-                JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
-                    final List<BibEntry> bes = mainTable.getSelectedEntries();
-                    if (bes.size() != 1) {
-                        output(Localization.lang("No entries or multiple entries selected."));
-                        return;
-                    }
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                final List<BibEntry> bes = mainTable.getSelectedEntries();
+                if (bes.size() != 1) {
+                    output(Localization.lang("No entries or multiple entries selected."));
+                    return;
+                }
 
-                    final BibEntry entry = bes.get(0);
-                    if (!entry.hasField(Globals.FILE_FIELD)) {
-                        // no bibtex field
-                        new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                        return;
-                    }
-                    FileListTableModel tableModel = new FileListTableModel();
-                    tableModel.setContent(entry.getField(Globals.FILE_FIELD));
-                    if (tableModel.getRowCount() == 0) {
-                        // content in bibtex field is not readable
-                        new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                        return;
-                    }
-                    FileListEntry flEntry = tableModel.getEntry(0);
-                    ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                            flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
-                    item.openLink();
-                }));
+                final BibEntry entry = bes.get(0);
+                if (!entry.hasField(Globals.FILE_FIELD)) {
+                    // no bibtex field
+                    new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
+                    return;
+                }
+                FileListTableModel tableModel = new FileListTableModel();
+                tableModel.setContent(entry.getField(Globals.FILE_FIELD));
+                if (tableModel.getRowCount() == 0) {
+                    // content in bibtex field is not readable
+                    new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
+                    return;
+                }
+                FileListEntry flEntry = tableModel.getEntry(0);
+                ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
+                        flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
+                item.openLink();
+            }));
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
             JabRefExecutorService.INSTANCE.execute(() -> {

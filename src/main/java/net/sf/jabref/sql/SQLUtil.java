@@ -219,17 +219,16 @@ final public class SQLUtil {
      * @return the result of the statement
      */
     public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
-        if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
-            // case?
-            PrintStream fout = (PrintStream) out;
-            fout.println(query);
-            return fout;
-        }
-        if (out instanceof Connection) {
-            Connection conn = (Connection) out;
-            return SQLUtil.executeQueryWithResults(conn, query);
-        }
         return null;
+    }
+
+    public static AutoCloseable processQueryWithResults(Connection out, String query) throws SQLException {
+        return SQLUtil.executeQueryWithResults(out, query);
+    }
+
+    public static AutoCloseable processQueryWithResults(PrintStream out, String query) throws SQLException {
+        out.println(query);
+        return out;
     }
 
     /**
@@ -240,7 +239,7 @@ final public class SQLUtil {
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
         DBStringsPreferences preferences = dbStrings.getDbPreferences();
-        return "jdbc:" + preferences.getServerType().toLowerCase() + "://" + preferences.getServerHostname()
+        return "jdbc:" + preferences.getServerType().getFormattedName().toLowerCase() + "://" + preferences.getServerHostname()
                 + (withDBName ? '/' + preferences.getDatabase() : "") + dbStrings.getDbParameters();
     }
 

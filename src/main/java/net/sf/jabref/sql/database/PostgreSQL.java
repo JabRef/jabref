@@ -3,6 +3,7 @@ package net.sf.jabref.sql.database;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.Database;
+import net.sf.jabref.sql.DatabaseType;
 import net.sf.jabref.sql.SQLUtil;
 
 import java.sql.*;
@@ -130,6 +131,11 @@ public class PostgreSQL implements Database {
         createPLPGSQLFunction(conn);
 
         return conn;
+    }
+
+    @Override
+    public DatabaseType getType() {
+        return DatabaseType.POSTGRESQL;
     }
 
     private void createPLPGSQLFunction(Connection conn) throws SQLException {

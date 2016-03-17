@@ -19,54 +19,42 @@ import net.sf.jabref.sql.database.MySQL;
 import net.sf.jabref.sql.database.PostgreSQL;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.sql.importer.DatabaseImporter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import java.util.Optional;
+import java.util.Objects;
 
 public class DBExporterAndImporterFactory {
 
-    private static final Log LOGGER = LogFactory.getLog(DBExporterAndImporterFactory.class);
-
-    private static final DatabaseImporter MYSQL_IMPORTER = new DatabaseImporter(new MySQL());
-    private static final DatabaseImporter POSTGRESQL_IMPORTER = new DatabaseImporter(new PostgreSQL());
-
+    /**
+     * ensuring that only one is used in the system
+     */
     private static final DatabaseExporter MYSQL_EXPORTER = new DatabaseExporter(new MySQL());
+
+    /**
+     * ensuring that only one is used in the system
+     */
     private static final DatabaseExporter POSTGRESQL_EXPORTER = new DatabaseExporter(new PostgreSQL());
 
-    /**
-     * Returns a DatabaseExporter object according the type given as a String
-     *
-     * @param type The type of the DB as a String. (e.g. Postgresql, MySQL)
-     * @return The DatabaseExporter object instance
-     */
-    public Optional<DatabaseExporter> getExporter(String type) {
-        return DatabaseType.build(type).map(t -> {
-            if (t == DatabaseType.MYSQL) {
-                return MYSQL_EXPORTER;
-            } else if (t == DatabaseType.POSTGRESQL) {
+    public DatabaseExporter getExporter(DatabaseType type) {
+        Objects.requireNonNull(type);
+
+        switch (type) {
+            case POSTGRESQL:
                 return POSTGRESQL_EXPORTER;
-            } else {
-                return null;
-            }
-        });
+            case MYSQL:
+            default:
+                return MYSQL_EXPORTER;
+        }
     }
 
-    /**
-     * Returns a DatabaseImporter object according the type given as a String
-     *
-     * @param type The type of the DB as a String. (e.g. Postgresql, MySQL)
-     * @return The DatabaseImporter object instance
-     */
-    public Optional<DatabaseImporter> getImporter(String type) {
-        return DatabaseType.build(type).map(t -> {
-            if (t == DatabaseType.MYSQL) {
-                return MYSQL_IMPORTER;
-            } else if (t == DatabaseType.POSTGRESQL) {
-                return POSTGRESQL_IMPORTER;
-            } else {
-                return null;
-            }
-        });
+    public DatabaseImporter getImporter(DatabaseType type) {
+        Objects.requireNonNull(type);
+
+        switch (type) {
+            case POSTGRESQL:
+                return new DatabaseImporter(new PostgreSQL());
+            case MYSQL:
+            default:
+                return new DatabaseImporter(new MySQL());
+        }
     }
 }

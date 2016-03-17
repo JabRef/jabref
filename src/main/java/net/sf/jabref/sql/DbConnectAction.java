@@ -24,7 +24,6 @@ import net.sf.jabref.sql.exporter.DatabaseExporter;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
-import java.util.Optional;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:05:13 PM To
@@ -79,8 +78,8 @@ public class DbConnectAction implements BaseAction {
 
             panel.frame().output(
                     Localization.lang("Establishing SQL connection..."));
-            Optional<DatabaseExporter> exporter = new DBExporterAndImporterFactory().getExporter(dbs.getDbPreferences().getServerType());
-            try (Connection conn = exporter.get().connectToDB(dbs)) {
+            DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(dbs.getDbPreferences().getServerType());
+            try (Connection conn = exporter.connectToDB(dbs)) {
                 // Nothing
             }
             dbs.isConfigValid(true);
