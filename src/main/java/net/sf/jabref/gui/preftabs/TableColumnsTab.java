@@ -19,6 +19,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibtexSingleField;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.*;
@@ -91,14 +92,14 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         private int length;
 
 
-        public TableRow(String name) {
-            this.name = name;
-            length = GUIGlobals.DEFAULT_FIELD_LENGTH;
+        public TableRow() {
+            name = "";
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
         }
 
-        public TableRow(int length) {
-            this.length = length;
-            name = "";
+        public TableRow(String name) {
+            this.name = name;
+            length = BibtexSingleField.DEFAULT_FIELD_LENGTH;
         }
 
         public TableRow(String name, int length) {
@@ -206,7 +207,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if (col == 0) {
                     rowContent.setName(value.toString());
                     if ("".equals(getValueAt(row, 1))) {
-                        setValueAt(String.valueOf(GUIGlobals.DEFAULT_FIELD_LENGTH), row, 1);
+                        setValueAt(String.valueOf(BibtexSingleField.DEFAULT_FIELD_LENGTH), row, 1);
                     }
                 }
                 else {
@@ -490,7 +491,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             }
             for (int i = 0; i < rows.length; i++) {
                 if (((rows[i] + i) - 1) < tableRows.size()) {
-                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow(GUIGlobals.DEFAULT_FIELD_LENGTH));
+                    tableRows.add(Math.max(0, (rows[i] + i) - 1), new TableRow());
                 }
             }
             rowCount += rows.length;

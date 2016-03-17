@@ -47,6 +47,7 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
 import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.bibtex.BibtexSingleField;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
@@ -413,7 +414,7 @@ public class MainTable extends JTable {
                             cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
                         } catch (NumberFormatException e) {
                             LOGGER.info("Exception while setting column widths. Choosing default.", e);
-                            cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
+                            cm.getColumn(i).setPreferredWidth(BibtexSingleField.DEFAULT_FIELD_LENGTH);
                         }
                         break;
                     }
