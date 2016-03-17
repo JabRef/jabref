@@ -362,6 +362,7 @@ public class DownloadExternalFile {
      * Callback interface that users of this class must implement in order to receive
      * notification when download is complete.
      */
+    @FunctionalInterface
     public interface DownloadCallback {
         void downloadComplete(FileListEntry file);
     }

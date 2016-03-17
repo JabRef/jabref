@@ -102,22 +102,13 @@ public class SaveDatabaseAction extends AbstractWorker {
                             ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getBibDatabaseContext().getDatabaseFile());
                             JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                             if (scanner.changesFound()) {
-                                scanner.displayResult(new ChangeScanner.DisplayResultCallback() {
-
-                                    @Override
-                                    public void scanResultsResolved(boolean resolved) {
-                                        if (resolved) {
-                                            panel.setUpdatedExternally(false);
-                                            SwingUtilities.invokeLater(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    panel.getSidePaneManager().hide("fileUpdate");
-                                                }
-                                            });
-                                        } else {
-                                            cancelled = true;
-                                        }
+                                scanner.displayResult(resolved -> {
+                                    if (resolved) {
+                                        panel.setUpdatedExternally(false);
+                                        SwingUtilities.invokeLater(
+                                                (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                                    } else {
+                                        cancelled = true;
                                     }
                                 });
                             }

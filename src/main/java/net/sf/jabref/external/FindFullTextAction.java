@@ -19,7 +19,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.fetcher.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
@@ -77,19 +76,16 @@ public class FindFullTextAction extends AbstractWorker {
             // TODO: this needs its own thread as it blocks the UI!
             DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.getBibDatabaseContext().getMetaData(), bibtexKey);
             try {
-                def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
-                    @Override
-                    public void downloadComplete(FileListEntry file) {
-                        FileListTableModel tm = new FileListTableModel();
-                        String oldValue = entry.getField(Globals.FILE_FIELD);
-                        tm.setContent(oldValue);
-                        tm.addEntry(tm.getRowCount(), file);
-                        String newValue = tm.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                        entry.setField(Globals.FILE_FIELD, newValue);
-                        basePanel.undoManager.addEdit(edit);
-                        basePanel.markBaseChanged();
-                    }
+                def.download(result.get(), file -> {
+                    FileListTableModel tm = new FileListTableModel();
+                    String oldValue = entry.getField(Globals.FILE_FIELD);
+                    tm.setContent(oldValue);
+                    tm.addEntry(tm.getRowCount(), file);
+                    String newValue = tm.getStringRepresentation();
+                    UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
+                    entry.setField(Globals.FILE_FIELD, newValue);
+                    basePanel.undoManager.addEdit(edit);
+                    basePanel.markBaseChanged();
                 });
             } catch (IOException e) {
                 LOGGER.warn("Problem downloading file", e);

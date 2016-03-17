@@ -33,7 +33,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().isEmpty());
+            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
             assertEquals(0, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
@@ -57,7 +57,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().isEmpty());
+            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
             assertEquals(1, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
@@ -99,7 +99,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().isEmpty());
+            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
             assertEquals(0, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());

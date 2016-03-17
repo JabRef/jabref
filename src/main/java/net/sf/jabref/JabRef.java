@@ -249,7 +249,7 @@ public class JabRef {
                 BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
-                if ((newBase != null) && (newBase.getEntryCount() > 0)) {
+                if ((newBase != null) && (!newBase.hasNoEntries())) {
                     String formatName;
 
                     //read in the export format, take default format if no format entered

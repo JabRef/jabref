@@ -83,7 +83,7 @@ public class ADSFetcher implements EntryFetcher {
             /* Query ADS and load the results into the BibDatabase */
             status.setStatus(Localization.lang("Processing %0", key));
             BibDatabase bd = importADSEntries(key, status);
-            if ((bd != null) && (bd.getEntryCount() > 0)) {
+            if ((bd != null) && (!bd.hasNoEntries())) {
                 /* Add the entry to the inspection dialog */
                 for (BibEntry entry : bd.getEntries()) {
                     importADSAbstract(key, entry, status);

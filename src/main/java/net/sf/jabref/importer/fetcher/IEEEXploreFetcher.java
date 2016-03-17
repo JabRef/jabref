@@ -67,6 +67,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
 
+    private static final Pattern PREPROCESSING_PATTERN = Pattern.compile("(?<!&)(#[x]*[0]*\\p{XDigit}+;)");
+
+    private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
+    private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
+    private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
+    private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
+    private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
+    private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
+    private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
+    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
     private final CaseKeeper caseKeeper = new CaseKeeper();
     private final UnitFormatter unitFormatter = new UnitFormatter();
@@ -172,16 +182,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-        } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
+        } catch (ConnectException | UnknownHostException e) {
+            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
-        } catch (UnknownHostException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (IOException e) {
-            status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
@@ -248,8 +252,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
         //add the ampersands back in before passing to the HTML formatter so they can be properly converted
         //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
-        //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
-        String result = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+        String result = PREPROCESSING_PATTERN.matcher(bibtexPage).replaceAll("&$1");
 
         //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
         //TODO: Maybe find a better spot for this if it applies more universally
@@ -279,15 +282,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
-                title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
-                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
-                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
             } else {
-                title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
-                title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
-                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
-                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
             }
 
             // Replace \infin with \infty
@@ -498,15 +501,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
-                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
-                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
-                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
             } else {
-                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
-                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
-                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
-                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             }
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");

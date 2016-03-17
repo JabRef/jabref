@@ -408,7 +408,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 new StringReader((String) content.getTransferData(DataFlavor.stringFlavor)));
                         BibDatabase db = bp.parse().getDatabase();
                         LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
-                        if (db.getEntryCount() > 0) {
+                        if (!db.hasNoEntries()) {
                             bes = db.getEntries();
                         }
                     } catch (UnsupportedFlavorException ex) {

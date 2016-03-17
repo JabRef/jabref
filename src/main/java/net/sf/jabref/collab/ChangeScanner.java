@@ -130,18 +130,14 @@ public class ChangeScanner implements Runnable {
 
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                    PositionWindow.placeDialog(dial, frame);
-                    dial.setVisible(true); // dial.show(); -> deprecated since 1.5
-                    fup.scanResultsResolved(dial.isOkPressed());
-                    if (dial.isOkPressed()) {
-                        // Overwrite the temp database:
-                        storeTempDatabase();
-                    }
+            SwingUtilities.invokeLater((Runnable) () -> {
+                ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
+                PositionWindow.placeDialog(dial, frame);
+                dial.setVisible(true);
+                fup.scanResultsResolved(dial.isOkPressed());
+                if (dial.isOkPressed()) {
+                    // Overwrite the temp database:
+                    storeTempDatabase();
                 }
             });
 
@@ -153,30 +149,25 @@ public class ChangeScanner implements Runnable {
     }
 
     private void storeTempDatabase() {
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                        .withMakeBackup(false)
+        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            try {
+                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
                         .withEncoding(panel.getEncoding());
 
-                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                    SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
-                    ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
-                } catch (SaveException ex) {
-                    LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
-                }
-
+                Defaults defaults = new Defaults(BibDatabaseMode
+                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
+                ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
+            } catch (SaveException ex) {
+                LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }
         });
     }
 
     private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
         MetaDataChange mdc = new MetaDataChange(inMem1, inTemp1);
-        ArrayList<String> handledOnDisk = new ArrayList<>();
+        List<String> handledOnDisk = new ArrayList<>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
         for (String key : inTemp1) {
@@ -389,9 +380,7 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanStrings(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
-        int nTmp = onTmp.getStringCount();
-        int nDisk = onDisk.getStringCount();
-        if ((nTmp == 0) && (nDisk == 0)) {
+        if (onTmp.hasNoStrings() && onDisk.hasNoStrings()) {
             return;
         }
 
@@ -526,8 +515,9 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    public interface DisplayResultCallback {
 
+    @FunctionalInterface
+    public interface DisplayResultCallback {
         void scanResultsResolved(boolean resolved);
     }
 }
