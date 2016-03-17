@@ -1026,6 +1026,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
+                    activateVisible();
                 }
             });
         }
