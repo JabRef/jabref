@@ -8,10 +8,10 @@ public class LocalizationKeyTest {
 
     @Test
     public void testConversionToPropertiesKey() {
-        LocalizationKey localizationKey = new LocalizationKey("test : =");
-        assertEquals("test_\\:_\\=", localizationKey.getPropertiesKey());
-        assertEquals("test_:_=", localizationKey.getPropertiesKeyUnescaped());
-        assertEquals("test : =", localizationKey.getTranslationValue());
+        LocalizationKey localizationKey = new LocalizationKey("#test! : =");
+        assertEquals("\\#test\\!_\\:_\\=", localizationKey.getPropertiesKey());
+        assertEquals("#test!_:_=", localizationKey.getPropertiesKeyUnescaped());
+        assertEquals("#test! : =", localizationKey.getTranslationValue());
     }
 
 }
