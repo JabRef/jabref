@@ -44,7 +44,7 @@ public final class DBStringsPreferences {
      * Store these db strings into JabRef preferences.
      */
     public void storeToPreferences(JabRefPreferences preferences) {
-        preferences.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, getServerType().getFormattedName());
+        preferences.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, getServerType().name());
         preferences.put(JabRefPreferences.DB_CONNECT_HOSTNAME, getServerHostname());
         preferences.put(JabRefPreferences.DB_CONNECT_DATABASE, getDatabase());
         preferences.put(JabRefPreferences.DB_CONNECT_USERNAME, getUsername());
