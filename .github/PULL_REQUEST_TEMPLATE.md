@@ -1,4 +1,4 @@
-<describe the changes you have made here>
+<describe the changes you have made here: what, why, ...>
 
 - [ ] Change in CHANGELOG.md described?
 - [ ] Tests created for changes?
