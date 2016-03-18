@@ -107,8 +107,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
         setupSortOrderConfiguration();
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 140dlu, pref,"));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:100dlu:grow, 4dlu, pref",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, fill:140dlu:grow"));
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -127,7 +127,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(saveInSpecifiedOrder).xyw(1, 17, 5);
 
         saveOrderPanel = new SaveOrderConfigDisplay();
-        builder.add(saveOrderPanel.getPanel()).xyw(1, 21, 5);
+        builder.add(saveOrderPanel.getPanel()).xyw(1, 21, 5, "f, f");
 
         builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
@@ -135,7 +135,7 @@ public class DatabasePropertiesDialog extends JDialog {
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
                 FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS);
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
-        builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
+        builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5, "f, f");
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();

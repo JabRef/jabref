@@ -92,7 +92,7 @@ public class SaveOrderConfigDisplay {
         saveTerDesc = new JCheckBox(Localization.lang("Descending"));
 
 
-        FormLayout layout = new FormLayout("right:pref, 8dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, left:pref",
+        FormLayout layout = new FormLayout("right:pref, 8dlu, fill:pref:grow, 4dlu, fill:60dlu:grow, 4dlu, left:pref",
                 "pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
         builder.add(Localization.lang("Primary sort criterion")).xy(1, 1);
