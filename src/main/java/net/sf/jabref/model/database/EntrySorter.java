@@ -90,8 +90,10 @@ public class EntrySorter implements DatabaseChangeListener {
             int pos;
             switch (e.getType()) {
             case ADDED_ENTRY:
-                pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
-                set.add(pos, e.getEntry());
+                pos = Collections.binarySearch(set, e.getEntry(), comp);
+                if (pos < 0) {
+                    set.add(0, e.getEntry());
+                }
                 break;
             case REMOVED_ENTRY:
                 set.remove(e.getEntry());
@@ -101,8 +103,7 @@ public class EntrySorter implements DatabaseChangeListener {
                 pos = Collections.binarySearch(set, e.getEntry(), comp);
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
-                    set.remove(posOld);
-                    set.add(-pos - 1, e.getEntry());
+                    set.add(0, e.getEntry());
                 }
                 break;
             }
