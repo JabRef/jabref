@@ -44,7 +44,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private JButton resetButton;
 
-    private FieldFormatterCleanups defaultFormatters;
+    private final FieldFormatterCleanups defaultFormatters;
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
         this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
@@ -68,11 +68,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
 
-        FormBuilder builder = FormBuilder.create().layout(
-                new FormLayout("left:pref, 13dlu, left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                        "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout("left:pref, 13dlu, left:pref, 4dlu, fill:pref:grow",
+                        "pref, 2dlu, pref, 2dlu, pref, 4dlu, fill:pref:grow, 2dlu, pref"));
         builder.add(enabled).xyw(1, 1, 5);
-        builder.add(getSelectorPanel()).xyw(3, 3, 5);
+        builder.add(getSelectorPanel()).xyw(3, 3, 3, "f, f");
 
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions.size());
         for (FieldFormatterCleanup action : configuredActions) {
@@ -80,7 +80,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         }
 
         descriptionText = new JLabel(DESCRIPTION);
-        builder.add(descriptionText).xyw(3, 5, 5);
+        builder.add(descriptionText).xyw(3, 5, 3, "f, f");
 
         actionsList = new JList(new SaveActionsListModel(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -96,15 +96,15 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 }
             }
         });
-        builder.add(actionsList).xyw(3, 7, 5);
+        builder.add(actionsList).xyw(3, 7, 3, "f, f");
 
         deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         deleteButton.addActionListener(new DeleteButtonListener());
-        builder.add(deleteButton).xy(3, 9);
+        builder.add(deleteButton).xy(3, 9, "l, f");
 
         resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((SaveActionsListModel) actionsList.getModel()).reset(defaultFormatters));
-        builder.add(resetButton).xy(5, 9);
+        builder.add(resetButton).xy(5, 9, "l, f");
 
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
@@ -132,8 +132,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     private JPanel getSelectorPanel() {
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                "pref, 2dlu,"));
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, pref", "fill:pref, 2dlu,"));
 
         keyField = new JTextFieldWithUnfocusedText(Localization.lang("Enter field name (e.g., title, author)"));
         keyField.setColumns(25);
@@ -165,7 +165,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                if (-1 < index && index < formatterDescriptions.size() && value != null) {
+                if ((-1 < index) && (index < formatterDescriptions.size()) && (value != null)) {
                     setToolTipText(String.format(formatterDescriptions.get(index), keyField.getText()));
                 }
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
