@@ -13,8 +13,8 @@ import java.util.Objects;
 class SaveActionsListModel implements ListModel<FieldFormatterCleanup> {
 
     private List<FieldFormatterCleanup> saveActions;
+    private final List<ListDataListener> listeners;
 
-    private List<ListDataListener> listeners;
 
     public SaveActionsListModel(List<FieldFormatterCleanup> saveActions) {
         Objects.requireNonNull(saveActions);
@@ -27,27 +27,27 @@ class SaveActionsListModel implements ListModel<FieldFormatterCleanup> {
         if (!saveActions.contains(action)) {
             saveActions.add(action);
             for (ListDataListener listener : listeners) {
-                listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_ADDED, saveActions.size(), saveActions.size()));
+                listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_ADDED, saveActions.size(),
+                        saveActions.size()));
             }
         }
     }
 
     public void removeAtIndex(int index) {
-        if (index < 0 || index > saveActions.size()) {
-            throw new IndexOutOfBoundsException("Index must be within 0 and " + saveActions.size() + " but was " + index);
-        }
 
-        FieldFormatterCleanup action = saveActions.remove(index);
+        if ((index >= 0) && (index < saveActions.size())) {
 
-        for (ListDataListener listener : listeners) {
-            listener.intervalAdded(new ListDataEvent(action, ListDataEvent.INTERVAL_REMOVED, index, index));
+            FieldFormatterCleanup action = saveActions.remove(index);
+
+            for (ListDataListener listener : listeners) {
+                listener.intervalRemoved(new ListDataEvent(action, ListDataEvent.INTERVAL_REMOVED, index, index));
+            }
         }
     }
 
     public List<FieldFormatterCleanup> getAllActions() {
         return saveActions;
     }
-
 
     @Override
     public int getSize() {

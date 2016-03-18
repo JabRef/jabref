@@ -40,6 +40,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 - PdfContentImporter does not write the content of the first page into the review field any more
 - Implemented [#462](https://github.com/JabRef/jabref/issues/462): Add new action to open console where opened database file is located. New button, menu entry and shortcut (CTRL+SHIFT+J) for this action have also been added.
+- [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
+- [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
+
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
@@ -73,7 +76,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#649](https://github.com/JabRef/jabref/issues/649): Key bindings are now working in the preview panel
 - Fixed [#410](https://github.com/JabRef/jabref/issues/410): Find unlinked files no longer freezes when extracting entry from PDF content
 - Fixed [#936](https://github.com/JabRef/jabref/issues/936): Preview panel is now updated when an entry is cut/deleted
-
+- Fixed [
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
 - Removed configuration option to use database file directory as base directory for attached files and make it default instead.
