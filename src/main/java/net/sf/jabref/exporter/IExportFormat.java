@@ -22,7 +22,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.filechooser.FileFilter;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Set;
 
 public interface IExportFormat {
 

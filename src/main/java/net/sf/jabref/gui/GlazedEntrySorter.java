@@ -17,7 +17,6 @@ package net.sf.jabref.gui;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;

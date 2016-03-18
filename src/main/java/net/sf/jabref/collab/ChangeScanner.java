@@ -84,7 +84,6 @@ public class ChangeScanner implements Runnable {
     @Override
     public void run() {
         try {
-            //long startTime = System.currentTimeMillis();
 
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
@@ -286,25 +285,9 @@ public class ChangeScanner implements Runnable {
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
                             disk.getEntryAt(bestMatchI));
                     changes.add(ec);
-
-                    // Create an undo edit to represent this change:
-                    //NamedCompound ce = new NamedCompound("Modified entry");
-                    //ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(bestMatchI), panel));
-                    //ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    //ce.end();
-                    //changes.add(ce);
-
-                    //System.out.println("Possible match for entry:");
-                    //System.out.println("----------------------------------------------");
-
                 } else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
                     changes.add(ec);
-                    /*NamedCompound ce = new NamedCompound("Removed entry");
-                    ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    ce.end();
-                    changes.add(ce);*/
-
                 }
 
             }
@@ -329,13 +312,8 @@ public class ChangeScanner implements Runnable {
                         EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
                         changes.add(ec);
                     }
-                    /*NamedCompound ce = new NamedCompound("Added entry");
-                    ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
-                    ce.end();
-                    changes.add(ce);*/
                 }
             }
-            //System.out.println("Suspected new entries in file: "+(disk.getEntryCount()-used.size()));
         }
     }
 

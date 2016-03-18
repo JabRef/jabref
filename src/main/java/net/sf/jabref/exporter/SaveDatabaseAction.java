@@ -23,7 +23,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.collab.ChangeScanner;
-import net.sf.jabref.collab.ChangeScanner.DisplayResultCallback;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Encodings;
@@ -100,7 +99,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                                 panel.getBibDatabaseContext().getDatabaseFile());
                         JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                         if (scanner.changesFound()) {
-                            scanner.displayResult((DisplayResultCallback) resolved -> {
+                            scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
                                 if (resolved) {
                                     panel.setUpdatedExternally(false);
                                     SwingUtilities.invokeLater(

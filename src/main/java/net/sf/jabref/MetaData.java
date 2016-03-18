@@ -440,7 +440,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> serialize() throws IOException {
+    public Map<String, String> serialize() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 
