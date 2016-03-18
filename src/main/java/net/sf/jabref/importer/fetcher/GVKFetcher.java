@@ -163,9 +163,7 @@ public class GVKFetcher implements EntryFetcher {
             try (InputStream is = url.openStream()) {
                 result = (new GVKParser()).parseEntries(is);
             }
-        } catch (
-
-        URISyntaxException e) {
+        } catch (URISyntaxException e) {
             LOGGER.error("URI malformed error", e);
             return Collections.emptyList();
         } catch (IOException e) {
