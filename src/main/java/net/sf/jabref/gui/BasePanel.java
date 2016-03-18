@@ -672,7 +672,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = entry;
                         // Store the old value:
                         oldvals.put(bes, bes.getField(BibEntry.KEY_FIELD));
-                        database.setCiteKeyForEntry(bes.getId(), null);
+                        database.setCiteKeyForEntry(bes, null);
                     }
                 }
 
@@ -682,7 +682,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 for (BibEntry entry : entries) {
                     bes = entry;
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
-                    ce.addEdit(new UndoableKeyChange(database, bes.getId(), (String) oldvals.get(bes),
+                    ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getField(BibEntry.KEY_FIELD)));
                 }
                 ce.end();
@@ -1395,11 +1395,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void editEntryByKeyAndFocusField(final String bibtexKey, final String fieldName) {
-        final BibEntry[] entries = database.getEntriesByKey(bibtexKey);
-        if (entries.length == 1) {
-            mainTable.setSelected(mainTable.findEntry(entries[0]));
+        final List<BibEntry> entries = database.getEntriesByKey(bibtexKey);
+        if (entries.size() == 1) {
+            mainTable.setSelected(mainTable.findEntry(entries.get(0)));
             selectionListener.editSignalled();
-            final EntryEditor editor = getEntryEditor(entries[0]);
+            final EntryEditor editor = getEntryEditor(entries.get(0));
             editor.setFocusToField(fieldName);
             new FocusRequester(editor);
         }
@@ -1412,7 +1412,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void createMainTable() {
         //Comparator comp = new FieldComparator("author");
 
-        final GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntryMap());
+        final GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntries());
         // Must initialize sort columns somehow:
 
         database.addDatabaseChangeListener(eventList);
@@ -2103,7 +2103,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
-                    ce.addEdit(new UndoableKeyChange(database, bes.getId(), null, bes.getCiteKey()));
+                    ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
                     any = true;
                 }
             }

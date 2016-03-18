@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.mods;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,21 +46,17 @@ public class MODSDatabase {
         entries = new HashSet<>();
     }
 
-    public MODSDatabase(BibDatabase bibtex) {
-        addEntries(bibtex, bibtex.getKeySet());
-    }
-
-    public MODSDatabase(BibDatabase bibtex, Set<String> keySet) {
-        if (keySet == null) {
-            keySet = bibtex.getKeySet();
+    public MODSDatabase(BibDatabase database, List<BibEntry> entries) {
+        if (entries == null) {
+            addEntries(database.getEntries());
+        } else {
+            addEntries(entries);
         }
-        addEntries(bibtex, keySet);
     }
 
-    private void addEntries(BibDatabase database, Set<String> keySet) {
+    private void addEntries(List<BibEntry> entriesToAdd) {
         entries = new HashSet<>();
-        for (String aKeySet : keySet) {
-            BibEntry entry = database.getEntryById(aKeySet);
+        for (BibEntry entry : entriesToAdd) {
             MODSEntry newMods = new MODSEntry(entry);
             entries.add(newMods);
         }

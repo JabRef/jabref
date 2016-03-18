@@ -49,20 +49,12 @@ public class MSBibDatabase {
         entries = new HashSet<>();
     }
 
-    public MSBibDatabase(InputStream stream) {
-        importEntries(stream);
-    }
-
-    public MSBibDatabase(BibDatabase bibtex) {
-        Set<String> keySet = bibtex.getKeySet();
-        addEntries(bibtex, keySet);
-    }
-
-    public MSBibDatabase(BibDatabase bibtex, Set<String> keySet) {
-        if (keySet == null) {
-            keySet = bibtex.getKeySet();
+    public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
+        if (entries == null) {
+            addEntries(database.getEntries());
+        } else {
+            addEntries(entries);
         }
-        addEntries(bibtex, keySet);
     }
 
     public List<BibEntry> importEntries(InputStream stream) {
@@ -98,10 +90,9 @@ public class MSBibDatabase {
         return bibitems;
     }
 
-    private void addEntries(BibDatabase database, Set<String> keySet) {
+    private void addEntries(List<BibEntry> entriesToAdd) {
         entries = new HashSet<>();
-        for (String key : keySet) {
-            BibEntry entry = database.getEntryById(key);
+        for (BibEntry entry : entriesToAdd) {
             MSBibEntry newMods = new MSBibEntry(entry);
             entries.add(newMods);
         }

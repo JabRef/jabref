@@ -79,10 +79,9 @@ public class ExplicitGroup extends AbstractGroup {
      * Called only when created fromString
      */
     private void addEntries(QuotedStringTokenizer tok, BibDatabase db) {
-        BibEntry[] entries;
         while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
-            Collections.addAll(this.entries, entries);
+            List<BibEntry> entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
+            this.entries.addAll(entries);
         }
     }
 

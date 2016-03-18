@@ -134,7 +134,7 @@ public class AppendDatabaseAction implements BaseAction {
         ArrayList<BibEntry> appendedEntries = new ArrayList<>();
         ArrayList<BibEntry> originalEntries = new ArrayList<>();
         BibDatabase database = panel.database();
-        BibEntry originalEntry;
+
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
         MetaData meta = pr.getMetaData();
 
@@ -142,8 +142,7 @@ public class AppendDatabaseAction implements BaseAction {
             boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
             boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
 
-            for (String key : fromDatabase.getKeySet()) {
-                originalEntry = fromDatabase.getEntryById(key);
+            for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
                 Util.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);

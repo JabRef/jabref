@@ -38,7 +38,7 @@ import spin.Spin;
 public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
-    private BibEntry[] bes;
+    private List<BibEntry> bes;
     private final List<BibEntry[]> duplicates = new ArrayList<>();
 
 
@@ -50,13 +50,10 @@ public class DuplicateSearch implements Runnable {
     public void run() {
 
         panel.output(Localization.lang("Searching for duplicates..."));
-        Object[] keys = panel.getDatabase().getKeySet().toArray();
-        if (keys.length < 2) {
+
+        bes = panel.getDatabase().getEntries();
+        if (bes.size() < 2) {
             return;
-        }
-        bes = new BibEntry[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            bes[i] = panel.getDatabase().getEntryById((String) keys[i]);
         }
 
         SearcherRunnable st = new SearcherRunnable();
@@ -170,14 +167,16 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void run() {
-            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
-                for (int j = i + 1; (j < bes.length) && !finished; j++) {
-                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j], panel.getBibDatabaseContext().getMode());
+            for (int i = 0; (i < (bes.size() - 1)) && !finished; i++) {
+                for (int j = i + 1; (j < bes.size()) && !finished; j++) {
+                    BibEntry first = bes.get(i);
+                    BibEntry second = bes.get(j);
+                    boolean eq = DuplicateCheck.isDuplicate(first, second, panel.getBibDatabaseContext().getMode());
 
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {
                         synchronized (duplicates) {
-                            duplicates.add(new BibEntry[]{bes[i], bes[j]});
+                            duplicates.add(new BibEntry[]{first, second});
                             duplicates.notifyAll(); // send wake up all
                         }
                     }

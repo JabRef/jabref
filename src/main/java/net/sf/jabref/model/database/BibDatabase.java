@@ -51,7 +51,7 @@ public class BibDatabase {
     /**
      * State attributes
      */
-    private final Map<String, BibEntry> entries = new ConcurrentHashMap<>();
+    private final List<BibEntry> entries = Collections.synchronizedList(new ArrayList<>());
     // use a map instead of a set since i need to know how many of each key is in there
     private final Map<String, Integer> allKeys = new HashMap<>();
     private String preamble;
@@ -88,14 +88,6 @@ public class BibDatabase {
     }
 
     /**
-     * Returns a Set containing the keys to all entries.
-     * Use getKeySet().iterator() to iterate over all entries.
-     */
-    public Set<String> getKeySet() {
-        return entries.keySet();
-    }
-
-    /**
      * Returns an EntrySorter with the sorted entries from this base,
      * sorted by the given Comparator.
      */
@@ -105,19 +97,15 @@ public class BibDatabase {
         return sorter;
     }
 
-    public Map<String, BibEntry> getEntryMap() {
-        return entries;
-    }
-
     /**
-     * Returns the entry with the given ID (-> entry_type + hashcode).
+     * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
-    public BibEntry getEntryById(String id) {
-        return entries.get(id);
+    public boolean containsEntryWithId(String id) {
+        return entries.stream().anyMatch(entry -> entry.getId() == id);
     }
 
-    public Collection<BibEntry> getEntries() {
-        return entries.values();
+    public List<BibEntry> getEntries() {
+        return Collections.unmodifiableList(entries);
     }
 
     public Set<String> getAllVisibleFields() {
@@ -146,9 +134,7 @@ public class BibDatabase {
 
         int keyHash = key.hashCode(); // key hash for better performance
 
-        Set<String> keySet = entries.keySet();
-        for (String entryID : keySet) {
-            BibEntry entry = getEntryById(entryID);
+        for (BibEntry entry : entries) {
             if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
                 back = entry;
             }
@@ -156,15 +142,15 @@ public class BibDatabase {
         return back;
     }
 
-    public synchronized BibEntry[] getEntriesByKey(String key) {
+    public synchronized List<BibEntry> getEntriesByKey(String key) {
         ArrayList<BibEntry> result = new ArrayList<>();
 
-        for (BibEntry entry : entries.values()) {
+        for (BibEntry entry : entries) {
             if (key.equals(entry.getCiteKey())) {
                 result.add(entry);
             }
         }
-        return result.toArray(new BibEntry[result.size()]);
+        return result;
     }
 
     /**
@@ -173,14 +159,11 @@ public class BibDatabase {
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
         String id = entry.getId();
-        if (getEntryById(id) != null) {
-            throw new KeyCollisionException(
-                    "ID is already in use, please choose another");
+        if (containsEntryWithId(id)) {
+            throw new KeyCollisionException("ID is already in use, please choose another");
         }
 
-        entry.addPropertyChangeListener(listener);
-
-        entries.put(id, entry);
+        entries.add(entry);
 
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
 
@@ -198,15 +181,10 @@ public class BibDatabase {
         entries.remove(oldValue.getId());
 
         removeKeyFromSet(oldValue.getCiteKey());
-        oldValue.removePropertyChangeListener(listener);
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
     }
 
-    public synchronized boolean setCiteKeyForEntry(String id, String key) {
-        if (!entries.containsKey(id)) {
-            return false; // Entry doesn't exist!
-        }
-        BibEntry entry = getEntryById(id);
+    public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
         String oldKey = entry.getCiteKey();
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
@@ -628,43 +606,6 @@ public class BibDatabase {
     public void setFollowCrossrefs(boolean followCrossrefs) {
         this.followCrossrefs = followCrossrefs;
     }
-
-    /*
-     * Entries are stored in a HashMap with the ID as key. What happens if
-     * someone changes a BibEntry's ID after it has been added to this
-     * BibDatabase? The key of that entry would be the old ID, not the new
-     * one. Use a PropertyChangeListener to identify an ID change and update the
-     * Map.
-     */
-    private final VetoableChangeListener listener = propertyChangeEvent -> {
-        if (propertyChangeEvent.getPropertyName() == null) {
-            fireDatabaseChanged(new DatabaseChangeEvent(BibDatabase.this,
-                    DatabaseChangeEvent.ChangeType.CHANGING_ENTRY, (BibEntry) propertyChangeEvent.getSource()));
-        } else if ("id".equals(propertyChangeEvent.getPropertyName())) {
-            // locate the entry under its old key
-            BibEntry oldEntry = entries.remove(propertyChangeEvent.getOldValue());
-
-            if (oldEntry != propertyChangeEvent.getSource()) {
-                // Something is very wrong!
-                // The entry under the old key isn't
-                // the one that sent this event.
-                // Restore the old state.
-                entries.put((String) propertyChangeEvent.getOldValue(), oldEntry);
-                throw new PropertyVetoException("Wrong old ID", propertyChangeEvent);
-            }
-
-            if (entries.get(propertyChangeEvent.getNewValue()) != null) {
-                entries.put((String) propertyChangeEvent.getOldValue(), oldEntry);
-                throw new PropertyVetoException("New ID already in use, please choose another", propertyChangeEvent);
-            }
-
-            // and re-file this entry
-            entries.put((String) propertyChangeEvent.getNewValue(), (BibEntry) propertyChangeEvent.getSource());
-        } else {
-            fireDatabaseChanged(new DatabaseChangeEvent(BibDatabase.this,
-                    DatabaseChangeEvent.ChangeType.CHANGED_ENTRY, (BibEntry) propertyChangeEvent.getSource()));
-        }
-    };
 
     public void setEpilog(String epilog) {
         this.epilog = epilog;

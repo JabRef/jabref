@@ -38,7 +38,6 @@ public class RisImporter extends ImportFormat {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
-
     /**
      * Return the name of this import format.
      */
@@ -93,10 +92,6 @@ public class RisImporter extends ImportFormat {
                 .split("ER  -.*\\n");
 
         for (String entry1 : entries) {
-
-            if (entry1.trim().isEmpty()) {
-                continue;
-            }
 
             String type = "";
             String author = "";
@@ -159,11 +154,11 @@ public class RisImporter extends ImportFormat {
                                 hm.put("title", oldVal + ": " + val);
                             }
                         }
-                    }
-                    // =
-                    // val;
-                    else if ("T2".equals(lab) || "T3".equals(lab) || "BT".equals(lab)) {
+                        hm.put("title", hm.get("title").replaceAll("\\s+", " ")); // Normalize whitespaces
+                    } else if ("T2".equals(lab) || "BT".equals(lab)) {
                         hm.put("booktitle", val);
+                    } else if ("T3".equals(lab)) {
+                        hm.put("series", val);
                     } else if ("AU".equals(lab) || "A1".equals(lab)) {
                         if ("".equals(author)) {
                             author = val;
@@ -194,6 +189,9 @@ public class RisImporter extends ImportFormat {
                         hm.put("address", val);
                     } else if ("EP".equals(lab)) {
                         endPage = val;
+                        if (!endPage.isEmpty()) {
+                            endPage = "--" + endPage;
+                        }
                     } else if ("SN".equals(lab)) {
                         hm.put("issn", val);
                     } else if ("VL".equals(lab)) {
@@ -233,7 +231,7 @@ public class RisImporter extends ImportFormat {
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
-                            comment = comment + "\n";
+                            comment = comment + " ";
                         }
                         comment = comment + val;
                     }
@@ -261,7 +259,7 @@ public class RisImporter extends ImportFormat {
                     hm.put("comment", comment);
                 }
 
-                hm.put("pages", startPage + "--" + endPage);
+                hm.put("pages", startPage + endPage);
             }
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 

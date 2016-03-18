@@ -23,17 +23,13 @@ public class EntrySorter implements DatabaseChangeListener {
 
     private final List<BibEntry> set;
     private final Comparator<BibEntry> comp;
-    private String[] idArray;
     private BibEntry[] entryArray;
     private boolean changed;
 
 
-    public EntrySorter(Map<String, BibEntry> entries, Comparator<BibEntry> comp) {
-        set = new ArrayList<>();
+    public EntrySorter(List<BibEntry> entries, Comparator<BibEntry> comp) {
+        set = entries;
         this.comp = comp;
-        for (Map.Entry<String, BibEntry> stringBibtexEntryEntry : entries.entrySet()) {
-            set.add(stringBibtexEntryEntry.getValue());
-        }
         changed = true;
         index();
     }
@@ -63,24 +59,12 @@ public class EntrySorter implements DatabaseChangeListener {
             // getValueAt() in EntryTableModel, which *has* to be efficient.
 
             int count = set.size();
-            idArray = new String[count];
             entryArray = new BibEntry[count];
             int piv = 0;
             for (BibEntry entry : set) {
-                idArray[piv] = entry.getId();
                 entryArray[piv] = entry;
                 piv++;
             }
-        }
-    }
-
-    public boolean isOutdated() {
-        return false;
-    }
-
-    public String getIdAt(int pos) {
-        synchronized (set) {
-            return idArray[pos];
         }
     }
 

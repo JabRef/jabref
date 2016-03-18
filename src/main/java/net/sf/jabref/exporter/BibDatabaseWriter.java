@@ -79,7 +79,7 @@ public class BibDatabaseWriter {
      * (such as the exportDatabase call), we do not wish to use the
      * global preference of saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, Set<String> keySet,
+    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort,
             SavePreferences preferences) {
 
         //if no meta data are present, simply return in original order
@@ -94,12 +94,8 @@ public class BibDatabaseWriter {
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
         List<BibEntry> sorted = new ArrayList<>();
-        if (keySet == null) {
-            keySet = bibDatabaseContext.getDatabase().getKeySet();
-        }
-        for (String id : keySet) {
-            sorted.add(bibDatabaseContext.getDatabase().getEntryById(id));
-        }
+        sorted.addAll(entriesToSort);
+
         Collections.sort(sorted, comparatorStack);
 
         return sorted;
@@ -129,11 +125,12 @@ public class BibDatabaseWriter {
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences) throws SaveException {
+    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences)
+            throws SaveException {
         return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), preferences);
     }
 
-    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
+    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries,
             SavePreferences preferences) throws SaveException {
 
         SaveSession session;
@@ -158,8 +155,8 @@ public class BibDatabaseWriter {
 
     }
 
-    public List<FieldChange> writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
-            SavePreferences preferences) throws IOException {
+    public List<FieldChange> writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext,
+            List<BibEntry> entries, SavePreferences preferences) throws IOException {
         Objects.requireNonNull(writer);
 
         // Map to collect entry type definitions that we must save along with entries using them.
@@ -177,8 +174,7 @@ public class BibDatabaseWriter {
         writeStrings(writer, bibDatabaseContext.getDatabase(), preferences.isReformatFile());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
-                entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
+        List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, entries, preferences);
         List<FieldChange> saveActionChanges = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
         for (BibEntry entry : sortedEntries) {
@@ -217,7 +213,7 @@ public class BibDatabaseWriter {
      * supplied input array bes.
      */
     public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
-            Collection<BibEntry> entries) throws SaveException {
+            List<BibEntry> entries) throws SaveException {
 
         return savePartOfDatabase(bibDatabaseContext, entries, preferences);
     }

@@ -73,17 +73,17 @@ public class DatabaseExporter {
      * @param database The DBTYPE of the database
      * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
-     * @param keySet   The set of IDs of the entries to export.
+     * @param entriesToExport   The list of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void performExport(final BibDatabase database, final MetaData metaData, Set<String> keySet, Object out,
-            String dbName) throws Exception {
+    private void performExport(final BibDatabase database, final MetaData metaData, List<BibEntry> entriesToExport,
+            Object out, String dbName) throws Exception {
         Defaults defaults = new Defaults(
                 BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, keySet, savePrefs);
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, entriesToExport, savePrefs);
         GroupTreeNode gtn = metaData.getGroups();
 
         final int database_id = DatabaseUtil.getDatabaseIDByName(metaData, out, dbName);
@@ -391,12 +391,12 @@ public class DatabaseExporter {
      *
      * @param database The BibDatabase to export
      * @param metaData The MetaData object containing the groups information
-     * @param keySet   The set of IDs of the entries to export.
+     * @param entriesToExport   The list of the entries to export.
      * @param file     The name of the file to which the DML should be written
      * @param encoding The encoding to be used
      */
-    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData, Set<String> keySet,
-            String file, Charset encoding) throws Exception {
+    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData,
+            List<BibEntry> entriesToExport, String file, Charset encoding) throws Exception {
         // open output file
         File outfile = new File(file);
         if (outfile.exists() && !outfile.delete()) {
@@ -404,8 +404,8 @@ public class DatabaseExporter {
             return;
         }
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
-                PrintStream fout = new PrintStream(writer)) {
-            performExport(database, metaData, keySet, fout, "file");
+             PrintStream fout = new PrintStream(writer)) {
+            performExport(database, metaData, entriesToExport, fout, "file");
         }
     }
 
@@ -415,11 +415,11 @@ public class DatabaseExporter {
      *
      * @param database        The BibDatabase to export
      * @param metaData        The MetaData object containing the groups information
-     * @param keySet          The set of IDs of the entries to export.
+     * @param entriesToExport The list of the entries to export.
      * @param databaseStrings The necessary database connection information
      */
-    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData, Set<String> keySet,
-            DBStrings databaseStrings, JabRefFrame frame) throws Exception {
+    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData,
+            List<BibEntry> entriesToExport, DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
         Connection conn = null;
         boolean redisplay = false;
@@ -435,14 +435,14 @@ public class DatabaseExporter {
                 redisplay = true;
             } else if (dialogo.hasDBSelected) {
                 dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                performExport(database, metaData, keySet, conn, dbName);
+                performExport(database, metaData, entriesToExport, conn, dbName);
             }
             if (!conn.getAutoCommit()) {
                 conn.commit();
                 conn.setAutoCommit(true);
             }
             if (redisplay) {
-                exportDatabaseToDBMS(database, metaData, keySet, databaseStrings, frame);
+                exportDatabaseToDBMS(database, metaData, entriesToExport, databaseStrings, frame);
             }
         } catch (SQLException ex) {
             if ((conn != null) && !conn.getAutoCommit()) {
