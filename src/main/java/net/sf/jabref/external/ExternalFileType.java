@@ -16,6 +16,7 @@
 package net.sf.jabref.external;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.*;
 
@@ -140,8 +141,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return extension;
     }
 
-    public String getOpenWith() {
-        return openWith;
+    public Optional<String> getOpenWithApplication() {
+        if (openWith == null || openWith.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(openWith);
     }
 
     public void setOpenWith(String openWith) {

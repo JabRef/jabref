@@ -200,7 +200,7 @@ public class ExternalFileTypeEntryEditor {
         name.setText(entry.getName());
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
-        application.setText(entry.getOpenWith());
+        application.setText(entry.getOpenWithApplication().orElse(""));
         icon.setIcon(entry.getIcon());
         if (application.getText().isEmpty()) {
             useDefault.setSelected(true);

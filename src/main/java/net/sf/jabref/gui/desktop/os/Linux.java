@@ -12,10 +12,14 @@ public class Linux implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
-        String viewer = type == null ? "xdg-open" : type.getOpenWith();
-        String[] cmdArray = new String[2];
-        cmdArray[0] = viewer;
-        cmdArray[1] = filePath;
+        String viewer;
+
+        if (type == null && !type.getOpenWithApplication().isPresent()) {
+            viewer = "xdg-open";
+        } else {
+            viewer = type.getOpenWithApplication().get();
+        }
+        String[] cmdArray = { viewer, filePath };
         Runtime.getRuntime().exec(cmdArray);
     }
 

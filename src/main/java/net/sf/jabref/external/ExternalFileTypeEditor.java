@@ -310,7 +310,7 @@ public class ExternalFileTypeEditor extends JDialog {
             case 3:
                 return type.getMimeType();
             default: // Five columns
-                return type.getOpenWith();
+                return type.getOpenWithApplication();
             }
         }
     }

@@ -11,10 +11,13 @@ public class OSX implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
-        String[] cmd = type != null ?
-                new String[] {"/usr/bin/open", "-a", type.getOpenWith(), filePath} :
-                new String[] {"/usr/bin/open", filePath};
-        Runtime.getRuntime().exec(cmd);
+
+        if (type == null && !type.getOpenWithApplication().isPresent()) {
+            openFileWithApplication(filePath, type.getOpenWithApplication().get());
+        } else {
+            String[] cmd = { "/usr/bin/open", filePath };
+            Runtime.getRuntime().exec(cmd);
+        }
     }
 
     @Override

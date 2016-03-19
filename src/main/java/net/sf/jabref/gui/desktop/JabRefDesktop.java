@@ -153,11 +153,12 @@ public class JabRefDesktop {
     }
 
     private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
-        String application = fileType.getOpenWith();
-        if("".equals(application)) {
+        Optional<String> application = fileType.getOpenWithApplication();
+
+        if(application.isPresent()) {
             NATIVE_DESKTOP.openFile(filePath, fileType.getExtension());
         } else {
-            NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+            NATIVE_DESKTOP.openFileWithApplication(filePath, application.get());
         }
     }
 
