@@ -650,8 +650,8 @@ public class MainTable extends JTable {
      * updateFont
      */
     public void updateFont() {
-        setFont(GUIGlobals.CURRENTFONT);
-        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.CURRENTFONT.getSize());
+        setFont(GUIGlobals.currentFont);
+        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.currentFont.getSize());
     }
 
     public void ensureVisible(int row) {

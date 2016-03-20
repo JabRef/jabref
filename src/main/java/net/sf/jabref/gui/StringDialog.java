@@ -60,6 +60,9 @@ class StringDialog extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
+    public static final String STRINGS_TITLE = Localization.lang("Strings for database");
+
+
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
         super(frame);
         this.panel = panel;
@@ -135,9 +138,9 @@ class StringDialog extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
+            setTitle(STRINGS_TITLE + ": " + GUIGlobals.UNTITLED_TITLE);
         } else {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
+            setTitle(STRINGS_TITLE + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
         }
         pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);

@@ -131,7 +131,7 @@ public class TextField extends JTextField implements FieldEditor {
 
     @Override
     public void updateFont() {
-        setFont(GUIGlobals.CURRENTFONT);
+        setFont(GUIGlobals.currentFont);
     }
 
     @Override

@@ -184,7 +184,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.encoding = encoding;
         this.bibDatabaseContext = bibDatabaseContext;
 
-        this.sidePaneManager = GUIGlobals.sidePaneManager;
+        this.sidePaneManager = frame.sidePaneManager;
         this.frame = frame;
         this.database = bibDatabaseContext.getDatabase();
 
@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         StringBuilder title = new StringBuilder();
 
         if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title.append(GUIGlobals.untitledTitle);
+            title.append(GUIGlobals.UNTITLED_TITLE);
 
             if (!database().getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -1935,7 +1935,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (getBibDatabaseContext().getDatabaseFile() == null) {
-                frame.setTabTitle(this, GUIGlobals.untitledTitle, null);
+                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
             } else {
                 frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
             }

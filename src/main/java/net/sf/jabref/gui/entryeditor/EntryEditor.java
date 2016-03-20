@@ -930,7 +930,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         public TypeLabel(String type) {
             super(type);
             setUI(new VerticalLabelUI(false));
-            setForeground(GUIGlobals.entryEditorLabelColor);
+            setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
             setHorizontalAlignment(SwingConstants.RIGHT);
             setFont(GUIGlobals.typeNameFont);
 
@@ -1175,7 +1175,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                     fieldEditor.setValidBackgroundColor();
                 }
                 if (fieldEditor.getTextComponent().hasFocus()) {
-                    fieldEditor.setBackground(GUIGlobals.activeEditor);
+                    fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
