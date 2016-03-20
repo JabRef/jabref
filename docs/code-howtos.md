@@ -14,10 +14,10 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-.bib-file)
   * [How to work with Preferences](#how-to-work-with-preferences)
   * [Test Cases](#test-cases)
-    * [Preferences in tests](#preferences-in-tests)
     * [Lists in tests](#lists-in-tests)
     * [Files and folders](#files-and-folders-in-tests)
     * [Loading Files from Resources](#loading-files-from-resources)
+    * [Preferences in tests](#preferences-in-tests)
 
   * [UI](#ui)
   * [UI for Preferences](#ui-for-preferences)
