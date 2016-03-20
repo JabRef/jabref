@@ -210,7 +210,7 @@ we would have five tests containing a single `assert` statement and named accord
 to the test class. A temporary file is now created by `File tempFile = testFolder.newFile("file.txt");`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [blog of Gary Gregory](https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/) for more details.
 
 ### Loading Files from Resources:
-Sometimes it is necessary to load a specific resource as files:
+Sometimes it is necessary to load a specific resource as a File:
 ```` java
 AuxCommandLineTest.class.getResource("paper.aux");
 ````
