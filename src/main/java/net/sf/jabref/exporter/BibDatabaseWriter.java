@@ -85,7 +85,11 @@ public class BibDatabaseWriter {
         //if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             List<BibEntry> result = new LinkedList<>();
-            result.addAll(bibDatabaseContext.getDatabase().getEntries());
+            if (entriesToSort == null) {
+                result.addAll(bibDatabaseContext.getDatabase().getEntries());
+            } else {
+                result.addAll(entriesToSort);
+            }
             return result;
         }
 
@@ -94,7 +98,11 @@ public class BibDatabaseWriter {
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
         List<BibEntry> sorted = new ArrayList<>();
-        sorted.addAll(entriesToSort);
+        if (entriesToSort == null) {
+            sorted.addAll(bibDatabaseContext.getDatabase().getEntries());
+        } else {
+            sorted.addAll(entriesToSort);
+        }
 
         Collections.sort(sorted, comparatorStack);
 
