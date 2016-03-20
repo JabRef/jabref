@@ -166,9 +166,9 @@ class PreambleEditor extends JDialog {
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {
-                    ed.setLabelColor(GUIGlobals.nullFieldColor);
+                    ed.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
                 } else {
-                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
+                    ed.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
                 ed.setValidBackgroundColor();
                 if (ed.getTextComponent().hasFocus()) {

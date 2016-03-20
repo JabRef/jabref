@@ -654,7 +654,7 @@ public class JabRef {
         }
 
         GUIGlobals.init();
-        GUIGlobals.CURRENTFONT = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
+        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
                 Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         LOGGER.debug("Initializing frame");
