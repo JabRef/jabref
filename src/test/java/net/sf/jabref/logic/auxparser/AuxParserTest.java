@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,9 +26,9 @@ public class AuxParserTest {
     }
 
     @Test
-    public void testNormal() {
+    public void testNormal() throws URISyntaxException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        File auxFile = new File(AuxParserTest.class.getResource("paper.aux").getFile());
+        File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
@@ -48,9 +50,10 @@ public class AuxParserTest {
     }
 
     @Test
-    public void testNotAllFound() {
+    public void testNotAllFound() throws URISyntaxException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        File auxFile = new File(AuxParserTest.class.getResource("badpaper.aux").getFile());
+        File auxFile = Paths.get(AuxParserTest.class.getResource("badpaper.aux").toURI()).toFile();
+
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
@@ -72,9 +75,9 @@ public class AuxParserTest {
     }
 
     @Test
-    public void duplicateBibDatabaseConfiguration() {
+    public void duplicateBibDatabaseConfiguration() throws URISyntaxException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
-        File auxFile = new File(AuxParserTest.class.getResource("paper.aux").getFile());
+        File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
@@ -90,9 +93,9 @@ public class AuxParserTest {
     }
 
     @Test
-    public void testNestedAux() {
+    public void testNestedAux() throws URISyntaxException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        File auxFile = new File(AuxParserTest.class.getResource("nested.aux").getFile());
+        File auxFile = Paths.get(AuxParserTest.class.getResource("nested.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 
