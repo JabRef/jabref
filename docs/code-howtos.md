@@ -15,6 +15,10 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [How to work with Preferences](#how-to-work-with-preferences)
   * [Test Cases](#test-cases)
     * [Preferences in tests](#preferences-in-tests)
+    * [Lists in tests](#lists-in-tests)
+    * [Files and folders](#files-and-folders-in-tests)
+    * [Loading Files from Resources](#loading-files-from-resources)
+
   * [UI](#ui)
   * [UI for Preferences](#ui-for-preferences)
   * ["Special Fields"](#special-fields)
@@ -206,7 +210,7 @@ we would have five tests containing a single `assert` statement and named accord
 to the test class. A temporary file is now created by `File tempFile = testFolder.newFile("file.txt");`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [blog of Gary Gregory](https://garygregory.wordpress.com/2010/01/20/junit-tip-use-rules-to-manage-temporary-files-and-folders/) for more details.
 
 ### Loading Files from Resources:
-Sometimes is is necessary to load a specific resource as files:
+Sometimes it is necessary to load a specific resource as files:
 ```` java
 AuxCommandLineTest.class.getResource("paper.aux");
 ````
@@ -216,7 +220,7 @@ File f = Paths.get(url.toUri()).toFile();
 //concrete example
 File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile(); 
 ````
-For more infos see discussions at 
+For more information see discussions at 
 http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
 
 ### Preferences in tests
