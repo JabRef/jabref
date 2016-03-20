@@ -152,7 +152,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
     }
 
     private void addFileInfo(BibEntry entry, File file) {
-        ExternalFileType fileType = ExternalFileTypes.getInstance()
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
         List<String> possibleFilePaths = JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);

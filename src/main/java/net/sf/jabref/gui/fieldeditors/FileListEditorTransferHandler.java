@@ -122,11 +122,11 @@ class FileListEditorTransferHandler extends TransferHandler {
                             // Find the file's extension, if any:
                             String name = file.getAbsolutePath();
                             Optional<String> extension = FileUtil.getFileExtension(name);
-                            ExternalFileType fileType = null;
+                            Optional<ExternalFileType> fileType = Optional.empty();
                             if (extension.isPresent()) {
                                 fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             }
-                            if (fileType != null) {
+                            if (fileType.isPresent()) {
                                 if (droppedFileHandler == null) {
                                     droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
                                 }

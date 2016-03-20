@@ -48,7 +48,6 @@ import ca.odell.glazedlists.event.ListEventListener;
 
 import java.util.List;
 import java.util.Objects;
-
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -311,7 +310,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.getIcon(),
+                                        flEntry.link, flEntry.type.get().getIcon(),
                                         panel.getBibDatabaseContext().getMetaData(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
@@ -398,15 +397,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     fileList.setContent(fileFieldContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
-                        if(column.isFileFilter() && !flEntry.type.toString().equals(column.getColumnName())) {
+                        if (column.isFileFilter()
+                                && (!flEntry.type.get().getName().equalsIgnoreCase(column.getColumnName()))) {
                             continue;
                         }
                         String description = flEntry.description;
                         if ((description == null) || (description.trim().isEmpty())) {
                             description = flEntry.link;
                         }
-                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description,
-                                flEntry.link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(),
+                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
+                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(),
                                 flEntry.type));
                         showDefaultPopup = false;
                     }

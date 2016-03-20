@@ -52,7 +52,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
                 }
                 File f = new File(o);
                 FileField.ParsedFileField flEntry = new FileField.ParsedFileField(f.getName(), o,
-                        ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
+                        ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field).orElse(null));
                 fileList.add(flEntry);
 
                 entry.clearField(field);

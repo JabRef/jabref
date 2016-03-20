@@ -351,7 +351,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             Optional<String> extension = FileUtil.getFileExtension(fileName);
-            ExternalFileType fileType;
+            Optional<ExternalFileType> fileType;
 
             if (extension.isPresent() && "bib".equals(extension.get())) {
                 // we assume that it is a BibTeX file.
@@ -367,7 +367,7 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if ((fileType != null) && (dropRow >= 0)) {
+            if ((fileType.isPresent()) && (dropRow >= 0)) {
 
                 /*
                  * TODO: make this an instance variable?

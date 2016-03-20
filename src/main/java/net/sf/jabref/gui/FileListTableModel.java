@@ -63,7 +63,7 @@ public class FileListTableModel extends AbstractTableModel {
             case 1:
                 return entry.link;
             default:
-                return entry.type == null ? "" : entry.type.getName();
+                return entry.type.isPresent() ? entry.type.get().getName() : "";
             }
         }
     }
@@ -166,16 +166,16 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (entry.type == null)) {
+        if ((entry == null) || (!entry.type.isPresent())) {
             return null;
         }
-        return entry.type.getIconLabel();
+        return entry.type.get().getIconLabel();
     }
 
     private FileListEntry decodeEntry(FileField.ParsedFileField entry, boolean deduceUnknownType) {
-        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
 
-        if (deduceUnknownType && (type instanceof UnknownExternalFileType)) {
+        if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
             type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.fileType);
@@ -183,9 +183,10 @@ public class FileListTableModel extends AbstractTableModel {
                 // No type could be found from mime type on the extension:
                 Optional<String> extension = FileUtil.getFileExtension(entry.link);
                 if (extension.isPresent()) {
-                    ExternalFileType typeGuess = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
+                    Optional<ExternalFileType> typeGuess = ExternalFileTypes.getInstance()
+                            .getExternalFileTypeByExt(extension.get());
 
-                    if (typeGuess != null) {
+                    if (typeGuess.isPresent()) {
                         type = typeGuess;
                     }
                 }
