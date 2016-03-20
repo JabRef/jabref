@@ -10,21 +10,31 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Collection;
 
 public class OpenDatabaseActionTest {
 
     private final Charset defaultEncoding = StandardCharsets.UTF_8;
-    private final File bibNoHeader = new File(OpenDatabaseActionTest.class.getResource("headerless.bib").getFile());
-    private final File bibWrongHeader = new File(
-            OpenDatabaseActionTest.class.getResource("wrong-header.bib").getFile());
-    private final File bibHeader = new File(OpenDatabaseActionTest.class.getResource("encoding-header.bib").getFile());
-    private final File bibHeaderAndSignature = new File(
-            OpenDatabaseActionTest.class.getResource("jabref-header.bib").getFile());
-    private final File bibEncodingWithoutNewline = new File(
-            OpenDatabaseActionTest.class.getResource("encodingWithoutNewline.bib").getFile());
+    private final File bibNoHeader;
+    private final File bibWrongHeader;
+    private final File bibHeader;
+    private final File bibHeaderAndSignature;
+    private final File bibEncodingWithoutNewline;
+
+
+    public OpenDatabaseActionTest() throws URISyntaxException {
+        bibNoHeader = Paths.get(OpenDatabaseActionTest.class.getResource("headerless.bib").toURI()).toFile();
+        bibWrongHeader = Paths.get(OpenDatabaseActionTest.class.getResource("wrong-header.bib").toURI()).toFile();
+        bibHeader = Paths.get(OpenDatabaseActionTest.class.getResource("encoding-header.bib").toURI()).toFile();
+        bibHeaderAndSignature = Paths.get(OpenDatabaseActionTest.class.getResource("jabref-header.bib").toURI())
+                .toFile();
+        bibEncodingWithoutNewline = Paths
+                .get(OpenDatabaseActionTest.class.getResource("encodingWithoutNewline.bib").toURI()).toFile();
+    }
 
     @BeforeClass
     public static void setUpGlobalsPrefs() {
