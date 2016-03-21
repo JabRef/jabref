@@ -150,6 +150,10 @@ public class JabRefPreferences {
     public static final String MERGEENTRIES_SIZE_X = "mergeEntriesSizeX";
     public static final String MERGEENTRIES_POS_Y = "mergeEntriesPosY";
     public static final String MERGEENTRIES_POS_X = "mergeEntriesPosX";
+    public static final String PREAMBLE_SIZE_Y = "preambleSizeY";
+    public static final String PREAMBLE_SIZE_X = "preambleSizeX";
+    public static final String PREAMBLE_POS_Y = "preamblePosY";
+    public static final String PREAMBLE_POS_X = "preamblePosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -552,8 +556,6 @@ public class JabRefPreferences {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(FILE_WORKING_DIRECTORY, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(ENTRY_TYPE_FORM_HEIGHT_FACTOR, 1);
-        defaults.put(ENTRY_TYPE_FORM_WIDTH, 1);
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
@@ -570,6 +572,10 @@ public class JabRefPreferences {
         defaults.put(MERGEENTRIES_POS_Y, 0);
         defaults.put(MERGEENTRIES_SIZE_X, 800);
         defaults.put(MERGEENTRIES_SIZE_Y, 600);
+        defaults.put(PREAMBLE_POS_X, 0);
+        defaults.put(PREAMBLE_POS_Y, 0);
+        defaults.put(PREAMBLE_SIZE_X, 600);
+        defaults.put(PREAMBLE_SIZE_Y, 400);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
