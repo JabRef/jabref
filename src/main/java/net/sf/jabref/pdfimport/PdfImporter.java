@@ -38,6 +38,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -300,8 +301,8 @@ public class PdfImporter {
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
                 // mode which makes sure the selection will trigger display of the entry editor
                 // and adjustment of the splitter.
-                if (panel.getMode() != BasePanel.SHOWING_EDITOR) {
-                    panel.setMode(BasePanel.WILL_SHOW_EDITOR);
+                if (panel.getMode() != BasePanelMode.SHOWING_EDITOR) {
+                    panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
                 }
 
                 panel.showEntry(be);
