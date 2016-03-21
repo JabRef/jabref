@@ -36,6 +36,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.UndoableChangeAssignment;
 import net.sf.jabref.groups.structure.AbstractGroup;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -977,11 +978,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // This will be true if the duplicate is in the existing
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
-                            first, DuplicateResolverDialog.INSPECTION);
+                            first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
                     PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
-                    if (diag.getSelected() == DuplicateResolverDialog.KEEP_UPPER) {
+                    if (diag.getSelected() == DuplicateResolverResult.KEEP_UPPER) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -993,17 +994,17 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         first.setGroupHit(false);
                         entries.getReadWriteLock().writeLock().unlock();
 
-                    } else if (diag.getSelected() == DuplicateResolverDialog.KEEP_LOWER) {
+                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_LOWER) {
                         // Remove the entry from the import inspection dialog.
                         entries.getReadWriteLock().writeLock().lock();
                         entries.remove(first);
                         entries.getReadWriteLock().writeLock().unlock();
-                    } else if (diag.getSelected() == DuplicateResolverDialog.KEEP_BOTH) {
+                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_BOTH) {
                         // Do nothing.
                         entries.getReadWriteLock().writeLock().lock();
                         first.setGroupHit(false);
                         entries.getReadWriteLock().writeLock().unlock();
-                    } else if (diag.getSelected() == DuplicateResolverDialog.KEEP_MERGE) {
+                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_MERGE) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1025,19 +1026,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 other = internalDuplicate(entries, first);
                 if (other.isPresent()) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
-                            other.get(), DuplicateResolverDialog.DUPLICATE_SEARCH);
+                            other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
                     PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
-                    int answer = diag.getSelected();
-                    if (answer == DuplicateResolverDialog.KEEP_UPPER) {
+                    DuplicateResolverResult answer = diag.getSelected();
+                    if (answer == DuplicateResolverResult.KEEP_UPPER) {
                         entries.remove(other.get());
                         first.setGroupHit(false);
-                    } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                    } else if (answer == DuplicateResolverResult.KEEP_LOWER) {
                         entries.remove(first);
-                    } else if (answer == DuplicateResolverDialog.KEEP_BOTH) {
+                    } else if (answer == DuplicateResolverResult.KEEP_BOTH) {
                         first.setGroupHit(false);
-                    } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                    } else if (answer == DuplicateResolverResult.KEEP_MERGE) {
                         diag.getMergedEntry().setGroupHit(false);
                         diag.getMergedEntry().setSearchHit(true);
                         entries.add(diag.getMergedEntry());
