@@ -86,10 +86,6 @@ public class GUIGlobals {
 
     public static final double PE_HEIGHT = 2;
 
-    //	Size constants for PreambleEditor; small, medium and large.
-    public static final int[] FORM_WIDTH = new int[]{500, 650, 820};
-    public static final int[] FORM_HEIGHT = new int[]{90, 110, 130};
-
     //	Constants controlling formatted bibtex output.
     public static final int INDENT = 4;
     public static final int LINE_LENGTH = 65; // Maximum

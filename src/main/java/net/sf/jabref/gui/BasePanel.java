@@ -475,7 +475,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening the preamble editor
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
-                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database, Globals.prefs);
+                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database);
                 PositionWindow.placeDialog(form, frame);
                 form.setVisible(true);
                 preambleEditor = form;
