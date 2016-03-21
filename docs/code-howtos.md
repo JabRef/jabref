@@ -192,6 +192,7 @@ we would have five tests containing a single `assert` statement and named accord
 - Do *not just test happy paths*, but also wrong/weird input.
 - It is recommend to write tests *before* you actually implement the functionality (test driven development). 
 - *Bug fixing:* write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
+- Do not catch exceptions in tests, instead add `@Test(expected=ExpectedException.class)` to the test method.
 
 ### Lists in tests
 * Use `Assert.assertEquals(Collections.emptyList(), actualList);` instead of `Assert.assertEquals(0, actualList.size());` to test whether a list is empty.
