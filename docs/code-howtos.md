@@ -15,6 +15,7 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [How to work with Preferences](#how-to-work-with-preferences)
   * [Test Cases](#test-cases)
     * [Lists in tests](#lists-in-tests)
+    * [BibEntries in tests](#bibentries-in-tests)
     * [Files and folders](#files-and-folders-in-tests)
     * [Loading Files from Resources](#loading-files-from-resources)
     * [Preferences in tests](#preferences-in-tests)
@@ -202,6 +203,10 @@ we would have five tests containing a single `assert` statement and named accord
          Assert.assertEquals("a", actualList.get(0));
          Assert.assertEquals("b", actualList.get(1));
 ````
+
+### BibEntries in tests
+* Use the `assertEquals` methods in `BibtexEntryAssert` to check that the correct BibEntry is returned.
+
 ### Files and folders in tests
 * If you need a temporary file in tests, then add 
 ```` java
