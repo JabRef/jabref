@@ -598,7 +598,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         });
 
         tabbedPane.setBorder(null);
-        tabbedPane.setForeground(GUIGlobals.inActiveTabbed);
+        tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -683,7 +683,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.FRAME_TITLE + " - " + GUIGlobals.untitledTitle + changeFlag + modeInfo);
+            setTitle(GUIGlobals.FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
         } else {
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().getPath();
             setTitle(GUIGlobals.FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
@@ -692,8 +692,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initSidePane() {
         sidePaneManager = new SidePaneManager(this);
-
-        GUIGlobals.sidePaneManager = this.sidePaneManager;
 
         groupSelector = new GroupSelector(this, sidePaneManager);
 
@@ -823,7 +821,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     String filename;
 
                     if (getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile() == null) {
-                        filename = GUIGlobals.untitledTitle;
+                        filename = GUIGlobals.UNTITLED_TITLE;
                     } else {
                         filename = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().getAbsolutePath();
                     }
@@ -960,7 +958,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         status.add(progressBar);
         con.weightx = 1;
         con.gridwidth = GridBagConstraints.REMAINDER;
-        statusLabel.setForeground(GUIGlobals.entryEditorLabelColor.darker());
+        statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
         con.insets = new Insets(0, 0, 0, 0);
         gbl.setConstraints(status, con);
         getContentPane().add(status);
@@ -1026,10 +1024,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
-            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.inActiveTabbed);
+            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.INACTIVE_TABBED_COLOR);
         }
         if ((now > -1) && (now < len)) {
-            tabbedPane.setForegroundAt(now, GUIGlobals.activeTabbed);
+            tabbedPane.setForegroundAt(now, GUIGlobals.ACTIVE_TABBED_COLOR);
         }
         lastTabbedPanelSelectionIndex = now;
     }
@@ -2027,8 +2025,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            int currentSize = GUIGlobals.CURRENTFONT.getSize();
-            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+            int currentSize = GUIGlobals.currentFont.getSize();
+            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
                     currentSize + 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
             for (BasePanel basePanel : getBasePanelList()) {
@@ -2046,11 +2044,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            int currentSize = GUIGlobals.CURRENTFONT.getSize();
+            int currentSize = GUIGlobals.currentFont.getSize();
             if (currentSize < 2) {
                 return;
             }
-            GUIGlobals.CURRENTFONT = new Font(GUIGlobals.CURRENTFONT.getFamily(), GUIGlobals.CURRENTFONT.getStyle(),
+            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
                     currentSize - 1);
             Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
             for (BasePanel basePanel : getBasePanelList()) {
@@ -2131,7 +2129,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String filename;
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            filename = GUIGlobals.untitledTitle;
+            filename = GUIGlobals.UNTITLED_TITLE;
         } else {
             filename = panel.getBibDatabaseContext().getDatabaseFile().getAbsolutePath();
         }

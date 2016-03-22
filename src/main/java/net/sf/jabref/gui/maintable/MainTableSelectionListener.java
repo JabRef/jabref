@@ -129,8 +129,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
             final BibEntry toShow = (BibEntry) newSelected;
-            final int mode = panel.getMode(); // What is the panel already showing?
-            if ((mode == BasePanel.WILL_SHOW_EDITOR) || (mode == BasePanel.SHOWING_EDITOR)) {
+            final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
+            if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
                 EntryEditor oldEditor = panel.getCurrentEditor();
                 String visName = null;
@@ -145,7 +145,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
 
                 // Show the new editor unless it was already visible:
-                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanel.SHOWING_EDITOR)) {
+                if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
 
                     if (visName != null) {
                         newEditor.setVisiblePanel(visName);
@@ -181,13 +181,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if ((list.size() != 1) || (list.get(0) != toShow)) {
             return;
         }
-        final int mode = panel.getMode();
+        final BasePanelMode mode = panel.getMode();
         workingOnPreview = true;
         SwingUtilities.invokeLater(() -> {
             preview.setEntry(toShow);
 
             // If nothing was already shown, set the preview and move the separator:
-            if (changedPreview || (mode == BasePanel.SHOWING_NOTHING)) {
+            if (changedPreview || (mode == BasePanelMode.SHOWING_NOTHING)) {
                 panel.showPreview(preview);
                 panel.adjustSplitter();
             }
@@ -202,9 +202,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void editSignalled(BibEntry entry) {
-        final int mode = panel.getMode();
+        final BasePanelMode mode = panel.getMode();
         EntryEditor editor = panel.getEntryEditor(entry);
-        if (mode != BasePanel.SHOWING_EDITOR) {
+        if (mode != BasePanelMode.SHOWING_EDITOR) {
             panel.showEntryEditor(editor);
             panel.adjustSplitter();
         }

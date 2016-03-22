@@ -101,15 +101,11 @@ import java.util.*;
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
-    public static final int SHOWING_NOTHING = 0;
-    private static final int SHOWING_PREVIEW = 1;
-    public static final int SHOWING_EDITOR = 2;
-    public static final int WILL_SHOW_EDITOR = 3;
 
     private final BibDatabase database;
     private final BibDatabaseContext bibDatabaseContext;
 
-    private int mode;
+    private BasePanelMode mode;
     private EntryEditor currentEditor;
     private PreviewPanel currentPreview;
 
@@ -184,7 +180,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.encoding = encoding;
         this.bibDatabaseContext = bibDatabaseContext;
 
-        this.sidePaneManager = GUIGlobals.sidePaneManager;
+        this.sidePaneManager = frame.sidePaneManager;
         this.frame = frame;
         this.database = bibDatabaseContext.getDatabase();
 
@@ -228,7 +224,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         StringBuilder title = new StringBuilder();
 
         if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title.append(GUIGlobals.untitledTitle);
+            title.append(GUIGlobals.UNTITLED_TITLE);
 
             if (!database().getEntries().isEmpty()) {
                 // if the database is not empty and no file is assigned,
@@ -249,11 +245,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return baseChanged;
     }
 
-    public int getMode() {
+    public BasePanelMode getMode() {
         return mode;
     }
 
-    public void setMode(int mode) {
+    public void setMode(BasePanelMode mode) {
         this.mode = mode;
     }
 
@@ -475,7 +471,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for opening the preamble editor
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
-                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database, Globals.prefs);
+                PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database);
                 PositionWindow.placeDialog(form, frame);
                 form.setVisible(true);
                 preambleEditor = form;
@@ -1284,8 +1280,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
                 // mode which makes sure the selection will trigger display of the entry editor
                 // and adjustment of the splitter.
-                if (mode != BasePanel.SHOWING_EDITOR) {
-                    mode = BasePanel.WILL_SHOW_EDITOR;
+                if (mode != BasePanelMode.SHOWING_EDITOR) {
+                    mode = BasePanelMode.WILL_SHOW_EDITOR;
                 }
 
                 int row = mainTable.findEntry(be);
@@ -1581,20 +1577,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         //setupTable();
         // If an entry is currently being shown, make sure it stays shown,
         // otherwise set the bottom component to null.
-        if (mode == BasePanel.SHOWING_PREVIEW) {
-            mode = BasePanel.SHOWING_NOTHING;
+        if (mode == BasePanelMode.SHOWING_PREVIEW) {
+            mode = BasePanelMode.SHOWING_NOTHING;
             int row = mainTable.findEntry(currentPreview.getEntry());
             if (row >= 0) {
                 mainTable.setRowSelectionInterval(row, row);
             }
 
-        } else if (mode == BasePanel.SHOWING_EDITOR) {
-            mode = BasePanel.SHOWING_NOTHING;
-            /*int row = mainTable.findEntry(currentEditor.entry);
-            if (row >= 0)
-                mainTable.setRowSelectionInterval(row, row);
-            */
-            //showEntryEditor(currentEditor);
+        } else if (mode == BasePanelMode.SHOWING_EDITOR) {
+            mode = BasePanelMode.SHOWING_NOTHING;
         } else {
             splitPane.setBottomComponent(null);
         }
@@ -1664,7 +1655,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void adjustSplitter() {
-        if (getMode() == BasePanel.SHOWING_PREVIEW) {
+        if (mode == BasePanelMode.SHOWING_PREVIEW) {
             splitPane.setDividerLocation(
                     splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT));
         } else {
@@ -1790,14 +1781,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param editor The entry editor to add.
      */
     public void showEntryEditor(EntryEditor editor) {
-        if (mode == BasePanel.SHOWING_EDITOR) {
+        if (mode == BasePanelMode.SHOWING_EDITOR) {
             Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
-        } else if (mode == BasePanel.SHOWING_PREVIEW) {
+        } else if (mode == BasePanelMode.SHOWING_PREVIEW) {
             Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
         }
-        mode = BasePanel.SHOWING_EDITOR;
+        mode = BasePanelMode.SHOWING_EDITOR;
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
         if (editor.getEntry() != getShowing()) {
@@ -1813,7 +1804,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param preview The preview to show.
      */
     public void showPreview(PreviewPanel preview) {
-        mode = BasePanel.SHOWING_PREVIEW;
+        mode = BasePanelMode.SHOWING_PREVIEW;
         currentPreview = preview;
         splitPane.setBottomComponent(preview);
     }
@@ -1822,7 +1813,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Removes the bottom component.
      */
     public void hideBottomComponent() {
-        mode = BasePanel.SHOWING_NOTHING;
+        mode = BasePanelMode.SHOWING_NOTHING;
         splitPane.setBottomComponent(null);
     }
 
@@ -1858,13 +1849,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param be a <code>BibEntry</code> value
      */
     public void ensureNotShowing(BibEntry be) {
-        if ((mode == BasePanel.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {
+        if ((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {
             selectionListener.entryEditorClosing(currentEditor);
         }
     }
 
     public void updateEntryEditorIfShowing() {
-        if (mode == BasePanel.SHOWING_EDITOR) {
+        if (mode == BasePanelMode.SHOWING_EDITOR) {
             if (currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
                 currentEditor.updateAllFields();
                 currentEditor.updateSource();
@@ -1935,7 +1926,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (getBibDatabaseContext().getDatabaseFile() == null) {
-                frame.setTabTitle(this, GUIGlobals.untitledTitle, null);
+                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
             } else {
                 frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
             }
@@ -2132,10 +2123,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * preference setting.
      */
     public void saveDividerLocation() {
-        if (mode == BasePanel.SHOWING_PREVIEW) {
+        if (mode == BasePanelMode.SHOWING_PREVIEW) {
             Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
-        } else if (mode == BasePanel.SHOWING_EDITOR) {
+        } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
         }

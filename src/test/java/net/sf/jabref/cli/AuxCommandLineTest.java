@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,9 +25,10 @@ public class AuxCommandLineTest {
     }
 
     @Test
-    public void test() {
+    public void test() throws URISyntaxException {
         InputStream originalStream = AuxCommandLineTest.class.getResourceAsStream("origin.bib");
-        File auxFile = new File(AuxCommandLineTest.class.getResource("paper.aux").getFile());
+
+        File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
             ParserResult result = BibtexParser.parse(originalReader);
 

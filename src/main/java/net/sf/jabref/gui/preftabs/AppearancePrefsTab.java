@@ -40,7 +40,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox overrideFonts;
     private final JCheckBox showGrid;
     private final ColorSetupPanel colorPanel = new ColorSetupPanel();
-    private Font font = GUIGlobals.CURRENTFONT;
+    private Font font = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
@@ -113,7 +113,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
 
         fontButton.addActionListener(
-                e -> new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x));
+                e -> new FontSelectorDialog(null, GUIGlobals.currentFont).getSelectedFont().ifPresent(x -> font = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -146,7 +146,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
         prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
-        GUIGlobals.CURRENTFONT = font;
+        GUIGlobals.currentFont = font;
         colorPanel.storeSettings();
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {

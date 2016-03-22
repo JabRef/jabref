@@ -101,12 +101,12 @@ public class MainTable extends JTable {
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
 
-    // Constants used to define how a cell should be rendered.
-    private static final int REQUIRED = 1;
-    private static final int OPTIONAL = 2;
-    private static final int OTHER = 3;
-    private static final int BOOLEAN = 4;
-
+    // Enum used to define how a cell should be rendered.
+    private enum CellRendererMode {
+        REQUIRED,
+        OPTIONAL,
+        OTHER
+    }
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
@@ -321,7 +321,7 @@ public class MainTable extends JTable {
         int score = -3;
         DefaultTableCellRenderer renderer = MainTable.defRenderer;
 
-        int status = getCellStatus(row, column);
+        CellRendererMode status = getCellStatus(row, column);
 
         if (!isFloatSearchActive || matches(row, searchMatcher)) {
             score++;
@@ -366,14 +366,11 @@ public class MainTable extends JTable {
                 renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
-        }
-        else if (tableColorCodes) {
-            if (status == MainTable.REQUIRED) {
+        } else if (tableColorCodes) {
+            if (status == CellRendererMode.REQUIRED) {
                 renderer = MainTable.reqRenderer;
-            } else if (status == MainTable.OPTIONAL) {
+            } else if (status == CellRendererMode.OPTIONAL) {
                 renderer = MainTable.optRenderer;
-            } else if (status == MainTable.BOOLEAN) {
-                renderer = (DefaultTableCellRenderer) getDefaultRenderer(Boolean.class);
             }
         }
 
@@ -555,22 +552,22 @@ public class MainTable extends JTable {
 
     }
 
-    private int getCellStatus(int row, int col) {
+    private CellRendererMode getCellStatus(int row, int col) {
         try {
             BibEntry be = sortedForGrouping.get(row);
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
             if(type.isPresent()) {
                 String columnName = getColumnName(col).toLowerCase();
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
-                    return MainTable.REQUIRED;
+                    return CellRendererMode.REQUIRED;
                 }
                 if (type.get().getOptionalFields().contains(columnName)) {
-                    return MainTable.OPTIONAL;
+                    return CellRendererMode.OPTIONAL;
                 }
             }
-            return MainTable.OTHER;
+            return CellRendererMode.OTHER;
         } catch (NullPointerException ex) {
-            return MainTable.OTHER;
+            return CellRendererMode.OTHER;
         }
     }
 
@@ -650,8 +647,8 @@ public class MainTable extends JTable {
      * updateFont
      */
     public void updateFont() {
-        setFont(GUIGlobals.CURRENTFONT);
-        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.CURRENTFONT.getSize());
+        setFont(GUIGlobals.currentFont);
+        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.currentFont.getSize());
     }
 
     public void ensureVisible(int row) {

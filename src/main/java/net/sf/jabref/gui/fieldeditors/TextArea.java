@@ -124,7 +124,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void updateFont() {
-        setFont(GUIGlobals.CURRENTFONT);
+        setFont(GUIGlobals.currentFont);
     }
 
     @Override

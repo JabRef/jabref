@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,10 +63,12 @@ public class OOBibStyleTest {
     }
 
     @Test
-    public void testAuthorYearAsFile() {
+    public void testAuthorYearAsFile() throws URISyntaxException {
         try {
-            URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
-            OOBibStyle style = new OOBibStyle(new File(defPath.getFile()), mock(JournalAbbreviationRepository.class),
+            File defFile = Paths.get(JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                    .toFile();
+
+            OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
                     Globals.prefs.getDefaultEncoding());
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());

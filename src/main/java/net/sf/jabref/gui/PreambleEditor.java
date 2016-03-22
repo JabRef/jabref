@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -19,6 +19,7 @@ import java.awt.event.*;
 import java.awt.*;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
@@ -28,6 +29,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 
 class PreambleEditor extends JDialog {
@@ -43,8 +45,10 @@ class PreambleEditor extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
+    private final PositionWindow pw;
 
-    public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base, JabRefPreferences prefs) {
+
+    public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base) {
         super(baseFrame);
         this.panel = panel;
         this.base = base;
@@ -69,9 +73,6 @@ class PreambleEditor extends JDialog {
             }
         });
 
-        int prefHeight = (int) (GUIGlobals.PE_HEIGHT * GUIGlobals.FORM_HEIGHT[prefs.getInt(JabRefPreferences.ENTRY_TYPE_FORM_HEIGHT_FACTOR)]);
-        setSize(GUIGlobals.FORM_WIDTH[prefs.getInt(JabRefPreferences.ENTRY_TYPE_FORM_WIDTH)], prefHeight);
-
         JPanel pan = new JPanel();
         GridBagLayout gbl = new GridBagLayout();
         pan.setLayout(gbl);
@@ -83,7 +84,7 @@ class PreambleEditor extends JDialog {
         String content = base.getPreamble();
 
         ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
-        //ed.addUndoableEditListener(panel.undoListener);
+
         setupJTextComponent((TextArea) ed);
 
         gbl.setConstraints(ed.getLabel(), con);
@@ -94,14 +95,32 @@ class PreambleEditor extends JDialog {
         gbl.setConstraints(ed.getPane(), con);
         pan.add(ed.getPane());
 
-        //tlb.add(closeAction);
-        //conPane.add(tlb, BorderLayout.NORTH);
         Container conPane = getContentPane();
         conPane.add(pan, BorderLayout.CENTER);
         setTitle(Localization.lang("Edit preamble"));
+
+        pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
+                JabRefPreferences.PREAMBLE_SIZE_X, JabRefPreferences.PREAMBLE_SIZE_Y);
+        pw.setWindowPosition();
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                pw.storeWindowPosition();
+            }
+        });
+
     }
 
-    private void setupJTextComponent(javax.swing.text.JTextComponent ta) {
+    private void setupJTextComponent(JTextComponent ta) {
         // Set up key bindings and focus listener for the FieldEditor.
         ta.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         ta.getActionMap().put("close", closeAction);
@@ -166,9 +185,9 @@ class PreambleEditor extends JDialog {
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {
-                    ed.setLabelColor(GUIGlobals.nullFieldColor);
+                    ed.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
                 } else {
-                    ed.setLabelColor(GUIGlobals.entryEditorLabelColor);
+                    ed.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
                 ed.setValidBackgroundColor();
                 if (ed.getTextComponent().hasFocus()) {
@@ -224,8 +243,6 @@ class PreambleEditor extends JDialog {
 
         public CloseAction() {
             super(Localization.lang("Close window"));
-            //, new ImageIcon(GUIGlobals.closeIconFile));
-            //putValue(SHORT_DESCRIPTION, "Close window (Ctrl-Q)");
         }
 
         @Override

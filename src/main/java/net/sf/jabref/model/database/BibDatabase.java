@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 JabRef contributors
+/* Copyright (C) 2003-2016 JabRef contributors
 Copyright (C) 2003 David Weitzman, Morten O. Alver
 
 All programs in this directory and
@@ -36,8 +36,6 @@ import net.sf.jabref.model.entry.MonthUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -101,7 +99,7 @@ public class BibDatabase {
      * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
     public boolean containsEntryWithId(String id) {
-        return entries.stream().anyMatch(entry -> entry.getId() == id);
+        return entries.stream().anyMatch(entry -> entry.getId().equals(id));
     }
 
     public List<BibEntry> getEntries() {
@@ -158,30 +156,30 @@ public class BibDatabase {
      * use Util.createId(...) to make up a unique ID for an entry.
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
+        Objects.requireNonNull(entry);
+
         String id = entry.getId();
         if (containsEntryWithId(id)) {
             throw new KeyCollisionException("ID is already in use, please choose another");
         }
 
         entries.add(entry);
-
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
-
         return checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
      * Removes the given entry.
+     * The Entry is removed based on the id {@link BibEntry#id}
      */
-    public synchronized void removeEntry(BibEntry oldValue) {
-        if (oldValue == null) {
-            return;
+    public synchronized void removeEntry(BibEntry toBeDeleted) {
+        Objects.requireNonNull(toBeDeleted);
+
+        boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        if (anyRemoved) {
+            removeKeyFromSet(toBeDeleted.getCiteKey());
+            fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, toBeDeleted));
         }
-
-        entries.remove(oldValue.getId());
-
-        removeKeyFromSet(oldValue.getCiteKey());
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
     }
 
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {

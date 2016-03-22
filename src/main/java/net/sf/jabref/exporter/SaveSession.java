@@ -101,7 +101,7 @@ public class SaveSession {
         if (file.exists() && backup) {
             String name = file.getName();
             String path = file.getParent();
-            File backupFile = new File(path, name + GUIGlobals.backupExt);
+            File backupFile = new File(path, name + GUIGlobals.BACKUP_EXTENSION);
             try {
                 FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
