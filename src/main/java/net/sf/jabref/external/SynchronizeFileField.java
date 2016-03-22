@@ -86,7 +86,7 @@ public class SynchronizeFileField extends AbstractWorker {
         autoSet = !optDiag.isAutoSetNone();
         checkExisting = optDiag.isCheckLinks();
 
-        panel.output(Localization.lang("Synchronizing %0 links...", Globals.FILE_FIELD.toUpperCase()));
+        panel.output(Localization.lang("Synchronizing file links..."));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class SynchronizeFileField extends AbstractWorker {
         int progressBarMax = (autoSet ? weightAutoSet * sel.size() : 0) + (checkExisting ? sel.size() : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset %0 field", Globals.FILE_FIELD));
+        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset file links."));
 
         Set<BibEntry> changedEntries = new HashSet<>();
 
@@ -257,8 +257,8 @@ public class SynchronizeFileField extends AbstractWorker {
             return;
         }
 
-        panel.output(Localization.lang("Finished synchronizing %0 links. Entries changed: %1.",
-                Globals.FILE_FIELD.toUpperCase(), String.valueOf(entriesChangedCount)));
+        panel.output(Localization.lang("Finished synchronizing file links. Entries changed: %0.",
+                String.valueOf(entriesChangedCount)));
         panel.frame().setProgressBarVisible(false);
         if (entriesChangedCount > 0) {
             panel.markBaseChanged();
@@ -273,17 +273,18 @@ public class SynchronizeFileField extends AbstractWorker {
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private boolean canceled = true;
         private final MetaData metaData;
-        private final String fn = Localization.lang("file");
         private final JRadioButton autoSetUnset = new JRadioButton(
-                Localization.lang("Autoset %0 links. Do not overwrite existing links.", fn), true);
+                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Do not overwrite existing links."),
+                true);
         private final JRadioButton autoSetAll = new JRadioButton(
-                Localization.lang("Autoset %0 links. Allow overwriting existing links.", fn), false);
+                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Allow overwriting existing links."),
+                false);
         private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not autoset"), false);
-        private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing %0 links", fn), true);
+        private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
 
 
         public OptionsDialog(JFrame parent, MetaData metaData) {
-            super(parent, Localization.lang("Synchronize %0 links", Globals.FILE_FIELD.toUpperCase()), true);
+            super(parent, Localization.lang("Synchronize file links"), true);
             this.metaData = metaData;
             ok.addActionListener(e -> {
                 canceled = false;
@@ -313,9 +314,9 @@ public class SynchronizeFileField extends AbstractWorker {
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
             JLabel description = new JLabel("<HTML>" + Localization.lang(
-                    "Attempt to autoset %0 links for your entries. Autoset works if "
-                            + "a %0 file in your %0 directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.",
-                    fn) + "</HTML>");
+                    "Attempt to autoset file links for your entries. Autoset works if "
+                            + "a file in your file directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.")
+                    + "</HTML>");
 
             builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
             builder.add(description).xy(1, 3);
@@ -324,9 +325,10 @@ public class SynchronizeFileField extends AbstractWorker {
             builder.add(autoSetNone).xy(1, 7);
             builder.addSeparator(Localization.lang("Check links")).xy(1, 9);
 
-            description = new JLabel("<HTML>" +
-                    Localization.lang("This makes JabRef look up each %0 link and check if the file exists. If not, you will be given options<BR>to resolve the problem.", fn)
-            + "</HTML>");
+            description = new JLabel("<HTML>"
+                    + Localization
+                            .lang("This makes JabRef look up each file link and check if the file exists. If not, you will be given options<BR>to resolve the problem.")
+                    + "</HTML>");
             builder.add(description).xy(1, 11);
             builder.add(checkLinks).xy(1, 13);
             builder.addSeparator("").xy(1, 15);
