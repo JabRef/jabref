@@ -20,8 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
-
+import java.util.Objects;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -48,6 +47,12 @@ class MSBibExportFormat extends ExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, List<BibEntry> entries) throws IOException {
+        Objects.requireNonNull(database);
+        Objects.requireNonNull(entries);
+
+        if (entries.isEmpty()) { // Only export if entries exist
+            return;
+        }
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);

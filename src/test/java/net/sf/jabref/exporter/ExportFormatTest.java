@@ -38,41 +38,60 @@ public class ExportFormatTest {
     }
 
     @Test
-    public void testExportingEmptyDatabaseLayoutBasedFormat() throws Exception {
+    public void testExportingEmptyDatabaseYieldsEmptyFile() throws Exception {
         BibDatabase database = new BibDatabase();
-        Map<String, IExportFormat> exportFormats = ExportFormats.getExportFormats();
-        IExportFormat exportFormat = exportFormats.get("ris");
-        File tmpFile = testFolder.newFile();
-        tmpFile.deleteOnExit();
-        String filename = tmpFile.getCanonicalPath();
-        List<BibEntry> entries = Collections.emptyList();
-        Charset charset = Charsets.UTF_8;
-        MetaData metaData = new MetaData();
-        exportFormat.performExport(database, metaData, filename, charset, entries);
-        assertTrue(tmpFile.exists());
-        try (FileReader fileReader = new FileReader(tmpFile)) {
-            char[] buffer = new char[512];
-            assertEquals(-1, fileReader.read(buffer)); // Empty file
+        for (Map.Entry<String, IExportFormat> exportFormats : ExportFormats.getExportFormats().entrySet()) {
+            IExportFormat exportFormat = exportFormats.getValue();
+            File tmpFile = testFolder.newFile();
+            tmpFile.deleteOnExit();
+            String filename = tmpFile.getCanonicalPath();
+            List<BibEntry> entries = Collections.emptyList();
+            Charset charset = Charsets.UTF_8;
+            MetaData metaData = new MetaData();
+            exportFormat.performExport(database, metaData, filename, charset, entries);
+            assertTrue(exportFormats.getKey() + " failed -- no file", tmpFile.exists());
+            try (FileReader fileReader = new FileReader(tmpFile)) {
+                char[] buffer = new char[512];
+                assertEquals(exportFormats.getKey() + " failed -- non-empty file", -1, fileReader.read(buffer)); // Empty file
+            }
         }
     }
 
     @Test
-    public void testExportingEmptyDatabaseClassBasedFormat() throws Exception {
-        BibDatabase database = new BibDatabase();
-        Map<String, IExportFormat> exportFormats = ExportFormats.getExportFormats();
-        IExportFormat exportFormat = exportFormats.get("oocalc");
-        File tmpFile = File.createTempFile("exporttest", "oocalc");
-        tmpFile.deleteOnExit();
-        String filename = tmpFile.getCanonicalPath();
+    public void testExportingNullDatabaseThrowsNPE() throws Exception {
         List<BibEntry> entries = Collections.emptyList();
         Charset charset = Charsets.UTF_8;
         MetaData metaData = new MetaData();
-        exportFormat.performExport(database, metaData, filename, charset, entries);
-        assertTrue(tmpFile.exists());
-        try (FileReader fileReader = new FileReader(tmpFile)) {
-            char[] buffer = new char[512];
-            assertEquals(-1, fileReader.read(buffer)); // Empty file
+        for (Map.Entry<String, IExportFormat> exportFormats : ExportFormats.getExportFormats().entrySet()) {
+            try {
+                IExportFormat exportFormat = exportFormats.getValue();
+                File tmpFile = testFolder.newFile();
+                tmpFile.deleteOnExit();
+                String filename = tmpFile.getCanonicalPath();
+                exportFormat.performExport(null, metaData, filename, charset, entries);
+                fail();
+            } catch (NullPointerException expected) {
+                // Ignore -- this is what we want!
+            }
         }
     }
 
+    @Test
+    public void testExportingNullEntriesThrowsNPE() throws Exception {
+        BibDatabase database = new BibDatabase();
+        Charset charset = Charsets.UTF_8;
+        MetaData metaData = new MetaData();
+        for (Map.Entry<String, IExportFormat> exportFormats : ExportFormats.getExportFormats().entrySet()) {
+            try {
+                IExportFormat exportFormat = exportFormats.getValue();
+                File tmpFile = testFolder.newFile();
+                tmpFile.deleteOnExit();
+                String filename = tmpFile.getCanonicalPath();
+                exportFormat.performExport(database, metaData, filename, charset, null);
+                fail();
+            } catch (NullPointerException expected) {
+                // Ignore -- this is what we want!
+            }
+        }
+    }
 }

@@ -176,7 +176,11 @@ public class ExportFormat implements IExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-
+        Objects.requireNonNull(database);
+        Objects.requireNonNull(entries);
+        if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
+            return;
+        }
         File outFile = new File(file);
         SaveSession ss = null;
         if (this.encoding != null) {
