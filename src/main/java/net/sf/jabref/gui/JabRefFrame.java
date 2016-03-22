@@ -2032,6 +2032,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
+            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
         }
     }
 
@@ -2054,6 +2055,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
+            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
         }
     }
 
