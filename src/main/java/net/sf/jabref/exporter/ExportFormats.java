@@ -202,7 +202,11 @@ public class ExportFormats {
                     final IExportFormat format = eff.getExportFormat();
                     List<BibEntry> entries = null;
                     if (selectedOnly) {
+                        // Selected entries
                         entries = frame.getCurrentBasePanel().getSelectedEntries();
+                    } else {
+                        // All entries
+                        entries = frame.getCurrentBasePanel().getDatabase().getEntries();
                     }
 
                     // Set the global variable for this database's file directory before exporting,

@@ -1,15 +1,18 @@
 package net.sf.jabref.exporter;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
-import java.io.IOException;
+import java.io.FileReader;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.google.common.base.Charsets;
 
@@ -22,6 +25,10 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class ExportFormatTest {
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -32,37 +39,39 @@ public class ExportFormatTest {
 
     @Test
     public void testExportingEmptyDatabaseLayoutBasedFormat() throws Exception {
-        BibDatabase db = new BibDatabase();
+        BibDatabase database = new BibDatabase();
         Map<String, IExportFormat> exportFormats = ExportFormats.getExportFormats();
-        IExportFormat exportFormat = exportFormats.get("html");
-        try {
-            File tmpFile = File.createTempFile("exporttest", "html");
-            tmpFile.deleteOnExit();
-            String filename = tmpFile.getCanonicalPath();
-            List<BibEntry> entries = Collections.emptyList();
-            Charset charset = Charsets.UTF_8;
-            MetaData metaData = new MetaData();
-            exportFormat.performExport(db, metaData, filename, charset, entries);
-        } catch (IOException e) {
-            Assert.fail("Exception caught: " + e.toString() + e.getMessage());
+        IExportFormat exportFormat = exportFormats.get("ris");
+        File tmpFile = testFolder.newFile();
+        tmpFile.deleteOnExit();
+        String filename = tmpFile.getCanonicalPath();
+        List<BibEntry> entries = Collections.emptyList();
+        Charset charset = Charsets.UTF_8;
+        MetaData metaData = new MetaData();
+        exportFormat.performExport(database, metaData, filename, charset, entries);
+        assertTrue(tmpFile.exists());
+        try (FileReader fileReader = new FileReader(tmpFile)) {
+            char[] buffer = new char[512];
+            assertEquals(-1, fileReader.read(buffer)); // Empty file
         }
     }
 
     @Test
     public void testExportingEmptyDatabaseClassBasedFormat() throws Exception {
-        BibDatabase db = new BibDatabase();
+        BibDatabase database = new BibDatabase();
         Map<String, IExportFormat> exportFormats = ExportFormats.getExportFormats();
         IExportFormat exportFormat = exportFormats.get("oocalc");
-        try {
-            File tmpFile = File.createTempFile("exporttest", "oocalc");
-            tmpFile.deleteOnExit();
-            String filename = tmpFile.getCanonicalPath();
-            List<BibEntry> entries = Collections.emptyList();
-            Charset charset = Charsets.UTF_8;
-            MetaData metaData = new MetaData();
-            exportFormat.performExport(db, metaData, filename, charset, entries);
-        } catch (IOException e) {
-            Assert.fail("Exception caught: " + e.toString() + e.getMessage());
+        File tmpFile = File.createTempFile("exporttest", "oocalc");
+        tmpFile.deleteOnExit();
+        String filename = tmpFile.getCanonicalPath();
+        List<BibEntry> entries = Collections.emptyList();
+        Charset charset = Charsets.UTF_8;
+        MetaData metaData = new MetaData();
+        exportFormat.performExport(database, metaData, filename, charset, entries);
+        assertTrue(tmpFile.exists());
+        try (FileReader fileReader = new FileReader(tmpFile)) {
+            char[] buffer = new char[512];
+            assertEquals(-1, fileReader.read(buffer)); // Empty file
         }
     }
 
