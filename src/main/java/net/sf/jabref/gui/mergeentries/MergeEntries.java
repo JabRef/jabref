@@ -18,9 +18,11 @@ package net.sf.jabref.gui.mergeentries;
 import java.awt.*;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
 import javax.swing.*;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
@@ -35,9 +37,11 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.PreviewPanel;
 
+import com.google.common.collect.Lists;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+
 import com.jgoodies.forms.layout.ColumnSpec;
 
 /**
@@ -51,13 +55,13 @@ public class MergeEntries {
     private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
     // Headings
-    private final String[] columnHeadings = {Localization.lang("Field"),
+    private static final String[] columnHeadings = {Localization.lang("Field"),
             Localization.lang("Left entry"),
             Localization.lang("Left"),
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry")};
-    private final Dimension DIM = new Dimension(800, 800);
+    private static final Dimension DIM = new Dimension(800, 800);
     private JRadioButton[][] rb;
     private Boolean[] identical;
     private final CellConstraints cc = new CellConstraints();
@@ -140,7 +144,7 @@ public class MergeEntries {
         String rowSpec = "pref, pref, 10px, fill:5cm:grow, 10px, pref, 10px, fill:3cm:grow";
         StringBuilder rowBuilder = new StringBuilder("");
         for (int i = 0; i < joint.size(); i++) {
-            rowBuilder.append("pref, ");
+            rowBuilder.append("pref, 2dlu, ");
         }
         rowBuilder.append("pref");
 
@@ -177,7 +181,9 @@ public class MergeEntries {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
         mergePanel.add(label, cc.xy(1, 1));
 
-        JTextArea type1ta = new JTextArea(type1);
+        JTextPane type1ta = new JTextPane();
+        type1ta.setContentType("text/html");
+        type1ta.setText(type1);
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
         if (type1.compareTo(type2) == 0) {
@@ -193,7 +199,9 @@ public class MergeEntries {
             }
             rb[0][0].setSelected(true);
         }
-        JTextArea type2ta = new JTextArea(type2);
+        JTextPane type2ta = new JTextPane();
+        type2ta.setContentType("text/html");
+        type2ta.setText(type2);
         type2ta.setEditable(false);
         mergePanel.add(type2ta, cc.xy(11, 1));
 
@@ -206,7 +214,7 @@ public class MergeEntries {
             label = new JLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-            mergePanel.add(label, cc.xy(1, row));
+            mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
             String string1 = one.getField(field);
             String string2 = two.getField(field);
             identical[row - 1] = false;
@@ -219,21 +227,11 @@ public class MergeEntries {
                 maxLabelWidth = tmpLabelWidth;
             }
 
-            if ("abstract".equals(field) || "review".equals(field)) {
-                // Treat the abstract and review fields special
-                JTextArea tf = new JTextArea();
-                tf.setLineWrap(true);
-                tf.setEditable(false);
-                JScrollPane jsptf = new JScrollPane(tf);
-
-                mergeLayout.setRowSpec(row, RowSpec.decode("center:2cm:grow"));
-                mergePanel.add(jsptf, cc.xy(3, row, "f, f"));
+            if (string1 != null) {
+                JTextPane tf = new JTextPane();
+                tf.setContentType("text/html");
                 tf.setText(string1);
-                tf.setCaretPosition(0);
-
-            } else {
-                JTextArea tf = new JTextArea(string1);
-                mergePanel.add(tf, cc.xy(3, row));
+                mergePanel.add(tf, cc.xy(3, (2 * row) - 1, "f, f"));
                 tf.setCaretPosition(0);
                 tf.setEditable(false);
             }
@@ -246,7 +244,7 @@ public class MergeEntries {
                 for (int k = 0; k < 3; k++) {
                     rb[k][row - 1] = new JRadioButton();
                     rbg[row - 1].add(rb[k][row - 1]);
-                    mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), row));
+                    mergePanel.add(rb[k][row - 1], cc.xy(5 + (k * 2), (2 * row) - 1));
                     rb[k][row - 1].addChangeListener(e -> updateAll());
                 }
                 if (string1 == null) {
@@ -262,24 +260,52 @@ public class MergeEntries {
                 }
             }
 
-            if ("abstract".equals(field) || "review".equals(field)) {
-                // Again, treat abstract and review special
-                JTextArea tf = new JTextArea();
-                tf.setLineWrap(true);
-                tf.setEditable(false);
-                JScrollPane jsptf = new JScrollPane(tf);
-
-                mergePanel.add(jsptf, cc.xy(11, row, "f, f"));
+            if ((string1 != null) && (string2 != null)) {
+                List<String> string1List = new ArrayList<>(Arrays.asList(string1.split("")));
+                List<String> string2List = new ArrayList<>(Arrays.asList(string2.split("")));
+                Patch<String> patch = DiffUtils.diff(string1List, string2List);
+                List<Delta<String>> deltaList = new ArrayList<>(patch.getDeltas());
+                for (Delta<String> delta : Lists.reverse(deltaList)) {
+                    int startPos = delta.getOriginal().getPosition();
+                    List<String> lines = delta.getOriginal().getLines();
+                    int offset = 0;
+                    switch (delta.getType()) {
+                    case CHANGE:
+                        for (String line : lines) {
+                            string1List.set(startPos + offset, (offset == 0 ? "<font color=\"red\"><s>" : "") + line);
+                            offset++;
+                        }
+                        string1List.set((startPos + offset) - 1, string1List.get((startPos + offset) - 1)
+                                + "</s></font><font color=\"blue\"><b><u>"
+                                + String.join("", delta.getRevised().getLines()) + "</u></b></font>");
+                        break;
+                    case DELETE:
+                        for (String line : lines) {
+                            string1List.set(startPos + offset, (offset == 0 ? "<font color=\"red\"><s>" : "") + line);
+                            offset++;
+                        }
+                        string1List.set((startPos + offset) - 1,
+                                string1List.get((startPos + offset) - 1) + "</s></font>");
+                        break;
+                    case INSERT:
+                        string1List.add(delta.getOriginal().getPosition(),
+                                "<font color=\"blue\"><b><u>" + String.join("", delta.getRevised().getLines())
+                                        + "</u></b></font>");
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                string2 = "<html>" + String.join("", string1List) + "</html>";
+            }
+            if (string2 != null) {
+                JTextPane tf = new JTextPane();
+                tf.setContentType("text/html");
                 tf.setText(string2);
-                tf.setCaretPosition(0);
-
-            } else {
-                JTextArea tf = new JTextArea(string2);
-                mergePanel.add(tf, cc.xy(11, row));
+                mergePanel.add(tf, cc.xy(11, (2 * row) - 1, "f, f"));
                 tf.setCaretPosition(0);
                 tf.setEditable(false);
             }
-
             row++;
         }
 
@@ -311,7 +337,6 @@ public class MergeEntries {
 
         String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
         pp = new PreviewPanel(null, mergedEntry, null, layoutString);
-        // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(pp, cc.xyw(1, 8, 6));
 
         label = new JLabel(Localization.lang("Merged BibTeX source code"));

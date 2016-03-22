@@ -43,8 +43,13 @@ URL:     http://commons.apache.org/cli/
 License: Apache 2.0
 
 Id:      commons-logging:commons-logging
-Project: Apache Commongs Logging
+Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
+License: Apache 2.0
+
+Id:      com.googlecode.java-diff-utils
+Project: java-diff-utils
+URL:     http://code.google.com/p/java-diff-utils/
 License: Apache 2.0
 
 Id:      com.jgoodies:jgoodies-common
