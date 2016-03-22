@@ -14,7 +14,7 @@ public class UnicodeConverterTest {
     private final UnicodeToLatexFormatter conv = new UnicodeToLatexFormatter();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 

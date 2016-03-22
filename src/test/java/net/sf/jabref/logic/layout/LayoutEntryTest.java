@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -47,7 +48,7 @@ public class LayoutEntryTest {
      * Initialize Preferences.
      */
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
             Globals.prefs.putBoolean("highLightWords", Boolean.TRUE);
@@ -82,7 +83,7 @@ public class LayoutEntryTest {
 
     // helper Methods
 
-    public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws Exception {
+    public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws IOException {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
@@ -98,7 +99,7 @@ public class LayoutEntryTest {
      */
     @Test
     @Ignore
-    public void testNoHighlighting() throws Exception {
+    public void testNoHighlighting() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
@@ -112,7 +113,7 @@ public class LayoutEntryTest {
      * @throws Exception
      */
     @Test
-    public void testHighlightingOneWordCaseInsesitive() throws Exception {
+    public void testHighlightingOneWordCaseInsesitive() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
@@ -129,7 +130,7 @@ public class LayoutEntryTest {
      * @throws Exception
      */
     @Test
-    public void testHighlightingTwoWordsCaseInsesitive() throws Exception {
+    public void testHighlightingTwoWordsCaseInsesitive() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
@@ -149,7 +150,7 @@ public class LayoutEntryTest {
      * @throws Exception
      */
     @Test
-    public void testHighlightingOneWordCaseSesitive() throws Exception {
+    public void testHighlightingOneWordCaseSesitive() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 
@@ -166,7 +167,7 @@ public class LayoutEntryTest {
      * @throws Exception
      */
     @Test
-    public void testHighlightingMoreWordsCaseSesitive() throws Exception {
+    public void testHighlightingMoreWordsCaseSesitive() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);
 

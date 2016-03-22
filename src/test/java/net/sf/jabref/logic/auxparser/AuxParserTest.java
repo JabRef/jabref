@@ -21,12 +21,12 @@ import net.sf.jabref.model.database.BibDatabase;
 public class AuxParserTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Test
-    public void testNormal() throws URISyntaxException {
+    public void testNormal() throws URISyntaxException, IOException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
@@ -44,13 +44,11 @@ public class AuxParserTest {
             assertEquals(auxResult.getFoundKeysInAux(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
-        } catch (IOException ex) {
-            fail("Cannot open file");
         }
     }
 
     @Test
-    public void testNotAllFound() throws URISyntaxException {
+    public void testNotAllFound() throws URISyntaxException, IOException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("badpaper.aux").toURI()).toFile();
 
@@ -69,13 +67,11 @@ public class AuxParserTest {
             assertEquals(auxResult.getFoundKeysInAux(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
-        } catch (IOException ex) {
-            fail("Cannot open file");
         }
     }
 
     @Test
-    public void duplicateBibDatabaseConfiguration() throws URISyntaxException {
+    public void duplicateBibDatabaseConfiguration() throws URISyntaxException, IOException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
@@ -87,13 +83,11 @@ public class AuxParserTest {
 
             assertEquals("\"Maintained by \" # maintainer", db.getPreamble());
             assertEquals(1, db.getStringCount());
-        } catch (IOException ex) {
-            fail("Cannot open file");
         }
     }
 
     @Test
-    public void testNestedAux() throws URISyntaxException {
+    public void testNestedAux() throws URISyntaxException, IOException {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("nested.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream)) {
@@ -111,8 +105,6 @@ public class AuxParserTest {
             assertEquals(auxResult.getFoundKeysInAux(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
-        } catch (IOException ex) {
-            fail("Cannot open file");
         }
     }
 }

@@ -27,7 +27,7 @@ public class BibtexImporterTest {
     private BibtexImporter importer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         importer = new BibtexImporter();
     }
@@ -40,7 +40,7 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testImportEntries() throws Exception {
+    public void testImportEntries() throws IOException {
         try (InputStream stream = BibtexImporterTest.class.getResourceAsStream("BibtexImporter.examples.bib")) {
             List<BibEntry> bibEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
@@ -93,12 +93,12 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void testGetFormatName() throws Exception {
+    public void testGetFormatName() {
         assertEquals("BibTeX", importer.getFormatName());
     }
 
     @Test
-    public void testGetExtensions() throws Exception {
+    public void testGetExtensions() {
         assertEquals("bib", importer.getExtensions());
     }
 }

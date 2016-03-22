@@ -11,6 +11,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -33,7 +36,7 @@ public class OAI2ImportTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws ParserConfigurationException, SAXException {
         parserFactory = SAXParserFactory.newInstance();
         saxParser = parserFactory.newSAXParser();
         be = new BibEntry(IdGenerator.next(), "article");
@@ -75,23 +78,18 @@ public class OAI2ImportTest {
     }
 
     @Test
-    public void testOai22xml() throws Exception {
-        try {
-            saxParser.parse(this.getClass().getResourceAsStream("oai22.xml"), handler);
-            Assert.assertEquals("2005", be.getField("year"));
-        } catch (SAXException e) {
-            throw e.getException();
-        }
+    public void testOai22xml() throws SAXException, IOException {
+
+        saxParser.parse(this.getClass().getResourceAsStream("oai22.xml"), handler);
+        Assert.assertEquals("2005", be.getField("year"));
+
     }
 
     @Test
-    public void testOai23xml() throws Throwable {
-        try {
-            saxParser.parse(this.getClass().getResourceAsStream("oai23.xml"), handler);
-            Assert.assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author"));
-        } catch (SAXException e) {
-            throw e.getException();
-        }
+    public void testOai23xml() throws SAXException, IOException {
+
+        saxParser.parse(this.getClass().getResourceAsStream("oai23.xml"), handler);
+        Assert.assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author"));
 
     }
 
@@ -129,8 +127,8 @@ public class OAI2ImportTest {
             Assert.assertNotNull(be);
 
             Assert.assertEquals("math/0612188", be.getField("eprint"));
-            Assert.assertEquals("On the classification and properties of noncommutative duplicates", be
-                    .getField("title"));
+            Assert.assertEquals("On the classification and properties of noncommutative duplicates",
+                    be.getField("title"));
             Assert.assertEquals("Javier López Peña and Gabriel Navarro", be.getField("author"));
             Assert.assertEquals("2007", be.getField("year"));
 

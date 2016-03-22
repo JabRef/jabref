@@ -22,7 +22,7 @@ public class MatchesHighlighterTest {
     }
 
     @Test
-    public void testHighlightWords() throws Exception {
+    public void testHighlightWords() {
         assertEquals("", MatchesHighlighter.highlightWordsWithHTML("", Optional.empty()));
         assertEquals("Einstein", MatchesHighlighter.highlightWordsWithHTML("Einstein", Optional.empty()));
         assertEquals("<span style=\"background-color:#3399FF;\">Einstein</span>", MatchesHighlighter.highlightWordsWithHTML("Einstein", Optional.of(Pattern.compile("Einstein"))));
@@ -39,12 +39,12 @@ public class MatchesHighlighterTest {
     }
 
     @Test
-    public void testNoWords() throws Exception {
+    public void testNoWords() {
         assertEquals(Optional.empty(), SearchQueryHighlightObservable.getPatternForWords(Collections.emptyList(), true, true));
     }
 
     @Test
-    public void testPatternCaseInsensitive() throws Exception {
+    public void testPatternCaseInsensitive() {
         Predicate<String> predicate = SearchQueryHighlightObservable.getPatternForWords(Collections.singletonList("abc"), true, false).get().asPredicate();
         assertTrue(predicate.test("abc"));
         assertTrue(predicate.test("ABC"));
@@ -53,7 +53,7 @@ public class MatchesHighlighterTest {
     }
 
     @Test
-    public void testPatternCaseSensitive() throws Exception {
+    public void testPatternCaseSensitive() {
         Predicate<String> predicate = SearchQueryHighlightObservable.getPatternForWords(Collections.singletonList("abc"), true, true).get().asPredicate();
         assertTrue(predicate.test("abc"));
         assertFalse(predicate.test("ABC"));

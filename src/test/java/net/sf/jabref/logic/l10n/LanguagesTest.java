@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class LanguagesTest {
 
     @Test
-    public void testConvertToKnownLocale() throws Exception {
+    public void testConvertToKnownLocale() {
         assertEquals(Optional.of("en"), Languages.convertToKnownLocale("en"));
         assertEquals(Optional.of("en"), Languages.convertToKnownLocale("en_US"));
         assertEquals(Optional.of("de"), Languages.convertToKnownLocale("de_DE"));

@@ -27,7 +27,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testUnifyLineBreaks() throws Exception {
+    public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
         assertEquals(Globals.NEWLINE, result);

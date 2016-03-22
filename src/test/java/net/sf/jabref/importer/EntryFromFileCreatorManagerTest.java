@@ -27,7 +27,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class EntryFromFileCreatorManagerTest {
     }
 
     @Test
-    public void testGetCreator() throws Exception {
+    public void testGetCreator() {
         EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
         EntryFromFileCreator creator = manager.getEntryCreator(ImportDataTest.NOT_EXISTING_PDF);
         Assert.assertNull(creator);
@@ -55,7 +57,7 @@ public class EntryFromFileCreatorManagerTest {
 
     @Test
     @Ignore
-    public void testAddEntrysFromFiles() throws Exception {
+    public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
         try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
             ParserResult result = BibtexParser.parse(fr);
             BibDatabase database = result.getDatabase();

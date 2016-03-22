@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class ContainsAndRegexBasedSearchRuleDescriberTest {
 
     @Test
-    public void testNoAst() throws Exception {
+    public void testNoAst() {
         String query = "a b";
         evaluateNoAst(query, true, true, "This search contains entries in which any field contains the regular expression " +
                 "<b>&#97;</b><b>&#98;</b> (case sensitive). " +

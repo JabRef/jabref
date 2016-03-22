@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +21,7 @@ import static org.mockito.Mockito.when;
 public class FieldFormatterCleanupsTest {
 
     private BibEntry entry;
+
 
     @BeforeClass
     public static void setUpPreferences() {
@@ -46,7 +46,7 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkSimpleUseCase() throws IOException {
+    public void checkSimpleUseCase() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[IdentityFormatter]");
 
@@ -56,7 +56,7 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void invalidSaveActionSting() throws IOException {
+    public void invalidSaveActionSting() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title");
 
@@ -66,7 +66,7 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkLowerCaseSaveAction() throws IOException {
+    public void checkLowerCaseSaveAction() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
 
@@ -76,7 +76,7 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkTwoSaveActionsForOneField() throws IOException {
+    public void checkTwoSaveActionsForOneField() {
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter]");
 
         assertEquals(2, actions.getConfiguredActions().size());
@@ -87,9 +87,10 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkThreeSaveActionsForOneField() throws IOException {
+    public void checkThreeSaveActionsForOneField() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter,DateFormatter]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
+                "title[LowerCaseChanger,IdentityFormatter,DateFormatter]");
 
         assertEquals(3, actions.getConfiguredActions().size());
 
@@ -98,11 +99,11 @@ public class FieldFormatterCleanupsTest {
         assertEquals("educational session 1", entry.getField("title"));
     }
 
-
     @Test
-    public void checkMultipleSaveActions() throws IOException {
+    public void checkMultipleSaveActions() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter]title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
+                "pages[PageNumbersFormatter]title[LowerCaseChanger]");
 
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
@@ -123,9 +124,10 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkMultipleSaveActionsWithMultipleFormatters() throws IOException {
+    public void checkMultipleSaveActionsWithMultipleFormatters() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
+                "pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]");
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         assertEquals(3, formatterCleanups.size());
@@ -134,7 +136,8 @@ public class FieldFormatterCleanupsTest {
             if (cleanup.getField().equals("title")) {
                 assertEquals("LowerCaseChanger", cleanup.getFormatter().getKey());
             } else if (cleanup.getField().equals("pages")) {
-                if (!("PageNumbersFormatter".equals(cleanup.getFormatter().getKey()) || "DateFormatter".equals(cleanup.getFormatter().getKey()))) {
+                if (!("PageNumbersFormatter".equals(cleanup.getFormatter().getKey())
+                        || "DateFormatter".equals(cleanup.getFormatter().getKey()))) {
                     fail("Wrong formatter for pages field: " + cleanup.getFormatter().getKey());
                 }
             }
