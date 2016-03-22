@@ -32,6 +32,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -729,8 +730,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private boolean storeSource() {
-        // Store edited bibtex code.
-        BibtexParser bibtexParser = new BibtexParser(new java.io.StringReader(source.getText()));
+        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()));
 
         try {
             ParserResult parserResult = bibtexParser.parse();
@@ -750,7 +750,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntries().iterator().next();
+            BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKey();
             boolean anyChanged = false;
             boolean changedType = false;
@@ -787,8 +787,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             // See if the user has changed the entry type:
             if (newEntry.getType() != entry.getType()) {
-                compound.addEdit(new UndoableChangeType(entry,
-                        entry.getType(), newEntry.getType()));
+                compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
                 entry.setType(newEntry.getType());
                 anyChanged = true;
                 changedType = true;
@@ -810,13 +809,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             }
 
             lastSourceStringAccepted = source.getText();
-            if (changedType) {
-                panel.updateEntryEditorIfShowing();
-            } else {
-                updateAllFields();
-                lastSourceAccepted = true;
-                updateSource = true;
-            }
+            // Update UI
+            // TODO: we need to repaint if fields that are not displayed have been added
+            panel.updateEntryEditorIfShowing();
+            lastSourceAccepted = true;
+            updateSource = true;
             // TODO: does updating work properly after source stored?
             panel.markBaseChanged();
 
