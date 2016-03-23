@@ -1,9 +1,8 @@
 package net.sf.jabref.logic.l10n;
 
-import com.google.common.base.Charsets;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,7 +71,7 @@ public class LocalizationParser {
         List<LocalizationEntry> result = new LinkedList<>();
 
         try {
-            List<String> lines = Files.readAllLines(path, Charsets.UTF_8);
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
             String content = String.join("\n", lines);
 
             List<String> keys = JavaLocalizationEntryParser.getLanguageKeysInString(content, type);
@@ -130,7 +129,7 @@ public class LocalizationParser {
                 StringBuilder b = new StringBuilder();
                 int quotations = 0;
                 for (char c : parsedContentsOfLangMethod.toCharArray()) {
-                    if (c == '"' && quotations > 0) {
+                    if ((c == '"') && (quotations > 0)) {
                         quotations--;
                     } else if (c == '"') {
                         quotations++;

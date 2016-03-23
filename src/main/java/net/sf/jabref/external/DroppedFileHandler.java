@@ -303,8 +303,7 @@ public class DroppedFileHandler {
     //
     // @return true if user pushed "OK", false otherwise
     //
-    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
- BibEntry entry,
+    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType, BibEntry entry,
             BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
