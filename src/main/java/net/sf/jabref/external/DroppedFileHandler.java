@@ -139,8 +139,7 @@ public class DroppedFileHandler {
         }
 
         // Show dialog
-        boolean newEntry = false;
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
             return;
         }
 
@@ -183,8 +182,7 @@ public class DroppedFileHandler {
         ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
         // Show dialog
-        boolean newEntry = false;
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
             return;
         }
 
@@ -306,7 +304,8 @@ public class DroppedFileHandler {
     // @return true if user pushed "OK", false otherwise
     //
     private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
-                                                 BibEntry entry, boolean newEntry, final boolean multipleEntries, BibDatabase database) {
+ BibEntry entry,
+            BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
@@ -336,27 +335,14 @@ public class DroppedFileHandler {
 
             @Override
             public void stateChanged(ChangeEvent arg0) {
-                renameCheckBox.setEnabled(!linkInPlace.isSelected()
-                        && !multipleEntries);
-                renameToTextBox.setEnabled(!linkInPlace.isSelected()
-                        && !multipleEntries);
-                if (multipleEntries) {
-                    renameToTextBox.setText(Localization.lang("Multiple entries"));
-                }
+                renameCheckBox.setEnabled(!linkInPlace.isSelected());
+                renameToTextBox.setEnabled(!linkInPlace.isSelected());
             }
         };
 
-        if (multipleEntries) {
-            linkInPlace.setText(Localization.lang("Leave files in their current directory."));
-            copyRadioButton.setText(Localization.lang("Copy files to file directory."));
-
-            moveRadioButton.setText(Localization.lang("Move files to file directory."));
-        } else {
-            linkInPlace.setText(Localization.lang("Leave file in its current directory."));
-            copyRadioButton.setText(Localization.lang("Copy file to file directory."));
-            moveRadioButton.setText(Localization.lang("Move file to file directory."));
-        }
-
+        linkInPlace.setText(Localization.lang("Leave file in its current directory."));
+        copyRadioButton.setText(Localization.lang("Copy file to file directory."));
+        moveRadioButton.setText(Localization.lang("Move file to file directory."));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
