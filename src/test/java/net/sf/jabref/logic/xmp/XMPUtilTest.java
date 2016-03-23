@@ -8,6 +8,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -446,7 +447,7 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
-        assertEqualsBibtexEntry(e, x);
+        BibtexEntryAssert.assertEquals(e, x);
     }
 
     /**
@@ -492,7 +493,7 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
-        assertEqualsBibtexEntry(t2BibtexEntry(), e);
+        BibtexEntryAssert.assertEquals(t2BibtexEntry(), e);
     }
 
     @Test
@@ -556,7 +557,7 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             BibEntry e = l.get(0);
 
-            assertEqualsBibtexEntry(t1BibtexEntry(), e);
+            BibtexEntryAssert.assertEquals(t1BibtexEntry(), e);
 
             // This is what we really want to test: Is the rest of the
             // descriptions still there?
@@ -632,7 +633,7 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
-        assertEqualsBibtexEntry(toSet, e);
+        BibtexEntryAssert.assertEquals(toSet, e);
 
         // This is what we really want to test: Is the rest of the
         // descriptions still there?
@@ -723,28 +724,7 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
-        assertEqualsBibtexEntry(e, x);
-    }
-
-    public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
-        Assert.assertNotNull(expected);
-        Assert.assertNotNull(actual);
-        Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
-        Assert.assertEquals(expected.getType(), actual.getType());
-
-        for (String field : expected.getFieldNames()) {
-
-            if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
-
-                AuthorList expectedAuthors = AuthorList.getAuthorList(expected.getField(field));
-                AuthorList actualAuthors = AuthorList.getAuthorList(actual.getField(field));
-                Assert.assertEquals(expectedAuthors, actualAuthors);
-            } else {
-                Assert.assertEquals("comparing " + field, expected.getField(field), actual.getField(field));
-            }
-        }
-
-        Assert.assertEquals(expected.getFieldNames().size(), actual.getFieldNames().size());
+        BibtexEntryAssert.assertEquals(e, x);
     }
 
     /**
@@ -826,8 +806,8 @@ public class XMPUtilTest {
             b = tmp;
         }
 
-        assertEqualsBibtexEntry(t2BibtexEntry(), a);
-        assertEqualsBibtexEntry(t3BibtexEntry(), b);
+        BibtexEntryAssert.assertEquals(t2BibtexEntry(), a);
+        BibtexEntryAssert.assertEquals(t3BibtexEntry(), b);
     }
 
     /**
@@ -857,8 +837,8 @@ public class XMPUtilTest {
             b = tmp;
         }
 
-        assertEqualsBibtexEntry(t2BibtexEntry(), a);
-        assertEqualsBibtexEntry(t3BibtexEntry(), b);
+        BibtexEntryAssert.assertEquals(t2BibtexEntry(), a);
+        BibtexEntryAssert.assertEquals(t3BibtexEntry(), b);
     }
 
     @Test
@@ -881,7 +861,7 @@ public class XMPUtilTest {
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/bibtexkey"));
             Assert.assertEquals("peanut, butter, jelly", document.getDocumentInformation().getKeywords());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(),
+            BibtexEntryAssert.assertEquals(t3BibtexEntry(),
                     XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -920,7 +900,7 @@ public class XMPUtilTest {
              */
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
+            BibtexEntryAssert.assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
 
         }
 
@@ -946,7 +926,7 @@ public class XMPUtilTest {
                     document.getDocumentInformation().getCustomMetadataValue("bibtex/bibtexkey"));
             Assert.assertEquals("peanut, butter, jelly", document.getDocumentInformation().getKeywords());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(),
+            BibtexEntryAssert.assertEquals(t3BibtexEntry(),
                     XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get());
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -985,7 +965,7 @@ public class XMPUtilTest {
              */
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
+            BibtexEntryAssert.assertEquals(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
 
         }
     }
@@ -1063,7 +1043,7 @@ public class XMPUtilTest {
             }
             List<BibEntry> l = XMPUtil.readXMP(pdfFile);
             Assert.assertEquals(1, l.size());
-            assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+            BibtexEntryAssert.assertEquals(t1BibtexEntry(), l.get(0));
 
         } finally {
             if (!tempBib.delete()) {
@@ -1099,7 +1079,7 @@ public class XMPUtilTest {
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
 
-                assertEqualsBibtexEntry(e, x);
+                BibtexEntryAssert.assertEquals(e, x);
             }
         }
         // Write XMP to file
@@ -1133,7 +1113,7 @@ public class XMPUtilTest {
             List<BibEntry> l = XMPUtil.readXMP(pdfFile);
             Assert.assertEquals(1, l.size());
 
-            assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+            BibtexEntryAssert.assertEquals(t1BibtexEntry(), l.get(0));
         }
     }
 
@@ -1164,7 +1144,7 @@ public class XMPUtilTest {
                 // PDF should be annotated:
                 List<BibEntry> l = XMPUtil.readXMP(pdfFile);
                 Assert.assertEquals(1, l.size());
-                assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+                BibtexEntryAssert.assertEquals(t1BibtexEntry(), l.get(0));
             }
             // Now try OezbekC06
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
@@ -1180,7 +1160,7 @@ public class XMPUtilTest {
             // PDF should be annotated:
             List<BibEntry> l = XMPUtil.readXMP(pdfFile);
             Assert.assertEquals(1, l.size());
-            assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+            BibtexEntryAssert.assertEquals(t2BibtexEntry(), l.get(0));
         } finally {
             if (!tempBib.delete()) {
                 System.err.println("Cannot delete temporary file");
@@ -1230,8 +1210,8 @@ public class XMPUtilTest {
             // Writing and reading will resolve strings!
             t3.setField("month", "July");
 
-            assertEqualsBibtexEntry(t1, a);
-            assertEqualsBibtexEntry(t3, b);
+            BibtexEntryAssert.assertEquals(t1, a);
+            BibtexEntryAssert.assertEquals(t3, b);
 
         } finally {
             if (!tempBib.delete()) {

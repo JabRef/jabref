@@ -15,6 +15,8 @@ public class CanonicalBibtexEntry {
      * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
      * as is
      *
+     * authors and editors are normalized
+     *
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
      */
     public static String getCanonicalRepresentation(BibEntry e) {
@@ -34,7 +36,12 @@ public class CanonicalBibtexEntry {
             if (!fieldName.equals(BibEntry.KEY_FIELD)) {
                 String lowerCaseFieldName = fieldName.toLowerCase(Locale.US);
                 sortedFields.add(lowerCaseFieldName);
-                mapFieldToValue.put(lowerCaseFieldName, e.getField(fieldName));
+                String value = e.getField(fieldName);
+                if ("author".equals(lowerCaseFieldName) || "editor".equals(lowerCaseFieldName)) {
+                    // normalize field contents
+                    value = AuthorList.getAuthorList(value).toString();
+                }
+                mapFieldToValue.put(lowerCaseFieldName, value);
             }
         }
 
