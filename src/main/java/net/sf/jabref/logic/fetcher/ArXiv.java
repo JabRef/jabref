@@ -37,22 +37,16 @@ public class ArXiv implements FullTextFinder {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        // Try unique DOI first
+        // 1. DOI
         Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        // 2. Eprint
+        String eprint = entry.getField("eprint");
 
         if (doi.isPresent()) {
             String doiString = doi.get().getDOI();
             // Available in catalog?
             try {
-                HttpResponse<InputStream> response = Unirest.get(API_URL)
-                        .queryString("search_query", doiString)
-                        .queryString("max_results", 1)
-                        .asBinary();
-
-                // Xml response
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document doc = builder.parse(response.getBody());
+                Document doc = queryApi(doiString);
 
                 NodeList nodes = doc.getElementsByTagName("arxiv:doi");
                 Node doiTag = nodes.item(0);
@@ -73,10 +67,44 @@ public class ArXiv implements FullTextFinder {
                         }
                     }
                 }
-            } catch(UnirestException | ParserConfigurationException | SAXException e) {
-                LOGGER.warn("arXiv API request failed", e);
+            } catch (UnirestException | ParserConfigurationException | SAXException | IOException e) {
+                LOGGER.warn("arXiv DOI API request failed", e);
+            }
+        } else if (eprint != null && !eprint.isEmpty()) {
+            try {
+                // only lookup on id field
+                Document doc = queryApi("id:" + eprint);
+
+                // Lookup PDF link
+                NodeList links = doc.getElementsByTagName("link");
+
+                for (int i = 0; i < links.getLength(); i++) {
+                    Node link = links.item(i);
+                    NamedNodeMap attr = link.getAttributes();
+                    String rel = attr.getNamedItem("rel").getNodeValue();
+                    String href = attr.getNamedItem("href").getNodeValue();
+
+                    if ("related".equals(rel) && "pdf".equals(attr.getNamedItem("title").getNodeValue())) {
+                        pdfLink = Optional.of(new URL(href));
+                        LOGGER.info("Fulltext PDF found @ arXiv.");
+                    }
+                }
+            } catch (UnirestException | ParserConfigurationException | SAXException | IOException e) {
+                LOGGER.warn("arXiv eprint API request failed", e);
             }
         }
         return pdfLink;
+    }
+
+    private Document queryApi(String query) throws SAXException, ParserConfigurationException, IOException, UnirestException {
+        HttpResponse<InputStream> response = Unirest.get(API_URL)
+                .queryString("search_query", query)
+                .queryString("max_results", 1)
+                .asBinary();
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        return builder.parse(response.getBody());
     }
 }

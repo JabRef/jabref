@@ -40,6 +40,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 - PdfContentImporter does not write the content of the first page into the review field any more
 - Implemented [#462](https://github.com/JabRef/jabref/issues/462): Add new action to open console where opened database file is located. New button, menu entry and shortcut (CTRL+SHIFT+J) for this action have also been added.
+- [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings

@@ -42,6 +42,16 @@ public class ArXivTest {
     }
 
     @Test
+    public void findByEprint() throws IOException {
+        entry.setField("eprint", "1603.06570");
+
+        Assert.assertEquals(
+                Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")),
+                finder.findFullText(entry)
+        );
+    }
+
+    @Test
     public void notFoundByDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
 
