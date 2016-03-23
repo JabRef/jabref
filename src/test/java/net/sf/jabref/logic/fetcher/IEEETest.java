@@ -14,6 +14,7 @@ public class IEEETest {
     private IEEE finder;
     private BibEntry entry;
 
+
     @Before
     public void setUp() {
         finder = new IEEE();
@@ -38,8 +39,7 @@ public class IEEETest {
         Assert.assertEquals(
                 Optional.of(
                         new URL("http://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931")),
-                finder.findFullText(entry)
-        );
+                finder.findFullText(entry));
     }
 
     @Test

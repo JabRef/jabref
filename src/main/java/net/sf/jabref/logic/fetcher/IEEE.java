@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.fetcher;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,26 +29,24 @@ public class IEEE implements FullTextFinder {
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfLink = Optional.empty();
 
         Optional<DOI> doi = DOI.build(entry.getField("doi"));
-        if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI)) {
-            Optional<URI> uri = doi.get().getURI();
-            if (uri.isPresent()) {
-                String firstResult = new URLDownload(uri.get().toURL()).downloadToString(Charsets.UTF_8);
-                Matcher matcher = STAMP_PATTERN.matcher(firstResult);
-                if (matcher.find()) {
-                    String secondResult = new URLDownload(new URL(BASE_URL + matcher.group(1)))
-                            .downloadToString(Charsets.UTF_8);
-                    matcher = PDF_PATTERN.matcher(secondResult);
-                    if (matcher.find()) {
-                        pdfLink = Optional.of(new URL(matcher.group(1)));
-                        LOGGER.debug("Full text document found on IEEE Xplore");
-                    }
-                }
+        if (!doi.isPresent() || !doi.get().getDOI().startsWith(IEEE_DOI) || !doi.get().getURI().isPresent()) {
+            return Optional.empty();
+        }
+
+        String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL()).downloadToString(Charsets.UTF_8);
+        Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
+        if (matcher.find()) {
+            String framePage = new URLDownload(new URL(BASE_URL + matcher.group(1)))
+                    .downloadToString(Charsets.UTF_8);
+            matcher = PDF_PATTERN.matcher(framePage);
+            if (matcher.find()) {
+                LOGGER.debug("Full text document found on IEEE Xplore");
+                return Optional.of(new URL(matcher.group(1)));
             }
         }
-        return pdfLink;
+        return Optional.empty();
     }
 
 }
