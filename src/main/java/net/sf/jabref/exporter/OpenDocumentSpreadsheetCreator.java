@@ -34,7 +34,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,7 +57,11 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, entries);
+        Objects.requireNonNull(database);
+        Objects.requireNonNull(entries);
+        if (!entries.isEmpty()) { // Only export if entries exists
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, entries);
+        }
     }
 
     private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {

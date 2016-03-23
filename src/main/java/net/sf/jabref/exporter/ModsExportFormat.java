@@ -29,7 +29,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.OutputKeys;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +47,12 @@ class ModsExportFormat extends ExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, List<BibEntry> entries) throws IOException {
+        Objects.requireNonNull(database);
+        Objects.requireNonNull(entries);
+        if (entries.isEmpty()) { // Only export if entries exist
+            return;
+        }
+
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
             MODSDatabase md = new MODSDatabase(database, entries);

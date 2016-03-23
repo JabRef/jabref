@@ -81,15 +81,13 @@ public class BibDatabaseWriter {
      */
     public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort,
             SavePreferences preferences) {
+        Objects.requireNonNull(bibDatabaseContext);
+        Objects.requireNonNull(entriesToSort);
 
         //if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             List<BibEntry> result = new LinkedList<>();
-            if (entriesToSort == null) {
-                result.addAll(bibDatabaseContext.getDatabase().getEntries());
-            } else {
-                result.addAll(entriesToSort);
-            }
+            result.addAll(entriesToSort);
             return result;
         }
 
@@ -98,11 +96,7 @@ public class BibDatabaseWriter {
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
         List<BibEntry> sorted = new ArrayList<>();
-        if (entriesToSort == null) {
-            sorted.addAll(bibDatabaseContext.getDatabase().getEntries());
-        } else {
-            sorted.addAll(entriesToSort);
-        }
+        sorted.addAll(entriesToSort);
 
         Collections.sort(sorted, comparatorStack);
 

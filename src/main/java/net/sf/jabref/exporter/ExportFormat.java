@@ -167,8 +167,7 @@ public class ExportFormat implements IExportFormat {
      * @param metaData   The database's meta data.
      * @param file       the file to write the resulting export to
      * @param encoding   The encoding of the database
-     * @param entries    Contains all entries that should be exported. If
-     *                   <code>null</code>, all entries will be exported.
+     * @param entries    Contains all entries that should be exported.
      * @throws IOException if a problem occurred while trying to write to {@code writer}
      *                     or read from required resources.
      * @throws Exception   if any other error occurred during export.
@@ -177,7 +176,11 @@ public class ExportFormat implements IExportFormat {
     @Override
     public void performExport(final BibDatabase database, final MetaData metaData, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-
+        Objects.requireNonNull(database);
+        Objects.requireNonNull(entries);
+        if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
+            return;
+        }
         File outFile = new File(file);
         SaveSession ss = null;
         if (this.encoding != null) {

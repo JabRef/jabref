@@ -275,7 +275,8 @@ public class JabRef {
                         // We have an ExportFormat instance:
                         try {
                             System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                            format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(), null);
+                            format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(),
+                                    newBase.getEntries());
                         } catch (Exception ex) {
                             System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                                     + ex.getMessage());
