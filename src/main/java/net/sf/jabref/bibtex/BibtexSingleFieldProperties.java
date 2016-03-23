@@ -12,7 +12,8 @@ public enum BibtexSingleFieldProperties {
     SET_OWNER,
     MONTH,
     FILE_EDITOR,
-    NUMERIC;
+    NUMERIC,
+    PERSON_NAMES;
 
     public static final EnumSet<BibtexSingleFieldProperties> ALL_OPTS = EnumSet
             .allOf(BibtexSingleFieldProperties.class);

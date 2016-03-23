@@ -1,5 +1,9 @@
 package net.sf.jabref.gui.maintable;
 
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.format.FormatChars;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -17,6 +21,8 @@ public class MainTableColumn {
     private final Optional<JLabel> iconLabel;
 
     private final Optional<BibDatabase> database;
+
+    private final LayoutFormatter toUnicode = new FormatChars();
 
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
@@ -66,7 +72,12 @@ public class MainTableColumn {
      * @return true if the bibtex fields contains author or editor
      */
     public boolean isNameColumn() {
-        return bibtexFields.contains("author") || bibtexFields.contains("editor");
+        for (String field : bibtexFields) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getColumnName() {
@@ -103,6 +114,10 @@ public class MainTableColumn {
             if (content != null) {
                 break;
             }
+        }
+
+        if (content != null) {
+            content = toUnicode.format(content);
         }
 
         if (isNameColumn()) {
