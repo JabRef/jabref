@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.fetcher;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 
-
 public class IEEE implements FullTextFinder {
 
     private static final Log LOGGER = LogFactory.getLog(IEEE.class);
@@ -22,28 +22,29 @@ public class IEEE implements FullTextFinder {
             .compile("\"(http://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "http://ieeexplore.ieee.org";
+
+
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-            Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        Optional<DOI> doi = DOI.build(entry.getField("doi"));
         if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI)) {
-            URLDownload urlDownload = new URLDownload(doi.get().getURI().get().toURL());
-            String firstResult = urlDownload.downloadToString();
-            Matcher matcher = STAMP_PATTERN.matcher(firstResult);
-            if (matcher.find()) {
-                URL stampURL = new URL(BASE_URL + matcher.group(1));
-                String secondResult = new URLDownload(stampURL).downloadToString();
-                matcher = PDF_PATTERN.matcher(secondResult);
+            Optional<URI> uri = doi.get().getURI();
+            if (uri.isPresent()) {
+                String firstResult = new URLDownload(uri.get().toURL()).downloadToString();
+                Matcher matcher = STAMP_PATTERN.matcher(firstResult);
                 if (matcher.find()) {
-                    String pdfURLText = matcher.group(1);
-                    pdfLink = Optional.of(new URL(pdfURLText));
-                    LOGGER.debug("Full text document found on IEEE Xplore");
+                    String secondResult = new URLDownload(new URL(BASE_URL + matcher.group(1))).downloadToString();
+                    matcher = PDF_PATTERN.matcher(secondResult);
+                    if (matcher.find()) {
+                        pdfLink = Optional.of(new URL(matcher.group(1)));
+                        LOGGER.debug("Full text document found on IEEE Xplore");
+                    }
                 }
             }
         }
-
         return pdfLink;
     }
 
