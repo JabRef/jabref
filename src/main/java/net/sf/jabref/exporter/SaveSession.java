@@ -194,7 +194,7 @@ public class SaveSession {
         return undoableFieldChanges;
     }
 
-    public void addFieldChanges(List<FieldChange> undoableFieldChanges) {
-        this.undoableFieldChanges.addAll(undoableFieldChanges);
+    public void addFieldChanges(List<FieldChange> newUndoableFieldChanges) {
+        this.undoableFieldChanges.addAll(newUndoableFieldChanges);
     }
 }

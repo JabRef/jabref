@@ -56,10 +56,10 @@ public class ArchitectureTests {
 
     @Test
     public void testLogicIndependentOfSwingAndGui() throws IOException {
-        assertIndependenceOfPackages(firstPackage, secondPackage);
+        assertIndependenceOfPackages();
     }
 
-    private void assertIndependenceOfPackages(String firstPackage, String secondPackage) throws IOException {
+    private void assertIndependenceOfPackages() throws IOException {
         List<Path> files = Files.walk(Paths.get("src"))
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
