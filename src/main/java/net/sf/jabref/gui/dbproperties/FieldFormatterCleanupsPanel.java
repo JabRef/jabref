@@ -53,7 +53,6 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private final FieldFormatterCleanups defaultFormatters;
 
-
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
         this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
         enabled = new JCheckBox(description);

@@ -140,7 +140,7 @@ class FileListEditorTransferHandler extends TransferHandler {
 
         } catch (IOException ioe) {
             LOGGER.warn("Failed to read dropped data. ", ioe);
-        } catch (UnsupportedFlavorException ufe) {
+        } catch (UnsupportedFlavorException | ClassCastException ufe) {
             LOGGER.warn("Drop type error. ", ufe);
         }
 

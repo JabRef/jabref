@@ -391,8 +391,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // We have determined that the clipboard data is a set of entries.
                     try {
                         bes = (Collection<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
-
-                    } catch (UnsupportedFlavorException ex) {
+                    } catch (UnsupportedFlavorException | ClassCastException ex) {
                         LOGGER.warn("Could not paste this type", ex);
                     } catch (IOException ex) {
                         LOGGER.warn("Could not paste", ex);
