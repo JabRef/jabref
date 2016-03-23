@@ -8,22 +8,22 @@ public class BibEntryTest {
     private BibEntry entry;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         entry = new BibEntry();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         entry = null;
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void notOverrideReservedFields() throws Exception {
+    public void notOverrideReservedFields() {
         entry.setField(BibEntry.ID_FIELD, "somevalue");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void notClearReservedFields() throws Exception {
+    public void notClearReservedFields() {
         entry.clearField(BibEntry.ID_FIELD);
     }
 }

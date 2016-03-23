@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class FindFullTextTest {
 
     @Ignore
     @Test
-    public void acceptPdfUrls() throws Exception {
+    public void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FullTextFinder finder = (e) -> Optional.of(pdfUrl);
         FindFullText fetcher = new FindFullText(Arrays.asList(finder));
@@ -36,7 +37,7 @@ public class FindFullTextTest {
     }
 
     @Test
-    public void rejectNonPdfUrls() throws Exception {
+    public void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
         FullTextFinder finder = (e) -> Optional.of(pdfUrl);
         FindFullText fetcher = new FindFullText(Arrays.asList(finder));

@@ -20,12 +20,12 @@ import net.sf.jabref.model.database.BibDatabase;
 public class AuxCommandLineTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Test
-    public void test() throws URISyntaxException {
+    public void test() throws URISyntaxException, IOException {
         InputStream originalStream = AuxCommandLineTest.class.getResourceAsStream("origin.bib");
 
         File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
@@ -36,8 +36,6 @@ public class AuxCommandLineTest {
             BibDatabase newDB = auxCommandLine.perform();
             Assert.assertNotNull(newDB);
             Assert.assertEquals(2, newDB.getEntries().size());
-        } catch (IOException ex) {
-            Assert.fail("Cannot open file");
         }
     }
 

@@ -29,13 +29,13 @@ public class MedlinePlainImporterTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         importer = new MedlinePlainImporter();
     }
 
     @Test
-    public void testIsRecognizedFormat() throws Exception {
+    public void testIsRecognizedFormat() throws IOException {
         List<String> list = Arrays.asList("CopacImporterTest1.txt", "CopacImporterTest2.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi");
         for (String str : list) {
@@ -59,12 +59,12 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
-    public void testIsNotEmptyFileRecognizedFormat() throws Exception {
+    public void testIsNotEmptyFileRecognizedFormat() throws IOException {
         Assert.assertFalse(importer.isRecognizedFormat(emptyFileStream));
     }
 
     @Test
-    public void testImportMultipleEntriesInSingleFile() throws Exception {
+    public void testImportMultipleEntriesInSingleFile() throws IOException {
         try (InputStream is = MedlinePlainImporter.class
                 .getResourceAsStream("MedlinePlainImporterTestMultipleEntries.txt")) {
 
@@ -109,7 +109,7 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
-    public void testEmptyFileImport() throws Exception {
+    public void testEmptyFileImport() throws IOException {
         List<BibEntry> emptyEntries = importer.importEntries(emptyFileStream, new OutputPrinterToNull());
         Assert.assertEquals(Collections.emptyList(), emptyEntries);
     }
@@ -140,16 +140,17 @@ public class MedlinePlainImporterTest {
     public void testMultiLineComments() throws IOException {
         try (InputStream stream = streamForString("PMID-22664220" + "\n" + "CON - Comment1" + "\n" + "CIN - Comment2"
                 + "\n" + "EIN - Comment3" + "\n" + "EFR - Comment4" + "\n" + "CRI - Comment5" + "\n" + "CRF - Comment6"
-                + "\n" + "PRIN- Comment7" + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n"
-                + "RPF - Comment10" + "\n" + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13"
-                + "\n" + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16");) {
+                + "\n" + "PRIN- Comment7" + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n" + "RPF - Comment10"
+                + "\n" + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13" + "\n"
+                + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16");) {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setField("comment", "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4"
-                    + "\n" + "Comment5" + "\n" + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9"
-                    + "\n" + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
-                    + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
+            expectedEntry.setField("comment",
+                    "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
+                            + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
+                            + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
+                            + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }

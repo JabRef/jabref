@@ -21,7 +21,7 @@ import net.sf.jabref.model.entry.BibEntry;
 public class GVKParserTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -56,7 +56,7 @@ public class GVKParserTest {
     }
 
     @Test
-    public void subTitleTest() throws Exception {
+    public void subTitleTest() throws IOException, ParserConfigurationException, SAXException {
         try (InputStream is = GVKParser.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
             GVKParser parser = new GVKParser();
             List<BibEntry> entries = parser.parseEntries(is);

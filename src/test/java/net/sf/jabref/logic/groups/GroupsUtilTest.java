@@ -21,7 +21,7 @@ public class GroupsUtilTest {
 
     @Before
     public void setup() {
-        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
+        Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @After

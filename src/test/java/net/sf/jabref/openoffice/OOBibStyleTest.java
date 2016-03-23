@@ -35,20 +35,20 @@ import static org.mockito.Mockito.mock;
 public class OOBibStyleTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         Globals.prefs = null;
     }
 
     @Test
-    public void testAuthorYear() {
-        try {
-            URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+    public void testAuthorYear() throws IOException {
+        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
+
+        try (Reader r = new InputStreamReader(defPath.openStream())) {
             OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());
@@ -57,36 +57,32 @@ public class OOBibStyleTest {
             assertFalse(style.isItalicCitations());
             assertFalse(style.isNumberEntries());
             assertFalse(style.isSortByPosition());
-        } catch (IOException e) {
-            fail();
         }
     }
 
     @Test
-    public void testAuthorYearAsFile() throws URISyntaxException {
-        try {
-            File defFile = Paths.get(JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                    .toFile();
+    public void testAuthorYearAsFile() throws URISyntaxException, IOException {
 
-            OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
-                    Globals.prefs.getDefaultEncoding());
-            assertTrue(style.isValid());
-            assertFalse(style.isBibtexKeyCiteMarkers());
-            assertFalse(style.isBoldCitations());
-            assertFalse(style.isFormatCitations());
-            assertFalse(style.isItalicCitations());
-            assertFalse(style.isNumberEntries());
-            assertFalse(style.isSortByPosition());
-        } catch (IOException e) {
-            fail();
-        }
+        File defFile = Paths.get(JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                .toFile();
+
+        OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
+                Globals.prefs.getDefaultEncoding());
+        assertTrue(style.isValid());
+        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isBoldCitations());
+        assertFalse(style.isFormatCitations());
+        assertFalse(style.isItalicCitations());
+        assertFalse(style.isNumberEntries());
+        assertFalse(style.isSortByPosition());
+
     }
 
     @Test
-    public void testNumerical() {
-        try {
-            URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream());
+    public void testNumerical() throws IOException {
+
+        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
+        try (Reader r = new InputStreamReader(defPath.openStream())) {
             OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());
@@ -95,9 +91,8 @@ public class OOBibStyleTest {
             assertFalse(style.isItalicCitations());
             assertTrue(style.isNumberEntries());
             assertTrue(style.isSortByPosition());
-        } catch (IOException e) {
-            fail();
         }
+
     }
 
     @Test
@@ -177,5 +172,5 @@ public class OOBibStyleTest {
         assertEquals(
                 "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>. In:  (Ed.), <i>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</i>, ACM.",
                 l.doLayout(entry, db));
-}
+    }
 }

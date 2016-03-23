@@ -6,7 +6,7 @@ import org.junit.Test;
 public class AbbreviationParserTest {
 
     @Test
-    public void testReadJournalListFromResource() throws Exception {
+    public void testReadJournalListFromResource() {
         AbbreviationParser ap = new AbbreviationParser();
         ap.readJournalListFromResource("/journals/journalList.txt");
          assertFalse(ap.getAbbreviations().isEmpty());

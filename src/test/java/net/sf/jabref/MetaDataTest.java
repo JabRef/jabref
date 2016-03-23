@@ -4,6 +4,7 @@ import net.sf.jabref.exporter.FieldFormatterCleanups;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,7 +26,7 @@ public class MetaDataTest {
     }
 
     @Test
-    public void serializeSingleSaveAction() throws Exception {
+    public void serializeSingleSaveAction() throws IOException {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
         metaData.setSaveActions(saveActions);
 
