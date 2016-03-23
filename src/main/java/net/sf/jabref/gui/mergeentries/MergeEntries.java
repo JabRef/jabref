@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.*;
@@ -37,7 +40,6 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.PreviewPanel;
 
-import com.google.common.collect.Lists;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
@@ -54,26 +56,48 @@ public class MergeEntries {
 
     private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
+    private static final String CONTENT_TYPE = "text/html";
+
+
     // Headings
-    private static final String[] columnHeadings = {Localization.lang("Field"),
+    private static final String[] COLUMN_HEADINGS = {Localization.lang("Field"),
             Localization.lang("Left entry"),
             Localization.lang("Left"),
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry")};
+    private static final String[] DIFF_MODES = {"Plain text",
+            "Latexdiff style",
+            "Symmetric"};
+
+    private static final String CHANGE_ADDITION_START = "<font color=\"green\"><u><b>";
+    private static final String CHANGE_ADDITION_END = "</b></u></font>";
+    private static final String CHANGE_REMOVAL_START = "<font color=\"green\"><s>";
+    private static final String CHANGE_REMOVAL_END = "</s></font>";
+    private static final String ADDITION_START = "<font color=\"blue\"><u><b>";
+    private static final String ADDITION_END = "</b></u></font>";
+    private static final String REMOVAL_START = "<font color=\"red\"><s>";
+    private static final String REMOVAL_END = "</s></font>";
+    private static final String HTML_START = "<html>";
+    private static final String HTML_END = "</html>";
     private static final Dimension DIM = new Dimension(800, 800);
     private JRadioButton[][] rb;
     private Boolean[] identical;
     private final CellConstraints cc = new CellConstraints();
     private final BibEntry mergedEntry = new BibEntry();
-    private final BibEntry one;
-    private final BibEntry two;
+    private final BibEntry leftEntry;
+    private final BibEntry rightEntry;
     private final BibDatabaseMode type;
+    private JScrollPane scrollPane;
     private JTextArea jta;
     private PreviewPanel pp;
     private Boolean doneBuilding = false;
-    private Set<String> joint;
+    private final Set<String> joint = new TreeSet<>();
+    private final JComboBox<String> diffMode = new JComboBox<>();
     private String[] jointStrings;
+    private final Map<String, JTextPane> leftTextPanes = new HashMap<>();
+    private final Map<String, JTextPane> rightTextPanes = new HashMap<>();
+
     private final JPanel mergePanel = new JPanel();
     private final JPanel mainPanel = new JPanel();
 
@@ -87,8 +111,8 @@ public class MergeEntries {
      * @param bTwo Second entry
      */
     public MergeEntries(BibEntry bOne, BibEntry bTwo, BibDatabaseMode type) {
-        one = bOne;
-        two = bTwo;
+        leftEntry = bOne;
+        rightEntry = bTwo;
         this.type = type;
         initialize();
     }
@@ -102,10 +126,10 @@ public class MergeEntries {
      * @param headingTwo Heading for second entry
      */
     public MergeEntries(BibEntry bOne, BibEntry bTwo, String headingOne, String headingTwo, BibDatabaseMode type) {
-        columnHeadings[1] = headingOne;
-        columnHeadings[5] = headingTwo;
-        one = bOne;
-        two = bTwo;
+        COLUMN_HEADINGS[1] = headingOne;
+        COLUMN_HEADINGS[5] = headingTwo;
+        leftEntry = bOne;
+        rightEntry = bTwo;
 
         this.type = type;
 
@@ -117,8 +141,8 @@ public class MergeEntries {
      */
     private void initialize() {
 
-        joint = new TreeSet<>(one.getFieldNames());
-        joint.addAll(two.getFieldNames());
+        joint.addAll(leftEntry.getFieldNames());
+        joint.addAll(rightEntry.getFieldNames());
 
         // Remove field starting with __
         TreeSet<String> toberemoved = new TreeSet<>();
@@ -132,6 +156,11 @@ public class MergeEntries {
             joint.remove(field);
         }
 
+        // Fill diff mode combo box
+        for (String diffText : DIFF_MODES) {
+            diffMode.addItem(diffText);
+        }
+        diffMode.addActionListener(e -> updateTextPanes());
         // Create storage arrays
         rb = new JRadioButton[3][joint.size() + 1];
         ButtonGroup[] rbg = new ButtonGroup[joint.size() + 1];
@@ -158,11 +187,12 @@ public class MergeEntries {
         label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
 
         mainPanel.add(label, cc.xyw(4, 1, 7, "center, bottom"));
+        mainPanel.add(diffMode, cc.xy(11, 1, "right, bottom"));
 
         // Set headings
         JLabel[] headingLabels = new JLabel[6];
         for (int i = 0; i < 6; i++) {
-            headingLabels[i] = new JLabel(columnHeadings[i]);
+            headingLabels[i] = new JLabel(COLUMN_HEADINGS[i]);
             font = headingLabels[i].getFont();
             headingLabels[i].setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mainPanel.add(headingLabels[i], cc.xy(1 + (i * 2), 2));
@@ -172,8 +202,8 @@ public class MergeEntries {
         mainPanel.add(new JSeparator(), cc.xyw(1, 3, 11));
 
         // Start with entry type
-        String type1 = one.getType();
-        String type2 = two.getType();
+        String type1 = leftEntry.getType();
+        String type2 = rightEntry.getType();
 
         mergedEntry.setType(type1);
         label = new JLabel(Localization.lang("Entry type"));
@@ -182,7 +212,7 @@ public class MergeEntries {
         mergePanel.add(label, cc.xy(1, 1));
 
         JTextPane type1ta = new JTextPane();
-        type1ta.setContentType("text/html");
+        type1ta.setContentType(CONTENT_TYPE);
         type1ta.setText(type1);
         type1ta.setEditable(false);
         mergePanel.add(type1ta, cc.xy(3, 1));
@@ -200,7 +230,7 @@ public class MergeEntries {
             rb[0][0].setSelected(true);
         }
         JTextPane type2ta = new JTextPane();
-        type2ta.setContentType("text/html");
+        type2ta.setContentType(CONTENT_TYPE);
         type2ta.setText(type2);
         type2ta.setEditable(false);
         mergePanel.add(type2ta, cc.xy(11, 1));
@@ -215,8 +245,8 @@ public class MergeEntries {
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
-            String string1 = one.getField(field);
-            String string2 = two.getField(field);
+            String string1 = leftEntry.getField(field);
+            String string2 = rightEntry.getField(field);
             identical[row - 1] = false;
             if ((string1 != null) && (string2 != null) && (string1.equals(string2))) {
                 identical[row - 1] = true;
@@ -229,11 +259,11 @@ public class MergeEntries {
 
             if (string1 != null) {
                 JTextPane tf = new JTextPane();
-                tf.setContentType("text/html");
-                tf.setText(string1);
+                tf.setContentType(CONTENT_TYPE);
                 mergePanel.add(tf, cc.xy(3, (2 * row) - 1, "f, f"));
                 tf.setCaretPosition(0);
                 tf.setEditable(false);
+                leftTextPanes.put(field, tf);
             }
 
             // Add radio buttons if the two entries do not have identical fields
@@ -260,57 +290,22 @@ public class MergeEntries {
                 }
             }
 
-            if ((string1 != null) && (string2 != null)) {
-                List<String> string1List = new ArrayList<>(Arrays.asList(string1.split("")));
-                List<String> string2List = new ArrayList<>(Arrays.asList(string2.split("")));
-                Patch<String> patch = DiffUtils.diff(string1List, string2List);
-                List<Delta<String>> deltaList = new ArrayList<>(patch.getDeltas());
-                for (Delta<String> delta : Lists.reverse(deltaList)) {
-                    int startPos = delta.getOriginal().getPosition();
-                    List<String> lines = delta.getOriginal().getLines();
-                    int offset = 0;
-                    switch (delta.getType()) {
-                    case CHANGE:
-                        for (String line : lines) {
-                            string1List.set(startPos + offset, (offset == 0 ? "<font color=\"red\"><s>" : "") + line);
-                            offset++;
-                        }
-                        string1List.set((startPos + offset) - 1, string1List.get((startPos + offset) - 1)
-                                + "</s></font><font color=\"blue\"><b><u>"
-                                + String.join("", delta.getRevised().getLines()) + "</u></b></font>");
-                        break;
-                    case DELETE:
-                        for (String line : lines) {
-                            string1List.set(startPos + offset, (offset == 0 ? "<font color=\"red\"><s>" : "") + line);
-                            offset++;
-                        }
-                        string1List.set((startPos + offset) - 1,
-                                string1List.get((startPos + offset) - 1) + "</s></font>");
-                        break;
-                    case INSERT:
-                        string1List.add(delta.getOriginal().getPosition(),
-                                "<font color=\"blue\"><b><u>" + String.join("", delta.getRevised().getLines())
-                                        + "</u></b></font>");
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                string2 = "<html>" + String.join("", string1List) + "</html>";
-            }
             if (string2 != null) {
                 JTextPane tf = new JTextPane();
-                tf.setContentType("text/html");
-                tf.setText(string2);
+                tf.setContentType(CONTENT_TYPE);
                 mergePanel.add(tf, cc.xy(11, (2 * row) - 1, "f, f"));
                 tf.setCaretPosition(0);
                 tf.setEditable(false);
+                rightTextPanes.put(field, tf);
             }
             row++;
         }
 
-        JScrollPane scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        updateTextPanes();
         mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
         mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
 
@@ -379,6 +374,119 @@ public class MergeEntries {
         javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
     }
 
+    private void updateTextPanes() {
+        int oldScrollPaneValue = scrollPane.getVerticalScrollBar().getValue();
+        for (String field : joint) {
+            String leftString = leftEntry.getField(field);
+            String rightString = rightEntry.getField(field);
+            switch (diffMode.getSelectedIndex()) {
+            case 0: // Plain text
+                break;
+            case 1: // Latexdiff style
+                rightString = generateLatexdiffHighlighting(leftString, rightString);
+                break;
+            case 2: // Symmetric
+                String tmpLeftString = generateSymmetricHighlighting(rightString, leftString);
+                rightString = generateSymmetricHighlighting(leftString, rightString);
+                leftString = tmpLeftString;
+            }
+            if ((leftString != null) && leftTextPanes.containsKey(field)) {
+                leftTextPanes.get(field).setText(leftString);
+            }
+            if ((rightString != null) && rightTextPanes.containsKey(field)) {
+                rightTextPanes.get(field).setText(rightString);
+            }
+        }
+        int valueToBeSet;
+        if (oldScrollPaneValue > scrollPane.getVerticalScrollBar().getMaximum()) {
+            valueToBeSet = scrollPane.getVerticalScrollBar().getMaximum();
+        } else {
+            valueToBeSet = oldScrollPaneValue;
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(valueToBeSet));
+    }
+
+    private String generateLatexdiffHighlighting(String baseString, String modifiedString) {
+        if ((baseString != null) && (modifiedString != null)) {
+            List<String> string1List = new ArrayList<>(Arrays.asList(baseString.split("")));
+            List<String> string2List = new ArrayList<>(Arrays.asList(modifiedString.split("")));
+            Patch<String> patch = DiffUtils.diff(string1List, string2List);
+            List<Delta<String>> deltaList = new ArrayList<>(patch.getDeltas());
+            Collections.reverse(deltaList);
+            for (Delta<String> delta : deltaList) {
+                int startPos = delta.getOriginal().getPosition();
+                List<String> lines = delta.getOriginal().getLines();
+                int offset = 0;
+                switch (delta.getType()) {
+                case CHANGE:
+                    for (String line : lines) {
+                        string1List.set(startPos + offset, (offset == 0 ? REMOVAL_START : "") + line);
+                        offset++;
+                    }
+                    string1List.set((startPos + offset) - 1, string1List.get((startPos + offset) - 1)
+                            + REMOVAL_END + ADDITION_START + String.join("", delta.getRevised().getLines())
+                            + ADDITION_END);
+                    break;
+                case DELETE:
+                    for (String line : lines) {
+                        string1List.set(startPos + offset, (offset == 0 ? REMOVAL_START : "") + line);
+                        offset++;
+                    }
+                    string1List.set((startPos + offset) - 1,
+                            string1List.get((startPos + offset) - 1) + REMOVAL_END);
+                    break;
+                case INSERT:
+                    string1List.add(delta.getOriginal().getPosition(),
+                            ADDITION_START + String.join("", delta.getRevised().getLines()) + ADDITION_END);
+                    break;
+                default:
+                    break;
+                }
+            }
+            return HTML_START + String.join("", string1List) + HTML_END;
+        }
+        return modifiedString;
+    }
+
+    private String generateSymmetricHighlighting(String baseString, String modifiedString) {
+        if ((baseString != null) && (modifiedString != null)) {
+            List<String> string1List = new ArrayList<>(Arrays.asList(baseString.split("")));
+            List<String> string2List = new ArrayList<>(Arrays.asList(modifiedString.split("")));
+            Patch<String> patch = DiffUtils.diff(string1List, string2List);
+            List<Delta<String>> deltaList = new ArrayList<>(patch.getDeltas());
+            Collections.reverse(deltaList);
+            for (Delta<String> delta : deltaList) {
+                int startPos = delta.getOriginal().getPosition();
+                List<String> lines = delta.getOriginal().getLines();
+                int offset = 0;
+                switch (delta.getType()) {
+                case CHANGE:
+                    for (String line : lines) {
+                        string1List.set(startPos + offset, (offset == 0 ? CHANGE_REMOVAL_START : "") + line);
+                        offset++;
+                    }
+                    string1List.set((startPos + offset) - 1,
+                            string1List.get((startPos + offset) - 1) + CHANGE_REMOVAL_END + CHANGE_ADDITION_START
+                                    + String.join("", delta.getRevised().getLines()) + CHANGE_ADDITION_END);
+                    break;
+                case DELETE:
+                    for (offset = 0; offset <= (lines.size() - 1); offset++) {
+                        string1List.set(startPos + offset, "");
+                    }
+                    break;
+                case INSERT:
+                    string1List.add(delta.getOriginal().getPosition(),
+                            ADDITION_START + String.join("", delta.getRevised().getLines()) + ADDITION_END);
+                    break;
+                default:
+                    break;
+                }
+            }
+            return HTML_START + String.join("", string1List) + HTML_END;
+        }
+        return modifiedString;
+    }
+
     /**
      * @return Merged BibEntry
      */
@@ -404,9 +512,9 @@ public class MergeEntries {
         // Check if the type is changed
         if (!identical[0]) {
             if (rb[0][0].isSelected()) {
-                mergedEntry.setType(one.getType());
+                mergedEntry.setType(leftEntry.getType());
             } else {
-                mergedEntry.setType(two.getType());
+                mergedEntry.setType(rightEntry.getType());
             }
         }
 
@@ -414,9 +522,9 @@ public class MergeEntries {
         for (int i = 0; i < joint.size(); i++) {
             if (!identical[i + 1]) {
                 if (rb[0][i + 1].isSelected()) {
-                    mergedEntry.setField(jointStrings[i], one.getField(jointStrings[i]));
+                    mergedEntry.setField(jointStrings[i], leftEntry.getField(jointStrings[i]));
                 } else if (rb[2][i + 1].isSelected()) {
-                    mergedEntry.setField(jointStrings[i], two.getField(jointStrings[i]));
+                    mergedEntry.setField(jointStrings[i], rightEntry.getField(jointStrings[i]));
                 } else {
                     mergedEntry.clearField(jointStrings[i]);
                 }
