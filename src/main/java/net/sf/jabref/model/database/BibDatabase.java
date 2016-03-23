@@ -316,7 +316,7 @@ public class BibDatabase {
      *
      * @param entries A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
-     *                references stored in the databasee.
+     *                references stored in the database.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
@@ -338,7 +338,7 @@ public class BibDatabase {
      *
      * @param entry   A BibEntry in which all strings of the form #xxx# will be
      *                resolved against the hash map of string references stored in
-     *                the databasee.
+     *                the database.
      * @param inPlace If inPlace is true then the given BibEntry will be
      *                modified, if false then a copy is made using close made before
      *                resolving the strings.
@@ -347,14 +347,18 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-        if (!inPlace) {
-            entry = (BibEntry) entry.clone();
+
+        BibEntry resultingEntry;
+        if (inPlace) {
+            resultingEntry = entry;
+        } else {
+            resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (String field : entry.getFieldNames()) {
-            entry.setField(field, this.resolveForStrings(entry.getField(field)));
+        for (String field : resultingEntry.getFieldNames()) {
+            resultingEntry.setField(field, this.resolveForStrings(resultingEntry.getField(field)));
         }
-        return entry;
+        return resultingEntry;
     }
 
     /**
@@ -400,7 +404,8 @@ public class BibDatabase {
         }
     }
 
-    private String resolveContent(String res, Set<String> usedIds) {
+    private String resolveContent(String result, Set<String> usedIds) {
+        String res = result;
         if (res.matches(".*#[^#]+#.*")) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;

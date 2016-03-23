@@ -30,7 +30,6 @@ import net.sf.jabref.logic.l10n.Localization;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
-    private BibDatabase secondary;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
@@ -43,11 +42,13 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
             BibDatabase secondary, final DefaultMutableTreeNode root) {
         super(owner, Localization.lang("External changes"), true);
-        this.secondary = secondary;
+        BibDatabase localSecondary;
 
         // Just to be sure, put in an empty secondary base if none is given:
         if (secondary == null) {
-            this.secondary = new BibDatabase();
+            localSecondary = new BibDatabase();
+        } else {
+            localSecondary = secondary;
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
@@ -92,7 +93,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
             for (Change c : Collections.list(enumer)) {
                 boolean allAccepted = false;
                 if (c.isAcceptable() && c.isAccepted()) {
-                    allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
+                    allAccepted = c.makeChange(panel, localSecondary, ce);
                 }
 
                 if (!allAccepted) {

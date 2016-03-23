@@ -19,7 +19,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,8 +27,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test the BibtexParser
@@ -61,14 +59,14 @@ public class BibtexParserTest {
     @Test
     public void fromStringReturnsEmptyListFromEmptyString() {
         Collection<BibEntry> parsed = BibtexParser.fromString("");
-        Assert.assertNotNull(parsed);
+        assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
     @Test
     public void fromStringReturnsEmptyListIfNoEntryRecognized() {
         Collection<BibEntry> parsed = BibtexParser.fromString("@@article@@{{{{{{}");
-        Assert.assertNotNull(parsed);
+        assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
@@ -91,19 +89,19 @@ public class BibtexParserTest {
                 .singleFromString("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}");
 
-        Assert.assertTrue(parsed.getCiteKey().equals("canh05") || parsed.getCiteKey().equals("foo"));
+        assertTrue(parsed.getCiteKey().equals("canh05") || parsed.getCiteKey().equals("foo"));
     }
 
     @Test
     public void singleFromStringReturnsNullFromEmptyString() {
         BibEntry parsed = BibtexParser.singleFromString("");
-        Assert.assertNull(parsed);
+        assertNull(parsed);
     }
 
     @Test
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
         BibEntry parsed = BibtexParser.singleFromString("@@article@@{{{{{{}");
-        Assert.assertNull(parsed);
+        assertNull(parsed);
     }
 
     @Test
@@ -419,7 +417,7 @@ public class BibtexParserTest {
                 + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                 + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
                 + "  url = {http://james.howison.name/publications.html}" + "\n" + "}))"));
-        Assert.assertNull(result.getEncoding());
+        assertNull(result.getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -581,7 +579,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{,author={Ed von Test}}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -598,7 +596,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author missing bracket}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(0, c.size());
@@ -612,7 +610,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,review={escaped \\{ bracket}}"));
 
-        Assert.assertFalse(result.hasWarnings());
+        assertFalse(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -628,7 +626,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,review={escaped \\} bracket}}"));
 
-        Assert.assertFalse(result.hasWarnings());
+        assertFalse(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -644,7 +642,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author=\"author {missing bracket\"}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(0, c.size());
@@ -665,7 +663,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"));
 
-        Assert.assertTrue("There should be warnings", result.hasWarnings());
+        assertTrue("There should be warnings", result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
@@ -677,7 +675,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"));
 
-        Assert.assertTrue("There should be warnings", result.hasWarnings());
+        assertTrue("There should be warnings", result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
@@ -747,7 +745,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von Test} year=2005}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(0, c.size());
@@ -759,7 +757,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{test,author={author missing bracket}" + "@article{test,author={Ed von Test}}"));
 
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -926,7 +924,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser
                 .parse(new StringReader("@string{bourdieu = {Bourdieu, Pierre}}" + "@string{bourdieu = {Other}}"));
-        Assert.assertTrue(result.hasWarnings());
+        assertTrue(result.hasWarnings());
         assertEquals(1, result.getDatabase().getStringCount());
     }
 
@@ -1111,7 +1109,7 @@ public class BibtexParserTest {
     public void parseHandlesAccentsCorrectly() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author = {H\'{e}lne Fiaux}}"));
-        Assert.assertFalse(result.hasWarnings());
+        assertFalse(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -1130,7 +1128,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser
                 .parse(new StringReader("@preamble{some text and \\latex}@article{test,author = {H\'{e}lne Fiaux}}"));
-        Assert.assertFalse(result.hasWarnings());
+        assertFalse(result.hasWarnings());
 
         assertEquals("some text and \\latex", result.getDatabase().getPreamble());
 
@@ -1151,7 +1149,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser
                 .parse(new StringReader("% Encoding: US-ASCII@preamble{some text and \\latex}"));
-        Assert.assertFalse(result.hasWarnings());
+        assertFalse(result.hasWarnings());
 
         assertEquals("some text and \\latex", result.getDatabase().getPreamble());
     }

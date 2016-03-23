@@ -21,6 +21,9 @@ import net.sf.jabref.model.entry.BibEntry;
 @RunWith(Parameterized.class)
 public class PdfContentImporterTestFiles {
 
+    @Parameter
+    public String fileName;
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -34,10 +37,6 @@ public class PdfContentImporterTestFiles {
         Object[][] data = new Object[][] {{"LNCS-minimal"}};
         return Arrays.asList(data);
     }
-
-
-    @Parameter
-    public String fileName;
 
     @Test
     public void correctContent() throws IOException {
