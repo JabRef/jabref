@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.google.common.base.Charsets;
+
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
@@ -33,10 +36,11 @@ public class IEEE implements FullTextFinder {
         if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI)) {
             Optional<URI> uri = doi.get().getURI();
             if (uri.isPresent()) {
-                String firstResult = new URLDownload(uri.get().toURL()).downloadToString();
+                String firstResult = new URLDownload(uri.get().toURL()).downloadToString(Charsets.UTF_8);
                 Matcher matcher = STAMP_PATTERN.matcher(firstResult);
                 if (matcher.find()) {
-                    String secondResult = new URLDownload(new URL(BASE_URL + matcher.group(1))).downloadToString();
+                    String secondResult = new URLDownload(new URL(BASE_URL + matcher.group(1)))
+                            .downloadToString(Charsets.UTF_8);
                     matcher = PDF_PATTERN.matcher(secondResult);
                     if (matcher.find()) {
                         pdfLink = Optional.of(new URL(matcher.group(1)));
