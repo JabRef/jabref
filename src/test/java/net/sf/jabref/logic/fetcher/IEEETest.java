@@ -1,9 +1,7 @@
 package net.sf.jabref.logic.fetcher;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,10 +33,7 @@ public class IEEETest {
 
     @Test
     public void findByDOI() throws IOException {
-        // CI server is unreliable
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("doi", "10.1109/ACCESS.2016.2535486"); // Open access paper
+        entry.setField("doi", "10.1109/ACCESS.2016.2535486");
 
         Assert.assertEquals(
                 Optional.of(
@@ -49,10 +44,7 @@ public class IEEETest {
 
     @Test
     public void notFoundByDOI() throws IOException {
-        // CI server is unreliable
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
-        entry.setField("doi", "10.1021/bk-2006-WWW.ch014"); // Arbitrary non-IEEE DOI
+        entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
