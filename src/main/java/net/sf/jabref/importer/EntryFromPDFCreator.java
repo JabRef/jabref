@@ -62,17 +62,17 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
 
         PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), JabRef.jrf.getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
-        ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
+        ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
         assert res.getEntries().size() == 1;
         return Optional.of(res.getEntries().get(0));
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntryDataFromXMP(pdfFile, entry);
-        
+
         if (entry.getField("title") == null) {
         	entry.setField("title", pdfFile.getName());
         }
-        
+
         return entry;*/
     }
 

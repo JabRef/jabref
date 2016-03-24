@@ -145,11 +145,21 @@ class CitationManager {
         private final Optional<String> origPageInfo;
 
 
-        public CitEntry(String refMarkName, String context, Optional<String> optional) {
+        // Only used for testing...
+        public CitEntry(String refMarkName, String context) {
+            this(refMarkName, context, Optional.empty());
+        }
+
+        // Only used for testing...
+        public CitEntry(String refMarkName, String context, String pageInfo) {
+            this(refMarkName, context, Optional.ofNullable(pageInfo));
+        }
+
+        public CitEntry(String refMarkName, String context, Optional<String> pageInfo) {
             this.refMarkName = refMarkName;
             this.context = context;
-            this.pageInfo = optional;
-            this.origPageInfo = optional;
+            this.pageInfo = pageInfo;
+            this.origPageInfo = pageInfo;
         }
 
         public Optional<String> getPageInfo() {
@@ -196,9 +206,8 @@ class CitationManager {
             return context;
         }
 
-        public void setPageInfo(Optional<String> trim) {
-            pageInfo = trim;
-
+        public void setPageInfo(String trim) {
+            pageInfo = Optional.ofNullable(trim);
         }
     }
 
@@ -278,9 +287,9 @@ class CitationManager {
 
             okButton.addActionListener(e -> {
                 if (pageInfo.getText().trim().isEmpty()) {
-                    entry.setPageInfo(Optional.empty());
+                    entry.setPageInfo(null);
                 } else {
-                    entry.setPageInfo(Optional.of(pageInfo.getText().trim()));
+                    entry.setPageInfo(pageInfo.getText().trim());
                 }
                 tableModel.fireTableDataChanged();
                 singleCiteDialog.dispose();
