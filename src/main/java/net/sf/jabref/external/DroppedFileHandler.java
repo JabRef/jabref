@@ -116,8 +116,7 @@ public class DroppedFileHandler {
      * @param mainTable The MainTable the file was dragged to.
      * @param dropRow   The row where the file was dropped.
      */
-    public void handleDroppedfile(String fileName, Optional<ExternalFileType> fileType, MainTable mainTable,
-            int dropRow) {
+    public void handleDroppedfile(String fileName, ExternalFileType fileType, MainTable mainTable, int dropRow) {
 
         BibEntry entry = mainTable.getEntryAt(dropRow);
         handleDroppedfile(fileName, fileType, entry);
@@ -128,8 +127,8 @@ public class DroppedFileHandler {
      * @param fileType  The FileType associated with the file.
      * @param entry     The target entry for the drop.
      */
-    public void handleDroppedfile(String fileName, Optional<ExternalFileType> fileType, BibEntry entry) {
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.get().getExtension()));
+    public void handleDroppedfile(String fileName, ExternalFileType fileType, BibEntry entry) {
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (tryXmpImport(fileName, fileType, edits)) {
             edits.end();
@@ -178,8 +177,14 @@ public class DroppedFileHandler {
     }
 
     public void linkPdfToEntry(String fileName, BibEntry entry) {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+        Optional<ExternalFileType> optFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
+        if (!optFileType.isPresent()) {
+            LOGGER.warn("No file type with extension 'pdf' registered.");
+            return;
+        }
+
+        ExternalFileType fileType = optFileType.get();
         // Show dialog
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
             return;
@@ -192,7 +197,7 @@ public class DroppedFileHandler {
 
         boolean success = true;
         String destFilename;
-        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.get().getExtension()));
+        NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
             destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
@@ -215,9 +220,9 @@ public class DroppedFileHandler {
 
     // Done by MrDlib
 
-    private boolean tryXmpImport(String fileName, Optional<ExternalFileType> fileType, NamedCompound edits) {
+    private boolean tryXmpImport(String fileName, ExternalFileType fileType, NamedCompound edits) {
 
-        if (!"pdf".equals(fileType.get().getExtension())) {
+        if (!"pdf".equals(fileType.getExtension())) {
             return false;
         }
 
@@ -274,7 +279,7 @@ public class DroppedFileHandler {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
             } else {
-                destFilename = single.getCiteKey() + "." + fileType.get().getExtension();
+                destFilename = single.getCiteKey() + "." + fileType.getExtension();
             }
 
             if (copyRadioButton.isSelected()) {
@@ -302,8 +307,8 @@ public class DroppedFileHandler {
     //
     // @return true if user pushed "OK", false otherwise
     //
-    private boolean showLinkMoveCopyRenameDialog(String linkFileName, Optional<ExternalFileType> fileType,
-            BibEntry entry, BibDatabase database) {
+    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType, BibEntry entry,
+            BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
         List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
@@ -346,7 +351,7 @@ public class DroppedFileHandler {
         // Determine which name to suggest:
         String targetName = Util.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
 
-        renameToTextBox.setText(targetName.concat(".").concat(fileType.get().getExtension()));
+        renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
         linkInPlace.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_LEAVE));
         copyRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_COPY));
@@ -380,12 +385,12 @@ public class DroppedFileHandler {
      * Make a extension to the file.
      *
      * @param entry    The entry to extension from.
-     * @param fileType The Optional<FileType> associated with the file.
+     * @param fileType The FileType associated with the file.
      * @param filename The path to the file.
      * @param edits    An NamedCompound action this action is to be added to. If none
      *                 is given, the edit is added to the panel's undoManager.
      */
-    private void doLink(BibEntry entry, Optional<ExternalFileType> fileType, String filename,
+    private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
         Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);

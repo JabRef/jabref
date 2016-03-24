@@ -132,11 +132,26 @@ public final class ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
+            if (type.getExtension().equalsIgnoreCase(extension)) {
                 return Optional.of(type);
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Returns true if there is an external file type registered for this extension.
+     *
+     * @param extension The file extension.
+     * @return true if an ExternalFileType with the extension exists, false otherwise
+     */
+    public boolean isExternalFileTypeByExt(String extension) {
+        for (ExternalFileType type : externalFileTypes) {
+            if (type.getExtension().equalsIgnoreCase(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -145,13 +160,13 @@ public final class ExternalFileTypes {
      * @param extension The file extension.
      * @return The name of the ExternalFileType registered, or null if none.
      */
-    public Optional<String> getExternalFileTypeNameByExt(String extension) {
+    public String getExternalFileTypeNameByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
-                return Optional.ofNullable(type.getName());
+            if (type.getExtension().equalsIgnoreCase(extension)) {
+                return type.getName();
             }
         }
-        return Optional.empty();
+        return "";
     }
 
     /**
@@ -164,7 +179,7 @@ public final class ExternalFileTypes {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
+            if (!type.getExtension().isEmpty() && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
                     && (type.getExtension().length() > longestFound)) {
                 longestFound = type.getExtension().length();
                 foundType = type;
@@ -182,11 +197,11 @@ public final class ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
+            if (type.getMimeType().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
             }
         }
-        if ("text/html".equals(mimeType)) {
+        if ("text/html".equalsIgnoreCase(mimeType)) {
             return Optional.of(HTML_FALLBACK_TYPE);
         } else {
             return Optional.empty();

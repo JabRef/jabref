@@ -33,6 +33,12 @@ public class FileListEntry {
         this(description, link, Optional.empty());
     }
 
+    public FileListEntry(String description, String link, ExternalFileType type) {
+        this.description = Objects.requireNonNull(description);
+        this.link = Objects.requireNonNull(link);
+        this.type = Optional.of(Objects.requireNonNull(type));
+    }
+
     public FileListEntry(String description, String link, Optional<ExternalFileType> type) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
@@ -44,7 +50,7 @@ public class FileListEntry {
     }
 
     private String getTypeName() {
-        return this.type.isPresent() ? "" : this.type.get().getName();
+        return this.type.isPresent() ? this.type.get().getName() : "";
     }
 
     @Override

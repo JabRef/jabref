@@ -114,6 +114,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public String getExtension() {
+        if (extension == null) {
+            return "";
+        }
         return extension;
     }
 
@@ -122,6 +125,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public String getMimeType() {
+        if (mimeType == null) {
+            return "";
+        }
         return mimeType;
     }
 

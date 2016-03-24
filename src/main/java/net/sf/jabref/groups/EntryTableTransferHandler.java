@@ -373,7 +373,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                  * TODO: make this an instance variable?
                  */
                 DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                dfh.handleDroppedfile(fileName, fileType, entryTable, dropRow);
+                dfh.handleDroppedfile(fileName, fileType.get(), entryTable, dropRow);
 
                 continue;
             }

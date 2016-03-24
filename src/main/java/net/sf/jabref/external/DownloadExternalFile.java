@@ -147,9 +147,6 @@ public class DownloadExternalFile {
         String suffix;
         if (suggestedType.isPresent()) {
             suffix = suggestedType.get().getExtension();
-            if (suffix == null) {
-                suffix = "";
-            }
         } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
@@ -322,7 +319,7 @@ public class DownloadExternalFile {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (!ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix).isPresent()) {
+        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');

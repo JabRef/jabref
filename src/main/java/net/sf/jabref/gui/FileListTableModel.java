@@ -179,7 +179,7 @@ public class FileListTableModel extends AbstractTableModel {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
             type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.fileType);
-            if (type == null) {
+            if (!type.isPresent()) {
                 // No type could be found from mime type on the extension:
                 Optional<String> extension = FileUtil.getFileExtension(entry.link);
                 if (extension.isPresent()) {
