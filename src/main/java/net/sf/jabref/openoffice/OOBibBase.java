@@ -243,13 +243,11 @@ class OOBibBase {
         }
     }
 
-    public String getCustomProperty(String property) throws UnknownPropertyException, WrappedTargetException {
+    public Optional<String> getCustomProperty(String property) throws UnknownPropertyException, WrappedTargetException {
         if (propertySet.getPropertySetInfo().hasPropertyByName(property)) {
-            return propertySet.getPropertyValue(property).toString();
-        } else {
-            return null;
+            return Optional.ofNullable(propertySet.getPropertyValue(property).toString());
         }
-
+        return Optional.empty();
     }
 
     public void updateSortedReferenceMarks() throws WrappedTargetException, NoSuchElementException {
@@ -1009,10 +1007,10 @@ class OOBibBase {
 
         // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
-        String pageInfo = getCustomProperty(name);
+        Optional<String> pageInfo = getCustomProperty(name);
         String citText;
-        if ((pageInfo != null) && !pageInfo.isEmpty()) {
-            citText = style.insertPageInfo(citationText, pageInfo);
+        if ((pageInfo.isPresent()) && !pageInfo.get().isEmpty()) {
+            citText = style.insertPageInfo(citationText, pageInfo.get());
         } else {
             citText = citationText;
         }

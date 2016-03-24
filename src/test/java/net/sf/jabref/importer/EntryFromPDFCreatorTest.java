@@ -24,6 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Optional;
 
 public class EntryFromPDFCreatorTest {
 
@@ -47,13 +48,13 @@ public class EntryFromPDFCreatorTest {
     @Test
     @Ignore
     public void testCreationOfEntry() {
-        BibEntry entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
-        Assert.assertNull(entry);
+        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
+        Assert.assertFalse(entry.isPresent());
 
         entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
-        Assert.assertNotNull(entry);
-        Assert.assertTrue(entry.getField("file").endsWith(":PDF"));
-        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
+        Assert.assertTrue(entry.isPresent());
+        Assert.assertTrue(entry.get().getField("file").endsWith(":PDF"));
+        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.get().getField("title"));
 
     }
 }

@@ -123,10 +123,7 @@ public class RegExpFileSearch {
             String extensionRegExp) {
         ArrayList<File> res = new ArrayList<>();
         for (File directory : dirs) {
-            List<File> tmp = RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp);
-            if (tmp != null) {
-                res.addAll(tmp);
-            }
+            res.addAll(RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp));
         }
         return res;
     }
@@ -145,7 +142,7 @@ public class RegExpFileSearch {
             root = new File(directory);
         }
         if (!root.exists()) {
-            return null;
+            return Collections.emptyList();
         }
         List<File> res = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
 

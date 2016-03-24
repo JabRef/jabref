@@ -140,20 +140,20 @@ class CitationManager {
     static class CitEntry implements Comparable<CitEntry> {
 
         private final String refMarkName;
-        private String pageInfo;
+        private Optional<String> pageInfo;
         private final String context;
-        private final String origPageInfo;
+        private final Optional<String> origPageInfo;
 
 
-        public CitEntry(String refMarkName, String context, String pageInfo) {
+        public CitEntry(String refMarkName, String context, Optional<String> optional) {
             this.refMarkName = refMarkName;
             this.context = context;
-            this.pageInfo = pageInfo;
-            this.origPageInfo = pageInfo;
+            this.pageInfo = optional;
+            this.origPageInfo = optional;
         }
 
         public Optional<String> getPageInfo() {
-            return Optional.ofNullable(pageInfo);
+            return pageInfo;
         }
 
         public String getRefMarkName() {
@@ -161,14 +161,15 @@ class CitationManager {
         }
 
         public boolean pageInfoChanged() {
-            if (((pageInfo != null) && (origPageInfo == null))
-                    || ((pageInfo == null) && (origPageInfo != null))) {
+            if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
                 return true;
             }
-            if (pageInfo == null) {
+            if (!pageInfo.isPresent()) {
+                // This means that origPageInfo.isPresent is also false
                 return false;
             } else {
-                return pageInfo.compareTo(origPageInfo) != 0;
+                // So origPageInfo.isPresent is true here
+                return pageInfo.get().compareTo(origPageInfo.get()) != 0;
             }
         }
 
@@ -195,7 +196,7 @@ class CitationManager {
             return context;
         }
 
-        public void setPageInfo(String trim) {
+        public void setPageInfo(Optional<String> trim) {
             pageInfo = trim;
 
         }
@@ -277,9 +278,9 @@ class CitationManager {
 
             okButton.addActionListener(e -> {
                 if (pageInfo.getText().trim().isEmpty()) {
-                    entry.setPageInfo(null);
+                    entry.setPageInfo(Optional.empty());
                 } else {
-                    entry.setPageInfo(pageInfo.getText().trim());
+                    entry.setPageInfo(Optional.of(pageInfo.getText().trim()));
                 }
                 tableModel.fireTableDataChanged();
                 singleCiteDialog.dispose();
