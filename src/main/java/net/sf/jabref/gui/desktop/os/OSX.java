@@ -12,8 +12,8 @@ public class OSX implements NativeDesktop {
     public void openFile(String filePath, String fileType) throws IOException {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
 
-        if (type == null && !type.getOpenWithApplication().isPresent()) {
-            openFileWithApplication(filePath, type.getOpenWithApplication().get());
+        if (type == null && type.getOpenWithApplication().isEmpty()) {
+            openFileWithApplication(filePath, type.getOpenWithApplication());
         } else {
             String[] cmd = { "/usr/bin/open", filePath };
             Runtime.getRuntime().exec(cmd);

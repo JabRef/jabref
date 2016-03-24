@@ -141,11 +141,11 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return extension;
     }
 
-    public Optional<String> getOpenWithApplication() {
+    public String getOpenWithApplication() {
         if (openWith == null || openWith.isEmpty()) {
-            return Optional.empty();
+            return "";
         }
-        return Optional.of(openWith);
+        return openWith;
     }
 
     public void setOpenWith(String openWith) {

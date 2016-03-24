@@ -310,11 +310,7 @@ public class ExternalFileTypeEditor extends JDialog {
             case 3:
                 return type.getMimeType();
             default:
-                if(!type.getOpenWithApplication().isPresent()) {
-                    return "";
-                } else {
-                    return type.getOpenWithApplication().get();
-                }
+                return type.getOpenWithApplication();
             }
         }
     }

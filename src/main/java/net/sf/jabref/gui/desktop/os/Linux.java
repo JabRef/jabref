@@ -14,10 +14,10 @@ public class Linux implements NativeDesktop {
         ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
         String viewer;
 
-        if (type == null || !type.getOpenWithApplication().isPresent()) {
+        if (type == null || type.getOpenWithApplication().isEmpty()) {
             viewer = "xdg-open";
         } else {
-            viewer = type.getOpenWithApplication().get();
+            viewer = type.getOpenWithApplication();
         }
         String[] cmdArray = { viewer, filePath };
         Runtime.getRuntime().exec(cmdArray);
