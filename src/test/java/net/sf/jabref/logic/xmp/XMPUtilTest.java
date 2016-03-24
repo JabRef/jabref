@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import javax.xml.transform.TransformerException;
@@ -387,7 +386,7 @@ public class XMPUtilTest {
                 return null;
             } else {
                 try (InputStream is = meta.createInputStream();
-                        InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     // trim() for killing padding end-newline
                     return CharStreams.toString(reader).trim();
                 }

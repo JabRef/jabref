@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ public class OOBibStyleTest {
     public void testAuthorYear() throws IOException {
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
 
-        try (Reader r = new InputStreamReader(defPath.openStream())) {
+        try (Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8)) {
             OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());
@@ -82,7 +81,7 @@ public class OOBibStyleTest {
     public void testNumerical() throws IOException {
 
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        try (Reader r = new InputStreamReader(defPath.openStream())) {
+        try (Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8)) {
             OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
             assertTrue(style.isValid());
             assertFalse(style.isBibtexKeyCiteMarkers());
@@ -98,7 +97,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetNumCitationMarker() throws IOException {
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
+        Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
         OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), -1, true));
         assertEquals("[1]", style.getNumCitationMarker(Arrays.asList(1), -1, false));
@@ -116,7 +115,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitProperty() throws IOException {
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
+        Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
         OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
@@ -130,8 +129,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarker() throws IOException {
         File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
         Reader r = new InputStreamReader(defPath.openStream());
         OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
@@ -153,8 +151,7 @@ public class OOBibStyleTest {
     @Test
     public void testLayout() throws IOException {
         File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
         URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
         Reader r = new InputStreamReader(defPath.openStream());
         OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));

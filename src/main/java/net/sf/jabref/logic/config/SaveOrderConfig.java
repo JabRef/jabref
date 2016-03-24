@@ -110,9 +110,8 @@ public class SaveOrderConfig {
     }
 
     public SaveOrderConfig(List<String> data) {
-        if (data == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(data);
+
         if (data.isEmpty()) {
             throw new IllegalArgumentException();
         }

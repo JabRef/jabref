@@ -148,7 +148,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
         } catch (IOException ioe) {
             LOGGER.error("Failed to read dropped data", ioe);
-        } catch (UnsupportedFlavorException ufe) {
+        } catch (UnsupportedFlavorException | ClassCastException ufe) {
             LOGGER.error("Drop type error", ufe);
         }
 

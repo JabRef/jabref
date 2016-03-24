@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -104,8 +105,11 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(String type) {
+        String newType;
         if (type == null) {
-            type = DEFAULT_TYPE;
+            newType = DEFAULT_TYPE;
+        } else {
+            newType = type;
         }
 
         String oldType = this.type;
@@ -114,9 +118,9 @@ public class BibEntry {
             // We set the type before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            this.type = type.toLowerCase();
+            this.type = newType.toLowerCase(Locale.ENGLISH);
             changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType, type);
+            firePropertyChangedEvent(TYPE_HEADER, oldType, newType);
         } catch (PropertyVetoException pve) {
             LOGGER.warn(pve);
         }

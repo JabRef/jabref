@@ -51,10 +51,6 @@ public class EntryTypes {
             return Optional.ofNullable(STANDARD_TYPES.get(name.toLowerCase()));
         }
 
-        public void addOrModifyCustomEntryType(CustomEntryType type) {
-            addOrModifyEntryType(type);
-        }
-
         private void addOrModifyEntryType(EntryType type) {
             ALL_TYPES.put(type.getName().toLowerCase(), type);
         }

@@ -49,16 +49,16 @@ public class FieldFormatterCleanup implements CleanupJob {
      * Runs the formatter on the specified field in the given entry.
      *
      * If the formatter returns an empty string, then the field is removed.
-     * @param field the field on which to run the formatter
+     * @param fieldKey the field on which to run the formatter
      * @param entry the entry to be cleaned up
      * @return a list of changes of the entry
      */
-    private List<FieldChange> cleanupSingleField(String field, BibEntry entry) {
-        if (!entry.hasField(field)) {
+    private List<FieldChange> cleanupSingleField(String fieldKey, BibEntry entry) {
+        if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
             return new ArrayList<>();
         }
-        String oldValue = entry.getField(field);
+        String oldValue = entry.getField(fieldKey);
 
         // Run formatter
         String newValue = formatter.format(oldValue);
@@ -67,11 +67,11 @@ public class FieldFormatterCleanup implements CleanupJob {
             return new ArrayList<>();
         } else {
             if(newValue.isEmpty()) {
-                entry.clearField(field);
+                entry.clearField(fieldKey);
             } else {
-                entry.setField(field, newValue);
+                entry.setField(fieldKey, newValue);
             }
-            FieldChange change = new FieldChange(entry, field, oldValue, newValue);
+            FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
             return Collections.singletonList(change);
         }
     }

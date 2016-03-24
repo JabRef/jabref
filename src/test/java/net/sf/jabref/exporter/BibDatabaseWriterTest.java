@@ -14,7 +14,6 @@ import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -77,7 +76,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -86,7 +85,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE + "@Preamble{Test preamble}" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals(Globals.NEWLINE + "@Preamble{Test preamble}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -96,7 +95,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Preamble{Test preamble}" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -109,7 +108,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE +
+        assertEquals(Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -122,7 +121,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -132,7 +131,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE + "Test epilog" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals(Globals.NEWLINE + "Test epilog" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -142,7 +141,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "Test epilog" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -154,7 +153,8 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE,
+                stringWriter.toString());
     }
 
     @Test
@@ -166,7 +166,8 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE
+                +
                 "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -179,7 +180,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         // @formatter:off
-        Assert.assertEquals(Globals.NEWLINE
+        assertEquals(Globals.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
@@ -200,7 +201,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
         // @formatter:off
-        Assert.assertEquals(
+        assertEquals(
                 "% Encoding: US-ASCII" + Globals.NEWLINE +
                 Globals.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
@@ -218,7 +219,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -228,7 +229,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
+        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
                 "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
     }
 
@@ -242,7 +243,8 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
-        Assert.assertEquals(Globals.NEWLINE +
+        assertEquals(
+                Globals.NEWLINE +
                         "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
                         + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
                 stringWriter.toString());
@@ -260,7 +262,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
         try (Scanner scanner = new Scanner(testBibtexFile)) {
-            Assert.assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
 
@@ -276,7 +278,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
-        Assert.assertEquals("presaved serialization", stringWriter.toString());
+        assertEquals("presaved serialization", stringWriter.toString());
     }
 
     @Test
@@ -291,7 +293,7 @@ public class BibDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
-        Assert.assertEquals(Globals.NEWLINE +
+        assertEquals(Globals.NEWLINE +
                         "@Article{," + Globals.NEWLINE + "  author = {Mr. author}" + Globals.NEWLINE + "}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
@@ -304,7 +306,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        Assert.assertEquals("serialization", stringWriter.toString());
+        assertEquals("serialization", stringWriter.toString());
     }
 
     @Test
@@ -316,7 +318,7 @@ public class BibDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
 
-        Assert.assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
+        assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, stringWriter.toString());
 
     }
 
