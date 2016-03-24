@@ -68,11 +68,10 @@ public class BiblioscapeImporter extends ImportFormat {
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         Map<String, String> hm = new HashMap<>();
-        Map<String, StringBuffer> lines = new HashMap<>();
-        StringBuffer previousLine = null;
+        Map<String, StringBuilder> lines = new HashMap<>();
+        StringBuilder previousLine = null;
         while ((line = in.readLine()) != null) {
-            if (line.isEmpty())
-            {
+            if (line.isEmpty()) {
                 continue; // ignore empty lines, e.g. at file
             }
             // end
@@ -86,7 +85,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 String titleTI = null;
                 List<String> comments = new ArrayList<>();
                 // add item
-                for (Map.Entry<String, StringBuffer> entry : lines.entrySet()) {
+                for (Map.Entry<String, StringBuilder> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {
                         hm.put("author", entry.getValue()
                                 .toString());
@@ -286,13 +285,13 @@ public class BiblioscapeImporter extends ImportFormat {
             // new key
             if (line.startsWith("--") && (line.length() >= 7)
                     && "-- ".equals(line.substring(4, 7))) {
-                lines.put(line.substring(2, 4), previousLine = new StringBuffer(line
-                        .substring(7)));
+                previousLine = new StringBuilder(line.substring(7));
+                lines.put(line.substring(2, 4), previousLine);
                 continue;
             }
             // continuation (folding) of previous line
             if (previousLine == null) {
-                return null;
+                return Collections.emptyList();
             }
             previousLine.append(line.trim());
         }

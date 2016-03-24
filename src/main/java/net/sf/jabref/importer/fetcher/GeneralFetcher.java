@@ -223,7 +223,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                     frame.getCurrentBasePanel(), InternalBibtexFields.DEFAULT_INSPECTION_FIELDS,
                                     activeFetcher.getTitle(), false);
                             d2.addCallBack(activeFetcher);
-                            PositionWindow.placeDialog(d2, frame);
+                            d2.setLocationRelativeTo(frame);
                             d2.setVisible(true);
                             JabRefExecutorService.INSTANCE.execute(() -> {
                                 pFetcher.getEntries(dialog.getSelection(), d2);
@@ -240,7 +240,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
                     InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
-            PositionWindow.placeDialog(dialog, frame);
+            dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(() -> {

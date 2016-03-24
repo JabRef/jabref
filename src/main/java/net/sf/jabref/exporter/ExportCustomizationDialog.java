@@ -32,8 +32,6 @@ import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
@@ -151,7 +149,7 @@ public class ExportCustomizationDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        PositionWindow.placeDialog(this, frame);
+        setLocationRelativeTo(frame);
         new FocusRequester(table);
     }
 

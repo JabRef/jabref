@@ -141,7 +141,7 @@ class ZipFileChooser extends JDialog {
         getContentPane().add(optionsPanel, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        PositionWindow.placeDialog(this, importCustomizationDialog);
+        this.setLocationRelativeTo(importCustomizationDialog);
         new FocusRequester(table);
     }
 

@@ -71,16 +71,16 @@ public class MedlinePlainImporter extends ImportFormat {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        String str;
-        while ((str = in.readLine()) != null) {
-            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
-                    || PMCR_PATTERN.matcher(str).find()) {
-                return true;
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
+                        || PMCR_PATTERN.matcher(str).find()) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -90,13 +90,14 @@ public class MedlinePlainImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        while ((str = in.readLine()) != null) {
-            sb.append(str);
-            sb.append('\n');
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            while ((str = in.readLine()) != null) {
+                sb.append(str);
+                sb.append('\n');
+            }
         }
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("\\n\\n");

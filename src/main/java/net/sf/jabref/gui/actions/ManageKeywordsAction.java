@@ -264,7 +264,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        PositionWindow.placeDialog(diag, frame);
+        diag.setLocationRelativeTo(frame);
         diag.setVisible(true);
         if (cancelled) {
             return;

@@ -87,36 +87,37 @@ public class CopacImporter extends ImportFormat {
             throw new IOException("No stream given.");
         }
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-
         List<String> entries = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
 
-        // Preprocess entries
-        String str;
-        StringBuffer sb = new StringBuffer();
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            // Preprocess entries
+            String str;
 
-        while ((str = in.readLine()) != null) {
+            while ((str = in.readLine()) != null) {
 
-            if (str.length() < 4) {
-                continue;
-            }
-
-            String code = str.substring(0, 4);
-
-            if ("    ".equals(code)) {
-                sb.append(' ').append(str.trim());
-            } else {
-
-                // begining of a new item
-                if ("TI- ".equals(str.substring(0, 4))) {
-                    if (sb.length() > 0) {
-                        entries.add(sb.toString());
-                    }
-                    sb = new StringBuffer();
+                if (str.length() < 4) {
+                    continue;
                 }
-                sb.append('\n').append(str);
+
+                String code = str.substring(0, 4);
+
+                if ("    ".equals(code)) {
+                    sb.append(' ').append(str.trim());
+                } else {
+
+                    // begining of a new item
+                    if ("TI- ".equals(str.substring(0, 4))) {
+                        if (sb.length() > 0) {
+                            entries.add(sb.toString());
+                        }
+                        sb = new StringBuilder();
+                    }
+                    sb.append('\n').append(str);
+                }
             }
         }
+
         if (sb.length() > 0) {
             entries.add(sb.toString());
         }

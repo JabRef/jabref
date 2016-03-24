@@ -72,7 +72,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         filesToOpen.clear();
         final MergeDialog md = new MergeDialog(frame, Localization.lang("Append database"), true);
-        PositionWindow.placeDialog(md, panel);
+        md.setLocationRelativeTo(panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
             List<String> chosen = FileDialogs.getMultipleFiles(frame,

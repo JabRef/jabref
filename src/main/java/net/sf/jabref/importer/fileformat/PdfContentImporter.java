@@ -35,8 +35,8 @@ public class PdfContentImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(PdfContentImporter.class);
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
-
-    private static final DOItoBibTeXFetcher doiToBibTeXFetcher = new DOItoBibTeXFetcher();
+    // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
+    private static final DOItoBibTeXFetcher DOI_TO_BIBTEX_FETCHER = new DOItoBibTeXFetcher();
 
     // input lines into several lines
     private String[] lines;
@@ -58,21 +58,21 @@ public class PdfContentImporter extends ImportFormat {
      * </p>
      */
     private static String removeNonLettersAtEnd(String input) {
-        input = input.trim();
-        if (input.isEmpty()) {
-            return input;
+        String result = input.trim();
+        if (result.isEmpty()) {
+            return result;
         }
-        char lastC = input.charAt(input.length() - 1);
+        char lastC = result.charAt(result.length() - 1);
         while (!Character.isLetter(lastC) && (lastC != ')')) {
             // if there is an asterix, a dot or something else at the end: remove it
-            input = input.substring(0, input.length() - 1);
-            if (input.isEmpty()) {
+            result = result.substring(0, result.length() - 1);
+            if (result.isEmpty()) {
                 break;
             } else {
-                lastC = input.charAt(input.length() - 1);
+                lastC = result.charAt(result.length() - 1);
             }
         }
-        return input;
+        return result;
     }
 
     private static String streamlineNames(String names) {
@@ -213,7 +213,7 @@ public class PdfContentImporter extends ImportFormat {
                     }
                 };
 
-                doiToBibTeXFetcher.processQuery(doi.get().getDOI(), inspector, status);
+                DOI_TO_BIBTEX_FETCHER.processQuery(doi.get().getDOI(), inspector, status);
                 if (!result.isEmpty()) {
                     return result;
                 }

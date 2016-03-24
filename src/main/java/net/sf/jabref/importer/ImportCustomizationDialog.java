@@ -206,7 +206,7 @@ public class ImportCustomizationDialog extends JDialog {
         getContentPane().add(buttons, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        PositionWindow.placeDialog(this, frame);
+        this.setLocationRelativeTo(frame);
         new FocusRequester(customImporterTable);
     }
 
