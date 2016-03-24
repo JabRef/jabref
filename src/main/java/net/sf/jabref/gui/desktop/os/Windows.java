@@ -2,6 +2,7 @@ package net.sf.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class Windows implements NativeDesktop {
     @Override
@@ -24,9 +25,7 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        String escapedLink = filePath.replace("&", "\"&\"").replace(" ", "\" \"");
-
-        Runtime.getRuntime().exec(application + " " + escapedLink);
+        Runtime.getRuntime().exec(Paths.get(application) + " " + Paths.get(filePath));
     }
 
     @Override
