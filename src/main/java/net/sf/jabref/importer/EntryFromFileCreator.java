@@ -97,14 +97,14 @@ public abstract class EntryFromFileCreator implements FileFilter {
      * @param addPathTokensAsKeywords
      * @return
      */
-    public BibEntry createEntry(File f, boolean addPathTokensAsKeywords) {
+    public Optional<BibEntry> createEntry(File f, boolean addPathTokensAsKeywords) {
         if ((f == null) || !f.exists()) {
-            return null;
+            return Optional.empty();
         }
         Optional<BibEntry> newEntry = createBibtexEntry(f);
 
         if (!(newEntry.isPresent())) {
-            return null;
+            return newEntry;
         }
 
         if (addPathTokensAsKeywords) {
@@ -116,7 +116,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         }
 
         addFileInfo(newEntry.get(), f);
-        return newEntry.get();
+        return newEntry;
     }
 
     /** Returns the ExternalFileType that is imported here */

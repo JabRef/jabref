@@ -73,7 +73,7 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
         return accept(file.getName());
     }
 
-    public boolean accept(String filename) {
+    private boolean accept(String filename) {
 
         String lowerCaseFileName = filename.toLowerCase();
         int dotPos = lowerCaseFileName.lastIndexOf('.');
@@ -86,34 +86,6 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
 
         return extSet.contains(lowerCaseFileName.substring(dotPos)) ||
                 ((dotDotPos >= 0) && extSet.contains(lowerCaseFileName.substring(dotDotPos)));
-    }
-
-    public String getSuffix(String filenm) {
-
-        int dotPos;
-
-        dotPos = filenm.lastIndexOf('.');
-        if (dotPos == -1) {
-            return null;
-        }
-
-        String suffix;
-        suffix = filenm.substring(dotPos);
-        if (extSet.contains(suffix)) {
-            return suffix;
-        }
-
-        dotPos = filenm.lastIndexOf('.', dotPos - 1); // for dot.dot extensions
-        if (dotPos == -1) {
-            return null;
-        }
-
-        suffix = filenm.substring(dotPos);
-        if (extSet.contains(suffix)) {
-            return suffix;
-        }
-
-        return null;
     }
 
     @Override

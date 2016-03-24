@@ -140,12 +140,22 @@ class CitationManager {
     static class CitEntry implements Comparable<CitEntry> {
 
         private final String refMarkName;
-        private String pageInfo;
+        private Optional<String> pageInfo;
         private final String context;
-        private final String origPageInfo;
+        private final Optional<String> origPageInfo;
 
 
+        // Only used for testing...
+        public CitEntry(String refMarkName, String context) {
+            this(refMarkName, context, Optional.empty());
+        }
+
+        // Only used for testing...
         public CitEntry(String refMarkName, String context, String pageInfo) {
+            this(refMarkName, context, Optional.ofNullable(pageInfo));
+        }
+
+        public CitEntry(String refMarkName, String context, Optional<String> pageInfo) {
             this.refMarkName = refMarkName;
             this.context = context;
             this.pageInfo = pageInfo;
@@ -153,7 +163,7 @@ class CitationManager {
         }
 
         public Optional<String> getPageInfo() {
-            return Optional.ofNullable(pageInfo);
+            return pageInfo;
         }
 
         public String getRefMarkName() {
@@ -161,14 +171,15 @@ class CitationManager {
         }
 
         public boolean pageInfoChanged() {
-            if (((pageInfo != null) && (origPageInfo == null))
-                    || ((pageInfo == null) && (origPageInfo != null))) {
+            if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
                 return true;
             }
-            if (pageInfo == null) {
+            if (!pageInfo.isPresent()) {
+                // This means that origPageInfo.isPresent is also false
                 return false;
             } else {
-                return pageInfo.compareTo(origPageInfo) != 0;
+                // So origPageInfo.isPresent is true here
+                return pageInfo.get().compareTo(origPageInfo.get()) != 0;
             }
         }
 
@@ -196,8 +207,7 @@ class CitationManager {
         }
 
         public void setPageInfo(String trim) {
-            pageInfo = trim;
-
+            pageInfo = Optional.ofNullable(trim);
         }
     }
 

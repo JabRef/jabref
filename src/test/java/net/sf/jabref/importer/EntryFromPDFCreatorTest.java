@@ -16,14 +16,19 @@
 package net.sf.jabref.importer;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
+
 import java.io.File;
+import java.util.Optional;
 
 public class EntryFromPDFCreatorTest {
 
@@ -35,6 +40,8 @@ public class EntryFromPDFCreatorTest {
         Globals.prefs = JabRefPreferences.getInstance();
         // Needed to initialize ExternalFileTypes
         entryCreator = new EntryFromPDFCreator();
+        // Needed for PdfImporter - still not enough
+        JabRef.jrf = mock(JabRefFrame.class);
     }
 
     @Test
@@ -45,15 +52,18 @@ public class EntryFromPDFCreatorTest {
     }
 
     @Test
-    @Ignore
-    public void testCreationOfEntry() {
-        BibEntry entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
-        Assert.assertNull(entry);
+    public void testCreationOfEntryNoPDF() {
+        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.NOT_EXISTING_PDF, false);
+        Assert.assertFalse(entry.isPresent());
+    }
 
-        entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
-        Assert.assertNotNull(entry);
-        Assert.assertTrue(entry.getField("file").endsWith(":PDF"));
-        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.getField("title"));
+    @Test
+    @Ignore
+    public void testCreationOfEntryNotInDatabase() {
+        Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
+        Assert.assertTrue(entry.isPresent());
+        Assert.assertTrue(entry.get().getField("file").endsWith(":PDF"));
+        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.get().getField("title"));
 
     }
 }

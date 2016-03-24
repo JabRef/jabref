@@ -48,7 +48,6 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -115,7 +114,7 @@ public class PdfImporter {
      * @param fileNames states the names of the files to import
      * @return list of successful created BibTeX entries and list of non-PDF files
      */
-    public ImportPdfFilesResult importPdfFiles(String[] fileNames, OutputPrinter status) {
+    public ImportPdfFilesResult importPdfFiles(String[] fileNames) {
         // sort fileNames in PDFfiles to import and other files
         // PDFfiles: variable files
         // other files: variable noPdfFiles
@@ -131,7 +130,7 @@ public class PdfImporter {
         // files and noPdfFiles correctly sorted
 
         // import the files
-        List<BibEntry> entries = importPdfFiles(files, status);
+        List<BibEntry> entries = importPdfFiles(files);
 
         return new ImportPdfFilesResult(noPdfFiles, entries);
     }
@@ -140,7 +139,7 @@ public class PdfImporter {
      * @param fileNames - PDF files to import
      * @return true if the import succeeded, false otherwise
      */
-    private List<BibEntry> importPdfFiles(List<String> fileNames, OutputPrinter status) {
+    private List<BibEntry> importPdfFiles(List<String> fileNames) {
         if (panel == null) {
             return Collections.emptyList();
         }
@@ -170,7 +169,7 @@ public class PdfImporter {
                     break;
 
                 case ImportDialog.CONTENT:
-                    doContentImport(fileName, res, status);
+                    doContentImport(fileName, res);
                     break;
                 case ImportDialog.NOMETA:
                     BibEntry entry = createNewBlankEntry(fileName);
@@ -233,13 +232,13 @@ public class PdfImporter {
         return newEntry;
     }
 
-    private void doContentImport(String fileName, List<BibEntry> res, OutputPrinter status) {
+    private void doContentImport(String fileName, List<BibEntry> res) {
         File file = new File(fileName);
         BibEntry entry;
         try (InputStream in = new FileInputStream(file)) {
             PdfContentImporter contentImporter = new PdfContentImporter();
             List<BibEntry> localRes = null;
-            localRes = contentImporter.importEntries(in, status);
+            localRes = contentImporter.importEntries(in, frame);
 
             if ((localRes == null) || localRes.isEmpty()) {
                 // import failed -> generate default entry

@@ -84,24 +84,24 @@ public class ImportFormatReader {
      * @param cliId CLI-Id
      * @return Import Format or <code>null</code> if none matches
      */
-    private ImportFormat getByCliId(String cliId) {
+    private Optional<ImportFormat> getByCliId(String cliId) {
         for (ImportFormat format : formats) {
             if (format.getCLIId().equals(cliId)) {
-                return format;
+                return Optional.of(format);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
             throws IOException {
-        ImportFormat importer = getByCliId(format);
+        Optional<ImportFormat> importer = getByCliId(format);
 
-        if (importer == null) {
+        if (!importer.isPresent()) {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        List<BibEntry> res = importer.importEntries(in, status);
+        List<BibEntry> res = importer.get().importEntries(in, status);
 
         // Remove all empty entries
         if (res != null) {
@@ -113,13 +113,13 @@ public class ImportFormatReader {
 
     public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
-        ImportFormat importer = getByCliId(format);
+        Optional<ImportFormat> importer = getByCliId(format);
 
-        if (importer == null) {
+        if (!importer.isPresent()) {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importFromFile(importer, filename, status);
+        return importFromFile(importer.get(), filename, status);
     }
 
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {

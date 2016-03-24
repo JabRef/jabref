@@ -325,7 +325,8 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             @Override
             public void run() {
-                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
+                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow)
+                        .importPdfFiles(fileNames);
                 if (!importRes.getNoPdfFiles().isEmpty()) {
                     loadOrImportFiles(importRes.getNoPdfFiles(), dropRow);
                 }

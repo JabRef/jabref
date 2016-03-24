@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -140,34 +141,34 @@ public final class EntryFromFileCreatorManager {
             if (creator == null) {
                 importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
             } else {
-                BibEntry entry = creator.createEntry(f,
+                Optional<BibEntry> entry = creator.createEntry(f,
                         generateKeywordsFromPathToFile);
-                if (entry == null) {
+                if (entry.isPresent()) {
                     importGUIMessages.add("Problem importing " + f.getPath()
                     + ": Entry could not be created.");
                     continue;
                 }
                 if (entryType != null) {
-                    entry.setType(entryType);
+                    entry.get().setType(entryType);
                 }
-                if (entry.getId() == null) {
-                    entry.setId(IdGenerator.next());
+                if (entry.get().getId() == null) {
+                    entry.get().setId(IdGenerator.next());
                 }
                 /*
                  * TODO: database.insertEntry(BibEntry) is not sensible. Why
                  * does 'true' mean "There were duplicates", while 'false' means
                  * "Everything alright"?
                  */
-                if (!database.containsEntryWithId(entry.getId())) {
+                if (!database.containsEntryWithId(entry.get().getId())) {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
-                    if (database.insertEntry(entry)) {
+                    if (database.insertEntry(entry.get())) {
                         importGUIMessages.add("Problem importing " + f.getPath()
                         + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {
-                            ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                            ce.addEdit(new UndoableInsertEntry(database, entry.get(), panel));
                         }
                     }
                 }
