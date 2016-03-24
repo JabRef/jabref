@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;

@@ -20,6 +20,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexSingleField;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.*;
@@ -151,7 +152,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
                 if (internalRow == 0) {
-                    return column == 0 ? GUIGlobals.NUMBER_COL : String.valueOf(ncWidth);
+                    return column == 0 ? InternalBibtexFields.NUMBER_COL : String.valueOf(ncWidth);
                 }
                 internalRow--;
                 if (internalRow >= tableRows.size()) {
