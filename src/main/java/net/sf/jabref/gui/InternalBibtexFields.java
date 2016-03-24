@@ -84,12 +84,16 @@ public class InternalBibtexFields {
         // but may be used by others that produce an annotated bibliography.
         // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/bibtex.html
         add(new BibtexSingleField("annote", true, BibtexSingleField.LARGE_W));
-        add(new BibtexSingleField("author", true, BibtexSingleField.MEDIUM_W, 280));
+        dummy = new BibtexSingleField("author", true, BibtexSingleField.MEDIUM_W, 280);
+        dummy.setExtras(EnumSet.of(BibtexSingleFieldProperties.PERSON_NAMES));
+        add(dummy);
         add(new BibtexSingleField("booktitle", true, 175));
         add(new BibtexSingleField("chapter", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField("crossref", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField("edition", true, BibtexSingleField.SMALL_W));
-        add(new BibtexSingleField("editor", true, BibtexSingleField.MEDIUM_W, 280));
+        dummy = new BibtexSingleField("editor", true, BibtexSingleField.MEDIUM_W, 280);
+        dummy.setExtras(EnumSet.of(BibtexSingleFieldProperties.PERSON_NAMES));
+        add(dummy);
         add(new BibtexSingleField("howpublished", true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("institution", true, BibtexSingleField.MEDIUM_W));
 

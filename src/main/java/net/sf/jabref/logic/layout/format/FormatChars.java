@@ -32,6 +32,9 @@ public class FormatChars implements LayoutFormatter {
 
     @Override
     public String format(String inField) {
+        if (inField.isEmpty()) {
+            return "";
+        }
         int i;
         String field = inField.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
