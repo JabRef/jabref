@@ -19,7 +19,12 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class EntrySorter implements DatabaseChangeListener {
+
+    private static final Log LOGGER = LogFactory.getLog(EntrySorter.class);
 
     private final List<BibEntry> set;
     private final Comparator<BibEntry> comp;
@@ -91,7 +96,12 @@ public class EntrySorter implements DatabaseChangeListener {
             switch (e.getType()) {
             case ADDED_ENTRY:
                 pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
-                set.add(pos, e.getEntry());
+                LOGGER.debug("Insert position = " + pos);
+                if (pos >= 0) {
+                    set.add(pos, e.getEntry());
+                } else {
+                    set.add(0, e.getEntry());
+                }
                 break;
             case REMOVED_ENTRY:
                 set.remove(e.getEntry());
@@ -102,8 +112,10 @@ public class EntrySorter implements DatabaseChangeListener {
                 int posOld = set.indexOf(e.getEntry());
                 if (pos < 0) {
                     set.remove(posOld);
-                    set.add(-pos - 1, e.getEntry());
+                    set.add(-posOld - 1, e.getEntry());
                 }
+                break;
+            default:
                 break;
             }
         }

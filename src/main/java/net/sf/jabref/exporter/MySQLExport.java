@@ -18,6 +18,7 @@ package net.sf.jabref.exporter;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;

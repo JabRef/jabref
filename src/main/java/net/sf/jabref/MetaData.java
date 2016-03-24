@@ -18,6 +18,9 @@ package net.sf.jabref;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
@@ -30,6 +33,8 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
+
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
@@ -77,7 +82,7 @@ public class MetaData implements Iterable<String> {
                         orderedData.add(unit);
                     }
                 } catch (IOException ex) {
-                    System.err.println("Weird error while parsing meta data.");
+                    LOGGER.error("Weird error while parsing meta data.", ex);
                 }
                 if (GROUPSVERSION.equals(entry.getKey())) {
                     if (!orderedData.isEmpty()) {
@@ -260,7 +265,7 @@ public class MetaData implements Iterable<String> {
             groupTreeValid = true;
         } catch (Exception e) {
             // we cannot really do anything about this here
-            System.err.println(e);
+            LOGGER.error("Problem parsing groups from MetaData", e);
             groupTreeValid = false;
         }
     }
@@ -440,7 +445,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> serialize() throws IOException {
+    public Map<String, String> serialize() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 
