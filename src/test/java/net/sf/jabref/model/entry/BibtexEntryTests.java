@@ -10,6 +10,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class BibtexEntryTests {
@@ -84,6 +86,22 @@ public class BibtexEntryTests {
     }
 
     @Test
+    public void typeOfBibEntryIsMiscAfterSettingToNullString() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }");
+        Assert.assertEquals("article", be.getType());
+        be.setType((String) null);
+        Assert.assertEquals("misc", be.getType());
+    }
+
+    @Test
+    public void typeOfBibEntryIsMiscAfterSettingToEmptyString() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }");
+        Assert.assertEquals("article", be.getType());
+        be.setType("");
+        Assert.assertEquals("misc", be.getType());
+    }
+
+    @Test
     public void testGetPublicationDate() {
 
         Assert.assertEquals("2003-02",
@@ -108,6 +126,78 @@ public class BibtexEntryTests {
 
     }
 
+    @Test
+    public void getFieldOrAliasDateWithYearNumericalMonth() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }");
+        Assert.assertEquals("2003-03", be.getFieldOrAlias("date"));
+    }
+
+    @Test
+    public void getFieldOrAliasDateWithYearNumericalMonthString() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = {3} }");
+        Assert.assertEquals("2003-03", be.getFieldOrAlias("date"));
+    }
+
+    @Test
+    public void getFieldOrAliasDateWithYearAbbreviatedMonth() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = mar }");
+        Assert.assertEquals("2003-03", be.getFieldOrAlias("date"));
+    }
+
+    @Test
+    public void getFieldOrAliasDateWithYearAbbreviatedMonthString() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = {mar} }");
+        Assert.assertEquals("2003-03", be.getFieldOrAlias("date"));
+    }
+
+    @Test
+    public void getFieldOrAliasDateWithOnlyYear() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003} }");
+        Assert.assertEquals("2003", be.getFieldOrAlias("date"));
+    }
+
+    @Test
+    public void getFieldOrAliasYearWithDateYYYY() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003}}");
+        Assert.assertEquals("2003", be.getFieldOrAlias("year"));
+    }
+
+    @Test
+    public void getFieldOrAliasYearWithDateYYYYMM() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003-03}}");
+        Assert.assertEquals("2003", be.getFieldOrAlias("year"));
+    }
+
+    @Test
+    public void getFieldOrAliasYearWithDateYYYYMMDD() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003-03-30}}");
+        Assert.assertEquals("2003", be.getFieldOrAlias("year"));
+    }
+
+    @Test
+    public void getFieldOrAliasMonthWithDateYYYYReturnsNull() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003}}");
+        Assert.assertNull(be.getFieldOrAlias("month"));
+    }
+
+    @Test
+    public void getFieldOrAliasMonthWithDateYYYYMM() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003-03}}");
+        Assert.assertEquals("3", be.getFieldOrAlias("month"));
+    }
+
+    @Test
+    public void getFieldOrAliasMonthWithDateYYYYMMDD() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{HipKro03, date = {2003-03-30}}");
+        Assert.assertEquals("3", be.getFieldOrAlias("month"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void setNullField() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+        be.setField(null);
+        Assert.fail();
+    }
 
     @Test(expected = NullPointerException.class)
     public void addNullKeyword() {
@@ -116,37 +206,113 @@ public class BibtexEntryTests {
         Assert.fail();
     }
 
+    @Test(expected = NullPointerException.class)
+    public void putNullKeywordList() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+        be.putKeywords(null);
+        Assert.fail();
+    }
+
     @Test
-    public void testKeywordMethods() {
+    public void testGetSeparatedKeywordsAreCorrect() {
         BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
 
         String[] expected = {"Foo",  "Bar"};
         Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+        Assert.assertFalse(be.hasChanged());
+    }
 
-        List<String> kw = be.getSeparatedKeywords();
+    @Test
+    public void testAddKeywordIsCorrect() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
 
         be.addKeyword("FooBar");
         String[] expected2 = {"Foo", "Bar", "FooBar"};
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        Assert.assertTrue(be.hasChanged());
+    }
+
+    @Test
+    public void testAddKeywordTwiceYiedsOnlyOne() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
 
         be.addKeyword("FooBar");
+        be.addKeyword("FooBar");
+        String[] expected2 = {"Foo", "Bar", "FooBar"};
         Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+    }
+
+    @Test
+    public void testAddKeywordIsCaseInsensitive() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
 
         be.addKeyword("FOO");
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        String[] expected = {"Foo", "Bar"};
+        Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+        Assert.assertFalse(be.hasChanged());
+    }
 
+    @Test
+    public void testAddKeywordEmptyKeywordIsNotAdded() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
         be.addKeyword("");
-        Assert.assertArrayEquals(expected2, be.getSeparatedKeywords().toArray());
+        String[] expected = {"Foo", "Bar"};
+        Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+        Assert.assertFalse(be.hasChanged());
+    }
 
-
+    @Test
+    public void texNewBibEntryHasNoKeywords() {
         BibEntry be2 = new BibEntry();
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
+    }
+
+    @Test
+    public void texNewBibEntryHasNoKeywordsEvenAfterAddingEmptyKeyword() {
+        BibEntry be2 = new BibEntry();
+        be2.setChanged(false);
         be2.addKeyword("");
         Assert.assertTrue(be2.getSeparatedKeywords().isEmpty());
+        Assert.assertFalse(be2.hasChanged());
+    }
+
+    @Test
+    public void testAddKeywordsWorksAsExpected() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+
+        String[] expected = {"Foo", "Bar"};
+        BibEntry be2 = new BibEntry();
         be2.addKeywords(be.getSeparatedKeywords());
-        Assert.assertArrayEquals(expected2, be2.getSeparatedKeywords().toArray());
-        be2.putKeywords(kw);
         Assert.assertArrayEquals(expected, be2.getSeparatedKeywords().toArray());
+    }
+
+    @Test
+    public void testPutKeywordsOverwritesOldKeywords() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+
+        be.putKeywords(Arrays.asList("Yin", "Yang"));
+        String[] expected = {"Yin", "Yang"};
+        Assert.assertArrayEquals(expected, be.getSeparatedKeywords().toArray());
+        Assert.assertTrue(be.hasChanged());
+    }
+
+    @Test
+    public void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
+        BibEntry be = BibtexParser.singleFromString("@ARTICLE{Key15, keywords = {Foo, Bar}}");
+
+        be.putKeywords(Collections.emptyList());
+        Assert.assertTrue(be.getSeparatedKeywords().isEmpty());
+        Assert.assertTrue(be.hasChanged());
+    }
+
+    @Test
+    public void testPutKeywordsPutEmpyListToEmptyBibentry() {
+        BibEntry be = new BibEntry();
+        be.setChanged(false);
+
+        be.putKeywords(Collections.emptyList());
+        Assert.assertTrue(be.getSeparatedKeywords().isEmpty());
+        Assert.assertFalse(be.hasChanged());
     }
 
     @Test

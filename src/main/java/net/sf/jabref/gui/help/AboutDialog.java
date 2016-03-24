@@ -31,7 +31,7 @@ public class AboutDialog extends JDialog {
     public AboutDialog(JabRefFrame bf) {
         super(Objects.requireNonNull(bf), Localization.lang("About JabRef"), true);
         setSize(new Dimension(750, 600));
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(bf);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout());
