@@ -1,6 +1,5 @@
 # coding=utf-8
 import os
-import re
 import sys
 
 res_dir = "src/main/resources/l10n"
