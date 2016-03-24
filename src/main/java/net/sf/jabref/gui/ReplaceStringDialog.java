@@ -185,7 +185,7 @@ class ReplaceStringDialog extends JDialog {
         pack();
         //setSize(400, 170);
 
-        PositionWindow.placeDialog(this, parent);
+        this.setLocationRelativeTo(parent);
     }
 
     public boolean okPressed() {

@@ -35,7 +35,6 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.DuplicateCheck;
@@ -131,7 +130,7 @@ public class ChangeScanner implements Runnable {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater((Runnable) () -> {
                 ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                PositionWindow.placeDialog(dial, frame);
+                dial.setLocationRelativeTo(frame);
                 dial.setVisible(true);
                 fup.scanResultsResolved(dial.isOkPressed());
                 if (dial.isOkPressed()) {

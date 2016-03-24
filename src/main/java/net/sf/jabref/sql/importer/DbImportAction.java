@@ -112,7 +112,7 @@ public class DbImportAction extends AbstractWorker {
 
             // show connection dialog
             dbd = new DBConnectDialog(frame, dbs);
-            PositionWindow.placeDialog(dbd, frame);
+            dbd.setLocationRelativeTo(frame);
             dbd.setVisible(true);
 
             connectedToDB = dbd.isConnectedToDB();

@@ -33,7 +33,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
 
         FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
 
-        PositionWindow.placeDialog(dialog, jabRefFrame);
+        dialog.setLocationRelativeTo(jabRefFrame);
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {

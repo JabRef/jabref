@@ -48,7 +48,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         String thisType = type;
         if (thisType == null) {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
-            PositionWindow.placeDialog(etd, jabRefFrame);
+            etd.setLocationRelativeTo(jabRefFrame);
             etd.setVisible(true);
             EntryType tp = etd.getChoice();
             if (tp == null) {

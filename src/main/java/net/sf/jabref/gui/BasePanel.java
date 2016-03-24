@@ -471,7 +471,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.EDIT_PREAMBLE, (BaseAction) () -> {
             if (preambleEditor == null) {
                 PreambleEditor form = new PreambleEditor(frame, BasePanel.this, database);
-                PositionWindow.placeDialog(form, frame);
+                form.setLocationRelativeTo(frame);
                 form.setVisible(true);
                 preambleEditor = form;
             } else {
@@ -524,7 +524,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                     // show connection dialog
                     DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                    PositionWindow.placeDialog(dbd, BasePanel.this);
+                    dbd.setLocationRelativeTo(BasePanel.this);
                     dbd.setVisible(true);
 
                     connectedToDB = dbd.isConnectedToDB();
@@ -591,7 +591,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
             final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
-            PositionWindow.placeDialog(dialog, frame);
+            dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
         });
 
@@ -962,7 +962,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.PLAIN_TEXT_IMPORT, (BaseAction) () -> {
             // get Type of new entry
             EntryTypeDialog etd = new EntryTypeDialog(frame);
-            PositionWindow.placeDialog(etd, BasePanel.this);
+            etd.setLocationRelativeTo(BasePanel.this);
             etd.setVisible(true);
             EntryType tp = etd.getChoice();
             if (tp == null) {
@@ -972,7 +972,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String id = IdGenerator.next();
             BibEntry bibEntry = new BibEntry(id, tp.getName());
             TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
-            PositionWindow.placeDialog(tidialog, BasePanel.this);
+            tidialog.setLocationRelativeTo(BasePanel.this);
             tidialog.setVisible(true);
 
             if (tidialog.okPressed()) {
@@ -1077,7 +1077,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
             ContentSelectorDialog2 csd = new ContentSelectorDialog2
                     (frame, frame, BasePanel.this, false, bibDatabaseContext.getMetaData(), null);
-            PositionWindow.placeDialog(csd, frame);
+            csd.setLocationRelativeTo(frame);
             csd.setVisible(true);
         });
 
@@ -1257,7 +1257,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Find out what type is wanted.
             final EntryTypeDialog etd = new EntryTypeDialog(frame);
             // We want to center the dialog, to make it look nicer.
-            PositionWindow.placeDialog(etd, frame);
+            etd.setLocationRelativeTo(frame);
             etd.setVisible(true);
             type = etd.getChoice();
         }

@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.pdfimport;
 
-import java.awt.Dimension;
-import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -157,7 +155,7 @@ public class PdfImporter {
                 if (!XMPUtil.hasMetadata(Paths.get(fileName))) {
                     importDialog.disableXMPChoice();
                 }
-                centerRelativeToWindow(importDialog, frame);
+                importDialog.setLocationRelativeTo(frame);
                 importDialog.showDialog();
                 doNotShowAgain = importDialog.isDoNotShowAgain();
             }
@@ -275,7 +273,7 @@ public class PdfImporter {
         // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
-        PositionWindow.placeDialog(etd, frame);
+        etd.setLocationRelativeTo(frame);
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 
@@ -332,31 +330,5 @@ public class PdfImporter {
         this.dropRow = dropRow;
     }
 
-    /**
-     * Used nowhere else, will be removed at the JavaFX migration
-     */
-    private static void centerRelativeToWindow(java.awt.Dialog diag, java.awt.Container win) {
-        int x;
-        int y;
-
-        Point topLeft = win.getLocationOnScreen();
-        Dimension parentSize = win.getSize();
-
-        Dimension mySize = diag.getSize();
-
-        if (parentSize.width > mySize.width) {
-            x = ((parentSize.width - mySize.width) / 2) + topLeft.x;
-        } else {
-            x = topLeft.x;
-        }
-
-        if (parentSize.height > mySize.height) {
-            y = ((parentSize.height - mySize.height) / 2) + topLeft.y;
-        } else {
-            y = topLeft.y;
-        }
-
-        diag.setLocation(x, y);
-    }
 
 }

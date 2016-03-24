@@ -37,7 +37,7 @@ public class ManageJournalsAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         ManageJournalsPanel panel = new ManageJournalsPanel(frame);
-        PositionWindow.placeDialog(panel.getDialog(), frame);
+        panel.getDialog().setLocationRelativeTo(frame);
         panel.setValues();
         panel.getDialog().setVisible(true);
     }

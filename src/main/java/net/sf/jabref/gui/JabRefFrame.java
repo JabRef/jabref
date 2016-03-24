@@ -723,7 +723,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
             prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
-            PositionWindow.placeDialog(prefsDialog, JabRefFrame.this);
+            prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();
         }
@@ -1699,7 +1699,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             KeyBindingsDialog d = new KeyBindingsDialog(new KeyBindingRepository(Globals.getKeyPrefs().getKeyBindings()));
             d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             d.pack(); //setSize(300,500);
-            PositionWindow.placeDialog(d, JabRefFrame.this);
+            d.setLocationRelativeTo(JabRefFrame.this);
             d.setVisible(true);
         }
     }
@@ -1758,7 +1758,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.entryListComplete();
-            PositionWindow.placeDialog(diag, JabRefFrame.this);
+            diag.setLocationRelativeTo(JabRefFrame.this);
             diag.setVisible(true);
             diag.toFront();
         });
@@ -1952,7 +1952,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             JDialog dl = new EntryCustomizationDialog(JabRefFrame.this);
-            PositionWindow.placeDialog(dl, JabRefFrame.this);
+            dl.setLocationRelativeTo(JabRefFrame.this);
             dl.setVisible(true);
         }
     }
@@ -1966,7 +1966,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         @Override
         public void actionPerformed(ActionEvent e) {
             GenFieldsCustomizer gf = new GenFieldsCustomizer(JabRefFrame.this);
-            PositionWindow.placeDialog(gf, JabRefFrame.this);
+            gf.setLocationRelativeTo(JabRefFrame.this);
             gf.setVisible(true);
 
         }
@@ -1986,7 +1986,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
             propertiesDialog.setPanel(getCurrentBasePanel());
-            PositionWindow.placeDialog(propertiesDialog, JabRefFrame.this);
+            propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
 
@@ -2010,7 +2010,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 // BibtexKeyPatternDialog allows for updating content based on currently selected panel
                 bibtexKeyPatternDialog.setPanel(getCurrentBasePanel());
             }
-            PositionWindow.placeDialog(bibtexKeyPatternDialog, JabRefFrame.this);
+            bibtexKeyPatternDialog.setLocationRelativeTo(JabRefFrame.this);
             bibtexKeyPatternDialog.setVisible(true);
         }
 

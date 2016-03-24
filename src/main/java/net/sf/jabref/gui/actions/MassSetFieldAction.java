@@ -197,7 +197,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         cancelled = true;
         prepareDialog(!entries.isEmpty());
         if (diag != null) {
-            PositionWindow.placeDialog(diag, frame);
+            diag.setLocationRelativeTo(frame);
             diag.setVisible(true);
         }
         if (cancelled) {

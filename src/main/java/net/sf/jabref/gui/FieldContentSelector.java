@@ -157,7 +157,7 @@ public class FieldContentSelector extends JComponent {
         manage.addActionListener(e -> {
             ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, metaData,
                     editor.getFieldName());
-            PositionWindow.placeDialog(csd, frame);
+            csd.setLocationRelativeTo(frame);
 
             // Calling setVisible(true) will open the modal dialog and block
             // for the dialog to close.

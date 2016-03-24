@@ -182,7 +182,7 @@ public class FileListEntryEditor {
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        PositionWindow.placeDialog(diag, frame);
+        diag.setLocationRelativeTo(frame);
         diag.addWindowListener(new WindowAdapter() {
 
             @Override

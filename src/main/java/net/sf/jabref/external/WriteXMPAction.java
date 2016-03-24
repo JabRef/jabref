@@ -30,7 +30,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -263,7 +262,7 @@ public class WriteXMPAction extends AbstractWorker {
         public void open() {
             progressArea.setText("");
             canceled = false;
-            PositionWindow.placeDialog(optDiag, panel.frame());
+            optDiag.setLocationRelativeTo(panel.frame());
 
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);

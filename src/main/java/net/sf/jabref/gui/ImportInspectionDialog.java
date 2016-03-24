@@ -979,7 +979,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // database.
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, other.get(),
                             first, DuplicateResolverDialog.DuplicateResolverType.INSPECTION);
-                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
+                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     if (diag.getSelected() == DuplicateResolverResult.KEEP_UPPER) {
@@ -1027,7 +1027,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (other.isPresent()) {
                     DuplicateResolverDialog diag = new DuplicateResolverDialog(ImportInspectionDialog.this, first,
                             other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH);
-                    PositionWindow.placeDialog(diag, ImportInspectionDialog.this);
+                    diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     DuplicateResolverResult answer = diag.getSelected();

@@ -68,7 +68,7 @@ public class DbConnectAction implements BaseAction {
 
         // show connection dialog
         DBConnectDialog dbd = new DBConnectDialog(panel.frame(), dbs);
-        PositionWindow.placeDialog(dbd, panel);
+        dbd.setLocationRelativeTo(panel);
         dbd.setVisible(true);
 
         // connect to database to test DBStrings

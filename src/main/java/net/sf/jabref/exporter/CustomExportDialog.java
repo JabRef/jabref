@@ -28,7 +28,6 @@ import javax.swing.*;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.FileDialogs;
@@ -178,7 +177,7 @@ class CustomExportDialog extends JDialog {
 
         setSize(700, 200);
 
-        PositionWindow.placeDialog(this, parent);
+        setLocationRelativeTo(parent);
     }
 
     public boolean okPressed() {
