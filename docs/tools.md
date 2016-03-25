@@ -8,6 +8,7 @@ This page lists some software we consider useful.
 Here, we collect some helpful git hints
 
 * https://github.com/blog/2019-how-to-undo-almost-anything-with-git
+* https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md
 
 ### Rebase everything as one commit on master
 * Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/). 
