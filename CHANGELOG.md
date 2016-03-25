@@ -49,6 +49,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
 - The mass edit function "Set/clear/rename fields" is now in the Edit menu
 - The merge entries dialog now show all text and colored differences between the fields
+- Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
 - Add "Move linked files to default file directory" as cleanup procedure

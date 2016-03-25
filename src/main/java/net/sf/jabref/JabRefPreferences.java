@@ -251,6 +251,7 @@ public class JabRefPreferences {
     public static final String PREVIEW_0 = "preview0";
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
+    public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -586,6 +587,9 @@ public class JabRefPreferences {
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
+
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, 0);
+
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
