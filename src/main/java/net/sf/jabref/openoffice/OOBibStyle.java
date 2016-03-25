@@ -432,7 +432,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             int i1 = lNum.get(i);
             if (combineFrom < 0) {
                 // Check if next entry is the next in the ref list:
-                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1))) {
+                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1)) && (i1 > 0)) {
                     combineFrom = i1;
                 } else {
                     // Add single entry:
@@ -705,15 +705,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String content = BibDatabase.getResolvedField(s, entry, database);
 
             if ((content != null) && !content.trim().isEmpty()) {
-                if (fieldFormatter != null) {
-
-                    if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
-                        return "{" + fieldFormatter.format(content) + "}";
-                    }
-                    return fieldFormatter.format(content);
+                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
+                    return "{" + fieldFormatter.format(content) + "}";
                 }
-                return content;
-
+                return fieldFormatter.format(content);
             }
         }
         // No luck? Return an empty string:
