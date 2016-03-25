@@ -53,16 +53,19 @@ package net.sf.jabref.wizard.text.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
 import javax.swing.*;
@@ -444,8 +447,16 @@ public class TextInputDialog extends JDialog implements ActionListener {
         if (importedEntries == null) {
             return false;
         } else {
-            Util.setAutomaticFields(importedEntries, false, false, true);
+            UpdateField.setAutomaticFields(importedEntries, false, false);
+            boolean markEntries = (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
+                    && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
+                            || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)));
+
             for (BibEntry e : importedEntries) {
+                if (markEntries) {
+                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+                }
+
                 frame.getCurrentBasePanel().insertEntry(e);
             }
             return true;

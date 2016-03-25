@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;

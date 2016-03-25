@@ -21,12 +21,12 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.groups.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.worker.MarkEntriesAction;

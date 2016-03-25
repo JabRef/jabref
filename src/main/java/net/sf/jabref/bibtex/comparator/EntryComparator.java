@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 

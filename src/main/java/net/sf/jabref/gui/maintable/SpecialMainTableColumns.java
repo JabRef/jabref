@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -15,7 +16,7 @@ import javax.swing.*;
 
 public class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(GUIGlobals.NUMBER_COL) {
+    public static final MainTableColumn NUMBER_COL = new MainTableColumn(InternalBibtexFields.NUMBER_COL) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {

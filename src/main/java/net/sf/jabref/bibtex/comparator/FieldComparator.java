@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;

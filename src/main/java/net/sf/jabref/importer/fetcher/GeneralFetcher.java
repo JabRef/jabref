@@ -18,6 +18,7 @@ package net.sf.jabref.importer.fetcher;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;

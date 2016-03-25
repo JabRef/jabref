@@ -49,8 +49,6 @@ public class GUIGlobals {
     public static final String FRAME_TITLE = "JabRef";
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
-    public static final String NUMBER_COL = "#";
-
     public static Font currentFont;
     public static Font typeNameFont;
 
