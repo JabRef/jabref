@@ -181,7 +181,7 @@ public class BibEntry {
     private String normalizeFieldName(String fieldName) {
         Objects.requireNonNull(fieldName, "field name must not be null");
 
-        return fieldName.toLowerCase();
+        return fieldName.toLowerCase(Locale.ENGLISH);
     }
 
     /**

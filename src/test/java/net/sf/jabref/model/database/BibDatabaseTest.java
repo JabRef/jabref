@@ -49,7 +49,7 @@ public class BibDatabaseTest {
     @Test
     public void resolveStrings() throws IOException {
         try (FileInputStream stream = new FileInputStream("src/test/resources/net/sf/jabref/util/twente.bib");
-                InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.ISO_8859_1)) {
+                InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             ParserResult result = BibtexParser.parse(fr);
 
             BibDatabase db = result.getDatabase();
@@ -84,7 +84,7 @@ public class BibDatabaseTest {
         assertTrue(database.containsEntryWithId(entry.getId()));
     }
 
-    @Test
+    @Test(expected = KeyCollisionException.class)
     public void insertEntryWithSameIdThrowsException() {
         BibDatabase database = new BibDatabase();
 
@@ -92,8 +92,8 @@ public class BibDatabaseTest {
         database.insertEntry(entry0);
 
         BibEntry entry1 = new BibEntry(entry0.getId());
-        thrown.expect(KeyCollisionException.class);
         database.insertEntry(entry1);
+        fail();
     }
 
     @Test
@@ -108,25 +108,30 @@ public class BibDatabaseTest {
         assertFalse(database.containsEntryWithId(entry.getId()));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void insertNullEntryThrowsException() {
         BibDatabase database = new BibDatabase();
-        thrown.expect(NullPointerException.class);
         database.insertEntry(null);
+        fail();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void removeNullEntryThrowsException() {
+        BibDatabase database = new BibDatabase();
+        database.removeEntry(null);
+        fail();
     }
 
     @Test
-    public void removeNullEntryThrowsException() {
+    public void emptyDatabaseHasNoStrings() {
         BibDatabase database = new BibDatabase();
-        thrown.expect(NullPointerException.class);
-        database.removeEntry(null);
+        assertEquals(Collections.emptySet(), database.getStringKeySet());
+        assertTrue(database.hasNoStrings());
     }
 
     @Test
     public void insertString() {
         BibDatabase database = new BibDatabase();
-        assertEquals(Collections.emptySet(), database.getStringKeySet());
-        assertTrue(database.hasNoStrings());
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
@@ -161,7 +166,7 @@ public class BibDatabaseTest {
     }
 
     @Test(expected = KeyCollisionException.class)
-    public void addSameStringLabelTwice() {
+    public void addSameStringLabelTwiceThrowsKeyCollisionException() {
         BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
@@ -171,7 +176,7 @@ public class BibDatabaseTest {
     }
 
     @Test(expected = KeyCollisionException.class)
-    public void addSameStringIdTwice() {
+    public void addSameStringIdTwiceThrowsKeyCollisionException() {
         BibDatabase database = new BibDatabase();
         String id = IdGenerator.next();
         BibtexString string = new BibtexString(id, "DSP", "Digital Signal Processing");
