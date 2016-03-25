@@ -156,7 +156,6 @@ File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().get
 
 `model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and https://github.com/JabRef/jabref/pull/658 for a detailed discussion.
 
-
 `Globals.prefs` is a global variable storing a link to the preferences form. 
 
 `Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”. 
@@ -173,7 +172,9 @@ When adding a new preference, following steps have to be taken:
   * add a constant for the configuration key 
   * in net.sf.jabref.JaRefPreferences.java put a “defaults.put(&lt;configuration key&gt;, &lt;value&gt;)” statement 
 
-When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used. 
+When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used.
+
+Defaults should go into the model package. See [here](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484) for the comment.
 
 ## Test Cases
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
