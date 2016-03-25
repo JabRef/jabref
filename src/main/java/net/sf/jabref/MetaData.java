@@ -503,7 +503,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName()));
+        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase()));
     }
 
     public void markAsProtected() {
