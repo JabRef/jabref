@@ -149,7 +149,7 @@ public class BibtexParser {
     }
 
     private ParserResult parseFileContent() throws IOException {
-        HashMap<String, String> meta = new HashMap<>();
+        Map<String, String> meta = new HashMap<>();
 
         while (!eof) {
             boolean found = consumeUncritically('@');

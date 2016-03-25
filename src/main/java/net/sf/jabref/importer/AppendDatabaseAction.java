@@ -177,7 +177,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // groupsSelector is always created, even when no groups
                 // have been defined. therefore, no check for null is
                 // required here
-                frame.groupSelector.addGroups(newGroups, ce);
+                frame.getGroupSelector().addGroups(newGroups, ce);
                 // for explicit groups, the entries copied to the mother fromDatabase have to
                 // be "reassigned", i.e. the old reference is removed and the reference
                 // to the new fromDatabase is added.
@@ -200,7 +200,7 @@ public class AppendDatabaseAction implements BaseAction {
                         }
                     }
                 }
-                frame.groupSelector.revalidateGroups();
+                frame.getGroupSelector().revalidateGroups();
             }
         }
 

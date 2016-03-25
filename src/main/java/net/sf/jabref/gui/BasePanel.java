@@ -48,7 +48,6 @@ import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.*;
 import net.sf.jabref.importer.AppendDatabaseAction;
@@ -180,7 +179,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.encoding = encoding;
         this.bibDatabaseContext = bibDatabaseContext;
 
-        this.sidePaneManager = frame.sidePaneManager;
+        this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
         this.database = bibDatabaseContext.getDatabase();
 
@@ -876,56 +875,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
 
-        actions.put(Actions.OPEN_URL, (BaseAction) () -> {
-            String URL_FIELD = "url";
-            String DOI_FIELD = "doi";
-            String PS_FIELD = "ps";
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            String field = DOI_FIELD;
-            if ((bes != null) && (bes.size() == 1)) {
-                Object link = bes.get(0).getField(DOI_FIELD);
-                if (bes.get(0).hasField(URL_FIELD)) {
-                    link = bes.get(0).getField(URL_FIELD);
-                    field = URL_FIELD;
-                }
-                if (link == null) {
-                    // No URL or DOI found in the "url" and "doi" fields.
-                    // Look for web links in the "file" field as a fallback:
-                    FileListEntry entry = null;
-                    FileListTableModel tm = new FileListTableModel();
-                    tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
-                    for (int i = 0; i < tm.getRowCount(); i++) {
-                        FileListEntry flEntry = tm.getEntry(i);
-                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.getName())
-                                || PS_FIELD.equalsIgnoreCase(flEntry.type.getName())) {
-                            entry = flEntry;
-                            break;
-                        }
-                    }
-                    if (entry == null) {
-                        output(Localization.lang("No url defined") + '.');
-                    } else {
-                        try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link,
-                                    entry.type);
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException e) {
-                            output(Localization.lang("Could not open link"));
-                            LOGGER.info("Could not open link", e);
-                        }
-                    }
-                } else {
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                    }
-                }
-            } else {
-                output(Localization.lang("No entries or multiple entries selected."));
-            }
-        });
+        actions.put(Actions.OPEN_URL, new OpenURLAction());
 
         actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
 
@@ -1051,7 +1001,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
             Globals.prefs.putBoolean(JabRefPreferences.PREVIEW_ENABLED, enabled);
             frame.setPreviewActive(enabled);
-            frame.previewToggle.setSelected(enabled);
+            frame.setPreviewToggle(enabled);
         });
 
         actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, (BaseAction) () -> {
@@ -1104,7 +1054,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * This method is called from JabRefFrame is a database specific action is requested by the user. Runs the command
+     * This method is called from JabRefFrame if a database specific action is requested by the user. Runs the command
      * if it is defined, or prints an error message to the standard error stream.
      *
      * @param _command The name of the command to run.
@@ -1253,17 +1203,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return The newly created BibEntry or null the operation was canceled by the user.
      */
     public BibEntry newEntry(EntryType type) {
-        if (type == null) {
+        EntryType actualType = type;
+        if (actualType == null) {
             // Find out what type is wanted.
             final EntryTypeDialog etd = new EntryTypeDialog(frame);
             // We want to center the dialog, to make it look nicer.
             etd.setLocationRelativeTo(frame);
             etd.setVisible(true);
-            type = etd.getChoice();
+            actualType = etd.getChoice();
         }
-        if (type != null) { // Only if the dialog was not cancelled.
+        if (actualType != null) { // Only if the dialog was not cancelled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type.getName());
+            final BibEntry be = new BibEntry(id, actualType.getName());
             try {
                 database.insertEntry(be);
                 // Set owner/timestamp if options are enabled:
@@ -1273,7 +1224,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 // Create an UndoableInsertEntry object.
                 undoManager.addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
-                output(Localization.lang("Added new '%0' entry.", type.getName().toLowerCase()));
+                output(Localization.lang("Added new '%0' entry.", actualType.getName().toLowerCase()));
 
                 // We are going to select the new entry. Before that, make sure that we are in
                 // show-entry mode. If we aren't already in that mode, enter the WILL_SHOW_EDITOR
@@ -1318,7 +1269,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if ((e.getType() == ChangeType.ADDED_ENTRY) && Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
                     && frame.groupToggle.isSelected()) {
                 final List<BibEntry> entries = Collections.singletonList(e.getEntry());
-                final TreePath[] selection = frame.groupSelector.getGroupsTree().getSelectionPaths();
+                final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
                     for (final TreePath tree : selection) {
@@ -1486,7 +1437,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
-                final TreePath path = frame.groupSelector.getSelectionPath();
+                final TreePath path = frame.getGroupSelector().getSelectionPath();
                 final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
 
                 if (e.isControlDown()) {
@@ -1497,25 +1448,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     case KeyEvent.VK_UP:
                         e.consume();
                         if (node != null) {
-                            frame.groupSelector.moveNodeUp(node, true);
+                            frame.getGroupSelector().moveNodeUp(node, true);
                         }
                         break;
                     case KeyEvent.VK_DOWN:
                         e.consume();
                         if (node != null) {
-                            frame.groupSelector.moveNodeDown(node, true);
+                            frame.getGroupSelector().moveNodeDown(node, true);
                         }
                         break;
                     case KeyEvent.VK_LEFT:
                         e.consume();
                         if (node != null) {
-                            frame.groupSelector.moveNodeLeft(node, true);
+                            frame.getGroupSelector().moveNodeLeft(node, true);
                         }
                         break;
                     case KeyEvent.VK_RIGHT:
                         e.consume();
                         if (node != null) {
-                            frame.groupSelector.moveNodeRight(node, true);
+                            frame.getGroupSelector().moveNodeRight(node, true);
                         }
                         break;
                     case KeyEvent.VK_PAGE_DOWN:
@@ -2132,7 +2083,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    class UndoAction implements BaseAction {
+    private class UndoAction implements BaseAction {
 
         @Override
         public void action() {
@@ -2163,7 +2114,67 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    class RedoAction implements BaseAction {
+    private class OpenURLAction implements BaseAction {
+
+        private static final String URL_FIELD = "url";
+        private static final String DOI_FIELD = "doi";
+        private static final String PS_FIELD = "ps";
+        private static final String PDF_FIELD = "pdf";
+
+
+        @Override
+        public void action() {
+            final List<BibEntry> bes = mainTable.getSelectedEntries();
+            String field = DOI_FIELD;
+            if ((bes != null) && (bes.size() == 1)) {
+                Object link = bes.get(0).getField(DOI_FIELD);
+                if (bes.get(0).hasField(URL_FIELD)) {
+                    link = bes.get(0).getField(URL_FIELD);
+                    field = URL_FIELD;
+                }
+                if (link == null) {
+                    // No URL or DOI found in the "url" and "doi" fields.
+                    // Look for web links in the "file" field as a fallback:
+                    FileListEntry entry = null;
+                    FileListTableModel tm = new FileListTableModel();
+                    tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
+                    for (int i = 0; i < tm.getRowCount(); i++) {
+                        FileListEntry flEntry = tm.getEntry(i);
+                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.getName())
+                                || PS_FIELD.equalsIgnoreCase(flEntry.type.getName())
+                                || PDF_FIELD.equalsIgnoreCase(flEntry.type.getName())) {
+                            entry = flEntry;
+                            break;
+                        }
+                    }
+                    if (entry == null) {
+                        output(Localization.lang("No url defined") + '.');
+                    } else {
+                        try {
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link,
+                                    entry.type);
+                            output(Localization.lang("External viewer called") + '.');
+                        } catch (IOException e) {
+                            output(Localization.lang("Could not open link"));
+                            LOGGER.info("Could not open link", e);
+                        }
+                    }
+                } else {
+                    try {
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
+                        output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                    }
+                }
+            } else {
+                output(Localization.lang("No entries or multiple entries selected."));
+            }
+
+        }
+    }
+
+    private class RedoAction implements BaseAction {
 
         @Override
         public void action() {
@@ -2331,7 +2342,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public GroupSelector getGroupSelector() {
-        return frame.groupSelector;
+        return frame.getGroupSelector();
     }
 
     public boolean isUpdatedExternally() {
