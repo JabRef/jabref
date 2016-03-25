@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
-import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.FormatChars;
 import net.sf.jabref.model.database.BibDatabase;

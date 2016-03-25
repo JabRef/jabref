@@ -62,6 +62,9 @@ public class UpdateField {
                 // Update
                 writtenValue = newValue;
                 be.setField(field, newValue);
+            } else {
+                // Values are the same, do nothing
+                return Optional.empty();
             }
         } else {
             // old field value not set
