@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.*;
+import javax.swing.text.html.StyleSheet;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,14 +70,11 @@ public class MergeEntries {
     private static final String[] DIFF_MODES = {"Plain text",
             "Latexdiff style - word", "Latexdiff style - character", "Symmetric - word", "Symmetric - character"};
 
-    private static final String CHANGE_ADDITION_START = "<font color=\"green\"><u><b>";
-    private static final String CHANGE_ADDITION_END = "</b></u></font>";
-    private static final String CHANGE_REMOVAL_START = "<font color=\"green\"><s>";
-    private static final String CHANGE_REMOVAL_END = "</s></font>";
-    private static final String ADDITION_START = "<font color=\"blue\"><u><b>";
-    private static final String ADDITION_END = "</b></u></font>";
-    private static final String REMOVAL_START = "<font color=\"red\"><s>";
-    private static final String REMOVAL_END = "</s></font>";
+    private static final String CHANGE_ADDITION_START = "<div id=\"cadd\">";
+    private static final String CHANGE_REMOVAL_START = "<div id=\"cdel\">";
+    private static final String ADDITION_START = "<div id=\"add\">";
+    private static final String REMOVAL_START = "<div id=\"del\">";
+    private static final String TAG_END = "</div>";
     private static final String HTML_START = "<html>";
     private static final String HTML_END = "</html>";
     private static final Dimension DIM = new Dimension(800, 800);
@@ -101,6 +99,8 @@ public class MergeEntries {
     private final JPanel mainPanel = new JPanel();
 
     private static final String MARGIN = "10px";
+
+    private StyleSheet styleSheet;
 
 
     /**
@@ -417,6 +417,14 @@ public class MergeEntries {
         javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(valueToBeSet));
     }
 
+    private void setupStyleSheet() {
+        styleSheet = new StyleSheet();
+        styleSheet.addRule("#cadd{color:green;text-decoration: underline}");
+        styleSheet.addRule("#add{color:blue;text-decoration:underline}");
+        styleSheet.addRule("#del{color:red;text-decoration:line-through;}");
+        styleSheet.addRule("#cdel{color:green;text-decoration: line-through;}");
+    }
+
     private String generateLatexdiffHighlighting(String baseString, String modifiedString, String separator) {
         if ((baseString != null) && (modifiedString != null)) {
             List<String> string1List = new ArrayList<>(Arrays.asList(baseString.split(separator)));
@@ -435,8 +443,8 @@ public class MergeEntries {
                         offset++;
                     }
                     string1List.set((startPos + offset) - 1,
-                            string1List.get((startPos + offset) - 1) + REMOVAL_END + separator + ADDITION_START
-                                    + String.join(separator, delta.getRevised().getLines()) + ADDITION_END);
+                            string1List.get((startPos + offset) - 1) + TAG_END + separator + ADDITION_START
+                                    + String.join(separator, delta.getRevised().getLines()) + TAG_END);
                     break;
                 case DELETE:
                     for (String line : lines) {
@@ -444,11 +452,11 @@ public class MergeEntries {
                         offset++;
                     }
                     string1List.set((startPos + offset) - 1,
-                            string1List.get((startPos + offset) - 1) + REMOVAL_END);
+                            string1List.get((startPos + offset) - 1) + TAG_END);
                     break;
                 case INSERT:
                     string1List.add(delta.getOriginal().getPosition(),
-                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + ADDITION_END);
+                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
                     break;
                 default:
                     break;
@@ -477,9 +485,9 @@ public class MergeEntries {
                         offset++;
                     }
                     string1List.set((startPos + offset) - 1,
-                            string1List.get((startPos + offset) - 1) + CHANGE_REMOVAL_END + separator
+                            string1List.get((startPos + offset) - 1) + TAG_END + separator
                                     + CHANGE_ADDITION_START + String.join(separator, delta.getRevised().getLines())
-                                    + CHANGE_ADDITION_END);
+                                    + TAG_END);
                     break;
                 case DELETE:
                     for (offset = 0; offset <= (lines.size() - 1); offset++) {
@@ -488,7 +496,7 @@ public class MergeEntries {
                     break;
                 case INSERT:
                     string1List.add(delta.getOriginal().getPosition(),
-                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + ADDITION_END);
+                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
                     break;
                 default:
                     break;
