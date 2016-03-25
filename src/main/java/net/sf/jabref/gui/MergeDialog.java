@@ -106,11 +106,6 @@ public class MergeDialog extends JDialog {
 
     }
 
-
-    public boolean okPressed() {
-        return okPressed;
-    }
-
     public boolean importEntries() {
         return entries.isSelected();
     }
