@@ -90,7 +90,7 @@ public class SearchBar extends JPanel {
         caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE));
         caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
         caseSensitive.addActionListener(e -> {
-            performSearch(false);
+            performSearch();
             updatePreferences();
         });
 
@@ -98,7 +98,7 @@ public class SearchBar extends JPanel {
         regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(), Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
         regularExp.setToolTipText(Localization.lang("regular expression"));
         regularExp.addActionListener(e -> {
-            performSearch(false);
+            performSearch();
             updatePreferences();
         });
 
@@ -107,7 +107,7 @@ public class SearchBar extends JPanel {
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_LIVE));
         liveSearch.setToolTipText(Localization.lang("Search on typing"));
         liveSearch.addActionListener(e -> {
-            performSearch(true); // If we enable live search, update search, if we disable it, do not
+            performSearchIfLive();
             updatePreferences();
         });
 
@@ -198,7 +198,7 @@ public class SearchBar extends JPanel {
         this.searchMode = searchMode == SearchMode.FILTER ? SearchMode.FLOAT : SearchMode.FILTER;
         updatePreferences();
         updateSearchModeButtonText();
-        performSearch(false);
+        performSearch();
     }
 
     private void updateSearchModeButtonText() {
@@ -231,10 +231,10 @@ public class SearchBar extends JPanel {
         searchField.addFocusListener(Globals.focusListener);
 
         // Search if user press enter
-        searchField.addActionListener(e -> performSearch(false));
+        searchField.addActionListener(e -> performSearch());
 
         // Subscribe to changes to the text in the search field in order to "live search"
-        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearch(true));
+        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearchIfLive());
 
         return searchField;
     }
@@ -287,14 +287,20 @@ public class SearchBar extends JPanel {
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     }
 
+
+
+    /**
+     * Checks if the search should be "live" and then performs a new search based on the current search query.
+     */
+    private void performSearchIfLive() {
+        if (liveSearch.isSelected()) {
+            performSearch();
+        }
+    }
     /**
      * Performs a new search based on the current search query.
      */
-    private void performSearch(boolean checkLiveSearch) {
-        if (checkLiveSearch && !liveSearch.isSelected()) {
-            // If we should check if the live search button is selected and it is not, do nothing
-            return;
-        }
+    private void performSearch() {
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             clearSearch();
