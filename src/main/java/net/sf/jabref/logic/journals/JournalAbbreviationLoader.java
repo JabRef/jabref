@@ -15,12 +15,14 @@
 */
 package net.sf.jabref.logic.journals;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -75,7 +77,8 @@ public class JournalAbbreviationLoader {
         String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
         if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
-                journalAbbrev.addEntries(readJournalListFromFile(new File(personalJournalList)));
+                journalAbbrev.addEntries(
+                        readJournalListFromFile(new File(personalJournalList), Globals.prefs.getDefaultEncoding()));
             } catch (FileNotFoundException e) {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }
@@ -109,6 +112,13 @@ public class JournalAbbreviationLoader {
         LOGGER.debug("Reading journal list from file " + file);
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(Objects.requireNonNull(file));
+        return parser.getAbbreviations();
+    }
+
+    public static List<Abbreviation> readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
+        LOGGER.debug("Reading journal list from file " + file);
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
         return parser.getAbbreviations();
     }
 }

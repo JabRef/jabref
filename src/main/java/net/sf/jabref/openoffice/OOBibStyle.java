@@ -18,6 +18,7 @@ package net.sf.jabref.openoffice;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -26,6 +27,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -84,6 +86,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String JOURNALS_MARK = "JOURNALS";
     private static final String DEFAULT_MARK = "default";
     private File styleFile;
+    private final Charset encoding;
     private long styleFileModificationTime = Long.MIN_VALUE;
 
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
@@ -129,18 +132,18 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public OOBibStyle(File styleFile, JournalAbbreviationRepository repository, Charset encoding) throws IOException {
         this.repository = Objects.requireNonNull(repository);
+        this.styleFile = Objects.requireNonNull(styleFile);
+        this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
-        try (InputStream stream = new FileInputStream(styleFile); Reader in = new InputStreamReader(stream, encoding)) {
-            initialize(in);
-        }
-        this.styleFile = styleFile;
-        this.styleFileModificationTime = styleFile.lastModified();
+        reload();
     }
 
-    public OOBibStyle(Reader in, JournalAbbreviationRepository repository) throws IOException {
+    public OOBibStyle(String resourcePath, JournalAbbreviationRepository repository)
+            throws IOException {
         this.repository = Objects.requireNonNull(repository);
+        this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(in);
+        initialize(JabRef.class.getResource(resourcePath).openStream());
     }
 
     private void setDefaultProperties() {
@@ -194,9 +197,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         return Collections.unmodifiableSet(journals);
     }
 
-    private void initialize(Reader in) throws IOException {
+    private void initialize(InputStream stream) throws IOException {
         name = null;
-        readFormatFile(in);
+        try (Reader reader = new InputStreamReader(stream, encoding)) {
+            readFormatFile(reader);
+        }
     }
 
     /**
@@ -220,8 +225,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private void reload() throws IOException {
         if (styleFile != null) {
             this.styleFileModificationTime = styleFile.lastModified();
-            try (FileReader fr = new FileReader(styleFile)) {
-                initialize(fr);
+            try (InputStream stream = new FileInputStream(styleFile)) {
+                initialize(stream);
             }
         }
     }

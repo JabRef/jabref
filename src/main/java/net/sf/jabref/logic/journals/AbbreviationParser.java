@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +40,7 @@ public class AbbreviationParser {
     public void readJournalListFromResource(String resourceFileName) {
         URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
         try {
-            readJournalList(new InputStreamReader(url.openStream()));
+            readJournalList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             LOGGER.info("Could not read journal list from file " + resourceFileName, e);
         }
@@ -53,6 +55,18 @@ public class AbbreviationParser {
             LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
         }
     }
+
+    public void readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
+        try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
+                InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
+            readJournalList(reader);
+        } catch (FileNotFoundException e) {
+            throw e;
+        } catch (IOException e) {
+            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
+        }
+    }
+
     /**
      * Read the given file, which should contain a list of journal names and their
      * abbreviations. Each line should be formatted as: "Full Journal Name=Abbr. Journal Name"
