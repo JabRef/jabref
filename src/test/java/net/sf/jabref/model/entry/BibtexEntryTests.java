@@ -3,7 +3,6 @@ package net.sf.jabref.model.entry;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
@@ -137,16 +136,6 @@ public class BibtexEntryTests {
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
                         .getPublicationDate());
 
-    }
-
-    @Test
-    @Ignore
-    public void getFieldOrAliasDateWithYearNumericalMonth() {
-        Assert.assertEquals("2003-03",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getFieldOrAlias("date"));
-        emptyEntry.setField("year", "2003");
-        emptyEntry.setField("month", "#3#");
-        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date"));
     }
 
     @Test
