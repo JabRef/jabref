@@ -50,6 +50,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
 - [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
+- [#1034](https://github.com/JabRef/jabref/issues/1034) Select if the search results should be updated on every pressed key or on enter only
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
