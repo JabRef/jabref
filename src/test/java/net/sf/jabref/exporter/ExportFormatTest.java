@@ -3,7 +3,8 @@ package net.sf.jabref.exporter;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,9 +59,10 @@ public class ExportFormatTest {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
         exportFormat.performExport(database, metaData, filename, charset, entries);
-        try (FileReader fileReader = new FileReader(tmpFile)) {
+        try (FileInputStream stream = new FileInputStream(tmpFile);
+                InputStreamReader reader = new InputStreamReader(stream, charset)) {
             char[] buffer = new char[512];
-            assertEquals(-1, fileReader.read(buffer)); // Empty file
+            assertEquals(-1, reader.read(buffer)); // Empty file
         }
     }
 
