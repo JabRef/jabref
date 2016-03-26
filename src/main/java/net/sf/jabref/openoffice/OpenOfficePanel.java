@@ -104,32 +104,7 @@ public class OpenOfficePanel extends AbstractWorker {
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OO bibliography"));
-        if (OS.WINDOWS) {
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "C:\\Program Files\\OpenOffice.org 4");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\classes");
-        } else if (OS.OS_X) {
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "/Applications/OpenOffice.org.app");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/Resources/java");
-        } else { // Linux
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
-        }
-
-        Globals.prefs.putDefaultValue(JabRefPreferences.SYNC_OO_WHEN_CITING, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.SHOW_OO_PANEL, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.USE_ALL_OPEN_BASES, true);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE, true);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_CHOOSE_STYLE_DIRECTLY, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_DIRECT_FILE, "");
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_STYLE_DIRECTORY, "");
+        OpenOfficePreferences.putDefaultPreferences();
         styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
 
     }
@@ -286,7 +261,6 @@ public class OpenOfficePanel extends AbstractWorker {
             } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
                 LOGGER.warn("Problem showing citation manager", ex);
             }
-
         });
 
         selectDocument.setEnabled(false);
@@ -490,11 +464,6 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    private void updateConnectionParams(String ooPath, String ooExec, String ooJars) {
-        Globals.prefs.put(JabRefPreferences.OO_PATH, ooPath);
-        Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, ooExec);
-        Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, ooJars);
-    }
 
     private void showConnectDialog() {
 
@@ -538,17 +507,15 @@ public class OpenOfficePanel extends AbstractWorker {
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         ActionListener tfListener = (e -> {
-
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            OpenOfficePreferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
-
         });
 
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
         ok.addActionListener(e -> {
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            OpenOfficePreferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
@@ -643,7 +610,8 @@ public class OpenOfficePanel extends AbstractWorker {
                                 + "<br>"
                                 + Localization
                                         .lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
-                + "</html>", "", JOptionPane.ERROR_MESSAGE);
+                                + "</html>",
+                        "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
@@ -657,7 +625,8 @@ public class OpenOfficePanel extends AbstractWorker {
                                 + "<br>"
                                 + Localization
                                         .lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
-                + "</html>", "", JOptionPane.ERROR_MESSAGE);
+                                + "</html>",
+                        "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void showSettingsPopup() {
@@ -711,7 +680,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
 
-    class OOPanel extends SidePaneComponent {
+    static private class OOPanel extends SidePaneComponent {
 
         private final OpenOfficePanel openOfficePanel;
 

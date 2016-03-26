@@ -489,7 +489,8 @@ class OOBibBase {
                         }
                         citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         for (int j = 0; j < keys.length; j++) {
-                            normCitMarker[j] = style.getNumCitationMarker(Arrays.asList(num.get(j)), minGroupingCount,
+                            normCitMarker[j] = style.getNumCitationMarker(Collections.singletonList(num.get(j)),
+                                    minGroupingCount,
                                     false);
                         }
                     } else {
@@ -528,8 +529,8 @@ class OOBibBase {
                             type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(Arrays.asList(cEntries[j]), entries, true, null,
-                                new int[] {-1});
+                        normCitMarker[j] = style.getCitationMarker(Collections.singletonList(cEntries[j]), entries,
+                                true, null, new int[] {-1});
                     }
                 }
                 citMarkers[i] = citationMarker;
@@ -1182,7 +1183,7 @@ class OOBibBase {
     }
 
 
-    private class ComparableMark implements Comparable<ComparableMark> {
+    private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;
         private final Point position;
@@ -1202,8 +1203,24 @@ class OOBibBase {
             }
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ComparableMark) {
+                ComparableMark other = (ComparableMark) o;
+                return (this.position.X == other.position.X) && (this.position.Y == other.position.Y)
+                        && Objects.equals(this.name, other.name);
+            }
+            return false;
+        }
+
         public String getName() {
             return name;
+        }
+
+        @Override
+        public int hashCode() {
+            // TODO Auto-generated method stub
+            return Objects.hash(position, name);
         }
 
     }

@@ -58,7 +58,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
     public boolean runAutodetection() {
         try {
-            if (AutoDetectPaths.checkAutoDetectedPaths()) {
+            if (OpenOfficePreferences.checkAutoDetectedPaths()) {
                 return true;
             }
             init();
@@ -94,7 +94,8 @@ public class AutoDetectPaths extends AbstractWorker {
     private boolean autoDetectPaths() {
 
         if (OS.WINDOWS) {
-            List<File> progFiles = findProgramFilesDir();
+            List<File> progFiles = new OpenOfficeFileSearch(Globals.journalAbbreviationLoader.getRepository())
+                    .findWindowsProgramFilesDir();
             File sOffice = null;
             List<File> sofficeFiles = new ArrayList<>();
             for (File dir : progFiles) {
@@ -112,9 +113,9 @@ public class AutoDetectPaths extends AbstractWorker {
                                 .lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
                         Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                         JOptionPane.INFORMATION_MESSAGE);
-                JFileChooser jfc = new JFileChooser(new File("C:\\"));
-                jfc.setDialogType(JFileChooser.OPEN_DIALOG);
-                jfc.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                JFileChooser fileChooser = new JFileChooser(new File(System.getenv("ProgramFiles")));
+                fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
                     @Override
                     public boolean accept(File file) {
@@ -126,10 +127,10 @@ public class AutoDetectPaths extends AbstractWorker {
                         return Localization.lang("Directories");
                     }
                 });
-                jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                jfc.showOpenDialog(parent);
-                if (jfc.getSelectedFile() != null) {
-                    sOffice = jfc.getSelectedFile();
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                fileChooser.showOpenDialog(parent);
+                if (fileChooser.getSelectedFile() != null) {
+                    sOffice = fileChooser.getSelectedFile();
                 }
             }
             if (sOffice == null) {
@@ -145,12 +146,12 @@ public class AutoDetectPaths extends AbstractWorker {
                 JList<File> fileList = new JList<>(mod);
                 fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 fileList.setSelectedIndex(0);
-                FormBuilder b = FormBuilder.create()
+                FormBuilder builder = FormBuilder.create()
                         .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 4dlu, pref"));
-                b.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
-                b.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
-                b.add(fileList).xy(1, 5);
-                int answer = JOptionPane.showConfirmDialog(null, b.getPanel(),
+                builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
+                builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
+                builder.add(fileList).xy(1, 5);
+                int answer = JOptionPane.showConfirmDialog(null, builder.getPanel(),
                         Localization.lang("Choose OpenOffice/LibreOffice executable"),
                         JOptionPane.OK_CANCEL_OPTION);
                 if (answer == JOptionPane.CANCEL_OPTION) {
@@ -255,49 +256,6 @@ public class AutoDetectPaths extends AbstractWorker {
         } else {
             Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
             return true;
-        }
-    }
-
-    /**
-     * Search for Program files directory.
-     * @return the File pointing to the Program files directory, or null if not found.
-     *   Since we are not including a library for Windows integration, this method can't
-     *   find the Program files dir in localized Windows installations.
-     */
-    private static List<File> findProgramFilesDir() {
-        List<String> sourceList = new ArrayList<>();
-        List<File> dirList = new ArrayList<>();
-
-         // 64-bits first
-        String progFiles = System.getenv("ProgramFiles");
-        if (progFiles != null) {
-            sourceList.add(progFiles);
-        }
-
-        // Then 32-bits
-        progFiles = System.getenv("ProgramFiles(x86)");
-        if (progFiles != null) {
-            sourceList.add(progFiles);
-        }
-
-        for (String rootPath : sourceList) {
-            File root = new File(rootPath);
-            File[] dirs = root.listFiles(File::isDirectory);
-            if (dirs != null) {
-                Collections.addAll(dirList, dirs);
-            }
-        }
-        return dirList;
-    }
-
-    private static boolean checkAutoDetectedPaths() {
-
-        if (Globals.prefs.hasKey(JabRefPreferences.OO_JARS_PATH)
-                && Globals.prefs.hasKey(JabRefPreferences.OO_EXECUTABLE_PATH)) {
-            return new File(Globals.prefs.get(JabRefPreferences.OO_JARS_PATH), "jurt.jar").exists()
-                    && new File(Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH)).exists();
-        } else {
-            return false;
         }
     }
 

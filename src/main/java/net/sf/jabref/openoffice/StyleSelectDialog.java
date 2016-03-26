@@ -26,10 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +96,6 @@ class StyleSelectDialog {
 
     private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
 
-    private static final String STYLE_FILE_EXTENSION = ".jstyle";
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
     private JDialog diag;
@@ -371,11 +368,14 @@ class StyleSelectDialog {
     private void readStyles() {
         table.clearSelection();
 
+        List<OOBibStyle> styleList = new ArrayList<>();
+        if (!styleDir.getText().isEmpty()) {
+            new OpenOfficeFileSearch(Globals.journalAbbreviationLoader.getRepository()).addStyles(styleDir.getText(),
+                    true, Globals.prefs.getDefaultEncoding(), styleList);
+        }
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
-        if (!styleDir.getText().isEmpty()) {
-            addStyles(styleDir.getText(), true, Globals.prefs.getDefaultEncoding());
-        }
+        styles.addAll(styleList);
         styles.getReadWriteLock().writeLock().unlock();
 
         selectLastUsed();
@@ -408,55 +408,6 @@ class StyleSelectDialog {
         }
     }
 
-    /**
-     * If the string dir indicates a file, parse it and add it to the list of styles if
-     * successful. If the string dir indicates a directory, parse all files looking like
-     * style files, and add them. The parameter recurse determines whether we should
-     * recurse into subdirectories.
-     * @param dir the directory or file to handle.
-     * @param recurse true indicates that we should recurse into subdirectories.
-     * @param encoding
-     */
-    private void addStyles(String dir, boolean recurse, Charset encoding) {
-        File dirF = new File(dir);
-        if (dirF.isDirectory()) {
-            File[] fileArray = dirF.listFiles();
-            List<File> files;
-            if (fileArray == null) {
-                files = Collections.emptyList();
-            } else {
-                files = Arrays.asList(fileArray);
-            }
-            for (File file : files) {
-                // If the file looks like a style file, parse it:
-                if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file, encoding);
-                } else if (file.isDirectory() && recurse) {
-                    // If the file is a directory, and we should recurse, do:
-                    addStyles(file.getPath(), recurse, encoding);
-                }
-            }
-        } else {
-            // The file wasn't a directory, so we simply parse it:
-            addSingleFile(dirF, encoding);
-        }
-    }
-
-    /**
-     * Parse a single file, and add it to the list of styles if parse was successful.
-     * @param file the file to parse.
-     */
-    private void addSingleFile(File file, Charset encoding) {
-        try {
-            OOBibStyle style = new OOBibStyle(file, Globals.journalAbbreviationLoader.getRepository(), encoding);
-            // Check if the parse was successful before adding it:
-            if (style.isValid() && !styles.contains(style)) {
-                styles.add(style);
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Unable to read style file: '" + file.getPath() + "'", e);
-        }
-    }
 
     private void storeSettings() {
         OOBibStyle selected = getSelectedStyle();
@@ -558,10 +509,11 @@ class StyleSelectDialog {
 
             // Make a dialog box to display the contents:
             final JDialog dd = new JDialog(diag, Localization.lang("Default style"), true);
-            JLabel header = new JLabel("<html>" + Localization.lang("The panel below shows the definition of the default style.")
-            //+"<br>"
-            + Localization.lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
-            + "</html>");
+            JLabel header = new JLabel(
+                    "<html>" + Localization.lang("The panel below shows the definition of the default style.") + " "
+                            + Localization
+                                    .lang("If you want to use it as a template for a new style, you can copy the contents into a new .jstyle file")
+                            + "</html>");
 
             header.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             dd.getContentPane().add(header, BorderLayout.NORTH);

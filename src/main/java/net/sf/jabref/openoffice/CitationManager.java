@@ -54,9 +54,9 @@ class CitationManager {
 
     private final OOBibBase ooBase;
     private final JDialog diag;
-    private final EventList<CitEntry> list;
+    private final EventList<CitationEntry> list;
     private final JTable table;
-    private final DefaultEventTableModel<CitEntry> tableModel;
+    private final DefaultEventTableModel<CitationEntry> tableModel;
 
     private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
@@ -70,7 +70,7 @@ class CitationManager {
         XNameAccess nameAccess = ooBase.getReferenceMarks();
         java.util.List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
-            list.add(new CitEntry(name,
+            list.add(new CitationEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
@@ -123,7 +123,7 @@ class CitationManager {
 
     private void storeSettings() throws UnknownPropertyException, NotRemoveableException, PropertyExistException,
             IllegalTypeException, IllegalArgumentException {
-        for (CitEntry entry : list) {
+        for (CitationEntry entry : list) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (entry.pageInfoChanged() && pageInfo.isPresent()) {
                 ooBase.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
@@ -137,81 +137,8 @@ class CitationManager {
     }
 
 
-    static class CitEntry implements Comparable<CitEntry> {
 
-        private final String refMarkName;
-        private Optional<String> pageInfo;
-        private final String context;
-        private final Optional<String> origPageInfo;
-
-
-        // Only used for testing...
-        public CitEntry(String refMarkName, String context) {
-            this(refMarkName, context, Optional.empty());
-        }
-
-        // Only used for testing...
-        public CitEntry(String refMarkName, String context, String pageInfo) {
-            this(refMarkName, context, Optional.ofNullable(pageInfo));
-        }
-
-        public CitEntry(String refMarkName, String context, Optional<String> pageInfo) {
-            this.refMarkName = refMarkName;
-            this.context = context;
-            this.pageInfo = pageInfo;
-            this.origPageInfo = pageInfo;
-        }
-
-        public Optional<String> getPageInfo() {
-            return pageInfo;
-        }
-
-        public String getRefMarkName() {
-            return refMarkName;
-        }
-
-        public boolean pageInfoChanged() {
-            if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
-                return true;
-            }
-            if (!pageInfo.isPresent()) {
-                // This means that origPageInfo.isPresent is also false
-                return false;
-            } else {
-                // So origPageInfo.isPresent is true here
-                return pageInfo.get().compareTo(origPageInfo.get()) != 0;
-            }
-        }
-
-        @Override
-        public int compareTo(CitEntry other) {
-            return this.refMarkName.compareTo(other.refMarkName);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof CitEntry) {
-                CitEntry other = (CitEntry) o;
-                return this.refMarkName.equals(other.refMarkName);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.refMarkName.hashCode();
-        }
-
-        public String getContext() {
-            return context;
-        }
-
-        public void setPageInfo(String trim) {
-            pageInfo = Optional.ofNullable(trim);
-        }
-    }
-
-    private static class CitEntryFormat implements TableFormat<CitEntry> {
+    private static class CitEntryFormat implements TableFormat<CitationEntry> {
 
         @Override
         public int getColumnCount() {
@@ -228,7 +155,7 @@ class CitationManager {
         }
 
         @Override
-        public Object getColumnValue(CitEntry citEntry, int i) {
+        public Object getColumnValue(CitationEntry citEntry, int i) {
             if (i == 0) {
                 return citEntry.getContext();
             } else {
@@ -244,24 +171,24 @@ class CitationManager {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
-                    SingleCitDialog scd = new SingleCitDialog(list.get(row));
+                    SingleCitationDialog scd = new SingleCitationDialog(list.get(row));
                     scd.showDialog();
                 }
             }
         }
     }
 
-    class SingleCitDialog {
+    class SingleCitationDialog {
 
         private final JDialog singleCiteDialog;
         private final JTextField pageInfo = new JTextField(20);
         private final JLabel title;
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        private final CitEntry entry;
+        private final CitationEntry entry;
 
 
-        public SingleCitDialog(CitEntry citEntry) {
+        public SingleCitationDialog(CitationEntry citEntry) {
             this.entry = citEntry;
             title = new JLabel(entry.getContext());
             pageInfo.setText(entry.getPageInfo().orElse(""));

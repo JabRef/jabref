@@ -401,19 +401,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Get the array of elements composing the reference for a given entry type.
-     * @param bibType The OO type number.
-     * @return The format definition.
-
-    public PropertyValue[][] getReferenceFormat(short bibType) {
-    Object o = bibLayout.get(new Short(bibType));
-    if (o != null)
-    return (PropertyValue[][])o;
-    else
-    return defaultBibLayout;
-    }*/
-
-    /**
      * Format a number-based citation marker for the given number.
      *
      * @param number The citation numbers.
@@ -515,22 +502,20 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
                     piv = -1;
                 } else {
-                    Map<BibEntry, BibDatabase> tmpMap = new HashMap<>(1);
-                    BibEntry tmpEntry = entries.get(i);
-                    tmpMap.put(tmpEntry, database.get(tmpEntry));
+                    BibEntry currentEntry = entries.get(i);
                     if (piv == -1) {
                         piv = i;
-                        tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(tmpEntry), tmpMap,
+                        tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry), database,
                                 null, unlimAuthors);
                     } else {
                         // See if this entry can go into a group with the previous one:
-                        String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(tmpEntry),
-                                tmpMap, null, unlimAuthors);
+                        String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry),
+                                database, null, unlimAuthors);
 
 
                         String authorField = getStringCitProperty(AUTHOR_FIELD);
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
-                        String author = getCitationMarkerField(tmpEntry, database.get(tmpEntry),
+                        String author = getCitationMarkerField(currentEntry, database.get(currentEntry),
                                 authorField);
                         AuthorList al = AuthorList.parse(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
@@ -606,24 +591,25 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         String andString = getStringCitProperty(AUTHOR_LAST_SEPARATOR); // The String to add between the two last author names, e.g. " & ".
         StringBuilder sb = new StringBuilder(startBrace);
         for (int j = 0; j < entries.size(); j++) {
-            BibEntry entry = entries.get(j);
+            BibEntry currentEntry = entries.get(j);
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
-            if (entry == null) {
+            if (currentEntry == null) {
                 continue;
             }
-
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (j > 0) {
                 sb.append(citationSeparator);
             }
 
-            String author = getCitationMarkerField(entry, database.get(entry), authorField);
+            BibDatabase currentDatabase = database.get(currentEntry);
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
+            int maxAuthors = unlimA > 0 ? unlimA : maxA;
+
+            String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(author, maxAuthors, authorSep, andString, etAlString, yearSep);
             sb.append(authorString);
-            String year = getCitationMarkerField(entry, database.get(entry), yearField);
+            String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
             if (year != null) {
                 sb.append(year);
             }
@@ -665,23 +651,25 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entries.size(); i++) {
-
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
+            BibEntry currentEntry = entries.get(i);
 
             // Check if this entry has been nulled due to grouping with the previous entry(ies):
-            if (entries.get(i) == null) {
+            if (currentEntry == null) {
                 continue;
             }
+
+            BibDatabase currentDatabase = database.get(currentEntry);
+            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
+            int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (i > 0) {
                 sb.append(citationSeparator);
             }
-            String author = getCitationMarkerField(entries.get(i), database.get(entries.get(i)), authorField);
+            String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(author, maxAuthors, authorSep, andString, etAlString, yearSep);
             sb.append(authorString);
             sb.append(startBrace);
-            String year = getCitationMarkerField(entries.get(i), database.get(entries.get(i)), yearField);
+            String year = getCitationMarkerField(currentEntry, currentDatabase, yearField);
             if (year != null) {
                 sb.append(year);
             }
