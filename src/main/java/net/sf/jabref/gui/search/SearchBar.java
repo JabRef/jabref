@@ -17,9 +17,6 @@ package net.sf.jabref.gui.search;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -103,7 +100,7 @@ public class SearchBar extends JPanel {
         });
 
 
-        liveSearch = new JToggleButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon(),
+        liveSearch = new JToggleButton(IconTheme.JabRefIcon.AUTO_RENEW.getSmallIcon(),
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_LIVE));
         liveSearch.setToolTipText(Localization.lang("Search on typing"));
         liveSearch.addActionListener(e -> {
@@ -147,11 +144,11 @@ public class SearchBar extends JPanel {
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
         toolBar.add(clearSearchButton);
-        toolBar.add(liveSearch);
         toolBar.addSeparator();
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
         toolBar.addSeparator();
+        toolBar.add(liveSearch);
         toolBar.add(searchModeButton);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);

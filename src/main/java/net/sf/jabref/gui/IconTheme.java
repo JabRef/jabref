@@ -159,6 +159,8 @@ public class IconTheme {
         CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
         REG_EX("\uf451"), /*css: mdi-regex */
         CONSOLE("\uf18d"), /*css: console */
+        AUTO_RENEW(
+                "\uf06a"), /*css: auto-renew */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 
