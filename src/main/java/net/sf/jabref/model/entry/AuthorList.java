@@ -162,7 +162,7 @@ public class AuthorList {
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList getAuthors(String authors) {
+    public static AuthorList parse(String authors) {
         Objects.requireNonNull(authors);
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
@@ -180,7 +180,7 @@ public class AuthorList {
      * @see AuthorList#getAsFirstLastNames
      */
     public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthors(authors).getAsFirstLastNames(abbr, oxfordComma);
+        return AuthorList.parse(authors).getAsFirstLastNames(abbr, oxfordComma);
     }
 
     /**
@@ -189,7 +189,7 @@ public class AuthorList {
      * @see AuthorList#getAsFirstLastNamesWithAnd
      */
     public static String fixAuthorFirstNameFirst(String authors) {
-        return AuthorList.getAuthors(authors).getAsFirstLastNamesWithAnd();
+        return AuthorList.parse(authors).getAsFirstLastNamesWithAnd();
     }
 
     /**
@@ -198,7 +198,7 @@ public class AuthorList {
      * @see AuthorList#getAsLastFirstNames
      */
     public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthors(authors).getAsLastFirstNames(abbr, oxfordComma);
+        return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
     }
 
     /**
@@ -207,7 +207,7 @@ public class AuthorList {
      * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors) {
-        return AuthorList.getAuthors(authors).getAsLastFirstNamesWithAnd(false);
+        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(false);
     }
 
     /**
@@ -216,7 +216,7 @@ public class AuthorList {
      * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors, boolean abbreviate) {
-        return AuthorList.getAuthors(authors).getAsLastFirstNamesWithAnd(abbreviate);
+        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(abbreviate);
     }
 
     /**
@@ -225,7 +225,7 @@ public class AuthorList {
      * @see AuthorList#getAsLastNames
      */
     public static String fixAuthorLastNameOnlyCommas(String authors, boolean oxfordComma) {
-        return AuthorList.getAuthors(authors).getAsLastNames(oxfordComma);
+        return AuthorList.parse(authors).getAsLastNames(oxfordComma);
     }
 
     /**
@@ -234,7 +234,7 @@ public class AuthorList {
      * @see AuthorList#getForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
-        return AuthorList.getAuthors(authors).getForAlphabetization();
+        return AuthorList.parse(authors).getForAlphabetization();
     }
 
     /**
@@ -243,7 +243,7 @@ public class AuthorList {
      * @see AuthorList#getAsNatbib
      */
     public static String fixAuthorNatbib(String authors) {
-        return AuthorList.getAuthors(authors).getAsNatbib();
+        return AuthorList.parse(authors).getAsNatbib();
     }
 
     /**

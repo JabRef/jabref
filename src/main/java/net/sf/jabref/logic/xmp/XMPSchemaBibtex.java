@@ -89,7 +89,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param value
      */
     public void setPersonList(String field, String value) {
-        AuthorList list = AuthorList.getAuthors(value);
+        AuthorList list = AuthorList.parse(value);
 
         for (Author author : list.getAuthors()) {
             addSequenceValue(field, author.getFirstLast(false));

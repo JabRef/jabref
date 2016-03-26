@@ -71,7 +71,7 @@ public class FormatNameFunction implements BstFunction {
         if (names == null) {
             stack.push("");
         } else {
-            AuthorList a = AuthorList.getAuthors(names);
+            AuthorList a = AuthorList.parse(names);
             if (name > a.getNumberOfAuthors()) {
                 throw new VMException("Author Out of Bounds. Number " + name + " invalid for " + names);
             }

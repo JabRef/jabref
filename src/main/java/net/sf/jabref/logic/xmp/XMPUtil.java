@@ -594,7 +594,7 @@ public class XMPUtil {
                  * Bibtex-Fields used: editor
                  */
 
-                AuthorList list = AuthorList.getAuthors(authors);
+                AuthorList list = AuthorList.parse(authors);
 
                 for (Author author : list.getAuthors()) {
                     dcSchema.addContributor(author.getFirstLast(false));
@@ -626,7 +626,7 @@ public class XMPUtil {
              */
             if ("author".equals(field)) {
                 String authors = resolvedEntry.getField(field);
-                AuthorList list = AuthorList.getAuthors(authors);
+                AuthorList list = AuthorList.parse(authors);
 
                 for (Author author : list.getAuthors()) {
                     dcSchema.addCreator(author.getFirstLast(false));

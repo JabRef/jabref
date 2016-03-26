@@ -53,7 +53,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
 
         StringBuilder sb = new StringBuilder(100);
 
-        AuthorList al = AuthorList.getAuthors(fieldText);
+        AuthorList al = AuthorList.parse(fieldText);
 
         addBody(sb, al, "author");
         return sb.toString();

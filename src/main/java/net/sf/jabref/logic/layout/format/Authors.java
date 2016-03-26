@@ -245,7 +245,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
         StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.getAuthors(fieldText);
+        AuthorList al = AuthorList.parse(fieldText);
 
         if ((maxAuthors < 0) || (al.getNumberOfAuthors() <= maxAuthors)) {
             for (int i = 0; i < al.getNumberOfAuthors(); i++) {

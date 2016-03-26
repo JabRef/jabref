@@ -527,7 +527,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
                         String author = getCitationMarkerField(tmpEntry, database.get(tmpEntry),
                                 authorField);
-                        AuthorList al = AuthorList.getAuthors(author);
+                        AuthorList al = AuthorList.parse(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
                                 || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
@@ -867,7 +867,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String etAlString, String yearSep) {
         StringBuilder sb = new StringBuilder();
         if (author != null) {
-            AuthorList al = AuthorList.getAuthors(author);
+            AuthorList al = AuthorList.parse(author);
             if (!al.isEmpty()) {
                 sb.append(getAuthorLastName(al, 0));
             }

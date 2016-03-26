@@ -25,7 +25,7 @@ public class AuthorLF_FFAbbr implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        AuthorList al = AuthorList.getAuthors(fieldText);
+        AuthorList al = AuthorList.parse(fieldText);
 
         return al.getAsLastFirstFirstLastNamesWithAnd(true);
     }

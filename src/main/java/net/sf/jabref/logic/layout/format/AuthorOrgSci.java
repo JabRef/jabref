@@ -40,7 +40,7 @@ public class AuthorOrgSci implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        AuthorList a = AuthorList.getAuthors(fieldText);
+        AuthorList a = AuthorList.parse(fieldText);
         if (a.isEmpty()) {
             return fieldText;
         }
