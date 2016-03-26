@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.AuthorList.Author;
+import net.sf.jabref.model.entry.Author;
 
 /**
  * From Bibtex:
@@ -40,9 +40,9 @@ import net.sf.jabref.model.entry.AuthorList.Author;
 public class BibtexNameFormatter {
 
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
-        AuthorList al = AuthorList.getAuthorList(authorsNameList);
+        AuthorList al = AuthorList.parse(authorsNameList);
 
-        if ((whichName < 1) && (whichName > al.size())) {
+        if ((whichName < 1) && (whichName > al.getNumberOfAuthors())) {
             warn.warn("AuthorList " + authorsNameList + " does not contain an author with number " + whichName);
             return "";
         }

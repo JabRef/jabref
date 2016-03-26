@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.openoffice;
 
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -526,10 +527,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
                         String author = getCitationMarkerField(tmpEntry, database.get(tmpEntry),
                                 authorField);
-                        AuthorList al = AuthorList.getAuthorList(author);
+                        AuthorList al = AuthorList.parse(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
-                                || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
+                                || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
                             if ((piv > -1) && (i > (piv + 1))) {
@@ -726,8 +727,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private String getAuthorLastName(AuthorList al, int number) {
         StringBuilder sb = new StringBuilder();
 
-        if (al.size() > number) {
-            AuthorList.Author a = al.getAuthor(number);
+        if (al.getNumberOfAuthors() > number) {
+            Author a = al.getAuthor(number);
             if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 String von = a.getVon();
                 sb.append(von);
@@ -866,20 +867,20 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String etAlString, String yearSep) {
         StringBuilder sb = new StringBuilder();
         if (author != null) {
-            AuthorList al = AuthorList.getAuthorList(author);
+            AuthorList al = AuthorList.parse(author);
             if (!al.isEmpty()) {
                 sb.append(getAuthorLastName(al, 0));
             }
-            if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {
+            if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
                 int j = 1;
-                while (j < (al.size() - 1)) {
+                while (j < (al.getNumberOfAuthors() - 1)) {
                     sb.append(authorSep);
                     sb.append(getAuthorLastName(al, j));
                     j++;
                 }
                 sb.append(andString);
-                sb.append(getAuthorLastName(al, al.size() - 1));
-            } else if (al.size() > maxAuthors) {
+                sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
+            } else if (al.getNumberOfAuthors() > maxAuthors) {
                 sb.append(etAlString);
             }
             sb.append(yearSep);
