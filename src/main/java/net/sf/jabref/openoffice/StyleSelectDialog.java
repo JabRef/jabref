@@ -371,7 +371,7 @@ class StyleSelectDialog {
         List<OOBibStyle> styleList = new ArrayList<>();
         if (!styleDir.getText().isEmpty()) {
             new OpenOfficeFileSearch(Globals.journalAbbreviationLoader.getRepository()).addStyles(styleDir.getText(),
-                    true, Globals.prefs.getDefaultEncoding(), styleList);
+                    Globals.prefs.getDefaultEncoding(), styleList);
         }
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();

@@ -39,12 +39,12 @@ public class CitationEntry implements Comparable<CitationEntry> {
         if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
             return true;
         }
-        if (!pageInfo.isPresent()) {
-            // This means that origPageInfo.isPresent is also false
-            return false;
-        } else {
-            // So origPageInfo.isPresent is true here
+        if (pageInfo.isPresent()) {
+            // This means that origPageInfo.isPresent is also true here
             return pageInfo.get().compareTo(origPageInfo.get()) != 0;
+        } else {
+            // So origPageInfo.isPresent is false here
+            return false;
         }
     }
 

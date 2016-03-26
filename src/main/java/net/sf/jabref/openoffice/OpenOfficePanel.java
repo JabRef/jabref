@@ -89,6 +89,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private boolean autoDetected;
     private String sOffice;
     private IOException connectException;
+    private final OpenOfficePreferences preferences;
 
     private static OpenOfficePanel instance;
 
@@ -104,7 +105,8 @@ public class OpenOfficePanel extends AbstractWorker {
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OO bibliography"));
-        OpenOfficePreferences.putDefaultPreferences();
+        preferences = new OpenOfficePreferences(Globals.prefs);
+        preferences.putDefaultPreferences();
         styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
 
     }
@@ -129,7 +131,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     public JMenuItem getMenuItem() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_OO_PANEL)) {
+        if (preferences.showPanel()) {
             manager.show(getName());
         }
         JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
@@ -309,7 +311,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
+        if (preferences.useAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.database());
             }
@@ -336,7 +338,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            ooBaseDirectory = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
+            ooBaseDirectory = preferences.getJarsPath();
             sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
         } else { // Manual connect
 
@@ -346,7 +348,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
 
             String ooPath = Globals.prefs.get(JabRefPreferences.OO_PATH);
-            String ooJars = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
+            String ooJars = preferences.getJarsPath();
             sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
 
             if (OS.WINDOWS) {
@@ -482,7 +484,7 @@ public class OpenOfficePanel extends AbstractWorker {
         final JTextField ooJars = new JTextField(30);
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
-        ooJars.setText(Globals.prefs.get(JabRefPreferences.OO_JARS_PATH));
+        ooJars.setText(preferences.getJarsPath());
 
         DefaultFormBuilder builder = new DefaultFormBuilder(
                 new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));
@@ -507,7 +509,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         ActionListener tfListener = (e -> {
-            OpenOfficePreferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
         });
 
@@ -515,7 +517,7 @@ public class OpenOfficePanel extends AbstractWorker {
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
         ok.addActionListener(e -> {
-            OpenOfficePreferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
@@ -570,7 +572,8 @@ public class OpenOfficePanel extends AbstractWorker {
                     if (style == null) {
                         readStyleFile();
                     }
-                    ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo);
+                    ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
+                            preferences.syncWhenCiting());
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
@@ -633,7 +636,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING));
+                preferences.syncWhenCiting());
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
@@ -642,29 +645,19 @@ public class OpenOfficePanel extends AbstractWorker {
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
         bg.add(useAllBases);
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
+        if (preferences.useAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING, autoSync.isSelected()));
+        autoSync.addActionListener(e -> preferences.setSyncWhenCiting(autoSync.isSelected()));
 
-        useAllBases.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.USE_ALL_OPEN_BASES, useAllBases.isSelected()));
+        useAllBases.addActionListener(e -> preferences.setUseAllDatabases(useAllBases.isSelected()));
 
-        useActiveBase.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.USE_ALL_OPEN_BASES, !useActiveBase.isSelected()));
+        useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
 
-        clearConnectionSettings.addActionListener(e -> {
-
-            Globals.prefs.clear(JabRefPreferences.OO_PATH);
-            Globals.prefs.clear(JabRefPreferences.OO_EXECUTABLE_PATH);
-            Globals.prefs.clear(JabRefPreferences.OO_JARS_PATH);
-            frame.output(Localization.lang("Cleared connection settings."));
-
-        });
+        clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
 
         menu.add(autoSync);
         menu.addSeparator();
@@ -680,7 +673,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
 
-    static private class OOPanel extends SidePaneComponent {
+    private class OOPanel extends SidePaneComponent {
 
         private final OpenOfficePanel openOfficePanel;
 
@@ -697,12 +690,12 @@ public class OpenOfficePanel extends AbstractWorker {
 
         @Override
         public void componentClosing() {
-            Globals.prefs.putBoolean(JabRefPreferences.SHOW_OO_PANEL, false);
+            preferences.setShowPanel(false);
         }
 
         @Override
         public void componentOpening() {
-            Globals.prefs.putBoolean(JabRefPreferences.SHOW_OO_PANEL, true);
+            preferences.setShowPanel(true);
         }
     }
 

@@ -45,6 +45,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
 
+    private final OpenOfficePreferences preferences;
 
     private boolean foundPaths;
     private boolean fileSearchCancelled;
@@ -54,11 +55,12 @@ public class AutoDetectPaths extends AbstractWorker {
 
     public AutoDetectPaths(JDialog parent) {
         this.parent = parent;
+        preferences = new OpenOfficePreferences(Globals.prefs);
     }
 
     public boolean runAutodetection() {
         try {
-            if (OpenOfficePreferences.checkAutoDetectedPaths()) {
+            if (preferences.checkAutoDetectedPaths()) {
                 return true;
             }
             init();
@@ -254,7 +256,7 @@ public class AutoDetectPaths extends AbstractWorker {
         if (jurt == null) {
             return false;
         } else {
-            Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, jurt.getPath());
+            preferences.setJarsPath(jurt.getPath());
             return true;
         }
     }

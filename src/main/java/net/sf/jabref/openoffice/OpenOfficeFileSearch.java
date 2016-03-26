@@ -66,10 +66,10 @@ public class OpenOfficeFileSearch {
      * style files, and add them. The parameter recurse determines whether we should
      * recurse into subdirectories.
      * @param dir the directory or file to handle.
-     * @param recurse true indicates that we should recurse into subdirectories.
      * @param encoding
+     * @param styles List that will be filled with the found styles
      */
-    public void addStyles(String dir, boolean recurse, Charset encoding, List<OOBibStyle> styles) {
+    public void addStyles(String dir, Charset encoding, List<OOBibStyle> styles) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
             File[] fileArray = dirF.listFiles();
@@ -83,9 +83,9 @@ public class OpenOfficeFileSearch {
                 // If the file looks like a style file, parse it:
                 if (!file.isDirectory() && (file.getName().endsWith(STYLE_FILE_EXTENSION))) {
                     addSingleFile(file, encoding, styles);
-                } else if (file.isDirectory() && recurse) {
+                } else if (file.isDirectory()) {
                     // If the file is a directory, and we should recurse, do:
-                    addStyles(file.getPath(), recurse, encoding, styles);
+                    addStyles(file.getPath(), encoding, styles);
                 }
             }
         } else {

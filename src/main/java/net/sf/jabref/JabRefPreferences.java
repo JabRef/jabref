@@ -358,9 +358,9 @@ public class JabRefPreferences {
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
     public static final String OO_JARS_PATH = "ooJarsPath";
-    public static final String SHOW_OO_PANEL = "showOOPanel";
-    public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
-    public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
+    public static final String OO_SHOW_PANEL = "showOOPanel";
+    public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
+    public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
     public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
