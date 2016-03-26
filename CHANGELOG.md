@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- The mass edit function "Set/clear/rename fields" is now in the Edit menu
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
