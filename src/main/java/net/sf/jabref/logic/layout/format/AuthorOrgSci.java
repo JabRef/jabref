@@ -41,14 +41,14 @@ public class AuthorOrgSci implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
         AuthorList a = AuthorList.getAuthors(fieldText);
-        if (a.getNumberOfAuthors() == 0) {
+        if (a.isEmpty()) {
             return fieldText;
         }
         Author first = a.getAuthor(0);
         StringBuilder sb = new StringBuilder();
         sb.append(first.getLastFirst(true));
-        for (Author author : a.getAuthors()) {
-            sb.append(", ").append(author.getFirstLast(true));
+        for (int i = 1; i < a.getNumberOfAuthors(); i++) {
+            sb.append(", ").append(a.getAuthor(i).getFirstLast(true));
         }
         return sb.toString();
     }

@@ -302,7 +302,7 @@ public class AuthorList {
         }
 
         StringBuilder res = new StringBuilder();
-        if (getNumberOfAuthors() > 0) {
+        if (!isEmpty()) {
             res.append(getAuthor(0).getLastOnly());
             if (getNumberOfAuthors() == 2) {
                 res.append(" and ");
@@ -341,7 +341,7 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (getNumberOfAuthors() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getLastOnly());
             int i = 1;
             while (i < (getNumberOfAuthors() - 1)) {
@@ -392,7 +392,7 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (getNumberOfAuthors() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
             int i = 1;
             while (i < (getNumberOfAuthors() - 1)) {
@@ -495,7 +495,7 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (getNumberOfAuthors() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
             while (i < (getNumberOfAuthors() - 1)) {
