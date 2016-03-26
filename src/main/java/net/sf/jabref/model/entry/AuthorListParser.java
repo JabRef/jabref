@@ -1,9 +1,6 @@
 package net.sf.jabref.model.entry;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AuthorListParser {
 
@@ -73,7 +70,9 @@ public class AuthorListParser {
      * @param listOfNames the String containing the person names to be parsed
      * @return a parsed list of persons
      */
-    public List<Author> parse(String listOfNames) {
+    public AuthorList parse(String listOfNames) {
+
+        Objects.requireNonNull(listOfNames);
 
         // initialization of parser
         original = listOfNames;
@@ -88,7 +87,7 @@ public class AuthorListParser {
                 authors.add(author);
             }
         }
-        return authors;
+        return new AuthorList(authors);
     }
 
     /**

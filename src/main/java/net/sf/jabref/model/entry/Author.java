@@ -276,6 +276,18 @@ public class Author {
         return res.toString();
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Author{");
+        sb.append("firstPart='").append(firstPart).append('\'');
+        sb.append(", firstAbbr='").append(firstAbbr).append('\'');
+        sb.append(", vonPart='").append(vonPart).append('\'');
+        sb.append(", lastPart='").append(lastPart).append('\'');
+        sb.append(", jrPart='").append(jrPart).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
     /**
      * Returns the name as "Last, Jr, F." omitting the von-part and removing
      * starting braces.

@@ -885,7 +885,7 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String firstAuthor(String authorField) {
-        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        AuthorList authorList = AuthorList.getAuthors(authorField);
         if (authorList.isEmpty()) {
             return "";
         }
@@ -906,7 +906,7 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String firstAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        AuthorList authorList = AuthorList.getAuthors(authorField);
         if (authorList.isEmpty()) {
             return "";
         }
@@ -927,7 +927,7 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String firstAuthorVonAndLast(String authorField) {
-        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        AuthorList authorList = AuthorList.getAuthors(authorField);
         if (authorList.isEmpty()) {
             return "";
         }
@@ -971,11 +971,11 @@ public class LabelPatternUtil {
      *             if authorField == null
      */
     public static String lastAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.getAuthorList(authorField);
+        AuthorList authorList = AuthorList.getAuthors(authorField);
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(authorList.size() - 1).getFirstAbbr();
+        String s = authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr();
         return s == null ? "" : s.substring(0, 1);
     }
 

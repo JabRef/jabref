@@ -735,8 +735,8 @@ public class XMPUtilTest {
 
             if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
 
-                AuthorList expectedAuthors = AuthorList.getAuthorList(expected.getField(field));
-                AuthorList actualAuthors = AuthorList.getAuthorList(actual.getField(field));
+                AuthorList expectedAuthors = AuthorList.getAuthors(expected.getField(field));
+                AuthorList actualAuthors = AuthorList.getAuthors(actual.getField(field));
                 Assert.assertEquals(expectedAuthors, actualAuthors);
             } else {
                 Assert.assertEquals("comparing " + field, expected.getField(field), actual.getField(field));
@@ -1268,8 +1268,8 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
-        Assert.assertEquals(AuthorList.getAuthorList("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-                AuthorList.getAuthorList(x.getField("author")));
+        Assert.assertEquals(AuthorList.getAuthors("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
+                AuthorList.getAuthors(x.getField("author")));
     }
 
     @Test(expected = EncryptionNotSupportedException.class)
@@ -1301,7 +1301,7 @@ public class XMPUtilTest {
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 
-            AuthorList originalAuthors = AuthorList.getAuthorList(
+            AuthorList originalAuthors = AuthorList.getAuthors(
                     "Patterson, David and Arvind and Asanov\\'\\i{}c, Krste and Chiou, Derek and Hoe, James and Kozyrakis, Christos and Lu, S{hih-Lien} and Oskin, Mark and Rabaey, Jan and Wawrzynek, John");
 
             try {
@@ -1310,16 +1310,16 @@ public class XMPUtilTest {
                 // Test whether we the main function can load the bibtex correctly
                 BibEntry b = XMPUtil.readXMP(pdfFile).get(0);
                 Assert.assertNotNull(b);
-                Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                Assert.assertEquals(originalAuthors, AuthorList.getAuthors(b.getField("author")));
 
                 // Next check from Document Information
                 try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
 
                     Assert.assertEquals(originalAuthors,
-                            AuthorList.getAuthorList(document.getDocumentInformation().getAuthor()));
+                            AuthorList.getAuthors(document.getDocumentInformation().getAuthor()));
 
                     b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get();
-                    Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                    Assert.assertEquals(originalAuthors, AuthorList.getAuthors(b.getField("author")));
 
                     // Now check from Dublin Core
                     PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1345,7 +1345,7 @@ public class XMPUtilTest {
 
                     b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get();
                     Assert.assertNotNull(b);
-                    Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                    Assert.assertEquals(originalAuthors, AuthorList.getAuthors(b.getField("author")));
                 }
             } finally {
                 if (!pdfFile.delete()) {

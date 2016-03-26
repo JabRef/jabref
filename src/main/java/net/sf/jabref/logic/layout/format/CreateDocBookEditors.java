@@ -47,7 +47,7 @@ public class CreateDocBookEditors extends CreateDocBookAuthors {
     public String format(String fieldText) {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
         StringBuilder sb = new StringBuilder(100);
-        AuthorList al = AuthorList.getAuthorList(fieldText);
+        AuthorList al = AuthorList.getAuthors(fieldText);
         addBody(sb, al, "editor");
         return sb.toString();
 

@@ -93,8 +93,8 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         for (String fieldName : fieldNames) {
             if (entry.hasField(fieldName)) {
                 String fieldValue = entry.getField(fieldName);
-                AuthorList authorList = AuthorList.getAuthorList(fieldValue);
-                for (Author author : authorList.getAuthorList()) {
+                AuthorList authorList = AuthorList.getAuthors(fieldValue);
+                for (Author author : authorList.getAuthors()) {
                     handleAuthor(author);
                 }
             }

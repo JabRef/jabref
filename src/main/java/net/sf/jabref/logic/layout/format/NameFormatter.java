@@ -102,9 +102,9 @@ public class NameFormatter implements LayoutFormatter {
 
         StringBuilder sb = new StringBuilder();
 
-        int n = al.size();
+        int n = al.getNumberOfAuthors();
 
-        for (int i = 1; i <= al.size(); i++) {
+        for (int i = 1; i <= al.getNumberOfAuthors(); i++) {
             for (int j = 1; j < formats.length; j += 2) {
                 if ("*".equals(formats[j])) {
                     sb.append(BibtexNameFormatter.formatName(toFormat, i, formats[j + 1], null));
@@ -145,7 +145,7 @@ public class NameFormatter implements LayoutFormatter {
 
     public String format(String toFormat, String inParameters) {
 
-        AuthorList al = AuthorList.getAuthorList(toFormat);
+        AuthorList al = AuthorList.getAuthors(toFormat);
         String parameters;
 
         if ((inParameters == null) || inParameters.isEmpty()) {
@@ -166,7 +166,7 @@ public class NameFormatter implements LayoutFormatter {
             if ("*".equals(formatString[0])) {
                 return format(toFormat, al, formatString);
             } else {
-                if (al.size() <= Integer.parseInt(formatString[0])) {
+                if (al.getNumberOfAuthors() <= Integer.parseInt(formatString[0])) {
                     return format(toFormat, al, formatString);
                 }
             }

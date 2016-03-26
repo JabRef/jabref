@@ -245,22 +245,22 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
 
         StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.getAuthorList(fieldText);
+        AuthorList al = AuthorList.getAuthors(fieldText);
 
-        if ((maxAuthors < 0) || (al.size() <= maxAuthors)) {
-            for (int i = 0; i < al.size(); i++) {
+        if ((maxAuthors < 0) || (al.getNumberOfAuthors() <= maxAuthors)) {
+            for (int i = 0; i < al.getNumberOfAuthors(); i++) {
                 Author a = al.getAuthor(i);
 
                 addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
 
-                if (i < (al.size() - 2)) {
+                if (i < (al.getNumberOfAuthors() - 2)) {
                     sb.append(separator);
-                } else if (i < (al.size() - 1)) {
+                } else if (i < (al.getNumberOfAuthors() - 1)) {
                     sb.append(lastSeparator);
                 }
             }
         } else {
-            for (int i = 0; i < Math.min(al.size() - 1, authorNumberEtAl); i++) {
+            for (int i = 0; i < Math.min(al.getNumberOfAuthors() - 1, authorNumberEtAl); i++) {
                 if (i > 0) {
                     sb.append(separator);
                 }

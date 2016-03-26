@@ -40,9 +40,9 @@ import net.sf.jabref.model.entry.Author;
 public class BibtexNameFormatter {
 
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
-        AuthorList al = AuthorList.getAuthorList(authorsNameList);
+        AuthorList al = AuthorList.getAuthors(authorsNameList);
 
-        if ((whichName < 1) && (whichName > al.size())) {
+        if ((whichName < 1) && (whichName > al.getNumberOfAuthors())) {
             warn.warn("AuthorList " + authorsNameList + " does not contain an author with number " + whichName);
             return "";
         }

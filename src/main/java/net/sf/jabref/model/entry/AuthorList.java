@@ -129,8 +129,7 @@ public class AuthorList {
 
     private final List<Author> authors;
 
-    // Variables for storing computed strings, so they only need be created
-    // once:
+    // Variables for storing computed strings, so they only need to be created once:
     private String authorsNatbib;
     private String authorsFirstFirstAnds;
     private String authorsAlph;
@@ -142,7 +141,7 @@ public class AuthorList {
     private final String[] authorsLastFirstFirstLast = new String[2];
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
-    
+
     /**
      * Creates a new list of authors.
      * <p>
@@ -151,25 +150,25 @@ public class AuthorList {
      *
      * @param authors the list of authors which should underlie this instance
      */
-    private AuthorList(List<Author> authors) {
+    protected AuthorList(List<Author> authors) {
         this.authors = Objects.requireNonNull(authors);
     }
 
     /**
      * Retrieve an AuthorList for the given string of authors or editors.
      * <p>
-     * This function tries to cache AuthorLists by string passed in.
+     * This function tries to cache the parsed AuthorLists by the string passed in.
      *
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList getAuthorList(String authors) {
+    public static AuthorList getAuthors(String authors) {
         Objects.requireNonNull(authors);
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();
-            authorList = new AuthorList(parser.parse(authors));
+            authorList = parser.parse(authors);
             AUTHOR_CACHE.put(authors, authorList);
         }
         return authorList;
@@ -178,73 +177,73 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsFirstFirst()
      *
-     * @see AuthorList#getAuthorsFirstFirst
+     * @see AuthorList#getAsFirstLastNames
      */
     public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsFirstFirst(abbr, oxfordComma);
+        return AuthorList.getAuthors(authors).getAsFirstLastNames(abbr, oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsFirstFirstAnds()
      *
-     * @see AuthorList#getAuthorsFirstFirstAnds
+     * @see AuthorList#getAsFirstLastNamesWithAnd
      */
     public static String fixAuthorFirstNameFirst(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsFirstFirstAnds();
+        return AuthorList.getAuthors(authors).getAsFirstLastNamesWithAnd();
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirst()
      *
-     * @see AuthorList#getAuthorsLastFirst
+     * @see AuthorList#getAsLastFirstNames
      */
     public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirst(abbr, oxfordComma);
+        return AuthorList.getAuthors(authors).getAsLastFirstNames(abbr, oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirstAnds(true)
      *
-     * @see AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(false);
+        return AuthorList.getAuthors(authors).getAsLastFirstNamesWithAnd(false);
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirstAnds()
      *
-     * @see AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors, boolean abbreviate) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(abbreviate);
+        return AuthorList.getAuthors(authors).getAsLastFirstNamesWithAnd(abbreviate);
     }
 
     /**
      * This is a convenience method for getAuthorsLastOnly()
      *
-     * @see AuthorList#getAuthorsLastOnly
+     * @see AuthorList#getAsLastNames
      */
     public static String fixAuthorLastNameOnlyCommas(String authors, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastOnly(oxfordComma);
+        return AuthorList.getAuthors(authors).getAsLastNames(oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsForAlphabetization()
      *
-     * @see AuthorList#getAuthorsForAlphabetization
+     * @see AuthorList#getForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsForAlphabetization();
+        return AuthorList.getAuthors(authors).getForAlphabetization();
     }
 
     /**
      * This is a convenience method for getAuthorsNatbib()
      *
-     * @see AuthorList#getAuthorsNatbib
+     * @see AuthorList#getAsNatbib
      */
     public static String fixAuthorNatbib(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsNatbib();
+        return AuthorList.getAuthors(authors).getAsNatbib();
     }
 
     /**
@@ -252,7 +251,7 @@ public class AuthorList {
      *
      * @return the number of author names in this object.
      */
-    public int size() {
+    public int getNumberOfAuthors() {
         return authors.size();
     }
 
@@ -280,7 +279,7 @@ public class AuthorList {
      *
      * @return the <CODE>List<Author></CODE> object.
      */
-    public List<Author> getAuthorList() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
@@ -296,19 +295,19 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsNatbib() {
+    public String getAsNatbib() {
         // Check if we've computed this before:
         if (authorsNatbib != null) {
             return authorsNatbib;
         }
 
         StringBuilder res = new StringBuilder();
-        if (size() > 0) {
+        if (getNumberOfAuthors() > 0) {
             res.append(getAuthor(0).getLastOnly());
-            if (size() == 2) {
+            if (getNumberOfAuthors() == 2) {
                 res.append(" and ");
                 res.append(getAuthor(1).getLastOnly());
-            } else if (size() > 2) {
+            } else if (getNumberOfAuthors() > 2) {
                 res.append(" et al.");
             }
         }
@@ -318,7 +317,7 @@ public class AuthorList {
 
     /**
      * Returns the list of authors separated by commas with last name only; If
-     * the list consists of three or more authors, "and" is inserted before the
+     * the list consists of two or more authors, "and" is inserted before the
      * last author's name.
      * <p>
      * <p>
@@ -333,7 +332,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsLastOnly(boolean oxfordComma) {
+    public String getAsLastNames(boolean oxfordComma) {
         int abbrInt = oxfordComma ? 0 : 1;
 
         // Check if we've computed this before:
@@ -342,18 +341,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (getNumberOfAuthors() > 0) {
             result.append(getAuthor(0).getLastOnly());
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastOnly());
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getLastOnly());
             }
@@ -383,7 +382,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsLastFirst(boolean abbreviate, boolean oxfordComma) {
+    public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         int abbrInt = abbreviate ? 0 : 1;
         abbrInt += oxfordComma ? 0 : 2;
 
@@ -393,18 +392,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (getNumberOfAuthors() > 0) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastFirst(abbreviate));
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getLastFirst(abbreviate));
             }
@@ -415,7 +414,7 @@ public class AuthorList {
 
     @Override
     public String toString() {
-        return getAuthorsLastFirstAnds(false);
+        return getAsLastFirstNamesWithAnd(false);
     }
 
     /**
@@ -432,7 +431,7 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsLastFirstAnds(boolean abbreviate) {
+    public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
         int abbrInt = abbreviate ? 0 : 1;
         // Check if we've computed this before:
         if (authorLastFirstAnds[abbrInt] != null) {
@@ -440,12 +439,12 @@ public class AuthorList {
         }
 
 
-        authorLastFirstAnds[abbrInt] = getAuthorList().stream().map(author -> author.getLastFirst(abbreviate))
+        authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
                 .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
     }
 
-    public String getAuthorsLastFirstFirstLastAnds(boolean abbreviate) {
+    public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         int abbrInt = abbreviate ? 0 : 1;
         // Check if we've computed this before:
         if (authorsLastFirstFirstLast[abbrInt] != null) {
@@ -455,7 +454,7 @@ public class AuthorList {
         StringBuilder result = new StringBuilder();
         if (!isEmpty()) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
-            for (int i = 1; i < size(); i++) {
+            for (int i = 1; i < getNumberOfAuthors(); i++) {
                 result.append(" and ");
                 result.append(getAuthor(i).getFirstLast(abbreviate));
             }
@@ -485,7 +484,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsFirstFirst(boolean abbr, boolean oxfordComma) {
+    public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
 
         int abbrInt = abbr ? 0 : 1;
         abbrInt += oxfordComma ? 0 : 2;
@@ -496,18 +495,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (getNumberOfAuthors() > 0) {
             result.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getFirstLast(abbr));
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getFirstLast(abbr));
             }
@@ -552,13 +551,13 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsFirstFirstAnds() {
+    public String getAsFirstLastNamesWithAnd() {
         // Check if we've computed this before:
         if (authorsFirstFirstAnds != null) {
             return authorsFirstFirstAnds;
         }
 
-        authorsFirstFirstAnds = getAuthorList().stream().map(author -> author.getFirstLast(false))
+        authorsFirstFirstAnds = getAuthors().stream().map(author -> author.getFirstLast(false))
                 .collect(Collectors.joining(" and "));
         return authorsFirstFirstAnds;
     }
@@ -576,12 +575,12 @@ public class AuthorList {
      *
      * @return formatted list of authors
      */
-    public String getAuthorsForAlphabetization() {
+    public String getForAlphabetization() {
         if (authorsAlph != null) {
             return authorsAlph;
         }
 
-        authorsAlph = getAuthorList().stream().map(author -> author.getNameForAlphabetization())
+        authorsAlph = getAuthors().stream().map(author -> author.getNameForAlphabetization())
                 .collect(Collectors.joining(" and "));
         return authorsAlph;
     }

@@ -11,7 +11,7 @@ public class BibtexNameFormatterTest {
     public void testFormatName() {
         {
             AuthorList al = AuthorList
-                    .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+                    .getAuthors("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~laVall{\\'e}e~PoussinCharles Louis Xavier~Joseph", BibtexNameFormatter.formatName(al
                     .getAuthor(0), "{vv}{ll}{jj}{ff}", Assert::fail));
@@ -19,7 +19,7 @@ public class BibtexNameFormatterTest {
 
         {
             AuthorList al = AuthorList
-                    .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+                    .getAuthors("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J.", BibtexNameFormatter.formatName(al
                     .getAuthor(0), "{vv~}{ll}{, jj}{, f.}", Assert::fail));
@@ -27,14 +27,14 @@ public class BibtexNameFormatterTest {
 
         {
             AuthorList al = AuthorList
-                    .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+                    .getAuthors("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
             Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", BibtexNameFormatter.formatName(al
                     .getAuthor(0), "{vv~}{ll}{, jj}{, f}?", Assert::fail));
         }
 
         AuthorList al = AuthorList
-                .getAuthorList("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
+                .getAuthors("Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin");
 
         Assert.assertEquals("dlVP", BibtexNameFormatter.formatName(al.getAuthor(0), "{v{}}{l{}}",
                 Assert::fail
