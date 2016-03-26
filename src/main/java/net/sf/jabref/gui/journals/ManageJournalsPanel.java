@@ -20,8 +20,9 @@ import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.*;
 
@@ -299,7 +300,8 @@ class ManageJournalsPanel extends JPanel {
         String filename = personalFile.getText();
         if ((!filename.isEmpty()) && new File(filename).exists()) {
             try {
-                userAbbreviations = JournalAbbreviationLoader.readJournalListFromFile(new File(filename));
+                userAbbreviations = JournalAbbreviationLoader.readJournalListFromFile(new File(filename),
+                        Globals.prefs.getDefaultEncoding());
             } catch (FileNotFoundException e) {
                 LOGGER.warn("Problem reading abbreviation file", e);
             }
@@ -348,12 +350,13 @@ class ManageJournalsPanel extends JPanel {
             if (!f.exists()) {
                 throw new FileNotFoundException(f.getAbsolutePath());
             }
-            try (FileWriter fw = new FileWriter(f, false)) {
+            try (FileOutputStream stream = new FileOutputStream(f, false);
+                    OutputStreamWriter writer = new OutputStreamWriter(stream, Globals.prefs.getDefaultEncoding())) {
                 for (JournalEntry entry : tableModel.getJournals()) {
-                    fw.write(entry.getName());
-                    fw.write(" = ");
-                    fw.write(entry.getAbbreviation());
-                    fw.write(Globals.NEWLINE);
+                    writer.write(entry.getName());
+                    writer.write(" = ");
+                    writer.write(entry.getAbbreviation());
+                    writer.write(Globals.NEWLINE);
                 }
             } catch (IOException e) {
                 LOGGER.warn("Problem writing abbreviation file", e);

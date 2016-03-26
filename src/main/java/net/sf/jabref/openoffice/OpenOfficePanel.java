@@ -46,7 +46,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -459,13 +458,9 @@ public class OpenOfficePanel extends AbstractWorker {
      */
     private void readStyleFile() throws IOException {
         if (useDefaultAuthoryearStyle) {
-            URL defPath = JabRef.class.getResource(DEFAULT_AUTHORYEAR_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
-            style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
+            style = new OOBibStyle(DEFAULT_AUTHORYEAR_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
         } else if (useDefaultNumericalStyle) {
-            URL defPath = JabRef.class.getResource(DEFAULT_NUMERICAL_STYLE_PATH);
-            Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
-            style = new OOBibStyle(r, Globals.journalAbbreviationLoader.getRepository());
+            style = new OOBibStyle(DEFAULT_NUMERICAL_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
         } else {
             style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository(),
                     Globals.prefs.getDefaultEncoding());

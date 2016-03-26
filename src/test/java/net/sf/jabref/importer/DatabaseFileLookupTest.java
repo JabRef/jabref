@@ -9,9 +9,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -31,8 +33,9 @@ public class DatabaseFileLookupTest {
     public void setUp() throws FileNotFoundException, IOException {
         Globals.prefs = JabRefPreferences.getInstance();
 
-        try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
-            ParserResult result = BibtexParser.parse(fr);
+        try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+            ParserResult result = BibtexParser.parse(reader);
             database = result.getDatabase();
             entries = database.getEntries();
 

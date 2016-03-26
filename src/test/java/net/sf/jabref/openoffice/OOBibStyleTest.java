@@ -3,10 +3,7 @@ package net.sf.jabref.openoffice;
 import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -48,18 +45,15 @@ public class OOBibStyleTest {
 
     @Test
     public void testAuthorYear() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
-
-        try (Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8)) {
-            OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
-            assertTrue(style.isValid());
-            assertFalse(style.isBibtexKeyCiteMarkers());
-            assertFalse(style.isBoldCitations());
-            assertFalse(style.isFormatCitations());
-            assertFalse(style.isItalicCitations());
-            assertFalse(style.isNumberEntries());
-            assertFalse(style.isSortByPosition());
-        }
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        assertTrue(style.isValid());
+        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isBoldCitations());
+        assertFalse(style.isFormatCitations());
+        assertFalse(style.isItalicCitations());
+        assertFalse(style.isNumberEntries());
+        assertFalse(style.isSortByPosition());
     }
 
     @Test
@@ -83,25 +77,22 @@ public class OOBibStyleTest {
     @Test
     public void testNumerical() throws IOException {
 
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        try (Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8)) {
-            OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
-            assertTrue(style.isValid());
-            assertFalse(style.isBibtexKeyCiteMarkers());
-            assertFalse(style.isBoldCitations());
-            assertFalse(style.isFormatCitations());
-            assertFalse(style.isItalicCitations());
-            assertTrue(style.isNumberEntries());
-            assertTrue(style.isSortByPosition());
-        }
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        assertTrue(style.isValid());
+        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isBoldCitations());
+        assertFalse(style.isFormatCitations());
+        assertFalse(style.isItalicCitations());
+        assertTrue(style.isNumberEntries());
+        assertTrue(style.isSortByPosition());
 
     }
 
     @Test
     public void testGetNumCitationMarker() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), -1, true));
         assertEquals("[1]", style.getNumCitationMarker(Arrays.asList(1), -1, false));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), 0, true));
@@ -117,9 +108,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetNumCitationMarkerUndefined() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; 2-4] ",
                 style.getNumCitationMarker(Arrays.asList(4, 2, 3, 0), 1, true));
 
@@ -136,9 +126,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitProperty() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8);
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
         assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
@@ -152,9 +141,8 @@ public class OOBibStyleTest {
     public void testGetCitationMarker() throws IOException {
         File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         BibDatabase db = result.getDatabase();
         for (BibEntry entry : db.getEntries()) {
@@ -174,9 +162,8 @@ public class OOBibStyleTest {
     public void testLayout() throws IOException {
         File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         BibDatabase db = result.getDatabase();
 
         Layout l = style.getReferenceFormat("default");
@@ -195,9 +182,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testInstitutionAuthor() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat("article");
@@ -209,16 +195,14 @@ public class OOBibStyleTest {
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
         database.insertEntry(entry);
-        assertEquals(
-                "<b>JabRef Development Team</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
+        assertEquals("<b>JabRef Development Team</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
                 l.doLayout(entry, database));
     }
 
     @Test
     public void testInstitutionAuthorMarker() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -237,9 +221,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testEmptyEntryMarker() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -255,9 +238,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarkerInParenthesisUniquefiers() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -292,9 +274,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarkerInTextUniquefiers() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -329,9 +310,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -365,9 +345,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
-        URL defPath = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r = new InputStreamReader(defPath.openStream());
-        OOBibStyle style = new OOBibStyle(r, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -403,12 +382,10 @@ public class OOBibStyleTest {
     @Ignore
     // TODO: equals only work when initialized from file, not from reader
     public void testEquals() throws IOException {
-        URL defPath1 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r1 = new InputStreamReader(defPath1.openStream());
-        OOBibStyle style1 = new OOBibStyle(r1, mock(JournalAbbreviationRepository.class));
-        URL defPath2 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r2 = new InputStreamReader(defPath2.openStream());
-        OOBibStyle style2 = new OOBibStyle(r2, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style1 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        OOBibStyle style2 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertEquals(style1, style2);
     }
 
@@ -416,34 +393,28 @@ public class OOBibStyleTest {
     @Ignore
     // TODO: equals only work when initialized from file, not from reader
     public void testNotEquals() throws IOException {
-        URL defPath1 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r1 = new InputStreamReader(defPath1.openStream());
-        OOBibStyle style1 = new OOBibStyle(r1, mock(JournalAbbreviationRepository.class));
-        URL defPath2 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        Reader r2 = new InputStreamReader(defPath2.openStream());
-        OOBibStyle style2 = new OOBibStyle(r2, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style1 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        OOBibStyle style2 = new OOBibStyle(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertNotEquals(style1, style2);
     }
 
     @Test
     public void testCompareToEqual() throws IOException {
-        URL defPath1 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r1 = new InputStreamReader(defPath1.openStream());
-        OOBibStyle style1 = new OOBibStyle(r1, mock(JournalAbbreviationRepository.class));
-        URL defPath2 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r2 = new InputStreamReader(defPath2.openStream());
-        OOBibStyle style2 = new OOBibStyle(r2, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style1 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        OOBibStyle style2 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertEquals(0, style1.compareTo(style2));
     }
 
     @Test
     public void testCompareToNotEqual() throws IOException {
-        URL defPath1 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
-        Reader r1 = new InputStreamReader(defPath1.openStream());
-        OOBibStyle style1 = new OOBibStyle(r1, mock(JournalAbbreviationRepository.class));
-        URL defPath2 = JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        Reader r2 = new InputStreamReader(defPath2.openStream());
-        OOBibStyle style2 = new OOBibStyle(r2, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style1 = new OOBibStyle(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        OOBibStyle style2 = new OOBibStyle(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }

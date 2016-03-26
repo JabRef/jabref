@@ -397,7 +397,7 @@ class StyleSelectDialog {
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
         if (!styleDir.getText().isEmpty()) {
-            addStyles(styleDir.getText(), true);
+            addStyles(styleDir.getText(), true, Globals.prefs.getDefaultEncoding());
         }
         styles.getReadWriteLock().writeLock().unlock();
 
@@ -438,8 +438,9 @@ class StyleSelectDialog {
      * recurse into subdirectories.
      * @param dir the directory or file to handle.
      * @param recurse true indicates that we should recurse into subdirectories.
+     * @param encoding
      */
-    private void addStyles(String dir, boolean recurse) {
+    private void addStyles(String dir, boolean recurse, Charset encoding) {
         File dirF = new File(dir);
         if (dirF.isDirectory()) {
             File[] fileArray = dirF.listFiles();
@@ -452,15 +453,15 @@ class StyleSelectDialog {
             for (File file : files) {
                 // If the file looks like a style file, parse it:
                 if (!file.isDirectory() && (file.getName().endsWith(StyleSelectDialog.STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file, Globals.prefs.getDefaultEncoding());
+                    addSingleFile(file, encoding);
                 } else if (file.isDirectory() && recurse) {
                     // If the file is a directory, and we should recurse, do:
-                    addStyles(file.getPath(), recurse);
+                    addStyles(file.getPath(), recurse, encoding);
                 }
             }
         } else {
             // The file wasn't a directory, so we simply parse it:
-            addSingleFile(dirF, Globals.prefs.getDefaultEncoding());
+            addSingleFile(dirF, encoding);
         }
     }
 
