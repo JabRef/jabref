@@ -71,6 +71,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private boolean valid;
 
+    private final boolean fromResource;
 
     enum BibStyleMode {
         NONE,
@@ -137,6 +138,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
         reload();
+        fromResource = false;
     }
 
     public OOBibStyle(String resourcePath, JournalAbbreviationRepository repository)
@@ -145,6 +147,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
         initialize(JabRef.class.getResource(resourcePath).openStream());
+        fromResource = true;
     }
 
     private void setDefaultProperties() {
@@ -836,6 +839,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public Object getProperty(String propName) {
         return properties.get(propName);
+    }
+
+    public boolean isFromResource() {
+        return fromResource;
     }
 
     @Override

@@ -9,77 +9,77 @@ import org.junit.Test;
 public class CitationEntryTest {
 
     @Test
-    public void testCitEntryInitalPageInfo() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context", "Info");
-        assertFalse(citEntry.pageInfoChanged());
-        assertTrue(citEntry.getPageInfo().isPresent());
-        assertEquals("Info", citEntry.getPageInfo().get());
-        assertEquals("RefMark", citEntry.getRefMarkName());
-        assertEquals("Context", citEntry.getContext());
+    public void testCitationEntryInitalPageInfo() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
+        assertFalse(citationEntry.pageInfoChanged());
+        assertTrue(citationEntry.getPageInfo().isPresent());
+        assertEquals("Info", citationEntry.getPageInfo().get());
+        assertEquals("RefMark", citationEntry.getRefMarkName());
+        assertEquals("Context", citationEntry.getContext());
     }
 
     @Test
-    public void testCitEntryOptionalInitalPageInfo() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
-        assertFalse(citEntry.pageInfoChanged());
-        assertTrue(citEntry.getPageInfo().isPresent());
-        assertEquals("Info", citEntry.getPageInfo().get());
-        assertEquals("RefMark", citEntry.getRefMarkName());
-        assertEquals("Context", citEntry.getContext());
+    public void testCitationEntryOptionalInitalPageInfo() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
+        assertFalse(citationEntry.pageInfoChanged());
+        assertTrue(citationEntry.getPageInfo().isPresent());
+        assertEquals("Info", citationEntry.getPageInfo().get());
+        assertEquals("RefMark", citationEntry.getRefMarkName());
+        assertEquals("Context", citationEntry.getContext());
     }
 
     @Test
-    public void testCitEntryInitalPageInfoChanged() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context", "Info");
-        citEntry.setPageInfo("Other info");
-        assertTrue(citEntry.pageInfoChanged());
-        assertTrue(citEntry.getPageInfo().isPresent());
-        assertEquals("Other info", citEntry.getPageInfo().get());
+    public void testCitationEntryInitalPageInfoChanged() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
+        citationEntry.setPageInfo("Other info");
+        assertTrue(citationEntry.pageInfoChanged());
+        assertTrue(citationEntry.getPageInfo().isPresent());
+        assertEquals("Other info", citationEntry.getPageInfo().get());
     }
 
     @Test
-    public void testCitEntryInitalPageInfoRemoved() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context", "Info");
-        citEntry.setPageInfo(null);
-        assertTrue(citEntry.pageInfoChanged());
-        assertFalse(citEntry.getPageInfo().isPresent());
+    public void testCitationEntryInitalPageInfoRemoved() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
+        citationEntry.setPageInfo(null);
+        assertTrue(citationEntry.pageInfoChanged());
+        assertFalse(citationEntry.getPageInfo().isPresent());
     }
 
     @Test
-    public void testCitEntryNoInitalPageInfo() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context");
-        assertFalse(citEntry.pageInfoChanged());
-        assertFalse(citEntry.getPageInfo().isPresent());
+    public void testCitationEntryNoInitalPageInfo() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
+        assertFalse(citationEntry.pageInfoChanged());
+        assertFalse(citationEntry.getPageInfo().isPresent());
     }
 
     @Test
-    public void testCitEntryNoInitalPageInfoChanged() {
-        CitationEntry citEntry = new CitationEntry("RefMark", "Context");
-        citEntry.setPageInfo("Other info");
-        assertTrue(citEntry.pageInfoChanged());
-        assertTrue(citEntry.getPageInfo().isPresent());
-        assertEquals("Other info", citEntry.getPageInfo().get());
+    public void testCitationEntryNoInitalPageInfoChanged() {
+        CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
+        citationEntry.setPageInfo("Other info");
+        assertTrue(citationEntry.pageInfoChanged());
+        assertTrue(citationEntry.getPageInfo().isPresent());
+        assertEquals("Other info", citationEntry.getPageInfo().get());
     }
 
     @Test
-    public void testCitEntryEquals() {
-        CitationEntry citEntry1 = new CitationEntry("RefMark", "Context", "Info");
-        CitationEntry citEntry2 = new CitationEntry("RefMark2", "Context", "Info");
-        CitationEntry citEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
-        assertEquals(citEntry1, citEntry1);
-        assertEquals(citEntry1, citEntry3);
-        assertNotEquals(citEntry1, citEntry2);
-        assertNotEquals(citEntry1, "Random String");
+    public void testCitationEntryEquals() {
+        CitationEntry citationEntry1 = new CitationEntry("RefMark", "Context", "Info");
+        CitationEntry citationEntry2 = new CitationEntry("RefMark2", "Context", "Info");
+        CitationEntry citationEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
+        assertEquals(citationEntry1, citationEntry1);
+        assertEquals(citationEntry1, citationEntry3);
+        assertNotEquals(citationEntry1, citationEntry2);
+        assertNotEquals(citationEntry1, "Random String");
     }
 
     @Test
-    public void testCitEntryCompareTo() {
-        CitationEntry citEntry1 = new CitationEntry("RefMark", "Context", "Info");
-        CitationEntry citEntry2 = new CitationEntry("RefMark2", "Context", "Info");
-        CitationEntry citEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
-        assertEquals(0, citEntry1.compareTo(citEntry1));
-        assertEquals(0, citEntry1.compareTo(citEntry3));
-        assertEquals(-1, citEntry1.compareTo(citEntry2));
-        assertEquals(1, citEntry2.compareTo(citEntry1));
+    public void testCitationEntryCompareTo() {
+        CitationEntry citationEntry1 = new CitationEntry("RefMark", "Context", "Info");
+        CitationEntry citationEntry2 = new CitationEntry("RefMark2", "Context", "Info");
+        CitationEntry citationEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
+        assertEquals(0, citationEntry1.compareTo(citationEntry1));
+        assertEquals(0, citationEntry1.compareTo(citationEntry3));
+        assertEquals(-1, citationEntry1.compareTo(citationEntry2));
+        assertEquals(1, citationEntry2.compareTo(citationEntry1));
     }
 }

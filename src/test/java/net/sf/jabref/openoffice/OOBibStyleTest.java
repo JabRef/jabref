@@ -132,7 +132,7 @@ public class OOBibStyleTest {
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
         assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
         assertEquals("Default", style.getCitationCharacterFormat());
-        assertEquals("Example style file for JabRef-OO connection. [number]", style.getName());
+        assertEquals("Default [number] style file.", style.getName());
         Set<String> journals = style.getJournals();
         assertTrue(journals.contains("Journal name 1"));
     }

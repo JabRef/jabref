@@ -478,7 +478,7 @@ class StyleSelectDialog {
             case 1:
                 return String.join(", ", style.getJournals());
             case 2:
-                return style.getFile().getName();
+                return style.isFromResource() ? Localization.lang("Internal style file") : style.getFile().getName();
             default:
                 return "";
             }
