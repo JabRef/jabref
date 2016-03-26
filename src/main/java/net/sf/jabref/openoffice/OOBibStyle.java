@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.openoffice;
 
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -727,7 +728,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         StringBuilder sb = new StringBuilder();
 
         if (al.size() > number) {
-            AuthorList.Author a = al.getAuthor(number);
+            Author a = al.getAuthor(number);
             if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 String von = a.getVon();
                 sb.append(von);

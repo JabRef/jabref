@@ -17,7 +17,7 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.AuthorList.Author;
+import net.sf.jabref.model.entry.Author;
 
 /**
  * Will return the Authors to match the OrgSci format:

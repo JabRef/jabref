@@ -37,6 +37,7 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
@@ -62,7 +63,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
     public void addBody(StringBuilder sb, AuthorList al, String tagName) {
         for (int i = 0; i < al.size(); i++) {
             sb.append('<').append(tagName).append('>');
-            AuthorList.Author a = al.getAuthor(i);
+            Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
                 sb.append("<firstname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()))
                         .append("</firstname>");

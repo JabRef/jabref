@@ -18,7 +18,7 @@ package net.sf.jabref.bst;
 import java.util.Stack;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.AuthorList.Author;
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.bst.VM.BstEntry;
 import net.sf.jabref.bst.VM.BstFunction;
 

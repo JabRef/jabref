@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 
 import java.util.ArrayList;
@@ -248,7 +249,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
         if ((maxAuthors < 0) || (al.size() <= maxAuthors)) {
             for (int i = 0; i < al.size(); i++) {
-                AuthorList.Author a = al.getAuthor(i);
+                Author a = al.getAuthor(i);
 
                 addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
 
@@ -271,7 +272,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         return sb.toString();
     }
 
-    private void addSingleName(StringBuilder sb, AuthorList.Author a, boolean firstFirst) {
+    private void addSingleName(StringBuilder sb, Author a, boolean firstFirst) {
         String firstNamePart = a.getFirst();
         String lastNamePart = a.getLast();
         String von = a.getVon();

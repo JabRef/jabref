@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.AuthorList.Author;
+import net.sf.jabref.model.entry.Author;
 
 /**
  * From Bibtex:

@@ -596,7 +596,7 @@ public class XMPUtil {
 
                 AuthorList list = AuthorList.getAuthorList(authors);
 
-                for (AuthorList.Author author : list.getAuthorList()) {
+                for (Author author : list.getAuthorList()) {
                     dcSchema.addContributor(author.getFirstLast(false));
                 }
                 continue;

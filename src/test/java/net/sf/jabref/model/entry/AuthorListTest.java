@@ -342,8 +342,7 @@ public class AuthorListTest {
     @Test
     public void testGetAuthor() {
 
-        AuthorList.Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John")
-                .getAuthor(0);
+        Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John").getAuthor(0);
         Assert.assertEquals("John", author.getFirst());
         Assert.assertEquals("J.", author.getFirstAbbr());
         Assert.assertEquals("John Smith", author.getFirstLast(false));
