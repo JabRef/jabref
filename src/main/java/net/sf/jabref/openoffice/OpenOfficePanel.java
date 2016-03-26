@@ -603,8 +603,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     if (style == null) {
                         readStyleFile();
                     }
-                    ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                            Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING));
+                    ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo);
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization

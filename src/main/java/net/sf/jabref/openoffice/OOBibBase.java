@@ -43,6 +43,9 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.l10n.Localization;
@@ -266,13 +269,11 @@ class OOBibBase {
      *   This is not relevant if numbered citations are used.
      * @param withText Indicates whether this should be a normal citation (true) or an empty
      *   (invisible) citation (false).
-     * @param sync Indicates whether the reference list should be refreshed.
      * @throws Exception
      */
     public void insertEntry(List<BibEntry> entries, BibDatabase database,
             List<BibDatabase> allBases, OOBibStyle style,
-            boolean inParenthesis, boolean withText, String pageInfo,
-            boolean sync) throws Exception {
+            boolean inParenthesis, boolean withText, String pageInfo) throws Exception {
 
         try {
 
@@ -328,7 +329,7 @@ class OOBibBase {
 
             XTextRange position = xViewCursor.getEnd();
 
-            if (sync) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING)) {
                 // To account for numbering and for uniqiefiers, we must refresh the cite markers:
                 updateSortedReferenceMarks();
                 refreshCiteMarkers(allBases, style);

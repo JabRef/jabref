@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -165,47 +164,30 @@ class StyleSelectDialog {
 
         popup.add(edit);
 
-        BrowseAction dfBrowse = BrowseAction.buildForFile(directFile, directFile);
-        browseDirectFile.addActionListener(dfBrowse);
+        browseDirectFile.addActionListener(BrowseAction.buildForFile(directFile, directFile));
 
-        BrowseAction sdBrowse = BrowseAction.buildForDir(styleDir, setDirectory);
-        browseStyleDir.addActionListener(sdBrowse);
+        browseStyleDir.addActionListener(BrowseAction.buildForDir(styleDir, setDirectory));
 
-        showDefaultAuthoryearStyle.addActionListener(new ActionListener() {
+        showDefaultAuthoryearStyle.addActionListener(actionEvent -> displayDefaultStyle(true));
+        showDefaultNumericalStyle.addActionListener(actionEvent -> displayDefaultStyle(false));
 
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                displayDefaultStyle(true);
-            }
-        });
-        showDefaultNumericalStyle.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                displayDefaultStyle(false);
-            }
-        });
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int i = table.getSelectedRow();
-                if (i == -1) {
-                    return;
+        edit.addActionListener(actionEvent -> {
+            int i = table.getSelectedRow();
+            if (i == -1) {
+                return;
+            }
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+            String link = tableModel.getElementAt(i).getFile().getPath();
+            try {
+                if (type.isPresent()) {
+                    JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
+                } else {
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
+                            new UnknownExternalFileType("jstyle"));
                 }
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = tableModel.getElementAt(i).getFile().getPath();
-                try {
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    LOGGER.warn("Problem open style file editor", e);
-                }
+            } catch (IOException e) {
+                LOGGER.warn("Problem open style file editor", e);
             }
         });
 
@@ -373,13 +355,7 @@ class StyleSelectDialog {
 
         diag.pack();
         diag.setLocationRelativeTo(frame);
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                contentPane.setDividerLocation(contentPane.getSize().height - 150);
-            }
-        });
+        SwingUtilities.invokeLater((Runnable) () -> contentPane.setDividerLocation(contentPane.getSize().height - 150));
 
     }
 
@@ -601,13 +577,7 @@ class StyleSelectDialog {
             bb.addGlue();
             bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             dd.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
-            okButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
-                    dd.dispose();
-                }
-            });
+            okButton.addActionListener(actionEvent -> dd.dispose());
             dd.pack();
             dd.setLocationRelativeTo(diag);
             dd.setVisible(true);
@@ -631,13 +601,9 @@ class StyleSelectDialog {
                 preview.setLayout(style.getReferenceFormat("default"));
                 // Update the preview's entry:
                 contentPane.setDividerLocation(contentPane.getSize().height - 150);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.update();
-                        preview.scrollRectToVisible(toRect);
-                    }
+                SwingUtilities.invokeLater((Runnable) () -> {
+                    preview.update();
+                    preview.scrollRectToVisible(toRect);
                 });
             }
         }
