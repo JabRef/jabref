@@ -123,7 +123,8 @@ public class JabRefDesktop {
      *            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link, final ExternalFileType fileType) throws IOException {
+    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link,
+            final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
@@ -141,10 +142,10 @@ public class JabRefDesktop {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (fileType != null)) {
+        if ((httpLink || file.exists()) && (type.isPresent())) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
-            openExternalFilePlatformIndependent(fileType, filePath);
+            openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
             // No file matched the name, or we didn't know the file type.
@@ -152,13 +153,16 @@ public class JabRefDesktop {
         }
     }
 
-    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
-        String application = fileType.getOpenWithApplication();
+    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
+            throws IOException {
+        if (fileType.isPresent()) {
+            String application = fileType.get().getOpenWithApplication();
 
-        if(application.isEmpty()) {
-            NATIVE_DESKTOP.openFile(filePath, fileType.getExtension());
-        } else {
-            NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+            if (application.isEmpty()) {
+                NATIVE_DESKTOP.openFile(filePath, fileType.get().getExtension());
+            } else {
+                NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+            }
         }
     }
 
@@ -191,7 +195,7 @@ public class JabRefDesktop {
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                 // Finally, open the file:
-                return openExternalFileAnyFormat(metaData, link, newType);
+                return openExternalFileAnyFormat(metaData, link, Optional.of(newType));
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -253,7 +257,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }
 

@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -193,14 +194,14 @@ class StyleSelectDialog {
                 if (i == -1) {
                     return;
                 }
-                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
                 String link = tableModel.getElementAt(i).getFile().getPath();
                 try {
-                    if (type == null) {
+                    if (type.isPresent()) {
+                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
+                    } else {
                         JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
                                 new UnknownExternalFileType("jstyle"));
-                    } else {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
                     }
                 } catch (IOException e) {
                     LOGGER.warn("Problem open style file editor", e);

@@ -215,7 +215,7 @@ public class PdfImporter {
         List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
-                ExternalFileTypes.getInstance().getExternalFileTypeByName("pdf")));
+                ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
         entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
         res.add(entry);
 

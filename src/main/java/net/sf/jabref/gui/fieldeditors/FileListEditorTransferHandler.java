@@ -24,9 +24,8 @@ import java.awt.dnd.DnDConstants;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
@@ -38,7 +37,6 @@ import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.groups.EntryTableTransferHandler;
 
@@ -94,10 +92,10 @@ class FileListEditorTransferHandler extends TransferHandler {
 
         try {
 
-            List<File> files = null;
+            List<File> files = new ArrayList<>();
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                files.addAll((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor));
             }
 
             if (t.isDataFlavorSupported(urlFlavor)) {
@@ -109,35 +107,27 @@ class FileListEditorTransferHandler extends TransferHandler {
             // under Gnome. The data consists of the file paths, one file per line:
             if (t.isDataFlavorSupported(stringFlavor)) {
                 String dropStr = (String) t.getTransferData(stringFlavor);
-                files = EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr);
+                files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
             }
 
-            if (files != null) {
-                final List<File> theFiles = files;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        for (File file : theFiles) {
-                            // Find the file's extension, if any:
-                            String name = file.getAbsolutePath();
-                            Optional<String> extension = FileUtil.getFileExtension(name);
-                            ExternalFileType fileType = null;
-                            if (extension.isPresent()) {
-                                fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
+            SwingUtilities.invokeLater((Runnable) () -> {
+                for (File file : files) {
+                    // Find the file's extension, if any:
+                    String name = file.getAbsolutePath();
+                    FileUtil.getFileExtension(name).ifPresent(extension -> {
+                        ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension).ifPresent(fileType -> {
+                            if (droppedFileHandler == null) {
+                                droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
                             }
-                            if (fileType != null) {
-                                if (droppedFileHandler == null) {
-                                    droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
-                                }
-                                droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
-                            }
-                        }
-                    }
-                });
+                            droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
+                        });
+                    });
+                }
+            });
+            if (!files.isEmpty()) {
+                // Found some files, return
                 return true;
             }
-
         } catch (IOException ioe) {
             LOGGER.warn("Failed to read dropped data. ", ioe);
         } catch (UnsupportedFlavorException | ClassCastException ufe) {

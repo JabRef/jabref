@@ -362,12 +362,12 @@ public class Util {
                         }
                         if (!alreadyHas) {
                             foundAny = true;
-                            ExternalFileType type;
+                            Optional<ExternalFileType> type;
                             Optional<String> extension = FileUtil.getFileExtension(f);
                             if (extension.isPresent()) {
                                 type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {
-                                type = new UnknownExternalFileType("");
+                                type = Optional.of(new UnknownExternalFileType(""));
                             }
                             FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);

@@ -297,13 +297,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.COPY, (BaseAction) () -> {
             List<BibEntry> bes = mainTable.getSelectedEntries();
 
-            if ((bes != null) && (!bes.isEmpty())) {
-                TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
-                // ! look at ClipBoardManager
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trbe, BasePanel.this);
-                output(formatOutputMessage(Localization.lang("Copied"), bes.size()));
-            } else {
+            if (bes.isEmpty()) {
                 // The user maybe selected a single cell.
+                // TODO: Check if this can actually happen
                 int[] rows = mainTable.getSelectedRows();
                 int[] cols = mainTable.getSelectedColumns();
                 if ((cols.length == 1) && (rows.length == 1)) {
@@ -316,26 +312,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         output(Localization.lang("Copied cell contents") + '.');
                     }
                 }
+            } else {
+                TransferableBibtexEntry trbe = new TransferableBibtexEntry(bes);
+                // ! look at ClipBoardManager
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trbe, BasePanel.this);
+                output(formatOutputMessage(Localization.lang("Copied"), bes.size()));
             }
         });
 
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
             List<BibEntry> bes = mainTable.getSelectedEntries();
-            //int row0 = mainTable.getSelectedRow();
-            if ((bes != null) && (!bes.isEmpty())) {
+            if (!bes.isEmpty()) {
                 // Create a CompoundEdit to make the action undoable.
                 NamedCompound ce = new NamedCompound(
-                        (bes.size() > 1 ?
-                    Localization.lang("cut entries") :
-                    Localization.lang("cut entry")));
+                        (bes.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
                 // Loop through the list of entries, and delete them.
                 for (BibEntry be : bes) {
                     ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
                     database.removeEntry(be);
                     ensureNotShowing(be);
                 }
-                //entryTable.clearSelection();
                 frame.output(formatOutputMessage(Localization.lang("Cut"), bes.size()));
                 ce.end();
                 undoManager.addEdit(ce);
@@ -348,15 +345,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.DELETE, (BaseAction) () -> {
             List<BibEntry> bes = mainTable.getSelectedEntries();
-            if ((bes != null) && (!bes.isEmpty())) {
-
-                boolean goOn = showDeleteConfirmationDialog(bes.size());
-                if (goOn) {
+            if (!bes.isEmpty()) {
+                if (showDeleteConfirmationDialog(bes.size())) {
                     // Create a CompoundEdit to make the action undoable.
                     NamedCompound ce = new NamedCompound(
-                            (bes.size() > 1 ?
-                        Localization.lang("delete entries") :
-                        Localization.lang("delete entry")));
+                            (bes.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
                     // Loop through the list of entries, and delete them.
                     for (BibEntry be : bes) {
                         ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
@@ -368,7 +361,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     ce.end();
                     undoManager.addEdit(ce);
                 }
-
                 //no entry is selected anymore, thus hide the preview panel
                 hideBottomComponent();
             }
@@ -719,7 +711,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> {
             List<BibEntry> bes = mainTable.getSelectedEntries();
-            if ((bes != null) && (!bes.isEmpty())) {
+            if (!bes.isEmpty()) {
                 storeCurrentEdit();
                 List<String> keys = new ArrayList<>(bes.size());
                 // Collect all non-null keys.
@@ -738,9 +730,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 if (keys.size() == bes.size()) {
                     // All entries had keys.
-                    output((bes.size() > 1 ?
-                        Localization.lang("Copied keys") :
-                        Localization.lang("Copied key")) + '.');
+                    output((bes.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
                 } else {
                     output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                             Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
@@ -751,7 +741,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying a cite for the selected entry.
         actions.put(Actions.COPY_CITE_KEY, (BaseAction) () -> {
             List<BibEntry> bes = mainTable.getSelectedEntries();
-            if ((bes != null) && (!bes.isEmpty())) {
+            if (!bes.isEmpty()) {
                 storeCurrentEdit();
                 List<String> keys = new ArrayList<>(bes.size());
                 // Collect all non-null keys.
@@ -782,7 +772,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> {
             List<BibEntry> bes = mainTable.getSelectedEntries();
-            if ((bes != null) && (!bes.isEmpty())) {
+            if (!bes.isEmpty()) {
                 storeCurrentEdit();
 
                 // OK: in a future version, this string should be configurable to allow arbitrary exports
@@ -853,14 +843,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 FileListEntry flEntry = tableModel.getEntry(0);
                 ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                        flEntry.type.getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
+                    flEntry.type.get().getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
                 item.openLink();
         }));
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
             JabRefExecutorService.INSTANCE.execute(() -> {
-                final List<BibEntry> bes = mainTable.getSelectedEntries();
-                final List<File> files = FileUtil.getListOfLinkedFiles(bes,
+                final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
                         bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
                 for (final File f : files) {
                     try {
@@ -2126,7 +2115,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
             String field = DOI_FIELD;
-            if ((bes != null) && (bes.size() == 1)) {
+            if (bes.size() == 1) {
                 Object link = bes.get(0).getField(DOI_FIELD);
                 if (bes.get(0).hasField(URL_FIELD)) {
                     link = bes.get(0).getField(URL_FIELD);
@@ -2140,9 +2129,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
-                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.getName())
-                                || PS_FIELD.equalsIgnoreCase(flEntry.type.getName())
-                                || PDF_FIELD.equalsIgnoreCase(flEntry.type.getName())) {
+                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
+                                || PS_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
+                                || PDF_FIELD.equalsIgnoreCase(flEntry.type.get().getName())) {
                             entry = flEntry;
                             break;
                         }
@@ -2529,11 +2518,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     final String filepath = res.get(0).getPath();
                     final Optional<String> extension = FileUtil.getFileExtension(filepath);
                     if (extension.isPresent()) {
-                        ExternalFileType type = ExternalFileTypes.getInstance()
+                        Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
                                 .getExternalFileTypeByExt(extension.get());
-                        if (type != null) {
+                        if (type.isPresent()) {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext().getMetaData(), filepath, type);
+                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext().getMetaData(),
+                                        filepath, type);
                                 basePanel.output(Localization.lang("External viewer called") + '.');
                                 return Optional.of(filepath);
                             } catch (IOException ex) {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import net.sf.jabref.external.ExternalFileType;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class represents a file link for a Bibtex entry.
@@ -26,16 +27,22 @@ public class FileListEntry {
 
     public String description;
     public String link;
-    public ExternalFileType type;
+    public Optional<ExternalFileType> type;
 
     public FileListEntry(String description, String link) {
-        this(description, link, null);
+        this(description, link, Optional.empty());
     }
 
     public FileListEntry(String description, String link, ExternalFileType type) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
-        this.type = type; // may be null
+        this.type = Optional.of(Objects.requireNonNull(type));
+    }
+
+    public FileListEntry(String description, String link, Optional<ExternalFileType> type) {
+        this.description = Objects.requireNonNull(description);
+        this.link = Objects.requireNonNull(link);
+        this.type = Objects.requireNonNull(type);
     }
 
     public String[] getStringArrayRepresentation() {
@@ -43,11 +50,11 @@ public class FileListEntry {
     }
 
     private String getTypeName() {
-        return this.type == null ? "" : this.type.getName();
+        return this.type.isPresent() ? this.type.get().getName() : "";
     }
 
     @Override
     public String toString() {
-        return description + " : " + link + " : " + type;
+        return description + " : " + link + " : " + type.orElse(null);
     }
 }

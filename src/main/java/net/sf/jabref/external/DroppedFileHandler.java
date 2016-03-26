@@ -125,8 +125,6 @@ public class DroppedFileHandler {
     /**
      * @param fileName  The name of the dragged file.
      * @param fileType  The FileType associated with the file.
-     * @param localFile Indicate whether this is a local file, or a remote file copied
-     *                  to a local temporary file.
      * @param entry     The target entry for the drop.
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, BibEntry entry) {
@@ -179,8 +177,14 @@ public class DroppedFileHandler {
     }
 
     public void linkPdfToEntry(String fileName, BibEntry entry) {
-        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+        Optional<ExternalFileType> optFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
+        if (!optFileType.isPresent()) {
+            LOGGER.warn("No file type with extension 'pdf' registered.");
+            return;
+        }
+
+        ExternalFileType fileType = optFileType.get();
         // Show dialog
         if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
             return;

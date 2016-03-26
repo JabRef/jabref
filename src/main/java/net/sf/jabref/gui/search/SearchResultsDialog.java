@@ -392,7 +392,7 @@ public class SearchResultsDialog {
                         description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.getIcon(), p.getBibDatabaseContext().getMetaData(),
+                            flEntry.link, flEntry.type.get().getIcon(), p.getBibDatabaseContext().getMetaData(),
                             flEntry.type));
                     count++;
                 }
@@ -457,10 +457,10 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            if (tmpModel.getEntry(0).type == null) {
-                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            if (tmpModel.getEntry(0).type.isPresent()) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.get().getIcon());
                             } else {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
                             }
                         }
                         return fileLabel;

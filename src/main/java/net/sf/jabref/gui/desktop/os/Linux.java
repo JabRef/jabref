@@ -7,17 +7,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 
 public class Linux implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
         String viewer;
 
-        if (type == null || type.getOpenWithApplication().isEmpty()) {
-            viewer = "xdg-open";
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            viewer = type.get().getOpenWithApplication();
         } else {
-            viewer = type.getOpenWithApplication();
+            viewer = "xdg-open";
         }
         String[] cmdArray = { viewer, filePath };
         Runtime.getRuntime().exec(cmdArray);

@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.swing.*;
 
@@ -43,7 +44,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     private final BibEntry entry;
     private final String link;
     private final MetaData metaData;
-    private ExternalFileType fileType;
+    private Optional<ExternalFileType> fileType;
     private final JabRefFrame frame;
     private String fieldName;
 
@@ -51,7 +52,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
             String link, Icon icon,
             MetaData metaData,
-            ExternalFileType fileType) {
+            Optional<ExternalFileType> fileType) {
         super(name, icon);
         this.frame = frame;
         this.entry = entry;
@@ -63,7 +64,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
     public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
             String link, Icon icon, MetaData metaData, String fieldName) {
-        this(frame, entry, name, link, icon, metaData, (ExternalFileType) null);
+        this(frame, entry, name, link, icon, metaData, Optional.empty());
         this.fieldName = fieldName;
     }
 
@@ -78,8 +79,8 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
     public boolean openLink() {
         frame.output(Localization.lang("External viewer called") + ".");
         try {
-            ExternalFileType type = fileType;
-            if (this.fileType == null) {
+            Optional<ExternalFileType> type = fileType;
+            if (!this.fileType.isPresent()) {
                 if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
                     File file = new File(link);
@@ -97,9 +98,9 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 }
             }
 
-            if (type instanceof UnknownExternalFileType) {
+            if (type.isPresent() && (type.get() instanceof UnknownExternalFileType)) {
                 return JabRefDesktop.openExternalFileUnknown(frame, entry, metaData, link,
-                        (UnknownExternalFileType) type);
+                        (UnknownExternalFileType) type.get());
             } else {
                 return JabRefDesktop.openExternalFileAnyFormat(metaData, link, type);
             }
@@ -109,12 +110,12 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             // link with. We check if the file type is set, and if the file type has a non-empty
             // application link. If that link is referred by the error message, we can assume
             // that the problem is in the open-with-application setting:
-            if ((fileType != null) && !fileType.getOpenWithApplication().isEmpty() &&
-                    e1.getMessage().contains(fileType.getOpenWithApplication())) {
+            if ((fileType.isPresent()) && (!fileType.get().getOpenWithApplication().isEmpty())
+                    && e1.getMessage().contains(fileType.get().getOpenWithApplication())) {
 
                 JOptionPane.showMessageDialog(frame, Localization.lang("Unable to open link. "
                                         + "The application '%0' associated with the file type '%1' could not be called.",
-                                fileType.getOpenWithApplication(), fileType.getName()),
+                        fileType.get().getOpenWithApplication(), fileType.get().getName()),
                         Localization.lang("Could not open link"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }

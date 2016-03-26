@@ -870,7 +870,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.getBibDatabaseContext().getMetaData(), fl.type))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
+                                panel.getBibDatabaseContext().getMetaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -928,8 +929,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.link;
                 }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
+                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
+                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1193,7 +1194,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            FileListEntry flEntry = new FileListEntry("", "", null);
+            FileListEntry flEntry = new FileListEntry("", "");
             FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true,
                     metaData);
             editor.setVisible(true, true);
@@ -1360,7 +1361,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         model.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if (model.getRowCount() > 0) {
-                            fileLabel.setIcon(model.getEntry(0).type.getIcon());
+                            fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
                         }
                         return fileLabel;
                     } else {

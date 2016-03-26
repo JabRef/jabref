@@ -28,7 +28,7 @@ public class AttachFileAction implements BaseAction {
             return; // TODO: display error message?
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        FileListEntry flEntry = new FileListEntry("", "", null);
+        FileListEntry flEntry = new FileListEntry("", "");
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
                 panel.getBibDatabaseContext().getMetaData());
         editor.setVisible(true, true);
