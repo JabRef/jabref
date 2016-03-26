@@ -497,8 +497,9 @@ class StyleSelectDialog {
     private void displayDefaultStyle(boolean authoryear) {
         try {
             // Read the contents of the default style file:
-            URL defPath = authoryear ? JabRef.class.getResource(OpenOfficePanel.DEFAULT_AUTHORYEAR_STYLE_PATH) :
-                JabRef.class.getResource(OpenOfficePanel.DEFAULT_NUMERICAL_STYLE_PATH);
+            URL defPath = authoryear ? JabRef.class
+                    .getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH) : JabRef.class
+                            .getResource(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
             BufferedReader r = new BufferedReader(new InputStreamReader(defPath.openStream(), StandardCharsets.UTF_8));
             String line;
             StringBuilder sb = new StringBuilder();

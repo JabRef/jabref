@@ -1,6 +1,7 @@
 package net.sf.jabref.openoffice;
 
 import java.io.File;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -98,5 +99,13 @@ public class OpenOfficePreferences {
 
     public void setShowPanel(boolean show) {
         Globals.prefs.putBoolean(JabRefPreferences.OO_SHOW_PANEL, show);
+    }
+
+    public List<String> getExternalStyleFiles() {
+        return Globals.prefs.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES);
+    }
+
+    public void setExternalStyleFiles(List<String> filenames) {
+        Globals.prefs.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, filenames);
     }
 }

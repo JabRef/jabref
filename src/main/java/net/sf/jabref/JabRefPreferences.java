@@ -367,6 +367,7 @@ public class JabRefPreferences {
     public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
     public static final String OO_DIRECT_FILE = "ooDirectFile";
     public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
+    public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
 
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";

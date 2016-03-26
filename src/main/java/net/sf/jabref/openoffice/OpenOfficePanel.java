@@ -59,9 +59,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
-    public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
-
     private OOPanel comp;
     private JDialog diag;
     private final JButton connect;
@@ -90,6 +87,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private String sOffice;
     private IOException connectException;
     private final OpenOfficePreferences preferences;
+    private final StyleLoader loader;
 
     private static OpenOfficePanel instance;
 
@@ -108,7 +106,7 @@ public class OpenOfficePanel extends AbstractWorker {
         preferences = new OpenOfficePreferences(Globals.prefs);
         preferences.putDefaultPreferences();
         styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
-
+        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository());
     }
 
     public static OpenOfficePanel getInstance() {
@@ -175,7 +173,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 useDefaultNumericalStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE);
                 styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
                 try {
-                    readStyleFile();
+                    style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not read style file", ex);
                 }
@@ -200,7 +198,7 @@ public class OpenOfficePanel extends AbstractWorker {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (style == null) {
-                        readStyleFile();
+                        style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
                     } else {
                         style.ensureUpToDate();
                     }
@@ -428,20 +426,6 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    /**
-     * Read the style file. Record the last modified time of the file.
-     * @throws Exception
-     */
-    private void readStyleFile() throws IOException {
-        if (useDefaultAuthoryearStyle) {
-            style = new OOBibStyle(DEFAULT_AUTHORYEAR_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
-        } else if (useDefaultNumericalStyle) {
-            style = new OOBibStyle(DEFAULT_NUMERICAL_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
-        } else {
-            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository(),
-                    Globals.prefs.getDefaultEncoding());
-        }
-    }
 
 
     // The methods addFile and associated final Class[] parameters were gratefully copied from
@@ -570,7 +554,7 @@ public class OpenOfficePanel extends AbstractWorker {
             if (!entries.isEmpty()) {
                 try {
                     if (style == null) {
-                        readStyleFile();
+                        style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
                             preferences.syncWhenCiting());
