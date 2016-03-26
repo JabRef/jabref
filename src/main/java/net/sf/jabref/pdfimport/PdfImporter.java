@@ -45,7 +45,6 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.model.entry.IdGenerator;

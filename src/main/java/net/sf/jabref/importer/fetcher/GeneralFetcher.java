@@ -23,7 +23,6 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 
@@ -283,7 +282,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void componentClosing() {
         super.componentClosing();
-        frame.fetcherToggle.setSelected(false);
+        frame.setFetcherToggle(false);
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 

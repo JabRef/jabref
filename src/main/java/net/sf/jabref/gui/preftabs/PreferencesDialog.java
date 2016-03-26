@@ -260,7 +260,7 @@ public class PreferencesDialog extends JDialog {
             MainTable.updateRenderers();
             GUIGlobals.updateEntryEditorColors();
             frame.setupAllTables();
-            frame.groupSelector.revalidateGroups(); // icons may have
+            frame.getGroupSelector().revalidateGroups(); // icons may have
             // changed
             frame.output(Localization.lang("Preferences recorded."));
         }

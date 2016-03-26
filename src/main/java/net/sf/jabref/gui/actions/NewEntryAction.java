@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;

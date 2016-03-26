@@ -1,9 +1,6 @@
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Locale;
