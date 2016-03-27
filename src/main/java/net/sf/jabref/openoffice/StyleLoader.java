@@ -3,6 +3,7 @@ package net.sf.jabref.openoffice;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 public class StyleLoader {
@@ -20,41 +20,27 @@ public class StyleLoader {
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
 
-    private final JournalAbbreviationRepository repository;
-    private final OpenOfficePreferences preferences;
-
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
+
+    private final JournalAbbreviationRepository repository;
+    private final OpenOfficePreferences preferences;
+    private final Charset encoding;
 
     private final List<OOBibStyle> internalStyles = new ArrayList<>();
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
 
-    public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository) {
+    public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository, Charset encoding) {
         this.repository = repository;
         this.preferences = preferences;
+        this.encoding = encoding;
         update();
     }
 
-    /**
-     * Read the style file. Record the last modified time of the file.
-     * @throws Exception
-     */
-    public OOBibStyle readStyleFile(boolean useDefaultAuthoryearStyle, boolean useDefaultNumericalStyle,
-            String styleFile) throws IOException {
-        if (useDefaultAuthoryearStyle) {
-            return new OOBibStyle(DEFAULT_AUTHORYEAR_STYLE_PATH, repository);
-        } else if (useDefaultNumericalStyle) {
-            return new OOBibStyle(DEFAULT_NUMERICAL_STYLE_PATH, repository);
-        } else {
-            return new OOBibStyle(new File(styleFile), repository,
-                    Globals.prefs.getDefaultEncoding());
-        }
-    }
-
     public void update() {
-        readInternalStyleFiles();
-        readExternalStyleFiles();
+        loadInternalStyles();
+        loadExternalStyles();
     }
 
     public List<OOBibStyle> getStyles() {
@@ -63,14 +49,14 @@ public class StyleLoader {
         return result;
     }
 
-    public void addStyleFile(String filename) {
+    public void addStyle(String filename) {
         try {
-            OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, Globals.prefs.getDefaultEncoding());
+            OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
             } else {
                 externalStyles.add(newStyle);
-                storeExternalStyleFiles();
+                storeExternalStyles();
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
@@ -81,13 +67,13 @@ public class StyleLoader {
 
     }
 
-    private void readExternalStyleFiles() {
+    private void loadExternalStyles() {
         externalStyles.clear();
         // Read external lists
-        List<String> lists = preferences.getExternalStyleFiles();
+        List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                externalStyles.add(new OOBibStyle(new File(filename), repository, Globals.prefs.getDefaultEncoding()));
+                externalStyles.add(new OOBibStyle(new File(filename), repository, encoding));
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find external style file " + filename, e);
@@ -97,7 +83,7 @@ public class StyleLoader {
         }
     }
 
-    private void readInternalStyleFiles() {
+    private void loadInternalStyles() {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
@@ -108,22 +94,25 @@ public class StyleLoader {
         }
     }
 
-    private void storeExternalStyleFiles() {
+    private void storeExternalStyles() {
         List<String> filenames = new ArrayList<>(externalStyles.size());
         for (OOBibStyle style : externalStyles) {
             filenames.add(style.getFile().getPath());
         }
-        preferences.setExternalStyleFiles(filenames);
+        preferences.setExternalStyles(filenames);
     }
 
-    public boolean removeStyleFile(OOBibStyle style) {
-        boolean result = externalStyles.remove(style);
-        storeExternalStyleFiles();
-        return result;
+    public boolean removeStyle(OOBibStyle style) {
+        if (!style.isFromResource()) {
+            boolean result = externalStyles.remove(style);
+            storeExternalStyles();
+            return result;
+        }
+        return false;
     }
 
     public OOBibStyle getUsedStyle() {
-        String filename = preferences.getUsedStyleFile();
+        String filename = preferences.getCurrentStyle();
         if (filename != null) {
             for (OOBibStyle style : getStyles()) {
                 if (filename.equals(style.getPath())) {
@@ -132,7 +121,7 @@ public class StyleLoader {
             }
         }
         // Pick the first internal
-        preferences.setUsedStyleFile(internalStyles.get(0).getPath());
+        preferences.setCurrentStyle(internalStyles.get(0).getPath());
         return internalStyles.get(0);
     }
 }

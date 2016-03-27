@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -92,6 +93,7 @@ class StyleSelectDialog {
     private final JPopupMenu popup = new JPopupMenu();
     private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
+    private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
@@ -112,7 +114,8 @@ class StyleSelectDialog {
 
         this.frame = frame;
         this.preferences = preferences;
-        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository());
+        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
+                Globals.prefs.getDefaultEncoding());
         setupPrevEntry();
         init();
 
@@ -123,6 +126,7 @@ class StyleSelectDialog {
 
         popup.add(edit);
         popup.add(show);
+        popup.add(remove);
 
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
@@ -149,25 +153,25 @@ class StyleSelectDialog {
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
             addDialog.setVisible(true);
-            addDialog.getFileName().ifPresent(loader::addStyleFile);
+            addDialog.getFileName().ifPresent(loader::addStyle);
             updateStyles();
         });
         addButton.setToolTipText(Localization.lang("Add style file"));
 
-        removeButton.addActionListener(actionEvent -> {
-            getSelectedStyle().ifPresent(style -> {
-                if (JOptionPane.showConfirmDialog(diag,
-                        Localization.lang("Are you sure you want to remove the style file?"),
-                        Localization.lang("Remove style file"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    if (!loader.removeStyleFile(style)) {
-                        LOGGER.info("Problem removing style file");
+        ActionListener removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
+            if (!style.isFromResource()) {
+                if (JOptionPane.showConfirmDialog(diag, Localization.lang("Are you sure you want to remove the style?"),
+                        Localization.lang("Remove style"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (!loader.removeStyle(style)) {
+                        LOGGER.info("Problem removing style");
                     }
                     updateStyles();
                 }
-
-            });
+            }
         });
-        removeButton.setToolTipText(Localization.lang("Remove style file"));
+        remove.addActionListener(removeAction);
+        removeButton.addActionListener(removeAction);
+        removeButton.setToolTipText(Localization.lang("Remove style"));
 
         diag = new JDialog(frame, Localization.lang("Styles"), true);
 
@@ -213,7 +217,8 @@ class StyleSelectDialog {
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
                 "pref, 4dlu, 100dlu:grow, 4dlu, pref, 4dlu, fill:100dlu"));
-        builder.add(Localization.lang("Select one of the available style files")).xyw(1, 1, 5);
+        builder.add(Localization.lang("Select one of the available styles or add a style file from disk.")).xyw(1, 1,
+                5);
         builder.add(new JScrollPane(table)).xyw(1, 3, 5);
         builder.add(addButton).xy(3, 5);
         builder.add(removeButton).xy(5, 5);
@@ -292,7 +297,7 @@ class StyleSelectDialog {
      * the first style is selected provided there are >0 styles.
      */
     private void selectLastUsed() {
-        String usedStyleFile = preferences.getUsedStyleFile();
+        String usedStyleFile = preferences.getCurrentStyle();
         // Set the initial selection of the table:
         if (usedStyleFile == null) {
             if (table.getRowCount() > 0) {
@@ -314,7 +319,7 @@ class StyleSelectDialog {
     }
 
     private void storeSettings() {
-        getSelectedStyle().ifPresent(style -> preferences.setUsedStyleFile(style.getPath()));
+        getSelectedStyle().ifPresent(style -> preferences.setCurrentStyle(style.getPath()));
     }
 
     public Optional<OOBibStyle> getStyle() {
@@ -376,7 +381,7 @@ class StyleSelectDialog {
             case 1:
                 return String.join(", ", style.getJournals());
             case 2:
-                return style.isFromResource() ? Localization.lang("Internal style file") : style.getFile().getName();
+                return style.isFromResource() ? Localization.lang("Internal style") : style.getFile().getName();
             default:
                 return "";
             }
@@ -391,8 +396,10 @@ class StyleSelectDialog {
     private void tablePopup(MouseEvent e) {
         getSelectedStyle().ifPresent(style -> {
             if (style.isFromResource()) {
+                remove.setEnabled(false);
                 edit.setEnabled(false);
             } else {
+                remove.setEnabled(true);
                 edit.setEnabled(true);
             }
             popup.show(e.getComponent(), e.getX(), e.getY());

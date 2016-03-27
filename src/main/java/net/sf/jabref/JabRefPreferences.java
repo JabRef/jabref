@@ -362,11 +362,6 @@ public class JabRefPreferences {
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
-    public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
-    public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
-    public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
-    public static final String OO_DIRECT_FILE = "ooDirectFile";
-    public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
 
     //non-default preferences

@@ -3,7 +3,6 @@ package net.sf.jabref.openoffice;
 import java.io.File;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -39,11 +38,6 @@ public class OpenOfficePreferences {
         preferences.putDefaultValue(JabRefPreferences.OO_SYNC_WHEN_CITING, false);
         preferences.putDefaultValue(JabRefPreferences.OO_SHOW_PANEL, false);
         preferences.putDefaultValue(JabRefPreferences.OO_USE_ALL_OPEN_BASES, true);
-        preferences.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE, true);
-        preferences.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE, false);
-        preferences.putDefaultValue(JabRefPreferences.OO_CHOOSE_STYLE_DIRECTLY, false);
-        preferences.putDefaultValue(JabRefPreferences.OO_DIRECT_FILE, "");
-        preferences.putDefaultValue(JabRefPreferences.OO_STYLE_DIRECTORY, "");
     }
 
     public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {
@@ -86,34 +80,34 @@ public class OpenOfficePreferences {
     }
 
     public boolean syncWhenCiting() {
-        return Globals.prefs.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING);
+        return preferences.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING);
     }
 
     public void setSyncWhenCiting(boolean sync) {
-        Globals.prefs.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, sync);
+        preferences.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, sync);
     }
 
     public boolean showPanel() {
-        return Globals.prefs.getBoolean(JabRefPreferences.OO_SHOW_PANEL);
+        return preferences.getBoolean(JabRefPreferences.OO_SHOW_PANEL);
     }
 
     public void setShowPanel(boolean show) {
-        Globals.prefs.putBoolean(JabRefPreferences.OO_SHOW_PANEL, show);
+        preferences.putBoolean(JabRefPreferences.OO_SHOW_PANEL, show);
     }
 
-    public List<String> getExternalStyleFiles() {
-        return Globals.prefs.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES);
+    public List<String> getExternalStyles() {
+        return preferences.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES);
     }
 
-    public void setExternalStyleFiles(List<String> filenames) {
-        Globals.prefs.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, filenames);
+    public void setExternalStyles(List<String> filenames) {
+        preferences.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, filenames);
     }
 
-    public String getUsedStyleFile() {
-        return Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
+    public String getCurrentStyle() {
+        return preferences.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
     }
 
-    public void setUsedStyleFile(String path) {
-        Globals.prefs.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
+    public void setCurrentStyle(String path) {
+        preferences.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
     }
 }

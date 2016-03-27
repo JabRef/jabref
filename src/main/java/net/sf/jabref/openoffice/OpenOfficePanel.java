@@ -78,9 +78,6 @@ public class OpenOfficePanel extends AbstractWorker {
     private JabRefFrame frame;
     private SidePaneManager manager;
     private OOBibStyle style;
-    private boolean useDefaultAuthoryearStyle;
-    private boolean useDefaultNumericalStyle;
-    private OldStyleSelectDialog oldStyleDialog;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
     private boolean autoDetected;
@@ -105,7 +102,8 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setToolTipText(Localization.lang("Sync OO bibliography"));
         preferences = new OpenOfficePreferences(Globals.prefs);
         preferences.putDefaultPreferences();
-        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository());
+        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
+                Globals.prefs.getDefaultEncoding());
     }
 
     public static OpenOfficePanel getInstance() {
@@ -139,9 +137,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void initPanel() {
 
-        useDefaultAuthoryearStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE);
-        useDefaultNumericalStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE);
-
         connect.addActionListener(e -> connect(true));
         manualConnect.addActionListener(e -> connect(false));
 
@@ -169,7 +164,7 @@ public class OpenOfficePanel extends AbstractWorker {
             styleDialog.setVisible(true);
             styleDialog.getStyle().ifPresent(selectedStyle -> {
                 style = selectedStyle;
-                frame.setStatus(Localization.lang("Selected style file '%0'", style.getName()));
+                frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
             });
 
         });
@@ -316,7 +311,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private void connect(boolean auto) {
         String ooBaseDirectory;
         if (auto) {
-            AutoDetectPaths adp = new AutoDetectPaths(diag);
+            AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
             if (adp.runAutodetection()) {
                 autoDetected = true;
                 dialogOkPressed = true;
@@ -369,7 +364,8 @@ public class OpenOfficePanel extends AbstractWorker {
             addURL(jarList);
 
             // Show progress dialog:
-            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Localization.lang("Connecting"),
+            final JDialog progDiag = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
+                    Localization.lang("Connecting"),
                     Localization.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();

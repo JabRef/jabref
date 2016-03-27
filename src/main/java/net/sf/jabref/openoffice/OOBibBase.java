@@ -267,6 +267,7 @@ class OOBibBase {
      *   This is not relevant if numbered citations are used.
      * @param withText Indicates whether this should be a normal citation (true) or an empty
      *   (invisible) citation (false).
+     * @param sync Indicates whether the reference list should be refreshed.
      * @throws Exception
      */
     public void insertEntry(List<BibEntry> entries, BibDatabase database,
@@ -488,8 +489,7 @@ class OOBibBase {
                         citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         for (int j = 0; j < keys.length; j++) {
                             normCitMarker[j] = style.getNumCitationMarker(Collections.singletonList(num.get(j)),
-                                    minGroupingCount,
-                                    false);
+                                    minGroupingCount, false);
                         }
                     } else {
                         // We need to find the number of the cited entry in the bibliography,

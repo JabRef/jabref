@@ -1,32 +1,11 @@
 package net.sf.jabref.openoffice;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 public class OpenOfficeFileSearch {
-
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficeFileSearch.class);
-
-    private static final String STYLE_FILE_EXTENSION = ".jstyle";
-
-    private final JournalAbbreviationRepository repository;
-
-
-    public OpenOfficeFileSearch(JournalAbbreviationRepository repository) {
-        Objects.requireNonNull(repository);
-        this.repository = repository;
-    }
 
     /**
      * Search for Program files directory.
@@ -59,58 +38,4 @@ public class OpenOfficeFileSearch {
         }
         return dirList;
     }
-
-    /**
-     * If the string dir indicates a file, parse it and add it to the list of styles if
-     * successful. If the string dir indicates a directory, parse all files looking like
-     * style files, and add them. The parameter recurse determines whether we should
-     * recurse into subdirectories.
-     * @param dir the directory or file to handle.
-     * @param encoding
-     * @param styles List that will be filled with the found styles
-     */
-    public void addStyles(String dir, Charset encoding, List<OOBibStyle> styles) {
-        File dirF = new File(dir);
-        if (dirF.isDirectory()) {
-            File[] fileArray = dirF.listFiles();
-            List<File> files;
-            if (fileArray == null) {
-                files = Collections.emptyList();
-            } else {
-                files = Arrays.asList(fileArray);
-            }
-            for (File file : files) {
-                // If the file looks like a style file, parse it:
-                if (!file.isDirectory() && (file.getName().endsWith(STYLE_FILE_EXTENSION))) {
-                    addSingleFile(file, encoding, styles);
-                } else if (file.isDirectory()) {
-                    // If the file is a directory, and we should recurse, do:
-                    addStyles(file.getPath(), encoding, styles);
-                }
-            }
-        } else {
-            // The file wasn't a directory, so we simply parse it:
-            addSingleFile(dirF, encoding, styles);
-        }
-    }
-
-    /**
-     * Parse a single file, and add it to the list of styles if parse was successful.
-     * @param file the file to parse.
-     * @param encoding the encoding of the style file
-     * @param styles the list to add the style to
-     */
-    private void addSingleFile(File file, Charset encoding, List<OOBibStyle> styles) {
-        try {
-            OOBibStyle style = new OOBibStyle(file, repository, encoding);
-            // Check if the parse was successful before adding it:
-            if (style.isValid() && !styles.contains(style)) {
-                styles.add(style);
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Unable to read style file: '" + file.getPath() + "'", e);
-        }
-    }
-
-
 }

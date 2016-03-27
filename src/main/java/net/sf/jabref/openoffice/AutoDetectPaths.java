@@ -53,9 +53,9 @@ public class AutoDetectPaths extends AbstractWorker {
     private final JDialog parent;
 
 
-    public AutoDetectPaths(JDialog parent) {
+    public AutoDetectPaths(JDialog parent, OpenOfficePreferences preferences) {
         this.parent = parent;
-        preferences = new OpenOfficePreferences(Globals.prefs);
+        this.preferences = preferences;
     }
 
     public boolean runAutodetection() {
@@ -96,8 +96,7 @@ public class AutoDetectPaths extends AbstractWorker {
     private boolean autoDetectPaths() {
 
         if (OS.WINDOWS) {
-            List<File> progFiles = new OpenOfficeFileSearch(Globals.journalAbbreviationLoader.getRepository())
-                    .findWindowsProgramFilesDir();
+            List<File> progFiles = new OpenOfficeFileSearch().findWindowsProgramFilesDir();
             File sOffice = null;
             List<File> sofficeFiles = new ArrayList<>();
             for (File dir : progFiles) {
