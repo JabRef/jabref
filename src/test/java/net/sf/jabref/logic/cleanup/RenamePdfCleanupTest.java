@@ -1,10 +1,12 @@
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -32,16 +34,16 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(
                 Collections.singletonList(testFolder.getRoot().getAbsolutePath()), false,
-                null, mock(JournalAbbreviationRepository.class));
+                new BibDatabaseContext(), mock(JournalAbbreviationRepository.class));
 
         File tempFile = testFolder.newFile("toot.tmp");
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "Toot");
-        FileField.ParsedFileField fileField = new FileField.ParsedFileField("", tempFile.getAbsolutePath(), "");
+        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         cleanup.cleanup(entry);
-        FileField.ParsedFileField newFileField = new FileField.ParsedFileField("", "Toot.tmp", "");
+        ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
         assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
     }
 }

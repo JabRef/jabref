@@ -5,6 +5,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import java.io.File;
 import java.util.*;
@@ -118,11 +119,11 @@ public class IntegrityCheck {
                 return Collections.emptyList();
             }
 
-            List<FileField.ParsedFileField> parsedFileFields = FileField.parse(value.get()).stream()
+            List<ParsedFileField> parsedFileFields = FileField.parse(value.get()).stream()
                     .filter(p -> !(p.link.startsWith("http://") || p.link.startsWith("https://")))
                     .collect(Collectors.toList());
 
-            for (FileField.ParsedFileField p : parsedFileFields) {
+            for (ParsedFileField p : parsedFileFields) {
                 Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.link);
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(

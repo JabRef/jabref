@@ -52,7 +52,7 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.TypedBibEntry;
+import net.sf.jabref.logic.TypedBibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

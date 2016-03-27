@@ -14,46 +14,28 @@
 
 package net.sf.jabref.logic.cleanup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public class CleanupWorker {
 
-    private final CleanupPreset preset;
     private final List<String> paths;
-    private final BibDatabase database;
+    private final BibDatabaseContext databaseContext;
     private final JournalAbbreviationRepository repository;
     private int unsuccessfulRenames;
 
-
-    /**
-     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
-     */
-    CleanupWorker(CleanupPreset preset) {
-        this(preset, Collections.emptyList());
-    }
-
-    /**
-     * This constructor is only used by CleanupWorkerTest. Therefore, the visibility is restricted.
-     */
-    CleanupWorker(CleanupPreset preset, List<String> paths) {
-        this(preset, paths, null, null);
-    }
-
-    public CleanupWorker(CleanupPreset preset, List<String> paths, BibDatabase database,
+    public CleanupWorker(List<String> paths, BibDatabaseContext databaseContext,
             JournalAbbreviationRepository repository) {
-        this.preset = Objects.requireNonNull(preset);
         this.paths = Objects.requireNonNull(paths);
-        this.database = database;
+        this.databaseContext = databaseContext;
         this.repository = repository;
     }
 
@@ -61,10 +43,11 @@ public class CleanupWorker {
         return unsuccessfulRenames;
     }
 
-    public List<FieldChange> cleanup(BibEntry entry) {
+    public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
+        Objects.requireNonNull(preset);
         Objects.requireNonNull(entry);
 
-        List<CleanupJob> jobs = determineCleanupActions();
+        List<CleanupJob> jobs = determineCleanupActions(preset);
 
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
@@ -74,7 +57,7 @@ public class CleanupWorker {
         return changes;
     }
 
-    private List<CleanupJob> determineCleanupActions() {
+    private List<CleanupJob> determineCleanupActions(CleanupPreset preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
@@ -90,10 +73,10 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(paths));
+            jobs.add(new RelativePathsCleanup(paths, databaseContext));
         }
         if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), database,
+            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), databaseContext,
                     repository);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();

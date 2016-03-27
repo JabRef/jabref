@@ -46,6 +46,7 @@ import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;

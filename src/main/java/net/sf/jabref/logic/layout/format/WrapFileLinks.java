@@ -22,6 +22,7 @@ import net.sf.jabref.model.entry.FileField;
 
 import java.util.*;
 
+import net.sf.jabref.model.entry.ParsedFileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -144,10 +145,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
         StringBuilder sb = new StringBuilder();
         // Build the list containing the links:
-        List<FileField.ParsedFileField> fileList = FileField.parse(field);
+        List<ParsedFileField> fileList = FileField.parse(field);
 
         int piv = 1; // counter for relevant iterations
-        for (FileField.ParsedFileField flEntry : fileList) {
+        for (ParsedFileField flEntry : fileList) {
             // Use this entry if we don't discriminate on types, or if the type fits:
             if ((fileType == null) || flEntry.fileType.equalsIgnoreCase(fileType)) {
 

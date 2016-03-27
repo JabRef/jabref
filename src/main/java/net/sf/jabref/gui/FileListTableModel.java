@@ -27,6 +27,7 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -130,10 +131,10 @@ public class FileListTableModel extends AbstractTableModel {
             value = "";
         }
 
-        List<FileField.ParsedFileField> fields = FileField.parse(value);
+        List<ParsedFileField> fields = FileField.parse(value);
         ArrayList<FileListEntry> files = new ArrayList<>();
 
-        for(FileField.ParsedFileField entry : fields) {
+        for(ParsedFileField entry : fields) {
             if (entry.isEmpty()) {
                 continue;
             }
@@ -172,7 +173,7 @@ public class FileListTableModel extends AbstractTableModel {
         return entry.type.get().getIconLabel();
     }
 
-    private FileListEntry decodeEntry(FileField.ParsedFileField entry, boolean deduceUnknownType) {
+    private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
 
         if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {

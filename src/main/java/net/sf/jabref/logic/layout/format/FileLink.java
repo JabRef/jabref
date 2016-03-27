@@ -21,7 +21,7 @@ import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.FileField.ParsedFileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
-import net.sf.jabref.model.entry.TypedBibEntry;
+import net.sf.jabref.logic.TypedBibEntry;
 
 public class BibEntryWriter {
 
