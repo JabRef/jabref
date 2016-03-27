@@ -73,6 +73,9 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private final boolean fromResource;
 
+    private final String path;
+
+
     enum BibStyleMode {
         NONE,
         LAYOUT,
@@ -90,6 +93,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private File styleFile;
     private final Charset encoding;
     private long styleFileModificationTime = Long.MIN_VALUE;
+    private String localCopy;
 
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
     private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
@@ -139,6 +143,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         setDefaultProperties();
         reload();
         fromResource = false;
+        path = styleFile.getPath();
     }
 
     public OOBibStyle(String resourcePath, JournalAbbreviationRepository repository)
@@ -148,6 +153,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         setDefaultProperties();
         initialize(JabRef.class.getResource(resourcePath).openStream());
         fromResource = true;
+        path = resourcePath;
     }
 
     private void setDefaultProperties() {
@@ -191,6 +197,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public String getName() {
         return name;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public File getFile() {
@@ -257,6 +267,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         while ((c = in.read()) != -1) {
             sb.append((char) c);
         }
+
+        // Store a local copy for viewing
+        localCopy = sb.toString();
+
         // Break into separate lines:
         String[] lines = sb.toString().split("\n");
         BibStyleMode mode = BibStyleMode.NONE;
@@ -843,6 +857,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public boolean isFromResource() {
         return fromResource;
+    }
+
+    public String getLocalCopy() {
+        return localCopy;
     }
 
     @Override

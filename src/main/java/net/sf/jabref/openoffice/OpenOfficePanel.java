@@ -74,13 +74,13 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction("OpenOfficeIntegration").getHelpButton();
-    private String styleFile;
     private OOBibBase ooBase;
     private JabRefFrame frame;
     private SidePaneManager manager;
     private OOBibStyle style;
     private boolean useDefaultAuthoryearStyle;
     private boolean useDefaultNumericalStyle;
+    private OldStyleSelectDialog oldStyleDialog;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
     private boolean autoDetected;
@@ -105,7 +105,6 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setToolTipText(Localization.lang("Sync OO bibliography"));
         preferences = new OpenOfficePreferences(Globals.prefs);
         preferences.putDefaultPreferences();
-        styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
         loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository());
     }
 
@@ -165,19 +164,13 @@ public class OpenOfficePanel extends AbstractWorker {
         setStyleFile.addActionListener(e -> {
 
             if (styleDialog == null) {
-                styleDialog = new StyleSelectDialog(frame, styleFile);
+                styleDialog = new StyleSelectDialog(frame, preferences);
             }
             styleDialog.setVisible(true);
-            if (styleDialog.isOkPressed()) {
-                useDefaultAuthoryearStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE);
-                useDefaultNumericalStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE);
-                styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
-                try {
-                    style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
-                } catch (IOException ex) {
-                    LOGGER.warn("Could not read style file", ex);
-                }
-            }
+            styleDialog.getStyle().ifPresent(selectedStyle -> {
+                style = selectedStyle;
+                frame.setStatus(Localization.lang("Selected style file '%0'", style.getName()));
+            });
 
         });
 
@@ -198,7 +191,7 @@ public class OpenOfficePanel extends AbstractWorker {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (style == null) {
-                        style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
+                        style = loader.getUsedStyle();
                     } else {
                         style.ensureUpToDate();
                     }
@@ -554,7 +547,7 @@ public class OpenOfficePanel extends AbstractWorker {
             if (!entries.isEmpty()) {
                 try {
                     if (style == null) {
-                        style = loader.readStyleFile(useDefaultAuthoryearStyle, useDefaultNumericalStyle, styleFile);
+                        style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
                             preferences.syncWhenCiting());

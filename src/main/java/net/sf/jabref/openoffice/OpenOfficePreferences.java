@@ -108,4 +108,12 @@ public class OpenOfficePreferences {
     public void setExternalStyleFiles(List<String> filenames) {
         Globals.prefs.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, filenames);
     }
+
+    public String getUsedStyleFile() {
+        return Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
+    }
+
+    public void setUsedStyleFile(String path) {
+        Globals.prefs.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
+    }
 }

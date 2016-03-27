@@ -33,6 +33,7 @@ public class StyleLoader {
     public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository) {
         this.repository = repository;
         this.preferences = preferences;
+        update();
     }
 
     /**
@@ -110,8 +111,28 @@ public class StyleLoader {
     private void storeExternalStyleFiles() {
         List<String> filenames = new ArrayList<>(externalStyles.size());
         for (OOBibStyle style : externalStyles) {
-            filenames.add(style.getFile().getAbsolutePath());
+            filenames.add(style.getFile().getPath());
         }
         preferences.setExternalStyleFiles(filenames);
+    }
+
+    public boolean removeStyleFile(OOBibStyle style) {
+        boolean result = externalStyles.remove(style);
+        storeExternalStyleFiles();
+        return result;
+    }
+
+    public OOBibStyle getUsedStyle() {
+        String filename = preferences.getUsedStyleFile();
+        if (filename != null) {
+            for (OOBibStyle style : getStyles()) {
+                if (filename.equals(style.getPath())) {
+                    return style;
+                }
+            }
+        }
+        // Pick the first internal
+        preferences.setUsedStyleFile(internalStyles.get(0).getPath());
+        return internalStyles.get(0);
     }
 }
