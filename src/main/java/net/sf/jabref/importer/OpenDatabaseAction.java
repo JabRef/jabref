@@ -38,6 +38,7 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -374,8 +375,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                NamedCompound compound = new NamedCompound("SpecialFieldSync");
                 for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");
             }
