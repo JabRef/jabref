@@ -26,10 +26,11 @@ import java.util.List;
 public class CleanupWorkerTest {
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public TemporaryFolder bibFolder = new TemporaryFolder();
 
     private CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
+    private File pdfFolder;
 
 
     @Before
@@ -40,8 +41,12 @@ public class CleanupWorkerTest {
         if (Globals.journalAbbreviationLoader == null) {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
+
+        pdfFolder = bibFolder.newFolder();
+
         MetaData metaData = new MetaData();
-        metaData.setFile(testFolder.newFile("test.bib"));
+        metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
+        metaData.setFile(bibFolder.newFile("test.bib"));
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         worker = new CleanupWorker(context, mock(JournalAbbreviationRepository.class));
     }
@@ -74,7 +79,7 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
         entry.setField("title", "<b>hallo</b> units 1 A case AlGaAs and latex $\\alpha$$\\beta$");
         entry.setField("abstract", "Réflexions");
-        File tempFile = testFolder.newFile();
+        File tempFile = bibFolder.newFile();
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
@@ -178,10 +183,26 @@ public class CleanupWorkerTest {
     }
 
     @Test
+    public void cleanupMoveFilesMovesFileFromSubfolder() throws IOException {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MOVE_PDF);
+
+        File subfolder = bibFolder.newFolder();
+        File tempFile = new File(subfolder, "test.pdf");
+        tempFile.createNewFile();
+        BibEntry entry = new BibEntry();
+        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
+
+        worker.cleanup(preset, entry);
+        ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
+        Assert.assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+    }
+
+    @Test
     public void cleanupRelativePathsConvertAbsoluteToRelativePath() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);
 
-        File tempFile = testFolder.newFile();
+        File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
@@ -195,7 +216,7 @@ public class CleanupWorkerTest {
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
 
-        File tempFile = testFolder.newFile();
+        File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "Toot");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");

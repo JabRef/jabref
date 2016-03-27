@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.dbproperties.FieldFormatterCleanupsPanel;
@@ -19,8 +20,10 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class CleanupPresetPanel {
 
+    private final BibDatabaseContext databaseContext;
     private JCheckBox cleanUpSuperscripts;
     private JCheckBox cleanUpDOI;
+    private JCheckBox cleanUpMovePDF;
     private JCheckBox cleanUpMakePathsRelative;
     private JCheckBox cleanUpRenamePDF;
     private JCheckBox cleanUpRenamePDFonlyRelativePaths;
@@ -32,7 +35,8 @@ public class CleanupPresetPanel {
     private JPanel panel;
     private CleanupPreset cleanupPreset;
 
-    public CleanupPresetPanel(CleanupPreset cleanupPreset) {
+    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
+        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.cleanupPreset = Objects.requireNonNull(cleanupPreset);
 
         init();
@@ -42,6 +46,14 @@ public class CleanupPresetPanel {
         cleanUpSuperscripts = new JCheckBox(Localization.lang("Convert 1st, 2nd, ... to real superscripts"));
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
+        String movePdfText = "Move linked files to default file directory %0";
+        if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+            cleanUpMovePDF = new JCheckBox(
+                    Localization.lang(movePdfText, databaseContext.getMetaData().getDefaultFileDirectory().get()));
+        } else {
+            cleanUpMovePDF = new JCheckBox(Localization.lang(movePdfText, "..."));
+            cleanUpMovePDF.setEnabled(false);
+        }
         cleanUpMakePathsRelative = new JCheckBox(
                 Localization.lang("Make paths of linked files relative (if possible)"));
         cleanUpRenamePDF = new JCheckBox(Localization.lang("Rename PDFs to given filename format pattern"));
@@ -59,26 +71,28 @@ public class CleanupPresetPanel {
         updateDisplay(cleanupPreset);
 
         FormLayout layout = new FormLayout("left:15dlu,pref:grow",
-                "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
+                "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
         builder.add(cleanUpUnicode).xyw(1, 1, 2);
         builder.add(cleanUpSuperscripts).xyw(1, 2, 2);
         builder.add(cleanUpDOI).xyw(1, 3, 2);
         builder.add(cleanUpUpgradeExternalLinks).xyw(1, 4, 2);
-        builder.add(cleanUpMakePathsRelative).xyw(1, 5, 2);
-        builder.add(cleanUpRenamePDF).xyw(1, 6, 2);
+        builder.add(cleanUpMovePDF).xyw(1, 5, 2);
+        builder.add(cleanUpMakePathsRelative).xyw(1, 6, 2);
+        builder.add(cleanUpRenamePDF).xyw(1, 7, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ").concat(
                 Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern)).xy(2, 7);
-        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 8);
-        builder.add(cleanUpBibLatex).xyw(1, 9, 2);
-        builder.add(cleanUpFormatters).xyw(1, 10, 2);
+        builder.add(new JLabel(currentPattern)).xy(2, 8);
+        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 9);
+        builder.add(cleanUpBibLatex).xyw(1, 10, 2);
+        builder.add(cleanUpFormatters).xyw(1, 11, 2);
         panel = builder.build();
     }
 
     private void updateDisplay(CleanupPreset preset) {
         cleanUpSuperscripts.setSelected(preset.isCleanUpSuperscripts());
         cleanUpDOI.setSelected(preset.isCleanUpDOI());
+        cleanUpMovePDF.setSelected(preset.isMakePathsRelative());
         cleanUpMakePathsRelative.setSelected(preset.isMakePathsRelative());
         cleanUpRenamePDF.setSelected(preset.isRenamePDF());
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isRenamePdfOnlyRelativePaths());
@@ -102,6 +116,9 @@ public class CleanupPresetPanel {
         }
         if (cleanUpDOI.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        }
+        if(cleanUpMovePDF.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
         }
         if (cleanUpMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.MAKE_PATHS_RELATIVE);

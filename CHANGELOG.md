@@ -16,6 +16,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
+- Add "Move linked files to default file directory" as cleanup procedure
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
 - All fields in a bib entry are written without any leading and trailing whitespace 
 - Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.

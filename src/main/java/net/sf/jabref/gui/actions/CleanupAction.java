@@ -54,7 +54,8 @@ public class CleanupAction extends AbstractWorker {
         this.panel = panel;
         this.frame = panel.frame();
         this.preferences = Objects.requireNonNull(preferences);
-        this.presetPanel = new CleanupPresetPanel(CleanupPreset.loadFromPreferences(preferences));
+        this.presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
+                CleanupPreset.loadFromPreferences(preferences));
     }
 
     @Override

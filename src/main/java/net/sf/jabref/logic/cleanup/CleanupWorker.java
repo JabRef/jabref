@@ -69,6 +69,9 @@ public class CleanupWorker {
         if (preset.isFixFileLinks()) {
             jobs.add(new FileLinksCleanup());
         }
+        if (preset.isMovePDF()) {
+            jobs.add(new MoveFilesCleanup(databaseContext));
+        }
         if (preset.isMakePathsRelative()) {
             jobs.add(new RelativePathsCleanup(databaseContext));
         }
