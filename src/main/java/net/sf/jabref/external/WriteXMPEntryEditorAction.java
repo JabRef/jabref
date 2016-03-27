@@ -69,7 +69,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
         // Then check the "file" field:
-        dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory();
         if (entry.hasField(Globals.FILE_FIELD)) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField(Globals.FILE_FIELD));

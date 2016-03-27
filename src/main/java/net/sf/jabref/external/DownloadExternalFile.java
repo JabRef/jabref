@@ -157,7 +157,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = getFileDirectory();
+        List<String> fDirectory = metaData.getFileDirectory();
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;
@@ -346,11 +346,6 @@ public class DownloadExternalFile {
         }
 
     }
-
-    private List<String> getFileDirectory() {
-        return metaData.getFileDirectory(Globals.FILE_FIELD);
-    }
-
 
     /**
      * Callback interface that users of this class must implement in order to receive

@@ -66,7 +66,7 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory();
             if (dirs.isEmpty()) {
                 // FIXME: Localization
                 JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);

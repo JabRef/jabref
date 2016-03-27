@@ -313,7 +313,7 @@ public class Util {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = metaData.getFileDirectory();
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }

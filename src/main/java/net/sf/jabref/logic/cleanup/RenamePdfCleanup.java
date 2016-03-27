@@ -27,16 +27,14 @@ import java.util.*;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private final List<String> paths;
     private final BibDatabaseContext databaseContext;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
     private final JournalAbbreviationRepository repository;
 
 
-    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
+    public RenamePdfCleanup(Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
             JournalAbbreviationRepository repository) {
-        this.paths = paths;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.repository = repository;
@@ -64,6 +62,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
+            List<String> paths = databaseContext.getMetaData().getFileDirectory();
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry

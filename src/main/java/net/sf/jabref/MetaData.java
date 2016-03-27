@@ -179,6 +179,9 @@ public class MetaData implements Iterable<String> {
         metaData.put(key, orderedData);
     }
 
+    public List<String> getFileDirectory() {
+        return getFileDirectory(Globals.FILE_FIELD);
+    }
     /**
      * Look up the directory set up for the given field type for this database.
      * If no directory is set up, return that defined in global preferences.
