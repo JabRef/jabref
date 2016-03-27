@@ -103,7 +103,7 @@ public class IntegrityCheckTest {
     @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
-        Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
+        Mockito.when(metaData.getFileDirectory()).thenReturn(Collections.singletonList("."));
 
         assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
         assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));

@@ -353,7 +353,7 @@ public class FileUtil {
         for (BibEntry entry : bes) {
             List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
             for (ParsedFileField file : fileList) {
-                expandFilename(file.link, fileDirs).ifPresent(result::add);
+                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
             }
         }
 

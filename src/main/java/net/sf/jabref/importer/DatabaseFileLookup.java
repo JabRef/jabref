@@ -82,7 +82,7 @@ class DatabaseFileLookup {
 
         List<File> fileLinks = new ArrayList<>();
         for (ParsedFileField field : entries) {
-            String link = field.link;
+            String link = field.getLink();
 
             // Do not query external file links (huge performance leak)
             if(link.contains("//")) {

@@ -64,10 +64,10 @@ public class FileField {
         }
         ParsedFileField field = new ParsedFileField(entry.get(0), entry.get(1), entry.get(2));
         // link is only mandatory field
-        if(field.description.isEmpty() && field.link.isEmpty() && !field.fileType.isEmpty()) {
-            field = new ParsedFileField("", field.fileType, "");
-        } else if(!field.description.isEmpty() && field.link.isEmpty() && field.fileType.isEmpty()) {
-            field = new ParsedFileField("", field.description, "");
+        if(field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
+            field = new ParsedFileField("", field.getFileType(), "");
+        } else if(!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
+            field = new ParsedFileField("", field.getDescription(), "");
         }
         entry.clear();
         return field;
@@ -77,7 +77,7 @@ public class FileField {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (ParsedFileField entry : fields) {
-            array[i] = new String[] {entry.description, entry.link, entry.fileType};
+            array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
             i++;
         }
         return encodeStringArray(array);

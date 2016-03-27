@@ -1,12 +1,11 @@
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.*;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -34,15 +33,17 @@ public class CleanupWorkerTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
         if (Globals.journalAbbreviationLoader == null) {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
-        worker = new CleanupWorker(Collections.singletonList(testFolder.getRoot().getAbsolutePath()),
-                new BibDatabaseContext(), mock(JournalAbbreviationRepository.class));
+        MetaData metaData = new MetaData();
+        metaData.setFile(testFolder.newFile("test.bib"));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        worker = new CleanupWorker(context, mock(JournalAbbreviationRepository.class));
     }
 
 

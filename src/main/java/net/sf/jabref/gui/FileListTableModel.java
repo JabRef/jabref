@@ -174,15 +174,15 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.fileType);
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.getFileType());
 
         if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {
             // No file type was recognized. Try to find a usable file type based
             // on mime type:
-            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.fileType);
+            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.getFileType());
             if (!type.isPresent()) {
                 // No type could be found from mime type on the extension:
-                Optional<String> extension = FileUtil.getFileExtension(entry.link);
+                Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
                     Optional<ExternalFileType> typeGuess = ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt(extension.get());
@@ -194,7 +194,7 @@ public class FileListTableModel extends AbstractTableModel {
             }
         }
 
-        return new FileListEntry(entry.description, entry.link, type);
+        return new FileListEntry(entry.getDescription(), entry.getLink(), type);
     }
 
     /**

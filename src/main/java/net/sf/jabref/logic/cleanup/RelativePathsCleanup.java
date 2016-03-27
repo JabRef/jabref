@@ -37,17 +37,17 @@ public class RelativePathsCleanup implements CleanupJob {
         List<ParsedFileField> fileList = typedEntry.getFiles();
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
-        for (ParsedFileField flEntry : fileList) {
-            String oldFileName = flEntry.link;
+        for (ParsedFileField fileEntry : fileList) {
+            String oldFileName = fileEntry.getLink();
             List<String> paths = databaseContext.getMetaData().getFileDirectory();
             String newFileName = FileUtil.shortenFileName(new File(oldFileName), paths).toString();
 
-            ParsedFileField newFlEntry = flEntry;
+            ParsedFileField newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {
-                newFlEntry = new ParsedFileField(flEntry.description, newFileName, flEntry.fileType);
+                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
                 changed = true;
             }
-            newFileList.add(newFlEntry);
+            newFileList.add(newFileEntry);
         }
         if (changed) {
             Optional<FieldChange> change = typedEntry.setFiles(newFileList);

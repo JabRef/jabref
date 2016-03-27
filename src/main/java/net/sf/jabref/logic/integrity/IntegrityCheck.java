@@ -120,11 +120,11 @@ public class IntegrityCheck {
             }
 
             List<ParsedFileField> parsedFileFields = FileField.parse(value.get()).stream()
-                    .filter(p -> !(p.link.startsWith("http://") || p.link.startsWith("https://")))
+                    .filter(p -> !(p.getLink().startsWith("http://") || p.getLink().startsWith("https://")))
                     .collect(Collectors.toList());
 
             for (ParsedFileField p : parsedFileFields) {
-                Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.link);
+                Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.getLink());
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,

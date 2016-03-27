@@ -6,14 +6,26 @@ public class ParsedFileField {
 
     private static final ParsedFileField NULL_OBJECT = new ParsedFileField("", "", "");
 
-    public final String description;
-    public final String link;
-    public final String fileType;
+    private final String description;
+    private final String link;
+    private final String fileType;
 
     public ParsedFileField(String description, String link, String fileType) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     @Override

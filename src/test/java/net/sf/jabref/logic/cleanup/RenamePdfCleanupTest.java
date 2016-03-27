@@ -1,9 +1,8 @@
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.*;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -32,9 +31,10 @@ public class RenamePdfCleanupTest {
         Globals.prefs = mock(JabRefPreferences.class);
         when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(
-                Collections.singletonList(testFolder.getRoot().getAbsolutePath()), false,
-                new BibDatabaseContext(), mock(JournalAbbreviationRepository.class));
+        MetaData metaData = new MetaData();
+        metaData.setFile(testFolder.newFile("test.bib"));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
 
         File tempFile = testFolder.newFile("toot.tmp");
         BibEntry entry = new BibEntry();

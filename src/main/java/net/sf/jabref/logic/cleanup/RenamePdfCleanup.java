@@ -47,7 +47,7 @@ public class RenamePdfCleanup implements CleanupJob {
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
         for (ParsedFileField flEntry : fileList) {
-            String realOldFilename = flEntry.link;
+            String realOldFilename = flEntry.getLink();
 
             if (onlyRelativePaths && (new File(realOldFilename).isAbsolute())) {
                 continue;
@@ -89,8 +89,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 changed = true;
 
                 //Change the path for this entry
-                String description = flEntry.description;
-                String type = flEntry.fileType;
+                String description = flEntry.getDescription();
+                String type = flEntry.getFileType();
 
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
                 File parent = (new File(realOldFilename)).getParentFile();
