@@ -46,13 +46,13 @@ public class CleanupPresetPanel {
         cleanUpSuperscripts = new JCheckBox(Localization.lang("Convert 1st, 2nd, ... to real superscripts"));
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
-        String movePdfText = "Move linked files to default file directory %0";
         if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
-            cleanUpMovePDF = new JCheckBox(
-                    Localization.lang(movePdfText, databaseContext.getMetaData().getDefaultFileDirectory().get()));
+            cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
+                    databaseContext.getMetaData().getDefaultFileDirectory().get()));
         } else {
-            cleanUpMovePDF = new JCheckBox(Localization.lang(movePdfText, "..."));
+            cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
             cleanUpMovePDF.setEnabled(false);
+            cleanUpMovePDF.setSelected(false);
         }
         cleanUpMakePathsRelative = new JCheckBox(
                 Localization.lang("Make paths of linked files relative (if possible)"));
@@ -92,7 +92,9 @@ public class CleanupPresetPanel {
     private void updateDisplay(CleanupPreset preset) {
         cleanUpSuperscripts.setSelected(preset.isCleanUpSuperscripts());
         cleanUpDOI.setSelected(preset.isCleanUpDOI());
-        cleanUpMovePDF.setSelected(preset.isMakePathsRelative());
+        if(cleanUpMovePDF.isEnabled()) {
+            cleanUpMovePDF.setSelected(preset.isMovePDF());
+        }
         cleanUpMakePathsRelative.setSelected(preset.isMakePathsRelative());
         cleanUpRenamePDF.setSelected(preset.isRenamePDF());
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isRenamePdfOnlyRelativePaths());
