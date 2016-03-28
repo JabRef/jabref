@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -37,6 +37,8 @@ import net.sf.jabref.logic.util.OS;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
+    private static final String SOFFICE_EXE = "soffice.exe";
+
     private static final String SOFFICE = "soffice";
 
     private static final String SOFFICE_BIN = "soffice.bin";
@@ -49,6 +51,9 @@ public class AutoDetectPaths extends AbstractWorker {
     private boolean fileSearchCancelled;
     private JDialog prog;
     private final JDialog parent;
+
+
+    private final OpenOfficeFileSearch fileSearch = new OpenOfficeFileSearch();
 
 
     public AutoDetectPaths(JDialog parent, OpenOfficePreferences preferences) {
@@ -92,21 +97,14 @@ public class AutoDetectPaths extends AbstractWorker {
     }
 
     private boolean autoDetectPaths() {
-
+        fileSearch.resetFileSearch();
         if (OS.WINDOWS) {
-            List<File> progFiles = new OpenOfficeFileSearch().findWindowsProgramFilesDir();
-            File sOffice = null;
-            List<File> sofficeFiles = new ArrayList<>();
-            for (File dir : progFiles) {
-                if (fileSearchCancelled) {
-                    return false;
-                }
-                sOffice = findFileDir(dir, "soffice.exe");
-                if (sOffice != null) {
-                    sofficeFiles.add(sOffice);
-                }
+            List<File> progFiles = fileSearch.findWindowsProgramFilesDir();
+            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileDir(progFiles, SOFFICE_EXE));
+            if (fileSearchCancelled) {
+                return false;
             }
-            if (sOffice == null) {
+            if (sofficeFiles.isEmpty()) {
                 JOptionPane.showMessageDialog(parent,
                         Localization
                                 .lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
@@ -132,67 +130,39 @@ public class AutoDetectPaths extends AbstractWorker {
                     sofficeFiles.add(fileChooser.getSelectedFile());
                 }
             }
-            if (sOffice == null) {
+            Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
+            if (actualFile.isPresent()) {
+                setupPreferencesForOO(actualFile.get().getParentFile(), actualFile.get(), SOFFICE_EXE);
+            } else {
                 return false;
             }
-
-            if (sofficeFiles.size() > 1) {
-                // More than one file found
-                DefaultListModel<File> mod = new DefaultListModel<>();
-                for (File tmpfile : sofficeFiles) {
-                    mod.addElement(tmpfile);
-                }
-                JList<File> fileList = new JList<>(mod);
-                fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                fileList.setSelectedIndex(0);
-                FormBuilder builder = FormBuilder.create()
-                        .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 4dlu, pref"));
-                builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
-                builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
-                builder.add(fileList).xy(1, 5);
-                int answer = JOptionPane.showConfirmDialog(null, builder.getPanel(),
-                        Localization.lang("Choose OpenOffice/LibreOffice executable"),
-                        JOptionPane.OK_CANCEL_OPTION);
-                if (answer == JOptionPane.CANCEL_OPTION) {
-                    return false;
-                } else {
-                    sOffice = fileList.getSelectedValue();
-                }
-
-            } else {
-                sOffice = sofficeFiles.get(0);
-            }
-            return setupPreferencesForOO(sOffice.getParentFile(), sOffice, "soffice.exe");
         } else if (OS.OS_X) {
-            File rootDir = new File("/Applications");
-            File[] files = rootDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory() && ("OpenOffice.org.app".equals(file.getName())
-                            || "LibreOffice.app".equals(file.getName()))) {
-                        rootDir = file;
-                        break;
-                    }
-                }
-            }
-            File sOffice = findFileDir(rootDir, SOFFICE_BIN);
+            List<File> dirList = fileSearch.findOSXProgramFilesDir();
+            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileDir(dirList, SOFFICE_BIN));
+
             if (fileSearchCancelled) {
                 return false;
             }
-            if (sOffice == null) {
+            Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
+            if (actualFile.isPresent()) {
+                for (File rootdir : dirList) {
+                    if (actualFile.get().getPath().startsWith(rootdir.getPath())) {
+                        return setupPreferencesForOO(rootdir, actualFile.get(), SOFFICE_BIN);
+                    }
+                }
                 return false;
             } else {
-                return setupPreferencesForOO(rootDir, sOffice, SOFFICE_BIN);
+                return false;
             }
         } else {
             // Linux:
             String usrRoot = "/usr/lib";
-            File inUsr = findFileDir(new File(usrRoot), SOFFICE);
+            File inUsr = fileSearch.findFileInDir(new File(usrRoot), SOFFICE);
             if (fileSearchCancelled) {
                 return false;
             }
             if (inUsr == null) {
-                inUsr = findFileDir(new File("/usr/lib64"), SOFFICE);
+                inUsr = fileSearch.findFileInDir(new File("/usr/lib64"), SOFFICE);
                 if (inUsr != null) {
                     usrRoot = "/usr/lib64";
                 }
@@ -201,7 +171,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            File inOpt = findFileDir(new File("/opt"), SOFFICE);
+            File inOpt = fileSearch.findFileInDir(new File("/opt"), SOFFICE);
             if (fileSearchCancelled) {
                 return false;
             }
@@ -246,7 +216,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
     private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
         preferences.setExecutablePath(new File(inUsr, sofficeName).getPath());
-        File jurt = findFileDir(rootDir, "jurt.jar");
+        File jurt = fileSearch.findFileInDir(rootDir, "jurt.jar");
         if (fileSearchCancelled) {
             return false;
         }
@@ -258,50 +228,48 @@ public class AutoDetectPaths extends AbstractWorker {
         }
     }
 
-    /**
-     * Search for a file, starting at the given directory.
-     * @param startDir The starting point.
-     * @param filename The name of the file to search for.
-     * @return The directory where the file was first found, or null if not found.
-     */
-    private File findFileDir(File startDir, String filename) {
-        if (fileSearchCancelled) {
-            return null;
+    private Optional<File> checkAndSelectAmongMultipleInstalls(List<File> sofficeFiles) {
+        if (sofficeFiles.isEmpty()) {
+            return Optional.empty();
+        } else if (sofficeFiles.size() == 1) {
+            return Optional.of(sofficeFiles.get(0));
         }
-        File[] files = startDir.listFiles();
-        if (files == null) {
-            return null;
+        // Otherwise more than one file found, select among them
+        DefaultListModel<File> mod = new DefaultListModel<>();
+        for (File tmpfile : sofficeFiles) {
+            mod.addElement(tmpfile);
         }
-        File result = null;
-        for (File file : files) {
-            if (fileSearchCancelled) {
-                return null;
-            }
-            if (file.isDirectory()) {
-                result = findFileDir(file, filename);
-                if (result != null) {
-                    break;
-                }
-            } else if (file.getName().equals(filename)) {
-                result = startDir;
-                break;
-            }
+        JList<File> fileList = new JList<>(mod);
+        fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        fileList.setSelectedIndex(0);
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref", "pref, 2dlu, pref, 4dlu, pref"));
+        builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
+        builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
+        builder.add(fileList).xy(1, 5);
+        int answer = JOptionPane.showConfirmDialog(null, builder.getPanel(),
+                Localization.lang("Choose OpenOffice/LibreOffice executable"), JOptionPane.OK_CANCEL_OPTION);
+        if (answer == JOptionPane.CANCEL_OPTION) {
+            return Optional.empty();
+        } else {
+            return Optional.of(fileList.getSelectedValue());
         }
-        return result;
+
     }
+
 
     public JDialog showProgressDialog(JDialog progressParent, String title, String message, boolean includeCancelButton) {
         fileSearchCancelled = false;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
-        JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.addActionListener(event -> {
-                fileSearchCancelled = true;
-                ((JButton) event.getSource()).setEnabled(false);
-        });
         final JDialog progressDialog = new JDialog(progressParent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         bar.setIndeterminate(true);
         if (includeCancelButton) {
+            JButton cancel = new JButton(Localization.lang("Cancel"));
+            cancel.addActionListener(event -> {
+                fileSearchCancelled = true;
+                fileSearch.cancelFileSearch();
+                ((JButton) event.getSource()).setEnabled(false);
+            });
             progressDialog.add(cancel, BorderLayout.SOUTH);
         }
         progressDialog.add(new JLabel(message), BorderLayout.NORTH);

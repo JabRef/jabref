@@ -317,6 +317,8 @@ public class OpenOfficePanel extends AbstractWorker {
             } else if (!adp.cancelled()) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                frame.setStatus(Localization.lang("Operation canceled."));
             }
             if (!autoDetected) {
                 return;
