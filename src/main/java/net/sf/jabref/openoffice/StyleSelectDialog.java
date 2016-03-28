@@ -297,6 +297,7 @@ class StyleSelectDialog {
      * settings, and add the styles to the list of styles.
      */
     private void updateStyles() {
+        table.clearSelection();
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
         styles.addAll(loader.getStyles());

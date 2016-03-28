@@ -100,7 +100,7 @@ public class AutoDetectPaths extends AbstractWorker {
         fileSearch.resetFileSearch();
         if (OS.WINDOWS) {
             List<File> progFiles = fileSearch.findWindowsProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileDir(progFiles, SOFFICE_EXE));
+            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileInDirs(progFiles, SOFFICE_EXE));
             if (fileSearchCancelled) {
                 return false;
             }
@@ -138,7 +138,7 @@ public class AutoDetectPaths extends AbstractWorker {
             }
         } else if (OS.OS_X) {
             List<File> dirList = fileSearch.findOSXProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileDir(dirList, SOFFICE_BIN));
+            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileInDirs(dirList, SOFFICE_BIN));
 
             if (fileSearchCancelled) {
                 return false;
@@ -150,10 +150,8 @@ public class AutoDetectPaths extends AbstractWorker {
                         return setupPreferencesForOO(rootdir, actualFile.get(), SOFFICE_BIN);
                     }
                 }
-                return false;
-            } else {
-                return false;
             }
+            return false;
         } else {
             // Linux:
             String usrRoot = "/usr/lib";

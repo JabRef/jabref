@@ -1330,4 +1330,5 @@ public class JabRefPreferences {
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));
     }
+    
 }

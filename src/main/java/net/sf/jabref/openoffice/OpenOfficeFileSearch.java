@@ -76,7 +76,7 @@ public class OpenOfficeFileSearch {
         fileSearchCancelled = true;
     }
 
-    public List<File> findFileDir(List<File> dirList, String filename) {
+    public List<File> findFileInDirs(List<File> dirList, String filename) {
         List<File> sofficeFiles = new ArrayList<>();
         for (File dir : dirList) {
             if (fileSearchCancelled) {

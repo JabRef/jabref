@@ -285,23 +285,28 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 continue;
             }
             // Check if we should change mode:
-            if (line.equals(OOBibStyle.NAME_MARK)) {
+            switch (line) {
+            case NAME_MARK:
                 mode = BibStyleMode.NAME;
                 continue;
-            } else if (line.equals(OOBibStyle.LAYOUT_MRK)) {
+            case LAYOUT_MRK:
                 mode = BibStyleMode.LAYOUT;
                 continue;
-            } else if (line.equals(OOBibStyle.PROPERTIES_MARK)) {
+            case PROPERTIES_MARK:
                 mode = BibStyleMode.PROPERTIES;
                 continue;
-            } else if (line.equals(OOBibStyle.CITATION_MARK)) {
+            case CITATION_MARK:
                 mode = BibStyleMode.CITATION;
                 continue;
-            } else if (line.equals(OOBibStyle.JOURNALS_MARK)) {
+            case JOURNALS_MARK:
                 mode = BibStyleMode.JOURNALS;
                 continue;
+            default:
+                break;
+
             }
 
+            // Handle line depending on mode
             switch (mode) {
             case NAME:
                 if (!line.trim().isEmpty()) {
@@ -361,7 +366,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {
-                    bibLayout.put(type.toLowerCase(), layout);
+                    bibLayout.put(type.toLowerCase(Locale.ENGLISH), layout);
                 }
 
             } catch (IOException ex) {
@@ -409,7 +414,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public Layout getReferenceFormat(String type) {
-        Layout l = bibLayout.get(type.toLowerCase());
+        Layout l = bibLayout.get(type.toLowerCase(Locale.ENGLISH));
         if (l == null) {
             return defaultBibLayout;
         } else {

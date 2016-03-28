@@ -1135,9 +1135,9 @@ class OOBibBase {
             while (couldExpand && (compare.compareRegionEnds(mxDocCursor, r2) > 0)) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
-            String text = mxDocCursor.getString();
+            String cursorText = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if ((text.indexOf('\n') == -1) && text.trim().isEmpty()) {
+            if ((cursorText.indexOf('\n') == -1) && cursorText.trim().isEmpty()) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference

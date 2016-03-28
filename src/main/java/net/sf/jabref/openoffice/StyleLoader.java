@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,13 +33,9 @@ public class StyleLoader {
 
 
     public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository, Charset encoding) {
-        this.repository = repository;
-        this.preferences = preferences;
-        this.encoding = encoding;
-        update();
-    }
-
-    public void update() {
+        this.repository = Objects.requireNonNull(repository);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.encoding = Objects.requireNonNull(encoding);
         loadInternalStyles();
         loadExternalStyles();
     }
@@ -50,6 +47,7 @@ public class StyleLoader {
     }
 
     public void addStyle(String filename) {
+        Objects.requireNonNull(filename);
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
             if (externalStyles.contains(newStyle)) {
@@ -103,6 +101,7 @@ public class StyleLoader {
     }
 
     public boolean removeStyle(OOBibStyle style) {
+        Objects.requireNonNull(style);
         if (!style.isFromResource()) {
             boolean result = externalStyles.remove(style);
             storeExternalStyles();
