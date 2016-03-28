@@ -18,7 +18,8 @@ package net.sf.jabref.openoffice;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -322,7 +323,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
 
             ooBaseDirectory = preferences.getJarsPath();
-            sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
+            sOffice = preferences.getExecutablePath();
         } else { // Manual connect
 
             showConnectDialog();
@@ -330,9 +331,9 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            String ooPath = Globals.prefs.get(JabRefPreferences.OO_PATH);
+            String ooPath = preferences.getOOPath();
             String ooJars = preferences.getJarsPath();
-            sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
+            sOffice = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
                 ooBaseDirectory = ooPath + "\\program\\classes";
@@ -443,12 +444,12 @@ public class OpenOfficePanel extends AbstractWorker {
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
-        ooPath.setText(Globals.prefs.get(JabRefPreferences.OO_PATH));
+        ooPath.setText(preferences.getOOPath());
         browseOOPath.addActionListener(BrowseAction.buildForDir(ooPath));
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
-        ooExec.setText(Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH));
+        ooExec.setText(preferences.getExecutablePath());
         browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
 
         final JTextField ooJars = new JTextField(30);

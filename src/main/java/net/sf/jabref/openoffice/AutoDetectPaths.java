@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.openoffice;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.worker.AbstractWorker;
 
 import javax.swing.*;
@@ -131,7 +129,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileChooser.showOpenDialog(parent);
                 if (fileChooser.getSelectedFile() != null) {
-                    sOffice = fileChooser.getSelectedFile();
+                    sofficeFiles.add(fileChooser.getSelectedFile());
                 }
             }
             if (sOffice == null) {
@@ -247,7 +245,7 @@ public class AutoDetectPaths extends AbstractWorker {
     }
 
     private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
-        Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, new File(inUsr, sofficeName).getPath());
+        preferences.setExecutablePath(new File(inUsr, sofficeName).getPath());
         File jurt = findFileDir(rootDir, "jurt.jar");
         if (fileSearchCancelled) {
             return false;

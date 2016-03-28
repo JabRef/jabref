@@ -38,19 +38,21 @@ public class OpenOfficePreferences {
         preferences.putDefaultValue(JabRefPreferences.OO_SYNC_WHEN_CITING, false);
         preferences.putDefaultValue(JabRefPreferences.OO_SHOW_PANEL, false);
         preferences.putDefaultValue(JabRefPreferences.OO_USE_ALL_OPEN_BASES, true);
+        preferences.putDefaultValue(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE,
+                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        preferences.putDefaultValue(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, "");
     }
 
     public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {
-        preferences.put(JabRefPreferences.OO_PATH, ooPath);
-        preferences.put(JabRefPreferences.OO_EXECUTABLE_PATH, execPath);
+        setOOPath(ooPath);
+        setExecutablePath(execPath);
         setJarsPath(jarsPath);
     }
 
     public boolean checkAutoDetectedPaths() {
         if (preferences.hasKey(JabRefPreferences.OO_JARS_PATH)
                 && preferences.hasKey(JabRefPreferences.OO_EXECUTABLE_PATH)) {
-            return new File(getJarsPath(), "jurt.jar").exists()
-                    && new File(preferences.get(JabRefPreferences.OO_EXECUTABLE_PATH)).exists();
+            return new File(getJarsPath(), "jurt.jar").exists() && new File(getExecutablePath()).exists();
         } else {
             return false;
         }
@@ -69,6 +71,22 @@ public class OpenOfficePreferences {
 
     public void setJarsPath(String path) {
         preferences.put(JabRefPreferences.OO_JARS_PATH, path);
+    }
+
+    public String getExecutablePath() {
+        return preferences.get(JabRefPreferences.OO_EXECUTABLE_PATH);
+    }
+
+    public void setExecutablePath(String path) {
+        preferences.put(JabRefPreferences.OO_EXECUTABLE_PATH, path);
+    }
+
+    public String getOOPath() {
+        return preferences.get(JabRefPreferences.OO_PATH);
+    }
+
+    public void setOOPath(String path) {
+        preferences.put(JabRefPreferences.OO_PATH, path);
     }
 
     public boolean useAllDatabases() {

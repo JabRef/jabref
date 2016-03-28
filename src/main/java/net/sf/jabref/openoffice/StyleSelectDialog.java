@@ -148,7 +148,7 @@ class StyleSelectDialog {
         updateStyles();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Styles"), true);
+        diag = new JDialog(frame, Localization.lang("Select style"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
