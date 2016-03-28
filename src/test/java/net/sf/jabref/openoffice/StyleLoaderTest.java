@@ -23,6 +23,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 public class StyleLoaderTest {
 
     private JabRefPreferences backup;
+    private static int numberOfInternalStyles = 2;
 
     private OpenOfficePreferences preferences;
     @Before
@@ -77,11 +78,11 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
         StyleLoader loader = new StyleLoader(preferences,
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
-        int beforeAdding = loader.getStyles().size();
+
         String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         loader.addStyle(filename);
-        assertEquals(beforeAdding + 1, loader.getStyles().size());
+        assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
 
     @Test
@@ -102,7 +103,7 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.singletonList(filename));
         StyleLoader loader = new StyleLoader(preferences,
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
-        assertEquals(3, loader.getStyles().size());
+        assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
 
     @Test
@@ -111,7 +112,7 @@ public class StyleLoaderTest {
 
         StyleLoader loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
-        assertEquals(2, loader.getStyles().size());
+        assertEquals(numberOfInternalStyles, loader.getStyles().size());
     }
 
     @Test
@@ -180,7 +181,7 @@ public class StyleLoaderTest {
 
 
     @Test
-    public void testGetDefaultUsedStyle() {
+    public void testGetDefaultUsedStyleWhenEmpty() {
         Globals.prefs.remove(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
         StyleLoader loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
@@ -188,6 +189,45 @@ public class StyleLoaderTest {
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentStyle());
+    }
+
+    @Test
+    public void testGetStoredUsedStyle() {
+        preferences.setCurrentStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
+        StyleLoader loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
+        OOBibStyle style = loader.getUsedStyle();
+        assertTrue(style.isValid());
+        assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, style.getPath());
+        assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, preferences.getCurrentStyle());
+    }
+
+    @Test
+    public void testGtDefaultUsedStyleWhenIncorrect() {
+        preferences.setCurrentStyle("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
+        StyleLoader loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
+        OOBibStyle style = loader.getUsedStyle();
+        assertTrue(style.isValid());
+        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
+        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentStyle());
+    }
+
+    @Test
+    public void testRemoveInternalStyleReturnsFalseAndDoNotRemove() {
+        preferences.setExternalStyles(Collections.emptyList());
+
+        StyleLoader loader = new StyleLoader(preferences, mock(JournalAbbreviationRepository.class),
+                Globals.prefs.getDefaultEncoding());
+        List<OOBibStyle> toremove = new ArrayList<>();
+        for (OOBibStyle style : loader.getStyles()) {
+            if (style.isFromResource()) {
+                toremove.add(style);
+            }
+        }
+
+        assertFalse(loader.removeStyle(toremove.get(0)));
+        assertEquals(numberOfInternalStyles, loader.getStyles().size());
     }
 
 }
