@@ -20,7 +20,7 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Dialog for modifying existing citations.
@@ -68,13 +69,13 @@ class CitationManager {
 
         list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
-        java.util.List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
+        List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
             list.add(new CitationEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new DefaultEventTableModel<>(list, new CitEntryFormat());
+        tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -115,8 +116,8 @@ class CitationManager {
                 (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
-        table.getColumnModel().getColumn(0).setPreferredWidth(600);
-        table.getColumnModel().getColumn(1).setPreferredWidth(90);
+        table.getColumnModel().getColumn(0).setPreferredWidth(580);
+        table.getColumnModel().getColumn(1).setPreferredWidth(110);
         table.setPreferredScrollableViewportSize(new Dimension(700, 500));
         table.addMouseListener(new TableClickListener());
     }
@@ -138,7 +139,7 @@ class CitationManager {
 
 
 
-    private static class CitEntryFormat implements TableFormat<CitationEntry> {
+    private static class CitationEntryFormat implements TableFormat<CitationEntry> {
 
         @Override
         public int getColumnCount() {
@@ -182,7 +183,6 @@ class CitationManager {
 
         private final JDialog singleCiteDialog;
         private final JTextField pageInfo = new JTextField(20);
-        private final JLabel title;
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
         private final CitationEntry entry;
@@ -190,26 +190,24 @@ class CitationManager {
 
         public SingleCitationDialog(CitationEntry citEntry) {
             this.entry = citEntry;
-            title = new JLabel(entry.getContext());
             pageInfo.setText(entry.getPageInfo().orElse(""));
 
             singleCiteDialog = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
-            DefaultFormBuilder b = new DefaultFormBuilder(
-                    new FormLayout("left:pref, 4dlu, left:150dlu", ""));
-            b.append(title, 3);
-            b.nextLine();
-            b.append(Localization.lang("Extra information (e.g. page number)"));
-            b.append(pageInfo);
-            b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            singleCiteDialog.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
+            FormBuilder builder = FormBuilder.create()
+                    .layout(new FormLayout("left:pref, 4dlu, fill:150dlu:grow", "pref, 4dlu, pref"));
+            builder.add(entry.getContext()).xyw(1, 1, 3);
+            builder.add(Localization.lang("Extra information (e.g. page number)")).xy(1, 3);
+            builder.add(pageInfo).xy(3, 3);
+            builder.padding("10dlu, 10dlu, 10dlu, 10dlu");
+            singleCiteDialog.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(okButton);
             bb.addButton(cancelButton);
             bb.addGlue();
-            bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
             singleCiteDialog.add(bb.getPanel(), BorderLayout.SOUTH);
 
             okButton.addActionListener(e -> {
@@ -231,9 +229,9 @@ class CitationManager {
             };
             cancelButton.addActionListener(cancelAction);
 
-            b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
+            builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
                     (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-            b.getPanel().getActionMap().put("close", cancelAction);
+            builder.getPanel().getActionMap().put("close", cancelAction);
 
         }
 

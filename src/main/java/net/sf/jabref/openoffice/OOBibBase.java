@@ -150,10 +150,12 @@ class OOBibBase {
         if (ls.isEmpty()) {
             // No text documents found.
             throw new NoDocumentException("No Writer documents found");
-        } else if (ls.size() > 1) {
-            selected = OOUtil.selectComponent(ls);
-        } else {
+        } else if (ls.size() == 1) {
+            // Get the only one
             selected = ls.get(0);
+        } else {
+            // Bring up a dialog
+            selected = OOUtil.selectComponent(ls);
         }
 
         if (selected == null) {
@@ -548,16 +550,17 @@ class OOBibBase {
                 String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
                 for (int j = 0; j < markers.length; j++) {
                     String marker = markers[j];
+                    String currentKey = bibtexKeys[i][j];
                     if (refKeys.containsKey(marker)) {
                         // Ok, we have seen this exact marker before.
-                        if (!refKeys.get(marker).contains(bibtexKeys[i][j])) {
+                        if (!refKeys.get(marker).contains(currentKey)) {
                             // ... but not for this entry.
-                            refKeys.get(marker).add(bibtexKeys[i][j]);
+                            refKeys.get(marker).add(currentKey);
                             refNums.get(marker).add(i);
                         }
                     } else {
                         List<String> l = new ArrayList<>(1);
-                        l.add(bibtexKeys[i][j]);
+                        l.add(currentKey);
                         refKeys.put(marker, l);
                         List<Integer> l2 = new ArrayList<>(1);
                         l2.add(i);
@@ -589,34 +592,37 @@ class OOBibBase {
                 String[] uniquif = new String[bibtexKeys[j].length];
                 BibEntry[] cEntries = new BibEntry[bibtexKeys[j].length];
                 for (int k = 0; k < bibtexKeys[j].length; k++) {
+                    String currentKey = bibtexKeys[j][k];
                     firstLimAuthors[k] = -1;
                     if (maxAuthorsFirst > 0) {
-                        if (!seenBefore.contains(bibtexKeys[j][k])) {
+                        if (!seenBefore.contains(currentKey)) {
                             firstLimAuthors[k] = maxAuthorsFirst;
                         }
-                        seenBefore.add(bibtexKeys[j][k]);
+                        seenBefore.add(currentKey);
                     }
-                    String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if (uniq != null) {
+                    String uniq = uniquefiers.get(currentKey);
+                    if (uniq == null) {
+                        if (firstLimAuthors[k] > 0) {
+                            needsChange = true;
+                            BibDatabase database = linkSourceBase.get(currentKey);
+                            if (database != null) {
+                                cEntries[k] = database.getEntryByKey(currentKey);
+                            }
+                            uniquif[k] = "";
+                        } else {
+                            BibDatabase database = linkSourceBase.get(currentKey);
+                            if (database != null) {
+                                cEntries[k] = database.getEntryByKey(currentKey);
+                            }
+                            uniquif[k] = "";
+                        }
+                    } else {
                         needsChange = true;
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
+                        BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
+                            cEntries[k] = database.getEntryByKey(currentKey);
                         }
                         uniquif[k] = uniq;
-                    } else if (firstLimAuthors[k] > 0) {
-                        needsChange = true;
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
-                        if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
-                        }
-                        uniquif[k] = "";
-                    } else {
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
-                        if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
-                        }
-                        uniquif[k] = "";
                     }
                 }
                 if (needsChange) {
@@ -914,13 +920,14 @@ class OOBibBase {
                     UnknownPropertyException, PropertyVetoException, WrappedTargetException {
         Map<BibEntry, BibDatabase> correctEntries;
         // If we don't have numbered entries, we need to sort the entries before adding them:
-        if (!style.isSortByPosition()) {
+        if (style.isSortByPosition()) {
+            // Use the received map directly
+            correctEntries = entries;
+        } else {
+            // Sort map
             Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
             newMap.putAll(entries);
             correctEntries = newMap;
-        } else {
-            // If not, use the received map directly
-            correctEntries = entries;
         }
         int number = 1;
         for (Map.Entry<BibEntry, BibDatabase> entry : correctEntries.entrySet()) {

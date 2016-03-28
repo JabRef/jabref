@@ -16,7 +16,7 @@
 package net.sf.jabref.openoffice;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
@@ -117,8 +117,8 @@ public class OpenOfficePanel extends AbstractWorker {
         return comp;
     }
 
-    public void init(JabRefFrame jrFrame, SidePaneManager spManager) {
-        frame = jrFrame;
+    public void init(JabRefFrame jabRefFrame, SidePaneManager spManager) {
+        this.frame = jabRefFrame;
         this.manager = spManager;
         comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
         initPanel();
@@ -159,7 +159,7 @@ public class OpenOfficePanel extends AbstractWorker {
         setStyleFile.addActionListener(e -> {
 
             if (styleDialog == null) {
-                styleDialog = new StyleSelectDialog(frame, preferences);
+                styleDialog = new StyleSelectDialog(frame, preferences, loader);
             }
             styleDialog.setVisible(true);
             styleDialog.getStyle().ifPresent(selectedStyle -> {
@@ -261,33 +261,30 @@ public class OpenOfficePanel extends AbstractWorker {
         manageCitations.setEnabled(false);
         diag = new JDialog((JFrame) null, "OpenOffice panel", false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref:grow",
-                //"p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu"));
-                "p,p,p,p,p,p,p,p,p,p"));
+        FormBuilder mainBuilder = FormBuilder.create().layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p"));
 
-        //ButtonBarBuilder bb = new ButtonBarBuilder();
-        DefaultFormBuilder bb = new DefaultFormBuilder(
-                new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
-                        + "1dlu, fill:pref:grow, 1dlu, fill:pref:grow", ""));
-        bb.append(connect);
-        bb.append(manualConnect);
-        bb.append(selectDocument);
-        bb.append(update);
-        bb.append(help);
-        b.append(bb.getPanel());
-        b.append(setStyleFile);
-        b.append(pushEntries);
-        b.append(pushEntriesInt);
-        b.append(pushEntriesAdvanced);
-        b.append(pushEntriesEmpty);
-        b.append(merge);
-        b.append(manageCitations);
-        b.append(settingsB);
+        FormBuilder topRowBuilder = FormBuilder.create()
+                .layout(new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
+                        + "1dlu, fill:pref:grow, 1dlu, fill:pref:grow", "pref"));
+        topRowBuilder.add(connect).xy(1, 1);
+        topRowBuilder.add(manualConnect).xy(3, 1);
+        topRowBuilder.add(selectDocument).xy(5, 1);
+        topRowBuilder.add(update).xy(7, 1);
+        topRowBuilder.add(help).xy(9, 1);
+        mainBuilder.add(topRowBuilder.getPanel()).xy(1, 1);
+        mainBuilder.add(setStyleFile).xy(1, 2);
+        mainBuilder.add(pushEntries).xy(1, 3);
+        mainBuilder.add(pushEntriesInt).xy(1, 4);
+        mainBuilder.add(pushEntriesAdvanced).xy(1, 5);
+        mainBuilder.add(pushEntriesEmpty).xy(1, 6);
+        mainBuilder.add(merge).xy(1, 7);
+        mainBuilder.add(manageCitations).xy(1, 8);
+        mainBuilder.add(settingsB).xy(1, 9);
 
         JPanel content = new JPanel();
         comp.setContentContainer(content);
         content.setLayout(new BorderLayout());
-        content.add(b.getPanel(), BorderLayout.CENTER);
+        content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
@@ -459,25 +456,24 @@ public class OpenOfficePanel extends AbstractWorker {
         browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooJars.setText(preferences.getJarsPath());
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create()
+                .layout(
+                        new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
         if (OS.WINDOWS || OS.OS_X) {
-            builder.append(Localization.lang("Path to OpenOffice directory"));
-            builder.append(ooPath);
-            builder.append(browseOOPath);
-            builder.nextLine();
+            builder.add(Localization.lang("Path to OpenOffice directory")).xy(1, 1);
+            builder.add(ooPath).xy(3, 1);
+            builder.add(browseOOPath).xy(5, 1);
         } else {
-            builder.append(Localization.lang("Path to OpenOffice executable"));
-            builder.append(ooExec);
-            builder.append(browseOOExec);
-            builder.nextLine();
+            builder.add(Localization.lang("Path to OpenOffice executable")).xy(1, 1);
+            builder.add(ooExec).xy(3, 1);
+            builder.add(browseOOExec).xy(5, 1);
 
-            builder.append(Localization.lang("Path to OpenOffice library dir"));
-            builder.append(ooJars);
-            builder.append(browseOOJars);
-            builder.nextLine();
+            builder.appendColumns("4dlu, pref");
+            builder.add(Localization.lang("Path to OpenOffice library dir")).xy(1, 3);
+            builder.add(ooJars).xy(3, 3);
+            builder.add(browseOOJars).xy(5, 3);
         }
-
+        builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
         ButtonBarBuilder bb = new ButtonBarBuilder();
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -502,8 +498,7 @@ public class OpenOfficePanel extends AbstractWorker {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
         cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         cDiag.pack();

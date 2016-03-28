@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -35,7 +36,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -97,6 +97,7 @@ class StyleSelectDialog {
     private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
+    private ActionListener removeAction;
 
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -110,12 +111,11 @@ class StyleSelectDialog {
     private final OpenOfficePreferences preferences;
 
 
-    public StyleSelectDialog(JabRefFrame frame, OpenOfficePreferences preferences) {
+    public StyleSelectDialog(JabRefFrame frame, OpenOfficePreferences preferences, StyleLoader loader) {
 
-        this.frame = frame;
-        this.preferences = preferences;
-        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
-                Globals.prefs.getDefaultEncoding());
+        this.frame = Objects.requireNonNull(frame);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.loader = Objects.requireNonNull(loader);
         setupPrevEntry();
         init();
 
@@ -124,31 +124,7 @@ class StyleSelectDialog {
     private void init() {
 
 
-        popup.add(edit);
-        popup.add(show);
-        popup.add(remove);
-
-
-        // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(actionEvent -> {
-            getSelectedStyle().ifPresent(style -> {
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = style.getFile().getPath();
-                try {
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    LOGGER.warn("Problem open style file editor", e);
-                }
-            });
-        });
-
-        // Add action listener to ""Show" menu item, which is supposed to open the style file in a dialog:
-        show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));
+        setupPopupMenu();
 
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
@@ -158,61 +134,21 @@ class StyleSelectDialog {
         });
         addButton.setToolTipText(Localization.lang("Add style file"));
 
-        ActionListener removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
-            if (!style.isFromResource()) {
-                if (JOptionPane.showConfirmDialog(diag, Localization.lang("Are you sure you want to remove the style?"),
-                        Localization.lang("Remove style"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    if (!loader.removeStyle(style)) {
-                        LOGGER.info("Problem removing style");
-                    }
-                    updateStyles();
-                }
-            }
-        });
-        remove.addActionListener(removeAction);
         removeButton.addActionListener(removeAction);
         removeButton.setToolTipText(Localization.lang("Remove style"));
 
-        diag = new JDialog(frame, Localization.lang("Styles"), true);
-
-        styles = new BasicEventList<>();
-        EventList<OOBibStyle> sortedStyles = new SortedList<>(styles);
-
-        // Create a preview panel for previewing styles:
+        // Create a preview panel for previewing styles
+        // Must be done before creating the table to avoid NPEs
         preview = new PreviewPanel(null, new MetaData(), "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 
-        tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
-                .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
-        table = new JTable(tableModel);
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(100);
-        cm.getColumn(1).setPreferredWidth(200);
-        cm.getColumn(2).setPreferredWidth(80);
-        selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedStyles);
-        table.setSelectionModel(selectionModel);
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.addMouseListener(new MouseAdapter() {
+        setupTable();
 
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                if (mouseEvent.isPopupTrigger()) {
-                    tablePopup(mouseEvent);
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-                if (mouseEvent.isPopupTrigger()) {
-                    tablePopup(mouseEvent);
-                }
-            }
-        });
-
-        selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
         updateStyles();
+
+        // Build dialog
+        diag = new JDialog(frame, Localization.lang("Styles"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
@@ -271,6 +207,84 @@ class StyleSelectDialog {
 
         diag.pack();
         diag.setLocationRelativeTo(frame);
+    }
+
+    private void setupTable() {
+        styles = new BasicEventList<>();
+        EventList<OOBibStyle> sortedStyles = new SortedList<>(styles);
+
+        tableModel = (DefaultEventTableModel<OOBibStyle>) GlazedListsSwing
+                .eventTableModelWithThreadProxyList(sortedStyles, new StyleTableFormat());
+        table = new JTable(tableModel);
+        TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(100);
+        cm.getColumn(1).setPreferredWidth(200);
+        cm.getColumn(2).setPreferredWidth(80);
+        selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
+                .eventSelectionModelWithThreadProxyList(sortedStyles);
+        table.setSelectionModel(selectionModel);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                if (mouseEvent.isPopupTrigger()) {
+                    tablePopup(mouseEvent);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+                if (mouseEvent.isPopupTrigger()) {
+                    tablePopup(mouseEvent);
+                }
+            }
+        });
+
+        selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
+    }
+
+    private void setupPopupMenu() {
+        popup.add(edit);
+        popup.add(show);
+        popup.add(remove);
+
+
+        // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
+        edit.addActionListener(actionEvent -> {
+            getSelectedStyle().ifPresent(style -> {
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+                String link = style.getFile().getPath();
+                try {
+                    if (type.isPresent()) {
+                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
+                    } else {
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
+                                new UnknownExternalFileType("jstyle"));
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn("Problem open style file editor", e);
+                }
+            });
+        });
+
+        // Add action listener to ""Show" menu item, which is supposed to open the style file in a dialog:
+        show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));
+
+        // Create action listener for removing a style, also used for the remove button
+        removeAction = actionEvent -> getSelectedStyle().ifPresent(style -> {
+            if (!style.isFromResource() && (JOptionPane.showConfirmDialog(diag,
+                    Localization.lang("Are you sure you want to remove the style?"), Localization.lang("Remove style"),
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+                if (!loader.removeStyle(style)) {
+                    LOGGER.info("Problem removing style");
+                }
+                updateStyles();
+            }
+        });
+        // Add it to the remove menu item
+        remove.addActionListener(removeAction);
+
     }
 
     public void setVisible(boolean visible) {
@@ -394,16 +408,7 @@ class StyleSelectDialog {
     }
 
     private void tablePopup(MouseEvent e) {
-        getSelectedStyle().ifPresent(style -> {
-            if (style.isFromResource()) {
-                remove.setEnabled(false);
-                edit.setEnabled(false);
-            } else {
-                remove.setEnabled(true);
-                edit.setEnabled(true);
-            }
             popup.show(e.getComponent(), e.getX(), e.getY());
-        });
     }
 
     private void displayStyle(OOBibStyle style) {
@@ -439,7 +444,21 @@ class StyleSelectDialog {
         public void listChanged(ListEvent<OOBibStyle> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
                 OOBibStyle style = listEvent.getSourceList().get(0);
+
+                // Enable/disable popup menu items and buttons
+                if (style.isFromResource()) {
+                    remove.setEnabled(false);
+                    edit.setEnabled(false);
+                    removeButton.setEnabled(false);
+                } else {
+                    remove.setEnabled(true);
+                    edit.setEnabled(true);
+                    removeButton.setEnabled(true);
+                }
+
+                // Set new preview layout
                 preview.setLayout(style.getReferenceFormat("default"));
+
                 // Update the preview's entry:
                 SwingUtilities.invokeLater((Runnable) () -> {
                     preview.update();
@@ -451,8 +470,8 @@ class StyleSelectDialog {
 
     private class AddFileDialog extends JDialog {
 
-        JTextField newFile = new JTextField();
-        boolean addOKPressed = false;
+        private final JTextField newFile = new JTextField();
+        private boolean addOKPressed;
 
 
         public AddFileDialog() {
@@ -467,9 +486,8 @@ class StyleSelectDialog {
             builder.add(Localization.lang("File")).xy(1, 1);
             builder.add(newFile).xy(3, 1);
             builder.add(browse).xy(5, 1);
-            JPanel panel = builder.build();
-            panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            getContentPane().add(panel, BorderLayout.CENTER);
+            builder.padding("10dlu, 10dlu, 10dlu, 10dlu");
+            getContentPane().add(builder.build(), BorderLayout.CENTER);
 
             // Buttons
             ButtonBarBuilder bb = new ButtonBarBuilder();
