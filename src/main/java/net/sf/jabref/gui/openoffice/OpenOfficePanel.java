@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -26,6 +26,10 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -307,7 +311,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void connect(boolean auto) {
-        String ooBaseDirectory;
+        String ooJarsDirectory;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
             if (adp.runAutodetection()) {
@@ -324,7 +328,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            ooBaseDirectory = preferences.getJarsPath();
+            ooJarsDirectory = preferences.getJarsPath();
             sOffice = preferences.getExecutablePath();
         } else { // Manual connect
 
@@ -338,22 +342,22 @@ public class OpenOfficePanel extends AbstractWorker {
             sOffice = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
-                ooBaseDirectory = ooPath + "\\program\\classes";
+                ooJarsDirectory = ooPath + "\\program\\classes";
                 sOffice = ooPath + "\\program\\soffice.exe";
             } else if (OS.OS_X) {
                 sOffice = ooPath + "/Contents/MacOS/soffice.bin";
-                ooBaseDirectory = ooPath + "/Contents/Resources/java";
+                ooJarsDirectory = ooPath + "/Contents/Resources/java";
             } else {
                 // Linux:
-                ooBaseDirectory = ooJars + "/program/classes";
+                ooJarsDirectory = ooJars + "/program/classes";
             }
         }
 
         // Add OO jars to the classpath:
         try {
-            List<File> jarFiles = Arrays.asList(new File(ooBaseDirectory, "unoil.jar"),
-                    new File(ooBaseDirectory, "jurt.jar"), new File(ooBaseDirectory, "juh.jar"),
-                    new File(ooBaseDirectory, "ridl.jar"));
+            List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
+                    new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),
+                    new File(ooJarsDirectory, "ridl.jar"));
             List<URL> jarList = new ArrayList<>(jarFiles.size());
             for (File jarFile : jarFiles) {
                 if (!jarFile.exists()) {

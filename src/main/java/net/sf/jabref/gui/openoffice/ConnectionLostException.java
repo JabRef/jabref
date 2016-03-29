@@ -1,4 +1,4 @@
-/*  Copyright (C) 2016 JabRef contributors.
+/*  Copyright (C) 2003-2011 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,16 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 /**
- * Exception used to indicate that the plugin attempted to set a character format that is
- * not defined in the current OpenOffice document.
+ * This exception is used to indicate that connection to OpenOffice has been lost.
  */
-class NoDocumentException extends Exception {
+class ConnectionLostException extends RuntimeException {
 
-    public NoDocumentException(String message) {
-        super(message);
+    public ConnectionLostException(String s) {
+        super(s);
     }
-
 }

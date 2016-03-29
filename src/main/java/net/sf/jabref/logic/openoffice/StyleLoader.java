@@ -1,4 +1,19 @@
-package net.sf.jabref.openoffice;
+/*  Copyright (C) 2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+package net.sf.jabref.logic.openoffice;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +36,7 @@ public class StyleLoader {
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
 
+    // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
 
@@ -28,6 +44,8 @@ public class StyleLoader {
     private final OpenOfficePreferences preferences;
     private final Charset encoding;
 
+    // Lists of the internal
+    // and external styles
     private final List<OOBibStyle> internalStyles = new ArrayList<>();
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 

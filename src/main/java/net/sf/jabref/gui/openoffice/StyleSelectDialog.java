@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -62,6 +62,9 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
@@ -48,6 +48,10 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OOPreFormatter;
+import net.sf.jabref.logic.openoffice.OOUtil;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
@@ -63,6 +67,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -155,7 +164,7 @@ class OOBibBase {
             selected = ls.get(0);
         } else {
             // Bring up a dialog
-            selected = OOUtil.selectComponent(ls);
+            selected = selectComponent(ls);
         }
 
         if (selected == null) {
@@ -1185,6 +1194,27 @@ class OOBibBase {
             refreshCiteMarkers(databases, style);
         }
 
+    }
+
+
+    public static XTextDocument selectComponent(List<XTextDocument> list)
+            throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
+        String[] values = new String[list.size()];
+        int ii = 0;
+        for (XTextDocument doc : list) {
+            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            ii++;
+        }
+        JList<String> sel = new JList<>(values);
+        sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sel.setSelectedIndex(0);
+        int ans = JOptionPane.showConfirmDialog(null, new JScrollPane(sel), Localization.lang("Select document"),
+                JOptionPane.OK_CANCEL_OPTION);
+        if (ans == JOptionPane.OK_OPTION) {
+            return list.get(sel.getSelectedIndex());
+        } else {
+            return null;
+        }
     }
 
 

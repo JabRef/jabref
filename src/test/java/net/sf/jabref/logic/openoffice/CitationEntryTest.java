@@ -1,4 +1,4 @@
-package net.sf.jabref.openoffice;
+package net.sf.jabref.logic.openoffice;
 
 import static org.junit.Assert.*;
 

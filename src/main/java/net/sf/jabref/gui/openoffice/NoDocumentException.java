@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,27 +13,16 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 /**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: 16-Dec-2007
- * Time: 10:37:23
- * To change this template use File | Settings | File Templates.
+ * Exception used to indicate that the plugin attempted to set a character format that is
+ * not defined in the current OpenOffice document.
  */
-class BibEntryNotFoundException extends Exception {
+class NoDocumentException extends Exception {
 
-    private final String bibtexKey;
-
-
-    public BibEntryNotFoundException(String bibtexKey, String message) {
+    public NoDocumentException(String message) {
         super(message);
-
-        this.bibtexKey = bibtexKey;
     }
 
-    public String getBibtexKey() {
-        return bibtexKey;
-    }
 }

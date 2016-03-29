@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
 
@@ -30,6 +30,8 @@ import java.util.List;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OpenOfficeFileSearch;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.util.OS;
 
 /**
@@ -132,7 +134,7 @@ public class AutoDetectPaths extends AbstractWorker {
             }
             Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
             if (actualFile.isPresent()) {
-                setupPreferencesForOO(actualFile.get().getParentFile(), actualFile.get(), SOFFICE_EXE);
+                return setupPreferencesForOO(actualFile.get().getParentFile(), actualFile.get(), SOFFICE_EXE);
             } else {
                 return false;
             }

@@ -13,18 +13,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 /**
- * Exception used to indicate that the plugin attempted to set a paragraph format that is
+ * Exception used to indicate that the plugin attempted to set a character format that is
  * not defined in the current OpenOffice document.
  */
-class UndefinedParagraphFormatException extends Exception {
+class UndefinedCharacterFormatException extends Exception {
 
     private final String formatName;
 
 
-    public UndefinedParagraphFormatException(String formatName) {
+    public UndefinedCharacterFormatException(String formatName) {
         super();
         this.formatName = formatName;
     }

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.logic.openoffice;
 
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
  * operation is performed for each JabRef BibEntry.
  */
-class OOBibStyle implements Comparable<OOBibStyle> {
+public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
     private String name;
