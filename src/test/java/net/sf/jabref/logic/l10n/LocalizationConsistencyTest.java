@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class LocalizationConsistencyTest {
 
@@ -21,7 +21,10 @@ public class LocalizationConsistencyTest {
 
                 List<String> missing = new LinkedList<>(englishKeys);
                 missing.removeAll(nonEnglishKeys);
+                List<String> obsolete = new LinkedList<>(nonEnglishKeys);
+                obsolete.removeAll(englishKeys);
                 assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
+                assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
             }
         }
     }
@@ -65,6 +68,40 @@ public class LocalizationConsistencyTest {
         String resultString = missingKeys.stream().map(Object::toString).collect(Collectors.joining("\n"));
         assertEquals("source code contains language keys for the menu which are not in the corresponding properties file",
                 "", resultString);
+    }
+
+    @Test
+    public void findObsoleteLocalizationKeys() throws IOException {
+        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
+
+        if (!obsoleteKeys.isEmpty()) {
+            System.out.println();
+            System.out.println("Obsolete keys found:");
+            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            System.out.println();
+            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
+            System.out.println(
+                    "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
+            System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
+            fail("Obsolete keys found in properties file which should be removed");
+        }
+    }
+
+    @Test
+    public void findObsoleteMenuLocalizationKeys() throws IOException {
+        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
+
+        if (!obsoleteKeys.isEmpty()) {
+            System.out.println();
+            System.out.println("Obsolete menu keys found:");
+            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
+            System.out.println();
+            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
+            System.out.println(
+                    "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
+            System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
+            fail("Obsolete keys found in menu properties file which should be removed");
+        }
     }
 
     private void printInfos(List<LocalizationEntry> missingKeys) {
