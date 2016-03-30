@@ -432,15 +432,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (line.startsWith(Globals.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(Globals.encPrefix)) {
+                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(Globals.encPrefix.length());
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));

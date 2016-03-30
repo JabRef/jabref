@@ -224,7 +224,7 @@ public class JabRefCLI {
     public void printUsage() {
         String header = "";
 
-        String importFormats = Globals.importFormatReader.getImportFormatList();
+        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
         String outFormats = ExportFormats.getConsoleExportList(70, 20, "");

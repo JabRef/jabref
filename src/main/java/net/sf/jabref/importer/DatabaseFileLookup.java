@@ -35,8 +35,6 @@ import net.sf.jabref.model.entry.FileField;
  */
 class DatabaseFileLookup {
 
-    private static final String KEY_FILE_FIELD = "file";
-
     private final Set<File> fileCache = new HashSet<>();
 
     private final List<String> possibleFilePaths;
@@ -76,7 +74,7 @@ class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        String fileField = entry.getField(DatabaseFileLookup.KEY_FILE_FIELD);
+        String fileField = entry.getField(Globals.FILE_FIELD);
         List<FileField.ParsedFileField> entries = FileField.parse(fileField);
 
         List<File> fileLinks = new ArrayList<>();
