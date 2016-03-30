@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
+
+import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
@@ -156,6 +158,7 @@ public class MergeEntryDOIDialog extends JDialog {
      */
     private void buttonPressed(String button) {
         BibEntry mergedEntry = mergeEntries.getMergeEntry();
+
         if ("cancel".equals(button)) {
             // Cancelled, throw it away
             panel.output(Localization.lang("Cancelled merging entries"));
@@ -163,8 +166,19 @@ public class MergeEntryDOIDialog extends JDialog {
             // Updated the original entry with the new fields
             Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());
             Set<String> originalFields = new TreeSet<>(originalEntry.getFieldNames());
-            Boolean edited = false;
+            boolean edited = false;
 
+            // entry type
+            String oldType = originalEntry.getType();
+            String newType = mergedEntry.getType();
+
+            if(!oldType.equalsIgnoreCase(newType)) {
+                originalEntry.setType(newType);
+                ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
+                edited = true;
+            }
+
+            // fields
             for (String field : jointFields) {
                 String originalString = originalEntry.getField(field);
                 String mergedString = mergedEntry.getField(field);
@@ -185,12 +199,11 @@ public class MergeEntryDOIDialog extends JDialog {
                 }
             }
 
-            //
-
             if (edited) {
                 ce.end();
                 panel.undoManager.addEdit(ce);
                 panel.output(Localization.lang("Updated entry with info from DOI"));
+                panel.updateEntryEditorIfShowing();
                 panel.markBaseChanged();
             } else {
                 panel.output(Localization.lang("No information added"));

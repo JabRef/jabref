@@ -23,16 +23,14 @@ import net.sf.jabref.model.entry.BibEntry;
  * This class represents the change of type for an entry.
  */
 public class UndoableChangeType extends AbstractUndoableEdit {
-
     private final String oldType;
     private final String newType;
-    private final BibEntry be;
+    private final BibEntry entry;
 
-
-    public UndoableChangeType(BibEntry be, String oldType, String newType) {
+    public UndoableChangeType(BibEntry entry, String oldType, String newType) {
         this.oldType = oldType;
         this.newType = newType;
-        this.be = be;
+        this.entry = entry;
     }
 
     @Override
@@ -48,13 +46,12 @@ public class UndoableChangeType extends AbstractUndoableEdit {
     @Override
     public void undo() {
         super.undo();
-        be.setType(oldType);
+        entry.setType(oldType);
     }
 
     @Override
     public void redo() {
         super.redo();
-        be.setType(newType);
+        entry.setType(newType);
     }
-
 }
