@@ -20,7 +20,6 @@ import java.util.List;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
 
 /**
  * The OpenOffice connection preferences are:
@@ -45,35 +44,11 @@ public class OpenOfficePreferences {
     public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
     public static final String OSX_EXECUTABLE = "soffice.bin";
     public static final String OSX_JARS_SUBPATH = "/Contents/Resources/java";
+    public static final String LINUX_EXECUTABLE = "soffice";
 
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
-    }
-
-    public void putDefaultPreferences() {
-        if (OS.WINDOWS) {
-            preferences.putDefaultValue(JabRefPreferences.OO_PATH, DEFAULT_WINDOWS_PATH);
-            preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    DEFAULT_WINDOWS_PATH + WINDOWS_EXECUTABLE_SUBPATH + WINDOWS_EXECUTABLE);
-            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH, DEFAULT_WINDOWS_PATH + WINDOWS_JARS_SUBPATH);
-        } else if (OS.OS_X) {
-            preferences.putDefaultValue(JabRefPreferences.OO_PATH, DEFAULT_OSX_PATH);
-            preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    DEFAULT_OSX_PATH + OSX_EXECUTABLE_SUBPATH + OSX_EXECUTABLE);
-            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH, DEFAULT_OSX_PATH + OSX_JARS_SUBPATH);
-        } else { // Linux
-            preferences.putDefaultValue(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
-            preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
-            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
-        }
-
-        preferences.putDefaultValue(JabRefPreferences.OO_SYNC_WHEN_CITING, false);
-        preferences.putDefaultValue(JabRefPreferences.OO_SHOW_PANEL, false);
-        preferences.putDefaultValue(JabRefPreferences.OO_USE_ALL_OPEN_BASES, true);
-        preferences.putDefaultValue(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE,
-                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        preferences.putDefaultValue(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, "");
     }
 
     public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {

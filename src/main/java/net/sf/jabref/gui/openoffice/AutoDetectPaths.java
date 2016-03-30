@@ -40,8 +40,6 @@ import net.sf.jabref.logic.util.OS;
 public class AutoDetectPaths extends AbstractWorker {
 
 
-    private static final String SOFFICE = "soffice";
-
     private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
 
     private final OpenOfficePreferences preferences;
@@ -157,12 +155,12 @@ public class AutoDetectPaths extends AbstractWorker {
         } else {
             // Linux:
             String usrRoot = "/usr/lib";
-            File inUsr = fileSearch.findFileInDir(new File(usrRoot), SOFFICE);
+            File inUsr = fileSearch.findFileInDir(new File(usrRoot), OpenOfficePreferences.LINUX_EXECUTABLE);
             if (fileSearchCancelled) {
                 return false;
             }
             if (inUsr == null) {
-                inUsr = fileSearch.findFileInDir(new File("/usr/lib64"), SOFFICE);
+                inUsr = fileSearch.findFileInDir(new File("/usr/lib64"), OpenOfficePreferences.LINUX_EXECUTABLE);
                 if (inUsr != null) {
                     usrRoot = "/usr/lib64";
                 }
@@ -171,15 +169,15 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCancelled) {
                 return false;
             }
-            File inOpt = fileSearch.findFileInDir(new File("/opt"), SOFFICE);
+            File inOpt = fileSearch.findFileInDir(new File("/opt"), OpenOfficePreferences.LINUX_EXECUTABLE);
             if (fileSearchCancelled) {
                 return false;
             }
             if ((inUsr != null) && (inOpt == null)) {
-                return setupPreferencesForOO(usrRoot, inUsr, SOFFICE);
+                return setupPreferencesForOO(usrRoot, inUsr, OpenOfficePreferences.LINUX_EXECUTABLE);
             } else if (inOpt != null) {
                 if (inUsr == null) {
-                    return setupPreferencesForOO("/opt", inOpt, SOFFICE);
+                    return setupPreferencesForOO("/opt", inOpt, OpenOfficePreferences.LINUX_EXECUTABLE);
                 } else { // Found both
                     JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
                     JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
@@ -200,9 +198,9 @@ public class AutoDetectPaths extends AbstractWorker {
                         return false;
                     }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt, SOFFICE);
+                        return setupPreferencesForOO("/opt", inOpt, OpenOfficePreferences.LINUX_EXECUTABLE);
                     } else {
-                        return setupPreferencesForOO(usrRoot, inUsr, SOFFICE);
+                        return setupPreferencesForOO(usrRoot, inUsr, OpenOfficePreferences.LINUX_EXECUTABLE);
                     }
                 }
             }

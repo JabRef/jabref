@@ -106,7 +106,6 @@ public class OpenOfficePanel extends AbstractWorker {
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OO bibliography"));
         preferences = new OpenOfficePreferences(Globals.prefs);
-        preferences.putDefaultPreferences();
         loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
                 Globals.prefs.getDefaultEncoding());
     }
