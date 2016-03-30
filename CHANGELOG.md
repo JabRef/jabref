@@ -80,6 +80,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#936](https://github.com/JabRef/jabref/issues/936): Preview panel is now updated when an entry is cut/deleted
 - Fixed [#1001](https://github.com/JabRef/jabref/issues/1001): No NPE when exporting a complete database
 - Fixed [#991](https://github.com/JabRef/jabref/issues/991): Entry is now correctly removed from the BibDatabase
+- Fixed [#1062](https://github.com/JabRef/jabref/issues/1062): Merge entry with DOI information now also applies changes to entry type
+
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
