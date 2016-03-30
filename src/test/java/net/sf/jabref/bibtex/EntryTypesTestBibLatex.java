@@ -48,7 +48,6 @@ public class EntryTypesTestBibLatex {
 
     @Test
     public void defaultType() {
-        EntryTypes types = new EntryTypes();
         assertEquals(BibLatexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype", BibDatabaseMode.BIBLATEX));
     }
 

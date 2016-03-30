@@ -37,7 +37,6 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -80,7 +79,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      */
     private String layoutFile;
 
-    private final Optional<BasePanel> panel;
+    private final Optional<BasePanel> basePanel;
 
     private JEditorPane previewPane;
 
@@ -137,7 +136,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.printAction = new PrintAction();
         this.copyPreviewAction = new CopyPreviewAction();
 
-        this.panel = Optional.ofNullable(panel);
+        this.basePanel = Optional.ofNullable(panel);
 
         createPreviewPane();
 
@@ -157,7 +156,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if (this.panel.isPresent()
+        if (this.basePanel.isPresent()
                 && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
@@ -188,7 +187,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         JPopupMenu menu = new JPopupMenu();
         menu.add(this.printAction);
         menu.add(this.copyPreviewAction);
-        this.panel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
+        this.basePanel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
         return menu;
     }
 
@@ -228,18 +227,13 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setEditable(false);
         previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
         previewPane.setContentType("text/html");
-        previewPane.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-                if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        String address = hyperlinkEvent.getURL().toString();
-                        JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData,
-                                address, "url");
-                    } catch (IOException e) {
-                        LOGGER.warn("Could not open external viewer", e);
-                    }
+        previewPane.addHyperlinkListener(hyperlinkEvent -> {
+            if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    String address = hyperlinkEvent.getURL().toString();
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData, address, "url");
+                } catch (IOException e) {
+                    LOGGER.warn("Could not open external viewer", e);
                 }
             }
         });
@@ -321,8 +315,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public void highlightPattern(Optional<Pattern> highlightPattern) {
-        this.highlightPattern = highlightPattern;
+    public void highlightPattern(Optional<Pattern> newPattern) {
+        this.highlightPattern = newPattern;
         update();
     }
 
@@ -350,6 +344,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                     JOptionPane.showMessageDialog(PreviewPanel.this,
                             Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
                             Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.info("Could not print preview", e);
                 }
             });
         }
@@ -364,7 +359,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.ifPresent(BasePanel::hideBottomComponent);
+            basePanel.ifPresent(BasePanel::hideBottomComponent);
         }
 
 

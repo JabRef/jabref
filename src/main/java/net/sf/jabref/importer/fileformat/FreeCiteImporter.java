@@ -106,7 +106,7 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IOException e) {
             status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            Collections.emptyList();
+            return Collections.emptyList();
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())

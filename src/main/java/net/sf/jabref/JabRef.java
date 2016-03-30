@@ -90,7 +90,7 @@ public class JabRef {
         InternalBibtexFields.setNumericFieldsFromPrefs();
 
         /* Build list of Import and Export formats */
-        Globals.importFormatReader.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports();
 
@@ -101,10 +101,10 @@ public class JabRef {
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
         if (remotePreferences.useRemoteServer()) {
 
-            Globals.remoteListener.open(new JabRefMessageHandler(this), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(this), remotePreferences.getPort());
 
-            if (Globals.remoteListener.isOpen()) {
-                Globals.remoteListener.start(); // we are alone, we start the server
+            if (Globals.REMOTE_LISTENER.isOpen()) {
+                Globals.REMOTE_LISTENER.start(); // we are alone, we start the server
             } else {
                 // we are not alone, there is already a server out there, try to contact already running JabRef:
                 if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
@@ -829,9 +829,9 @@ public class JabRef {
                 try {
                     List<BibEntry> entries;
                     if (OS.WINDOWS) {
-                        entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRef.jrf);
                     } else {
-                        entries = Globals.importFormatReader.importFromFile(data[1],
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
                                 data[0].replace("~", System.getProperty("user.home")), JabRef.jrf);
                     }
                     return Optional.of(new ParserResult(entries));
@@ -845,9 +845,9 @@ public class JabRef {
 
                 ImportFormatReader.UnknownFormatImport importResult;
                 if (OS.WINDOWS) {
-                    importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
+                    importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(data[0]);
                 } else {
-                    importResult = Globals.importFormatReader
+                    importResult = Globals.IMPORT_FORMAT_READER
                             .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
                 }
 

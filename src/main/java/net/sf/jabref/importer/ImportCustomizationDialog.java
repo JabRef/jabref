@@ -159,7 +159,7 @@ public class ImportCustomizationDialog extends JDialog {
                 customImporterTable.removeRowSelectionInterval(row, row);
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
-                Globals.importFormatReader.resetImportFormats();
+                Globals.IMPORT_FORMAT_READER.resetImportFormats();
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -251,7 +251,7 @@ public class ImportCustomizationDialog extends JDialog {
      */
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
-        Globals.importFormatReader.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats();
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 
