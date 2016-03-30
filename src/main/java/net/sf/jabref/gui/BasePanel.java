@@ -1753,16 +1753,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             form.switchTo(entry);
-            //if (visName != null)
-            //    form.setVisiblePanel(visName);
         } else {
             // We must instantiate a new editor for this type. First make sure the old one
             // stores its last edit:
             storeCurrentEdit();
             // Then start the new one:
             form = new EntryEditor(frame, BasePanel.this, entry);
-            //if (visName != null)
-            //    form.setVisiblePanel(visName);
 
             entryEditors.put(entry.getType(), form);
         }

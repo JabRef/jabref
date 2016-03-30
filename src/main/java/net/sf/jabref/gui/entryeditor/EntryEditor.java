@@ -673,15 +673,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         return tabbed.getSelectedComponent().getName();
     }
 
-    /**
-     * Sets the panel with the given index visible.
-     *
-     * @param i an <code>int</code> value
-     */
-    public void setVisiblePanel(int i) {
-        tabbed.setSelectedIndex(Math.min(i, tabbed.getTabCount() - 1));
-    }
-
     public void setVisiblePanel(String name) {
         for (int i = 0; i < tabbed.getTabCount(); ++i) {
             if ((tabbed.getComponent(i).getName() != null) && tabbed.getComponent(i).getName().equals(name)) {
@@ -752,22 +743,20 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKey();
-            boolean anyChanged = false;
-            boolean changedType = false;
+            boolean entryChanged = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
             if (panel.getDatabase().setCiteKeyForEntry(entry, newKey)) {
                 duplicateWarning = true;
-
-                // First, remove fields that the user have removed.
             }
 
+            // First, remove fields that the user has removed.
             for (String field : entry.getFieldNames()) {
                 if (InternalBibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
                     compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
                     entry.clearField(field);
-                    anyChanged = true;
+                    entryChanged = true;
                 }
             }
 
@@ -781,7 +770,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                     compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                     entry.setField(field, newValue);
-                    anyChanged = true;
+                    entryChanged = true;
                 }
             }
 
@@ -789,12 +778,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             if (!Objects.equals(newEntry.getType(), entry.getType())) {
                 compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
                 entry.setType(newEntry.getType());
-                anyChanged = true;
-                changedType = true;
+                entryChanged = true;
             }
             compound.end();
 
-            if (!anyChanged) {
+            if (!entryChanged) {
                 return true;
             }
 
@@ -810,7 +798,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             lastSourceStringAccepted = source.getText();
             // Update UI
-            // TODO: we need to repaint if fields that are not displayed have been added
+            // TODO: we need to repaint the entryeditor if fields that are not displayed have been added
             panel.updateEntryEditorIfShowing();
             lastSourceAccepted = true;
             updateSource = true;
