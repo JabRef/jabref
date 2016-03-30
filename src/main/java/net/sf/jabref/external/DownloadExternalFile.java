@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -120,46 +121,39 @@ public class DownloadExternalFile {
         final URL urlF = url;
         final URLDownload udlF = udl;
 
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    udlF.downloadToFile(tmp);
-                } catch (IOException e2) {
-                    dontShowDialog = true;
-                    if ((editor != null) && editor.isVisible()) {
-                        editor.setVisible(false, false);
-                    }
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
-                                    + e2.getMessage(), Localization.lang("Download file"),
-                            JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
-                    return;
+        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            try {
+                udlF.downloadToFile(tmp);
+            } catch (IOException e2) {
+                dontShowDialog = true;
+                if ((editor != null) && editor.isVisible()) {
+                    editor.setVisible(false, false);
                 }
-                // Download finished: call the method that stops the progress bar etc.:
-                SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
+                JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + e2.getMessage(),
+                        Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
+                return;
             }
+            // Download finished: call the method that stops the progress bar etc.:
+            SwingUtilities.invokeLater(DownloadExternalFile.this::downloadFinished);
         });
 
-        ExternalFileType suggestedType = null;
+        Optional<ExternalFileType> suggestedType = Optional.empty();
         if (mimeType != null) {
             LOGGER.debug("MIME Type suggested: " + mimeType);
             suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
         String suffix;
-        if (suggestedType == null) {
+        if (suggestedType.isPresent()) {
+            suffix = suggestedType.get().getExtension();
+        } else {
             // If we didn't find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
             if (suffix == null) {
                 suffix = "";
             }
             suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix);
-        } else {
-            suffix = suggestedType.getExtension();
-            if (suffix == null) {
-                suffix = "";
-            }
         }
 
         String suggestedName = getSuggestedFileName(suffix);
@@ -325,7 +319,7 @@ public class DownloadExternalFile {
         } else {
             suffix = strippedLink.substring(strippedLinkIndex + 1);
         }
-        if (ExternalFileTypes.getInstance().getExternalFileTypeByExt(suffix) == null) {
+        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
             // If the suffix doesn't seem to give any reasonable file type, try
             // with the non-stripped link:
             int index = link.lastIndexOf('.');

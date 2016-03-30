@@ -27,7 +27,6 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import org.apache.commons.logging.Log;
@@ -42,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -206,19 +206,16 @@ public class FileListEntryEditor {
 
             // Check if this looks like a remote link:
             if (FileListEntryEditor.REMOTE_LINK_PATTERN.matcher(link.getText()).matches()) {
-                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
-                if (type != null) {
-                    types.setSelectedItem(type);
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+                if (type.isPresent()) {
+                    types.setSelectedItem(type.get());
                     return;
                 }
             }
 
             // Try to guess the file type:
             String theLink = link.getText().trim();
-            ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink);
-            if (type != null) {
-                types.setSelectedItem(type);
-            }
+            ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink).ifPresent(types::setSelectedItem);
         }
     }
 
@@ -226,7 +223,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null) {
             try {
-                JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
+                JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), Optional.of(type));
             } catch (IOException e) {
                 LOGGER.error("File could not be opened", e);
             }
@@ -277,8 +274,8 @@ public class FileListEntryEditor {
         types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        if ((entry.type != null) && !(entry.type instanceof UnknownExternalFileType)) {
-            types.setSelectedItem(entry.type);
+        if ((entry.type.isPresent()) && !(entry.type.get() instanceof UnknownExternalFileType)) {
+            types.setSelectedItem(entry.type.get());
         } else if ((entry.link != null) && (!entry.link.isEmpty())) {
             checkExtension();
         }
@@ -319,7 +316,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
         entry.description = descriptionText;
-        entry.type = type;
+        entry.type = Optional.ofNullable(type);
         entry.link = link;
     }
 

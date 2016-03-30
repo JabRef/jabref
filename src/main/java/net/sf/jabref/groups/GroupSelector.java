@@ -1398,7 +1398,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            frame.sidePaneManager.hide("groups");
+            frame.getSidePaneManager().hide("groups");
             return;
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
@@ -1412,10 +1412,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         // auto show/hide groups interface
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW) && !groupsRoot.isLeaf()) { // groups were defined
-            frame.sidePaneManager.show("groups");
+            frame.getSidePaneManager().show("groups");
             frame.groupToggle.setSelected(true);
         } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE) && groupsRoot.isLeaf()) { // groups were not defined
-            frame.sidePaneManager.hide("groups");
+            frame.getSidePaneManager().hide("groups");
             frame.groupToggle.setSelected(false);
         }
 

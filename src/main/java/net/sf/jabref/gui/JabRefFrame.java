@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
@@ -87,7 +88,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
     private static final String ELLIPSES = "...";
 
-    final JSplitPane contentPane = new JSplitPane();
+    private final JSplitPane splitPane = new JSplitPane();
 
     private final JabRefPreferences prefs = Globals.prefs;
     private PreferencesDialog prefsDialog;
@@ -95,7 +96,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private int lastTabbedPanelSelectionIndex = -1;
 
     // The sidepane manager takes care of populating the sidepane.
-    public SidePaneManager sidePaneManager;
+    private SidePaneManager sidePaneManager;
 
     private JTabbedPane tabbedPane; // initialized at constructor
 
@@ -186,8 +187,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /* References to the toggle buttons in the toolbar */
     // the groups interface
     public JToggleButton groupToggle;
-    public JToggleButton previewToggle;
-    public JToggleButton fetcherToggle;
+    private JToggleButton previewToggle;
+    private JToggleButton fetcherToggle;
 
 
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
@@ -448,11 +449,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final List<Action> fetcherActions = new LinkedList<>();
 
-    public GroupSelector groupSelector;
+    private GroupSelector groupSelector;
+
+    private int previousTabCount = -1;
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
+
+    // The action for closing the current database and leaving the window open.
+    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
+    private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
+    private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
+
+    // The action for opening the preferences dialog.
+    private final AbstractAction showPrefs = new ShowPrefsAction();
+
+    // Lists containing different subsets of actions for different purposes
+    private final List<Object> specialFieldButtons = new LinkedList<>();
+    private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
+    private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
+    private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
 
 
     private class EditModeAction extends AbstractAction {
@@ -757,7 +774,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
         // Store divider location for side pane:
-        int width = contentPane.getDividerLocation();
+        int width = splitPane.getDividerLocation();
         if (width > 0) {
             prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, width);
         }
@@ -886,8 +903,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
-        contentPane.setDividerSize(2);
-        contentPane.setBorder(null);
+        splitPane.setDividerSize(2);
+        splitPane.setBorder(null);
         //getContentPane().setBackground(GUIGlobals.lightGray);
         con.fill = GridBagConstraints.HORIZONTAL;
         con.anchor = GridBagConstraints.WEST;
@@ -929,13 +946,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //tabbedPane.setVisible(false);
         //tabbedPane.setForeground(GUIGlobals.lightGray);
         con.weighty = 1;
-        gbl.setConstraints(contentPane, con);
-        getContentPane().add(contentPane);
+        gbl.setConstraints(splitPane, con);
+        getContentPane().add(splitPane);
 
         UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
 
-        contentPane.setRightComponent(tabbedPane);
-        contentPane.setLeftComponent(sidePaneManager.getPanel());
+        splitPane.setRightComponent(tabbedPane);
+        splitPane.setLeftComponent(sidePaneManager.getPanel());
         sidePaneManager.updateView();
 
         JPanel status = new JPanel();
@@ -1129,7 +1146,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void fillMenu() {
-        //mb.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         mb.setBorder(null);
         JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
@@ -1496,11 +1512,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
-    private final List<Object> specialFieldButtons = new LinkedList<>();
-    private final List<Object> openDatabaseOnlyActions = new LinkedList<>();
-    private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
-    private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
-
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
@@ -1548,8 +1559,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
     }
-
-    private int previousTabCount = -1;
 
     /**
      * Enable or Disable all actions based on the number of open tabs.
@@ -1720,14 +1729,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             quit();
         }
     }
-
-    // The action for closing the current database and leaving the window open.
-    private final CloseDatabaseAction closeDatabaseAction = new CloseDatabaseAction();
-    private final CloseAllDatabasesAction closeAllDatabasesAction = new CloseAllDatabasesAction();
-    private final CloseOtherDatabasesAction closeOtherDatabasesAction = new CloseOtherDatabasesAction();
-
-    // The action for opening the preferences dialog.
-    private final AbstractAction showPrefs = new ShowPrefsAction();
 
     class ShowPrefsAction extends MnemonicAwareAction {
 
@@ -2060,8 +2061,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private static class MyGlassPane extends JPanel {
-
-        //ForegroundLabel infoLabel = new ForegroundLabel("Showing search");
         public MyGlassPane() {
             addKeyListener(new KeyAdapter() {
                 // Nothing
@@ -2224,9 +2223,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class ToolBar extends OSXCompatibleToolbar {
+    private class ToolBar extends OSXCompatibleToolbar {
 
-        void addAction(Action a) {
+        public void addAction(Action a) {
             JButton b = new JButton(a);
             b.setText(null);
             if (!OS.OS_X) {
@@ -2240,7 +2239,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             add(b);
         }
 
-        void addJToogleButton(JToggleButton button) {
+        public void addJToogleButton(JToggleButton button) {
             button.setText(null);
             if (!OS.OS_X) {
                 button.setMargin(marg);
@@ -2268,5 +2267,25 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public AbstractAction getSwitchPreviewAction() {
         return switchPreview;
+    }
+
+    public JSplitPane getSplitPane() {
+        return splitPane;
+    }
+
+    public SidePaneManager getSidePaneManager() {
+        return sidePaneManager;
+    }
+
+    public GroupSelector getGroupSelector() {
+        return groupSelector;
+    }
+
+    public void setFetcherToggle(boolean enabled) {
+        fetcherToggle.setSelected(enabled);
+    }
+
+    public void setPreviewToggle(boolean enabled) {
+        previewToggle.setSelected(enabled);
     }
 }

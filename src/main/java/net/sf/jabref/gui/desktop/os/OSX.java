@@ -6,14 +6,14 @@ import net.sf.jabref.external.ExternalFileTypes;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class OSX implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
-        ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
-
-        if (type != null && !type.getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.getOpenWithApplication());
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
+            openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             String[] cmd = { "/usr/bin/open", filePath };
             Runtime.getRuntime().exec(cmd);

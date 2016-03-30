@@ -106,7 +106,7 @@ public class BibEntry {
      */
     public void setType(String type) {
         String newType;
-        if (type == null) {
+        if ((type == null) || type.isEmpty()) {
             newType = DEFAULT_TYPE;
         } else {
             newType = type;
@@ -181,7 +181,7 @@ public class BibEntry {
     private String normalizeFieldName(String fieldName) {
         Objects.requireNonNull(fieldName, "field name must not be null");
 
-        return fieldName.toLowerCase();
+        return fieldName.toLowerCase(Locale.ENGLISH);
     }
 
     /**
@@ -545,11 +545,16 @@ public class BibEntry {
         } else {
             newValue = String.join(", ", keywords);
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (newValue == null) {
+            if (oldValue != null) {
+                this.clearField("keywords");
+                changed = true;
+            }
             return;
         }
         if ((oldValue == null) || !oldValue.equals(newValue)) {
             this.setField("keywords", newValue);
+            changed = true;
         }
     }
 

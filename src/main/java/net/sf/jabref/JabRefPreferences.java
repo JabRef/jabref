@@ -58,6 +58,7 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.CustomExportList;
 import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.external.DroppedFileHandler;

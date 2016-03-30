@@ -45,7 +45,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -58,6 +57,7 @@ import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
@@ -392,7 +392,7 @@ public class SearchResultsDialog {
                         description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.getIcon(), p.getBibDatabaseContext().getMetaData(),
+                            flEntry.link, flEntry.type.get().getIcon(), p.getBibDatabaseContext().getMetaData(),
                             flEntry.type));
                     count++;
                 }
@@ -457,10 +457,10 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            if (tmpModel.getEntry(0).type == null) {
-                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            if (tmpModel.getEntry(0).type.isPresent()) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.get().getIcon());
                             } else {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
                             }
                         }
                         return fileLabel;

@@ -494,7 +494,7 @@ public class VM implements Warn {
             }
             String s = (String) o1;
 
-            stack.push(AuthorList.getAuthorList(s).size());
+            stack.push(AuthorList.parse(s).getNumberOfAuthors());
         });
 
         /**

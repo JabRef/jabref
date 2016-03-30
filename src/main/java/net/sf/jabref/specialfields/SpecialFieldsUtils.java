@@ -16,13 +16,11 @@
 package net.sf.jabref.specialfields;
 
 import java.util.List;
-
-import net.sf.jabref.util.Util;
-
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.util.UpdateField;
 
 public class SpecialFieldsUtils {
 
@@ -78,7 +76,8 @@ public class SpecialFieldsUtils {
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
     public static void updateField(SpecialField e, String value, BibEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
-        Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
+        UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
+                .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
@@ -145,7 +144,8 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        Util.updateNonDisplayableField(be, c.getFieldName(), newValue, nc);
+        UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue)
+                .ifPresent(fieldChange -> nc.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
     /**

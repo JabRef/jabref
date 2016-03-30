@@ -45,17 +45,16 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 public class PdfImporter {
 
@@ -216,7 +215,7 @@ public class PdfImporter {
         List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
-                ExternalFileTypes.getInstance().getExternalFileTypeByName("pdf")));
+                ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
         entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
         res.add(entry);
 
@@ -286,7 +285,7 @@ public class PdfImporter {
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                Util.setAutomaticFields(list, true, true, false);
+                UpdateField.setAutomaticFields(list, true, true);
 
                 // Create an UndoableInsertEntry object.
                 panel.undoManager.addEdit(new UndoableInsertEntry(panel.database(), be, panel));

@@ -17,7 +17,7 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.AuthorList.Author;
+import net.sf.jabref.model.entry.Author;
 
 /**
  * Will return the Authors to match the OrgSci format:
@@ -40,14 +40,14 @@ public class AuthorOrgSci implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        AuthorList a = AuthorList.getAuthorList(fieldText);
-        if (a.size() == 0) {
+        AuthorList a = AuthorList.parse(fieldText);
+        if (a.isEmpty()) {
             return fieldText;
         }
         Author first = a.getAuthor(0);
         StringBuilder sb = new StringBuilder();
         sb.append(first.getLastFirst(true));
-        for (int i = 1; i < a.size(); i++) {
+        for (int i = 1; i < a.getNumberOfAuthors(); i++) {
             sb.append(", ").append(a.getAuthor(i).getFirstLast(true));
         }
         return sb.toString();

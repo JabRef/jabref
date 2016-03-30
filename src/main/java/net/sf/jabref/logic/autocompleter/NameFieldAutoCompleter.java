@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -92,8 +93,8 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         for (String fieldName : fieldNames) {
             if (entry.hasField(fieldName)) {
                 String fieldValue = entry.getField(fieldName);
-                AuthorList authorList = AuthorList.getAuthorList(fieldValue);
-                for (AuthorList.Author author : authorList.getAuthorList()) {
+                AuthorList authorList = AuthorList.parse(fieldValue);
+                for (Author author : authorList.getAuthors()) {
                     handleAuthor(author);
                 }
             }
@@ -118,7 +119,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         return result;
     }
 
-    private void handleAuthor(AuthorList.Author author) {
+    private void handleAuthor(Author author) {
         if (lastNameOnlyAndSeparationBySpace) {
             addItemToIndex(author.getLastOnly());
         } else {

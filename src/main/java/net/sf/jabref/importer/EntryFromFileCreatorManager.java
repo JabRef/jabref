@@ -69,7 +69,8 @@ public final class EntryFromFileCreatorManager {
     private boolean hasSpecialisedCreatorForExternalFileType(
             ExternalFileType externalFileType) {
         for (EntryFromFileCreator entryCreator : entryCreators) {
-            if ((entryCreator.getExternalFileType() == null) || (entryCreator.getExternalFileType().getExtension() == null)) {
+            if ((entryCreator.getExternalFileType() == null)
+                    || (entryCreator.getExternalFileType().getExtension().isEmpty())) {
                 continue;
             }
             if (entryCreator.getExternalFileType().getExtension().equals(

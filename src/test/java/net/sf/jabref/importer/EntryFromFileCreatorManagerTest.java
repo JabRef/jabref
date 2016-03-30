@@ -27,9 +27,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +60,9 @@ public class EntryFromFileCreatorManagerTest {
     @Test
     @Ignore
     public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
-        try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
-            ParserResult result = BibtexParser.parse(fr);
+        try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+            ParserResult result = BibtexParser.parse(reader);
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();

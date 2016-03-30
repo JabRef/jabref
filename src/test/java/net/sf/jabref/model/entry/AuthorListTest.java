@@ -30,9 +30,9 @@ public class AuthorListTest {
     @Test
     public void testGetAuthorList() {
         // Test caching in authorCache.
-        AuthorList al = AuthorList.getAuthorList("John Smith");
-        Assert.assertTrue(al == AuthorList.getAuthorList("John Smith"));
-        Assert.assertFalse(al == AuthorList.getAuthorList("Smith"));
+        AuthorList al = AuthorList.parse("John Smith");
+        Assert.assertTrue(al == AuthorList.parse("John Smith"));
+        Assert.assertFalse(al == AuthorList.parse("Smith"));
     }
 
     @SuppressWarnings("unused")
@@ -300,7 +300,7 @@ public class AuthorListTest {
     }
 
     public static int size(String bibtex) {
-        return AuthorList.getAuthorList(bibtex).size();
+        return AuthorList.parse(bibtex).getNumberOfAuthors();
     }
 
     @Test
@@ -329,21 +329,20 @@ public class AuthorListTest {
     @Test
     public void testIsEmpty() {
 
-        Assert.assertTrue(AuthorList.getAuthorList("").isEmpty());
-        Assert.assertFalse(AuthorList.getAuthorList("Bar").isEmpty());
+        Assert.assertTrue(AuthorList.parse("").isEmpty());
+        Assert.assertFalse(AuthorList.parse("Bar").isEmpty());
     }
 
     @Test(expected = Exception.class)
     public void testGetEmptyAuthor() {
-        AuthorList.getAuthorList("").getAuthor(0);
+        AuthorList.parse("").getAuthor(0);
         Assert.fail();
     }
 
     @Test
     public void testGetAuthor() {
 
-        AuthorList.Author author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John")
-                .getAuthor(0);
+        Author author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(0);
         Assert.assertEquals("John", author.getFirst());
         Assert.assertEquals("J.", author.getFirstAbbr());
         Assert.assertEquals("John Smith", author.getFirstLast(false));
@@ -356,7 +355,7 @@ public class AuthorListTest {
         Assert.assertEquals("Smith, J.", author.getNameForAlphabetization());
         Assert.assertEquals(null, author.getVon());
 
-        author = AuthorList.getAuthorList("Peter Black Brown").getAuthor(0);
+        author = AuthorList.parse("Peter Black Brown").getAuthor(0);
         Assert.assertEquals("Peter Black", author.getFirst());
         Assert.assertEquals("P. B.", author.getFirstAbbr());
         Assert.assertEquals("Peter Black Brown", author.getFirstLast(false));
@@ -364,7 +363,7 @@ public class AuthorListTest {
         Assert.assertEquals(null, author.getJr());
         Assert.assertEquals(null, author.getVon());
 
-        author = AuthorList.getAuthorList("John Smith and von Neumann, Jr, John").getAuthor(1);
+        author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(1);
         Assert.assertEquals("John", author.getFirst());
         Assert.assertEquals("J.", author.getFirstAbbr());
         Assert.assertEquals("John von Neumann, Jr", author.getFirstLast(false));
@@ -380,44 +379,47 @@ public class AuthorListTest {
 
     @Test
     public void testGetAuthorsNatbib() {
-        Assert.assertEquals("", AuthorList.getAuthorList("").getAuthorsNatbib());
-        Assert.assertEquals("Smith", AuthorList.getAuthorList("John Smith").getAuthorsNatbib());
-        Assert.assertEquals("Smith and Black Brown", AuthorList.getAuthorList(
-                "John Smith and Black Brown, Peter").getAuthorsNatbib());
-        Assert.assertEquals("von Neumann et al.", AuthorList.getAuthorList(
-                "John von Neumann and John Smith and Black Brown, Peter").getAuthorsNatbib());
+        Assert.assertEquals("", AuthorList.parse("").getAsNatbib());
+        Assert.assertEquals("Smith", AuthorList.parse("John Smith").getAsNatbib());
+        Assert.assertEquals("Smith and Black Brown", AuthorList.parse(
+                "John Smith and Black Brown, Peter").getAsNatbib());
+        Assert.assertEquals("von Neumann et al.", AuthorList.parse(
+                "John von Neumann and John Smith and Black Brown, Peter").getAsNatbib());
 
         /*
          * [ 1465610 ] (Double-)Names containing hyphen (-) not handled correctly
          */
-        Assert.assertEquals("Last-Name et al.", AuthorList.getAuthorList(
-                "First Second Last-Name" + " and John Smith and Black Brown, Peter").getAuthorsNatbib());
+        Assert.assertEquals("Last-Name et al.", AuthorList.parse(
+                "First Second Last-Name" + " and John Smith and Black Brown, Peter").getAsNatbib());
 
         // Test caching
         AuthorList al = AuthorList
-                .getAuthorList("John von Neumann and John Smith and Black Brown, Peter");
-        Assert.assertTrue(al.getAuthorsNatbib().equals(al.getAuthorsNatbib()));
+                .parse("John von Neumann and John Smith and Black Brown, Peter");
+        Assert.assertTrue(al.getAsNatbib().equals(al.getAsNatbib()));
     }
 
     @Test
     public void testGetAuthorsLastOnly() {
 
         // No comma before and
-        Assert.assertEquals("", AuthorList.getAuthorList("").getAuthorsLastOnly(false));
-        Assert.assertEquals("Smith", AuthorList.getAuthorList("John Smith").getAuthorsLastOnly(false));
-        Assert.assertEquals("Smith", AuthorList.getAuthorList("Smith, Jr, John").getAuthorsLastOnly(
+        Assert.assertEquals("", AuthorList.parse("").getAsLastNames(false));
+        Assert.assertEquals("Smith", AuthorList.parse("John Smith").getAsLastNames(false));
+        Assert.assertEquals("Smith", AuthorList.parse("Smith, Jr, John").getAsLastNames(
                 false));
 
-        Assert.assertEquals("von Neumann, Smith and Black Brown", AuthorList.getAuthorList(
-                "John von Neumann and John Smith and Black Brown, Peter").getAuthorsLastOnly(false));
+        Assert.assertEquals("von Neumann, Smith and Black Brown", AuthorList.parse(
+                "John von Neumann and John Smith and Black Brown, Peter").getAsLastNames(false));
         // Oxford comma
-        Assert.assertEquals("", AuthorList.getAuthorList("").getAuthorsLastOnly(true));
-        Assert.assertEquals("Smith", AuthorList.getAuthorList("John Smith").getAuthorsLastOnly(true));
-        Assert.assertEquals("Smith", AuthorList.getAuthorList("Smith, Jr, John").getAuthorsLastOnly(
+        Assert.assertEquals("", AuthorList.parse("").getAsLastNames(true));
+        Assert.assertEquals("Smith", AuthorList.parse("John Smith").getAsLastNames(true));
+        Assert.assertEquals("Smith", AuthorList.parse("Smith, Jr, John").getAsLastNames(
                 true));
 
-        Assert.assertEquals("von Neumann, Smith, and Black Brown", AuthorList.getAuthorList(
-                "John von Neumann and John Smith and Black Brown, Peter").getAuthorsLastOnly(true));
+        Assert.assertEquals("von Neumann, Smith, and Black Brown", AuthorList.parse(
+                "John von Neumann and John Smith and Black Brown, Peter").getAsLastNames(true));
+
+        Assert.assertEquals("von Neumann and Smith",
+                AuthorList.parse("John von Neumann and John Smith").getAsLastNames(false));
     }
 
     @Test
@@ -425,27 +427,27 @@ public class AuthorListTest {
         // No commas before and
         AuthorList al;
 
-        al = AuthorList.getAuthorList("");
-        Assert.assertEquals("", al.getAuthorsLastFirst(true, false));
-        Assert.assertEquals("", al.getAuthorsLastFirst(false, false));
+        al = AuthorList.parse("");
+        Assert.assertEquals("", al.getAsLastFirstNames(true, false));
+        Assert.assertEquals("", al.getAsLastFirstNames(false, false));
 
-        al = AuthorList.getAuthorList("John Smith");
-        Assert.assertEquals("Smith, John", al.getAuthorsLastFirst(false, false));
-        Assert.assertEquals("Smith, J.", al.getAuthorsLastFirst(true, false));
+        al = AuthorList.parse("John Smith");
+        Assert.assertEquals("Smith, John", al.getAsLastFirstNames(false, false));
+        Assert.assertEquals("Smith, J.", al.getAsLastFirstNames(true, false));
 
-        al = AuthorList.getAuthorList("John Smith and Black Brown, Peter");
-        Assert.assertEquals("Smith, John and Black Brown, Peter", al.getAuthorsLastFirst(false, false));
-        Assert.assertEquals("Smith, J. and Black Brown, P.", al.getAuthorsLastFirst(true, false));
+        al = AuthorList.parse("John Smith and Black Brown, Peter");
+        Assert.assertEquals("Smith, John and Black Brown, Peter", al.getAsLastFirstNames(false, false));
+        Assert.assertEquals("Smith, J. and Black Brown, P.", al.getAsLastFirstNames(true, false));
 
-        al = AuthorList.getAuthorList("John von Neumann and John Smith and Black Brown, Peter");
+        al = AuthorList.parse("John von Neumann and John Smith and Black Brown, Peter");
         // Method description is different than code -> additional comma
         // there
         Assert.assertEquals("von Neumann, John, Smith, John and Black Brown, Peter",
-                al.getAuthorsLastFirst(false, false));
-        Assert.assertEquals("von Neumann, J., Smith, J. and Black Brown, P.", al.getAuthorsLastFirst(true, false));
+                al.getAsLastFirstNames(false, false));
+        Assert.assertEquals("von Neumann, J., Smith, J. and Black Brown, P.", al.getAsLastFirstNames(true, false));
 
-        al = AuthorList.getAuthorList("John Peter von Neumann");
-        Assert.assertEquals("von Neumann, J. P.", al.getAuthorsLastFirst(true, false));
+        al = AuthorList.parse("John Peter von Neumann");
+        Assert.assertEquals("von Neumann, J. P.", al.getAsLastFirstNames(true, false));
     }
 
     @Test
@@ -453,48 +455,48 @@ public class AuthorListTest {
         // Oxford comma
         AuthorList al;
 
-        al = AuthorList.getAuthorList("");
-        Assert.assertEquals("", al.getAuthorsLastFirst(true, true));
-        Assert.assertEquals("", al.getAuthorsLastFirst(false, true));
+        al = AuthorList.parse("");
+        Assert.assertEquals("", al.getAsLastFirstNames(true, true));
+        Assert.assertEquals("", al.getAsLastFirstNames(false, true));
 
-        al = AuthorList.getAuthorList("John Smith");
-        Assert.assertEquals("Smith, John", al.getAuthorsLastFirst(false, true));
-        Assert.assertEquals("Smith, J.", al.getAuthorsLastFirst(true, true));
+        al = AuthorList.parse("John Smith");
+        Assert.assertEquals("Smith, John", al.getAsLastFirstNames(false, true));
+        Assert.assertEquals("Smith, J.", al.getAsLastFirstNames(true, true));
 
-        al = AuthorList.getAuthorList("John Smith and Black Brown, Peter");
-        Assert.assertEquals("Smith, John and Black Brown, Peter", al.getAuthorsLastFirst(false, true));
-        Assert.assertEquals("Smith, J. and Black Brown, P.", al.getAuthorsLastFirst(true, true));
+        al = AuthorList.parse("John Smith and Black Brown, Peter");
+        Assert.assertEquals("Smith, John and Black Brown, Peter", al.getAsLastFirstNames(false, true));
+        Assert.assertEquals("Smith, J. and Black Brown, P.", al.getAsLastFirstNames(true, true));
 
-        al = AuthorList.getAuthorList("John von Neumann and John Smith and Black Brown, Peter");
+        al = AuthorList.parse("John von Neumann and John Smith and Black Brown, Peter");
         Assert.assertEquals("von Neumann, John, Smith, John, and Black Brown, Peter", al
-                .getAuthorsLastFirst(false, true));
-        Assert.assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", al.getAuthorsLastFirst(
+                .getAsLastFirstNames(false, true));
+        Assert.assertEquals("von Neumann, J., Smith, J., and Black Brown, P.", al.getAsLastFirstNames(
                 true, true));
 
-        al = AuthorList.getAuthorList("John Peter von Neumann");
-        Assert.assertEquals("von Neumann, J. P.", al.getAuthorsLastFirst(true, true));
+        al = AuthorList.parse("John Peter von Neumann");
+        Assert.assertEquals("von Neumann, J. P.", al.getAsLastFirstNames(true, true));
     }
 
     @Test
     public void testGetAuthorsLastFirstAnds() {
-        Assert.assertEquals("Smith, John", AuthorList.getAuthorList("John Smith").getAuthorsLastFirstAnds(
+        Assert.assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(
                 false));
-        Assert.assertEquals("Smith, John and Black Brown, Peter", AuthorList.getAuthorList(
-                "John Smith and Black Brown, Peter").getAuthorsLastFirstAnds(false));
+        Assert.assertEquals("Smith, John and Black Brown, Peter", AuthorList.parse(
+                "John Smith and Black Brown, Peter").getAsLastFirstNamesWithAnd(false));
         Assert.assertEquals("von Neumann, John and Smith, John and Black Brown, Peter", AuthorList
-                .getAuthorList("John von Neumann and John Smith and Black Brown, Peter")
-                .getAuthorsLastFirstAnds(false));
-        Assert.assertEquals("von Last, Jr, First", AuthorList.getAuthorList("von Last, Jr ,First")
-                .getAuthorsLastFirstAnds(false));
+                .parse("John von Neumann and John Smith and Black Brown, Peter")
+                .getAsLastFirstNamesWithAnd(false));
+        Assert.assertEquals("von Last, Jr, First", AuthorList.parse("von Last, Jr ,First")
+                .getAsLastFirstNamesWithAnd(false));
 
-        Assert.assertEquals("Smith, J.", AuthorList.getAuthorList("John Smith").getAuthorsLastFirstAnds(
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(
                 true));
-        Assert.assertEquals("Smith, J. and Black Brown, P.", AuthorList.getAuthorList(
-                "John Smith and Black Brown, Peter").getAuthorsLastFirstAnds(true));
-        Assert.assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.", AuthorList.getAuthorList(
-                "John von Neumann and John Smith and Black Brown, Peter").getAuthorsLastFirstAnds(true));
-        Assert.assertEquals("von Last, Jr, F.", AuthorList.getAuthorList("von Last, Jr ,First")
-                .getAuthorsLastFirstAnds(true));
+        Assert.assertEquals("Smith, J. and Black Brown, P.", AuthorList.parse(
+                "John Smith and Black Brown, Peter").getAsLastFirstNamesWithAnd(true));
+        Assert.assertEquals("von Neumann, J. and Smith, J. and Black Brown, P.", AuthorList.parse(
+                "John von Neumann and John Smith and Black Brown, Peter").getAsLastFirstNamesWithAnd(true));
+        Assert.assertEquals("von Last, Jr, F.", AuthorList.parse("von Last, Jr ,First")
+                .getAsLastFirstNamesWithAnd(true));
 
     }
 
@@ -503,75 +505,79 @@ public class AuthorListTest {
 
         AuthorList al;
 
-        al = AuthorList.getAuthorList("");
-        Assert.assertEquals("", al.getAuthorsFirstFirst(true, false));
-        Assert.assertEquals("", al.getAuthorsFirstFirst(false, false));
-        Assert.assertEquals("", al.getAuthorsFirstFirst(true, true));
-        Assert.assertEquals("", al.getAuthorsFirstFirst(false, true));
+        al = AuthorList.parse("");
+        Assert.assertEquals("", al.getAsFirstLastNames(true, false));
+        Assert.assertEquals("", al.getAsFirstLastNames(false, false));
+        Assert.assertEquals("", al.getAsFirstLastNames(true, true));
+        Assert.assertEquals("", al.getAsFirstLastNames(false, true));
 
-        al = AuthorList.getAuthorList("John Smith");
-        Assert.assertEquals("John Smith", al.getAuthorsFirstFirst(false, false));
-        Assert.assertEquals("J. Smith", al.getAuthorsFirstFirst(true, false));
-        Assert.assertEquals("John Smith", al.getAuthorsFirstFirst(false, true));
-        Assert.assertEquals("J. Smith", al.getAuthorsFirstFirst(true, true));
+        al = AuthorList.parse("John Smith");
+        Assert.assertEquals("John Smith", al.getAsFirstLastNames(false, false));
+        Assert.assertEquals("J. Smith", al.getAsFirstLastNames(true, false));
+        Assert.assertEquals("John Smith", al.getAsFirstLastNames(false, true));
+        Assert.assertEquals("J. Smith", al.getAsFirstLastNames(true, true));
 
-        al = AuthorList.getAuthorList("John Smith and Black Brown, Peter");
-        Assert.assertEquals("John Smith and Peter Black Brown", al.getAuthorsFirstFirst(false, false));
-        Assert.assertEquals("J. Smith and P. Black Brown", al.getAuthorsFirstFirst(true, false));
-        Assert.assertEquals("John Smith and Peter Black Brown", al.getAuthorsFirstFirst(false, true));
-        Assert.assertEquals("J. Smith and P. Black Brown", al.getAuthorsFirstFirst(true, true));
+        al = AuthorList.parse("John Smith and Black Brown, Peter");
+        Assert.assertEquals("John Smith and Peter Black Brown", al.getAsFirstLastNames(false, false));
+        Assert.assertEquals("J. Smith and P. Black Brown", al.getAsFirstLastNames(true, false));
+        Assert.assertEquals("John Smith and Peter Black Brown", al.getAsFirstLastNames(false, true));
+        Assert.assertEquals("J. Smith and P. Black Brown", al.getAsFirstLastNames(true, true));
 
-        al = AuthorList.getAuthorList("John von Neumann and John Smith and Black Brown, Peter");
-        Assert.assertEquals("John von Neumann, John Smith and Peter Black Brown", al.getAuthorsFirstFirst(
+        al = AuthorList.parse("John von Neumann and John Smith and Black Brown, Peter");
+        Assert.assertEquals("John von Neumann, John Smith and Peter Black Brown", al.getAsFirstLastNames(
                 false, false));
-        Assert.assertEquals("J. von Neumann, J. Smith and P. Black Brown", al.getAuthorsFirstFirst(true,
+        Assert.assertEquals("J. von Neumann, J. Smith and P. Black Brown", al.getAsFirstLastNames(true,
                 false));
         Assert.assertEquals("John von Neumann, John Smith, and Peter Black Brown", al
-                .getAuthorsFirstFirst(false, true));
-        Assert.assertEquals("J. von Neumann, J. Smith, and P. Black Brown", al.getAuthorsFirstFirst(true,
+                .getAsFirstLastNames(false, true));
+        Assert.assertEquals("J. von Neumann, J. Smith, and P. Black Brown", al.getAsFirstLastNames(true,
                 true));
 
-        al = AuthorList.getAuthorList("John Peter von Neumann");
-        Assert.assertEquals("John Peter von Neumann", al.getAuthorsFirstFirst(false, false));
-        Assert.assertEquals("John Peter von Neumann", al.getAuthorsFirstFirst(false, true));
-        Assert.assertEquals("J. P. von Neumann", al.getAuthorsFirstFirst(true, false));
-        Assert.assertEquals("J. P. von Neumann", al.getAuthorsFirstFirst(true, true));
+        al = AuthorList.parse("John Peter von Neumann");
+        Assert.assertEquals("John Peter von Neumann", al.getAsFirstLastNames(false, false));
+        Assert.assertEquals("John Peter von Neumann", al.getAsFirstLastNames(false, true));
+        Assert.assertEquals("J. P. von Neumann", al.getAsFirstLastNames(true, false));
+        Assert.assertEquals("J. P. von Neumann", al.getAsFirstLastNames(true, true));
     }
 
     @Test
     public void testGetAuthorsFirstFirstAnds() {
-        Assert.assertEquals("John Smith", AuthorList.getAuthorList("John Smith")
-                .getAuthorsFirstFirstAnds());
-        Assert.assertEquals("John Smith and Peter Black Brown", AuthorList.getAuthorList(
-                "John Smith and Black Brown, Peter").getAuthorsFirstFirstAnds());
+        Assert.assertEquals("John Smith", AuthorList.parse("John Smith")
+                .getAsFirstLastNamesWithAnd());
+        Assert.assertEquals("John Smith and Peter Black Brown", AuthorList.parse(
+                "John Smith and Black Brown, Peter").getAsFirstLastNamesWithAnd());
         Assert.assertEquals("John von Neumann and John Smith and Peter Black Brown", AuthorList
-                .getAuthorList("John von Neumann and John Smith and Black Brown, Peter")
-                .getAuthorsFirstFirstAnds());
+                .parse("John von Neumann and John Smith and Black Brown, Peter")
+                .getAsFirstLastNamesWithAnd());
         Assert.assertEquals("First von Last, Jr. III", AuthorList
-                .getAuthorList("von Last, Jr. III, First").getAuthorsFirstFirstAnds());
+                .parse("von Last, Jr. III, First").getAsFirstLastNamesWithAnd());
     }
 
     @Test
     public void testGetAuthorsForAlphabetization() {
-        Assert.assertEquals("Smith, J.", AuthorList.getAuthorList("John Smith")
-                .getAuthorsForAlphabetization());
-        Assert.assertEquals("Neumann, J.", AuthorList.getAuthorList("John von Neumann")
-                .getAuthorsForAlphabetization());
-        Assert.assertEquals("Neumann, J.", AuthorList.getAuthorList("J. von Neumann")
-                .getAuthorsForAlphabetization());
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith")
+                .getForAlphabetization());
+        Assert.assertEquals("Neumann, J.", AuthorList.parse("John von Neumann")
+                .getForAlphabetization());
+        Assert.assertEquals("Neumann, J.", AuthorList.parse("J. von Neumann")
+                .getForAlphabetization());
         Assert.assertEquals("Neumann, J. and Smith, J. and Black Brown, Jr., P.", AuthorList
-                .getAuthorList("John von Neumann and John Smith and de Black Brown, Jr., Peter")
-                .getAuthorsForAlphabetization());
+                .parse("John von Neumann and John Smith and de Black Brown, Jr., Peter")
+                .getForAlphabetization());
     }
 
     @Test
     public void testRemoveStartAndEndBraces() {
-        Assert.assertEquals("{A}bbb{c}", AuthorList.getAuthorList("{A}bbb{c}").getAuthorsLastOnly(false));
-        Assert.assertEquals("Vall{\\'e}e Poussin", AuthorList.getAuthorList("{Vall{\\'e}e Poussin}").getAuthorsLastOnly(false));
-        Assert.assertEquals("Poussin", AuthorList.getAuthorList("{Vall{\\'e}e} {Poussin}").getAuthorsLastOnly(false));
-        Assert.assertEquals("Poussin", AuthorList.getAuthorList("Vall{\\'e}e Poussin").getAuthorsLastOnly(false));
-        Assert.assertEquals("Lastname", AuthorList.getAuthorList("Firstname {Lastname}").getAuthorsLastOnly(false));
-        Assert.assertEquals("Firstname Lastname", AuthorList.getAuthorList("{Firstname Lastname}").getAuthorsLastOnly(false));
+        Assert.assertEquals("{A}bbb{c}", AuthorList.parse("{A}bbb{c}").getAsLastNames(false));
+        Assert.assertEquals("Vall{\\'e}e Poussin", AuthorList.parse("{Vall{\\'e}e Poussin}").getAsLastNames(false));
+        Assert.assertEquals("Poussin", AuthorList.parse("{Vall{\\'e}e} {Poussin}").getAsLastNames(false));
+        Assert.assertEquals("Poussin", AuthorList.parse("Vall{\\'e}e Poussin").getAsLastNames(false));
+        Assert.assertEquals("Lastname", AuthorList.parse("Firstname {Lastname}").getAsLastNames(false));
+        Assert.assertEquals("Firstname Lastname", AuthorList.parse("{Firstname Lastname}").getAsLastNames(false));
     }
 
+    @Test
+    public void createCorrectInitials() {
+        Assert.assertEquals("J. G.", AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
+    }
 }

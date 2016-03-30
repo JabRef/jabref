@@ -29,6 +29,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
@@ -45,13 +46,13 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -655,9 +656,17 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 boolean groupingCanceled = false;
 
                 // Set owner/timestamp if options are enabled:
-                net.sf.jabref.util.Util.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
+                UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
+                // Mark entries if we should
+                if (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
+                        && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
+                                || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP))) {
+                    for (BibEntry entry : selected) {
+                        EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+                    }
+                }
                 // Check if we should unmark entries before adding the new ones:
                 if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
                     for (BibEntry entry : panel.database().getEntries()) {
@@ -861,7 +870,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null, panel.getBibDatabaseContext().getMetaData(), fl.type))
+                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
+                                panel.getBibDatabaseContext().getMetaData(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -919,8 +929,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if ((description == null) || (description.trim().isEmpty())) {
                     description = flEntry.link;
                 }
-                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry
-                        .link, flEntry.type.getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
+                menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
+                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1184,7 +1194,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            FileListEntry flEntry = new FileListEntry("", "", null);
+            FileListEntry flEntry = new FileListEntry("", "");
             FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true,
                     metaData);
             editor.setVisible(true, true);
@@ -1351,7 +1361,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         model.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if (model.getRowCount() > 0) {
-                            fileLabel.setIcon(model.getEntry(0).type.getIcon());
+                            fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
                         }
                         return fileLabel;
                     } else {

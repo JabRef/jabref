@@ -15,9 +15,11 @@
 */
 package net.sf.jabref.openoffice;
 
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -26,6 +28,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -68,12 +71,15 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     private boolean valid;
 
-    private static final int MODE_NONE = 0;
-    private static final int MODE_LAYOUT = 1;
-    private static final int MODE_PROPERTIES = 2;
-    private static final int MODE_CITATION = 3;
-    private static final int MODE_NAME = 4;
-    private static final int MODE_JOURNALS = 5;
+
+    enum BibStyleMode {
+        NONE,
+        LAYOUT,
+        PROPERTIES,
+        CITATION,
+        NAME,
+        JOURNALS
+    }
     private static final String LAYOUT_MRK = "LAYOUT";
     private static final String PROPERTIES_MARK = "PROPERTIES";
     private static final String CITATION_MARK = "CITATION";
@@ -81,6 +87,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String JOURNALS_MARK = "JOURNALS";
     private static final String DEFAULT_MARK = "default";
     private File styleFile;
+    private final Charset encoding;
     private long styleFileModificationTime = Long.MIN_VALUE;
 
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
@@ -126,18 +133,18 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
     public OOBibStyle(File styleFile, JournalAbbreviationRepository repository, Charset encoding) throws IOException {
         this.repository = Objects.requireNonNull(repository);
+        this.styleFile = Objects.requireNonNull(styleFile);
+        this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
-        try (InputStream stream = new FileInputStream(styleFile); Reader in = new InputStreamReader(stream, encoding)) {
-            initialize(in);
-        }
-        this.styleFile = styleFile;
-        this.styleFileModificationTime = styleFile.lastModified();
+        reload();
     }
 
-    public OOBibStyle(Reader in, JournalAbbreviationRepository repository) throws IOException {
+    public OOBibStyle(String resourcePath, JournalAbbreviationRepository repository)
+            throws IOException {
         this.repository = Objects.requireNonNull(repository);
+        this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(in);
+        initialize(JabRef.class.getResource(resourcePath).openStream());
     }
 
     private void setDefaultProperties() {
@@ -191,9 +198,11 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         return Collections.unmodifiableSet(journals);
     }
 
-    private void initialize(Reader in) throws IOException {
+    private void initialize(InputStream stream) throws IOException {
         name = null;
-        readFormatFile(in);
+        try (Reader reader = new InputStreamReader(stream, encoding)) {
+            readFormatFile(reader);
+        }
     }
 
     /**
@@ -217,8 +226,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private void reload() throws IOException {
         if (styleFile != null) {
             this.styleFileModificationTime = styleFile.lastModified();
-            try (FileReader fr = new FileReader(styleFile)) {
-                initialize(fr);
+            try (InputStream stream = new FileInputStream(styleFile)) {
+                initialize(stream);
             }
         }
     }
@@ -247,7 +256,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
         }
         // Break into separate lines:
         String[] lines = sb.toString().split("\n");
-        int mode = OOBibStyle.MODE_NONE;
+        BibStyleMode mode = BibStyleMode.NONE;
 
         for (String line1 : lines) {
             String line = line1;
@@ -260,38 +269,38 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             }
             // Check if we should change mode:
             if (line.equals(OOBibStyle.NAME_MARK)) {
-                mode = OOBibStyle.MODE_NAME;
+                mode = BibStyleMode.NAME;
                 continue;
             } else if (line.equals(OOBibStyle.LAYOUT_MRK)) {
-                mode = OOBibStyle.MODE_LAYOUT;
+                mode = BibStyleMode.LAYOUT;
                 continue;
             } else if (line.equals(OOBibStyle.PROPERTIES_MARK)) {
-                mode = OOBibStyle.MODE_PROPERTIES;
+                mode = BibStyleMode.PROPERTIES;
                 continue;
             } else if (line.equals(OOBibStyle.CITATION_MARK)) {
-                mode = OOBibStyle.MODE_CITATION;
+                mode = BibStyleMode.CITATION;
                 continue;
             } else if (line.equals(OOBibStyle.JOURNALS_MARK)) {
-                mode = OOBibStyle.MODE_JOURNALS;
+                mode = BibStyleMode.JOURNALS;
                 continue;
             }
 
             switch (mode) {
-            case MODE_NAME:
+            case NAME:
                 if (!line.trim().isEmpty()) {
                     name = line.trim();
                 }
                 break;
-            case MODE_LAYOUT:
+            case LAYOUT:
                 handleStructureLine(line);
                 break;
-            case MODE_PROPERTIES:
+            case PROPERTIES:
                 handlePropertiesLine(line, properties);
                 break;
-            case MODE_CITATION:
+            case CITATION:
                 handlePropertiesLine(line, citProperties);
                 break;
-            case MODE_JOURNALS:
+            case JOURNALS:
                 handleJournalsLine(line);
                 break;
             default:
@@ -302,7 +311,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
 
         // Set validity boolean based on whether we found anything interesting
         // in the file:
-        if (mode != OOBibStyle.MODE_NONE) {
+        if (mode != BibStyleMode.NONE) {
             valid = true;
         }
 
@@ -429,7 +438,7 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             int i1 = lNum.get(i);
             if (combineFrom < 0) {
                 // Check if next entry is the next in the ref list:
-                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1))) {
+                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1)) && (i1 > 0)) {
                     combineFrom = i1;
                 } else {
                     // Add single entry:
@@ -523,10 +532,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
                         String author = getCitationMarkerField(tmpEntry, database.get(tmpEntry),
                                 authorField);
-                        AuthorList al = AuthorList.getAuthorList(author);
+                        AuthorList al = AuthorList.parse(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
-                                || ((al.size() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
+                                || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
                             if ((piv > -1) && (i > (piv + 1))) {
@@ -632,16 +641,6 @@ class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @param entries     The list of BibEntry to get fields from.
      * @param database    A map of BibEntry-BibDatabase pairs.
-     * @param authorField The bibtex field providing author names, e.g. "author" or "editor".
-     * @param yearField   The bibtex field providing the year, e.g. "year".
-     * @param maxA        The maximum number of authors to write out in full without using etal. Set to
-     *                    -1 to always write out all authors.
-     * @param authorSep   The String to add between author names except the last two, e.g. ", ".
-     * @param andString   The String to add between the two last author names, e.g. " & ".
-     * @param etAlString  The String to represent authors that are not mentioned, e.g. " et al."
-     * @param yearSep     The String to separate authors from year, e.g. "; ".
-     * @param startBrace  The opening parenthesis.
-     * @param endBrace    The closing parenthesis.
      * @param uniquefiers Optional parameters to separate similar citations. Can be null if not needed.
      * @return The formatted citation.
      */
@@ -712,15 +711,10 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String content = BibDatabase.getResolvedField(s, entry, database);
 
             if ((content != null) && !content.trim().isEmpty()) {
-                if (fieldFormatter != null) {
-
-                    if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
-                        return "{" + fieldFormatter.format(content) + "}";
-                    }
-                    return fieldFormatter.format(content);
+                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
+                    return "{" + fieldFormatter.format(content) + "}";
                 }
-                return content;
-
+                return fieldFormatter.format(content);
             }
         }
         // No luck? Return an empty string:
@@ -738,8 +732,8 @@ class OOBibStyle implements Comparable<OOBibStyle> {
     private String getAuthorLastName(AuthorList al, int number) {
         StringBuilder sb = new StringBuilder();
 
-        if (al.size() > number) {
-            AuthorList.Author a = al.getAuthor(number);
+        if (al.getNumberOfAuthors() > number) {
+            Author a = al.getAuthor(number);
             if ((a.getVon() != null) && !a.getVon().isEmpty()) {
                 String von = a.getVon();
                 sb.append(von);
@@ -878,20 +872,20 @@ class OOBibStyle implements Comparable<OOBibStyle> {
             String etAlString, String yearSep) {
         StringBuilder sb = new StringBuilder();
         if (author != null) {
-            AuthorList al = AuthorList.getAuthorList(author);
+            AuthorList al = AuthorList.parse(author);
             if (!al.isEmpty()) {
                 sb.append(getAuthorLastName(al, 0));
             }
-            if ((al.size() > 1) && ((al.size() <= maxAuthors) || (maxAuthors < 0))) {
+            if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
                 int j = 1;
-                while (j < (al.size() - 1)) {
+                while (j < (al.getNumberOfAuthors() - 1)) {
                     sb.append(authorSep);
                     sb.append(getAuthorLastName(al, j));
                     j++;
                 }
                 sb.append(andString);
-                sb.append(getAuthorLastName(al, al.size() - 1));
-            } else if (al.size() > maxAuthors) {
+                sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
+            } else if (al.getNumberOfAuthors() > maxAuthors) {
                 sb.append(etAlString);
             }
             sb.append(yearSep);

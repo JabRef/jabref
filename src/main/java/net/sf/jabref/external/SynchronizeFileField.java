@@ -187,14 +187,15 @@ public class SynchronizeFileField extends AbstractWorker {
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
-                        if (!deleted && (flEntry.type instanceof UnknownExternalFileType)) {
+                        if (!deleted && flEntry.type.isPresent()
+                                && (flEntry.type.get() instanceof UnknownExternalFileType)) {
                             String[] options = new String[] {
-                                    Localization.lang("Define '%0'", flEntry.type.getName()),
+                                    Localization.lang("Define '%0'", flEntry.type.get().getName()),
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                    flEntry.type.getName()),
+                                    flEntry.type.get().getName()),
                                     Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
                                     );
@@ -202,7 +203,8 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
-                                ExternalFileType newType = new ExternalFileType(flEntry.type.getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                ExternalFileType newType = new ExternalFileType(flEntry.type.get().getName(), "", "",
+                                        "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {

@@ -234,9 +234,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                ExternalFileType type = ExternalFileTypes.getInstance()
-                        .getExternalFileTypeByName(entry.type.getName());
-                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, type == null ? entry.type : type);
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
+                        .getExternalFileTypeByName(entry.type.get().getName());
+                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, type.isPresent() ? type : entry.type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -314,7 +314,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row == -1) {
             row = 0;
         }
-        FileListEntry entry = new FileListEntry("", initialLink, null);
+        FileListEntry entry = new FileListEntry("", initialLink);
         if (editListEntry(entry, true)) {
             tableModel.addEntry(row, entry);
         }

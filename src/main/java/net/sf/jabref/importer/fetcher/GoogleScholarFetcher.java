@@ -216,20 +216,17 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
-        //save("query.html", cont);
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
+
         while (m.find()) {
             String link = m.group(1).replace("&amp;", "&");
             String pText;
-            //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = GoogleScholarFetcher.TITLE_START_PATTERN.matcher(part);
             Matcher titleE = GoogleScholarFetcher.TITLE_END_PATTERN.matcher(part);
             boolean fS = titleS.find();
             boolean fE = titleE.find();
-            //System.out.println("fs = "+fS+", fE = "+fE);
-            //System.out.println(titleS.end()+" : "+titleE.start());
             if (fS && fE) {
                 if (titleS.end() < titleE.start()) {
                     pText = part.substring(titleS.end(), titleE.start());

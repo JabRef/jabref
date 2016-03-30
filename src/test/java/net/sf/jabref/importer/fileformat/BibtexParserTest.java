@@ -1334,7 +1334,7 @@ public class BibtexParserTest {
 
     @Test
     public void integrationTestBiblatexMode() throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader("@comment{jabref-meta: databaseType:BibLaTeX;}"));
+        ParserResult result = BibtexParser.parse(new StringReader("@comment{jabref-meta: databaseType:biblatex;}"));
 
         Optional<BibDatabaseMode> mode = result.getMetaData().getMode();
 

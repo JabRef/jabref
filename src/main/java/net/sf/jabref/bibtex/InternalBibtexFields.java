@@ -28,7 +28,7 @@
 // modified : r.nagel 25.04.2006
 //            export/import of some definition from/to a xml file
 
-package net.sf.jabref.gui;
+package net.sf.jabref.bibtex;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +43,6 @@ import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexSingleField;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -58,6 +56,7 @@ public class InternalBibtexFields {
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp";
     private static final String ENTRYTYPE = "entrytype";
+    public static final String NUMBER_COL = "#";
 
     public static final String[] DEFAULT_INSPECTION_FIELDS = new String[]
             {"author", "title", "year", BibEntry.KEY_FIELD};
@@ -199,7 +198,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("search", false, 75));
 
         // some internal fields ----------------------------------------------
-        dummy = new BibtexSingleField(GUIGlobals.NUMBER_COL, false, 32);
+        dummy = new BibtexSingleField(InternalBibtexFields.NUMBER_COL, false, 32);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);

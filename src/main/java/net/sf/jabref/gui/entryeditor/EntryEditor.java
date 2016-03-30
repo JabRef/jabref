@@ -45,6 +45,7 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.*;
@@ -61,6 +62,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import net.sf.jabref.logic.util.date.TimeStamp;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
@@ -1077,8 +1079,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
-                if (net.sf.jabref.util.Util.updateTimeStampIsSet()) {
-                    NamedCompound ce = net.sf.jabref.util.Util.doUpdateTimeStamp(entry, undoableKeyChange);
+                if (TimeStamp.updateTimeStampIsSet()) {
+                    NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
+                    ce.addEdit(undoableKeyChange);
+                    TimeStamp.doUpdateTimeStamp(entry)
+                            .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                     panel.undoManager.addEdit(ce);
                 } else {
                     panel.undoManager.addEdit(undoableKeyChange);
@@ -1140,8 +1145,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (net.sf.jabref.util.Util.updateTimeStampIsSet()) {
-                            NamedCompound ce = net.sf.jabref.util.Util.doUpdateTimeStamp(entry, undoableFieldChange);
+                        if (TimeStamp.updateTimeStampIsSet()) {
+                            NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
+                            ce.addEdit(undoableFieldChange);
+
+                            TimeStamp.doUpdateTimeStamp(entry)
+                                    .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+
                             panel.undoManager.addEdit(ce);
                         } else {
                             panel.undoManager.addEdit(undoableFieldChange);

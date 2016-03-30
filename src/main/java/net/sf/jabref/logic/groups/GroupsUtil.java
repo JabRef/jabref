@@ -62,8 +62,8 @@ public class GroupsUtil {
             for (String field : fields) {
                 String val = be.getField(field);
                 if ((val != null) && !val.isEmpty()) {
-                    AuthorList al = AuthorList.getAuthorList(val);
-                    res.addAll(al.getAuthorList().stream().map(author -> author.getLast())
+                    AuthorList al = AuthorList.parse(val);
+                    res.addAll(al.getAuthors().stream().map(author -> author.getLast())
                             .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
                             .collect(Collectors.toList()));
                 }

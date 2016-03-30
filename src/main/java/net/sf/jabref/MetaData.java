@@ -33,7 +33,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
-
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     public static final String META_FLAG = "jabref-meta: ";
@@ -64,6 +63,7 @@ public class MetaData implements Iterable<String> {
      * it has been passed.
      */
     public MetaData(Map<String, String> inData, BibDatabase db) {
+        Objects.requireNonNull(inData);
         boolean groupsTreePresent = false;
         List<String> flatGroupsData = null;
         List<String> treeGroupsData = null;
@@ -71,33 +71,31 @@ public class MetaData implements Iterable<String> {
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
 
-        if (inData != null) {
-            for (Map.Entry<String, String> entry : inData.entrySet()) {
-                StringReader data = new StringReader(entry.getValue());
-                String unit;
-                List<String> orderedData = new ArrayList<>();
-                // We must allow for ; and \ in escape sequences.
-                try {
-                    while ((unit = getNextUnit(data)) != null) {
-                        orderedData.add(unit);
-                    }
-                } catch (IOException ex) {
-                    LOGGER.error("Weird error while parsing meta data.", ex);
+        for (Map.Entry<String, String> entry : inData.entrySet()) {
+            StringReader data = new StringReader(entry.getValue());
+            String unit;
+            List<String> orderedData = new ArrayList<>();
+            // We must allow for ; and \ in escape sequences.
+            try {
+                while ((unit = getNextUnit(data)) != null) {
+                    orderedData.add(unit);
                 }
-                if (GROUPSVERSION.equals(entry.getKey())) {
-                    if (!orderedData.isEmpty()) {
-                        groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
-                    }
-                } else if (GROUPSTREE.equals(entry.getKey())) {
-                    groupsTreePresent = true;
-                    treeGroupsData = orderedData; // save for later user
-                    // actual import operation is handled later because "groupsversion"
-                    // tag might not yet have been read
-                } else if (GROUPS.equals(entry.getKey())) {
-                    flatGroupsData = orderedData;
-                } else {
-                    putData(entry.getKey(), orderedData);
+            } catch (IOException ex) {
+                LOGGER.error("Weird error while parsing meta data.", ex);
+            }
+            if (GROUPSVERSION.equals(entry.getKey())) {
+                if (!orderedData.isEmpty()) {
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                 }
+            } else if (GROUPSTREE.equals(entry.getKey())) {
+                groupsTreePresent = true;
+                treeGroupsData = orderedData; // save for later user
+                // actual import operation is handled later because "groupsversion"
+                // tag might not yet have been read
+            } else if (GROUPS.equals(entry.getKey())) {
+                flatGroupsData = orderedData;
+            } else {
+                putData(entry.getKey(), orderedData);
             }
         }
 
@@ -397,7 +395,7 @@ public class MetaData implements Iterable<String> {
         if (this.getData(SAVE_ACTIONS) == null) {
             return new FieldFormatterCleanups(false, new ArrayList<>());
         } else {
-            boolean enablementStatus = this.getData(SAVE_ACTIONS).get(0).equals("enabled");
+            boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
             String formatterString = this.getData(SAVE_ACTIONS).get(1);
             return new FieldFormatterCleanups(enablementStatus, formatterString);
         }
@@ -464,7 +462,7 @@ public class MetaData implements Iterable<String> {
 
             String serializedItem = stringBuilder.toString();
             // Only add non-empty values
-            if (!serializedItem.isEmpty() && !serializedItem.equals(";")) {
+            if (!serializedItem.isEmpty() && !";".equals(serializedItem)) {
                 serializedMetaData.put(metaItem.getKey(), serializedItem);
             }
         }
@@ -503,7 +501,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName()));
+        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase()));
     }
 
     public void markAsProtected() {

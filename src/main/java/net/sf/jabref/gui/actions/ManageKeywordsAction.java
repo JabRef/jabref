@@ -58,7 +58,6 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

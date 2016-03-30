@@ -34,11 +34,11 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     private static ExternalFileType getPDFExternalFileType() {
-        ExternalFileType pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-        if (pdfFileType == null) {
+        Optional<ExternalFileType> pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+        if (!pdfFileType.isPresent()) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
-        return pdfFileType;
+        return pdfFileType.get();
     }
 
     /*

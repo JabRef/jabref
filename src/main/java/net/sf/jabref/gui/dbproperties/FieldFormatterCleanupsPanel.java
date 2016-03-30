@@ -18,9 +18,9 @@ package net.sf.jabref.gui.dbproperties;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -41,7 +41,7 @@ import java.util.List;
 public class FieldFormatterCleanupsPanel extends JPanel {
 
     private static final String DESCRIPTION = Localization.lang("Description") + ": ";
-    private final JCheckBox enabled;
+    private final JCheckBox cleanupEnabled;
     private FieldFormatterCleanups fieldFormatterCleanups;
     private JList<?> actionsList;
     private JComboBox<?> formattersCombobox;
@@ -56,7 +56,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public FieldFormatterCleanupsPanel(String description, FieldFormatterCleanups defaultFormatters) {
         this.defaultFormatters = Objects.requireNonNull(defaultFormatters);
-        enabled = new JCheckBox(description);
+        cleanupEnabled = new JCheckBox(description);
     }
 
     public void setValues(MetaData metaData) {
@@ -82,7 +82,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         FormBuilder builder = FormBuilder.create()
                 .layout(new FormLayout("left:pref, 13dlu, left:pref:grow, 4dlu, pref, 4dlu, pref",
                         "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
-        builder.add(enabled).xyw(1, 1, 7);
+        builder.add(cleanupEnabled).xyw(1, 1, 7);
         builder.add(getSelectorPanel()).xyw(3, 3, 5);
         descriptionText = new JLabel(DESCRIPTION);
         builder.add(descriptionText).xyw(3, 5, 5);
@@ -113,8 +113,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         this.add(builder.getPanel(), BorderLayout.WEST);
 
         // make sure the layout is set according to the checkbox
-        enabled.addActionListener(new EnablementStatusListener(fieldFormatterCleanups.isEnabled()));
-        enabled.setSelected(fieldFormatterCleanups.isEnabled());
+        cleanupEnabled.addActionListener(new EnablementStatusListener(fieldFormatterCleanups.isEnabled()));
+        cleanupEnabled.setSelected(fieldFormatterCleanups.isEnabled());
     }
 
     private void updateDescription() {
@@ -203,7 +203,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public FieldFormatterCleanups getFormatterCleanups() {
         List<FieldFormatterCleanup> actions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
-        return new FieldFormatterCleanups(enabled.isSelected(), actions);
+        return new FieldFormatterCleanups(cleanupEnabled.isSelected(), actions);
     }
 
     public boolean hasChanged() {
@@ -243,7 +243,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            boolean enablementStatus = enabled.isSelected();
+            boolean enablementStatus = cleanupEnabled.isSelected();
             setStatus(enablementStatus);
 
         }

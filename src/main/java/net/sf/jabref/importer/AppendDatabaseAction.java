@@ -39,12 +39,11 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.util.Util;
 
 /**
  * Created by IntelliJ IDEA.
@@ -145,7 +144,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                Util.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
@@ -177,7 +176,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // groupsSelector is always created, even when no groups
                 // have been defined. therefore, no check for null is
                 // required here
-                frame.groupSelector.addGroups(newGroups, ce);
+                frame.getGroupSelector().addGroups(newGroups, ce);
                 // for explicit groups, the entries copied to the mother fromDatabase have to
                 // be "reassigned", i.e. the old reference is removed and the reference
                 // to the new fromDatabase is added.
@@ -200,7 +199,7 @@ public class AppendDatabaseAction implements BaseAction {
                         }
                     }
                 }
-                frame.groupSelector.revalidateGroups();
+                frame.getGroupSelector().revalidateGroups();
             }
         }
 

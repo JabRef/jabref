@@ -129,8 +129,7 @@ public class AuthorList {
 
     private final List<Author> authors;
 
-    // Variables for storing computed strings, so they only need be created
-    // once:
+    // Variables for storing computed strings, so they only need to be created once:
     private String authorsNatbib;
     private String authorsFirstFirstAnds;
     private String authorsAlph;
@@ -141,113 +140,35 @@ public class AuthorList {
     private final String[] authorsLastFirst = new String[4];
     private final String[] authorsLastFirstFirstLast = new String[2];
 
-    // The following variables are used only during parsing
-
-    private String original; // the raw bibtex author/editor field
-
-    // the following variables are updated by getToken procedure
-    private int tokenStart; // index in orig
-
-    private int tokenEnd; // to point 'abc' in ' abc xyz', start=2 and end=5
-
-    // the following variables are valid only if getToken returns TOKEN_WORD
-    private int tokenAbbr; // end of token abbreviation (always: token_start <
-
-    // token_abbr <= token_end)
-
-    private char tokenTerm; // either space or dash
-
-    private boolean tokenCase; // true if upper-case token, false if lower-case
-
-    // token
-
-    // Tokens of one author name.
-    // Each token occupies TGL consecutive entries in this vector (as described
-    // below)
-    private List<Object> tokens;
-
-    private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for
-
-    // a token
-
-    // the following are offsets of an entry in a group of entries for one token
-    private static final int OFFSET_TOKEN = 0; // String -- token itself;
-
-    private static final int OFFSET_TOKEN_ABBR = 1; // String -- token abbreviation;
-
-    private static final int OFFSET_TOKEN_TERM = 2; // Character -- token terminator (either " " or
-    // "-") comma)
-
-    // Token types (returned by getToken procedure)
-    private static final int TOKEN_EOF = 0;
-
-    private static final int TOKEN_AND = 1;
-
-    private static final int TOKEN_COMMA = 2;
-
-    private static final int TOKEN_WORD = 3;
-
-    // Constant HashSet containing names of TeX special characters
-    private static final Set<String> TEX_NAMES = new HashSet<>();
-
-    // and static constructor to initialize it
-    static {
-        TEX_NAMES.add("aa");
-        TEX_NAMES.add("ae");
-        TEX_NAMES.add("l");
-        TEX_NAMES.add("o");
-        TEX_NAMES.add("oe");
-        TEX_NAMES.add("i");
-        TEX_NAMES.add("AA");
-        TEX_NAMES.add("AE");
-        TEX_NAMES.add("L");
-        TEX_NAMES.add("O");
-        TEX_NAMES.add("OE");
-        TEX_NAMES.add("j");
-    }
-
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
 
-
     /**
-     * Parses the parameter strings and stores preformatted author information.
+     * Creates a new list of authors.
      * <p>
      * Don't call this constructor directly but rather use the getAuthorList()
      * method which caches its results.
      *
-     * @param bibtexAuthors contents of either <CODE>author</CODE> or <CODE>editor</CODE>
-     *                      bibtex field.
+     * @param authors the list of authors which should underlie this instance
      */
-    private AuthorList(String bibtexAuthors) {
-        authors = new ArrayList<>(5); // 5 seems to be reasonable initial size
-        original = bibtexAuthors; // initialization
-        tokenStart = 0;
-        tokenEnd = 0; // of parser
-        while (tokenStart < original.length()) {
-            Author author = getAuthor();
-            if (author != null) {
-                authors.add(author);
-            }
-        }
-        // clean-up
-        original = null;
-        tokens = null;
+    protected AuthorList(List<Author> authors) {
+        this.authors = Objects.requireNonNull(authors);
     }
 
     /**
      * Retrieve an AuthorList for the given string of authors or editors.
      * <p>
-     * This function tries to cache AuthorLists by string passed in.
+     * This function tries to cache the parsed AuthorLists by the string passed in.
      *
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList getAuthorList(String authors) {
+    public static AuthorList parse(String authors) {
         Objects.requireNonNull(authors);
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
-            authorList = new AuthorList(authors);
+            AuthorListParser parser = new AuthorListParser();
+            authorList = parser.parse(authors);
             AUTHOR_CACHE.put(authors, authorList);
         }
         return authorList;
@@ -256,370 +177,73 @@ public class AuthorList {
     /**
      * This is a convenience method for getAuthorsFirstFirst()
      *
-     * @see AuthorList#getAuthorsFirstFirst
+     * @see AuthorList#getAsFirstLastNames
      */
     public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsFirstFirst(abbr, oxfordComma);
+        return AuthorList.parse(authors).getAsFirstLastNames(abbr, oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsFirstFirstAnds()
      *
-     * @see AuthorList#getAuthorsFirstFirstAnds
+     * @see AuthorList#getAsFirstLastNamesWithAnd
      */
     public static String fixAuthorFirstNameFirst(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsFirstFirstAnds();
+        return AuthorList.parse(authors).getAsFirstLastNamesWithAnd();
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirst()
      *
-     * @see AuthorList#getAuthorsLastFirst
+     * @see AuthorList#getAsLastFirstNames
      */
     public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirst(abbr, oxfordComma);
+        return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirstAnds(true)
      *
-     * @see AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(false);
+        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(false);
     }
 
     /**
      * This is a convenience method for getAuthorsLastFirstAnds()
      *
-     * @see AuthorList#getAuthorsLastFirstAnds
+     * @see AuthorList#getAsLastFirstNamesWithAnd
      */
     public static String fixAuthorLastNameFirst(String authors, boolean abbreviate) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastFirstAnds(abbreviate);
+        return AuthorList.parse(authors).getAsLastFirstNamesWithAnd(abbreviate);
     }
 
     /**
      * This is a convenience method for getAuthorsLastOnly()
      *
-     * @see AuthorList#getAuthorsLastOnly
+     * @see AuthorList#getAsLastNames
      */
     public static String fixAuthorLastNameOnlyCommas(String authors, boolean oxfordComma) {
-        return AuthorList.getAuthorList(authors).getAuthorsLastOnly(oxfordComma);
+        return AuthorList.parse(authors).getAsLastNames(oxfordComma);
     }
 
     /**
      * This is a convenience method for getAuthorsForAlphabetization()
      *
-     * @see AuthorList#getAuthorsForAlphabetization
+     * @see AuthorList#getForAlphabetization
      */
     public static String fixAuthorForAlphabetization(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsForAlphabetization();
+        return AuthorList.parse(authors).getForAlphabetization();
     }
 
     /**
      * This is a convenience method for getAuthorsNatbib()
      *
-     * @see AuthorList#getAuthorsNatbib
+     * @see AuthorList#getAsNatbib
      */
     public static String fixAuthorNatbib(String authors) {
-        return AuthorList.getAuthorList(authors).getAuthorsNatbib();
-    }
-
-    /**
-     * Parses one author name and returns preformatted information.
-     *
-     * @return Preformatted author name; <CODE>null</CODE> if author name is
-     * empty.
-     */
-    private Author getAuthor() {
-
-        tokens = new ArrayList<>(); // initialization
-        int vonStart = -1;
-        int lastStart = -1;
-        int commaFirst = -1;
-        int commaSecond = -1;
-
-        // First step: collect tokens in 'tokens' Vector and calculate indices
-        boolean continueLoop = true;
-        while (continueLoop) {
-            int token = getToken();
-            switch (token) {
-            case TOKEN_EOF:
-            case TOKEN_AND:
-                continueLoop = false;
-                break;
-            case TOKEN_COMMA:
-                if (commaFirst < 0) {
-                    commaFirst = tokens.size();
-                } else if (commaSecond < 0) {
-                    commaSecond = tokens.size();
-                }
-                break;
-            case TOKEN_WORD:
-                tokens.add(original.substring(tokenStart, tokenEnd));
-                tokens.add(original.substring(tokenStart, tokenAbbr));
-                tokens.add(tokenTerm);
-                tokens.add(tokenCase);
-                if (commaFirst >= 0) {
-                    break;
-                }
-                if (lastStart >= 0) {
-                    break;
-                }
-                if (vonStart < 0) {
-                    if (!tokenCase) {
-                        vonStart = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
-                        break;
-                    }
-                } else if ((lastStart < 0) && tokenCase) {
-                    lastStart = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
-                    break;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-
-        // Second step: split name into parts (here: calculate indices
-        // of parts in 'tokens' Vector)
-        if (tokens.isEmpty()) {
-            return null; // no author information
-        }
-
-        // the following negatives indicate absence of the corresponding part
-        int firstPartStart = -1;
-        int vonPartStart = -1;
-        int lastPartStart = -1;
-        int jrPartStart = -1;
-        int firstPartEnd;
-        int vonPartEnd = 0;
-        int lastPartEnd = 0;
-        int jrPartEnd = 0;
-        if (commaFirst < 0) { // no commas
-            if (vonStart < 0) { // no 'von part'
-                lastPartEnd = tokens.size();
-                lastPartStart = tokens.size() - AuthorList.TOKEN_GROUP_LENGTH;
-                int index = (tokens.size() - (2 * AuthorList.TOKEN_GROUP_LENGTH)) + AuthorList.OFFSET_TOKEN_TERM;
-                if (index > 0) {
-                    Character ch = (Character) tokens.get(index);
-                    if (ch == '-') {
-                        lastPartStart -= AuthorList.TOKEN_GROUP_LENGTH;
-                    }
-                }
-                firstPartEnd = lastPartStart;
-                if (firstPartEnd > 0) {
-                    firstPartStart = 0;
-                }
-            } else { // 'von part' is present
-                if (lastStart >= 0) {
-                    lastPartEnd = tokens.size();
-                    lastPartStart = lastStart;
-                    vonPartEnd = lastPartStart;
-                } else {
-                    vonPartEnd = tokens.size();
-                }
-                vonPartStart = vonStart;
-                firstPartEnd = vonPartStart;
-                if (firstPartEnd > 0) {
-                    firstPartStart = 0;
-                }
-            }
-        } else { // commas are present: it affects only 'first part' and
-            // 'junior part'
-            firstPartEnd = tokens.size();
-            if (commaSecond < 0) { // one comma
-                if (commaFirst < firstPartEnd) {
-                    firstPartStart = commaFirst;
-                }
-            } else { // two or more commas
-                if (commaSecond < firstPartEnd) {
-                    firstPartStart = commaSecond;
-                }
-                jrPartEnd = commaSecond;
-                if (commaFirst < jrPartEnd) {
-                    jrPartStart = commaFirst;
-                }
-            }
-            if (vonStart == 0) { // 'von part' is present
-                if (lastStart < 0) {
-                    vonPartEnd = commaFirst;
-                } else {
-                    lastPartEnd = commaFirst;
-                    lastPartStart = lastStart;
-                    vonPartEnd = lastPartStart;
-                }
-                vonPartStart = 0;
-            } else { // no 'von part'
-                lastPartEnd = commaFirst;
-                if (lastPartEnd > 0) {
-                    lastPartStart = 0;
-                }
-            }
-        }
-
-        if ((firstPartStart == -1) && (lastPartStart == -1) && (vonPartStart != -1)) {
-            // There is no first or last name, but we have a von part. This is likely
-            // to indicate a single-entry name without an initial capital letter, such
-            // as "unknown".
-            // We make the von part the last name, to facilitate handling by last-name formatters:
-            lastPartStart = vonPartStart;
-            lastPartEnd = vonPartEnd;
-            vonPartStart = -1;
-            vonPartEnd = -1;
-        }
-
-        // Third step: do actual splitting, construct Author object
-        return new Author(firstPartStart < 0 ? null : concatTokens(firstPartStart,
-                firstPartEnd, AuthorList.OFFSET_TOKEN, false), firstPartStart < 0 ? null : concatTokens(
-                firstPartStart, firstPartEnd, AuthorList.OFFSET_TOKEN_ABBR, true), vonPartStart < 0 ? null
-                : concatTokens(vonPartStart, vonPartEnd, AuthorList.OFFSET_TOKEN, false),
-                lastPartStart < 0 ? null : concatTokens(lastPartStart, lastPartEnd,
-                        AuthorList.OFFSET_TOKEN, false), jrPartStart < 0 ? null : concatTokens(jrPartStart,
-                jrPartEnd, AuthorList.OFFSET_TOKEN, false));
-    }
-
-    /**
-     * Concatenates list of tokens from 'tokens' Vector. Tokens are separated by
-     * spaces or dashes, depending on stored in 'tokens'. Callers always ensure
-     * that start < end; thus, there exists at least one token to be
-     * concatenated.
-     *
-     * @param start     index of the first token to be concatenated in 'tokens' Vector
-     *                  (always divisible by TOKEN_GROUP_LENGTH).
-     * @param end       index of the first token not to be concatenated in 'tokens'
-     *                  Vector (always divisible by TOKEN_GROUP_LENGTH).
-     * @param offset    offset within token group (used to request concatenation of
-     *                  either full tokens or abbreviation).
-     * @param dotAfter <CODE>true</CODE> -- add period after each token, <CODE>false</CODE> --
-     *                  do not add.
-     * @return the result of concatenation.
-     */
-    private String concatTokens(int start, int end, int offset, boolean dotAfter) {
-        StringBuilder result = new StringBuilder();
-        // Here we always have start < end
-        result.append((String) tokens.get(start + offset));
-        if (dotAfter) {
-            result.append('.');
-        }
-        int updatedStart = start + AuthorList.TOKEN_GROUP_LENGTH;
-        while (updatedStart < end) {
-            result.append(tokens.get((updatedStart - AuthorList.TOKEN_GROUP_LENGTH) + AuthorList.OFFSET_TOKEN_TERM));
-            result.append((String) tokens.get(updatedStart + offset));
-            if (dotAfter) {
-                result.append('.');
-            }
-            updatedStart += AuthorList.TOKEN_GROUP_LENGTH;
-        }
-        return result.toString();
-    }
-
-    /**
-     * Parses the next token.
-     * <p>
-     * The string being parsed is stored in global variable <CODE>orig</CODE>,
-     * and position which parsing has to start from is stored in global variable
-     * <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
-     * to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>;
-     * thus, subsequent invocations do not require any additional variable
-     * settings.
-     * <p>
-     * The type of the token is returned; if it is <CODE>TOKEN_WORD</CODE>,
-     * additional information is given in global variables <CODE>token_start</CODE>,
-     * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
-     * and <CODE>token_case</CODE>; namely: <CODE>orig.substring(token_start,token_end)</CODE>
-     * is the thext of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
-     * is the token abbreviation, <CODE>token_term</CODE> contains token
-     * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
-     * if token is upper-case and <CODE>false</CODE> if token is lower-case.
-     *
-     * @return <CODE>TOKEN_EOF</CODE> -- no more tokens, <CODE>TOKEN_COMMA</CODE> --
-     * token is comma, <CODE>TOKEN_AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.), <CODE>TOKEN_WORD</CODE> --
-     * token is a word; additional information is given in global
-     * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
-     * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
-     * <CODE>token_case</CODE>.
-     */
-    private int getToken() {
-        tokenStart = tokenEnd;
-        while (tokenStart < original.length()) {
-            char c = original.charAt(tokenStart);
-            if (!((c == '~') || (c == '-') || Character.isWhitespace(c))) {
-                break;
-            }
-            tokenStart++;
-        }
-        tokenEnd = tokenStart;
-        if (tokenStart >= original.length()) {
-            return AuthorList.TOKEN_EOF;
-        }
-        if (original.charAt(tokenStart) == ',') {
-            tokenEnd++;
-            return AuthorList.TOKEN_COMMA;
-        }
-        tokenAbbr = -1;
-        tokenTerm = ' ';
-        tokenCase = true;
-        int bracesLevel = 0;
-        int currentBackslash = -1;
-        boolean firstLetterIsFound = false;
-        while (tokenEnd < original.length()) {
-            char c = original.charAt(tokenEnd);
-            if (c == '{') {
-                bracesLevel++;
-            }
-            if ((c == '}') && (bracesLevel > 0)) {
-                bracesLevel--;
-            }
-            if (firstLetterIsFound && (tokenAbbr < 0) && (bracesLevel == 0)) {
-                tokenAbbr = tokenEnd;
-            }
-            if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
-                if (bracesLevel == 0) {
-                    tokenCase = Character.isUpperCase(c);
-                } else {
-                    // If this is a particle in braces, always treat it as if it starts with
-                    // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
-                    // will not yield a proper last name:
-                    tokenCase = true;
-                }
-                firstLetterIsFound = true;
-            }
-            if ((currentBackslash >= 0) && !Character.isLetter(c)) {
-                if (!firstLetterIsFound) {
-                    String texCmdName = original.substring(currentBackslash + 1, tokenEnd);
-                    if (AuthorList.TEX_NAMES.contains(texCmdName)) {
-                        tokenCase = Character.isUpperCase(texCmdName.charAt(0));
-                        firstLetterIsFound = true;
-                    }
-                }
-                currentBackslash = -1;
-            }
-            if (c == '\\') {
-                currentBackslash = tokenEnd;
-            }
-            if ((bracesLevel == 0) && ((",~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
-                break;
-            }
-            // Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to
-            // prevent
-            // problems with names like Bailey-Jones getting broken up and
-            // sorted wrong.
-            // Aaron Chen 14 Sep 2008: Enable hyphen check for first names like Chang-Chin
-            tokenEnd++;
-        }
-        if (tokenAbbr < 0) {
-            tokenAbbr = tokenEnd;
-        }
-        if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
-            tokenTerm = '-';
-        }
-        if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {
-            return AuthorList.TOKEN_AND;
-        } else {
-            return AuthorList.TOKEN_WORD;
-        }
+        return AuthorList.parse(authors).getAsNatbib();
     }
 
     /**
@@ -627,7 +251,7 @@ public class AuthorList {
      *
      * @return the number of author names in this object.
      */
-    public int size() {
+    public int getNumberOfAuthors() {
         return authors.size();
     }
 
@@ -655,7 +279,7 @@ public class AuthorList {
      *
      * @return the <CODE>List<Author></CODE> object.
      */
-    public List<Author> getAuthorList() {
+    public List<Author> getAuthors() {
         return authors;
     }
 
@@ -671,19 +295,19 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsNatbib() {
+    public String getAsNatbib() {
         // Check if we've computed this before:
         if (authorsNatbib != null) {
             return authorsNatbib;
         }
 
         StringBuilder res = new StringBuilder();
-        if (size() > 0) {
+        if (!isEmpty()) {
             res.append(getAuthor(0).getLastOnly());
-            if (size() == 2) {
+            if (getNumberOfAuthors() == 2) {
                 res.append(" and ");
                 res.append(getAuthor(1).getLastOnly());
-            } else if (size() > 2) {
+            } else if (getNumberOfAuthors() > 2) {
                 res.append(" et al.");
             }
         }
@@ -693,7 +317,7 @@ public class AuthorList {
 
     /**
      * Returns the list of authors separated by commas with last name only; If
-     * the list consists of three or more authors, "and" is inserted before the
+     * the list consists of two or more authors, "and" is inserted before the
      * last author's name.
      * <p>
      * <p>
@@ -708,7 +332,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsLastOnly(boolean oxfordComma) {
+    public String getAsLastNames(boolean oxfordComma) {
         int abbrInt = oxfordComma ? 0 : 1;
 
         // Check if we've computed this before:
@@ -717,18 +341,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getLastOnly());
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastOnly());
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getLastOnly());
             }
@@ -758,7 +382,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsLastFirst(boolean abbreviate, boolean oxfordComma) {
+    public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         int abbrInt = abbreviate ? 0 : 1;
         abbrInt += oxfordComma ? 0 : 2;
 
@@ -768,18 +392,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getLastFirst(abbreviate));
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getLastFirst(abbreviate));
             }
@@ -790,7 +414,7 @@ public class AuthorList {
 
     @Override
     public String toString() {
-        return getAuthorsLastFirstAnds(false);
+        return getAsLastFirstNamesWithAnd(false);
     }
 
     /**
@@ -807,7 +431,7 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsLastFirstAnds(boolean abbreviate) {
+    public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
         int abbrInt = abbreviate ? 0 : 1;
         // Check if we've computed this before:
         if (authorLastFirstAnds[abbrInt] != null) {
@@ -815,12 +439,12 @@ public class AuthorList {
         }
 
 
-        authorLastFirstAnds[abbrInt] = getAuthorList().stream().map(author -> author.getLastFirst(abbreviate))
+        authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
                 .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
     }
 
-    public String getAuthorsLastFirstFirstLastAnds(boolean abbreviate) {
+    public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         int abbrInt = abbreviate ? 0 : 1;
         // Check if we've computed this before:
         if (authorsLastFirstFirstLast[abbrInt] != null) {
@@ -830,7 +454,7 @@ public class AuthorList {
         StringBuilder result = new StringBuilder();
         if (!isEmpty()) {
             result.append(getAuthor(0).getLastFirst(abbreviate));
-            for (int i = 1; i < size(); i++) {
+            for (int i = 1; i < getNumberOfAuthors(); i++) {
                 result.append(" and ");
                 result.append(getAuthor(i).getFirstLast(abbreviate));
             }
@@ -860,7 +484,7 @@ public class AuthorList {
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
      */
-    public String getAuthorsFirstFirst(boolean abbr, boolean oxfordComma) {
+    public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
 
         int abbrInt = abbr ? 0 : 1;
         abbrInt += oxfordComma ? 0 : 2;
@@ -871,18 +495,18 @@ public class AuthorList {
         }
 
         StringBuilder result = new StringBuilder();
-        if (size() > 0) {
+        if (!isEmpty()) {
             result.append(getAuthor(0).getFirstLast(abbr));
             int i = 1;
-            while (i < (size() - 1)) {
+            while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
                 result.append(getAuthor(i).getFirstLast(abbr));
                 i++;
             }
-            if ((size() > 2) && oxfordComma) {
+            if ((getNumberOfAuthors() > 2) && oxfordComma) {
                 result.append(',');
             }
-            if (size() > 1) {
+            if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
                 result.append(getAuthor(i).getFirstLast(abbr));
             }
@@ -927,13 +551,13 @@ public class AuthorList {
      *
      * @return formatted list of authors.
      */
-    public String getAuthorsFirstFirstAnds() {
+    public String getAsFirstLastNamesWithAnd() {
         // Check if we've computed this before:
         if (authorsFirstFirstAnds != null) {
             return authorsFirstFirstAnds;
         }
 
-        authorsFirstFirstAnds = getAuthorList().stream().map(author -> author.getFirstLast(false))
+        authorsFirstFirstAnds = getAuthors().stream().map(author -> author.getFirstLast(false))
                 .collect(Collectors.joining(" and "));
         return authorsFirstFirstAnds;
     }
@@ -951,319 +575,14 @@ public class AuthorList {
      *
      * @return formatted list of authors
      */
-    public String getAuthorsForAlphabetization() {
+    public String getForAlphabetization() {
         if (authorsAlph != null) {
             return authorsAlph;
         }
 
-        authorsAlph = getAuthorList().stream().map(author -> author.getNameForAlphabetization())
+        authorsAlph = getAuthors().stream().map(author -> author.getNameForAlphabetization())
                 .collect(Collectors.joining(" and "));
         return authorsAlph;
-    }
-
-
-    /**
-     * This is an immutable class that keeps information regarding single
-     * author. It is just a container for the information, with very simple
-     * methods to access it.
-     * <p>
-     * Current usage: only methods <code>getLastOnly</code>,
-     * <code>getFirstLast</code>, and <code>getLastFirst</code> are used;
-     * all other methods are provided for completeness.
-     */
-    public static class Author {
-
-        private final String firstPart;
-
-        private final String firstAbbr;
-
-        private final String vonPart;
-
-        private final String lastPart;
-
-        private final String jrPart;
-
-
-
-        /**
-         * Creates the Author object. If any part of the name is absent, <CODE>null</CODE>
-         * must be passed; otherwise other methods may return erroneous results.
-         *
-         * @param first     the first name of the author (may consist of several
-         *                  tokens, like "Charles Louis Xavier Joseph" in "Charles
-         *                  Louis Xavier Joseph de la Vall{\'e}e Poussin")
-         * @param firstabbr the abbreviated first name of the author (may consist of
-         *                  several tokens, like "C. L. X. J." in "Charles Louis
-         *                  Xavier Joseph de la Vall{\'e}e Poussin"). It is a
-         *                  responsibility of the caller to create a reasonable
-         *                  abbreviation of the first name.
-         * @param von       the von part of the author's name (may consist of several
-         *                  tokens, like "de la" in "Charles Louis Xavier Joseph de la
-         *                  Vall{\'e}e Poussin")
-         * @param last      the lats name of the author (may consist of several
-         *                  tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier
-         *                  Joseph de la Vall{\'e}e Poussin")
-         * @param jr        the junior part of the author's name (may consist of
-         *                  several tokens, like "Jr. III" in "Smith, Jr. III, John")
-         */
-        public Author(String first, String firstabbr, String von, String last, String jr) {
-            firstPart = removeStartAndEndBraces(first);
-            firstAbbr = removeStartAndEndBraces(firstabbr);
-            vonPart = removeStartAndEndBraces(von);
-            lastPart = removeStartAndEndBraces(last);
-            jrPart = removeStartAndEndBraces(jr);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(firstAbbr, firstPart, jrPart, lastPart, vonPart);
-        }
-
-        /**
-         * Compare this object with the given one.
-         * <p>
-         * Will return true iff the other object is an Author and all fields are identical on a string comparison.
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o instanceof Author) {
-                Author a = (Author) o;
-                return Objects.equals(firstPart, a.firstPart) && Objects.equals(firstAbbr, a.firstAbbr)
-                        && Objects.equals(vonPart, a.vonPart) && Objects.equals(lastPart, a.lastPart)
-                        && Objects.equals(jrPart, a.jrPart);
-            }
-            return false;
-        }
-
-        /**
-         * @return true if the brackets in s are properly paired
-         */
-        private boolean properBrackets(String s) {
-            // nested construct is there, check for "proper" nesting
-            int i = 0;
-            int level = 0;
-            loop:
-            while (i < s.length()) {
-                char c = s.charAt(i);
-                switch (c) {
-                case '{':
-                    level++;
-                    break;
-                case '}':
-                    level--;
-                    if (level == -1) {
-                        // the improper nesting
-                        break loop;
-                    }
-                    break;
-                default:
-                    break;
-                }
-                i++;
-            }
-            return level == 0;
-        }
-
-        /**
-         * Removes start and end brace at a string
-         * <p>
-         * E.g.,
-         * * {Vall{\'e}e Poussin} -> Vall{\'e}e Poussin
-         * * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
-         * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
-         */
-        private String removeStartAndEndBraces(String name) {
-            if (name == null) {
-                return null;
-            }
-            if (!name.contains("{")) {
-                return name;
-            }
-
-            String[] split = name.split(" ");
-            StringBuilder b = new StringBuilder();
-            for (String s : split) {
-                if ((s.length() > 2) && s.startsWith("{") && s.endsWith("}")) {
-                    // quick solution (which we don't do: just remove first "{" and last "}"
-                    // however, it might be that s is like {A}bbb{c}, where braces may not be removed
-
-                    // inner
-                    String inner = s.substring(1, s.length() - 1);
-
-                    if (inner.contains("}")) {
-                        if (properBrackets(inner)) {
-                            s = inner;
-                        }
-                    } else {
-                        //  no inner curly brackets found, no check needed, inner can just be used as s
-                        s = inner;
-                    }
-                }
-                b.append(s).append(' ');
-            }
-            // delete last
-            b.deleteCharAt(b.length() - 1);
-
-            // now, all inner words are cleared
-            // case {word word word} remains
-            // as above, we have to be aware of {w}ord word wor{d} and {{w}ord word word}
-
-            String newName = b.toString();
-
-            if (newName.startsWith("{") && newName.endsWith("}")) {
-                String inner = newName.substring(1, newName.length() - 1);
-                if (properBrackets(inner)) {
-                    return inner;
-                } else {
-                    return newName;
-                }
-            } else {
-                return newName;
-            }
-        }
-
-        /**
-         * Returns the first name of the author stored in this object ("First").
-         *
-         * @return first name of the author (may consist of several tokens)
-         */
-        public String getFirst() {
-            return firstPart;
-        }
-
-        /**
-         * Returns the abbreviated first name of the author stored in this
-         * object ("F.").
-         *
-         * @return abbreviated first name of the author (may consist of several
-         * tokens)
-         */
-        public String getFirstAbbr() {
-            return firstAbbr;
-        }
-
-        /**
-         * Returns the von part of the author's name stored in this object
-         * ("von").
-         *
-         * @return von part of the author's name (may consist of several tokens)
-         */
-        public String getVon() {
-            return vonPart;
-        }
-
-        /**
-         * Returns the last name of the author stored in this object ("Last").
-         *
-         * @return last name of the author (may consist of several tokens)
-         */
-        public String getLast() {
-            return lastPart;
-        }
-
-        /**
-         * Returns the junior part of the author's name stored in this object
-         * ("Jr").
-         *
-         * @return junior part of the author's name (may consist of several
-         * tokens) or null if the author does not have a Jr. Part
-         */
-        public String getJr() {
-            return jrPart;
-        }
-
-        /**
-         * Returns von-part followed by last name ("von Last"). If both fields
-         * were specified as <CODE>null</CODE>, the empty string <CODE>""</CODE>
-         * is returned.
-         *
-         * @return 'von Last'
-         */
-        public String getLastOnly() {
-            if (vonPart == null) {
-                return lastPart == null ? "" : lastPart;
-            } else {
-                return lastPart == null ? vonPart : vonPart + ' ' + lastPart;
-            }
-        }
-
-        /**
-         * Returns the author's name in form 'von Last, Jr., First' with the
-         * first name full or abbreviated depending on parameter.
-         *
-         * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-         *             do not abbreviate
-         * @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or
-         * 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
-         */
-        public String getLastFirst(boolean abbr) {
-            StringBuilder res = new StringBuilder(getLastOnly());
-            if (jrPart != null) {
-                res.append(", ").append(jrPart);
-            }
-            if (abbr) {
-                if (firstAbbr != null) {
-                    res.append(", ").append(firstAbbr);
-                }
-            } else {
-                if (firstPart != null) {
-                    res.append(", ").append(firstPart);
-                }
-            }
-            return res.toString();
-        }
-
-        /**
-         * Returns the author's name in form 'First von Last, Jr.' with the
-         * first name full or abbreviated depending on parameter.
-         *
-         * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-         *             do not abbreviate
-         * @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F.
-         * von Last, Jr.' (if <CODE>abbr==true</CODE>)
-         */
-        public String getFirstLast(boolean abbr) {
-            StringBuilder res = new StringBuilder();
-            if (abbr) {
-                res.append(firstAbbr == null ? "" : firstAbbr + ' ').append(getLastOnly());
-            } else {
-                res.append(firstPart == null ? "" : firstPart + ' ').append(getLastOnly());
-            }
-            if (jrPart != null) {
-                res.append(", ").append(jrPart);
-            }
-            return res.toString();
-        }
-
-        /**
-         * Returns the name as "Last, Jr, F." omitting the von-part and removing
-         * starting braces.
-         *
-         * @return "Last, Jr, F." as described above or "" if all these parts
-         * are empty.
-         */
-        public String getNameForAlphabetization() {
-            StringBuilder res = new StringBuilder();
-            if (lastPart != null) {
-                res.append(lastPart);
-            }
-            if (jrPart != null) {
-                res.append(", ");
-                res.append(jrPart);
-            }
-            if (firstAbbr != null) {
-                res.append(", ");
-                res.append(firstAbbr);
-            }
-            while ((res.length() > 0) && (res.charAt(0) == '{')) {
-                res.deleteCharAt(0);
-            }
-            return res.toString();
-        }
     }
 
 }

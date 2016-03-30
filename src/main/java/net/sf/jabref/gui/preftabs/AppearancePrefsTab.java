@@ -27,7 +27,7 @@ import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.ColorSetupPanel;
+
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -40,7 +40,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox overrideFonts;
     private final JCheckBox showGrid;
     private final ColorSetupPanel colorPanel = new ColorSetupPanel();
-    private Font font = GUIGlobals.currentFont;
+    private Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
@@ -113,7 +113,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
 
         fontButton.addActionListener(
-                e -> new FontSelectorDialog(null, GUIGlobals.currentFont).getSelectedFont().ifPresent(x -> font = x));
+                e -> new FontSelectorDialog(null, GUIGlobals.currentFont).getSelectedFont().ifPresent(x -> usedFont = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -142,11 +142,11 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
 
         prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
-        prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
-        prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
-        prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
+        prefs.put(JabRefPreferences.FONT_FAMILY, usedFont.getFamily());
+        prefs.putInt(JabRefPreferences.FONT_STYLE, usedFont.getStyle());
+        prefs.putInt(JabRefPreferences.FONT_SIZE, usedFont.getSize());
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
-        GUIGlobals.currentFont = font;
+        GUIGlobals.currentFont = usedFont;
         colorPanel.storeSettings();
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {

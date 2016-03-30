@@ -37,6 +37,7 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
@@ -52,7 +53,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
 
         StringBuilder sb = new StringBuilder(100);
 
-        AuthorList al = AuthorList.getAuthorList(fieldText);
+        AuthorList al = AuthorList.parse(fieldText);
 
         addBody(sb, al, "author");
         return sb.toString();
@@ -60,9 +61,9 @@ public class CreateDocBookAuthors implements LayoutFormatter {
     }
 
     public void addBody(StringBuilder sb, AuthorList al, String tagName) {
-        for (int i = 0; i < al.size(); i++) {
+        for (int i = 0; i < al.getNumberOfAuthors(); i++) {
             sb.append('<').append(tagName).append('>');
-            AuthorList.Author a = al.getAuthor(i);
+            Author a = al.getAuthor(i);
             if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
                 sb.append("<firstname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()))
                         .append("</firstname>");
@@ -79,7 +80,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
                 sb.append("</surname>");
             }
 
-            if (i < (al.size() - 1)) {
+            if (i < (al.getNumberOfAuthors() - 1)) {
                 sb.append("</").append(tagName).append(">\n       ");
             } else {
                 sb.append("</").append(tagName).append('>');
