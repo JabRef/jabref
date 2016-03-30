@@ -33,7 +33,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
-
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     public static final String META_FLAG = "jabref-meta: ";
@@ -502,7 +501,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName()));
+        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase()));
     }
 
     public void markAsProtected() {
