@@ -282,7 +282,7 @@ class StyleSelectDialog {
         edit.addActionListener(actionEvent -> {
             getSelectedStyle().ifPresent(style -> {
                 Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = style.getFile().getPath();
+                String link = style.getPath();
                 try {
                     if (type.isPresent()) {
                         JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);

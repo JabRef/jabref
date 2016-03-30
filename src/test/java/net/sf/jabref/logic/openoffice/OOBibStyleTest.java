@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
@@ -48,6 +47,7 @@ public class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
         assertTrue(style.isValid());
+        assertTrue(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
@@ -65,13 +65,13 @@ public class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
                 Globals.prefs.getDefaultEncoding());
         assertTrue(style.isValid());
+        assertFalse(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
         assertFalse(style.isItalicCitations());
         assertFalse(style.isNumberEntries());
         assertFalse(style.isSortByPosition());
-
     }
 
     @Test
@@ -200,6 +200,25 @@ public class OOBibStyleTest {
     }
 
     @Test
+    public void testVonAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+        BibDatabase database = new BibDatabase();
+
+        Layout l = style.getReferenceFormat("article");
+        l.setPostFormatter(new OOPreFormatter());
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta");
+        entry.setField("title", "JabRef Manual");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        assertEquals("<b>von Beta, A.</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
+                l.doLayout(entry, database));
+    }
+
+    @Test
     public void testInstitutionAuthorMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
@@ -217,6 +236,62 @@ public class OOBibStyleTest {
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[JabRef Development Team, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
+    }
+
+    @Test
+    public void testVonAuthorMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta");
+        entry.setField("title", "JabRef Manual");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("[von Beta, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
+    }
+
+    @Test
+    public void testNullAuthorMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("[, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
+    }
+
+    @Test
+    public void testNullYearMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                mock(JournalAbbreviationRepository.class));
+
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("[von Beta, ]", style.getCitationMarker(entries, entryDBMap, true, null, null));
     }
 
     @Test
@@ -379,7 +454,6 @@ public class OOBibStyleTest {
     }
 
     @Test
-    @Ignore
     // TODO: equals only work when initialized from file, not from reader
     public void testEquals() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
@@ -390,7 +464,6 @@ public class OOBibStyleTest {
     }
 
     @Test
-    @Ignore
     // TODO: equals only work when initialized from file, not from reader
     public void testNotEquals() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,

@@ -873,21 +873,19 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     @Override
     public boolean equals(Object o) {
         if (o instanceof OOBibStyle) {
-            return styleFile.equals(((OOBibStyle) o).styleFile);
+            return path.equals(((OOBibStyle) o).path);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(styleFile);
+        return Objects.hash(path);
     }
 
     private String createAuthorList(String author, int maxAuthors, String andString,
             String yearSep) {
-        if (author == null) {
-            return "";
-        }
+        Objects.requireNonNull(author);
         String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
         String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
         String oxfordComma = getStringCitProperty(OXFORD_COMMA); // The String to put after the second to last author in case of three or more authors

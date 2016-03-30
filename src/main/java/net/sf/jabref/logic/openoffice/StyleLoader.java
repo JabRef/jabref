@@ -113,7 +113,7 @@ public class StyleLoader {
     private void storeExternalStyles() {
         List<String> filenames = new ArrayList<>(externalStyles.size());
         for (OOBibStyle style : externalStyles) {
-            filenames.add(style.getFile().getPath());
+            filenames.add(style.getPath());
         }
         preferences.setExternalStyles(filenames);
     }
