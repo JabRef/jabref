@@ -97,6 +97,7 @@ class StyleSelectDialog {
     private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
+    private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
     private PreviewPanel preview;
@@ -251,6 +252,7 @@ class StyleSelectDialog {
         popup.add(edit);
         popup.add(show);
         popup.add(remove);
+        popup.add(reload);
 
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
@@ -271,7 +273,7 @@ class StyleSelectDialog {
             });
         });
 
-        // Add action listener to ""Show" menu item, which is supposed to open the style file in a dialog:
+        // Add action listener to "Show" menu item, which is supposed to open the style file in a dialog:
         show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));
 
         // Create action listener for removing a style, also used for the remove button
@@ -287,6 +289,15 @@ class StyleSelectDialog {
         });
         // Add it to the remove menu item
         remove.addActionListener(removeAction);
+
+        // Add action listener to the "Reload" menu item, which is supposed to reload an external style file
+        reload.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+            try {
+                style.ensureUpToDate();
+            } catch (IOException e) {
+                LOGGER.warn("Problem with style file '" + style.getPath() + "'", e);
+            }
+        }));
 
     }
 
@@ -453,10 +464,12 @@ class StyleSelectDialog {
                 if (style.isFromResource()) {
                     remove.setEnabled(false);
                     edit.setEnabled(false);
+                    reload.setEnabled(false);
                     removeButton.setEnabled(false);
                 } else {
                     remove.setEnabled(true);
                     edit.setEnabled(true);
+                    reload.setEnabled(true);
                     removeButton.setEnabled(true);
                 }
 

@@ -23,7 +23,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 
 /**
- * The JabRef preferences are:
+ * The OpenOffice connection preferences are:
  * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
  * OO_EXECUTABLE_PATH path to soffice-file
  * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
@@ -37,6 +37,15 @@ import net.sf.jabref.logic.util.OS;
 public class OpenOfficePreferences {
 
     private final JabRefPreferences preferences;
+    public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
+    public static final String WINDOWS_EXECUTABLE_SUBPATH = "\\program\\";
+    public static final String WINDOWS_EXECUTABLE = "soffice.exe";
+    public static final String WINDOWS_JARS_SUBPATH = "\\program\\classes";
+    public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
+    public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
+    public static final String OSX_EXECUTABLE = "soffice.bin";
+    public static final String OSX_JARS_SUBPATH = "/Contents/Resources/java";
+
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -44,17 +53,15 @@ public class OpenOfficePreferences {
 
     public void putDefaultPreferences() {
         if (OS.WINDOWS) {
-            preferences.putDefaultValue(JabRefPreferences.OO_PATH, "C:\\Program Files\\OpenOffice.org 4");
+            preferences.putDefaultValue(JabRefPreferences.OO_PATH, DEFAULT_WINDOWS_PATH);
             preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe");
-            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\classes");
+                    DEFAULT_WINDOWS_PATH + WINDOWS_EXECUTABLE_SUBPATH + WINDOWS_EXECUTABLE);
+            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH, DEFAULT_WINDOWS_PATH + WINDOWS_JARS_SUBPATH);
         } else if (OS.OS_X) {
+            preferences.putDefaultValue(JabRefPreferences.OO_PATH, DEFAULT_OSX_PATH);
             preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
-            preferences.putDefaultValue(JabRefPreferences.OO_PATH, "/Applications/OpenOffice.org.app");
-            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/Resources/java");
+                    DEFAULT_OSX_PATH + OSX_EXECUTABLE_SUBPATH + OSX_EXECUTABLE);
+            preferences.putDefaultValue(JabRefPreferences.OO_JARS_PATH, DEFAULT_OSX_PATH + OSX_JARS_SUBPATH);
         } else { // Linux
             preferences.putDefaultValue(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
             preferences.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");

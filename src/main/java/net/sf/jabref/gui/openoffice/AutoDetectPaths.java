@@ -39,11 +39,8 @@ import net.sf.jabref.logic.util.OS;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
-    private static final String SOFFICE_EXE = "soffice.exe";
 
     private static final String SOFFICE = "soffice";
-
-    private static final String SOFFICE_BIN = "soffice.bin";
 
     private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
 
@@ -102,7 +99,8 @@ public class AutoDetectPaths extends AbstractWorker {
         fileSearch.resetFileSearch();
         if (OS.WINDOWS) {
             List<File> progFiles = fileSearch.findWindowsProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileInDirs(progFiles, SOFFICE_EXE));
+            List<File> sofficeFiles = new ArrayList<>(
+                    fileSearch.findFileInDirs(progFiles, OpenOfficePreferences.WINDOWS_EXECUTABLE));
             if (fileSearchCancelled) {
                 return false;
             }
@@ -134,13 +132,15 @@ public class AutoDetectPaths extends AbstractWorker {
             }
             Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
             if (actualFile.isPresent()) {
-                return setupPreferencesForOO(actualFile.get().getParentFile(), actualFile.get(), SOFFICE_EXE);
+                return setupPreferencesForOO(actualFile.get().getParentFile(), actualFile.get(),
+                        OpenOfficePreferences.WINDOWS_EXECUTABLE);
             } else {
                 return false;
             }
         } else if (OS.OS_X) {
             List<File> dirList = fileSearch.findOSXProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(fileSearch.findFileInDirs(dirList, SOFFICE_BIN));
+            List<File> sofficeFiles = new ArrayList<>(
+                    fileSearch.findFileInDirs(dirList, OpenOfficePreferences.OSX_EXECUTABLE));
 
             if (fileSearchCancelled) {
                 return false;
@@ -149,7 +149,7 @@ public class AutoDetectPaths extends AbstractWorker {
             if (actualFile.isPresent()) {
                 for (File rootdir : dirList) {
                     if (actualFile.get().getPath().startsWith(rootdir.getPath())) {
-                        return setupPreferencesForOO(rootdir, actualFile.get(), SOFFICE_BIN);
+                        return setupPreferencesForOO(rootdir, actualFile.get(), OpenOfficePreferences.OSX_EXECUTABLE);
                     }
                 }
             }
@@ -176,10 +176,10 @@ public class AutoDetectPaths extends AbstractWorker {
                 return false;
             }
             if ((inUsr != null) && (inOpt == null)) {
-                return setupPreferencesForOO(usrRoot, inUsr, SOFFICE_BIN);
+                return setupPreferencesForOO(usrRoot, inUsr, SOFFICE);
             } else if (inOpt != null) {
                 if (inUsr == null) {
-                    return setupPreferencesForOO("/opt", inOpt, SOFFICE_BIN);
+                    return setupPreferencesForOO("/opt", inOpt, SOFFICE);
                 } else { // Found both
                     JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
                     JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
@@ -200,9 +200,9 @@ public class AutoDetectPaths extends AbstractWorker {
                         return false;
                     }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt, SOFFICE_BIN);
+                        return setupPreferencesForOO("/opt", inOpt, SOFFICE);
                     } else {
-                        return setupPreferencesForOO(usrRoot, inUsr, SOFFICE_BIN);
+                        return setupPreferencesForOO(usrRoot, inUsr, SOFFICE);
                     }
                 }
             }

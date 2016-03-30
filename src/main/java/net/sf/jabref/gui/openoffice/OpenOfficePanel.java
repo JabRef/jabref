@@ -161,7 +161,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
         });
 
-        setStyleFile.addActionListener(e -> {
+        setStyleFile.addActionListener(event -> {
 
             if (styleDialog == null) {
                 styleDialog = new StyleSelectDialog(frame, preferences, loader);
@@ -169,6 +169,11 @@ public class OpenOfficePanel extends AbstractWorker {
             styleDialog.setVisible(true);
             styleDialog.getStyle().ifPresent(selectedStyle -> {
                 style = selectedStyle;
+                try {
+                    style.ensureUpToDate();
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                }
                 frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
             });
 
@@ -342,11 +347,12 @@ public class OpenOfficePanel extends AbstractWorker {
             sOffice = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
-                ooJarsDirectory = ooPath + "\\program\\classes";
-                sOffice = ooPath + "\\program\\soffice.exe";
+                ooJarsDirectory = ooPath + OpenOfficePreferences.WINDOWS_JARS_SUBPATH;
+                sOffice = ooPath + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH
+                        + OpenOfficePreferences.WINDOWS_EXECUTABLE;
             } else if (OS.OS_X) {
-                sOffice = ooPath + "/Contents/MacOS/soffice.bin";
-                ooJarsDirectory = ooPath + "/Contents/Resources/java";
+                sOffice = ooPath + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE;
+                ooJarsDirectory = ooPath + OpenOfficePreferences.OSX_JARS_SUBPATH;
             } else {
                 // Linux:
                 ooJarsDirectory = ooJars + "/program/classes";

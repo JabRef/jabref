@@ -885,32 +885,33 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private String createAuthorList(String author, int maxAuthors, String andString,
             String yearSep) {
+        if (author == null) {
+            return "";
+        }
         String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
         String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".
         String oxfordComma = getStringCitProperty(OXFORD_COMMA); // The String to put after the second to last author in case of three or more authors
         StringBuilder sb = new StringBuilder();
-        if (author != null) {
-            AuthorList al = AuthorList.parse(author);
-            if (!al.isEmpty()) {
-                sb.append(getAuthorLastName(al, 0));
-            }
-            if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
-                int j = 1;
-                while (j < (al.getNumberOfAuthors() - 1)) {
-                    sb.append(authorSep);
-                    sb.append(getAuthorLastName(al, j));
-                    j++;
-                }
-                if (al.getNumberOfAuthors() > 2) {
-                    sb.append(oxfordComma);
-                }
-                sb.append(andString);
-                sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
-            } else if (al.getNumberOfAuthors() > maxAuthors) {
-                sb.append(etAlString);
-            }
-            sb.append(yearSep);
+        AuthorList al = AuthorList.parse(author);
+        if (!al.isEmpty()) {
+            sb.append(getAuthorLastName(al, 0));
         }
+        if ((al.getNumberOfAuthors() > 1) && ((al.getNumberOfAuthors() <= maxAuthors) || (maxAuthors < 0))) {
+            int j = 1;
+            while (j < (al.getNumberOfAuthors() - 1)) {
+                sb.append(authorSep);
+                sb.append(getAuthorLastName(al, j));
+                j++;
+            }
+            if (al.getNumberOfAuthors() > 2) {
+                sb.append(oxfordComma);
+            }
+            sb.append(andString);
+            sb.append(getAuthorLastName(al, al.getNumberOfAuthors() - 1));
+        } else if (al.getNumberOfAuthors() > maxAuthors) {
+            sb.append(etAlString);
+        }
+        sb.append(yearSep);
         return sb.toString();
     }
 }
