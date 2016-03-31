@@ -65,7 +65,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
         if (panel.getSelectedEntries().size() != 1) {
             JOptionPane.showMessageDialog(panel.frame(), Localization.lang("Select one entry."),
-                    Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
@@ -78,7 +78,7 @@ public class MergeEntryDOIDialog extends JDialog {
             panel.output("");
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("Cannot get info based on given DOI: %0", this.originalEntry.getField("doi")),
-                    Localization.lang("Merge entry from DOI"), JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
@@ -96,7 +96,7 @@ public class MergeEntryDOIDialog extends JDialog {
                 Localization.lang("Entry from DOI"), panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(Localization.lang("Merge from DOI"));
+        ce = new NamedCompound(Localization.lang("Merge entry with DOI information"));
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
         // layout.setColumnGroups(new int[][] {{3, 11}});

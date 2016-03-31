@@ -158,7 +158,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
 
-    private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"), Globals.prefs
+    private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
+            Globals.prefs
             .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());

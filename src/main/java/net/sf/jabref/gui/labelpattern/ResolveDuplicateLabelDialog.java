@@ -59,13 +59,13 @@ class ResolveDuplicateLabelDialog {
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
                 "left:pref, 4dlu, fill:pref", "p"));
-        b.add(new JLabel(Localization.lang("Duplicate key") + ": " + key)).xyw(1, 1, 3);
+        b.add(new JLabel(Localization.lang("Duplicate BibTeX key") + ": " + key)).xyw(1, 1, 3);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         boolean first = true;
         int row = 3;
         for (BibEntry entry : entries) {
-            JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
+            JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());
             //pan.add(cb, BorderLayout.NORTH);
