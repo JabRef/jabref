@@ -51,7 +51,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Localization.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
+        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods");
     }
 
     @Override
