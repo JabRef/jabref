@@ -681,7 +681,7 @@ public class JabRefPreferences {
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
         defaults.put(PREVIEW_0,
-                "<font face=\"helvetica\">"
+                "<font face=\"sans-serif\">"
                 + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                 + "\\end{bibtexkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
@@ -701,7 +701,7 @@ public class JabRefPreferences {
                 + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                 + "</dd>__NEWLINE__<p></p></font>");
         defaults.put(PREVIEW_1,
-                "<font face=\"helvetica\">"
+                "<font face=\"sans-serif\">"
                 + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                 + "\\end{bibtexkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
