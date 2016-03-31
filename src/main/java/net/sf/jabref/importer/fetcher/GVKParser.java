@@ -388,7 +388,7 @@ public class GVKParser {
             result.setField("publisher", publisher);
         }
         if (date != null) {
-            result.setField("date", date);
+            result.setField("year", date);
         }
         if (address != null) {
             result.setField("address", address);
