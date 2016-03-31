@@ -8,7 +8,6 @@ public enum BibtexSingleFieldProperties {
     DATEPICKER,
     JOURNAL_NAMES,
     EXTERNAL,
-    BROWSE,
     SET_OWNER,
     MONTH,
     FILE_EDITOR,
