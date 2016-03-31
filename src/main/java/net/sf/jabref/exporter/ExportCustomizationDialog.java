@@ -174,7 +174,7 @@ public class ExportCustomizationDialog extends JDialog {
             case 1:
                 return Localization.lang("Main layout file");
             default:
-                return Localization.lang("File extension");
+                return Localization.lang("Extension");
             }
         }
     }

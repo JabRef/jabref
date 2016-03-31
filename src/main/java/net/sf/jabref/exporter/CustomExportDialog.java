@@ -137,7 +137,7 @@ class CustomExportDialog extends JDialog {
         gbl.setConstraints(nr, con);
         main.add(nr);
         con.gridy = 2;
-        JLabel nf = new JLabel(Localization.lang("File extension") + ':');
+        JLabel nf = new JLabel(Localization.lang("Extension") + ':');
         gbl.setConstraints(nf, con);
         main.add(nf);
 

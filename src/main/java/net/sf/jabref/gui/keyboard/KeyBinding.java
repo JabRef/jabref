@@ -45,7 +45,6 @@ public enum KeyBinding {
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl shift A"),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl shift B"),
     NEW_ENTRY("New entry", Localization.lang("New entry"), "ctrl N"),
-    NEW_FILE_LINK("New file link", Localization.lang("New file link"), "ctrl N"),
     NEW_FROM_PLAIN_TEXT("New from plain text", Localization.lang("New from plain text"), "ctrl shift N"),
     NEW_INBOOK("New inbook", Localization.lang("New inbook"), "ctrl shift I"),
     NEW_MASTERSTHESIS("New mastersthesis", Localization.lang("New mastersthesis"), "ctrl shift M"),
