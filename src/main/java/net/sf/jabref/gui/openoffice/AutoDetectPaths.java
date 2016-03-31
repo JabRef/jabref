@@ -177,7 +177,8 @@ public class AutoDetectPaths extends AbstractWorker {
                     FormBuilder b = FormBuilder.create()
                             .layout(new FormLayout("left:pref", "pref, 2dlu, pref, 2dlu, pref "));
                     b.add(Localization
-                            .lang("Found more than one OpenOffice/LibreOffice executable. Please choose which one to connect to:"))
+                            .lang("Found more than one OpenOffice/LibreOffice executable.") + " "
+                            + Localization.lang("Please choose which one to connect to:"))
                             .xy(1, 1);
                     b.add(optRB).xy(1, 3);
                     b.add(usrRB).xy(1, 5);
