@@ -406,7 +406,7 @@ public class MetaData implements Iterable<String> {
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase()));
+        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase(Locale.ENGLISH)));
     }
 
     public boolean isProtected() {
