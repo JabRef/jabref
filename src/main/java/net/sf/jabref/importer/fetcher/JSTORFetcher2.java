@@ -199,7 +199,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                         + Localization.lang("Number of references to fetch?"), Integer.toString(countOfRefs));
 
                 if (strCount == null) {
-                    status.setStatus(Localization.lang("JSTOR import cancelled"));
+                    status.setStatus(Localization.lang("%0 import canceled", "JSTOR"));
                     return JSTORFetcher2.CANCELLED;
                 }
 
