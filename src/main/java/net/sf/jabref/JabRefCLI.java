@@ -206,7 +206,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("g").
                 longOpt("generateBibtexKeys").
-                desc(Localization.lang("Regenerate all keys for the entries in a bibtex file"))
+                desc(Localization.lang("Regenerate all keys for the entries in a BibTeX file"))
                 .build());
 
         options.addOption(Option.builder("asfl").

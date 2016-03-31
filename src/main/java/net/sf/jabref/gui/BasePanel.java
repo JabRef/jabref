@@ -664,7 +664,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                final NamedCompound ce = new NamedCompound(Localization.lang("autogenerate keys"));
+                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
 
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
@@ -2026,7 +2026,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void autoGenerateKeysBeforeSaving() {
         if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
-            NamedCompound ce = new NamedCompound(Localization.lang("autogenerate keys"));
+            NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
             boolean any = false;
 
             for (BibEntry bes : database.getEntries()) {

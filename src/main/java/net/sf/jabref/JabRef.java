@@ -465,13 +465,13 @@ public class JabRef {
 
             MetaData metaData = parserResult.getMetaData();
             if (metaData != null) {
-                LOGGER.info(Localization.lang("Regenerating bibtex keys according to metadata"));
+                LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
                     LabelPatternUtil.makeLabel(metaData, database, entry);
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
+                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));
             }
         }
     }
