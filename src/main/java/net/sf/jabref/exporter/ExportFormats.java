@@ -75,7 +75,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
         ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690txt", "iso690", "iso690txt", ".txt"));
         ExportFormats.putFormat(new ExportFormat("Endnote", "endnote", "EndNote", "endnote", ".txt"));
-        ExportFormats.putFormat(new ExportFormat("OpenOffice CSV", "oocsv", "openoffice-csv",
+        ExportFormats.putFormat(new ExportFormat("OpenOffice/LibreOffice CSV", "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
         ExportFormat ef = new ExportFormat("RIS", "ris", "ris", "ris", ".ris");
         ef.setEncoding(StandardCharsets.UTF_8);

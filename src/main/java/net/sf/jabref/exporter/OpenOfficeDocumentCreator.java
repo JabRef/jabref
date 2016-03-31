@@ -48,7 +48,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super("OpenOffice Calc", "oocalc", null, null, ".sxc");
+        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, ".sxc");
     }
 
     @Override

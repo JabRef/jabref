@@ -64,7 +64,8 @@ public enum KeyBinding {
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl L"),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl Q"),
     REDO("Redo", Localization.lang("Redo"), "ctrl Y"),
-    REFRESH_OO("Refresh OO", Localization.lang("Refresh OO"), "ctrl alt O"),
+    REFRESH_OO(
+            "Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O"),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl R"),
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D"),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S"),

@@ -104,7 +104,7 @@ public class OpenOfficePanel extends AbstractWorker {
         selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
-        update.setToolTipText(Localization.lang("Sync OO bibliography"));
+        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         preferences = new OpenOfficePreferences(Globals.prefs);
         loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
                 Globals.prefs.getDefaultEncoding());
@@ -208,7 +208,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(frame,
                                 Localization.lang(
-                                        "Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                        "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                         unresolvedKeys.get(0)),
                                 Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -228,7 +228,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang(
-                                    "Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                    "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.debug("BibEntry not found", ex);
@@ -268,7 +268,7 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setEnabled(false);
         merge.setEnabled(false);
         manageCitations.setEnabled(false);
-        diag = new JDialog((JFrame) null, "OpenOffice panel", false);
+        diag = new JDialog((JFrame) null, "OpenOffice/LibreOffice panel", false);
 
         FormBuilder mainBuilder = FormBuilder.create().layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p"));
 
@@ -322,7 +322,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 autoDetected = true;
                 dialogOkPressed = true;
                 diag.dispose();
-            } else if (!adp.cancelled()) {
+            } else if (!adp.canceled()) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
             } else {
@@ -406,8 +406,8 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
-                    Localization.lang("Could not connect to running OpenOffice.") + "\n"
-                            + Localization.lang("Make sure you have installed OpenOffice with Java support.") + "\n"
+                    Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
+                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
                             + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
         }
@@ -472,16 +472,16 @@ public class OpenOfficePanel extends AbstractWorker {
                 .layout(
                         new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
         if (OS.WINDOWS || OS.OS_X) {
-            builder.add(Localization.lang("Path to OpenOffice directory")).xy(1, 1);
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice directory")).xy(1, 1);
             builder.add(ooPath).xy(3, 1);
             builder.add(browseOOPath).xy(5, 1);
         } else {
-            builder.add(Localization.lang("Path to OpenOffice executable")).xy(1, 1);
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice executable")).xy(1, 1);
             builder.add(ooExec).xy(3, 1);
             builder.add(browseOOExec).xy(5, 1);
 
             builder.appendColumns("4dlu, pref");
-            builder.add(Localization.lang("Path to OpenOffice library dir")).xy(1, 3);
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice library dir")).xy(1, 3);
             builder.add(ooJars).xy(3, 3);
             builder.add(browseOOJars).xy(5, 3);
         }
@@ -577,8 +577,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void showConnectionLostErrorMessage() {
         JOptionPane.showMessageDialog(frame,
-                Localization.lang("Connection to OpenOffice has been lost. "
-                        + "Please make sure OpenOffice is running, and try to reconnect."),
+                Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
+                        + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."),
                 Localization.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
     }
 
@@ -588,7 +588,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         frame, "<html>"
                                 + Localization.lang(
                                         "Your style file specifies the paragraph format '%0', "
-                                                + "which is undefined in your current OpenOffice document.",
+                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
                                         ex.getFormatName())
                                 + "<br>"
                                 + Localization
@@ -603,7 +603,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         frame, "<html>"
                                 + Localization.lang(
                                         "Your style file specifies the character format '%0', "
-                                                + "which is undefined in your current OpenOffice document.",
+                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
                                         ex.getFormatName())
                                 + "<br>"
                                 + Localization
@@ -649,7 +649,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     public String getName() {
-        return "OpenOffice";
+        return "OpenOffice/LibreOffice";
     }
 
 

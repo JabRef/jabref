@@ -19,9 +19,6 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 
 import javax.swing.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.awt.*;
 import java.util.*;
@@ -39,13 +36,10 @@ import net.sf.jabref.logic.util.OS;
  */
 public class AutoDetectPaths extends AbstractWorker {
 
-
-    private static final Log LOGGER = LogFactory.getLog(AutoDetectPaths.class);
-
     private final OpenOfficePreferences preferences;
 
     private boolean foundPaths;
-    private boolean fileSearchCancelled;
+    private boolean fileSearchCanceled;
     private JDialog prog;
     private final JDialog parent;
 
@@ -59,18 +53,14 @@ public class AutoDetectPaths extends AbstractWorker {
     }
 
     public boolean runAutodetection() {
-        try {
-            if (preferences.checkAutoDetectedPaths()) {
-                return true;
-            }
-            init();
-            getWorker().run();
-            update();
-            return foundPaths;
-        } catch (Throwable e) {
-            LOGGER.warn("Problem when auto-detecting paths", e);
-            return false;
+        foundPaths = false;
+        if (preferences.checkAutoDetectedPaths()) {
+            return true;
         }
+        init();
+        getWorker().run();
+        update();
+        return foundPaths;
     }
 
     @Override
@@ -78,12 +68,12 @@ public class AutoDetectPaths extends AbstractWorker {
         foundPaths = autoDetectPaths();
     }
 
-    public boolean cancelled() {
-        return fileSearchCancelled;
+    public boolean canceled() {
+        return fileSearchCanceled;
     }
 
     @Override
-    public void init() throws Throwable {
+    public void init() {
         prog = showProgressDialog(parent, Localization.lang("Autodetecting paths..."),
                 Localization.lang("Please wait..."), true);
     }
@@ -99,7 +89,7 @@ public class AutoDetectPaths extends AbstractWorker {
             List<File> progFiles = fileSearch.findWindowsProgramFilesDir();
             List<File> sofficeFiles = new ArrayList<>(
                     fileSearch.findFileInDirs(progFiles, OpenOfficePreferences.WINDOWS_EXECUTABLE));
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return false;
             }
             if (sofficeFiles.isEmpty()) {
@@ -140,7 +130,7 @@ public class AutoDetectPaths extends AbstractWorker {
             List<File> sofficeFiles = new ArrayList<>(
                     fileSearch.findFileInDirs(dirList, OpenOfficePreferences.OSX_EXECUTABLE));
 
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return false;
             }
             Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
@@ -156,7 +146,7 @@ public class AutoDetectPaths extends AbstractWorker {
             // Linux:
             String usrRoot = "/usr/lib";
             File inUsr = fileSearch.findFileInDir(new File(usrRoot), OpenOfficePreferences.LINUX_EXECUTABLE);
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return false;
             }
             if (inUsr == null) {
@@ -166,11 +156,11 @@ public class AutoDetectPaths extends AbstractWorker {
                 }
             }
 
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return false;
             }
             File inOpt = fileSearch.findFileInDir(new File("/opt"), OpenOfficePreferences.LINUX_EXECUTABLE);
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return false;
             }
             if ((inUsr != null) && (inOpt == null)) {
@@ -215,7 +205,7 @@ public class AutoDetectPaths extends AbstractWorker {
     private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
         preferences.setExecutablePath(new File(inUsr, sofficeName).getPath());
         File jurt = fileSearch.findFileInDir(rootDir, "jurt.jar");
-        if (fileSearchCancelled) {
+        if (fileSearchCanceled) {
             return false;
         }
         if (jurt == null) {
@@ -256,7 +246,7 @@ public class AutoDetectPaths extends AbstractWorker {
 
 
     public JDialog showProgressDialog(JDialog progressParent, String title, String message, boolean includeCancelButton) {
-        fileSearchCancelled = false;
+        fileSearchCanceled = false;
         JProgressBar bar = new JProgressBar(SwingConstants.HORIZONTAL);
         final JDialog progressDialog = new JDialog(progressParent, title, false);
         bar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -264,7 +254,7 @@ public class AutoDetectPaths extends AbstractWorker {
         if (includeCancelButton) {
             JButton cancel = new JButton(Localization.lang("Cancel"));
             cancel.addActionListener(event -> {
-                fileSearchCancelled = true;
+                fileSearchCanceled = true;
                 fileSearch.cancelFileSearch();
                 ((JButton) event.getSource()).setEnabled(false);
             });
