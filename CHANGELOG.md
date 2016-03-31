@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Swedish is added as a language option (still not a complete translation)
 - The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
