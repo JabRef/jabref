@@ -72,7 +72,7 @@ public class SpringerFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("Search canceled"));
+                            status.setStatus(Localization.lang("%0 import canceled", "Springer"));
                             return false;
                         }
 

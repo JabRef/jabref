@@ -1151,7 +1151,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
         JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
         JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
-        JMenu bibtex = JabRefFrame.subMenu(Localization.menuTitle("BibTeX"));
+        JMenu bibtex = JabRefFrame.subMenu("&BibTeX");
         JMenu quality = JabRefFrame.subMenu(Localization.menuTitle("Quality"));
         JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
         JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
