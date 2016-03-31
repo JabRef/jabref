@@ -420,4 +420,92 @@ public class BibDatabaseWriterTest {
 
         assertEquals("", stringWriter.toString());
     }
+
+    @Test
+    public void writeEntriesSorted() throws IOException {
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+                new SaveOrderConfig.SortCriterion("year", true),
+                new SaveOrderConfig.SortCriterion("abstract", false));
+        metaData.setSaveOrderConfig(saveOrderConfig);
+
+        BibEntry firstEntry = new BibEntry();
+        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setField("author", "A");
+        firstEntry.setField("year", "2000");
+
+        BibEntry secondEntry = new BibEntry();
+        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setField("author", "A");
+        secondEntry.setField("year", "2010");
+
+        BibEntry thirdEntry = new BibEntry();
+        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setField("author", "B");
+        thirdEntry.setField("year", "2000");
+
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
+        database.insertEntry(firstEntry);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, database.getEntries(), new SavePreferences());
+
+        assertEquals(
+                Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {A}," + Globals.NEWLINE +
+                "  year =   {2000}" + Globals.NEWLINE +
+                "}"  + Globals.NEWLINE + Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {A}," + Globals.NEWLINE +
+                "  year =   {2010}" + Globals.NEWLINE +
+                "}" + Globals.NEWLINE + Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {B}," + Globals.NEWLINE +
+                "  year =   {2000}" + Globals.NEWLINE +
+                "}" + Globals.NEWLINE + Globals.NEWLINE +
+                "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
+                Globals.NEWLINE
+                , stringWriter.toString());
+    }
+
+    @Test
+    public void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws IOException {
+        BibEntry firstEntry = new BibEntry(IdGenerator.next());
+        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setField("author", "A");
+        firstEntry.setField("year", "2010");
+
+        BibEntry secondEntry = new BibEntry(IdGenerator.next());
+        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setField("author", "B");
+        secondEntry.setField("year", "2000");
+
+        BibEntry thirdEntry = new BibEntry(IdGenerator.next());
+        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setField("author", "A");
+        thirdEntry.setField("year", "2000");
+
+        database.insertEntry(firstEntry);
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
+
+        SavePreferences preferences = new SavePreferences().withSaveInOriginalOrder(false);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, database.getEntries(), preferences);
+
+        assertEquals(
+                Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {A}," + Globals.NEWLINE +
+                        "  year =   {2010}" + Globals.NEWLINE +
+                        "}" + Globals.NEWLINE + Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {B}," + Globals.NEWLINE +
+                        "  year =   {2000}" + Globals.NEWLINE +
+                        "}" + Globals.NEWLINE + Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {A}," + Globals.NEWLINE +
+                        "  year =   {2000}" + Globals.NEWLINE +
+                        "}"  + Globals.NEWLINE
+                , stringWriter.toString());
+    }
 }

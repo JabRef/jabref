@@ -51,7 +51,7 @@ public class SavePreferences {
     }
 
     public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
-        Boolean saveInOriginalOrder = true;
+        Boolean saveInOriginalOrder = false;
         SaveOrderConfig saveOrder = null;
         Charset encoding = preferences.getDefaultEncoding();
         Boolean makeBackup = preferences.getBoolean(JabRefPreferences.BACKUP);
