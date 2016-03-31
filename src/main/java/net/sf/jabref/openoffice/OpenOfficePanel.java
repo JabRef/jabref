@@ -148,7 +148,7 @@ public class OpenOfficePanel extends AbstractWorker {
     public void init(JabRefFrame jrFrame, SidePaneManager spManager) {
         frame = jrFrame;
         this.manager = spManager;
-        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), Localization.lang("OpenOffice"), this);
+        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
         initPanel();
         spManager.register(getName(), comp);
     }

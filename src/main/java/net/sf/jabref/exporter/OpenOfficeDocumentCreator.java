@@ -17,8 +17,6 @@ package net.sf.jabref.exporter;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -50,7 +48,7 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super(Localization.lang("OpenOffice Calc"), "oocalc", null, null, ".sxc");
+        super("OpenOffice Calc", "oocalc", null, null, ".sxc");
     }
 
     @Override

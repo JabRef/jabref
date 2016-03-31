@@ -1404,7 +1404,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private void warnDuplicateBibtexkey() {
-        panel.output(Localization.lang("Duplicate BibTeX key.")+" "+Localization.lang("Grouping may not work for this entry."));
+        panel.output(Localization.lang("Duplicate BibTeX key") + ". "
+                + Localization.lang("Grouping may not work for this entry."));
     }
 
     private void warnEmptyBibtexkey() {

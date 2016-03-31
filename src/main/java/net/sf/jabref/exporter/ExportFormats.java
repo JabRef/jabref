@@ -58,12 +58,12 @@ public class ExportFormats {
         ExportFormats.EXPORT_FORMATS.clear();
 
         // Initialize Build-In Export Formats
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML"), "html", "html", null, ".html"));
+        ExportFormats.putFormat(new ExportFormat("HTML", "html", "html", null, ".html"));
         ExportFormats.putFormat(new ExportFormat(Localization.lang("Simple HTML"), "simplehtml", "simplehtml", null, ".html"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("DocBook").concat(" 4.4"), "docbook", "docbook", null, ".xml"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("DIN 1505"), "din1505", "din1505winword", "din1505", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("BibTeXML"), "bibtexml", "bibtexml", null, ".xml"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("BibO RDF"), "bibordf", "bibordf", null, ".rdf"));
+        ExportFormats.putFormat(new ExportFormat("DocBook 4.4", "docbook", "docbook", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat("DIN 1505", "din1505", "din1505winword", "din1505", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat("BibTeXML", "bibtexml", "bibtexml", null, ".xml"));
+        ExportFormats.putFormat(new ExportFormat("BibO RDF", "bibordf", "bibordf", null, ".rdf"));
         ExportFormats.putFormat(new ModsExportFormat());
         ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs", ".html"));
         ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML list"),
@@ -72,15 +72,15 @@ public class ExportFormats {
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
         ExportFormats.putFormat(new ExportFormat(Localization.lang("Harvard RTF"), "harvard", "harvard",
                 "harvard", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("ISO 690"), "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("ISO 690"), "iso690txt", "iso690", "iso690txt", ".txt"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("Endnote"), "endnote", "EndNote", "endnote", ".txt"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("OpenOffice CSV"), "oocsv", "openoffice-csv",
+        ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
+        ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690txt", "iso690", "iso690txt", ".txt"));
+        ExportFormats.putFormat(new ExportFormat("Endnote", "endnote", "EndNote", "endnote", ".txt"));
+        ExportFormats.putFormat(new ExportFormat("OpenOffice CSV", "oocsv", "openoffice-csv",
                 "openoffice", ".csv"));
-        ExportFormat ef = new ExportFormat(Localization.lang("RIS"), "ris", "ris", "ris", ".ris");
+        ExportFormat ef = new ExportFormat("RIS", "ris", "ris", "ris", ".ris");
         ef.setEncoding(StandardCharsets.UTF_8);
         ExportFormats.putFormat(ef);
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("MIS Quarterly"), "misq", "misq", "misq",".rtf"));
+        ExportFormats.putFormat(new ExportFormat("MIS Quarterly", "misq", "misq", "misq", ".rtf"));
 
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
