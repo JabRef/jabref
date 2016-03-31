@@ -13,10 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
@@ -54,17 +54,14 @@ class AdvancedCiteDialog {
 
         inPar.addChangeListener(changeEvent -> defaultInPar = inPar.isSelected());
 
-        DefaultFormBuilder b = new DefaultFormBuilder
-                (new FormLayout("left:pref, 4dlu, fill:pref", ""));
-        b.append(inPar, 3);
-        b.nextLine();
-        b.append(inText, 3);
-        b.nextLine();
-        b.append(Localization.lang("Extra information (e.g. page number)") + ":");
-        b.append(pageInfo);
-
-        b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        diag.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref, 4dlu, pref"));
+        builder.add(inPar).xyw(1, 1, 3);
+        builder.add(inText).xyw(1, 3, 3);
+        builder.add(Localization.lang("Extra information (e.g. page number)") + ":").xy(1, 5);
+        builder.add(pageInfo).xy(3, 5);
+        builder.padding("10dlu, 10dlu, 10dlu, 10dlu");
+        diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -73,7 +70,7 @@ class AdvancedCiteDialog {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
         diag.pack();
@@ -96,9 +93,9 @@ class AdvancedCiteDialog {
             }
         };
         cancel.addActionListener(cancelAction);
-        b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+        builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        b.getPanel().getActionMap().put("close", cancelAction);
+        builder.getPanel().getActionMap().put("close", cancelAction);
 
     }
 

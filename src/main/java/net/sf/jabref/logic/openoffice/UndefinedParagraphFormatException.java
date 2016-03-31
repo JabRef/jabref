@@ -13,14 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.logic.openoffice;
 
 /**
- * This exception is used to indicate that connection to OpenOffice has been lost.
+ * Exception used to indicate that the plugin attempted to set a paragraph format that is
+ * not defined in the current OpenOffice document.
  */
-class ConnectionLostException extends RuntimeException {
+public class UndefinedParagraphFormatException extends Exception {
 
-    public ConnectionLostException(String s) {
-        super(s);
+    private final String formatName;
+
+
+    public UndefinedParagraphFormatException(String formatName) {
+        super();
+        this.formatName = formatName;
+    }
+
+    public String getFormatName() {
+        return formatName;
     }
 }

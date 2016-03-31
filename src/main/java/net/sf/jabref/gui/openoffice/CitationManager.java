@@ -13,14 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -35,6 +35,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.CitationEntry;
 
 import javax.swing.*;
 
@@ -46,6 +47,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Dialog for modifying existing citations.
@@ -54,9 +56,9 @@ class CitationManager {
 
     private final OOBibBase ooBase;
     private final JDialog diag;
-    private final EventList<CitEntry> list;
+    private final EventList<CitationEntry> list;
     private final JTable table;
-    private final DefaultEventTableModel<CitEntry> tableModel;
+    private final DefaultEventTableModel<CitationEntry> tableModel;
 
     private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
 
@@ -68,13 +70,13 @@ class CitationManager {
 
         list = new BasicEventList<>();
         XNameAccess nameAccess = ooBase.getReferenceMarks();
-        java.util.List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
+        List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
         for (String name : names) {
-            list.add(new CitEntry(name,
+            list.add(new CitationEntry(name,
                     "<html>..." + ooBase.getCitationContext(nameAccess, name, 30, 30, true) + "...</html>",
                     ooBase.getCustomProperty(name)));
         }
-        tableModel = new DefaultEventTableModel<>(list, new CitEntryFormat());
+        tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -115,15 +117,15 @@ class CitationManager {
                 (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         bb.getPanel().getActionMap().put("close", cancelAction);
 
-        table.getColumnModel().getColumn(0).setPreferredWidth(600);
-        table.getColumnModel().getColumn(1).setPreferredWidth(90);
+        table.getColumnModel().getColumn(0).setPreferredWidth(580);
+        table.getColumnModel().getColumn(1).setPreferredWidth(110);
         table.setPreferredScrollableViewportSize(new Dimension(700, 500));
         table.addMouseListener(new TableClickListener());
     }
 
     private void storeSettings() throws UnknownPropertyException, NotRemoveableException, PropertyExistException,
             IllegalTypeException, IllegalArgumentException {
-        for (CitEntry entry : list) {
+        for (CitationEntry entry : list) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (entry.pageInfoChanged() && pageInfo.isPresent()) {
                 ooBase.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
@@ -137,81 +139,8 @@ class CitationManager {
     }
 
 
-    static class CitEntry implements Comparable<CitEntry> {
 
-        private final String refMarkName;
-        private Optional<String> pageInfo;
-        private final String context;
-        private final Optional<String> origPageInfo;
-
-
-        // Only used for testing...
-        public CitEntry(String refMarkName, String context) {
-            this(refMarkName, context, Optional.empty());
-        }
-
-        // Only used for testing...
-        public CitEntry(String refMarkName, String context, String pageInfo) {
-            this(refMarkName, context, Optional.ofNullable(pageInfo));
-        }
-
-        public CitEntry(String refMarkName, String context, Optional<String> pageInfo) {
-            this.refMarkName = refMarkName;
-            this.context = context;
-            this.pageInfo = pageInfo;
-            this.origPageInfo = pageInfo;
-        }
-
-        public Optional<String> getPageInfo() {
-            return pageInfo;
-        }
-
-        public String getRefMarkName() {
-            return refMarkName;
-        }
-
-        public boolean pageInfoChanged() {
-            if (pageInfo.isPresent() ^ origPageInfo.isPresent()) {
-                return true;
-            }
-            if (!pageInfo.isPresent()) {
-                // This means that origPageInfo.isPresent is also false
-                return false;
-            } else {
-                // So origPageInfo.isPresent is true here
-                return pageInfo.get().compareTo(origPageInfo.get()) != 0;
-            }
-        }
-
-        @Override
-        public int compareTo(CitEntry other) {
-            return this.refMarkName.compareTo(other.refMarkName);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof CitEntry) {
-                CitEntry other = (CitEntry) o;
-                return this.refMarkName.equals(other.refMarkName);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.refMarkName.hashCode();
-        }
-
-        public String getContext() {
-            return context;
-        }
-
-        public void setPageInfo(String trim) {
-            pageInfo = Optional.ofNullable(trim);
-        }
-    }
-
-    private static class CitEntryFormat implements TableFormat<CitEntry> {
+    private static class CitationEntryFormat implements TableFormat<CitationEntry> {
 
         @Override
         public int getColumnCount() {
@@ -228,7 +157,7 @@ class CitationManager {
         }
 
         @Override
-        public Object getColumnValue(CitEntry citEntry, int i) {
+        public Object getColumnValue(CitationEntry citEntry, int i) {
             if (i == 0) {
                 return citEntry.getContext();
             } else {
@@ -244,45 +173,42 @@ class CitationManager {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row >= 0) {
-                    SingleCitDialog scd = new SingleCitDialog(list.get(row));
+                    SingleCitationDialog scd = new SingleCitationDialog(list.get(row));
                     scd.showDialog();
                 }
             }
         }
     }
 
-    class SingleCitDialog {
+    class SingleCitationDialog {
 
         private final JDialog singleCiteDialog;
         private final JTextField pageInfo = new JTextField(20);
-        private final JLabel title;
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        private final CitEntry entry;
+        private final CitationEntry entry;
 
 
-        public SingleCitDialog(CitEntry citEntry) {
+        public SingleCitationDialog(CitationEntry citEntry) {
             this.entry = citEntry;
-            title = new JLabel(entry.getContext());
             pageInfo.setText(entry.getPageInfo().orElse(""));
 
             singleCiteDialog = new JDialog(CitationManager.this.diag, Localization.lang("Citation"), true);
 
-            DefaultFormBuilder b = new DefaultFormBuilder(
-                    new FormLayout("left:pref, 4dlu, left:150dlu", ""));
-            b.append(title, 3);
-            b.nextLine();
-            b.append(Localization.lang("Extra information (e.g. page number)"));
-            b.append(pageInfo);
-            b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            singleCiteDialog.getContentPane().add(b.getPanel(), BorderLayout.CENTER);
+            FormBuilder builder = FormBuilder.create()
+                    .layout(new FormLayout("left:pref, 4dlu, fill:150dlu:grow", "pref, 4dlu, pref"));
+            builder.add(entry.getContext()).xyw(1, 1, 3);
+            builder.add(Localization.lang("Extra information (e.g. page number)")).xy(1, 3);
+            builder.add(pageInfo).xy(3, 3);
+            builder.padding("10dlu, 10dlu, 10dlu, 10dlu");
+            singleCiteDialog.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
             ButtonBarBuilder bb = new ButtonBarBuilder();
             bb.addGlue();
             bb.addButton(okButton);
             bb.addButton(cancelButton);
             bb.addGlue();
-            bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
             singleCiteDialog.add(bb.getPanel(), BorderLayout.SOUTH);
 
             okButton.addActionListener(e -> {
@@ -304,9 +230,9 @@ class CitationManager {
             };
             cancelButton.addActionListener(cancelAction);
 
-            b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
+            builder.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put
                     (Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-            b.getPanel().getActionMap().put("close", cancelAction);
+            builder.getPanel().getActionMap().put("close", cancelAction);
 
         }
 

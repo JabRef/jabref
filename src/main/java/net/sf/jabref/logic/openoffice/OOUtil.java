@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,18 +13,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.logic.openoffice;
 
-import java.util.List;
 import java.util.Set;
 import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -38,15 +32,14 @@ import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
-import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
-import net.sf.jabref.logic.l10n.Localization;
+
 import net.sf.jabref.logic.layout.Layout;
 
 /**
  * Utility methods for processing OO Writer documents.
  */
-class OOUtil {
+public class OOUtil {
 
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
     private static final String CHAR_UNDERLINE = "CharUnderline";
@@ -58,7 +51,7 @@ class OOUtil {
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
 
 
-    enum Formatting {
+    public enum Formatting {
         BOLD,
         ITALIC,
         SMALLCAPS,
@@ -74,6 +67,9 @@ class OOUtil {
     private static final String UNIQUEFIER_FIELD = "uniq";
 
 
+    private OOUtil() {
+        // Just to hide the public constructor
+    }
 
     /**
      * Insert a reference, formatted using a Layout, at the position of a given cursor.
@@ -303,25 +299,5 @@ class OOUtil {
         XPropertySet props = UnoRuntime.queryInterface(
                 XPropertySet.class, o);
         return props.getPropertyValue(property);
-    }
-
-    public static XTextDocument selectComponent(List<XTextDocument> list)
-            throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
-        String[] values = new String[list.size()];
-        int ii = 0;
-        for (XTextDocument doc : list) {
-            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
-            ii++;
-        }
-        JList<String> sel = new JList<>(values);
-        sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        sel.setSelectedIndex(0);
-        int ans = JOptionPane.showConfirmDialog(null, new JScrollPane(sel), Localization.lang("Select document"),
-                JOptionPane.OK_CANCEL_OPTION);
-        if (ans == JOptionPane.OK_OPTION) {
-            return list.get(sel.getSelectedIndex());
-        } else {
-            return null;
-        }
     }
 }

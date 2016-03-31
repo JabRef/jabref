@@ -13,23 +13,27 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 /**
- * Exception used to indicate that the plugin attempted to set a character format that is
- * not defined in the current OpenOffice document.
+ * Created by IntelliJ IDEA.
+ * User: alver
+ * Date: 16-Dec-2007
+ * Time: 10:37:23
+ * To change this template use File | Settings | File Templates.
  */
-class UndefinedCharacterFormatException extends Exception {
+class BibEntryNotFoundException extends Exception {
 
-    private final String formatName;
+    private final String bibtexKey;
 
 
-    public UndefinedCharacterFormatException(String formatName) {
-        super();
-        this.formatName = formatName;
+    public BibEntryNotFoundException(String bibtexKey, String message) {
+        super(message);
+
+        this.bibtexKey = bibtexKey;
     }
 
-    public String getFormatName() {
-        return formatName;
+    public String getBibtexKey() {
+        return bibtexKey;
     }
 }

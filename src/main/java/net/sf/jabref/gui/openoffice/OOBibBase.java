@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
@@ -43,10 +43,15 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OOPreFormatter;
+import net.sf.jabref.logic.openoffice.OOUtil;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
@@ -62,6 +67,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -149,10 +159,12 @@ class OOBibBase {
         if (ls.isEmpty()) {
             // No text documents found.
             throw new NoDocumentException("No Writer documents found");
-        } else if (ls.size() > 1) {
-            selected = OOUtil.selectComponent(ls);
-        } else {
+        } else if (ls.size() == 1) {
+            // Get the only one
             selected = ls.get(0);
+        } else {
+            // Bring up a dialog
+            selected = selectComponent(ls);
         }
 
         if (selected == null) {
@@ -271,8 +283,7 @@ class OOBibBase {
      */
     public void insertEntry(List<BibEntry> entries, BibDatabase database,
             List<BibDatabase> allBases, OOBibStyle style,
-            boolean inParenthesis, boolean withText, String pageInfo,
-            boolean sync) throws Exception {
+            boolean inParenthesis, boolean withText, String pageInfo, boolean sync) throws Exception {
 
         try {
 
@@ -488,8 +499,8 @@ class OOBibBase {
                         }
                         citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         for (int j = 0; j < keys.length; j++) {
-                            normCitMarker[j] = style.getNumCitationMarker(Arrays.asList(num.get(j)), minGroupingCount,
-                                    false);
+                            normCitMarker[j] = style.getNumCitationMarker(Collections.singletonList(num.get(j)),
+                                    minGroupingCount, false);
                         }
                     } else {
                         // We need to find the number of the cited entry in the bibliography,
@@ -527,8 +538,8 @@ class OOBibBase {
                             type == OOBibBase.AUTHORYEAR_PAR, null, null);
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(Arrays.asList(cEntries[j]), entries, true, null,
-                                new int[] {-1});
+                        normCitMarker[j] = style.getCitationMarker(Collections.singletonList(cEntries[j]), entries,
+                                true, null, new int[] {-1});
                     }
                 }
                 citMarkers[i] = citationMarker;
@@ -548,16 +559,17 @@ class OOBibBase {
                 String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
                 for (int j = 0; j < markers.length; j++) {
                     String marker = markers[j];
+                    String currentKey = bibtexKeys[i][j];
                     if (refKeys.containsKey(marker)) {
                         // Ok, we have seen this exact marker before.
-                        if (!refKeys.get(marker).contains(bibtexKeys[i][j])) {
+                        if (!refKeys.get(marker).contains(currentKey)) {
                             // ... but not for this entry.
-                            refKeys.get(marker).add(bibtexKeys[i][j]);
+                            refKeys.get(marker).add(currentKey);
                             refNums.get(marker).add(i);
                         }
                     } else {
                         List<String> l = new ArrayList<>(1);
-                        l.add(bibtexKeys[i][j]);
+                        l.add(currentKey);
                         refKeys.put(marker, l);
                         List<Integer> l2 = new ArrayList<>(1);
                         l2.add(i);
@@ -589,34 +601,37 @@ class OOBibBase {
                 String[] uniquif = new String[bibtexKeys[j].length];
                 BibEntry[] cEntries = new BibEntry[bibtexKeys[j].length];
                 for (int k = 0; k < bibtexKeys[j].length; k++) {
+                    String currentKey = bibtexKeys[j][k];
                     firstLimAuthors[k] = -1;
                     if (maxAuthorsFirst > 0) {
-                        if (!seenBefore.contains(bibtexKeys[j][k])) {
+                        if (!seenBefore.contains(currentKey)) {
                             firstLimAuthors[k] = maxAuthorsFirst;
                         }
-                        seenBefore.add(bibtexKeys[j][k]);
+                        seenBefore.add(currentKey);
                     }
-                    String uniq = uniquefiers.get(bibtexKeys[j][k]);
-                    if (uniq != null) {
+                    String uniq = uniquefiers.get(currentKey);
+                    if (uniq == null) {
+                        if (firstLimAuthors[k] > 0) {
+                            needsChange = true;
+                            BibDatabase database = linkSourceBase.get(currentKey);
+                            if (database != null) {
+                                cEntries[k] = database.getEntryByKey(currentKey);
+                            }
+                            uniquif[k] = "";
+                        } else {
+                            BibDatabase database = linkSourceBase.get(currentKey);
+                            if (database != null) {
+                                cEntries[k] = database.getEntryByKey(currentKey);
+                            }
+                            uniquif[k] = "";
+                        }
+                    } else {
                         needsChange = true;
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
+                        BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
+                            cEntries[k] = database.getEntryByKey(currentKey);
                         }
                         uniquif[k] = uniq;
-                    } else if (firstLimAuthors[k] > 0) {
-                        needsChange = true;
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
-                        if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
-                        }
-                        uniquif[k] = "";
-                    } else {
-                        BibDatabase database = linkSourceBase.get(bibtexKeys[j][k]);
-                        if (database != null) {
-                            cEntries[k] = database.getEntryByKey(bibtexKeys[j][k]);
-                        }
-                        uniquif[k] = "";
                     }
                 }
                 if (needsChange) {
@@ -914,13 +929,14 @@ class OOBibBase {
                     UnknownPropertyException, PropertyVetoException, WrappedTargetException {
         Map<BibEntry, BibDatabase> correctEntries;
         // If we don't have numbered entries, we need to sort the entries before adding them:
-        if (!style.isSortByPosition()) {
+        if (style.isSortByPosition()) {
+            // Use the received map directly
+            correctEntries = entries;
+        } else {
+            // Sort map
             Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
             newMap.putAll(entries);
             correctEntries = newMap;
-        } else {
-            // If not, use the received map directly
-            correctEntries = entries;
         }
         int number = 1;
         for (Map.Entry<BibEntry, BibDatabase> entry : correctEntries.entrySet()) {
@@ -1128,9 +1144,9 @@ class OOBibBase {
             while (couldExpand && (compare.compareRegionEnds(mxDocCursor, r2) > 0)) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
-            String text = mxDocCursor.getString();
+            String cursorText = mxDocCursor.getString();
             // Check if the string contains no line breaks and only whitespace:
-            if ((text.indexOf('\n') == -1) && text.trim().isEmpty()) {
+            if ((cursorText.indexOf('\n') == -1) && cursorText.trim().isEmpty()) {
 
                 // If we are supposed to set character format for citations, test this before
                 // making any changes. This way we can throw an exception before any reference
@@ -1181,7 +1197,28 @@ class OOBibBase {
     }
 
 
-    private class ComparableMark implements Comparable<ComparableMark> {
+    public static XTextDocument selectComponent(List<XTextDocument> list)
+            throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
+        String[] values = new String[list.size()];
+        int ii = 0;
+        for (XTextDocument doc : list) {
+            values[ii] = String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title"));
+            ii++;
+        }
+        JList<String> sel = new JList<>(values);
+        sel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sel.setSelectedIndex(0);
+        int ans = JOptionPane.showConfirmDialog(null, new JScrollPane(sel), Localization.lang("Select document"),
+                JOptionPane.OK_CANCEL_OPTION);
+        if (ans == JOptionPane.OK_OPTION) {
+            return list.get(sel.getSelectedIndex());
+        } else {
+            return null;
+        }
+    }
+
+
+    private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;
         private final Point position;
@@ -1201,8 +1238,24 @@ class OOBibBase {
             }
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ComparableMark) {
+                ComparableMark other = (ComparableMark) o;
+                return (this.position.X == other.position.X) && (this.position.Y == other.position.Y)
+                        && Objects.equals(this.name, other.name);
+            }
+            return false;
+        }
+
         public String getName() {
             return name;
+        }
+
+        @Override
+        public int hashCode() {
+            // TODO Auto-generated method stub
+            return Objects.hash(position, name);
         }
 
     }

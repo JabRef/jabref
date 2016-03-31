@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,18 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.openoffice;
+package net.sf.jabref.gui.openoffice;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -59,9 +64,6 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
-    public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
-
     private OOPanel comp;
     private JDialog diag;
     private final JButton connect;
@@ -77,18 +79,17 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction("OpenOfficeIntegration").getHelpButton();
-    private String styleFile;
     private OOBibBase ooBase;
     private JabRefFrame frame;
     private SidePaneManager manager;
     private OOBibStyle style;
-    private boolean useDefaultAuthoryearStyle;
-    private boolean useDefaultNumericalStyle;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
     private boolean autoDetected;
     private String sOffice;
     private IOException connectException;
+    private final OpenOfficePreferences preferences;
+    private final StyleLoader loader;
 
     private static OpenOfficePanel instance;
 
@@ -103,35 +104,10 @@ public class OpenOfficePanel extends AbstractWorker {
         selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
-        update.setToolTipText(Localization.lang("Sync OO bibliography"));
-        if (OS.WINDOWS) {
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "C:\\Program Files\\OpenOffice.org 4");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "C:\\Program Files\\OpenOffice.org 4\\program\\classes");
-        } else if (OS.OS_X) {
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "/Applications/OpenOffice.org.app");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH,
-                    "/Applications/OpenOffice.org.app/Contents/Resources/java");
-        } else { // Linux
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
-            Globals.prefs.putDefaultValue(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
-        }
-
-        Globals.prefs.putDefaultValue(JabRefPreferences.SYNC_OO_WHEN_CITING, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.SHOW_OO_PANEL, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.USE_ALL_OPEN_BASES, true);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE, true);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_CHOOSE_STYLE_DIRECTLY, false);
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_DIRECT_FILE, "");
-        Globals.prefs.putDefaultValue(JabRefPreferences.OO_STYLE_DIRECTORY, "");
-        styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
-
+        update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
+        preferences = new OpenOfficePreferences(Globals.prefs);
+        loader = new StyleLoader(preferences, Globals.journalAbbreviationLoader.getRepository(),
+                Globals.prefs.getDefaultEncoding());
     }
 
     public static OpenOfficePanel getInstance() {
@@ -145,8 +121,8 @@ public class OpenOfficePanel extends AbstractWorker {
         return comp;
     }
 
-    public void init(JabRefFrame jrFrame, SidePaneManager spManager) {
-        frame = jrFrame;
+    public void init(JabRefFrame jabRefFrame, SidePaneManager spManager) {
+        this.frame = jabRefFrame;
         this.manager = spManager;
         comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
         initPanel();
@@ -154,7 +130,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     public JMenuItem getMenuItem() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_OO_PANEL)) {
+        if (preferences.showPanel()) {
             manager.show(getName());
         }
         JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
@@ -164,9 +140,6 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void initPanel() {
-
-        useDefaultAuthoryearStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE);
-        useDefaultNumericalStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE);
 
         connect.addActionListener(e -> connect(true));
         manualConnect.addActionListener(e -> connect(false));
@@ -187,22 +160,21 @@ public class OpenOfficePanel extends AbstractWorker {
 
         });
 
-        setStyleFile.addActionListener(e -> {
+        setStyleFile.addActionListener(event -> {
 
             if (styleDialog == null) {
-                styleDialog = new StyleSelectDialog(frame, styleFile);
+                styleDialog = new StyleSelectDialog(frame, preferences, loader);
             }
             styleDialog.setVisible(true);
-            if (styleDialog.isOkPressed()) {
-                useDefaultAuthoryearStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_AUTHORYEAR_STYLE);
-                useDefaultNumericalStyle = Globals.prefs.getBoolean(JabRefPreferences.OO_USE_DEFAULT_NUMERICAL_STYLE);
-                styleFile = Globals.prefs.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
+            styleDialog.getStyle().ifPresent(selectedStyle -> {
+                style = selectedStyle;
                 try {
-                    readStyleFile();
-                } catch (IOException ex) {
-                    LOGGER.warn("Could not read style file", ex);
+                    style.ensureUpToDate();
+                } catch (IOException e) {
+                    LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
                 }
-            }
+                frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
+            });
 
         });
 
@@ -223,7 +195,7 @@ public class OpenOfficePanel extends AbstractWorker {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (style == null) {
-                        readStyleFile();
+                        style = loader.getUsedStyle();
                     } else {
                         style.ensureUpToDate();
                     }
@@ -236,7 +208,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(frame,
                                 Localization.lang(
-                                        "Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                        "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                         unresolvedKeys.get(0)),
                                 Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -256,7 +228,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang(
-                                    "Your OpenOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                    "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.debug("BibEntry not found", ex);
@@ -286,7 +258,6 @@ public class OpenOfficePanel extends AbstractWorker {
             } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
                 LOGGER.warn("Problem showing citation manager", ex);
             }
-
         });
 
         selectDocument.setEnabled(false);
@@ -297,35 +268,32 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setEnabled(false);
         merge.setEnabled(false);
         manageCitations.setEnabled(false);
-        diag = new JDialog((JFrame) null, "OpenOffice panel", false);
+        diag = new JDialog((JFrame) null, "OpenOffice/LibreOffice panel", false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("fill:pref:grow",
-                //"p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu,p,0dlu"));
-                "p,p,p,p,p,p,p,p,p,p"));
+        FormBuilder mainBuilder = FormBuilder.create().layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p"));
 
-        //ButtonBarBuilder bb = new ButtonBarBuilder();
-        DefaultFormBuilder bb = new DefaultFormBuilder(
-                new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
-                        + "1dlu, fill:pref:grow, 1dlu, fill:pref:grow", ""));
-        bb.append(connect);
-        bb.append(manualConnect);
-        bb.append(selectDocument);
-        bb.append(update);
-        bb.append(help);
-        b.append(bb.getPanel());
-        b.append(setStyleFile);
-        b.append(pushEntries);
-        b.append(pushEntriesInt);
-        b.append(pushEntriesAdvanced);
-        b.append(pushEntriesEmpty);
-        b.append(merge);
-        b.append(manageCitations);
-        b.append(settingsB);
+        FormBuilder topRowBuilder = FormBuilder.create()
+                .layout(new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
+                        + "1dlu, fill:pref:grow, 1dlu, fill:pref:grow", "pref"));
+        topRowBuilder.add(connect).xy(1, 1);
+        topRowBuilder.add(manualConnect).xy(3, 1);
+        topRowBuilder.add(selectDocument).xy(5, 1);
+        topRowBuilder.add(update).xy(7, 1);
+        topRowBuilder.add(help).xy(9, 1);
+        mainBuilder.add(topRowBuilder.getPanel()).xy(1, 1);
+        mainBuilder.add(setStyleFile).xy(1, 2);
+        mainBuilder.add(pushEntries).xy(1, 3);
+        mainBuilder.add(pushEntriesInt).xy(1, 4);
+        mainBuilder.add(pushEntriesAdvanced).xy(1, 5);
+        mainBuilder.add(pushEntriesEmpty).xy(1, 6);
+        mainBuilder.add(merge).xy(1, 7);
+        mainBuilder.add(manageCitations).xy(1, 8);
+        mainBuilder.add(settingsB).xy(1, 9);
 
         JPanel content = new JPanel();
         comp.setContentContainer(content);
         content.setLayout(new BorderLayout());
-        content.add(b.getPanel(), BorderLayout.CENTER);
+        content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
@@ -335,7 +303,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
+        if (preferences.useAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
                 databases.add(basePanel.database());
             }
@@ -347,23 +315,25 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void connect(boolean auto) {
-        String ooBaseDirectory;
+        String ooJarsDirectory;
         if (auto) {
-            AutoDetectPaths adp = new AutoDetectPaths(diag);
+            AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
             if (adp.runAutodetection()) {
                 autoDetected = true;
                 dialogOkPressed = true;
                 diag.dispose();
-            } else if (!adp.cancelled()) {
+            } else if (!adp.canceled()) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                frame.setStatus(Localization.lang("Operation canceled."));
             }
             if (!autoDetected) {
                 return;
             }
 
-            ooBaseDirectory = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
-            sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
+            ooJarsDirectory = preferences.getJarsPath();
+            sOffice = preferences.getExecutablePath();
         } else { // Manual connect
 
             showConnectDialog();
@@ -371,27 +341,28 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            String ooPath = Globals.prefs.get(JabRefPreferences.OO_PATH);
-            String ooJars = Globals.prefs.get(JabRefPreferences.OO_JARS_PATH);
-            sOffice = Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH);
+            String ooPath = preferences.getOOPath();
+            String ooJars = preferences.getJarsPath();
+            sOffice = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
-                ooBaseDirectory = ooPath + "\\program\\classes";
-                sOffice = ooPath + "\\program\\soffice.exe";
+                ooJarsDirectory = ooPath + OpenOfficePreferences.WINDOWS_JARS_SUBPATH;
+                sOffice = ooPath + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH
+                        + OpenOfficePreferences.WINDOWS_EXECUTABLE;
             } else if (OS.OS_X) {
-                sOffice = ooPath + "/Contents/MacOS/soffice.bin";
-                ooBaseDirectory = ooPath + "/Contents/Resources/java";
+                sOffice = ooPath + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE;
+                ooJarsDirectory = ooPath + OpenOfficePreferences.OSX_JARS_SUBPATH;
             } else {
                 // Linux:
-                ooBaseDirectory = ooJars + "/program/classes";
+                ooJarsDirectory = ooJars + "/program/classes";
             }
         }
 
         // Add OO jars to the classpath:
         try {
-            List<File> jarFiles = Arrays.asList(new File(ooBaseDirectory, "unoil.jar"),
-                    new File(ooBaseDirectory, "jurt.jar"), new File(ooBaseDirectory, "juh.jar"),
-                    new File(ooBaseDirectory, "ridl.jar"));
+            List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
+                    new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),
+                    new File(ooJarsDirectory, "ridl.jar"));
             List<URL> jarList = new ArrayList<>(jarFiles.size());
             for (File jarFile : jarFiles) {
                 if (!jarFile.exists()) {
@@ -402,7 +373,8 @@ public class OpenOfficePanel extends AbstractWorker {
             addURL(jarList);
 
             // Show progress dialog:
-            final JDialog progDiag = new AutoDetectPaths(diag).showProgressDialog(diag, Localization.lang("Connecting"),
+            final JDialog progDiag = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
+                    Localization.lang("Connecting"),
                     Localization.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progDiag.dispose();
@@ -434,8 +406,8 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (IOException e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
-                    Localization.lang("Could not connect to running OpenOffice.") + "\n"
-                            + Localization.lang("Make sure you have installed OpenOffice with Java support.") + "\n"
+                    Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
+                            + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
                             + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
         }
@@ -452,20 +424,6 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    /**
-     * Read the style file. Record the last modified time of the file.
-     * @throws Exception
-     */
-    private void readStyleFile() throws IOException {
-        if (useDefaultAuthoryearStyle) {
-            style = new OOBibStyle(DEFAULT_AUTHORYEAR_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
-        } else if (useDefaultNumericalStyle) {
-            style = new OOBibStyle(DEFAULT_NUMERICAL_STYLE_PATH, Globals.journalAbbreviationLoader.getRepository());
-        } else {
-            style = new OOBibStyle(new File(styleFile), Globals.journalAbbreviationLoader.getRepository(),
-                    Globals.prefs.getDefaultEncoding());
-        }
-    }
 
 
     // The methods addFile and associated final Class[] parameters were gratefully copied from
@@ -490,11 +448,6 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    private void updateConnectionParams(String ooPath, String ooExec, String ooJars) {
-        Globals.prefs.put(JabRefPreferences.OO_PATH, ooPath);
-        Globals.prefs.put(JabRefPreferences.OO_EXECUTABLE_PATH, ooExec);
-        Globals.prefs.put(JabRefPreferences.OO_JARS_PATH, ooJars);
-    }
 
     private void showConnectDialog() {
 
@@ -502,53 +455,50 @@ public class OpenOfficePanel extends AbstractWorker {
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
-        ooPath.setText(Globals.prefs.get(JabRefPreferences.OO_PATH));
+        ooPath.setText(preferences.getOOPath());
         browseOOPath.addActionListener(BrowseAction.buildForDir(ooPath));
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
-        ooExec.setText(Globals.prefs.get(JabRefPreferences.OO_EXECUTABLE_PATH));
+        ooExec.setText(preferences.getExecutablePath());
         browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
 
         final JTextField ooJars = new JTextField(30);
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
-        ooJars.setText(Globals.prefs.get(JabRefPreferences.OO_JARS_PATH));
+        ooJars.setText(preferences.getJarsPath());
 
-        DefaultFormBuilder builder = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", ""));
+        FormBuilder builder = FormBuilder.create()
+                .layout(
+                        new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
         if (OS.WINDOWS || OS.OS_X) {
-            builder.append(Localization.lang("Path to OpenOffice directory"));
-            builder.append(ooPath);
-            builder.append(browseOOPath);
-            builder.nextLine();
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice directory")).xy(1, 1);
+            builder.add(ooPath).xy(3, 1);
+            builder.add(browseOOPath).xy(5, 1);
         } else {
-            builder.append(Localization.lang("Path to OpenOffice executable"));
-            builder.append(ooExec);
-            builder.append(browseOOExec);
-            builder.nextLine();
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice executable")).xy(1, 1);
+            builder.add(ooExec).xy(3, 1);
+            builder.add(browseOOExec).xy(5, 1);
 
-            builder.append(Localization.lang("Path to OpenOffice library dir"));
-            builder.append(ooJars);
-            builder.append(browseOOJars);
-            builder.nextLine();
+            builder.appendColumns("4dlu, pref");
+            builder.add(Localization.lang("Path to OpenOffice/LibreOffice library dir")).xy(1, 3);
+            builder.add(ooJars).xy(3, 3);
+            builder.add(browseOOJars).xy(5, 3);
         }
-
+        builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
         ButtonBarBuilder bb = new ButtonBarBuilder();
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         ActionListener tfListener = (e -> {
-
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
-
         });
 
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
         ok.addActionListener(e -> {
-            updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
@@ -560,8 +510,7 @@ public class OpenOfficePanel extends AbstractWorker {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
-        builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
         cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         cDiag.pack();
@@ -601,10 +550,10 @@ public class OpenOfficePanel extends AbstractWorker {
             if (!entries.isEmpty()) {
                 try {
                     if (style == null) {
-                        readStyleFile();
+                        style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                            Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING));
+                            preferences.syncWhenCiting());
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
@@ -628,8 +577,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private void showConnectionLostErrorMessage() {
         JOptionPane.showMessageDialog(frame,
-                Localization.lang("Connection to OpenOffice has been lost. "
-                        + "Please make sure OpenOffice is running, and try to reconnect."),
+                Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
+                        + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."),
                 Localization.lang("Connection lost"), JOptionPane.ERROR_MESSAGE);
     }
 
@@ -639,12 +588,13 @@ public class OpenOfficePanel extends AbstractWorker {
                         frame, "<html>"
                                 + Localization.lang(
                                         "Your style file specifies the paragraph format '%0', "
-                                                + "which is undefined in your current OpenOffice document.",
+                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
                                         ex.getFormatName())
                                 + "<br>"
                                 + Localization
                                         .lang("The paragraph format is controlled by the property 'ReferenceParagraphFormat' or 'ReferenceHeaderParagraphFormat' in the style file.")
-                + "</html>", "", JOptionPane.ERROR_MESSAGE);
+                                + "</html>",
+                        "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void reportUndefinedCharacterFormat(UndefinedCharacterFormatException ex) {
@@ -653,19 +603,20 @@ public class OpenOfficePanel extends AbstractWorker {
                         frame, "<html>"
                                 + Localization.lang(
                                         "Your style file specifies the character format '%0', "
-                                                + "which is undefined in your current OpenOffice document.",
+                                                + "which is undefined in your current OpenOffice/LibreOffice document.",
                                         ex.getFormatName())
                                 + "<br>"
                                 + Localization
                                         .lang("The character format is controlled by the citation property 'CitationCharacterFormat' in the style file.")
-                + "</html>", "", JOptionPane.ERROR_MESSAGE);
+                                + "</html>",
+                        "", JOptionPane.ERROR_MESSAGE);
     }
 
     private void showSettingsPopup() {
         JPopupMenu menu = new JPopupMenu();
         final JCheckBoxMenuItem autoSync = new JCheckBoxMenuItem(
                 Localization.lang("Automatically sync bibliography when inserting citations"),
-                Globals.prefs.getBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING));
+                preferences.syncWhenCiting());
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
@@ -674,29 +625,19 @@ public class OpenOfficePanel extends AbstractWorker {
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
         bg.add(useAllBases);
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_ALL_OPEN_BASES)) {
+        if (preferences.useAllDatabases()) {
             useAllBases.setSelected(true);
         } else {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.SYNC_OO_WHEN_CITING, autoSync.isSelected()));
+        autoSync.addActionListener(e -> preferences.setSyncWhenCiting(autoSync.isSelected()));
 
-        useAllBases.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.USE_ALL_OPEN_BASES, useAllBases.isSelected()));
+        useAllBases.addActionListener(e -> preferences.setUseAllDatabases(useAllBases.isSelected()));
 
-        useActiveBase.addActionListener(
-                e -> Globals.prefs.putBoolean(JabRefPreferences.USE_ALL_OPEN_BASES, !useActiveBase.isSelected()));
+        useActiveBase.addActionListener(e -> preferences.setUseAllDatabases(!useActiveBase.isSelected()));
 
-        clearConnectionSettings.addActionListener(e -> {
-
-            Globals.prefs.clear(JabRefPreferences.OO_PATH);
-            Globals.prefs.clear(JabRefPreferences.OO_EXECUTABLE_PATH);
-            Globals.prefs.clear(JabRefPreferences.OO_JARS_PATH);
-            frame.output(Localization.lang("Cleared connection settings."));
-
-        });
+        clearConnectionSettings.addActionListener(e -> frame.output(preferences.clearConnectionSettings()));
 
         menu.add(autoSync);
         menu.addSeparator();
@@ -708,11 +649,11 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     public String getName() {
-        return "OpenOffice";
+        return "OpenOffice/LibreOffice";
     }
 
 
-    class OOPanel extends SidePaneComponent {
+    private class OOPanel extends SidePaneComponent {
 
         private final OpenOfficePanel openOfficePanel;
 
@@ -729,12 +670,12 @@ public class OpenOfficePanel extends AbstractWorker {
 
         @Override
         public void componentClosing() {
-            Globals.prefs.putBoolean(JabRefPreferences.SHOW_OO_PANEL, false);
+            preferences.setShowPanel(false);
         }
 
         @Override
         public void componentOpening() {
-            Globals.prefs.putBoolean(JabRefPreferences.SHOW_OO_PANEL, true);
+            preferences.setShowPanel(true);
         }
     }
 

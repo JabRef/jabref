@@ -51,6 +51,8 @@ import net.sf.jabref.logic.formatter.bibtexfields.*;
 import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -354,19 +356,30 @@ public class JabRefPreferences {
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
-    // OpenOffice/LibreOffice preferences
+    /**
+     * The OpenOffice/LibreOffice connection preferences are:
+     * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
+     * OO_EXECUTABLE_PATH path to soffice-file
+     * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
+     * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
+     * OO_SHOW_PANEL true if the OO panel is shown on startup
+     * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
+     * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+     * OO_EXTERNAL_STYLE_FILES list with paths to external style files
+     * STYLES_*_* size and position of "Select style" dialog
+     */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
     public static final String OO_JARS_PATH = "ooJarsPath";
-    public static final String SHOW_OO_PANEL = "showOOPanel";
-    public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
-    public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
+    public static final String OO_SHOW_PANEL = "showOOPanel";
+    public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
+    public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
-    public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
-    public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
-    public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
-    public static final String OO_DIRECT_FILE = "ooDirectFile";
-    public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
+    public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static final String STYLES_SIZE_Y = "stylesSizeY";
+    public static final String STYLES_SIZE_X = "stylesSizeX";
+    public static final String STYLES_POS_Y = "stylesPosY";
+    public static final String STYLES_POS_X = "stylesPosX";
 
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
@@ -655,6 +668,36 @@ public class JabRefPreferences {
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
         defaults.put(LIST_OF_FILE_COLUMNS, "");
+
+        // OpenOffice/LibreOffice
+        if (OS.WINDOWS) {
+            defaults.put(JabRefPreferences.OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH
+                    + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH + OpenOfficePreferences.WINDOWS_EXECUTABLE);
+            defaults.put(JabRefPreferences.OO_JARS_PATH,
+                    OpenOfficePreferences.DEFAULT_WINDOWS_PATH + OpenOfficePreferences.WINDOWS_JARS_SUBPATH);
+        } else if (OS.OS_X) {
+            defaults.put(JabRefPreferences.OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH
+                    + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE);
+            defaults.put(JabRefPreferences.OO_JARS_PATH,
+                    OpenOfficePreferences.DEFAULT_OSX_PATH + OpenOfficePreferences.OSX_JARS_SUBPATH);
+        } else { // Linux
+            defaults.put(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
+            defaults.put(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
+        }
+
+        defaults.put(JabRefPreferences.OO_SYNC_WHEN_CITING, false);
+        defaults.put(JabRefPreferences.OO_SHOW_PANEL, false);
+        defaults.put(JabRefPreferences.OO_USE_ALL_OPEN_BASES, true);
+        defaults.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE,
+                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        defaults.put(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, "");
+        defaults.put(STYLES_POS_X, 0);
+        defaults.put(STYLES_POS_Y, 0);
+        defaults.put(STYLES_SIZE_X, 600);
+        defaults.put(STYLES_SIZE_Y, 400);
 
         defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
@@ -1334,4 +1377,5 @@ public class JabRefPreferences {
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));
     }
+
 }
