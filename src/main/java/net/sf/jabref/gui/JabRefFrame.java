@@ -1246,13 +1246,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         edit.add(getManageKeywords());
+        edit.add(getMassSetField());
         edit.addSeparator();
         edit.add(selectAll);
         mb.add(edit);
 
         search.add(normalSearch);
         search.add(replaceAll);
-        search.add(getMassSetField());
         search.addSeparator();
         search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
