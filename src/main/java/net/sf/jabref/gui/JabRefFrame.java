@@ -212,11 +212,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save database"),
             Localization.lang("Save database"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
-            Localization.menuTitle("Save database as ..."), Localization.lang("Save database as ..."),
+            Localization.menuTitle("Save database as..."), Localization.lang("Save database as..."),
             Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
-            Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."));
+            Localization.menuTitle("Save selected as..."), Localization.lang("Save selected as..."));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             Localization.menuTitle("Save selected as plain BibTeX..."),
             Localization.lang("Save selected as plain BibTeX..."));

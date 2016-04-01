@@ -70,7 +70,7 @@ public enum KeyBinding {
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D"),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S"),
     SAVE_DATABASE("Save database", Localization.lang("Save database"), "ctrl S"),
-    SAVE_DATABASE_AS("Save database as ...", Localization.lang("Save database as ..."), "ctrl shift S"),
+    SAVE_DATABASE_AS("Save database as...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N"),
