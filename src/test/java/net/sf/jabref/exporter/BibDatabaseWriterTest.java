@@ -296,7 +296,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         assertEquals(Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}" + Globals.NEWLINE + "}" + Globals.NEWLINE,
+                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}," + Globals.NEWLINE + "}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -456,15 +456,15 @@ public class BibDatabaseWriterTest {
                 Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE +
                 "  author = {A}," + Globals.NEWLINE +
-                "  year =   {2000}" + Globals.NEWLINE +
+                "  year =   {2000}," + Globals.NEWLINE +
                 "}"  + Globals.NEWLINE + Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE +
                 "  author = {A}," + Globals.NEWLINE +
-                "  year =   {2010}" + Globals.NEWLINE +
+                "  year =   {2010}," + Globals.NEWLINE +
                 "}" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Article{," + Globals.NEWLINE +
                 "  author = {B}," + Globals.NEWLINE +
-                "  year =   {2000}" + Globals.NEWLINE +
+                "  year =   {2000}," + Globals.NEWLINE +
                 "}" + Globals.NEWLINE + Globals.NEWLINE +
                 "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
                 Globals.NEWLINE
@@ -499,15 +499,15 @@ public class BibDatabaseWriterTest {
                 Globals.NEWLINE +
                         "@Article{," + Globals.NEWLINE +
                         "  author = {A}," + Globals.NEWLINE +
-                        "  year =   {2010}" + Globals.NEWLINE +
+                        "  year =   {2010}," + Globals.NEWLINE +
                         "}" + Globals.NEWLINE + Globals.NEWLINE +
                         "@Article{," + Globals.NEWLINE +
                         "  author = {B}," + Globals.NEWLINE +
-                        "  year =   {2000}" + Globals.NEWLINE +
+                        "  year =   {2000}," + Globals.NEWLINE +
                         "}" + Globals.NEWLINE + Globals.NEWLINE +
                         "@Article{," + Globals.NEWLINE +
                         "  author = {A}," + Globals.NEWLINE +
-                        "  year =   {2000}" + Globals.NEWLINE +
+                        "  year =   {2000}," + Globals.NEWLINE +
                         "}"  + Globals.NEWLINE
                 , stringWriter.toString());
     }
