@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * To make it easier to maintain Scribe-compatible databases, the standard styles convert
  * a single dash (as in 7-33) to the double dash used in TEX to denote number ranges (as in 7--33).
  */
-public class PageNumbersFormatter implements Formatter {
+public class NormalizePagesFormatter implements Formatter {
 
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
 
@@ -26,12 +26,12 @@ public class PageNumbersFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Page numbers";
+        return Localization.lang("Normalize page numbers");
     }
 
     @Override
     public String getKey() {
-        return "PageNumbersFormatter";
+        return "normalize_page_numbers";
     }
 
     /**
@@ -73,6 +73,16 @@ public class PageNumbersFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Ensures that pages numbers in %s are of the form num--num.");
+        return Localization.lang("Normalize pages to BibTeX standard.");
+    }
+
+    @Override
+    public int hashCode() {
+        return defaultHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return defaultEquals(obj);
     }
 }

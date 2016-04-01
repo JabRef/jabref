@@ -37,6 +37,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -46,9 +47,8 @@ import org.json.JSONObject;
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
@@ -78,9 +78,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
     private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
-    private final HTMLToLatexFormatter htmlConverter = new HTMLToLatexFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
@@ -259,7 +259,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         result = result.replaceAll("(?<!\\\\)%", "\\\\%");
 
         //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
-        result = htmlConverter.format(result);
+        result = htmlToLatexFormatter.format(result);
 
         return result;
     }
@@ -298,12 +298,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             // Unit formatting
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                title = unitFormatter.format(title);
+                title = unitsToLatexFormatter.format(title);
             }
 
             // Automatic case keeping
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                title = caseKeeper.format(title);
+                title = protectTermsFormatter.format(title);
             }
             // Write back
             entry.setField("title", title);

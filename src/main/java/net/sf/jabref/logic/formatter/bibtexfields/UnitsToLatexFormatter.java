@@ -22,7 +22,7 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
-public class UnitFormatter implements Formatter {
+public class UnitsToLatexFormatter implements Formatter {
 
     private static final String[] UNIT_LIST = new String[] {
             "A", // Ampere
@@ -94,13 +94,13 @@ public class UnitFormatter implements Formatter {
     private static final String[] UNIT_COMBINATIONS;
 
     static {
-        int uLLength = UnitFormatter.UNIT_LIST.length;
-        int uPLLength = UnitFormatter.UNIT_PREFIX_LIST.length;
+        int uLLength = UnitsToLatexFormatter.UNIT_LIST.length;
+        int uPLLength = UnitsToLatexFormatter.UNIT_PREFIX_LIST.length;
         int uCLength = uLLength * uPLLength;
         UNIT_COMBINATIONS = new String[uCLength];
         for (int i = 0; i < uLLength; i++) {
             for (int j = 0; j < uPLLength; j++) {
-                UnitFormatter.UNIT_COMBINATIONS[(i * uPLLength) + j] = UnitFormatter.UNIT_PREFIX_LIST[j] + UnitFormatter.UNIT_LIST[i];
+                UnitsToLatexFormatter.UNIT_COMBINATIONS[(i * uPLLength) + j] = UnitsToLatexFormatter.UNIT_PREFIX_LIST[j] + UnitsToLatexFormatter.UNIT_LIST[i];
             }
         }
 
@@ -108,7 +108,7 @@ public class UnitFormatter implements Formatter {
 
 
     private static String format(String text, String[] listOfWords) {
-        Arrays.sort(listOfWords, new StringLengthComparator()); // LengthComparator from CaseKeeper.java
+        Arrays.sort(listOfWords, new StringLengthComparator()); // LengthComparator from ProtectTermsFormatter.java
 
         // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
         String result = text.replaceAll("([0-9,\\.]+)-([Bb][Ii][Tt])", "$1\\\\mbox\\{-\\}$2");
@@ -134,7 +134,7 @@ public class UnitFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return format(text, UnitFormatter.UNIT_COMBINATIONS);
+        return format(text, UnitsToLatexFormatter.UNIT_COMBINATIONS);
     }
 
     @Override
@@ -144,12 +144,12 @@ public class UnitFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("UnitFormatter");
+        return Localization.lang("Units to LaTeX");
     }
 
     @Override
     public String getKey() {
-        return "UnitFormatter";
+        return "units_to_latex";
     }
 
 }

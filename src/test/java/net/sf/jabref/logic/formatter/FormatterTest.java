@@ -4,7 +4,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.*;
 import net.sf.jabref.logic.formatter.casechanger.*;
-import net.sf.jabref.logic.formatter.minifier.AuthorsMinifier;
+import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,25 +74,26 @@ public class FormatterTest {
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
         return Arrays.asList(
-                new Object[]{new AuthorsFormatter()},
-                new Object[]{new UpperEachFirstCaseChanger()},
-                new Object[]{new UpperCaseChanger()},
-                new Object[]{new MonthFormatter()},
-                new Object[]{new LatexFormatter()},
+                new Object[]{new NormalizeNamesFormatter()},
+                new Object[]{new CapitalizeFormatter()},
+                new Object[]{new UpperCaseFormatter()},
+                new Object[]{new NormalizeMonthFormatter()},
+                new Object[]{new LatexCleanupFormatter()},
                 new Object[]{new IdentityFormatter()},
-                new Object[]{new UpperFirstCaseChanger()},
-                new Object[]{new AuthorsMinifier()},
-                new Object[]{new DateFormatter()},
-                new Object[]{new TitleCaseChanger()},
-                new Object[]{new CaseKeeper()},
-                new Object[]{new PageNumbersFormatter()},
-                new Object[]{new LowerCaseChanger()},
-                new Object[]{new HTMLToLatexFormatter()},
-                new Object[]{new SuperscriptFormatter()},
-                new Object[]{new UnitFormatter()},
-                new Object[]{new RemoveBracesFormatter()},
+                new Object[]{new SentenceCaseFormatter()},
+                new Object[]{new MinifyNameListFormatter()},
+                new Object[]{new NormalizeDateFormatter()},
+                new Object[]{new TitleCaseFormatter()},
+                new Object[]{new ProtectTermsFormatter()},
+                new Object[]{new NormalizePagesFormatter()},
+                new Object[]{new LowerCaseFormatter()},
+                new Object[]{new HtmlToLatexFormatter()},
+                new Object[]{new LatexToUnicodeFormatter()},
                 new Object[]{new UnicodeToLatexFormatter()},
-                new Object[]{new EraseFormatter()}
+                new Object[]{new OrdinalsToSuperscriptFormatter()},
+                new Object[]{new UnitsToLatexFormatter()},
+                new Object[]{new RemoveBracesFormatter()},
+                new Object[]{new ClearFormatter()}
         );
     }
 }

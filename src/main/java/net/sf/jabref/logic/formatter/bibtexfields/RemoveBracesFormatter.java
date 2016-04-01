@@ -12,12 +12,12 @@ public class RemoveBracesFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Remove enclosing double braces";
+        return Localization.lang("Remove enclosing braces");
     }
 
     @Override
     public String getKey() {
-        return "RemoveBracesFormatter";
+        return "remove_braces";
     }
 
     @Override
@@ -43,7 +43,7 @@ public class RemoveBracesFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Removes all matching braces around the contents of %s.");
+        return Localization.lang("Removes braces encapsulating the complete field content.");
     }
 
     /**

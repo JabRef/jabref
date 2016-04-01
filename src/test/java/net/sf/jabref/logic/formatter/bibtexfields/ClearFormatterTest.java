@@ -4,15 +4,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class EraseFormatterTest {
+public class ClearFormatterTest {
 
     @Test
     public void formatReturnsEmptyForEmptyString() throws Exception {
-        assertEquals("", new EraseFormatter().format(""));
+        assertEquals("", new ClearFormatter().format(""));
     }
 
     @Test
     public void formatReturnsEmptyForSomeString() throws Exception {
-        assertEquals("", new EraseFormatter().format("test"));
+        assertEquals("", new ClearFormatter().format("test"));
     }
 }

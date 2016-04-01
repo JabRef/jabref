@@ -11,12 +11,12 @@ public class IdentityFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "IdentityFormatter";
+        return "Identity";
     }
 
     @Override
     public String getKey() {
-        return getName();
+        return "identity";
     }
 
     @Override
@@ -29,4 +29,15 @@ public class IdentityFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Does nothing.");
     }
+
+    @Override
+    public int hashCode() {
+        return defaultHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return defaultEquals(obj);
+    }
+
 }

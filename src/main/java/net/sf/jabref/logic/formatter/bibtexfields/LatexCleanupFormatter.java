@@ -3,16 +3,16 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class LatexFormatter implements Formatter {
+public class LatexCleanupFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Latex";
+        return Localization.lang("LaTeX cleanup");
     }
 
     @Override
     public String getKey() {
-        return "LatexFormatter";
+        return "latex_cleanup";
     }
 
     @Override
@@ -37,7 +37,7 @@ public class LatexFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Cleans latex code in %s.");
+        return Localization.lang("Cleans up LaTeX code.");
     }
 
 }

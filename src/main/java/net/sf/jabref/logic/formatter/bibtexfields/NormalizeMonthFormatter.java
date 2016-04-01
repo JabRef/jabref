@@ -6,16 +6,16 @@ import net.sf.jabref.model.entry.MonthUtil;
 
 import java.util.Objects;
 
-public class MonthFormatter implements Formatter {
+public class NormalizeMonthFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Month";
+        return Localization.lang("Normalize month");
     }
 
     @Override
     public String getKey() {
-        return "MonthFormatter";
+        return "normalize_month";
     }
 
     @Override
@@ -31,6 +31,6 @@ public class MonthFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Normalizes content of %s to the format #mon#.");
+        return Localization.lang("Normalize month to BibTex standard abbreviation.");
     }
 }

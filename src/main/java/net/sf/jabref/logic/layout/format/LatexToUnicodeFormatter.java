@@ -16,6 +16,8 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -26,9 +28,19 @@ import java.util.Map;
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
  * and removes other LaTeX commands without handling them.
  */
-public class FormatChars implements LayoutFormatter {
+public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
+
+    @Override
+    public String getName() {
+        return Localization.lang("LaTeX to Unicode");
+    }
+
+    @Override
+    public String getKey() {
+        return "latex_to_unicode";
+    }
 
     @Override
     public String format(String inField) {
@@ -55,7 +67,7 @@ public class FormatChars implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = FormatChars.CHARS.get(command);
+                    Object result = LatexToUnicodeFormatter.CHARS.get(command);
                     if (result == null) {
                         sb.append(command);
                     } else {
@@ -94,7 +106,7 @@ public class FormatChars implements LayoutFormatter {
                         } else {
                             combody = field.substring(i, i + 1);
                         }
-                        Object result = FormatChars.CHARS.get(command + combody);
+                        Object result = LatexToUnicodeFormatter.CHARS.get(command + combody);
 
                         if (result != null) {
                             sb.append((String) result);
@@ -106,7 +118,7 @@ public class FormatChars implements LayoutFormatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = FormatChars.CHARS.get(command);
+                            Object result = LatexToUnicodeFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -138,7 +150,7 @@ public class FormatChars implements LayoutFormatter {
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = FormatChars.CHARS.get(command + argument);
+                            Object result = LatexToUnicodeFormatter.CHARS.get(command + argument);
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
@@ -152,7 +164,7 @@ public class FormatChars implements LayoutFormatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = FormatChars.CHARS.get(command);
+                        Object result = LatexToUnicodeFormatter.CHARS.get(command);
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
@@ -160,7 +172,7 @@ public class FormatChars implements LayoutFormatter {
                             sb.append((String) result);
                         }
                     } else {
-                        Object result = FormatChars.CHARS.get(command);
+                        Object result = LatexToUnicodeFormatter.CHARS.get(command);
                         if (result == null) {
                             sb.append(command);
                         } else {
@@ -191,6 +203,11 @@ public class FormatChars implements LayoutFormatter {
 
         return sb.toString().replace("&amp;", "&").replace("<p>", Globals.NEWLINE).replace("&dollar;", "$").replace("~",
                 "\u00A0");
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Converts LaTeX encoding to Unicode characters.");
     }
 
 }

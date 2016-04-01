@@ -27,6 +27,7 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,8 +36,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
@@ -45,8 +45,8 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
 
     @Override
@@ -136,12 +136,12 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             entry.getFieldOptional("title").ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                    title = unitFormatter.format(title);
+                    title = unitsToLatexFormatter.format(title);
                 }
 
                 // Case keeping
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                    title = caseKeeper.format(title);
+                    title = protectTermsFormatter.format(title);
                 }
                 entry.setField("title", title);
             });

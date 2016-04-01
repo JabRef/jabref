@@ -17,9 +17,9 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
@@ -159,7 +159,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField("author", new AuthorsFormatter().format(authors));
+                entry.setField("author", new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:

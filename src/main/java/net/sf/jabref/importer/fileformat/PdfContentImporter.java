@@ -76,7 +76,7 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     private static String streamlineNames(String names) {
-        // TODO: replace with AuthorsFormatter?!
+        // TODO: replace with NormalizeNamesFormatter?!
         String res;
         // supported formats:
         //   Matthias Schrepfer1, Johannes Wolf1, Jan Mendling1, and Hajo A. Reijers2

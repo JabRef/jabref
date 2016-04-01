@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
-public class CaseKeeperTest {
+public class ProtectTermsFormatterTest {
 
     @Test
     public void test() {
-        CaseKeeper ck = new CaseKeeper();
+        ProtectTermsFormatter ck = new ProtectTermsFormatter();
 
         assertEquals("{VLSI}", ck.format("VLSI"));
         assertEquals("{VLSI}", ck.format("{VLSI}"));
