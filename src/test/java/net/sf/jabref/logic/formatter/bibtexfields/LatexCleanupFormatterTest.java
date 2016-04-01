@@ -4,11 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class LatexFormatterTest {
+public class LatexCleanupFormatterTest {
 
     @Test
     public void test() {
-        LatexFormatter lf = new LatexFormatter();
+        LatexCleanupFormatter lf = new LatexCleanupFormatter();
 
         assertEquals("$\\alpha\\beta$", lf.format("$\\alpha$$\\beta$"));
         assertEquals("{VLSI DSP}", lf.format("{VLSI} {DSP}"));

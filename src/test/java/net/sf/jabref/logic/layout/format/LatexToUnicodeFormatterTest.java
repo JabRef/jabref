@@ -32,27 +32,27 @@ import org.junit.Test;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 
-public class FormatCharsTest {
+public class LatexToUnicodeFormatterTest {
 
     @Test
     public void testPlainFormat() {
-        assertEquals("aaa", new FormatChars().format("aaa"));
+        assertEquals("aaa", new LatexToUnicodeFormatter().format("aaa"));
     }
 
     @Test
     public void testFormatUmlaut() {
-        assertEquals("ä", new FormatChars().format("{\\\"{a}}"));
-        assertEquals("Ä", new FormatChars().format("{\\\"{A}}"));
+        assertEquals("ä", new LatexToUnicodeFormatter().format("{\\\"{a}}"));
+        assertEquals("Ä", new LatexToUnicodeFormatter().format("{\\\"{A}}"));
     }
 
     @Test
     public void testFormatStripLatexCommands() {
-        assertEquals("-", new FormatChars().format("\\mbox{-}"));
+        assertEquals("-", new LatexToUnicodeFormatter().format("\\mbox{-}"));
     }
 
     @Test
     public void testEquations() {
-        LayoutFormatter layout = new FormatChars();
+        LayoutFormatter layout = new LatexToUnicodeFormatter();
 
         assertEquals("$", layout.format("\\$"));
         assertEquals("σ", layout.format("$\\sigma$"));

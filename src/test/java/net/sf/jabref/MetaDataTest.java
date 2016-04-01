@@ -1,6 +1,8 @@
 package net.sf.jabref;
 
 import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,12 +29,13 @@ public class MetaDataTest {
 
     @Test
     public void serializeSingleSaveAction() throws IOException {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+                Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
-                "enabled;" + Globals.NEWLINE + "title[LowerCaseChanger]" + Globals.NEWLINE + ";");
+                "enabled;" + Globals.NEWLINE + "title[lower_case]" + Globals.NEWLINE + ";");
         assertEquals(expectedSerialization, metaData.serialize());
     }
 }

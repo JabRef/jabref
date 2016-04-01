@@ -22,9 +22,9 @@ import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.HTMLToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -54,9 +54,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
-    private final HTMLToLatexFormatter htmlConverter = new HTMLToLatexFormatter();
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;
 
     private static final String START_URL = "http://portal.acm.org/";
@@ -196,12 +196,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
                         // Unit formatting
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                            title = unitFormatter.format(title);
+                            title = unitsToLatexFormatter.format(title);
                         }
 
                         // Case keeping
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                            title = caseKeeper.format(title);
+                            title = protectTermsFormatter.format(title);
                         }
                         entry.setField("title", title);
                     });
@@ -377,7 +377,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      */
     private String convertHTMLChars(String text) {
 
-        return htmlConverter.format(text);
+        return htmlToLatexFormatter.format(text);
     }
 
     /**

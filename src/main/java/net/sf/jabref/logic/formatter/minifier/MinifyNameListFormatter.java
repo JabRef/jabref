@@ -8,15 +8,15 @@ import java.util.Objects;
 /**
  * Replaces three or more authors with and others
  */
-public class AuthorsMinifier implements Formatter {
+public class MinifyNameListFormatter implements Formatter {
     @Override
     public String getName() {
-        return "Minify authors";
+        return Localization.lang("Minify list of person names");
     }
 
     @Override
     public String getKey() {
-        return "MinifyAuthors";
+        return "minify_name_list";
     }
 
     /**
@@ -42,7 +42,7 @@ public class AuthorsMinifier implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Replaces three or more authors with \"and others\".");
+        return Localization.lang("Shortens lists of persons if there are more than 2 persons to \"et al.\".");
     }
 
     private String abbreviateAuthor(String authorField) {

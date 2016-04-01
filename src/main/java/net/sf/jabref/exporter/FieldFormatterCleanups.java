@@ -7,6 +7,9 @@ import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -27,8 +30,11 @@ public class FieldFormatterCleanups {
         availableFormatters.addAll(BibtexFieldFormatters.ALL);
         availableFormatters.addAll(CaseChangers.ALL);
 
-        String defaultFormatterString = "pages[PageNumbersFormatter]month[MonthFormatter]booktitle[SuperscriptFormatter]";
-        DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatterString);
+        List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
+        defaultFormatters.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup("booktitle", new OrdinalsToSuperscriptFormatter()));
+        DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
     }
 
     public FieldFormatterCleanups(boolean enabled, String formatterString) {

@@ -3,16 +3,16 @@ package net.sf.jabref.logic.formatter.casechanger;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class UpperCaseChanger implements Formatter {
+public class UpperCaseFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("UPPER");
+        return Localization.lang("Upper case");
     }
 
     @Override
     public String getKey() {
-        return "UpperCaseChanger";
+        return "upper_case";
     }
 
     /**
@@ -30,6 +30,6 @@ public class UpperCaseChanger implements Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Converts all characters in %s to upper case, but does not change words starting with \"{\".");
+                "Changes all letters to upper case.");
     }
 }

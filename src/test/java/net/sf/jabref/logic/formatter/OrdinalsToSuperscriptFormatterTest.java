@@ -1,18 +1,18 @@
 package net.sf.jabref.logic.formatter;
 
 
-import net.sf.jabref.logic.formatter.bibtexfields.SuperscriptFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SuperscriptFormatterTest {
-    private SuperscriptFormatter formatter;
+public class OrdinalsToSuperscriptFormatterTest {
+    private OrdinalsToSuperscriptFormatter formatter;
 
     @Before
     public void setUp() {
-        formatter = new SuperscriptFormatter();
+        formatter = new OrdinalsToSuperscriptFormatter();
     }
 
     @After

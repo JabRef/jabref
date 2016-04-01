@@ -11,15 +11,15 @@ import java.util.Optional;
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
  */
-public class DateFormatter implements Formatter {
+public class NormalizeDateFormatter implements Formatter {
     @Override
     public String getName() {
-        return "Date";
+        return Localization.lang("Normalize date");
     }
 
     @Override
     public String getKey() {
-        return "DateFormatter";
+        return "normalize_date";
     }
 
     /**
@@ -43,7 +43,7 @@ public class DateFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Normalizes dates in %s to the BibLaTeX standard yyyy-mm-dd or yyyy-mm.");
+        return Localization.lang("Normalizes the date to ISO date format.");
     }
 
     /*
@@ -69,5 +69,15 @@ public class DateFormatter implements Formatter {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public int hashCode() {
+        return defaultHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return defaultEquals(obj);
     }
 }

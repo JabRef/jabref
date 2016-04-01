@@ -48,7 +48,7 @@ import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.bibtexfields.*;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
@@ -342,13 +342,13 @@ public class JabRefPreferences {
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
-        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new MonthFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new CaseKeeper()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HTMLToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.NORMALIZE_PAGES));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.NORMALIZE_DATE));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexCleanupFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()));
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }

@@ -81,7 +81,7 @@ public class CleanupWorker {
             jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));
         }
         if (preset.isCleanUpSuperscripts()) {
-            jobs.add(new FormatterCleanup(BibtexFieldFormatters.SUPERSCRIPTS));
+            jobs.add(new FormatterCleanup(BibtexFieldFormatters.ORDINALS_TO_LATEX_SUPERSCRIPT));
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());

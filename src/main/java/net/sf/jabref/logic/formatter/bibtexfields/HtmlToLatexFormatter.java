@@ -30,9 +30,9 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
-public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
+public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(HTMLToLatexFormatter.class);
+    private static final Log LOGGER = LogFactory.getLog(HtmlToLatexFormatter.class);
 
     private static final int MAX_TAG_LENGTH = 100;
 
@@ -133,7 +133,7 @@ public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Changes HTML expressions in %s to their LaTeX equivalent.");
+        return Localization.lang("Converts HTML code to LaTeX code.");
     }
 
     private int readTag(String text, int position) {
@@ -148,11 +148,11 @@ public class HTMLToLatexFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String getName() {
-        return "HTMLConverter";
+        return Localization.lang("HTML to LaTeX");
     }
 
     @Override
     public String getKey() {
-        return "HtmlConverter";
+        return "html_to_latex";
     }
 }

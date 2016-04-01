@@ -2,7 +2,9 @@ package net.sf.jabref.exporter;
 
 import com.google.common.base.Charsets;
 import net.sf.jabref.*;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.groups.GroupTreeNode;
@@ -324,13 +326,14 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeSaveActions() throws Exception {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+                Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + Globals.NEWLINE
-                + "title[LowerCaseChanger]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, stringWriter.toString());
+                + "title[lower_case]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test

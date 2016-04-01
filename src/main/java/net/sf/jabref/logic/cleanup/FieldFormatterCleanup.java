@@ -113,7 +113,7 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public String toString() {
-        return field + ": " + formatter.getKey();
+        return field + ": " + formatter.getName();
     }
 
     /**

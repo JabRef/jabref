@@ -4,16 +4,16 @@ import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class UpperFirstCaseChanger implements Formatter {
+public class SentenceCaseFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Upper first");
+        return Localization.lang("Sentence case");
     }
 
     @Override
     public String getKey() {
-        return "UpperFirstCaseChanger";
+        return "sentence_case";
     }
 
     /**
@@ -21,7 +21,7 @@ public class UpperFirstCaseChanger implements Formatter {
      */
     @Override
     public String format(String input) {
-        Title title = new Title(CaseChangers.LOWER.format(input));
+        Title title = new Title(CaseChangers.TO_LOWER_CASE.format(input));
 
         title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 
@@ -31,6 +31,6 @@ public class UpperFirstCaseChanger implements Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Converts the first character of the first word in %s to upper case (and the remaining characters of the first word to lower case), but does not change anything if word starts with \"{\".");
+                "Capitalize the first word, changes other words to lower case.");
     }
 }

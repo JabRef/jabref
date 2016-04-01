@@ -26,6 +26,7 @@ import java.util.Scanner;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,8 +36,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -48,8 +48,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(ISBNtoBibTeXFetcher.class);
 
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?isbn=%s";
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
 
     @Override
@@ -93,12 +93,12 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                 if (title != null) {
                     // Unit formatting
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                        title = unitFormatter.format(title);
+                        title = unitsToLatexFormatter.format(title);
                     }
 
                     // Case keeping
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                        title = caseKeeper.format(title);
+                        title = protectTermsFormatter.format(title);
                     }
                     entry.setField("title", title);
                 }

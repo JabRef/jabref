@@ -17,8 +17,9 @@
 */
 package net.sf.jabref.gui.fieldeditors.contextmenu;
 
+import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
+import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.Converters;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -34,9 +35,9 @@ public class ConversionMenu extends JMenu {
     public ConversionMenu(JTextComponent opener) {
         super(Localization.lang("Convert"));
         // create menu items, one for each case changer
-        for (final Converters.Converter converter : Converters.ALL) {
+        for (Formatter converter : BibtexFieldFormatters.CONVERTERS) {
             JMenuItem menuItem = new JMenuItem(converter.getName());
-            menuItem.addActionListener(e -> opener.setText(converter.convert(opener.getText())));
+            menuItem.addActionListener(e -> opener.setText(converter.format(opener.getText())));
             this.add(menuItem);
         }
     }

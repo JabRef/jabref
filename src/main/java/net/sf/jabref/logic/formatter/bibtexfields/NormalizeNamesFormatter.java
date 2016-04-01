@@ -22,9 +22,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class for normalizing author lists to BibTeX format.
+ * Formatter normalizing a list of person names to the BibTeX format.
  */
-public class AuthorsFormatter implements Formatter {
+public class NormalizeNamesFormatter implements Formatter {
     private static final Pattern LAST_F_F = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) (\\p{javaUpperCase}+)");
     private static final Pattern LAST_FDOT_F = Pattern.compile("(\\p{javaUpperCase}[\\p{javaLowerCase}]+) ([\\. \\p{javaUpperCase}]+)");
     private static final Pattern F_F_LAST = Pattern.compile("(\\p{javaUpperCase}+) (\\p{javaUpperCase}[\\p{javaLowerCase}]+)");
@@ -33,17 +33,14 @@ public class AuthorsFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "BibTex authors format";
+        return Localization.lang("Normalize names of persons");
     }
 
     @Override
     public String getKey() {
-        return "AuthorsFormatter";
+        return "normalize_names";
     }
 
-    /**
-     *
-     */
     @Override
     public String format(String value) {
         boolean andSep = false;
@@ -124,7 +121,7 @@ public class AuthorsFormatter implements Formatter {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < authors.length; i++) {
-            String norm = AuthorsFormatter.normalizeName(authors[i]);
+            String norm = NormalizeNamesFormatter.normalizeName(authors[i]);
             stringBuilder.append(norm);
             if (i < (authors.length - 1)) {
                 stringBuilder.append(" and ");
@@ -135,12 +132,12 @@ public class AuthorsFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Normalizes lists of persons in %s to the BibTeX standard.");
+        return Localization.lang("Normalizes lists of persons to the BibTeX standard.");
     }
 
     private static String normalizeName(String oldName) {
         String name = oldName;
-        Matcher matcher = AuthorsFormatter.LAST_F_F.matcher(name);
+        Matcher matcher = NormalizeNamesFormatter.LAST_F_F.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
@@ -148,7 +145,7 @@ public class AuthorsFormatter implements Formatter {
             fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
-        matcher = AuthorsFormatter.LAST_FDOT_F.matcher(name);
+        matcher = NormalizeNamesFormatter.LAST_FDOT_F.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(2).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(1));
@@ -157,7 +154,7 @@ public class AuthorsFormatter implements Formatter {
             return stringBuilder.toString();
         }
 
-        matcher = AuthorsFormatter.F_F_LAST.matcher(name);
+        matcher = NormalizeNamesFormatter.F_F_LAST.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1);
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
@@ -165,7 +162,7 @@ public class AuthorsFormatter implements Formatter {
             fixInitials(initials, stringBuilder);
             return stringBuilder.toString();
         }
-        matcher = AuthorsFormatter.FDOT_F_LAST.matcher(name);
+        matcher = NormalizeNamesFormatter.FDOT_F_LAST.matcher(name);
         if (matcher.matches()) {
             String initials = matcher.group(1).replaceAll("[\\. ]+", "");
             StringBuilder stringBuilder = new StringBuilder(matcher.group(2));
@@ -201,7 +198,7 @@ public class AuthorsFormatter implements Formatter {
                 }
             } else {
                 // Only a single part. Check if it looks like a name or initials:
-                Matcher nameMatcher = AuthorsFormatter.SINGLE_NAME.matcher(firstNameParts[0]);
+                Matcher nameMatcher = NormalizeNamesFormatter.SINGLE_NAME.matcher(firstNameParts[0]);
                 if (nameMatcher.matches()) {
                     stringBuilder.append(firstNameParts[0]);
                 } else {
@@ -217,7 +214,7 @@ public class AuthorsFormatter implements Formatter {
             String[] parts = name.split(" +");
             boolean allNames = true;
             for (String part : parts) {
-                matcher = AuthorsFormatter.SINGLE_NAME.matcher(part);
+                matcher = NormalizeNamesFormatter.SINGLE_NAME.matcher(part);
                 if (!matcher.matches()) {
                     allNames = false;
                     break;
