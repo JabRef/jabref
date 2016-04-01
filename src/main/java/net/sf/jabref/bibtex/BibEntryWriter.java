@@ -187,6 +187,6 @@ public class BibEntryWriter {
 
         String suffix = suffixSB.toString();
 
-        return actualField.toLowerCase() + " = " + suffix;
+        return actualField.toLowerCase() + suffix + " = ";
     }
 }
