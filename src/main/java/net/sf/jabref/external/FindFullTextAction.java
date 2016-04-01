@@ -20,7 +20,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.logic.fetcher.FindFullText;
+import net.sf.jabref.logic.fulltext.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 

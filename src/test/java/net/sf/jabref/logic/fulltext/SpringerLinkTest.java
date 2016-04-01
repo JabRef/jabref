@@ -1,21 +1,22 @@
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.fulltext;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.support.DevEnvironment;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-public class DoiResolutionTest {
+public class SpringerLinkTest {
 
-    private DoiResolution finder;
+    private SpringerLink finder;
     private BibEntry entry;
 
     @Before
     public void setUp() {
-        finder = new DoiResolution();
+        finder = new SpringerLink();
         entry = new BibEntry();
     }
 
@@ -32,28 +33,18 @@ public class DoiResolutionTest {
 
     @Test
     public void findByDOI() throws IOException {
-        // CI server is blocked
-        Assume.assumeFalse(DevEnvironment.isCIServer());
 
-        entry.setField("doi", "10.1051/0004-6361/201527330");
+
+        entry.setField("doi", "10.1186/s13677-015-0042-8");
 
         Assert.assertEquals(
-                Optional.of(new URL("http://www.aanda.org/articles/aa/pdf/2016/01/aa27330-15.pdf")),
+                Optional.of(new URL("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf")),
                 finder.findFullText(entry)
         );
     }
 
-    @Ignore
-    @Test
-    public void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
-        // To be implemented
-    }
-
     @Test
     public void notFoundByDOI() throws IOException {
-        // CI server is blocked
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
         entry.setField("doi", "10.1186/unknown-doi");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));

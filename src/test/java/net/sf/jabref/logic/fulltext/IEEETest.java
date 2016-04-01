@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.fulltext;
 
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;

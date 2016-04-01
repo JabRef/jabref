@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.fulltext;
 
 import net.sf.jabref.logic.io.MimeTypeDetector;
 import net.sf.jabref.logic.util.DOI;

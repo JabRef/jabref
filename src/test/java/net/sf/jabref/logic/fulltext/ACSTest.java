@@ -1,7 +1,9 @@
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.fulltext;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,14 +11,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-public class ArXivTest {
+public class ACSTest {
 
-    private ArXiv finder;
+    private ACS finder;
     private BibEntry entry;
 
     @Before
     public void setUp() {
-        finder = new ArXiv();
+        finder = new ACS();
         entry = new BibEntry();
     }
 
@@ -33,27 +35,23 @@ public class ArXivTest {
 
     @Test
     public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1529/biophysj.104.047340");
+        // CI server is unreliable
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
+        entry.setField("doi", "10.1021/bk-2006-STYG.ch014");
 
         Assert.assertEquals(
-                Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")),
-                finder.findFullText(entry)
-        );
-    }
-
-    @Test
-    public void findByEprint() throws IOException {
-        entry.setField("eprint", "1603.06570");
-
-        Assert.assertEquals(
-                Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")),
+                Optional.of(new URL("http://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014")),
                 finder.findFullText(entry)
         );
     }
 
     @Test
     public void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1529/unknown");
+        // CI server is unreliable
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
+        entry.setField("doi", "10.1021/bk-2006-WWW.ch014");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }

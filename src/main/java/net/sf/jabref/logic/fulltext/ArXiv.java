@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.fulltext;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
