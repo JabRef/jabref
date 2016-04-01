@@ -11,7 +11,7 @@ public class IdentityFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Identity";
+        return Localization.lang("Identity");
     }
 
     @Override
