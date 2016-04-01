@@ -13,13 +13,7 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Delivers possible completions for a given string.
@@ -29,7 +23,7 @@ import java.util.TreeSet;
  */
 public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
-    private static final int SHORTEST_WORD_TO_ADD = 4;
+    protected static final int SHORTEST_WORD_TO_ADD = 4;
     private final AutoCompletePreferences preferences;
 
     /**
@@ -45,8 +39,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     /**
      * Stores for a lowercase string the possible expanded strings.
      */
-    private final Map<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
-
+    private final Map<String, TreeSet<String>> possibleStringsForLowercaseSearch = new HashMap<>();
 
     public AbstractAutoCompleter(AutoCompletePreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -59,30 +52,28 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
      */
     @Override
     public List<String> complete(String toComplete) {
-        if(toComplete == null) {
-            return new ArrayList<>();
+        if(toComplete == null || !hasMinimumLength(toComplete)) {
+            return Collections.emptyList();
         }
-        if (isTooShortToComplete(toComplete)) {
-            return new ArrayList<>();
-        }
+
         String lowerCase = toComplete.toLowerCase();
 
+        // TODO: does this decision make sense?
+        // user typed in lower case word -> we do an case-insensitive search
         if (lowerCase.equals(toComplete)) {
-            // user typed in lower case word -> we do an case-insensitive search
-            String ender = AbstractAutoCompleter.incrementLastCharacter(lowerCase);
+            String ender = incrementLastCharacter(lowerCase);
             SortedSet<String> subset = indexCaseInsensitive.subSet(lowerCase, ender);
 
-            // As subset only contains lower case strings,
-            // we have to to determine possible strings for each hit
+            // As subset only contains lower case strings, we have to to determine possible strings for each hit
             ArrayList<String> result = new ArrayList<>();
             for (String s : subset) {
-                result.addAll(possibleStringsForSearchString.get(s));
+                result.addAll(possibleStringsForLowercaseSearch.get(s));
             }
             return result;
-        } else {
-            // user typed in a mix of upper case and lower case,
-            // we assume user wants to have exact search
-            String ender = AbstractAutoCompleter.incrementLastCharacter(toComplete);
+        }
+        // user typed in a mix of upper case and lower case, we assume user wants to have exact search
+        else {
+            String ender = incrementLastCharacter(toComplete);
             SortedSet<String> subset = indexCaseSensitive.subSet(toComplete, ender);
             return new ArrayList<>(subset);
         }
@@ -105,13 +96,13 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     /**
      * Returns whether the string is to short to be completed.
      */
-    private boolean isTooShortToComplete(String toCheck) {
-        return toCheck.length() < preferences.getShortestLengthToComplete();
+    private boolean hasMinimumLength(String toCheck) {
+        return toCheck.length() >= preferences.getMinLengthToComplete();
     }
 
     @Override
     public void addItemToIndex(String word) {
-        if (word.length() < getLengthOfShortestWordToAdd()) {
+        if (word.length() < SHORTEST_WORD_TO_ADD) {
             return;
         }
 
@@ -122,12 +113,12 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         // second, add a mapping from the lower cased word to the real word
         String lowerCase = word.toLowerCase();
         indexCaseInsensitive.add(lowerCase);
-        TreeSet<String> set = possibleStringsForSearchString.get(lowerCase);
+        TreeSet<String> set = possibleStringsForLowercaseSearch.get(lowerCase);
         if (set == null) {
             set = new TreeSet<>();
         }
         set.add(word);
-        possibleStringsForSearchString.put(lowerCase, set);
+        possibleStringsForLowercaseSearch.put(lowerCase, set);
     }
 
     @Override
@@ -140,7 +131,4 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         return item;
     }
 
-    protected int getLengthOfShortestWordToAdd() {
-        return AbstractAutoCompleter.SHORTEST_WORD_TO_ADD;
-    }
 }

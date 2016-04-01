@@ -154,7 +154,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
+        when(preferences.getMinLengthToComplete()).thenReturn(100);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();

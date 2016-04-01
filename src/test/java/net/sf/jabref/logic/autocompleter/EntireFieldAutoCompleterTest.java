@@ -167,7 +167,7 @@ public class EntireFieldAutoCompleterTest {
     @Test
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
+        when(preferences.getMinLengthToComplete()).thenReturn(100);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();

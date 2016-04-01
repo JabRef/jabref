@@ -25,12 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import java.awt.event.*;
 import java.util.List;
 
-/**
- * Created by Morten O. Alver, 16 Feb. 2007
- */
 public class AutoCompleteListener extends KeyAdapter implements FocusListener {
-
-    //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
     private final AutoCompleter<String> completer;
@@ -41,20 +36,9 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     private int lastCaretPosition = -1;
     private List<String> lastCompletions;
     private int lastShownCompletion;
-    private boolean consumeEnterKey = true;
-
-    // This field is set if the focus listener should call another focus listener
-    // after finishing. This is needed because the autocomplete listener must
-    // run before the focus listener responsible for storing the current edit.
     private FocusListener nextFocusListener;
 
     public AutoCompleteListener(AutoCompleter<String> completer) {
-        //    	if (logger.getHandlers().length == 0) {
-        //	    	logger.setLevel(Level.FINEST);
-        //	    	ConsoleHandler ch = new ConsoleHandler();
-        //	    	ch.setLevel(Level.FINEST);
-        //	    	logger.addHandler(ch);
-        //    	}
         this.completer = completer;
     }
 
@@ -65,18 +49,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
      * @param listener The listener to call.
      */
     public void setNextFocusListener(FocusListener listener) {
-        this.nextFocusListener = listener;
-    }
-
-    /**
-     * This setting determines whether the autocomplete listener should consume the Enter key stroke when it leads to
-     * accepting a completion. If set to false, the JTextComponent will receive the Enter key press after the completion
-     * is done. The default value if true.
-     *
-     * @param t true to indicate that the Enter key should be consumed, false that it should be forwarded
-     */
-    public void setConsumeEnterKey(boolean t) {
-        this.consumeEnterKey = t;
+        nextFocusListener = listener;
     }
 
     @Override
@@ -90,9 +63,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             int end = comp.getSelectionEnd();
             comp.select(end, end);
             toSetIn = null;
-            if (consumeEnterKey) {
-                e.consume();
-            }
+            e.consume();
         }
         // Cycle through alternative completions when user presses PGUP/PGDN:
         else if ((e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) && (toSetIn != null)) {
@@ -115,8 +86,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             } else {
                 resetAutoCompletion();
             }
-        } else {
-            LOGGER.debug("Special case: defined character, but not caught above");
         }
     }
 
@@ -260,10 +229,10 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        LOGGER.debug("key typed event caught " + e.getKeyCode());
         char ch = e.getKeyChar();
-        if (ch == '\n') {
-            // this case is handled at keyPressed(e)
+
+        // this case is handled at keyPressed(e)
+        if (ch == KeyEvent.VK_ENTER) {
             return;
         }
 

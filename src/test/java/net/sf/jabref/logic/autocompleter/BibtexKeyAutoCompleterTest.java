@@ -13,7 +13,6 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class BibtexKeyAutoCompleterTest {
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullPreferenceThrowsException() {
         new BibtexKeyAutoCompleter(null);
@@ -148,7 +147,7 @@ public class BibtexKeyAutoCompleterTest {
     @Test
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
+        when(preferences.getMinLengthToComplete()).thenReturn(100);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
         BibEntry entry = new BibEntry();
