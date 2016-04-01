@@ -204,7 +204,7 @@ public class FromAuxDialog extends JDialog {
         b = new DefaultFormBuilder(new FormLayout(
                 "fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"), statusPanel);
         b.appendSeparator(Localization.lang("Result"));
-        b.append(Localization.lang("Unknown bibtex entries") + ":");
+        b.append(Localization.lang("Unknown BibTeX entries") + ":");
         b.append(Localization.lang("Messages") + ":");
         b.nextLine();
         b.append(listScrollPane);

@@ -249,11 +249,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
         parseWithFreeCiteButton.addActionListener(this);
 
         // Radio buttons
-        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_bibtex_key"));
+        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_BibTeX_key"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
-        overRadio.setToolTipText(Localization.lang("Override_the_bibtex_key_by_the_selected_text"));
+        overRadio.setToolTipText(Localization.lang("Override_the_BibTeX_key_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
 

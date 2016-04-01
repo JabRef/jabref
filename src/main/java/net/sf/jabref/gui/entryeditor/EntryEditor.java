@@ -255,7 +255,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         fileListEditor = optPan3.fileListEditor;
                     }
                     tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan3
-                            .getPane(), Localization.lang("Show deprecated bibtex fields"));
+                            .getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
                 }
             }
