@@ -5,12 +5,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AuthorsMinifierTest {
-    private AuthorsMinifier formatter;
+public class MinifyNameListFormatterTest {
+    private MinifyNameListFormatter formatter;
 
     @Before
     public void setUp() {
-        formatter = new AuthorsMinifier();
+        formatter = new MinifyNameListFormatter();
     }
 
     @After

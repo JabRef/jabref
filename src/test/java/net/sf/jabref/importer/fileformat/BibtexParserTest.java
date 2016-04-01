@@ -12,7 +12,7 @@ import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.formatter.casechanger.LowerCaseChanger;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -1259,34 +1259,37 @@ public class BibtexParserTest {
 
     @Test
     public void parseRecognizesSaveActionsAfterEntry() throws IOException {
-        BibtexParser parser = new BibtexParser(
-                new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
-                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
-                        + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
-                        + "  Pages                    = {1-7},\n"
-                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
-                        + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
-                        + "  ISSN                     = {0886-5930}\n" + "}\n" + "\n"
-                        + "@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger]}"));
+        BibtexParser parser = new BibtexParser(new StringReader("@InProceedings{6055279,\n" +
+                "  Title                    = {Educational session 1},\n" +
+                "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n" +
+                "  Year                     = {2011},\n" +
+                "  Month                    = {Sept},\n" +
+                "  Pages                    = {1-7},\n" +
+                "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n" +
+                "  DOI                      = {10.1109/CICC.2011.6055279},\n" +
+                "  ISSN                     = {0886-5930}\n" +
+                "}\n" +
+                "\n" +
+                "@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
         ParserResult parserResult = parser.parse();
 
         List<String> saveActions = parserResult.getMetaData().getData(MetaData.SAVE_ACTIONS);
 
         assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[LowerCaseChanger]", saveActions.get(1));
+        assertEquals("title[lower_case]", saveActions.get(1));
     }
 
     @Test
     public void integrationTestSaveActions() throws IOException {
         BibtexParser parser = new BibtexParser(
-                new StringReader("@comment{jabref-meta: saveActions:enabled;title[LowerCaseChanger]}"));
+                new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
         ParserResult parserResult = parser.parse();
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions();
 
         assertTrue(saveActions.isEnabled());
-        assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseChanger())),
+        assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
     }
 

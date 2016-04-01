@@ -3,16 +3,16 @@ package net.sf.jabref.logic.formatter.casechanger;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class LowerCaseChanger implements Formatter {
+public class LowerCaseFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("lower");
+        return Localization.lang("Lower case");
     }
 
     @Override
     public String getKey() {
-        return "LowerCaseChanger";
+        return "lower_case";
     }
 
     /**
@@ -29,21 +29,16 @@ public class LowerCaseChanger implements Formatter {
 
     @Override
     public int hashCode() {
-        return getKey().hashCode();
+        return defaultHashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Formatter) {
-            return getKey().equals(((Formatter)obj).getKey());
-        } else {
-            return false;
-        }
+        return defaultEquals(obj);
     }
 
     @Override
     public String getDescription() {
-        return Localization.lang(
-                "Converts all characters in %s to lower case, but does not change words starting with \"{\"");
+        return Localization.lang("Changes all letters to lower case.");
     }
 }

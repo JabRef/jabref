@@ -22,7 +22,7 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
-public class CaseKeeper implements Formatter {
+public class ProtectTermsFormatter implements Formatter {
 
     private String format(String text, List<String> listOfWords) {
         String result = text;
@@ -53,12 +53,12 @@ public class CaseKeeper implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("CaseKeeper");
+        return Localization.lang("Protect terms");
     }
 
     @Override
     public String getKey() {
-        return "CaseKeeper";
+        return "protect_terms";
     }
 
 }

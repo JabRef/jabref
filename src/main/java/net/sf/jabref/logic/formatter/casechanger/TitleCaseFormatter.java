@@ -3,16 +3,16 @@ package net.sf.jabref.logic.formatter.casechanger;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class TitleCaseChanger implements Formatter {
+public class TitleCaseFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Title");
+        return Localization.lang("Title case");
     }
 
     @Override
     public String getKey() {
-        return "TitleCaseChanger";
+        return "title_case";
     }
 
     /**
@@ -42,6 +42,6 @@ public class TitleCaseChanger implements Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Converts all words in %s to upper case, but converts articles, prepositions, and conjunctions to lower case.");
+                "Capitalize all words, but converts articles, prepositions, and conjunctions to lower case.");
     }
 }

@@ -1,17 +1,17 @@
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.logic.formatter.bibtexfields.PageNumbersFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PageNumbersFormatterTest {
-    private PageNumbersFormatter formatter;
+public class NormalizePagesFormatterTest {
+    private NormalizePagesFormatter formatter;
 
     @Before
     public void setUp() {
-        formatter = new PageNumbersFormatter();
+        formatter = new NormalizePagesFormatter();
     }
 
     @After
@@ -20,9 +20,8 @@ public class PageNumbersFormatterTest {
     }
 
     @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
+    public void formatSinglePageResultsInNoChange() {
+        expectCorrect("1", "1");
     }
 
     @Test

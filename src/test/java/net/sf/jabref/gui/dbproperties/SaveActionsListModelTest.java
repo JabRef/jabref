@@ -2,7 +2,7 @@ package net.sf.jabref.gui.dbproperties;
 
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.bibtexfields.EraseFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -37,7 +37,7 @@ public class SaveActionsListModelTest {
     public void resetSetsFormattersToPassedList() throws Exception {
         SaveActionsListModel model = new SaveActionsListModel(Collections.emptyList());
         FieldFormatterCleanups defaultFormatters = mock(FieldFormatterCleanups.class);
-        List<FieldFormatterCleanup> formatters = Arrays.asList(new FieldFormatterCleanup("test", new EraseFormatter()));
+        List<FieldFormatterCleanup> formatters = Arrays.asList(new FieldFormatterCleanup("test", new ClearFormatter()));
         when(defaultFormatters.getConfiguredActions()).thenReturn(formatters);
 
         model.reset(defaultFormatters);

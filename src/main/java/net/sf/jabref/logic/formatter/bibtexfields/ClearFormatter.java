@@ -5,16 +5,16 @@ import net.sf.jabref.logic.l10n.Localization;
 
 import java.util.Objects;
 
-public class EraseFormatter implements Formatter {
+public class ClearFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "Erase all";
+        return Localization.lang("Clear");
     }
 
     @Override
     public String getKey() {
-        return "EraseFormatter";
+        return "clear";
     }
 
     @Override
@@ -25,6 +25,6 @@ public class EraseFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Completely erases %s.");
+        return Localization.lang("Completely the field.");
     }
 }

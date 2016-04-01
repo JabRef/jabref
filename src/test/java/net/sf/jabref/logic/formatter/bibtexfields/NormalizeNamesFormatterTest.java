@@ -5,12 +5,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AuthorsFormatterTest {
-    private AuthorsFormatter formatter;
+public class NormalizeNamesFormatterTest {
+    private NormalizeNamesFormatter formatter;
 
     @Before
     public void setUp() {
-        formatter = new AuthorsFormatter();
+        formatter = new NormalizeNamesFormatter();
     }
 
     @After
