@@ -112,7 +112,7 @@ public class BibEntryWriter {
         }
 
         // Finally, end the entry.
-        out.write((hasWritten ? Globals.NEWLINE : "") + '}');
+        out.write((hasWritten ? "," + Globals.NEWLINE : "") + '}');
     }
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
