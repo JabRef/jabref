@@ -27,6 +27,7 @@ public class FindFullText {
         finders.add(new SpringerLink());
         finders.add(new ACS());
         finders.add(new ArXiv());
+        finders.add(new IEEE());
         // Meta search
         finders.add(new GoogleScholar());
     }
