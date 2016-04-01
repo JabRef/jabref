@@ -19,20 +19,16 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Returns an autocompleter to a given fieldname.
- *
- * @author kahlert, cordes
+ * Returns an autocompleter for a given field name.
  */
 public class AutoCompleterFactory {
-
     private final AutoCompletePreferences preferences;
-
 
     public AutoCompleterFactory(AutoCompletePreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public AutoCompleter<String> getFor(String fieldName) {
+    public AutoCompleter<String> forField(String fieldName) {
         Objects.requireNonNull(fieldName);
 
         if ("author".equals(fieldName) || "editor".equals(fieldName)) {
@@ -49,5 +45,4 @@ public class AutoCompleterFactory {
     public AutoCompleter<String> getPersonAutoCompleter() {
         return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
     }
-
 }

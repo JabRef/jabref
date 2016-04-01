@@ -26,7 +26,6 @@ import net.sf.jabref.model.entry.BibEntry;
  * @author kahlert, cordes
  */
 class EntireFieldAutoCompleter extends AbstractAutoCompleter {
-
     private final String fieldName;
 
     /**
@@ -34,7 +33,6 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
      */
     EntireFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
         super(preferences);
-
         this.fieldName = Objects.requireNonNull(fieldName);
     }
 
@@ -48,11 +46,11 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
      * Stores the full original value of the given field.
      */
     @Override
-    public void addBibtexEntry(BibEntry entry) {
+    public void addToIndex(BibEntry entry) {
         if (entry == null) {
             return;
         }
 
-        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> addItemToIndex(fieldValue.trim()));
+        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> insertIntoIndex(fieldValue.trim()));
     }
 }

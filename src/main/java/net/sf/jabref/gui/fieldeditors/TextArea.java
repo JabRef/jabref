@@ -150,7 +150,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
     @Override
     public void clearAutoCompleteSuggestion() {
         if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
+            autoCompleteListener.clearAutoCompletion(this);
         }
     }
 }

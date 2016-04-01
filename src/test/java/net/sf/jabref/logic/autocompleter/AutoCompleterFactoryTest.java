@@ -16,7 +16,7 @@ public class AutoCompleterFactoryTest {
     public void getForUnknownFieldReturnsDefaultAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("unknownField");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("unknownField");
         Assert.assertTrue(autoCompleter instanceof DefaultAutoCompleter);
     }
 
@@ -24,14 +24,14 @@ public class AutoCompleterFactoryTest {
     public void getForNullThrowsException() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        autoCompleterFactory.getFor(null);
+        autoCompleterFactory.forField(null);
     }
 
     @Test
     public void getForAuthorReturnsNameFieldAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("author");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("author");
         Assert.assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
     }
 
@@ -39,7 +39,7 @@ public class AutoCompleterFactoryTest {
     public void getForEditorReturnsNameFieldAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("editor");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("editor");
         Assert.assertTrue(autoCompleter instanceof NameFieldAutoCompleter);
     }
 
@@ -47,7 +47,7 @@ public class AutoCompleterFactoryTest {
     public void getForCrossrefReturnsBibtexKeyAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("crossref");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("crossref");
         Assert.assertTrue(autoCompleter instanceof BibtexKeyAutoCompleter);
     }
 
@@ -55,7 +55,7 @@ public class AutoCompleterFactoryTest {
     public void getForJournalReturnsEntireFieldAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("journal");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("journal");
         Assert.assertTrue(autoCompleter instanceof EntireFieldAutoCompleter);
     }
 
@@ -63,7 +63,7 @@ public class AutoCompleterFactoryTest {
     public void getForPublisherReturnsEntireFieldAutoCompleter() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
-        AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor("publisher");
+        AutoCompleter<String> autoCompleter = autoCompleterFactory.forField("publisher");
         Assert.assertTrue(autoCompleter instanceof EntireFieldAutoCompleter);
     }
 

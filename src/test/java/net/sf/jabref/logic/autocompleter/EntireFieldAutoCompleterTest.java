@@ -39,7 +39,7 @@ public class EntireFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
-        autoCompleter.addBibtexEntry(null);
+        autoCompleter.addToIndex(null);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -51,7 +51,7 @@ public class EntireFieldAutoCompleterTest {
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -64,7 +64,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -77,7 +77,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("testValue");
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -90,7 +90,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -103,7 +103,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("testvalue");
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -116,7 +116,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete(null);
         Assert.assertEquals(Collections.emptyList(), result);
@@ -129,7 +129,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -142,10 +142,10 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testValueOne");
-        autoCompleter.addBibtexEntry(entryOne);
+        autoCompleter.addToIndex(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testValueTwo");
-        autoCompleter.addBibtexEntry(entryTwo);
+        autoCompleter.addToIndex(entryTwo);
 
         List<String> result = autoCompleter.complete("testValue");
         Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
@@ -158,7 +158,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "val");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("va");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -172,7 +172,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -185,7 +185,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("val");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -198,7 +198,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("lue");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -211,7 +211,7 @@ public class EntireFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("te");
         Assert.assertEquals(Arrays.asList("test value"), result);

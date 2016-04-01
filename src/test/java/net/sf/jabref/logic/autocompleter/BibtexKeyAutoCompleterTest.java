@@ -32,7 +32,7 @@ public class BibtexKeyAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
-        autoCompleter.addBibtexEntry(null);
+        autoCompleter.addToIndex(null);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -44,7 +44,7 @@ public class BibtexKeyAutoCompleterTest {
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
 
         BibEntry entry = new BibEntry();
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -57,7 +57,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("testKey");
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -70,7 +70,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -83,7 +83,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("testkey");
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -96,7 +96,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete(null);
         Assert.assertEquals(Collections.emptyList(), result);
@@ -109,7 +109,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -122,10 +122,10 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entryOne = new BibEntry();
         entryOne.setField(BibEntry.KEY_FIELD, "testKeyOne");
-        autoCompleter.addBibtexEntry(entryOne);
+        autoCompleter.addToIndex(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField(BibEntry.KEY_FIELD, "testKeyTwo");
-        autoCompleter.addBibtexEntry(entryTwo);
+        autoCompleter.addToIndex(entryTwo);
 
         List<String> result = autoCompleter.complete("testKey");
         Assert.assertEquals(Arrays.asList("testKeyOne", "testKeyTwo"), result);
@@ -138,7 +138,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "key");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("k");
         Assert.assertEquals(Arrays.asList("key"), result);
@@ -152,7 +152,7 @@ public class BibtexKeyAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
