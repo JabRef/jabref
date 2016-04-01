@@ -210,11 +210,7 @@ class PreambleEditor extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.UNDO);
-            } catch (Throwable ignored) {
-                // Ignored
-            }
+            panel.runCommand(Actions.UNDO);
         }
     }
 
@@ -229,11 +225,7 @@ class PreambleEditor extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.REDO);
-            } catch (Throwable ignored) {
-                // Ignored
-            }
+            panel.runCommand(Actions.REDO);
         }
     }
 

@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -111,24 +110,20 @@ public class CiteSeerXFetcher implements EntryFetcher {
      */
     private List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
-        try {
-            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
-                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            int count = 1;
-            String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
-                urlQuery = nextPage;
-                count++;
-                if (stopFetching) {
-                    break;
-                }
+        List<String> ids = new ArrayList<>();
+        urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
+                URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
+        int count = 1;
+        String nextPage;
+        while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
+                && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
+            urlQuery = nextPage;
+            count++;
+            if (stopFetching) {
+                break;
             }
-            return ids;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
+        return ids;
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {

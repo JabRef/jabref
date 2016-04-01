@@ -65,7 +65,7 @@ public class KeyBindingPreferences {
             if (SHORTCUT_MASK == -1) {
                 try {
                     SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-                } catch (Throwable ignored) {
+                } catch (AWTError | HeadlessException ignored) {
                     // Ignored
                 }
             }
