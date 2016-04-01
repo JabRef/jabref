@@ -199,7 +199,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
-        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
+        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
 

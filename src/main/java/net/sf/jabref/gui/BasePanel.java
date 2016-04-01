@@ -609,7 +609,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("First select the entries you want keys to be generated for."),
-                            Localization.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
+                            Localization.lang("Autogenerate BibTeX keys"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
                 frame.block();
@@ -972,7 +972,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Quality.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Quality.getInstance(),
                         Quality.getInstance().getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle quality"), Localization.lang("Toggled quality for %0 entries")));
+                        Localization.lang("Toggle quality assured"),
+                        Localization.lang("Toggled quality for %0 entries")));
         actions.put(Printed.getInstance().getValues().get(0).getActionName(), new SpecialFieldAction(frame,
                 Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue().get(), true,
                 Localization.lang("Toggle print status"), Localization.lang("Toggled print status for %0 entries")));

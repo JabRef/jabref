@@ -91,7 +91,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 6);
         builder.add(useProxyCheckBox).xyw(2, 3, 5);
-        builder.add(Localization.lang("Host") + ':').xy(2, 5);
+        builder.add(Localization.lang("Hostname") + ':').xy(2, 5);
         builder.add(hostnameTextField).xyw(4, 5, 3);
         builder.add(Localization.lang("Port") + ':').xy(2, 7);
         builder.add(portTextField).xyw(4, 7, 3);

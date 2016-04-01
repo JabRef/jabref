@@ -30,8 +30,9 @@ public class Quality extends SpecialField {
     private Quality() {
         ArrayList<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "qualityAssured" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured", Localization.lang("Toogle quality assured"), IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon(),
-                Localization.lang("Toogle quality assured")));
+        values.add(new SpecialFieldValue(this, "qualityAssured", "toggleQualityAssured",
+                Localization.lang("Toggle quality assured"), IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon(),
+                Localization.lang("Toggle quality assured")));
         this.setValues(values);
         TEXT_DONE_PATTERN = "Toggled quality for %0 entries";
     }

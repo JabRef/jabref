@@ -101,7 +101,7 @@ public class SynchronizeFileField extends AbstractWorker {
         int progressBarMax = (autoSet ? weightAutoSet * sel.size() : 0) + (checkExisting ? sel.size() : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset file links."));
+        final NamedCompound ce = new NamedCompound(Localization.lang("Automatically set file links"));
 
         Set<BibEntry> changedEntries = new HashSet<>();
 
@@ -275,12 +275,14 @@ public class SynchronizeFileField extends AbstractWorker {
         private boolean canceled = true;
         private final MetaData metaData;
         private final JRadioButton autoSetUnset = new JRadioButton(
-                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Do not overwrite existing links."),
+                Localization.lang("Automatically set file links") + ". "
+                        + Localization.lang("Do not overwrite existing links."),
                 true);
         private final JRadioButton autoSetAll = new JRadioButton(
-                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Allow overwriting existing links."),
+                Localization.lang("Automatically set file links") + ". "
+                        + Localization.lang("Allow overwriting existing links."),
                 false);
-        private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not autoset"), false);
+        private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not automatically set"), false);
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
 
 
@@ -315,8 +317,8 @@ public class SynchronizeFileField extends AbstractWorker {
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
             JLabel description = new JLabel("<HTML>" + Localization.lang(
-                    "Attempt to autoset file links for your entries. Autoset works if "
-                            + "a file in your file directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.")
+                    "Attempt to automatically set file links for your entries. Automatically setting works if "
+                            + "a file in your file directory<BR>or a subdirectory is named identically to an entry's BibTeX key, plus extension.")
                     + "</HTML>");
 
             builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
