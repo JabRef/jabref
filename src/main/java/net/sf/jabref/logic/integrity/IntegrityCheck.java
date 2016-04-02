@@ -123,7 +123,7 @@ public class IntegrityCheck {
                     .collect(Collectors.toList());
 
             for (FileField.ParsedFileField p : parsedFileFields) {
-                Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.link);
+                Optional<File> file = FileUtil.expandFilename(context, p.link);
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,

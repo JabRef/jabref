@@ -1395,7 +1395,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 String link = tf.getText(); // get selected ? String
 
                 try {
-                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, tf.getFieldName());
+                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, tf.getFieldName());
                 } catch (IOException ex) {
                     LOGGER.warn("Error opening file.", ex);
                 }

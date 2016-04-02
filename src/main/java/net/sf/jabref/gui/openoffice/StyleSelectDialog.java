@@ -48,6 +48,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.BibDatabaseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -147,7 +148,7 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, new MetaData(), "");
+        preview = new PreviewPanel(null, null, "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 
@@ -285,9 +286,9 @@ class StyleSelectDialog {
                 String link = style.getPath();
                 try {
                     if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
+                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
                     } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
                                 new UnknownExternalFileType("jstyle"));
                     }
                 } catch (IOException e) {

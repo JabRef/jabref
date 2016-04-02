@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.BibDatabaseContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,8 +55,7 @@ public class DbImportAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(DbImportAction.class);
 
-    private BibDatabase database;
-    private MetaData metaData;
+    private BibDatabaseContext databaseContext;
     private boolean connectedToDB;
     private final JabRefFrame frame;
     private DBStrings dbs;
@@ -159,13 +159,12 @@ public class DbImportAction extends AbstractWorker {
                                 DBImportExportDialog.DialogType.IMPORTER);
                         if (dialogo.removeAction) {
                             String dbName = dialogo.selectedDB;
-                            importer.removeDB(dialogo, dbName, conn, metaData);
+                            importer.removeDB(dialogo, dbName, conn, databaseContext);
                             performImport();
                         } else if (dialogo.moreThanOne) {
                             databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
                             for (DBImporterResult res : databases) {
-                                database = res.getDatabase();
-                                metaData = res.getMetaData();
+                                databaseContext = res.getDatabaseContext();
                                 dbs.isConfigValid(true);
                             }
                             frame.output(Localization.lang("%0 databases will be imported",
@@ -194,10 +193,9 @@ public class DbImportAction extends AbstractWorker {
             return;
         }
         for (DBImporterResult res : databases) {
-            database = res.getDatabase();
-            metaData = res.getMetaData();
-            if (database != null) {
-                BasePanel pan = frame.addTab(database, null, metaData, Globals.prefs.getDefaultEncoding(), true);
+            databaseContext = res.getDatabaseContext();
+            if (databaseContext != null) {
+                BasePanel pan = frame.addTab(databaseContext, Globals.prefs.getDefaultEncoding(), true);
                 pan.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

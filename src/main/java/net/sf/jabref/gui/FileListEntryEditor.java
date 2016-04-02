@@ -18,6 +18,7 @@ package net.sf.jabref.gui;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -68,7 +69,7 @@ public class FileListEntryEditor {
     private ConfirmCloseFileListEntryEditor externalConfirm;
 
     private FileListEntry entry;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private boolean okPressed;
     private boolean okDisabledExternally;
     private boolean openBrowseWhenShown;
@@ -78,9 +79,9 @@ public class FileListEntryEditor {
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
-            boolean showOpenButton, MetaData metaData) {
+            boolean showOpenButton, BibDatabaseContext databaseContext) {
         this.entry = entry;
-        this.metaData = metaData;
+        this.databaseContext = databaseContext;
 
         ActionListener okAction = e -> {
             // If OK button is disabled, ignore this event:
@@ -223,7 +224,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null) {
             try {
-                JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), Optional.of(type));
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, link.getText(), Optional.of(type));
             } catch (IOException e) {
                 LOGGER.error("File could not be opened", e);
             }
@@ -286,7 +287,7 @@ public class FileListEntryEditor {
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = databaseContext.getFileDirectory(Globals.FILE_FIELD);
             if (dirs.isEmpty()) {
                 link = this.link.getText().trim();
             } else {
@@ -351,7 +352,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = databaseContext.getFileDirectory(Globals.FILE_FIELD);
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

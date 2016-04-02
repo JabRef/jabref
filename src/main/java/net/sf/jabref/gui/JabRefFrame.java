@@ -1401,13 +1401,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+                addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
-            addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+            addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
         }
     }
 
@@ -1608,17 +1608,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public BasePanel addTab(BibDatabase db, File file, MetaData metaData, Charset encoding, boolean raisePanel) {
-        // ensure that non-null parameters are really non-null
-        if (metaData == null) {
-            metaData = new MetaData();
-        }
+    public BasePanel addTab(BibDatabaseContext databaseContext, Charset encoding, boolean raisePanel) {
+        Objects.requireNonNull(databaseContext);
+
         if (encoding == null) {
             encoding = Globals.prefs.getDefaultEncoding();
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
+        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext, encoding);
         addTab(bp, raisePanel);
         return bp;
     }

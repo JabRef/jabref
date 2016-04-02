@@ -53,15 +53,15 @@ public class DownloadExternalFile {
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private final String bibtexKey;
     private FileListEntryEditor editor;
     private boolean downloadFinished;
     private boolean dontShowDialog;
 
-    public DownloadExternalFile(JabRefFrame frame, MetaData metaData, String bibtexKey) {
+    public DownloadExternalFile(JabRefFrame frame, BibDatabaseContext databaseContext, String bibtexKey) {
         this.frame = frame;
-        this.metaData = metaData;
+        this.databaseContext = databaseContext;
         this.bibtexKey = bibtexKey;
     }
 
@@ -157,7 +157,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = getFileDirectory();
+        List<String> fDirectory = databaseContext.getFileDirectory(Globals.FILE_FIELD);
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;
@@ -167,7 +167,7 @@ public class DownloadExternalFile {
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
         FileListEntry entry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
-        editor = new FileListEntryEditor(frame, entry, true, false, metaData);
+        editor = new FileListEntryEditor(frame, entry, true, false, databaseContext);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
@@ -346,11 +346,6 @@ public class DownloadExternalFile {
         }
 
     }
-
-    private List<String> getFileDirectory() {
-        return metaData.getFileDirectory(Globals.FILE_FIELD);
-    }
-
 
     /**
      * Callback interface that users of this class must implement in order to receive

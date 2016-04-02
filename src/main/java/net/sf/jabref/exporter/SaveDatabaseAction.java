@@ -360,12 +360,12 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         if (f != null) {
             File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
-            panel.getBibDatabaseContext().getMetaData().setFile(f);
+            panel.getBibDatabaseContext().setDatabaseFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
             // If the operation failed, revert the file field and return:
             if (!success) {
-                panel.getBibDatabaseContext().getMetaData().setFile(oldFile);
+                panel.getBibDatabaseContext().setDatabaseFile(oldFile);
                 return;
             }
             // Register so we get notifications about outside changes to the file.

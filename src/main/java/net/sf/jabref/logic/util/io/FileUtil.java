@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.logic.util.io;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -157,15 +158,15 @@ public class FileUtil {
      * <li>the directory of the bib file</li>
      * </ul>
      *
-     * @param metaData The MetaData for the database this file belongs to.
+     * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final MetaData metaData, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = metaData.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        List<String> fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = databaseContext.getFileDirectory(Globals.FILE_FIELD);
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
         for (String dir : directories) {

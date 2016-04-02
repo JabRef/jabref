@@ -71,27 +71,22 @@ public abstract class DBExporter extends DBImporterExporter {
     /**
      * Method for the exportDatabase methods.
      *
-     * @param database The DBTYPE of the database
-     * @param database The BibDatabase to export
-     * @param metaData The MetaData object containing the groups information
-     * @param entriesToExport   The list of the entries to export.
+     * @param databaseContext the database to export
+     * @param entriesToExport The list of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void performExport(final BibDatabase database, final MetaData metaData, List<BibEntry> entriesToExport,
+    private void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
             Object out, String dbName) throws Exception {
-        Defaults defaults = new Defaults(
-                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, entriesToExport, savePrefs);
-        GroupTreeNode gtn = metaData.getGroups();
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(databaseContext, entriesToExport, savePrefs);
+        GroupTreeNode gtn = databaseContext.getMetaData().getGroups();
 
-        final int database_id = getDatabaseIDByName(metaData, out, dbName);
+        final int database_id = getDatabaseIDByName(databaseContext, out, dbName);
         removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out, bibDatabaseContext.getMode());
+        populateEntryTypesTable(out, databaseContext.getMode());
         populateEntriesTable(database_id, entries, out);
-        populateStringTable(database, out, database_id);
+        populateStringTable(databaseContext.getDatabase(), out, database_id);
         populateGroupTypesTable(out);
         populateGroupsTable(gtn, 0, 1, out, database_id);
         populateEntryGroupsTable(gtn, 0, 1, out, database_id);
@@ -379,13 +374,12 @@ public abstract class DBExporter extends DBImporterExporter {
      * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified output file.
      *
-     * @param database The BibDatabase to export
-     * @param metaData The MetaData object containing the groups information
+     * @param databaseContext the database to export
      * @param entriesToExport   The list of the entries to export.
      * @param file     The name of the file to which the DML should be written
      * @param encoding The encoding to be used
      */
-    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData,
+    public void exportDatabaseAsFile(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, String file, Charset encoding) throws Exception {
         // open output file
         File outfile = new File(file);
@@ -395,7 +389,7 @@ public abstract class DBExporter extends DBImporterExporter {
         }
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
                 PrintStream fout = new PrintStream(writer)) {
-            performExport(database, metaData, entriesToExport, fout, "file");
+            performExport(databaseContext, entriesToExport, fout, "file");
         }
     }
 
@@ -403,12 +397,11 @@ public abstract class DBExporter extends DBImporterExporter {
      * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified SQL database.
      *
-     * @param database        The BibDatabase to export
-     * @param metaData        The MetaData object containing the groups information
+     * @param databaseContext the database to export
      * @param entriesToExport The list of the entries to export.
      * @param databaseStrings The necessary database connection information
      */
-    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData,
+    public void exportDatabaseToDBMS(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
         Connection conn = null;
@@ -421,18 +414,18 @@ public abstract class DBExporter extends DBImporterExporter {
                     DBImportExportDialog.DialogType.EXPORTER);
             if (dialogo.removeAction) {
                 dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                removeDB(dialogo, dbName, conn, metaData);
+                removeDB(dialogo, dbName, conn, databaseContext);
                 redisplay = true;
             } else if (dialogo.hasDBSelected) {
                 dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                performExport(database, metaData, entriesToExport, conn, dbName);
+                performExport(databaseContext, entriesToExport, conn, dbName);
             }
             if (!conn.getAutoCommit()) {
                 conn.commit();
                 conn.setAutoCommit(true);
             }
             if (redisplay) {
-                exportDatabaseToDBMS(database, metaData, entriesToExport, databaseStrings, frame);
+                exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
             }
         } catch (SQLException ex) {
             if ((conn != null) && !conn.getAutoCommit()) {

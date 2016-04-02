@@ -30,7 +30,7 @@ public class AttachFileAction implements BaseAction {
         BibEntry entry = panel.getSelectedEntries().get(0);
         FileListEntry flEntry = new FileListEntry("", "");
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
-                panel.getBibDatabaseContext().getMetaData());
+                panel.getBibDatabaseContext());
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();

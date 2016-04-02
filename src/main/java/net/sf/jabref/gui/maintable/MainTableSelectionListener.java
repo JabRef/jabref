@@ -85,10 +85,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableRows();
         previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0)),
-                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1))};
+                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
+                        Globals.prefs.get(JabRefPreferences.PREVIEW_0)),
+                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
+                        Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
@@ -311,7 +311,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
                                         flEntry.link, flEntry.type.get().getIcon(),
-                                        panel.getBibDatabaseContext().getMetaData(), flEntry.type);
+                                        panel.getBibDatabaseContext(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
                                     panel.output(Localization.lang("Unable to open link."));
@@ -319,8 +319,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                         } else {
                             try {
-                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link,
-                                        fieldName);
+                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                                 LOGGER.info("Unable to open link", ex);
@@ -406,7 +405,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             description = flEntry.link;
                         }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(),
+                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext(),
                                 flEntry.type));
                         showDefaultPopup = false;
                     }
@@ -425,7 +424,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 icon = iconLabel.getIcon();
                             }
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
-                                    panel.getBibDatabaseContext().getMetaData(), field));
+                                    panel.getBibDatabaseContext(), field));
                             showDefaultPopup = false;
                         }
                     }
