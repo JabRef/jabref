@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -25,7 +26,8 @@ public class AttachFileAction implements BaseAction {
     @Override
     public void action() {
         if (panel.getSelectedEntries().size() != 1) {
-            return; // TODO: display error message?
+            panel.output(Localization.lang("No entries or multiple entries selected."));
+            return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
         FileListEntry flEntry = new FileListEntry("", "");

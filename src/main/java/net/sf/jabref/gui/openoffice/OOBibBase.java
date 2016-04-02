@@ -1254,7 +1254,6 @@ class OOBibBase {
 
         @Override
         public int hashCode() {
-            // TODO Auto-generated method stub
             return Objects.hash(position, name);
         }
 
