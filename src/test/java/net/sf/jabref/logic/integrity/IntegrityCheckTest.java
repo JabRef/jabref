@@ -104,7 +104,7 @@ public class IntegrityCheckTest {
     @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
-        Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
+        Mockito.when(metaData.getData("file")).thenReturn(Collections.singletonList("."));
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
@@ -118,10 +118,10 @@ public class IntegrityCheckTest {
         File bibFile = testFolder.newFile("lit.bib");
         testFolder.newFile("file.pdf");
 
-        MetaData metaData = new MetaData();
-        metaData.setFile(bibFile);
+        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        databaseContext.setDatabaseFile(bibFile);
 
-        assertCorrect(createContext("file", ":file.pdf:PDF", metaData));
+        assertCorrect(databaseContext);
     }
 
     @Test

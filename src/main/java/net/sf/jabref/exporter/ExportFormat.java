@@ -215,7 +215,7 @@ public class ExportFormat implements IExportFormat {
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(databaseContext.getDatabase(), encoding));
+                ps.write(beginLayout.doLayout(databaseContext, encoding));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -288,7 +288,7 @@ public class ExportFormat implements IExportFormat {
 
             // Write footer
             if ((endLayout != null) && (this.encoding != null)) {
-                ps.write(endLayout.doLayout(databaseContext.getDatabase(), this.encoding));
+                ps.write(endLayout.doLayout(databaseContext, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 
