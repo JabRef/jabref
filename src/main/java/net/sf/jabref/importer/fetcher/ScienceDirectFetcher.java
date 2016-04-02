@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
 
 public class ScienceDirectFetcher implements EntryFetcher {
 
+    private static final String SCIENCE_DIRECT = "ScienceDirect";
+
     private static final Log LOGGER = LogFactory.getLog(ScienceDirectFetcher.class);
 
     private static final int MAX_PAGES_TO_LOAD = 8;
@@ -51,7 +53,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "ScienceDirect";
+        return SCIENCE_DIRECT;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return ("ScienceDirect");
+        return SCIENCE_DIRECT;
     }
 
     @Override
@@ -81,7 +83,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
             if (citations.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         query),
-                        Localization.lang("Search %0", "ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", SCIENCE_DIRECT), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -99,7 +101,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
             status.showMessage(
-                    Localization.lang("Error while fetching from %0", "ScienceDirect") + ": " + e.getMessage());
+                    Localization.lang("Error while fetching from %0", SCIENCE_DIRECT) + ": " + e.getMessage());
         }
         return false;
     }
