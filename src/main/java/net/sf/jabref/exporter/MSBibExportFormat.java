@@ -30,6 +30,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
@@ -45,9 +46,9 @@ class MSBibExportFormat extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws IOException {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
         if (entries.isEmpty()) { // Only export if entries exist
@@ -56,7 +57,7 @@ class MSBibExportFormat extends ExportFormat {
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
-        MSBibDatabase md = new MSBibDatabase(database, entries);
+        MSBibDatabase md = new MSBibDatabase(databaseContext.getDatabase(), entries);
         try (VerifyingWriter ps = ss.getWriter()) {
 
         // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES

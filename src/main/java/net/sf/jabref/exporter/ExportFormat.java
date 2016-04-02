@@ -215,7 +215,7 @@ public class ExportFormat implements IExportFormat {
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(database, encoding));
+                ps.write(beginLayout.doLayout(databaseContext.getDatabase(), encoding));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -226,11 +226,8 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
-                    new BibDatabaseContext(database, metaData, defaults), entries, savePrefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePrefs);
 
             // Load default layout
             Layout defLayout;
@@ -274,7 +271,7 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, database));
+                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
             }
 
             // Print footer
@@ -291,7 +288,7 @@ public class ExportFormat implements IExportFormat {
 
             // Write footer
             if ((endLayout != null) && (this.encoding != null)) {
-                ps.write(endLayout.doLayout(database, this.encoding));
+                ps.write(endLayout.doLayout(databaseContext.getDatabase(), this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 

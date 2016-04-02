@@ -232,10 +232,8 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.getCurrentBasePanel().database(),
-                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                                        finFile.getPath(), frame
-                                                .getCurrentBasePanel().getEncoding(), finEntries);
+                                format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                                        finFile.getPath(), frame.getCurrentBasePanel().getEncoding(), finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {
