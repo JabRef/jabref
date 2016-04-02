@@ -395,9 +395,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
-                    frame.output(Localization.lang("Finished autosetting external links."));
+                    frame.output(Localization.lang("Finished automatically setting external links."));
                 } else {
-                    frame.output(Localization.lang("Finished autosetting external links.")
+                    frame.output(Localization.lang("Finished automatically setting external links.")
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before

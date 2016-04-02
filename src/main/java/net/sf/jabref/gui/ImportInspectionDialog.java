@@ -1140,7 +1140,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private class AutoSetLinks extends JMenuItem implements ActionListener {
 
         public AutoSetLinks() {
-            super(Localization.lang("Autoset external links"));
+            super(Localization.lang("Automatically set file links"));
             addActionListener(this);
         }
 

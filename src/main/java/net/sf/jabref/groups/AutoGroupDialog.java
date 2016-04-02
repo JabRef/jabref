@@ -112,7 +112,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 }
 
                 m_groupsRoot.add(autoGroupsRoot);
-                NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
+                NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot, autoGroupsRoot,
                         UndoableAddOrRemoveGroup.ADD_NODE);
                 undo.setRevalidate(true);

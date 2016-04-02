@@ -109,7 +109,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (autoSet) {
             Collection<BibEntry> entries = new ArrayList<>(sel);
 
-            // Start the autosetting process:
+            // Start the automatically setting process:
             Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext().getMetaData(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
@@ -321,7 +321,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             + "a file in your file directory<BR>or a subdirectory is named identically to an entry's BibTeX key, plus extension.")
                     + "</HTML>");
 
-            builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
+            builder.addSeparator(Localization.lang("Automatically set file links")).xy(1, 1);
             builder.add(description).xy(1, 3);
             builder.add(autoSetUnset).xy(1, 5);
             builder.add(autoSetAll).xy(1, 6);
