@@ -101,7 +101,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
+                .getFileDirectory().toArray(new String[0]);
 
         File tmp = null;
         try {

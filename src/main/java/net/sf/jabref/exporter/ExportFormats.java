@@ -213,7 +213,7 @@ public class ExportFormats {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                            .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
+                            .getFileDirectory().toArray(new String[0]);
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:

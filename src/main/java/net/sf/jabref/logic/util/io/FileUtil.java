@@ -166,7 +166,7 @@ public class FileUtil {
         // Find the default directory for this field type, if any:
         List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = databaseContext.getFileDirectory();
         // Include the directory of the bib file:
         ArrayList<String> al = new ArrayList<>();
         for (String dir : directories) {

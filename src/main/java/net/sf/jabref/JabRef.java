@@ -350,7 +350,7 @@ public class JabRef {
                     }
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(theFile);
-                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
+                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
                     System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format == null) {

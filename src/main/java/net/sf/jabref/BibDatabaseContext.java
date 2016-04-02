@@ -167,4 +167,8 @@ public class BibDatabaseContext {
 
         return fileDirs;
     }
+
+    public List<String> getFileDirectory() {
+        return getFileDirectory(Globals.FILE_FIELD);
+    }
 }

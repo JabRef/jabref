@@ -160,7 +160,7 @@ public class CleanupAction extends AbstractWorker {
         // Create and run cleaner
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
         CleanupWorker cleaner = new CleanupWorker(preset,
-                bibDatabaseContext.getFileDirectory(Globals.FILE_FIELD), bibDatabaseContext.getDatabase(),
+                bibDatabaseContext.getFileDirectory(), bibDatabaseContext.getDatabase(),
                 Globals.journalAbbreviationLoader.getRepository());
         List<FieldChange> changes = cleaner.cleanup(entry);
 
