@@ -25,6 +25,6 @@ public class ClearFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Completely the field.");
+        return Localization.lang("Clears the field completely.");
     }
 }

@@ -97,7 +97,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 SaveActionsListModel m = (SaveActionsListModel) actionsList.getModel();
                 int index = actionsList.locationToIndex(e.getPoint());
                 if (index > -1) {
-                    actionsList.setToolTipText(m.getElementAt(index).getDescription());
+                    actionsList.setToolTipText(m.getElementAt(index).getFormatter().getDescription());
                 }
             }
         });
@@ -120,14 +120,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private void updateDescription() {
         FieldFormatterCleanup formatterCleanup = getFieldFormatterCleanup();
         if (formatterCleanup != null) {
-            descriptionText.setText(DESCRIPTION + formatterCleanup.getDescription());
+            descriptionText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
         } else {
             Formatter selectedFormatter = getFieldFormatter();
             if (selectedFormatter != null) {
-                // Create dummy FieldFormatterCleanup just for displaying the description
-                FieldFormatterCleanup displayFormatterCleanup = new FieldFormatterCleanup(
-                        Localization.lang("the given field"), selectedFormatter);
-                descriptionText.setText(DESCRIPTION + displayFormatterCleanup.getDescription());
+                descriptionText.setText(DESCRIPTION + selectedFormatter.getDescription());
             } else {
                 descriptionText.setText(DESCRIPTION);
             }
@@ -157,8 +154,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
                 if ((-1 < index) && (index < formatterDescriptions.size()) && (value != null)) {
-                    setToolTipText(String.format(formatterDescriptions.get(index),
-                            selectFieldCombobox.getSelectedItem().toString()));
+                    setToolTipText(formatterDescriptions.get(index));
                 }
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
