@@ -15,42 +15,30 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import javax.swing.*;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import net.sf.jabref.*;
+import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-
-import java.util.List;
-import java.util.Objects;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
@@ -85,9 +73,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableRows();
         previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
+                new PreviewPanel(panel.getDatabase(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
                         .get(JabRefPreferences.PREVIEW_0)),
-                new PreviewPanel(panel.database(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
+                new PreviewPanel(panel.getDatabase(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
                         .get(JabRefPreferences.PREVIEW_1))};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
