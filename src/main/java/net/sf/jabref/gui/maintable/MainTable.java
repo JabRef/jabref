@@ -110,8 +110,7 @@ public class MainTable extends JTable {
     }
 
 
-    public MainTable(MainTableFormat tableFormat, EventList<BibEntry> list, JabRefFrame frame,
-            BasePanel panel) {
+    public MainTable(MainTableFormat tableFormat, EventList<BibEntry> list, JabRefFrame frame, BasePanel panel) {
         super();
 
         addFocusListener(Globals.focusListener);
@@ -259,11 +258,6 @@ public class MainTable extends JTable {
             refreshSorting();
         }
     }
-
-    public boolean isFloatGroupingActive() {
-        return isFloatGroupingActive;
-    }
-
 
     public EventList<BibEntry> getTableRows() {
         return sortedForGrouping;
@@ -573,14 +567,6 @@ public class MainTable extends JTable {
         localSelectionModel.setSelectionInterval(row, row);
     }
 
-    /**
-     * Adds the given row to the selection
-     * @param row the row to add to the selection
-     */
-    public void addSelection(int row) {
-        this.localSelectionModel.addSelectionInterval(row, row);
-    }
-
     public int findEntry(BibEntry entry) {
         return sortedForGrouping.indexOf(entry);
     }
@@ -642,7 +628,7 @@ public class MainTable extends JTable {
 
     }
 
-    public void scrollToCenter(int rowIndex, int vColIndex) {
+    private void scrollToCenter(int rowIndex, int vColIndex) {
         if (!(this.getParent() instanceof JViewport)) {
             return;
         }
@@ -757,21 +743,6 @@ public class MainTable extends JTable {
         } else {
             return l.get(number);
         }
-    }
-
-    public PersistenceTableColumnListener getTableColumnListener() {
-        return tableColumnListener;
-    }
-
-    /**
-     * Returns the List of entries sorted by a user-selected term. This is the
-     * sorting before marking, search etc. applies.
-     *
-     * Note: The returned List must not be modified from the outside
-     * @return The sorted list of entries.
-     */
-    public SortedList<BibEntry> getSortedForTable() {
-        return sortedForTable;
     }
 
     public MainTableColumn getMainTableColumn(int modelIndex) {
