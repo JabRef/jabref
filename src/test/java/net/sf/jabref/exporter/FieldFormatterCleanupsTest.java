@@ -3,7 +3,6 @@ package net.sf.jabref.exporter;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -14,13 +13,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class FieldFormatterCleanupsTest {
 
@@ -155,14 +153,5 @@ public class FieldFormatterCleanupsTest {
         actions.applySaveActions(entry);
 
         assertEquals(Optional.empty(), entry.getFieldOptional("mont"));
-    }
-
-    @Test
-    public void getDescriptionCallsFormatter() {
-        Formatter formatter = mock(Formatter.class);
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup("testField", formatter);
-        when(formatter.getDescription()).thenReturn("Format field %s");
-
-        assertEquals("Format field testField", cleanup.getDescription());
     }
 }
