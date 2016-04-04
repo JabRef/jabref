@@ -113,7 +113,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -126,7 +125,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class TextInputDialog extends JDialog implements ActionListener {
+public class TextInputDialog extends JDialog {
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
     private final JButton insertButton = new JButton(Localization.lang("Insert"));
@@ -139,6 +138,10 @@ public class TextInputDialog extends JDialog implements ActionListener {
     private final JRadioButton overRadio = new JRadioButton(Localization.lang("Override"));
     private final JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
 
+    private final List<String> requiredFields = new ArrayList<>();
+    private final List<String> optionalFields = new ArrayList<>();
+    private final Color requiredColor;
+    private final Color optionalColor;
 
     private final BibEntry entry;
 
@@ -162,6 +165,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
         entry = bibEntry;
         marked = new TagToMarkedTextStore();
 
+        requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
+        optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
         jbInit();
         pack();
         updateSourceView();
@@ -286,17 +291,22 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // insert buttons
-        insertButton.addActionListener(this);
+        insertButton.addActionListener(event -> insertTextForTag());
 
         // parse with FreeCite button
-        parseWithFreeCiteButton.addActionListener(this);
+        parseWithFreeCiteButton.addActionListener(event -> {
+            if (parseWithFreeCiteAndAddEntries()) {
+                okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
+                dispose();
+            }
+        });
 
         // Radio buttons
-        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_BibTeX_key"));
+        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_BibTeX_field"));
         appRadio.setMnemonic(KeyEvent.VK_A);
         appRadio.setSelected(true);
 
-        overRadio.setToolTipText(Localization.lang("Override_the_BibTeX_key_by_the_selected_text"));
+        overRadio.setToolTipText(Localization.lang("Override_the_BibTeX_field_by_the_selected_text"));
         overRadio.setMnemonic(KeyEvent.VK_O);
         overRadio.setSelected(false);
 
@@ -345,8 +355,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
     }
 
     private void initButtonPanel() {
-        okButton.addActionListener(this);
-        cancelButton.addActionListener(this);
+        okButton.addActionListener(event -> {
+            okPressed = true;
+            dispose();
+        });
+        cancelButton.addActionListener(event -> dispose());
 
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -451,25 +464,6 @@ public class TextInputDialog extends JDialog implements ActionListener {
         return okPressed;
     }
 
-    //  ActionListener
-    //  handling of buttons-click actions
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object source = e.getSource();
-
-        if (source == this.okButton) {
-            okPressed = true;
-            dispose();
-        } else if (source == this.cancelButton) {
-            dispose();
-        } else if (source == this.insertButton) {
-            insertTextForTag();
-        } else if ((source == this.parseWithFreeCiteButton) && parseWithFreeCiteAndAddEntries()) {
-                okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
-                dispose();
-        }
-    }
-
     /**
      * tries to parse the pasted reference with freecite
      * @return true if successful, false otherwise
@@ -526,6 +520,8 @@ public class TextInputDialog extends JDialog implements ActionListener {
                 frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         if (type.isPresent()) {
             texFields.addAll(type.get().getAllFields());
+            requiredFields.addAll(type.get().getRequiredFieldsFlat());
+            optionalFields.addAll(type.get().getPrimaryOptionalFields());
         }
         List<String> internalFields = InternalBibtexFields.getAllFieldNames();
         for (String field : internalFields) {
@@ -682,6 +678,11 @@ public class TextInputDialog extends JDialog implements ActionListener {
             } else {
                 this.setIcon(needIcon);
                 this.setToolTipText(Localization.lang("Field is missing"));
+                if (requiredFields.contains(s)) {
+                    this.setBackground(requiredColor);
+                } else if (optionalFields.contains(s)) {
+                    this.setBackground(optionalColor);
+                }
             }
             return this;
         }
