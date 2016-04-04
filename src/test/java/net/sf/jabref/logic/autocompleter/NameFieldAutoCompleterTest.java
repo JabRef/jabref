@@ -97,19 +97,6 @@ public class NameFieldAutoCompleterTest {
     }
 
     @Test
-    public void completeLowercaseNameReturnsName() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Testname");
-        autoCompleter.addToIndex(entry);
-
-        List<String> result = autoCompleter.complete("test");
-        Assert.assertEquals(Arrays.asList("Testname"), result);
-    }
-
-    @Test
     public void completeNullReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);

@@ -97,19 +97,6 @@ public class EntireFieldAutoCompleterTest {
     }
 
     @Test
-    public void completeLowercaseValueReturnsValue() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
-        autoCompleter.addToIndex(entry);
-
-        List<String> result = autoCompleter.complete("testvalue");
-        Assert.assertEquals(Arrays.asList("testValue"), result);
-    }
-
-    @Test
     public void completeNullReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         EntireFieldAutoCompleter autoCompleter = new EntireFieldAutoCompleter("field", preferences);

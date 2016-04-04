@@ -77,19 +77,6 @@ public class BibtexKeyAutoCompleterTest {
     }
 
     @Test
-    public void completeLowercaseKeyReturnsKey() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "testKey");
-        autoCompleter.addToIndex(entry);
-
-        List<String> result = autoCompleter.complete("testkey");
-        Assert.assertEquals(Arrays.asList("testKey"), result);
-    }
-
-    @Test
     public void completeNullReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
