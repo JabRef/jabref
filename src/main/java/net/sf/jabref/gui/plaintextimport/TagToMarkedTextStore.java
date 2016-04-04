@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2016 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -31,7 +32,7 @@
 //
 // modified :
 
-package net.sf.jabref.wizard.text;
+package net.sf.jabref.gui.plaintextimport;
 
 import java.util.HashMap;
 import java.util.LinkedList;

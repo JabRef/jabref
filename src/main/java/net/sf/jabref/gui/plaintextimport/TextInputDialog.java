@@ -49,25 +49,31 @@
 //            - little help box
 //
 
-package net.sf.jabref.wizard.text.gui;
+package net.sf.jabref.gui.plaintextimport;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.ClipBoardManager;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.component.OverlayPanel;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.wizard.text.TagToMarkedTextStore;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -103,6 +109,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -123,9 +132,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TextInputDialog extends JDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
+
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
     private final JButton insertButton = new JButton(Localization.lang("Insert"));
@@ -135,52 +148,47 @@ public class TextInputDialog extends JDialog {
     private final JPanel rawPanel = new JPanel();
     private final JPanel sourcePanel = new JPanel();
     private JList<String> fieldList;
-    private final JRadioButton overRadio = new JRadioButton(Localization.lang("Override"));
-    private final JRadioButton appRadio = new JRadioButton(Localization.lang("Append"));
+    private final JRadioButton override = new JRadioButton(Localization.lang("Override"));
+    private final JRadioButton append = new JRadioButton(Localization.lang("Append"));
 
     private final List<String> requiredFields = new ArrayList<>();
     private final List<String> optionalFields = new ArrayList<>();
-    private final Color requiredColor;
-    private final Color optionalColor;
 
     private final BibEntry entry;
 
     private final JPopupMenu inputMenu = new JPopupMenu();
-    private StyledDocument doc; // content from inputPane
-    private JTextPane textPane;
-    private JTextArea preview;
+    private StyledDocument document; // content from inputPane
+    private final JTextPane textPane = new JTextPane();
+    private final JTextArea sourcePreview = new JTextArea();
 
-    private final TagToMarkedTextStore marked;
+    private final TagToMarkedTextStore markedTextStore;
 
     private final JabRefFrame frame;
 
     private boolean okPressed;
 
 
-    public TextInputDialog(JabRefFrame frame, String title, boolean modal, BibEntry bibEntry) {
-        super(frame, title, modal);
+    public TextInputDialog(JabRefFrame frame, BibEntry bibEntry) {
+        super(frame, true);
 
-        this.frame = frame;
+        this.frame = Objects.requireNonNull(frame);
 
-        entry = bibEntry;
-        marked = new TagToMarkedTextStore();
+        entry = Objects.requireNonNull(bibEntry);
+        markedTextStore = new TagToMarkedTextStore();
 
-        requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
-        optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
         jbInit();
         pack();
         updateSourceView();
     }
 
     private void jbInit() {
-        this.setModal(true);
         getContentPane().setLayout(new BorderLayout());
-        StringBuilder typeStr = new StringBuilder(Localization.lang("for"));
-        if ((entry != null) && (entry.getType() != null)) {
-            typeStr.append(' ').append(entry.getType());
+        StringBuilder typeStr = new StringBuilder("Plain text import");
+        if (entry.getType() != null) {
+            typeStr.append(' ').append(Localization.lang("for")).append(' ').append(entry.getType());
         }
 
-        typeStr.insert(0, Localization.lang("Plain_text_import") + " ");
+
         this.setTitle(typeStr.toString());
         getContentPane().add(panel1, BorderLayout.CENTER);
 
@@ -190,8 +198,8 @@ public class TextInputDialog extends JDialog {
 
         JTabbedPane tabbed = new JTabbedPane();
 
-        tabbed.add(rawPanel, Localization.lang("Raw_source"));
-        tabbed.add(sourcePanel, Localization.lang("BibTeX_source"));
+        tabbed.add(rawPanel, Localization.lang("Raw source"));
+        tabbed.add(sourcePanel, Localization.lang("BibTeX source"));
 
         // Panel Layout
         panel1.setLayout(new BorderLayout());
@@ -216,29 +224,28 @@ public class TextInputDialog extends JDialog {
         rawPanel.setLayout(new BorderLayout());
 
         // Textarea
-        textPane = new JTextPane();
-
         textPane.setEditable(false);
 
-        doc = textPane.getStyledDocument();
-        addStylesToDocument(doc);
+        document = textPane.getStyledDocument();
+        addStylesToDocument();
 
         try {
-            doc.insertString(0, "", doc.getStyle("regular"));
+            document.insertString(0, "", document.getStyle("regular"));
         } catch (BadLocationException ignored) {
             // Ignored
         }
 
-        OverlayPanel testPanel = new OverlayPanel(textPane,
-                Localization.lang("paste_text_here"));
+        OverlayPanel testPanel = new OverlayPanel(textPane, Localization.lang("paste text here"));
 
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
 
         // copy/paste Menu
         PasteAction pasteAction = new PasteAction();
+        ClearAction clearAction = new ClearAction();
         JMenuItem pasteMI = new JMenuItem(pasteAction);
-        inputMenu.add(new MenuHeaderAction());
+
+        inputMenu.add(clearAction);
         inputMenu.addSeparator();
         inputMenu.add(pasteMI);
 
@@ -249,7 +256,7 @@ public class TextInputDialog extends JDialog {
 
         // Toolbar
         JToolBar toolBar = new OSXCompatibleToolbar();
-        toolBar.add(new ClearAction());
+        toolBar.add(clearAction);
         toolBar.setBorderPainted(false);
         toolBar.addSeparator();
         toolBar.add(pasteAction);
@@ -275,7 +282,7 @@ public class TextInputDialog extends JDialog {
         TitledBorder titledBorder1 = new TitledBorder(
                 BorderFactory.createLineBorder(
                         new Color(153, 153, 153), 2),
-                Localization.lang("Work_options"));
+                Localization.lang("Work options"));
         inputPanel.setBorder(titledBorder1);
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
@@ -302,22 +309,22 @@ public class TextInputDialog extends JDialog {
         });
 
         // Radio buttons
-        appRadio.setToolTipText(Localization.lang("Append_the_selected_text_to_BibTeX_field"));
-        appRadio.setMnemonic(KeyEvent.VK_A);
-        appRadio.setSelected(true);
+        append.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
+        append.setMnemonic(KeyEvent.VK_A);
+        append.setSelected(true);
 
-        overRadio.setToolTipText(Localization.lang("Override_the_BibTeX_field_by_the_selected_text"));
-        overRadio.setMnemonic(KeyEvent.VK_O);
-        overRadio.setSelected(false);
+        override.setToolTipText(Localization.lang("Override the BibTeX field by the selected text"));
+        override.setMnemonic(KeyEvent.VK_O);
+        override.setSelected(false);
 
         //Group the radio buttons.
         ButtonGroup group = new ButtonGroup();
-        group.add(appRadio);
-        group.add(overRadio);
+        group.add(append);
+        group.add(override);
 
         JPanel radioPanel = new JPanel(new GridLayout(0, 1));
-        radioPanel.add(appRadio);
-        radioPanel.add(overRadio);
+        radioPanel.add(append);
+        radioPanel.add(override);
 
         // insert sub components
         JLabel label1 = new JLabel(Localization.lang("Available BibTeX fields"));
@@ -370,12 +377,11 @@ public class TextInputDialog extends JDialog {
         bb.addGlue();
     }
 
-    // Panel with bibtex source code
+    // Panel with BibTeX source code
     private void initSourcePanel() {
-        preview = new JTextArea();
-        preview.setEditable(false);
-
-        JScrollPane paneScrollPane = new JScrollPane(preview);
+        sourcePreview.setEditable(false);
+        sourcePreview.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        JScrollPane paneScrollPane = new JScrollPane(sourcePreview);
         paneScrollPane.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         paneScrollPane.setPreferredSize(new Dimension(500, 255));
@@ -385,76 +391,70 @@ public class TextInputDialog extends JDialog {
         sourcePanel.add(paneScrollPane, BorderLayout.CENTER);
     }
 
-    private void addStylesToDocument(StyledDocument document) {
+    private void addStylesToDocument() {
         //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        Style defaultStyle = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
 
-        Style regular = document.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "SansSerif");
-        StyleConstants.setFontSize(def, 12);
+        Style regularStyle = document.addStyle("regular", defaultStyle);
+        StyleConstants.setFontFamily(defaultStyle, "SansSerif");
+        StyleConstants.setFontSize(defaultStyle, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
-        Style s = document.addStyle("oldused", regular);
-        StyleConstants.setItalic(s, true);
-        StyleConstants.setForeground(s, Color.blue);
-
-        s = document.addStyle("used", regular);
+        Style s = document.addStyle("used", regularStyle);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.blue);
 
-        s = document.addStyle("marked", regular);
+        s = document.addStyle("marked", regularStyle);
         StyleConstants.setBold(s, true);
         StyleConstants.setForeground(s, Color.red);
-
-        s = document.addStyle("small", regular);
-        StyleConstants.setFontSize(s, 10);
-
-        s = document.addStyle("large", regular);
-        StyleConstants.setFontSize(s, 16);
     }
 
     private void insertTextForTag() {
-        String type = fieldList.getSelectedValue();
-        if (type != null) {
+        String fieldName = fieldList.getSelectedValue();
+        if (fieldName != null) {
             String txt = textPane.getSelectedText();
 
             if (txt != null) {
-                int selStart = textPane.getSelectionStart();
-                int selEnd = textPane.getSelectionEnd();
+                int selectionStart = textPane.getSelectionStart();
+                int selectionEnd = textPane.getSelectionEnd();
 
                 // unselect text
-                textPane.setSelectionEnd(selStart);
+                textPane.setSelectionEnd(selectionStart);
 
                 // mark the selected text as "used"
-                doc.setCharacterAttributes(selStart, selEnd - selStart,
-                        doc.getStyle("marked"), true);
+                document.setCharacterAttributes(selectionStart, selectionEnd - selectionStart,
+                        document.getStyle("marked"), true);
 
                 // override an existing entry
-                if (overRadio.isSelected()) {
-                    entry.setField(type, txt);
+                if (override.isSelected()) {
+                    entry.setField(fieldName, txt);
                     // erase old text selection
-                    marked.setStyleForTag(type, "regular", doc); // delete all previous styles
-                    marked.insertPosition(type, selStart, selEnd); // insert new selection style
+                    markedTextStore.setStyleForTag(fieldName, "regular", document); // delete all previous styles
+                    markedTextStore.insertPosition(fieldName, selectionStart, selectionEnd); // insert new selection style
                 } else {
                     // memorize the selection for text highlighting
-                    marked.appendPosition(type, selStart, selEnd);
+                    markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
-                    // get old text from bibtex tag
-                    String old = entry.getField(type);
+                    // get old text from BibTeX tag
+                    String old = entry.getField(fieldName);
 
                     // merge old and selected text
                     if (old == null) {
                         // "null"+"txt" Strings forbidden
-                        entry.setField(type, txt);
+                        entry.setField(fieldName, txt);
                     } else {
-                        // insert a new author or editor with an additional "and"
-                        if ("author".equals(type) || "editor".equals(type)) {
-                            entry.setField(type, old + " and " + txt);
+                        // insert a new name with an additional "and"
+                        if (InternalBibtexFields.getFieldExtras(fieldName)
+                                .contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+                            entry.setField(fieldName, old + " and " + txt);
+                        } else if ("keywords".equals(fieldName)) {
+                            // Add keyword
+                                entry.addKeyword(txt);
                         } else {
-                            entry.setField(type, old + txt);
+                            entry.setField(fieldName, old + txt);
                         }
                     }
                 }
-                // make the new data in bibtex source code visible
+                // make the new data in BibTeX source code visible
                 updateSourceView();
             }
         }
@@ -505,10 +505,9 @@ public class TextInputDialog extends JDialog {
         StringWriter sw = new StringWriter(200);
         try {
             new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-            String srcString = sw.getBuffer().toString();
-            preview.setText(srcString);
-        } catch (IOException ignored) {
-            // Ignored
+            sourcePreview.setText(sw.getBuffer().toString());
+        } catch (IOException ex) {
+            LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
         }
 
         fieldList.clearSelection();
@@ -532,7 +531,8 @@ public class TextInputDialog extends JDialog {
         return texFields.toArray(new String[texFields.size()]);
     }
 
-    class PasteAction extends BasicAction {
+
+    private class PasteAction extends BasicAction {
         public PasteAction() {
             super(Localization.lang("Paste"),
                     Localization.lang("Paste from clipboard"),
@@ -550,7 +550,7 @@ public class TextInputDialog extends JDialog {
                 }
                 int cPos = textPane.getCaretPosition();
                 try {
-                    doc.insertString(cPos, data, doc.getStyle("regular"));
+                    document.insertString(cPos, data, document.getStyle("regular"));
                 } catch (BadLocationException ignored) {
                     // Ignored
                 }
@@ -558,7 +558,7 @@ public class TextInputDialog extends JDialog {
         }
     }
 
-    class LoadAction extends BasicAction {
+    private class LoadAction extends BasicAction {
         public LoadAction() {
             super(Localization.lang("Open"),
                     Localization.lang("Open file"),
@@ -571,22 +571,22 @@ public class TextInputDialog extends JDialog {
                 String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
-                    doc.remove(0, doc.getLength());
+                    document.remove(0, document.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
                         try (FileInputStream fis = new FileInputStream(newFile)) {
-                            eKit.read(fis, doc, 0);
-                            doc.setLogicalStyle(0, doc.getStyle("regular"));
+                            eKit.read(fis, document, 0);
+                            document.setLogicalStyle(0, document.getStyle("regular"));
                         }
                     }
                 }
-            } catch (BadLocationException | IOException ignored) {
-                // Ignored
+            } catch (BadLocationException | IOException ex) {
+                LOGGER.warn("Problem reading or inserting file", ex);
             }
         }
     }
 
-    class ClearAction extends BasicAction {
+    private class ClearAction extends BasicAction {
         public ClearAction() {
             super(Localization.lang("Clear"),
                     Localization.lang("Clear inputarea"),
@@ -596,18 +596,6 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             textPane.setText("");
-        }
-    }
-
-    static class MenuHeaderAction extends BasicAction {
-        public MenuHeaderAction() {
-            super(Localization.lang("Edit"));
-            this.setEnabled(false);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Do nothing
         }
     }
 
@@ -625,11 +613,11 @@ public class TextInputDialog extends JDialog {
                 if (!isAdjusting) {
                     if (lastIndex > -1) {
                         String tag1 = fieldList.getModel().getElementAt(lastIndex);
-                        marked.setStyleForTag(tag1, "used", doc);
+                        markedTextStore.setStyleForTag(tag1, "used", document);
                     }
 
                     String tag2 = fieldList.getModel().getElementAt(index);
-                    marked.setStyleForTag(tag2, "marked", doc);
+                    markedTextStore.setStyleForTag(tag2, "marked", document);
 
                     lastIndex = index;
                 }
@@ -639,11 +627,13 @@ public class TextInputDialog extends JDialog {
 
     // simple JList Renderer
     // based on : Advanced JList Programming at developers.sun.com
-    class SimpleCellRenderer extends DefaultListCellRenderer {
+    private class SimpleCellRenderer extends DefaultListCellRenderer {
         private final Font baseFont;
         private final Font usedFont;
         private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
         private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
+        private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
+        private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
@@ -678,11 +668,11 @@ public class TextInputDialog extends JDialog {
             } else {
                 this.setIcon(needIcon);
                 this.setToolTipText(Localization.lang("Field is missing"));
-                if (requiredFields.contains(s)) {
-                    this.setBackground(requiredColor);
-                } else if (optionalFields.contains(s)) {
-                    this.setBackground(optionalColor);
-                }
+            }
+            if (requiredFields.contains(s)) {
+                this.setBackground(requiredColor);
+            } else if (optionalFields.contains(s)) {
+                this.setBackground(optionalColor);
             }
             return this;
         }
