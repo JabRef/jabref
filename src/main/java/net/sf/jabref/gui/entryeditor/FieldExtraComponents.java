@@ -32,6 +32,8 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
@@ -305,7 +307,8 @@ public class FieldExtraComponents {
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                 storeFieldAction, false,
-                "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
+                InternalBibtexFields.getFieldExtras(editor.getFieldName())
+                        .contains(BibtexSingleFieldProperties.PERSON_NAMES) ? " and " : ", ");
         contentSelectors.add(ws);
         return Optional.of(ws);
     }

@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -39,8 +41,11 @@ public class IntegrityCheck {
             return result;
         }
 
-        result.addAll(new AuthorNameChecker("author").check(entry));
-        result.addAll(new AuthorNameChecker("editor").check(entry));
+        for (String fieldName : entry.getFieldNames()) {
+            if (InternalBibtexFields.getFieldExtras(fieldName).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+                result.addAll(new AuthorNameChecker(fieldName).check(entry));
+            }
+        }
 
         if (!bibDatabaseContext.isBiblatexMode()) {
             result.addAll(new TitleChecker().check(entry));

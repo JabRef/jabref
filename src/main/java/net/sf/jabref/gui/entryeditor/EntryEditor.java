@@ -456,13 +456,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER)) {
+                || fieldExtras.contains(BibtexSingleFieldProperties.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER));
+                    fieldExtras.contains(BibtexSingleFieldProperties.DATE));
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.JOURNAL_NAMES)) {
+        } else if (fieldExtras.contains(BibtexSingleFieldProperties.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
@@ -474,7 +474,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.SET_OWNER)) {
+        } else if (fieldExtras.contains(BibtexSingleFieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);

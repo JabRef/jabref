@@ -18,6 +18,9 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Arrays;
 import java.util.Objects;
 
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+
 /**
  * Returns an autocompleter to a given fieldname.
  *
@@ -35,7 +38,7 @@ public class AutoCompleterFactory {
     public AutoCompleter<String> getFor(String fieldName) {
         Objects.requireNonNull(fieldName);
 
-        if ("author".equals(fieldName) || "editor".equals(fieldName)) {
+        if (InternalBibtexFields.getFieldExtras(fieldName).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
         } else if ("crossref".equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);

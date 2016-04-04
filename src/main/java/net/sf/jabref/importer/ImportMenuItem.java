@@ -28,7 +28,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -189,7 +188,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 } else {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
+                            openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
                     diag.setLocationRelativeTo(frame);

@@ -871,4 +871,10 @@ public class BibLatexEntryTypes {
     public static Optional<EntryType> getType(String name) {
         return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
     }
+
+    public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList("author", "editor", "editora",
+    "editorb", "editorc", "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
+    "bookauthor", "holder", "shortauthor", "shorteditor");
+
+    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList("date", "eventdate", "origdate", "urldate");
 }

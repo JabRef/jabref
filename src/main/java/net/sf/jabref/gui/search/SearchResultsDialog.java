@@ -58,6 +58,7 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -478,7 +479,7 @@ public class SearchResultsDialog {
             }
             else {
                 String field = FIELDS[column - PAD];
-                if ("author".equals(field) || "editor".equals(field)) {
+                if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {

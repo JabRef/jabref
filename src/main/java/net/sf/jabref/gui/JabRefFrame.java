@@ -18,7 +18,6 @@ package net.sf.jabref.gui;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
@@ -1717,7 +1716,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
         SwingUtilities.invokeLater(() -> {
             ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
-                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    Localization.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.entryListComplete();
             diag.setLocationRelativeTo(JabRefFrame.this);

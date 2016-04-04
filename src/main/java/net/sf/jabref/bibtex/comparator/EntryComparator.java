@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -76,7 +77,7 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if ("author".equals(sortField) || "editor".equals(sortField)) {
+        if (InternalBibtexFields.getFieldExtras(sortField).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
             }
