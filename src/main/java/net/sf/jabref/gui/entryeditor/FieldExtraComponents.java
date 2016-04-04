@@ -15,45 +15,39 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
-import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLUtil;
+import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
 
 public class FieldExtraComponents {
 
@@ -118,6 +112,7 @@ public class FieldExtraComponents {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
         JButton button = new JButton(Localization.lang("Open"));
+        button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
                 JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
@@ -127,6 +122,33 @@ public class FieldExtraComponents {
         });
 
         controls.add(button, BorderLayout.SOUTH);
+
+        // enable/disable button
+        JTextComponent url = (JTextComponent) fieldEditor;
+
+        DocumentListener documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            private void checkUrl(DocumentEvent documentEvent) {
+                if (URLUtil.isURL(url.getText())) {
+                    button.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                }
+            }
+        };
+        url.getDocument().addDocumentListener(documentListener);
+
         return Optional.of(controls);
     }
 
@@ -141,6 +163,7 @@ public class FieldExtraComponents {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
         JButton button = new JButton(Localization.lang("Open"));
+        button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
                 JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
@@ -149,10 +172,38 @@ public class FieldExtraComponents {
             }
         });
         JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
+        fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> new MergeEntryDOIDialog(panel));
 
         controls.add(button, BorderLayout.NORTH);
         controls.add(fetchButton, BorderLayout.SOUTH);
+
+        // enable/disable button
+        JTextComponent doi = (JTextComponent) fieldEditor;
+
+        DocumentListener documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            private void checkDoi(DocumentEvent documentEvent) {
+                Optional<DOI> doiUrl = DOI.build(doi.getText());
+                if(doiUrl.isPresent()) {
+                    button.setEnabled(true);
+                    fetchButton.setEnabled(true);
+                }
+            }
+        };
+        doi.getDocument().addDocumentListener(documentListener);
+
         return Optional.of(controls);
     }
 
