@@ -26,7 +26,7 @@ public class AttachFileAction implements BaseAction {
     @Override
     public void action() {
         if (panel.getSelectedEntries().size() != 1) {
-            panel.output(Localization.lang("No entries or multiple entries selected."));
+            panel.output(Localization.lang("This operation requires exactly one item to be selected."));
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);

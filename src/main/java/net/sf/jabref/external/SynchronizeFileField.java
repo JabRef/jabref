@@ -91,7 +91,7 @@ public class SynchronizeFileField extends AbstractWorker {
     @Override
     public void run() {
         if (!goOn) {
-            panel.output(Localization.lang("No entries selected."));
+            panel.output(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
         entriesChangedCount = 0;

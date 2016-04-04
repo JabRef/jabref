@@ -34,7 +34,8 @@ public class AutoLinkFilesAction extends AbstractAction {
     public void actionPerformed(ActionEvent event) {
         List<BibEntry> entries = JabRef.jrf.getCurrentBasePanel().getSelectedEntries();
         if (entries.isEmpty()) {
-            JabRef.jrf.getCurrentBasePanel().output(Localization.lang("No entries selected."));
+            JabRef.jrf.getCurrentBasePanel()
+                    .output(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
