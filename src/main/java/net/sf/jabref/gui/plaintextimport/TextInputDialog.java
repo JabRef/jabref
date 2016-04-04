@@ -516,9 +516,7 @@ public class TextInputDialog extends JDialog {
             return false;
         } else {
             UpdateField.setAutomaticFields(importedEntries, false, false);
-            boolean markEntries = (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                    && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                            || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)));
+            boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {
                 if (markEntries) {
