@@ -173,6 +173,7 @@ public class JabRefPreferences {
     public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
     public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+    public static final String SEARCH_LIVE = "searchLive";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -594,6 +595,7 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_MODE_FILTER, Boolean.TRUE);
+        defaults.put(SEARCH_LIVE, Boolean.TRUE);
 
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);

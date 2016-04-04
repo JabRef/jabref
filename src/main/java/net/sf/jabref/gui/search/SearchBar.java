@@ -17,9 +17,6 @@ package net.sf.jabref.gui.search;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -67,6 +64,7 @@ public class SearchBar extends JPanel {
 
     private final JToggleButton caseSensitive;
     private final JToggleButton regularExp;
+    private final JToggleButton liveSearch;
 
     private final JLabel currentResults = new JLabel("");
 
@@ -101,6 +99,14 @@ public class SearchBar extends JPanel {
             updatePreferences();
         });
 
+
+        liveSearch = new JToggleButton(IconTheme.JabRefIcon.AUTO_RENEW.getSmallIcon(),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_LIVE));
+        liveSearch.setToolTipText(Localization.lang("Search on typing"));
+        liveSearch.addActionListener(e -> {
+            performSearchIfLive();
+            updatePreferences();
+        });
 
         openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
@@ -142,6 +148,7 @@ public class SearchBar extends JPanel {
         toolBar.add(regularExp);
         toolBar.add(caseSensitive);
         toolBar.addSeparator();
+        toolBar.add(liveSearch);
         toolBar.add(searchModeButton);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
@@ -224,7 +231,7 @@ public class SearchBar extends JPanel {
         searchField.addActionListener(e -> performSearch());
 
         // Subscribe to changes to the text in the search field in order to "live search"
-        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearch());
+        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearchIfLive());
 
         return searchField;
     }
@@ -245,6 +252,7 @@ public class SearchBar extends JPanel {
 
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE, caseSensitive.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_REG_EXP, regularExp.isSelected());
+        Globals.prefs.putBoolean(JabRefPreferences.SEARCH_LIVE, liveSearch.isSelected());
     }
 
     /**
@@ -276,6 +284,16 @@ public class SearchBar extends JPanel {
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     }
 
+
+
+    /**
+     * Checks if the search should be "live" and then performs a new search based on the current search query.
+     */
+    private void performSearchIfLive() {
+        if (liveSearch.isSelected()) {
+            performSearch();
+        }
+    }
     /**
      * Performs a new search based on the current search query.
      */
