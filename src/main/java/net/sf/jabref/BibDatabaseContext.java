@@ -49,11 +49,12 @@ public class BibDatabaseContext {
 
         if (!mode.isPresent()) {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
+            BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
             if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                return BibDatabaseMode.BIBLATEX;
-            } else {
-                return BibDatabaseMode.BIBTEX;
+                newMode =  BibDatabaseMode.BIBLATEX;
             }
+            this.setMode(newMode);
+            return newMode;
         }
         return mode.get();
     }
