@@ -85,8 +85,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             return;
         }
 
+        // only handle plain key or SHIFT+key
         if ((e.getModifiers() | InputEvent.SHIFT_MASK) != InputEvent.SHIFT_MASK) {
-            // TODO: plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             return;
         }
 
@@ -221,6 +221,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             }
         } catch (BadLocationException ignore) {
             // potentially thrown by textField.getText()
+            LOGGER.warn("Cannot extract text from field. Wrong caret position given.");
         }
 
         return result;

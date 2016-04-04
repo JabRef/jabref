@@ -1,16 +1,17 @@
 package net.sf.jabref.gui.autocompleter;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AutoCompleteState {
-    private List<String> suggestions;
+    private final List<String> suggestions;
     private String currentWord;
     private int currentCompletion;
     private int realCaretPosition;
 
     public AutoCompleteState(String currentWord, List<String> suggestions, int caretPosition) {
-        this.currentWord = currentWord;
-        this.suggestions = suggestions;
+        this.currentWord = Objects.requireNonNull(currentWord);
+        this.suggestions = Objects.requireNonNull(suggestions);
         realCaretPosition = caretPosition;
         currentCompletion = 0;
     }
