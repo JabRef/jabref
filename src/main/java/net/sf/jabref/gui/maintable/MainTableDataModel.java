@@ -73,6 +73,9 @@ public class MainTableDataModel {
         searchComparator = null;
         groupComparator = null;
         markingComparator = null;
+
+        updateSearchState(DisplayOption.DISABLED);
+        updateGroupingState(DisplayOption.DISABLED);
     }
 
     public void updateSearchState(DisplayOption searchState) {
