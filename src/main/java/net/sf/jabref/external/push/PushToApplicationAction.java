@@ -67,7 +67,10 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : entries) {
                 if ((entry.getCiteKey() == null) || entry.getCiteKey().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("This operation requires all selected entries to have BibTex keys defined."), (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame,
+                            Localization
+                                    .lang("This operation requires all selected entries to have BibTeX keys defined."),
+                            (String) getValue(Action.NAME), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }

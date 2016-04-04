@@ -13,6 +13,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Added missing German translations
 - Swedish is added as a language option (still not a complete translation)
 - The OpenOffice/LibreOffice style file handling is changed to have only a single list of available style and you need to add your custom styles again
 - OpenOffice/LibreOffice style files are now always read and written with the same default encoding as for the database (found in the preferences)
@@ -48,7 +49,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#462](https://github.com/JabRef/jabref/issues/462): Add new action to open console where opened database file is located. New button, menu entry and shortcut (CTRL+SHIFT+J) for this action have also been added.
 - [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
 - [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
-
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
 
 ### Fixed
