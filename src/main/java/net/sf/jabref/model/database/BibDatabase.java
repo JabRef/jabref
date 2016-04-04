@@ -99,7 +99,7 @@ public class BibDatabase {
      * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
     public boolean containsEntryWithId(String id) {
-        return entries.stream().anyMatch(entry -> entry.getId().equals(id));
+        return allKeys.containsKey(id);
     }
 
     public List<BibEntry> getEntries() {
