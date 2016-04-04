@@ -151,6 +151,7 @@ public class TextInputDialog extends JDialog {
     private JList<String> fieldList;
     private final JRadioButton override = new JRadioButton(Localization.lang("Override"));
     private final JRadioButton append = new JRadioButton(Localization.lang("Append"));
+    private final JToolBar toolBar = new OSXCompatibleToolbar();
 
     private final List<String> allFields = new ArrayList<>();
     private final List<String> requiredFields = new ArrayList<>();
@@ -242,35 +243,50 @@ public class TextInputDialog extends JDialog {
         testPanel.setPreferredSize(new Dimension(450, 255));
         testPanel.setMaximumSize(new Dimension(450, Integer.MAX_VALUE));
 
-        // copy/paste Menu
-        PasteAction pasteAction = new PasteAction();
-        ClearAction clearAction = new ClearAction();
-        JMenuItem pasteMI = new JMenuItem(pasteAction);
+        // Setup fields (required to be done before setting up popup menu)
+        fieldList = new JList<>(getAllFields());
+        fieldList.setCellRenderer(new SimpleCellRenderer(fieldList.getFont()));
+        ListSelectionModel listSelectionModel = fieldList.getSelectionModel();
+        listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listSelectionModel.addListSelectionListener(new FieldListSelectionHandler());
+        fieldList.addMouseListener(new FieldListMouseListener());
 
-        inputMenu.add(clearAction);
-        inputMenu.addSeparator();
-        inputMenu.add(pasteMI);
-        inputMenu.addSeparator();
-
+        // After the call to getAllFields
+        initPopupMenuAndToolbar();
 
         //Add listener to components that can bring up popup menus.
         MouseListener popupListener = new PopupListener(inputMenu);
         textPane.addMouseListener(popupListener);
         testPanel.addMouseListener(popupListener);
 
-        // Toolbar
-        JToolBar toolBar = new OSXCompatibleToolbar();
-        toolBar.add(clearAction);
-        toolBar.setBorderPainted(false);
-        toolBar.addSeparator();
-        toolBar.add(pasteAction);
-        toolBar.add(new LoadAction());
-
         JPanel leftPanel = new JPanel(new BorderLayout());
 
         leftPanel.add(toolBar, BorderLayout.NORTH);
         leftPanel.add(testPanel, BorderLayout.CENTER);
 
+        JPanel inputPanel = setUpFieldListPanel();
+
+        // parse with FreeCite button
+        parseWithFreeCiteButton.addActionListener(event -> {
+            if (parseWithFreeCiteAndAddEntries()) {
+                okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
+                dispose();
+            }
+        });
+
+        rawPanel.add(leftPanel, BorderLayout.CENTER);
+        rawPanel.add(inputPanel, BorderLayout.EAST);
+
+        JLabel desc = new JLabel("<html><h3>" + Localization.lang("Plain text import") + "</h3><p>"
+                + Localization.lang("This is a simple copy and paste dialog. First load or paste some text into "
+                + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
+                + "</p></html>");
+        desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        rawPanel.add(desc, BorderLayout.SOUTH);
+    }
+
+    private JPanel setUpFieldListPanel() {
         JPanel inputPanel = new JPanel();
 
         // Panel Layout
@@ -283,47 +299,20 @@ public class TextInputDialog extends JDialog {
         inputPanel.setLayout(gbl);
 
         // Border
-        TitledBorder titledBorder1 = new TitledBorder(
-                BorderFactory.createLineBorder(
-                        new Color(153, 153, 153), 2),
+        TitledBorder titledBorder1 = new TitledBorder(BorderFactory.createLineBorder(new Color(153, 153, 153), 2),
                 Localization.lang("Work options"));
         inputPanel.setBorder(titledBorder1);
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
-        fieldList = new JList<>(getAllFields());
-        fieldList.setCellRenderer(new SimpleCellRenderer(fieldList.getFont()));
-        ListSelectionModel listSelectionModel = fieldList.getSelectionModel();
-        listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listSelectionModel.addListSelectionListener(new FieldListSelectionHandler());
-        fieldList.addMouseListener(new FieldListMouseListener());
 
         JScrollPane fieldScroller = new JScrollPane(fieldList);
         fieldScroller.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        // Right-click append/override
-        JMenu appendMenu = new JMenu(Localization.lang("Append"));
-        appendMenu.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
-        JMenu overrideMenu = new JMenu(Localization.lang("Override"));
-        overrideMenu.setToolTipText(Localization.lang("Override the BibTeX field by the selected text"));
-        for (String field : allFields) {
-            appendMenu.add(new JMenuItem(new MenuTextForTagAction(field, false)));
-            overrideMenu.add(new JMenuItem(new MenuTextForTagAction(field, true)));
-        }
-
-        inputMenu.add(appendMenu);
-        inputMenu.add(overrideMenu);
 
         // insert buttons
         insertButton.addActionListener(event -> insertTextForTag(override.isSelected()));
 
-        // parse with FreeCite button
-        parseWithFreeCiteButton.addActionListener(event -> {
-            if (parseWithFreeCiteAndAddEntries()) {
-                okPressed = false; // we do not want to have the super method to handle our entries, we do it on our own
-                dispose();
-            }
-        });
 
         // Radio buttons
         append.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
@@ -365,17 +354,42 @@ public class TextInputDialog extends JDialog {
         con.gridwidth = GridBagConstraints.REMAINDER;
         gbl.setConstraints(insertButton, con);
         inputPanel.add(insertButton);
+        return inputPanel;
+    }
 
-        rawPanel.add(leftPanel, BorderLayout.CENTER);
-        rawPanel.add(inputPanel, BorderLayout.EAST);
+    private void initPopupMenuAndToolbar() {
+        // copy/paste Menu
+        PasteAction pasteAction = new PasteAction();
+        ClearAction clearAction = new ClearAction();
+        JMenuItem pasteMI = new JMenuItem(pasteAction);
 
-        JLabel desc = new JLabel("<html><h3>" + Localization.lang("Plain text import") + "</h3><p>"
-                + Localization.lang("This is a simple copy and paste dialog. First load or paste some text into "
-                + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
-                + "</p></html>");
-        desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        inputMenu.add(clearAction);
+        inputMenu.addSeparator();
+        inputMenu.add(pasteMI);
+        inputMenu.addSeparator();
 
-        rawPanel.add(desc, BorderLayout.SOUTH);
+        // Right-click append/override
+        JMenu appendMenu = new JMenu(Localization.lang("Append"));
+        appendMenu.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
+        JMenu overrideMenu = new JMenu(Localization.lang("Override"));
+        overrideMenu.setToolTipText(Localization.lang("Override the BibTeX field by the selected text"));
+        for (String field : allFields) {
+            appendMenu.add(new JMenuItem(new MenuTextForTagAction(field, false)));
+            overrideMenu.add(new JMenuItem(new MenuTextForTagAction(field, true)));
+        }
+
+        inputMenu.add(appendMenu);
+        inputMenu.add(overrideMenu);
+
+
+
+        // Toolbar
+
+        toolBar.add(clearAction);
+        toolBar.setBorderPainted(false);
+        toolBar.addSeparator();
+        toolBar.add(pasteAction);
+        toolBar.add(new LoadAction());
     }
 
     private void initButtonPanel() {
@@ -558,18 +572,16 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
-            if (data != null) {
-                int selStart = textPane.getSelectionStart();
-                int selEnd = textPane.getSelectionEnd();
-                if ((selEnd - selStart) > 0) {
-                    textPane.replaceSelection("");
-                }
-                int cPos = textPane.getCaretPosition();
-                try {
-                    document.insertString(cPos, data, document.getStyle("regular"));
-                } catch (BadLocationException ignored) {
-                    // Ignored
-                }
+            int selStart = textPane.getSelectionStart();
+            int selEnd = textPane.getSelectionEnd();
+            if ((selEnd - selStart) > 0) {
+                textPane.replaceSelection("");
+            }
+            int cPos = textPane.getCaretPosition();
+            try {
+                document.insertString(cPos, data, document.getStyle("regular"));
+            } catch (BadLocationException ex) {
+                LOGGER.warn("Could not paste text", ex);
             }
         }
     }
