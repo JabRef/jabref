@@ -89,6 +89,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -151,6 +152,7 @@ public class TextInputDialog extends JDialog {
     private final JRadioButton override = new JRadioButton(Localization.lang("Override"));
     private final JRadioButton append = new JRadioButton(Localization.lang("Append"));
 
+    private final List<String> allFields = new ArrayList<>();
     private final List<String> requiredFields = new ArrayList<>();
     private final List<String> optionalFields = new ArrayList<>();
 
@@ -248,6 +250,8 @@ public class TextInputDialog extends JDialog {
         inputMenu.add(clearAction);
         inputMenu.addSeparator();
         inputMenu.add(pasteMI);
+        inputMenu.addSeparator();
+
 
         //Add listener to components that can bring up popup menus.
         MouseListener popupListener = new PopupListener(inputMenu);
@@ -297,8 +301,21 @@ public class TextInputDialog extends JDialog {
         fieldScroller.setVerticalScrollBarPolicy(
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+        // Right-click append/override
+        JMenu appendMenu = new JMenu(Localization.lang("Append"));
+        appendMenu.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
+        JMenu overrideMenu = new JMenu(Localization.lang("Override"));
+        overrideMenu.setToolTipText(Localization.lang("Override the BibTeX field by the selected text"));
+        for (String field : allFields) {
+            appendMenu.add(new JMenuItem(new MenuTextForTagAction(field, false)));
+            overrideMenu.add(new JMenuItem(new MenuTextForTagAction(field, true)));
+        }
+
+        inputMenu.add(appendMenu);
+        inputMenu.add(overrideMenu);
+
         // insert buttons
-        insertButton.addActionListener(event -> insertTextForTag());
+        insertButton.addActionListener(event -> insertTextForTag(override.isSelected()));
 
         // parse with FreeCite button
         parseWithFreeCiteButton.addActionListener(event -> {
@@ -408,7 +425,7 @@ public class TextInputDialog extends JDialog {
         StyleConstants.setForeground(s, Color.red);
     }
 
-    private void insertTextForTag() {
+    private void insertTextForTag(boolean overrideField) {
         String fieldName = fieldList.getSelectedValue();
         if (fieldName != null) {
             String txt = textPane.getSelectedText();
@@ -425,7 +442,7 @@ public class TextInputDialog extends JDialog {
                         document.getStyle("marked"), true);
 
                 // override an existing entry
-                if (override.isSelected()) {
+                if (overrideField) {
                     entry.setField(fieldName, txt);
                     // erase old text selection
                     markedTextStore.setStyleForTag(fieldName, "regular", document); // delete all previous styles
@@ -514,21 +531,20 @@ public class TextInputDialog extends JDialog {
     }
 
     private String[] getAllFields() {
-        List<String> texFields = new ArrayList<>();
         Optional<EntryType> type = EntryTypes.getType(entry.getType(),
                 frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         if (type.isPresent()) {
-            texFields.addAll(type.get().getAllFields());
+            allFields.addAll(type.get().getAllFields());
             requiredFields.addAll(type.get().getRequiredFieldsFlat());
             optionalFields.addAll(type.get().getPrimaryOptionalFields());
         }
         List<String> internalFields = InternalBibtexFields.getAllFieldNames();
         for (String field : internalFields) {
-            if (!texFields.contains(field)) {
-                texFields.add(field);
+            if (!allFields.contains(field)) {
+                allFields.add(field);
             }
         }
-        return texFields.toArray(new String[texFields.size()]);
+        return allFields.toArray(new String[allFields.size()]);
     }
 
 
@@ -682,8 +698,26 @@ public class TextInputDialog extends JDialog {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
-                insertTextForTag();
+                insertTextForTag(override.isSelected());
             }
+        }
+    }
+
+    private class MenuTextForTagAction extends AbstractAction {
+
+        String field;
+        Boolean overrideField;
+        public MenuTextForTagAction(String field, Boolean overrideField) {
+            super(field);
+            this.field = field;
+            this.overrideField = overrideField;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // To enable correct marking of used values
+            fieldList.setSelectedValue(field, false);
+            insertTextForTag(overrideField);
         }
     }
 }
