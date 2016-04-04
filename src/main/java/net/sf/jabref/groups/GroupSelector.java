@@ -723,8 +723,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         final TreePath[] selection = groupsTree.getSelectionPaths();
         if ((selection == null) || (selection.length == 0) || ((selection.length == 1)
                 && (((GroupTreeNode) selection[0].getLastPathComponent()).getGroup() instanceof AllEntriesGroup))) {
-            panel.getFilterGroupToggle().stop();
-            panel.mainTable.stopShowingFloatGrouping();
+            panel.mainTable.getTableModel().getFilterGroupToggle().stop();
+            panel.mainTable.getTableModel().stopShowingFloatGrouping();
             if (showOverlappingGroups.isSelected()) {
                 groupsTree.setHighlight2Cells(null);
             }
@@ -785,12 +785,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         public void update() {
             // Show the result in the chosen way:
             if (hideNonHits.isSelected()) {
-                panel.mainTable.stopShowingFloatGrouping(); // Turn off shading, if active.
-                panel.getFilterGroupToggle().start(); // Turn on filtering.
+                panel.mainTable.getTableModel().stopShowingFloatGrouping(); // Turn off shading, if active.
+                panel.mainTable.getTableModel().getFilterGroupToggle().start(); // Turn on filtering.
 
             } else if (grayOut.isSelected()) {
-                panel.getFilterGroupToggle().stop(); // Turn off filtering, if active.
-                panel.mainTable.showFloatGrouping(); // Turn on shading.
+                panel.mainTable.getTableModel().getFilterGroupToggle().stop(); // Turn off filtering, if active.
+                panel.mainTable.getTableModel().showFloatGrouping(); // Turn on shading.
             }
 
             if (showOverlappingGroupsP) {
@@ -891,8 +891,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     @Override
     public void componentClosing() {
         if (panel != null) {// panel may be null if no file is open any more
-            panel.getFilterGroupToggle().stop();
-            panel.mainTable.stopShowingFloatGrouping();
+            panel.mainTable.getTableModel().getFilterGroupToggle().stop();
+            panel.mainTable.getTableModel().stopShowingFloatGrouping();
         }
         frame.groupToggle.setSelected(false);
     }

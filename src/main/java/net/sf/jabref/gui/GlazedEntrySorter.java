@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import java.util.Collections;
 import java.util.List;
+
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
@@ -30,15 +31,16 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
 
     public GlazedEntrySorter(List<BibEntry> entries) {
         list = new BasicEventList<>();
-        list.getReadWriteLock().writeLock().lock();
-        list.addAll(entries);
+        try {
+            list.getReadWriteLock().writeLock().lock();
+            list.addAll(entries);
 
-        // Sort the list so it is ordered according to creation (or read) order
-        // when the table is unsorted.
-        Collections.sort(list, new IdComparator());
-
-        list.getReadWriteLock().writeLock().unlock();
-
+            // Sort the list so it is ordered according to creation (or read) order
+            // when the table is unsorted.
+            Collections.sort(list, new IdComparator());
+        } finally {
+            list.getReadWriteLock().writeLock().unlock();
+        }
     }
 
     public EventList<BibEntry> getTheList() {
@@ -48,20 +50,23 @@ public class GlazedEntrySorter implements DatabaseChangeListener {
     @Override
     public void databaseChanged(DatabaseChangeEvent e) {
         list.getReadWriteLock().writeLock().lock();
-        if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
-            list.add(e.getEntry());
-        } else if (e.getType() == DatabaseChangeEvent.ChangeType.REMOVED_ENTRY) {
-            list.remove(e.getEntry());
-        } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
-            int index = list.indexOf(e.getEntry());
-            if (index != -1) {
-                // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
-                // DatabaseChangeEvent.ADDED_ENTRY
-                // thus,
-                list.set(index, e.getEntry());
+        try {
+            if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
+                list.add(e.getEntry());
+            } else if (e.getType() == DatabaseChangeEvent.ChangeType.REMOVED_ENTRY) {
+                list.remove(e.getEntry());
+            } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
+                int index = list.indexOf(e.getEntry());
+                if (index != -1) {
+                    // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
+                    // DatabaseChangeEvent.ADDED_ENTRY
+                    // thus,
+                    list.set(index, e.getEntry());
+                }
             }
+        } finally {
+            list.getReadWriteLock().writeLock().unlock();
         }
-        list.getReadWriteLock().writeLock().unlock();
 
     }
 

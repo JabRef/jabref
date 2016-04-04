@@ -199,7 +199,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         floatMarked.addActionListener(e -> {
             Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
-            panel.mainTable.refreshSorting(); // Bad remote access
+            panel.mainTable.getTableModel().refreshSorting(); // Bad remote access
         });
 
         // create disabledIcons for all menu entries

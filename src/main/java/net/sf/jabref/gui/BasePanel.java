@@ -40,6 +40,7 @@ import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -103,42 +104,43 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final BibDatabase database;
     private final BibDatabaseContext bibDatabaseContext;
+    private final MainTableDataModel tableModel;
 
+    // To contain instantiated entry editors. This is to save time
     private BasePanelMode mode;
     private EntryEditor currentEditor;
-    private PreviewPanel currentPreview;
 
+    private PreviewPanel currentPreview;
     private MainTableSelectionListener selectionListener;
+
     private ListEventListener<BibEntry> groupsHighlightListener;
 
     private JSplitPane splitPane;
 
     private final JabRefFrame frame;
-
     private String fileMonitorHandle;
     private boolean saving;
     private boolean updatedExternally;
+
     private Charset encoding;
 
     // AutoCompleter used in the search bar
     private AutoCompleter<String> searchAutoCompleter;
-
     // The undo manager.
     public final CountingUndoManager undoManager = new CountingUndoManager(this);
     private final UndoAction undoAction = new UndoAction();
+
     private final RedoAction redoAction = new RedoAction();
-
     private final List<BibEntry> previousEntries = new ArrayList<>();
-    private final List<BibEntry> nextEntries = new ArrayList<>();
 
+    private final List<BibEntry> nextEntries = new ArrayList<>();
     private boolean baseChanged;
     private boolean nonUndoableChange;
-    // Used to track whether the base has changed since last save.
 
+    // Used to track whether the base has changed since last save.
     public MainTable mainTable;
+
     public MainTableFormat tableFormat;
-    private FilterList<BibEntry> searchFilterList;
-    private FilterList<BibEntry> groupFilterList;
 
     public RightClickMenu rcm;
 
@@ -147,29 +149,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
-
     // To indicate which entry is currently shown.
     public final Map<String, EntryEditor> entryEditors = new HashMap<>();
-    // To contain instantiated entry editors. This is to save time
+
     // in switching between entries.
-
     private PreambleEditor preambleEditor;
+
     // Keeps track of the preamble dialog if it is open.
-
     private StringDialog stringDialog;
-    // Keeps track of the string dialog if it is open.
 
+    // Keeps track of the string dialog if it is open.
     private final Map<String, Object> actions = new HashMap<>();
+
     private final SidePaneManager sidePaneManager;
 
     private final SearchBar searchBar;
-
-    private final StartStopListAction<BibEntry> filterSearchToggle;
-
-    private final StartStopListAction<BibEntry> filterGroupToggle;
-
     private ContentAutoCompleters autoCompleters;
-
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext, Charset encoding) {
         Objects.requireNonNull(frame);
@@ -182,6 +177,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
         this.database = bibDatabaseContext.getDatabase();
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         searchBar = new SearchBar(this);
 
@@ -209,11 +205,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
         }
-
-        filterSearchToggle = new StartStopListAction<>(searchFilterList, SearchMatcher.INSTANCE,
-                EverythingMatcher.INSTANCE);
-        filterGroupToggle = new StartStopListAction<>(groupFilterList, GroupMatcher.INSTANCE,
-                EverythingMatcher.INSTANCE);
     }
 
     // Returns a collection of AutoCompleters, which are populated from the current database
@@ -1345,24 +1336,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void createMainTable() {
-        //Comparator comp = new FieldComparator("author");
-
-        final GlazedEntrySorter eventList = new GlazedEntrySorter(database.getEntries());
-        // Must initialize sort columns somehow:
-
-        database.addDatabaseChangeListener(eventList);
+        database.addDatabaseChangeListener(tableModel.getEventList());
         database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
-        groupFilterList = new FilterList<>(eventList.getTheList(), EverythingMatcher.INSTANCE);
-        if (filterGroupToggle != null) {
-            filterGroupToggle.updateFilterList(groupFilterList);
-        }
-        searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
-        if (filterSearchToggle != null) {
-            filterSearchToggle.updateFilterList(searchFilterList);
-        }
+
         tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
-        mainTable = new MainTable(tableFormat, searchFilterList, frame, this);
+        mainTable = new MainTable(tableFormat, tableModel, frame, this);
 
         selectionListener = new MainTableSelectionListener(this, mainTable);
         mainTable.updateFont();
@@ -1502,7 +1481,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 });*/
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null) && isShowingFloatSearch();
+        boolean floatSearchActive = (mainTable != null) && this.tableModel.isFloatSearchActive();
 
         createMainTable();
 
@@ -1557,7 +1536,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // restore floating search result
         // (needed if preferences have been changed which causes a recreation of the main table)
         if (floatSearchActive) {
-            startShowingFloatSearch();
+            tableModel.showFloatSearch();
         }
 
         splitPane.revalidate();
@@ -1883,73 +1862,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.scrollToCenter(pos, 0);
     }
 
-    public StartStopListAction<BibEntry> getFilterSearchToggle() {
-        return filterSearchToggle;
-    }
 
-    public StartStopListAction<BibEntry> getFilterGroupToggle() {
-        return filterGroupToggle;
-    }
-
-
-    public static class StartStopListAction<E> {
-
-        private FilterList<E> list;
-        private final Matcher<E> active;
-        private final Matcher<E> inactive;
-
-        private boolean isActive;
-
-
-        private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
-            this.list = list;
-            this.active = active;
-            this.inactive = inactive;
-        }
-
-        public void start() {
-            list.setMatcher(active);
-            isActive = true;
-        }
-
-        public void stop() {
-            if (isActive) {
-                list.setMatcher(inactive);
-                isActive = false;
-            }
-        }
-
-        public boolean isActive() {
-            return isActive;
-        }
-
-        public void updateFilterList(FilterList<E> filterList) {
-            list = filterList;
-            if (isActive) {
-                list.setMatcher(active);
-            } else {
-                list.setMatcher(inactive);
-            }
-        }
-    }
-
-
-    /**
-     * Query whether this BasePanel is in the mode where a float search result is shown.
-     *
-     * @return true if showing float search, false otherwise.
-     */
-    public boolean isShowingFloatSearch() {
-        return mainTable.isFloatSearchActive();
-    }
-
-    public void stopShowingFloatSearch() {
-        mainTable.stopShowingFloatSearch();
-    }
-
-    public void startShowingFloatSearch() {
-        mainTable.showFloatSearch();
-    }
 
     public BibDatabase getDatabase() {
         return database;
