@@ -23,6 +23,7 @@ import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -267,8 +268,7 @@ public class SearchBar extends JPanel {
 
         this.currentResults.setText("");
 
-        basePanel.mainTable.getTableModel().stopShowingFloatSearch();
-        basePanel.mainTable.getTableModel().getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -313,8 +313,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
 
-        basePanel.mainTable.getTableModel().stopShowingFloatSearch();
-        basePanel.mainTable.getTableModel().getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
         searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));

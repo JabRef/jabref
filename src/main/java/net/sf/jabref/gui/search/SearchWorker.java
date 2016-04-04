@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.search;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
@@ -75,18 +76,15 @@ class SearchWorker extends SwingWorker<List<BibEntry>,Void> {
             entry.setSearchHit(true);
         }
 
-        basePanel.mainTable.getTableModel().stopShowingFloatSearch();
-        basePanel.mainTable.getTableModel().getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         // Show the result in the chosen way:
         switch (mode) {
         case FLOAT:
-            basePanel.mainTable.getTableModel().getFilterSearchToggle().stop();
-            basePanel.mainTable.getTableModel().showFloatSearch();
+            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
             break;
         case FILTER:
-            basePanel.mainTable.getTableModel().stopShowingFloatSearch();
-            basePanel.mainTable.getTableModel().getFilterSearchToggle().start();
+            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
             break;
         default:
             break;

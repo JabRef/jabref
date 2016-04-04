@@ -36,6 +36,7 @@ import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -1507,7 +1508,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void stopShowingSearchResults() {
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            getBasePanelAt(i).mainTable.getTableModel().getFilterSearchToggle().stop();
+            getBasePanelAt(i).mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
         }
     }
 

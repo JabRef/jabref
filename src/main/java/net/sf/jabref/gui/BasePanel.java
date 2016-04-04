@@ -1481,7 +1481,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 });*/
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null) && this.tableModel.isFloatSearchActive();
+        boolean floatSearchActive = (mainTable != null) && this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT;
 
         createMainTable();
 
@@ -1536,7 +1536,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // restore floating search result
         // (needed if preferences have been changed which causes a recreation of the main table)
         if (floatSearchActive) {
-            tableModel.showFloatSearch();
+            mainTable.showFloatSearch();
         }
 
         splitPane.revalidate();

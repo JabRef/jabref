@@ -208,10 +208,10 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if (!model.isFloatSearchActive() || matches(row, model.getSearchMatcher())) {
+        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchMatcher())) {
             score++;
         }
-        if (!model.isFloatGroupingActive() || matches(row, model.getGroupMatcher())) {
+        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupMatcher())) {
             score += 2;
         }
 
@@ -532,6 +532,12 @@ public class MainTable extends JTable {
         scb.setValue(y * scb.getUnitIncrement(1));
     }
 
+    public void showFloatSearch() {
+        this.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
+
+        scrollTo(0);
+    }
+
     /**
      * updateFont
      */
@@ -543,7 +549,7 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !model.isFloatSearchActive())) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
 
