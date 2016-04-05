@@ -1,12 +1,12 @@
 package net.sf.jabref.gui.maintable;
 
-import ca.odell.glazedlists.*;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.matchers.Matcher;
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.GroupMatcher;
-import net.sf.jabref.gui.GlazedEntrySorter;
 import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
@@ -14,191 +14,144 @@ import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
 import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.model.entry.BibEntry;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MainTableDataModel {
 
-    public enum DisplayOption {
-        FLOAT, FILTER, DISABLED
-    }
-
-    private final GlazedEntrySorter eventList;
-    private final SortedList<BibEntry> sortedForMarking;
-    private final SortedList<BibEntry> sortedForTable;
-    private final SortedList<BibEntry> sortedForSearch;
-    private final SortedList<BibEntry> sortedForGrouping;
-
-    private final StartStopListAction<BibEntry> filterSearchToggle;
-    private final StartStopListAction<BibEntry> filterGroupToggle;
-
-    private DisplayOption searchState;
-    private DisplayOption groupingState;
-
-    private Comparator<BibEntry> searchComparator;
-
-    private Comparator<BibEntry> markingComparator;
-    private Comparator<BibEntry> groupComparator;
-    private Matcher<BibEntry> searchMatcher;
-    private Matcher<BibEntry> groupMatcher;
+    private final ListSynchronizer listSynchronizer;
+    private final SortedList<BibEntry> sortedForUserDefinedTableColumnSorting;
+    private final SortedList<BibEntry> sortedForMarkingSearchGrouping;
+    private final StartStopListFilterAction filterSearchToggle;
+    private final StartStopListFilterAction filterGroupToggle;
     private final EventList<BibEntry> finalList;
+    private final FilterAndSortingState filterAndSortingState = new FilterAndSortingState();
 
     public MainTableDataModel(BibDatabaseContext context) {
         List<BibEntry> entries = context.getDatabase().getEntries();
-        eventList = new GlazedEntrySorter(entries);
 
-        EventList<BibEntry> initialEventList = eventList.getTheList();
+        EventList<BibEntry> initialEventList = new BasicEventList<>();
+        initialEventList.addAll(entries);
+
+        listSynchronizer = new ListSynchronizer(initialEventList);
 
         // This SortedList has a Comparator controlled by the TableComparatorChooser
         // we are going to install, which responds to user sorting selections:
-        sortedForTable = new SortedList<>(initialEventList, null);
+        sortedForUserDefinedTableColumnSorting = new SortedList<>(initialEventList, null);
         // This SortedList applies afterwards, and floats marked entries:
-        sortedForMarking = new SortedList<>(sortedForTable, null);
-        // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList<>(sortedForMarking, null);
-        // This SortedList applies afterwards, and can float grouping hits:
-        sortedForGrouping = new SortedList<>(sortedForSearch, null);
+        sortedForMarkingSearchGrouping = new SortedList<>(sortedForUserDefinedTableColumnSorting, null);
 
-        FilterList<BibEntry> groupFilterList = new FilterList<>(sortedForGrouping, EverythingMatcher.INSTANCE);
-        filterGroupToggle = new StartStopListAction<>(groupFilterList, GroupMatcher.INSTANCE,
+        FilterList<BibEntry> groupFilterList = new FilterList<>(sortedForMarkingSearchGrouping, EverythingMatcher.INSTANCE);
+        filterGroupToggle = new StartStopListFilterAction(groupFilterList, GroupMatcher.INSTANCE,
                 EverythingMatcher.INSTANCE);
         FilterList<BibEntry> searchFilterList = new FilterList<>(groupFilterList, EverythingMatcher.INSTANCE);
-        filterSearchToggle = new StartStopListAction<>(searchFilterList, SearchMatcher.INSTANCE,
+        filterSearchToggle = new StartStopListFilterAction(searchFilterList, SearchMatcher.INSTANCE,
                 EverythingMatcher.INSTANCE);
 
         finalList = searchFilterList;
+    }
 
-        searchMatcher = null;
-        groupMatcher = null;
-        searchComparator = null;
-        groupComparator = null;
-        markingComparator = null;
+    public void updateSortOrder() {
+        Comparator<BibEntry> markingComparator = filterAndSortingState.markingState ? IsMarkedComparator.INSTANCE : null;
+        Comparator<BibEntry> searchComparator = getSearchState() == DisplayOption.FLOAT ? new HitOrMissComparator(SearchMatcher.INSTANCE) : null;
+        Comparator<BibEntry> groupingComparator = getGroupingState() == DisplayOption.FLOAT ? new HitOrMissComparator(GroupMatcher.INSTANCE) : null;
+        GenericCompositeComparator comparator = new GenericCompositeComparator(
+                markingComparator,
+                searchComparator,
+                groupingComparator
+        );
 
-        updateSearchState(DisplayOption.DISABLED);
-        updateGroupingState(DisplayOption.DISABLED);
+        sortedForMarkingSearchGrouping.getReadWriteLock().writeLock().lock();
+        try {
+            if (sortedForMarkingSearchGrouping.getComparator() != comparator) {
+                sortedForMarkingSearchGrouping.setComparator(comparator);
+            }
+        } finally {
+            sortedForMarkingSearchGrouping.getReadWriteLock().writeLock().unlock();
+        }
     }
 
     public void updateSearchState(DisplayOption searchState) {
-        if(this.searchState == searchState) {
+        Objects.requireNonNull(searchState);
+
+        // fail fast
+        if (filterAndSortingState.searchState == searchState) {
             return;
         }
 
-        if(this.searchState == DisplayOption.FLOAT) {
-            stopShowingFloatSearch();
-            refreshSorting();
-        } else if(this.searchState == DisplayOption.FILTER) {
+        boolean updateSortOrder = false;
+        if (filterAndSortingState.searchState == DisplayOption.FLOAT) {
+            updateSortOrder = true;
+        } else if (filterAndSortingState.searchState == DisplayOption.FILTER) {
             filterSearchToggle.stop();
         }
 
-        if(searchState == DisplayOption.FLOAT) {
-            showFloatSearch();
-            refreshSorting();
-        } else if(searchState == DisplayOption.FILTER) {
+        if (searchState == DisplayOption.FLOAT) {
+            updateSortOrder = true;
+        } else if (searchState == DisplayOption.FILTER) {
             filterSearchToggle.start();
         }
 
-        this.searchState = searchState;
+        filterAndSortingState.searchState = searchState;
+        if (updateSortOrder) {
+            updateSortOrder();
+        }
     }
 
     public void updateGroupingState(DisplayOption groupingState) {
-        if(this.groupingState == groupingState) {
+        Objects.requireNonNull(groupingState);
+
+        // fail fast
+        if (filterAndSortingState.groupingState == groupingState) {
             return;
         }
 
-        if(this.groupingState == DisplayOption.FLOAT) {
-            stopShowingFloatGrouping();
-            refreshSorting();
-        } else if(this.groupingState == DisplayOption.FILTER) {
+        boolean updateSortOrder = false;
+        if (filterAndSortingState.groupingState == DisplayOption.FLOAT) {
+            updateSortOrder = true;
+        } else if (filterAndSortingState.groupingState == DisplayOption.FILTER) {
             filterGroupToggle.stop();
         }
 
-        if(groupingState == DisplayOption.FLOAT) {
-            showFloatGrouping();
-            refreshSorting();
-        } else if(groupingState == DisplayOption.FILTER) {
+        if (groupingState == DisplayOption.FLOAT) {
+            updateSortOrder = true;
+        } else if (groupingState == DisplayOption.FILTER) {
             filterGroupToggle.start();
         }
 
-        this.groupingState = groupingState;
+        filterAndSortingState.groupingState = groupingState;
+        if (updateSortOrder) {
+            updateSortOrder();
+        }
     }
 
     public DisplayOption getSearchState() {
-        return searchState;
+        return filterAndSortingState.searchState;
     }
 
     DisplayOption getGroupingState() {
-        return groupingState;
+        return filterAndSortingState.groupingState;
     }
 
     public DatabaseChangeListener getEventList() {
-        return this.eventList;
+        return this.listSynchronizer;
     }
 
-    Matcher<BibEntry> getSearchMatcher() {
-        return searchMatcher;
-    }
+    public void updateMarkingState(boolean floatMarkedEntries) {
+        // fail fast
+        if (filterAndSortingState.markingState == floatMarkedEntries) {
+            return;
+        }
 
-    Matcher<BibEntry> getGroupMatcher() {
-        return groupMatcher;
-    }
-
-    public void refreshSorting() {
-        updateMarkingComparator();
-
-        update(sortedForMarking, markingComparator);
-        update(sortedForSearch, searchComparator);
-        update(sortedForGrouping, groupComparator);
-    }
-
-    private void updateMarkingComparator() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
-            markingComparator = IsMarkedComparator.INSTANCE;
+        if (floatMarkedEntries) {
+            filterAndSortingState.markingState = true;
         } else {
-            markingComparator = null;
+            filterAndSortingState.markingState = false;
         }
-    }
-
-    private static <E> void update(SortedList<E> list, Comparator<E> comparator) {
-        list.getReadWriteLock().writeLock().lock();
-        try {
-            if (list.getComparator() != comparator) {
-                list.setComparator(comparator);
-            }
-        } finally {
-            list.getReadWriteLock().writeLock().unlock();
-        }
-    }
-
-    /**
-     * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
-     */
-    private void showFloatSearch() {
-        searchMatcher = SearchMatcher.INSTANCE;
-        searchComparator = new HitOrMissComparator(searchMatcher);
-    }
-
-    /**
-     * Removes sorting by search results, and graying out of non-hits.
-     */
-    private void stopShowingFloatSearch() {
-        searchMatcher = null;
-        searchComparator = null;
-    }
-
-    /**
-     * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
-     */
-    private void showFloatGrouping() {
-        groupMatcher = GroupMatcher.INSTANCE;
-        groupComparator = new HitOrMissComparator(groupMatcher);
-    }
-
-    /**
-     * Removes sorting by group, and graying out of non-hits.
-     */
-    private void stopShowingFloatGrouping() {
-        groupMatcher = null;
-        groupComparator = null;
+        updateSortOrder();
     }
 
     EventList<BibEntry> getTableRows() {
@@ -213,17 +166,48 @@ public class MainTableDataModel {
      *
      * @return The sorted list of entries.
      */
-    SortedList<BibEntry> getSortedForTable() {
-        return sortedForTable;
+    SortedList<BibEntry> getSortedForUserDefinedTableColumnSorting() {
+        return sortedForUserDefinedTableColumnSorting;
     }
 
-    private static class StartStopListAction<E> {
+    public enum DisplayOption {
+        FLOAT, FILTER, DISABLED
+    }
 
-        private final Matcher<E> active;
-        private final Matcher<E> inactive;
-        private FilterList<E> list;
+    static class FilterAndSortingState {
+        // at the beginning, everything is disabled
+        private DisplayOption searchState = DisplayOption.DISABLED;
+        private DisplayOption groupingState = DisplayOption.DISABLED;
+        private boolean markingState = false;
+    }
 
-        private StartStopListAction(FilterList<E> list, Matcher<E> active, Matcher<E> inactive) {
+    private static class GenericCompositeComparator implements Comparator<BibEntry> {
+
+        private final List<Comparator<BibEntry>> comparators;
+
+        public GenericCompositeComparator(Comparator<BibEntry>... comparators) {
+            this.comparators = Arrays.asList(comparators).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        }
+
+        @Override
+        public int compare(BibEntry lhs, BibEntry rhs) {
+            for (Comparator<BibEntry> comp : comparators) {
+                int result = comp.compare(lhs, rhs);
+                if (result != 0) {
+                    return result;
+                }
+            }
+            return 0;
+        }
+    }
+
+    private static class StartStopListFilterAction {
+
+        private final Matcher<BibEntry> active;
+        private final Matcher<BibEntry> inactive;
+        private FilterList<BibEntry> list;
+
+        private StartStopListFilterAction(FilterList<BibEntry> list, Matcher<BibEntry> active, Matcher<BibEntry> inactive) {
             this.list = list;
             this.active = active;
             this.inactive = inactive;
@@ -232,11 +216,50 @@ public class MainTableDataModel {
         }
 
         public void start() {
-            list.setMatcher(active);
+            update(active);
         }
 
         public void stop() {
-            list.setMatcher(inactive);
+            update(inactive);
+        }
+
+        private void update(Matcher<BibEntry> comparator) {
+            list.getReadWriteLock().writeLock().lock();
+            try {
+                list.setMatcher(comparator);
+            } finally {
+                list.getReadWriteLock().writeLock().unlock();
+            }
+        }
+    }
+
+    private static class StartStopListSortAction {
+
+        private final Comparator<BibEntry> active;
+        private SortedList<BibEntry> list;
+
+        private StartStopListSortAction(SortedList<BibEntry> list, Comparator<BibEntry> active) {
+            this.list = Objects.requireNonNull(list);
+            this.active = Objects.requireNonNull(active);
+        }
+
+        public void start() {
+            update(active);
+        }
+
+        public void stop() {
+            update(null);
+        }
+
+        private void update(Comparator<BibEntry> comparator) {
+            list.getReadWriteLock().writeLock().lock();
+            try {
+                if (list.getComparator() != comparator) {
+                    list.setComparator(comparator);
+                }
+            } finally {
+                list.getReadWriteLock().writeLock().unlock();
+            }
         }
     }
 }

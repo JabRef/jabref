@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import net.sf.jabref.logic.util.strings.StringUtil;
+
 import java.util.Calendar;
 
 public class YearUtil {
@@ -42,12 +44,29 @@ public class YearUtil {
             return year;
         }
 
-        try {
-            int yearNumber = Integer.parseInt(year);
-            return String.valueOf(new Year(thisYear).toFourDigitYear(yearNumber));
-        } catch (NumberFormatException e) {
+        Integer yearNumber = StringUtil.intValueOfWithNull(year);
+        if(yearNumber == null) {
             return year;
         }
+
+        return String.valueOf(new Year(thisYear).toFourDigitYear(yearNumber));
+    }
+
+    public static int toFourDigitYearWithInts(String year) {
+        return YearUtil.toFourDigitYearWithInts(year, YearUtil.CURRENT_YEAR);
+    }
+
+    private static int toFourDigitYearWithInts(String year, int thisYear) {
+        if ((year == null) || (year.length() != 2)) {
+            return 0;
+        }
+
+        Integer yearNumber = StringUtil.intValueOfWithNull(year);
+        if(yearNumber == null) {
+            return 0;
+        }
+
+        return new Year(thisYear).toFourDigitYear(yearNumber);
     }
 
 

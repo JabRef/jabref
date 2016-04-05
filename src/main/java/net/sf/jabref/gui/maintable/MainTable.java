@@ -34,10 +34,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.groups.GroupMatcher;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
+import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.gui.util.comparator.FirstColumnComparator;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
@@ -150,7 +152,7 @@ public class MainTable extends JTable {
 
         this.setTableHeader(new PreventDraggingJTableHeader(this, tableFormat));
 
-        comparatorChooser = this.createTableComparatorChooser(this, model.getSortedForTable(),
+        comparatorChooser = this.createTableComparatorChooser(this, model.getSortedForUserDefinedTableColumnSorting(),
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener = new PersistenceTableColumnListener(this);
@@ -168,7 +170,7 @@ public class MainTable extends JTable {
         pane.setTransferHandler(xfer);
 
         setupComparatorChooser();
-        model.refreshSorting();
+        model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         setWidths();
     }
 
@@ -208,10 +210,10 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchMatcher())) {
+        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
             score++;
         }
-        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupMatcher())) {
+        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
             score += 2;
         }
 
@@ -383,7 +385,7 @@ public class MainTable extends JTable {
                 Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
         }; // descending
 
-        model.getSortedForTable().getReadWriteLock().writeLock().lock();
+        model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().lock();
         try {
             for (int i = 0; i < sortFields.length; i++) {
                 int index = -1;
@@ -405,7 +407,7 @@ public class MainTable extends JTable {
                 }
             }
         } finally {
-            model.getSortedForTable().getReadWriteLock().writeLock().unlock();
+            model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().unlock();
         }
 
         // Add action listener so we can remember the sort order:
@@ -634,13 +636,7 @@ public class MainTable extends JTable {
 
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
-        final TableComparatorChooser<BibEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-
-        // We need to reset the stack of sorted list each time sorting order
-        // changes, or the sorting breaks down:
-        result.addSortActionListener(e -> model.refreshSorting());
-
-        return result;
+        return TableComparatorChooser.install(table, list, sortingStrategy);
     }
 
     /**

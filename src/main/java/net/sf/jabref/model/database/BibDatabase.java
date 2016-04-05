@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * A bibliography database.
@@ -422,9 +423,11 @@ public class BibDatabase {
         }
     }
 
+    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
     private String resolveContent(String result, Set<String> usedIds) {
         String res = result;
-        if (res.matches(".*#[^#]+#.*")) {
+        if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;

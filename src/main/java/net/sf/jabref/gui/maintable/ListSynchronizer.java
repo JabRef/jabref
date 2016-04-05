@@ -13,38 +13,19 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.maintable;
 
-import java.util.Collections;
-import java.util.List;
-
-import net.sf.jabref.model.entry.BibEntry;
+import ca.odell.glazedlists.EventList;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
-import net.sf.jabref.logic.id.IdComparator;
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
+import net.sf.jabref.model.entry.BibEntry;
 
-public class GlazedEntrySorter implements DatabaseChangeListener {
+public class ListSynchronizer implements DatabaseChangeListener {
 
     private final EventList<BibEntry> list;
 
-    public GlazedEntrySorter(List<BibEntry> entries) {
-        list = new BasicEventList<>();
-        try {
-            list.getReadWriteLock().writeLock().lock();
-            list.addAll(entries);
-
-            // Sort the list so it is ordered according to creation (or read) order
-            // when the table is unsorted.
-            Collections.sort(list, new IdComparator());
-        } finally {
-            list.getReadWriteLock().writeLock().unlock();
-        }
-    }
-
-    public EventList<BibEntry> getTheList() {
-        return list;
+    public ListSynchronizer(EventList<BibEntry> list) {
+        this.list = list;
     }
 
     @Override
