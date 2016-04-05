@@ -15,9 +15,6 @@
  */
 package net.sf.jabref.logic.xmp;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 import javax.xml.transform.TransformerException;
@@ -68,10 +65,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         XMPMetadata meta = parser.parse(e.toString().getBytes());
         XMPSchemaBibtex schema = (XMPSchemaBibtex)meta.getSchema(XMPSchemaBibtex.KEY);
         return schema;
-    }
-
-    private static String makeProperty(String propertyName) {
-        return XMPSchemaBibtex.KEY + ':' + propertyName;
     }
 
     /**
