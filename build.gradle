@@ -363,3 +363,9 @@ task getdeps(type: Copy) {
     into 'build/tmp/alldeps/'
 }
 
+jmh {
+    warmupIterations = 5
+    iterations = 10
+    fork = 2
+    benchmarkMode = 'avgt'
+}
