@@ -501,8 +501,8 @@ public class JabRefPreferences {
         defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
-        defaults.put(SIZE_X, 1080);
-        defaults.put(SIZE_Y, 680);
+        defaults.put(SIZE_X, 1024);
+        defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
