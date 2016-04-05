@@ -91,32 +91,32 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        bibtex.setTextProperty("title",
+        bibtex.setTextPropertyValueAsSimple("title",
                 "The advanced Flux-Compensation for Delawney-Separation");
 
-        String e = bibtex.getTextProperty("title");
+        String e = bibtex.getUnqualifiedTextPropertyValue("title");
         Assert.assertEquals("The advanced Flux-Compensation for Delawney-Separation",
                 e);
 
         Assert.assertEquals("The advanced Flux-Compensation for Delawney-Separation",
-                bibtex.getTextProperty("title"));
+                bibtex.getUnqualifiedTextPropertyValue("title"));
 
-        bibtex.setTextProperty("title",
+        bibtex.setTextPropertyValueAsSimple("title",
                 "The advanced Flux-Correlation for Delawney-Separation");
 
-        e = bibtex.getTextProperty("title");
+        e = bibtex.getUnqualifiedTextPropertyValue("title");
         Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation", e );
 
         Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation",
-                bibtex.getTextProperty("title"));
+                bibtex.getUnqualifiedTextPropertyValue("title"));
 
         bibtex
-                .setTextProperty(
+                .setTextPropertyValueAsSimple(
                         "abstract",
                         "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.");
         Assert.assertEquals(
                 "   The abstract\n can go \n \n on several \n lines with \n many \n\n empty ones in \n between.",
-                bibtex.getTextProperty("abstract"));
+                bibtex.getUnqualifiedTextPropertyValue("abstract"));
     }
 
     @Test
@@ -125,11 +125,11 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        bibtex.addBagValue("author", "Tom DeMarco");
-        bibtex.addBagValue("author", "Kent Beck");
+        bibtex.addBagValueAsSimple("author", "Tom DeMarco");
+        bibtex.addBagValueAsSimple("author", "Kent Beck");
         {
 
-            List<String> l = bibtex.getBagList("author");
+            List<String> l = bibtex.getUnqualifiedBagValueList("author");
 
             Assert.assertEquals(2, l.size());
 
@@ -139,27 +139,27 @@ public class XMPSchemaBibtexTest {
                     || l.get(1).equals("Kent Beck"));
         }
         {
-            bibtex.removeBagValue("author", "Kent Beck");
-            List<String> l = bibtex.getBagList("author");
+            bibtex.removeUnqualifiedBagValue("author", "Kent Beck");
+            List<String> l = bibtex.getUnqualifiedBagValueList("author");
             Assert.assertEquals(1, l.size());
             Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
         }
         { // Already removed
-            bibtex.removeBagValue("author", "Kent Beck");
-            List<String> l = bibtex.getBagList("author");
+            bibtex.removeUnqualifiedBagValue("author", "Kent Beck");
+            List<String> l = bibtex.getUnqualifiedBagValueList("author");
             Assert.assertEquals(1, l.size());
             Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
         }
         { // Duplicates allowed!
-            bibtex.addBagValue("author", "Tom DeMarco");
-            List<String> l = bibtex.getBagList("author");
+            bibtex.addBagValueAsSimple("author", "Tom DeMarco");
+            List<String> l = bibtex.getUnqualifiedBagValueList("author");
             Assert.assertEquals(2, l.size());
             Assert.assertTrue(l.get(0).equals("Tom DeMarco"));
             Assert.assertTrue(l.get(1).equals("Tom DeMarco"));
         }
         // Removes both
-        bibtex.removeBagValue("author", "Tom DeMarco");
-        List<String> l = bibtex.getBagList("author");
+        bibtex.removeUnqualifiedBagValue("author", "Tom DeMarco");
+        List<String> l = bibtex.getUnqualifiedBagValueList("author");
         Assert.assertEquals(0, l.size());
     }
 
@@ -169,11 +169,11 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        bibtex.addSequenceValue("author", "Tom DeMarco");
-        bibtex.addSequenceValue("author", "Kent Beck");
+        bibtex.addUnqualifiedSequenceValue("author", "Tom DeMarco");
+        bibtex.addUnqualifiedSequenceValue("author", "Kent Beck");
         {
 
-            List<String> l = bibtex.getSequenceList("author");
+            List<String> l = bibtex.getUnqualifiedSequenceValueList("author");
 
             Assert.assertEquals(2, l.size());
 
@@ -181,27 +181,27 @@ public class XMPSchemaBibtexTest {
             Assert.assertEquals("Kent Beck", l.get(1));
         }
         {
-            bibtex.removeSequenceValue("author", "Tom DeMarco");
-            List<String> l = bibtex.getSequenceList("author");
+            bibtex.removeUnqualifiedSequenceValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getUnqualifiedSequenceValueList("author");
             Assert.assertEquals(1, l.size());
             Assert.assertTrue(l.get(0).equals("Kent Beck"));
         }
         { // Already removed
-            bibtex.removeSequenceValue("author", "Tom DeMarco");
-            List<String> l = bibtex.getSequenceList("author");
+            bibtex.removeUnqualifiedSequenceValue("author", "Tom DeMarco");
+            List<String> l = bibtex.getUnqualifiedSequenceValueList("author");
             Assert.assertEquals(1, l.size());
             Assert.assertTrue(l.get(0).equals("Kent Beck"));
         }
         { // Duplicates allowed!
-            bibtex.addSequenceValue("author", "Kent Beck");
-            List<String> l = bibtex.getSequenceList("author");
+            bibtex.addUnqualifiedSequenceValue("author", "Kent Beck");
+            List<String> l = bibtex.getUnqualifiedSequenceValueList("author");
             Assert.assertEquals(2, l.size());
             Assert.assertTrue(l.get(0).equals("Kent Beck"));
             Assert.assertTrue(l.get(1).equals("Kent Beck"));
         }
         // Remvoes all
-        bibtex.removeSequenceValue("author", "Kent Beck");
-        List<String> l = bibtex.getSequenceList("author");
+        bibtex.removeUnqualifiedSequenceValue("author", "Kent Beck");
+        List<String> l = bibtex.getUnqualifiedSequenceValueList("author");
         Assert.assertEquals(0, l.size());
     }
 
@@ -210,10 +210,10 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        bibtex.setTextProperty("title", "BlaBla Ta Ta\nHello World");
-        bibtex.setTextProperty("abstract", "BlaBla Ta Ta\nHello World");
-        bibtex.setTextProperty("review", "BlaBla Ta Ta\nHello World");
-        bibtex.setTextProperty("note", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextPropertyValueAsSimple("title", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextPropertyValueAsSimple("abstract", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextPropertyValueAsSimple("review", "BlaBla Ta Ta\nHello World");
+        bibtex.setTextPropertyValueAsSimple("note", "BlaBla Ta Ta\nHello World");
         bibtex.setPersonList("author", "Mouse, Mickey and Bond, James");
 
         Map<String, String> s = XMPSchemaBibtex.getAllProperties(bibtex,
