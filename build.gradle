@@ -19,6 +19,7 @@ plugins {
     id "com.github.youribonnaffe.gradle.format" version "1.3"
     id "com.coverity.ondemand" version "1.5.61"
     id "net.ltgt.errorprone" version "0.0.8"
+    id 'me.champeau.gradle.jmh' version '0.3.0'
 }
 
 apply plugin: "java"
@@ -27,6 +28,7 @@ apply plugin: "project-report"
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'install4j'
+apply plugin: 'me.champeau.gradle.jmh'
 
 apply plugin: 'checkstyle'
 
@@ -368,3 +370,8 @@ task getdeps(type: Copy) {
     into 'build/tmp/alldeps/'
 }
 
+jmh {
+    warmupIterations = 5
+    iterations = 10
+    fork = 2
+}

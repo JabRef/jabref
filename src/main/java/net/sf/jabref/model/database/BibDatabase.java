@@ -74,10 +74,6 @@ public class BibDatabase {
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
-    public BibDatabaseMode getBibType() {
-        return BibDatabaseModeDetection.inferMode(this);
-    }
-
     /**
      * Returns the number of entries.
      */
