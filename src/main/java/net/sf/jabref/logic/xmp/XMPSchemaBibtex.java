@@ -81,7 +81,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @return
      */
     public List<String> getPersonList(String field) {
-        return getSequenceList(field);
+        return getUnqualifiedSequenceValueList(field);
     }
 
     /**
@@ -94,40 +94,8 @@ public class XMPSchemaBibtex extends XMPSchema {
         AuthorList list = AuthorList.parse(value);
 
         for (Author author : list.getAuthors()) {
-            addSequenceValue(field, author.getFirstLast(false));
+            addUnqualifiedSequenceValue(field, author.getFirstLast(false));
         }
-    }
-
-    public String getTextProperty(String field) {
-        return super.getUnqualifiedTextProperty(makeProperty(field)).getStringValue();
-    }
-
-    public void setTextProperty(String field, String value) {
-        super.setTextPropertyValue(makeProperty(field), value);
-    }
-
-    public List<String> getBagList(String bagName) {
-        return super.getUnqualifiedBagValueList(makeProperty(bagName));
-    }
-
-    public void removeBagValue(String bagName, String value) {
-        super.removeUnqualifiedBagValue(makeProperty(bagName), value);
-    }
-
-    public void addBagValue(String bagName, String value) {
-        super.addBagValueAsSimple(makeProperty(bagName), value);
-    }
-
-    public List<String> getSequenceList(String seqName) {
-        return super.getUnqualifiedSequenceValueList(makeProperty(seqName));
-    }
-
-    public void removeSequenceValue(String seqName, String value) {
-        super.removeUnqualifiedSequenceValue(makeProperty(seqName), value);
-    }
-
-    public void addSequenceValue(String seqName, String value) {
-        super.addUnqualifiedSequenceValue(makeProperty(seqName), value);
     }
 
     private static String getContents(NodeList seqList) {
@@ -264,14 +232,14 @@ public class XMPSchemaBibtex extends XMPSchema {
             if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {
-                setTextProperty(field, value);
+               setTextPropertyValueAsSimple(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextPropertyValueAsSimple("entrytype", entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
+        String type = getUnqualifiedTextPropertyValue("entrytype");
         BibEntry e = new BibEntry(IdGenerator.next(), type);
 
         // Get Text Properties
