@@ -29,15 +29,12 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.entry.MonthUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import net.sf.jabref.model.entry.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A bibliography database.
@@ -66,10 +63,6 @@ public class BibDatabase {
      * Behavior
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
-
-    public BibDatabaseMode getBibType() {
-        return BibDatabaseModeDetection.inferMode(this);
-    }
 
     /**
      * Returns the number of entries.

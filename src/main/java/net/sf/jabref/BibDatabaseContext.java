@@ -1,13 +1,12 @@
 package net.sf.jabref;
 
+import java.io.File;
+import java.util.Objects;
+import java.util.Optional;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
-
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Represents everything related to a .bib file.

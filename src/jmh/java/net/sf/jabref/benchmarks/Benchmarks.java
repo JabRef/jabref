@@ -16,6 +16,8 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.entry.BibEntry;
 import org.openjdk.jmh.Main;
 import org.openjdk.jmh.annotations.*;
@@ -23,6 +25,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 @State(Scope.Thread)
 public class Benchmarks {
+
     StringReader bibtexStringReader;
     BibDatabase database = new BibDatabase();
 
@@ -31,8 +34,7 @@ public class Benchmarks {
         Globals.prefs = JabRefPreferences.getInstance();
 
         Random randomizer = new Random();
-        for(int i = 0; i < 10000; i++)
-        {
+        for (int i = 0; i < 1000; i++) {
             BibEntry entry = new BibEntry();
             entry.setCiteKey("id" + i);
             entry.setField("title", "This is my title " + i);
@@ -45,9 +47,9 @@ public class Benchmarks {
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
         StringWriter stringWriter = new StringWriter();
 
-        //databaseWriter.writePartOfDatabase(stringWriter,
-        //        new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
-        //        new SavePreferences());
+        databaseWriter.writePartOfDatabase(stringWriter,
+                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
+                new SavePreferences());
         String bibtexString = stringWriter.toString();
         bibtexStringReader = new StringReader(bibtexString);
     }
@@ -76,6 +78,11 @@ public class Benchmarks {
         List<BibEntry> matchedEntries = new ArrayList<>();
         matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
         return matchedEntries;
+    }
+
+    @Benchmark
+    public BibDatabaseMode inferBibDatabaseMode() {
+        return BibDatabaseModeDetection.inferMode(database);
     }
 
     public static void main(String[] args) throws IOException, RunnerException {
