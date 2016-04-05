@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class URLUtil {
-
     private static final String URL_EXP = "^(https?|ftp)://.+";
 
     // Detect Google search URL
@@ -42,7 +41,6 @@ public class URLUtil {
      */
     public static String cleanGoogleSearchURL(String url) {
         Objects.requireNonNull(url);
-
 
         if(!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
@@ -75,6 +73,17 @@ public class URLUtil {
         } catch (UnsupportedEncodingException | MalformedURLException e) {
             return url;
         }
+    }
+
+    /**
+     * Checks whether the given String is a URL.
+     * Currently only checks for a protocol String.
+     *
+     * @param url the String to check for a URL
+     * @return true if <c>url</c> contains a valid URL
+     */
+    public static boolean isURL(String url) {
+        return url.contains("://");
     }
 
 }

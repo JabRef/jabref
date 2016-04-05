@@ -69,7 +69,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
-        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy special"));
+        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy") + "...");
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
         copySpecialMenu
@@ -160,8 +160,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
-
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
@@ -170,6 +168,10 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
+        addSeparator();
+
+        add(typeMenu);
+
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
                 if (!(isFieldSetForSelectedEntry("doi"))) {
@@ -177,13 +179,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-
-        addSeparator();
-
-        add(typeMenu);
-        add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
-
         add(frame.getMassSetField());
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
         add(frame.getManageKeywords());
         add(new GeneralAction(Actions.MERGE_ENTRIES,
                 Localization.lang("Merge entries") + "...",
@@ -206,11 +203,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
-
-        floatMarked.addActionListener(e -> {
-            Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
-            panel.mainTable.refreshSorting(); // Bad remote access
-        });
 
         // create disabledIcons for all menu entries
         frame.createDisabledIconsForMenuEntries(this);
@@ -252,10 +244,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
         }
-
-        addSeparator();
-        floatMarked.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
-        add(floatMarked);
     }
 
 
