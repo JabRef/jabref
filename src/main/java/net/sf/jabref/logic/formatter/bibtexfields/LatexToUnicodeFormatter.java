@@ -13,13 +13,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.logic.layout.format;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 import java.util.Map;
@@ -28,7 +27,7 @@ import java.util.Map;
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
  * and removes other LaTeX commands without handling them.
  */
-public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
+public class LatexToUnicodeFormatter implements Formatter {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 

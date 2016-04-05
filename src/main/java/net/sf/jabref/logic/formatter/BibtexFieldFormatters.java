@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.formatter;
 
 import net.sf.jabref.logic.formatter.bibtexfields.*;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 
 import java.util.Arrays;
 import java.util.List;

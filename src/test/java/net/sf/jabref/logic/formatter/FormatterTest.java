@@ -5,7 +5,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.*;
 import net.sf.jabref.logic.formatter.casechanger.*;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
