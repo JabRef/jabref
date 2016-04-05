@@ -52,6 +52,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
 - Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
 - Added open buttons to DOI and URL field
+- Move Look & Feel settings from advanced to appearance tab in preferences
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
