@@ -29,16 +29,13 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.entry.MonthUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.model.entry.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A bibliography database.
@@ -90,10 +87,10 @@ public class BibDatabase {
     }
 
     /**
-     * Checks if the database contains no entries.
+     * Checks if the database contains entries.
      */
-    public boolean hasNoEntries() {
-        return entries.isEmpty();
+    public boolean hasEntries() {
+        return !entries.isEmpty();
     }
 
     /**

@@ -353,7 +353,7 @@ public class ImportFormatReader {
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
                     Globals.prefs.getDefaultEncoding());
-            if (!pr.getDatabase().hasNoEntries() || !pr.getDatabase().hasNoStrings()) {
+            if (pr.getDatabase().hasEntries() || !pr.getDatabase().hasNoStrings()) {
                 pr.setFile(new File(filename));
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }

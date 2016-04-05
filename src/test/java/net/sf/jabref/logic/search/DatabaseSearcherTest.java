@@ -1,5 +1,8 @@
 package net.sf.jabref.logic.search;
 
+import java.util.Collections;
+
+import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Test;
@@ -16,14 +19,14 @@ public class DatabaseSearcherTest {
         BibDatabase database = new BibDatabase();
         BibDatabase newDatabase = new DatabaseSearcher(new SearchQuery("whatever", true, true), database)
                 .getDatabaseFromMatches();
-        assertTrue(newDatabase.getEntries().isEmpty());
+        assertEquals(Collections.emptyList(), newDatabase.getEntries());
     }
 
     @Test
     public void testGetDatabaseFromMatchesEmptyDatabaseInvalidSearchExpression() {
         BibDatabase database = new BibDatabase();
         BibDatabase newDatabase = new DatabaseSearcher(INVALID_SEARCH_QUERY, database).getDatabaseFromMatches();
-        assertTrue(newDatabase.getEntries().isEmpty());
+        assertEquals(Collections.emptyList(), newDatabase.getEntries());
     }
 
     @Test
@@ -32,7 +35,7 @@ public class DatabaseSearcherTest {
         database.insertEntry(new BibEntry());
         BibDatabase newDatabase = new DatabaseSearcher(new SearchQuery("whatever", true, true), database)
                 .getDatabaseFromMatches();
-        assertTrue(newDatabase.getEntries().isEmpty());
+        assertEquals(Collections.emptyList(), newDatabase.getEntries());
     }
 
     @Test
@@ -44,7 +47,7 @@ public class DatabaseSearcherTest {
         database.insertEntry(entry);
         BibDatabase newDatabase = new DatabaseSearcher(new SearchQuery("whatever", true, true), database)
                 .getDatabaseFromMatches();
-        assertTrue(newDatabase.getEntries().isEmpty());
+        assertEquals(Collections.emptyList(), newDatabase.getEntries());
     }
 
     @Test
@@ -56,7 +59,6 @@ public class DatabaseSearcherTest {
         database.insertEntry(entry);
         BibDatabase newDatabase = new DatabaseSearcher(new SearchQuery("harrer", true, true), database)
                 .getDatabaseFromMatches();
-        assertEquals(1, newDatabase.getEntryCount());
-        assertEquals(entry, newDatabase.getEntries().iterator().next());
+        BibtexEntryAssert.assertEquals(Collections.singletonList(entry), newDatabase.getEntries());
     }
 }

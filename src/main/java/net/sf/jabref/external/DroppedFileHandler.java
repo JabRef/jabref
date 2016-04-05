@@ -137,7 +137,7 @@ public class DroppedFileHandler {
         }
 
         // Show dialog
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.getDatabase())) {
             return;
         }
 
@@ -186,7 +186,7 @@ public class DroppedFileHandler {
 
         ExternalFileType fileType = optFileType.get();
         // Show dialog
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.getDatabase())) {
             return;
         }
 

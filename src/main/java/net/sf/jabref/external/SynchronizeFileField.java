@@ -15,10 +15,18 @@
  */
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.*;
+import javax.swing.*;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -26,16 +34,9 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.*;
-import java.util.List;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -68,7 +69,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
     @Override
     public void init() {
-        Collection<BibEntry> col = panel.database().getEntries();
+        Collection<BibEntry> col = panel.getDatabase().getEntries();
         goOn = true;
         sel = new ArrayList<>(col);
 

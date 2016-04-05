@@ -15,10 +15,23 @@
 */
 package net.sf.jabref.groups;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.groups.structure.*;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
@@ -30,21 +43,6 @@ import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.undo.AbstractUndoableEdit;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -480,7 +478,7 @@ class GroupDialog extends JDialog {
             return;
         }
         List<BibEntry> list = new ArrayList<>();
-        for (BibEntry entry : m_basePanel.database().getEntries()) {
+        for (BibEntry entry : m_basePanel.getDatabase().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 list.add(entry);
             }

@@ -58,7 +58,7 @@ class GroupChange extends Change {
             // the group tree is now appled to a different BibDatabase than it was created
             // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
             // We must traverse the tree and refresh all groups:
-            root.refreshGroupsForNewDatabase(panel.database());
+            root.refreshGroupsForNewDatabase(panel.getDatabase());
         }
 
         if (panel.getGroupSelector().getGroupTreeRoot() == root) {

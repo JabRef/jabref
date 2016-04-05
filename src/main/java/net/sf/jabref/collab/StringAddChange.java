@@ -51,15 +51,15 @@ class StringAddChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
-        if (panel.database().hasStringLabel(string.getName())) {
+        if (panel.getDatabase().hasStringLabel(string.getName())) {
             // The name to change to is already in the database, so we can't comply.
             LOGGER.info("Cannot add string '" + string.getName() + "' because the name "
                     + "is already in use.");
         }
 
         try {
-            panel.database().addString(string);
-            undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), string));
+            panel.getDatabase().addString(string);
+            undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), string));
         } catch (KeyCollisionException ex) {
             LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }

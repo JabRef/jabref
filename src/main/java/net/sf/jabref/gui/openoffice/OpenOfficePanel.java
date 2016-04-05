@@ -15,38 +15,12 @@
  */
 package net.sf.jabref.gui.openoffice;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.OOBibStyle;
-import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
-import net.sf.jabref.logic.openoffice.StyleLoader;
-import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
-import com.sun.star.lang.WrappedTargetException;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -54,6 +28,27 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.*;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.container.NoSuchElementException;
+import com.sun.star.lang.WrappedTargetException;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.*;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This test panel can be opened by reflection from JabRef, passing the JabRefFrame as an
@@ -305,10 +300,10 @@ public class OpenOfficePanel extends AbstractWorker {
         List<BibDatabase> databases = new ArrayList<>();
         if (preferences.useAllDatabases()) {
             for (BasePanel basePanel : frame.getBasePanelList()) {
-                databases.add(basePanel.database());
+                databases.add(basePanel.getDatabase());
             }
         } else {
-            databases.add(frame.getCurrentBasePanel().database());
+            databases.add(frame.getCurrentBasePanel().getDatabase());
         }
 
         return databases;
@@ -545,7 +540,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
         BasePanel panel = frame.getCurrentBasePanel();
         if (panel != null) {
-            final BibDatabase database = panel.database();
+            final BibDatabase database = panel.getDatabase();
             List<BibEntry> entries = panel.getSelectedEntries();
             if (!entries.isEmpty()) {
                 try {
