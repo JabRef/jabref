@@ -50,9 +50,6 @@ public class GUIGlobals {
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
     public static Font currentFont;
-    public static Font typeNameFont;
-
-    public static Double zoomLevel = 1.0;
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     public static final int SPLIT_PANE_DIVIDER_SIZE = 4;
@@ -133,7 +130,6 @@ public class GUIGlobals {
      * on Un*x is unavailable.
      */
     public static void init() {
-        GUIGlobals.typeNameFont = new Font("dialog", Font.ITALIC + Font.BOLD, 18);
         JLabel label;
         label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
