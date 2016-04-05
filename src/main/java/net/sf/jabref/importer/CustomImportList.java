@@ -35,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.fileformat.ImportFormat;
 
 /**
  * Collection of user defined custom import formats.
