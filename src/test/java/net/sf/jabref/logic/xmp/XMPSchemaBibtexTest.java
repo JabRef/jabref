@@ -50,7 +50,7 @@ public class XMPSchemaBibtexTest {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
-        Assert.assertNotNull(bibtex.getUnqualifiedTextProperty("rdf:Description"));
+        Assert.assertNotNull(bibtex.getUnqualifiedTextPropertyValue("rdf:Description"));
 
     }
 
@@ -73,11 +73,6 @@ public class XMPSchemaBibtexTest {
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
 
         bibtex.setPersonList("author", "Tom DeMarco and Kent Beck");
-
-        List<String> li = bibtex.getUnqualifiedSequenceValueList("rdf:li");
-
-        Assert.assertEquals("Tom DeMarco", li.get(0));
-        Assert.assertEquals("Kent Beck", li.get(1));
 
         List<String> authors = bibtex.getPersonList("author");
         Assert.assertEquals(2, authors.size());

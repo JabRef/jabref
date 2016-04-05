@@ -26,7 +26,9 @@ import net.sf.jabref.model.database.BibDatabase;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.XMPSchema;
 import org.apache.xmpbox.type.AbstractField;
+import org.apache.xmpbox.type.ArrayProperty;
 import org.apache.xmpbox.type.Attribute;
+import org.apache.xmpbox.type.TextType;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
 import org.w3c.dom.Element;
@@ -63,7 +65,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     public static XMPSchemaBibtex parseFromXml(Element e) throws XmpParsingException {
         DomXmpParser parser = new DomXmpParser();
         XMPMetadata meta = parser.parse(e.toString().getBytes());
-        XMPSchemaBibtex schema = (XMPSchemaBibtex)meta.getSchema(XMPSchemaBibtex.class);
+        XMPSchemaBibtex schema = (XMPSchemaBibtex) meta.getSchema(XMPSchemaBibtex.class);
         return schema;
     }
 
@@ -91,25 +93,20 @@ public class XMPSchemaBibtex extends XMPSchema {
         }
     }
 
-    private static String getContents(NodeList seqList) {
+    private static String getContents(ArrayProperty seqList) {
+        List<String> seq = seqList.getElementsAsString();
+        StringBuffer result = null;
 
-        Element seqNode = (Element) seqList.item(0);
-        StringBuffer seq = null;
-
-        NodeList items = seqNode.getElementsByTagName("rdf:li");
-        for (int j = 0; j < items.getLength(); j++) {
-            Element li = (Element) items.item(j);
-            if (seq == null) {
-                seq = new StringBuffer();
+        for(String item: seq){
+            if (result == null) {
+                result = new StringBuffer();
             } else {
-                seq.append(" and ");
+                result.append(" and ");
             }
-            seq.append(XMPSchemaBibtex.getTextContent(li));
+            result.append(item);
         }
-        if (seq != null) {
-            return seq.toString();
-        }
-        return null;
+
+        return result.toString();
     }
 
     /**
@@ -129,44 +126,28 @@ public class XMPSchemaBibtex extends XMPSchema {
             return result;
         }
 
-        // Check child-nodes first
-        int n = nodes.size();
-
-        for (int i = 0; i < n; i++) {
-            AbstractField node = nodes.get(i);
+        for (AbstractField node : nodes) {
 
             String nodeName = node.getPropertyName();
 
-            String[] split = nodeName.split(":");
+            if (node instanceof ArrayProperty) {
+                ArrayProperty seqList = ((ArrayProperty) node);
 
-            if ((split.length == 2) && split[0].equals(namespaceName)) {
-                NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
-                if (seqList.getLength() > 0) {
 
-                    String seq = XMPSchemaBibtex.getContents(seqList);
+                String seq = XMPSchemaBibtex.getContents(seqList);
 
-                    if (seq != null) {
-                        result.put(split[1], seq);
-                    }
-                } else {
-                    NodeList bagList = ((Element) node).getElementsByTagName("rdf:Bag");
-                    if (bagList.getLength() > 0) {
-
-                        String seq = XMPSchemaBibtex.getContents(bagList);
-
-                        if (seq != null) {
-                            result.put(split[1], seq);
-                        }
-                    } else {
-                        result.put(split[1], ((Element) node).getTextContent());
-                    }
+                if (seq != null) {
+                    result.put(nodeName, seq);
                 }
+            } else if (node instanceof TextType) {
+                TextType text = (TextType) node;
+                result.put(nodeName, text.getStringValue());
             }
         }
 
         // Then check Attributes
         List<Attribute> attrs = schema.getAllAttributes();
-        for (Attribute attribute: attrs) {
+        for (Attribute attribute : attrs) {
 
             String nodeName = attribute.getName();
             String[] split = nodeName.split(":");
@@ -198,7 +179,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         return result;
     }
 
-
     public void setBibtexEntry(BibEntry entry) {
         setBibtexEntry(entry, null);
     }
@@ -225,7 +205,7 @@ public class XMPSchemaBibtex extends XMPSchema {
             if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {
-               setTextPropertyValueAsSimple(field, value);
+                setTextPropertyValueAsSimple(field, value);
             }
         }
         setTextPropertyValueAsSimple("entrytype", entry.getType());
@@ -240,27 +220,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         text.remove("entrytype");
         e.setField(text);
         return e;
-    }
-
-    /**
-     * Taken from DOM2Utils.java:
-     * <p>
-     * JBoss, the OpenSource EJB server
-     * <p>
-     * Distributable under LGPL license. See terms of license at gnu.org.
-     */
-    public static String getTextContent(Node node) {
-        boolean hasTextContent = false;
-        StringBuilder buffer = new StringBuilder();
-        NodeList nlist = node.getChildNodes();
-        for (int i = 0; i < nlist.getLength(); i++) {
-            Node child = nlist.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE) {
-                buffer.append(child.getNodeValue());
-                hasTextContent = true;
-            }
-        }
-        return hasTextContent ? buffer.toString() : "";
     }
 
 }
