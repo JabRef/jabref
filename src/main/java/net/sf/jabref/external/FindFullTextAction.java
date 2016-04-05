@@ -68,8 +68,10 @@ public class FindFullTextAction extends AbstractWorker {
         if (result.isPresent()) {
             List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
             if (dirs.isEmpty()) {
-                // FIXME: Localization
-                JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(basePanel.frame(),
+                        Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                + " -> " + Localization.lang("External programs"),
+                        Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String bibtexKey = entry.getCiteKey();
@@ -93,7 +95,7 @@ public class FindFullTextAction extends AbstractWorker {
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }
         else {
-            String message = Localization.lang("Full text article download failed");
+            String message = Localization.lang("Full text document download failed");
             basePanel.output(message);
             JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
         }

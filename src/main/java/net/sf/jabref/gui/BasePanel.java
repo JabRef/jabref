@@ -828,7 +828,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
                     final List<BibEntry> bes = mainTable.getSelectedEntries();
                     if (bes.size() != 1) {
-                        output(Localization.lang("No entries or multiple entries selected."));
+                        output(Localization.lang("This operation requires exactly one item to be selected."));
                         return;
                     }
 
@@ -930,7 +930,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 List<BibEntry> bes = mainTable.getSelectedEntries();
                 if (bes.isEmpty()) {
-                    output(Localization.lang("No entries selected."));
+                    output(Localization.lang("This operation requires one or more entries to be selected."));
                     return;
                 }
                 NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
@@ -2160,7 +2160,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
             } else {
-                output(Localization.lang("No entries or multiple entries selected."));
+                output(Localization.lang("This operation requires exactly one item to be selected."));
             }
 
         }
