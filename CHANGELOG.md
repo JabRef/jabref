@@ -53,6 +53,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
 - Added open buttons to DOI and URL field
 
+- Move PDF file directory configuration from external tab to file tab in preferences
+
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
 - Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup
