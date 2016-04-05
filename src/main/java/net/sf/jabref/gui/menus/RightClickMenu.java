@@ -161,18 +161,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
-                    this.setEnabled(false);
-                }
-            }
-        });
-
-        add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
-            {
-                if (!(isFieldSetForSelectedEntry("doi"))) {
                     this.setEnabled(false);
                 }
             }
@@ -182,9 +173,15 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(typeMenu);
 
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
-
+        add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
+            {
+                if (!(isFieldSetForSelectedEntry("doi"))) {
+                    this.setEnabled(false);
+                }
+            }
+        });
         add(frame.getMassSetField());
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
         add(frame.getManageKeywords());
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
