@@ -60,7 +60,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param parent
      */
     public XMPSchemaBibtex(XMPMetadata parent) {
-        super(parent, XMPSchemaBibtex.KEY, XMPSchemaBibtex.NAMESPACE);
+        super(parent, XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.KEY);
     }
 
     public static XMPSchemaBibtex parseFromXml(Element e) throws XmpParsingException {
