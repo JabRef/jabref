@@ -531,17 +531,26 @@ public class JabRef {
     private void setLookAndFeel() {
         try {
             String lookFeel;
-            String systemLnF = UIManager.getSystemLookAndFeelClassName();
+            String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
 
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                // Use system Look & Feel by default
-                lookFeel = systemLnF;
+                lookFeel = systemLookFeel;
             } else {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
-            // At all cost, avoid ending up with the Metal look and feel:
-            if ("javax.swing.plaf.metal.MetalLookAndFeel".equals(lookFeel)) {
+            // Problems with OpenJDK and GTK L&F
+            // See https://github.com/JabRef/jabref/issues/393, https://github.com/JabRef/jabref/issues/638
+            // TODO: Still open if this also affects OracleJDK
+            if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
+                // Metal L&F
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                // notify the user
+                JOptionPane.showMessageDialog(jrf,
+                        "There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.",
+                        Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+            } else if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
+                // Otherwise try to avoid ending up with the ugly Metal L&F
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
                 com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
@@ -552,9 +561,9 @@ public class JabRef {
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
                         UnsupportedLookAndFeelException e) {
                     // specified look and feel does not exist on the classpath, so use system l&f
-                    UIManager.setLookAndFeel(systemLnF);
+                    UIManager.setLookAndFeel(systemLookFeel);
                     // also set system l&f as default
-                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLnF);
+                    Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
                     // notify the user
                     JOptionPane.showMessageDialog(JabRef.jrf,
                             Localization
@@ -596,9 +605,6 @@ public class JabRef {
         PreferencesMigrations.replaceAbstractField();
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
-
-        // Set up custom or default icon theme:
-        // This is now done at processArguments
 
         // This property is set to make the Mac OSX Java VM move the menu bar to
         // the top of the screen, where Mac users expect it to be.
