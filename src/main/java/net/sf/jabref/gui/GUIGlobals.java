@@ -188,7 +188,7 @@ public class GUIGlobals {
 
         // Priority icon used for the menu
         label = new JLabel(Priority.getInstance().getRepresentingIcon());
-        label.setToolTipText(Rank.getInstance().getToolTip());
+        label.setToolTipText(Priority.getInstance().getToolTip());
         GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, label);
 
         // Read icon used for menu

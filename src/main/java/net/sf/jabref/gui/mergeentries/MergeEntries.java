@@ -49,7 +49,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 public class MergeEntries {
 
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
+    private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
     // Headings
     private final String[] columnHeadings = {Localization.lang("Field"),
