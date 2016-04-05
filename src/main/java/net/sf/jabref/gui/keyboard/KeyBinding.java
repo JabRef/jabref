@@ -4,11 +4,14 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
 
-    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate"), "ctrl alt A"),
+    ABBREVIATE(
+            "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G"),
-    AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically link files"), "alt F"),
+    AUTOMATICALLY_LINK_FILES(
+            "Automatically link files", Localization.lang("Automatically set file links"), "alt F"),
     BACK("Back", Localization.lang("Back"), "alt LEFT"),
-    CLEANUP("Cleanup", Localization.lang("Cleanup"), "ctrl shift F7"),
+    CLEANUP(
+            "Cleanup", Localization.lang("Cleanup entries"), "ctrl shift F7"),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE"),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W"),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE"),
@@ -70,7 +73,8 @@ public enum KeyBinding {
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D"),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S"),
     SAVE_DATABASE("Save database", Localization.lang("Save database"), "ctrl S"),
-    SAVE_DATABASE_AS("Save database as...", Localization.lang("Save database as..."), "ctrl shift S"),
+    SAVE_DATABASE_AS(
+            "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N"),

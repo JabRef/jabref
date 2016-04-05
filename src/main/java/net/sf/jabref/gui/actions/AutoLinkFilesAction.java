@@ -48,9 +48,9 @@ public class AutoLinkFilesAction extends AbstractAction {
                             JabRef.jrf.getCurrentBasePanel().undoManager.addEdit(nc);
                             JabRef.jrf.getCurrentBasePanel().markBaseChanged();
                         }
-                        JabRef.jrf.output(Localization.lang("Finished autosetting external links."));
+                        JabRef.jrf.output(Localization.lang("Finished automatically setting external links."));
                     } else {
-                        JabRef.jrf.output(Localization.lang("Finished autosetting external links.") + " "
+                        JabRef.jrf.output(Localization.lang("Finished automatically setting external links.") + " "
                                 + Localization.lang("No files found."));
                     }
                 } , diag);
