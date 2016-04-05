@@ -727,7 +727,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                 throw new IllegalStateException("More than one entry found.");
             }
 
-            if (database.hasNoEntries()) {
+            if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
                     throw new IllegalStateException(parserResult.warnings().get(0));

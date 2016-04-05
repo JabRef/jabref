@@ -188,7 +188,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.database.addDatabaseChangeListener(new GroupTreeUpdater());
 
         if (file == null) {
-            if (!database.getEntries().isEmpty()) {
+            if (database.hasEntries()) {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
@@ -220,7 +220,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (getBibDatabaseContext().getDatabaseFile() == null) {
             title.append(GUIGlobals.UNTITLED_TITLE);
 
-            if (!getDatabase().getEntries().isEmpty()) {
+            if (getDatabase().hasEntries()) {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
@@ -385,7 +385,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 new StringReader((String) content.getTransferData(DataFlavor.stringFlavor)));
                         BibDatabase db = bp.parse().getDatabase();
                         LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
-                        if (!db.hasNoEntries()) {
+                        if (db.hasEntries()) {
                             bes = db.getEntries();
                         }
                     } catch (UnsupportedFlavorException ex) {
