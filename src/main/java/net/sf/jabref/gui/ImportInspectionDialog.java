@@ -661,9 +661,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
                 // Mark entries if we should
-                if (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                        && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                                || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP))) {
+                if (EntryMarker.shouldMarkEntries()) {
                     for (BibEntry entry : selected) {
                         EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                     }
