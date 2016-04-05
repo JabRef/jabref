@@ -1021,21 +1021,21 @@ public class XMPUtilTest {
         Assert.assertNotNull(schema);
         XMPSchemaBibtex bib = (XMPSchemaBibtex) schemas.get(0);
 
-        List<String> authors = bib.getSequenceList("author");
+        List<String> authors = bib.getUnqualifiedSequenceValueList("author");
         Assert.assertEquals(4, authors.size());
         Assert.assertEquals("K. Crowston", authors.get(0));
         Assert.assertEquals("H. Annabi", authors.get(1));
         Assert.assertEquals("J. Howison", authors.get(2));
         Assert.assertEquals("C. Masango", authors.get(3));
 
-        Assert.assertEquals("article", bib.getTextProperty("entrytype"));
+        Assert.assertEquals("article", bib.getUnqualifiedTextPropertyValue("entrytype"));
         Assert.assertEquals("Effective work practices for floss development: A model and propositions",
-                bib.getTextProperty("title"));
+                bib.getUnqualifiedTextPropertyValue("title"));
         Assert.assertEquals("Hawaii International Conference On System Sciences (HICSS)",
-                bib.getTextProperty("booktitle"));
-        Assert.assertEquals("2005", bib.getTextProperty("year"));
-        Assert.assertEquals("oezbek", bib.getTextProperty("owner"));
-        Assert.assertEquals("http://james.howison.name/publications.html", bib.getTextProperty("url"));
+                bib.getUnqualifiedTextPropertyValue("booktitle"));
+        Assert.assertEquals("2005", bib.getUnqualifiedTextPropertyValue("year"));
+        Assert.assertEquals("oezbek", bib.getUnqualifiedTextPropertyValue("owner"));
+        Assert.assertEquals("http://james.howison.name/publications.html", bib.getUnqualifiedTextPropertyValue("url"));
 
     }
 
