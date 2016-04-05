@@ -8,6 +8,7 @@ import net.sf.jabref.JabRefPreferences;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
+import org.apache.xmpbox.xml.XmpSerializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,9 +19,10 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -45,13 +47,17 @@ public class XMPSchemaBibtexTest {
     }
 
     @Test
-    public void testXMPSchemaBibtexXMPMetadata() throws IOException {
+    public void testXMPSchemaBibtexXMPMetadata() throws IOException, TransformerException {
 
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
+        xmp.addSchema(bibtex);
 
-        Assert.assertNotNull(bibtex.getUnqualifiedTextPropertyValue("rdf:Description"));
+        XmpSerializer serializer = new XmpSerializer();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        serializer.serialize(xmp, outputStream, true);
 
+        Assert.assertNotNull(outputStream.toString(String.valueOf(StandardCharsets.UTF_8)).contains("rdf:Description"));
     }
 
     @Test
@@ -100,7 +106,7 @@ public class XMPSchemaBibtexTest {
                 "The advanced Flux-Correlation for Delawney-Separation");
 
         e = bibtex.getUnqualifiedTextPropertyValue("title");
-        Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation", e );
+        Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation", e);
 
         Assert.assertEquals("The advanced Flux-Correlation for Delawney-Separation",
                 bibtex.getUnqualifiedTextPropertyValue("title"));
@@ -253,9 +259,9 @@ public class XMPSchemaBibtexTest {
         //TODO: currently no idea how to translate
         //Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString.getBytes()));
 
-       // Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
-       //         XMPSchemaBibtex.getTextContent(
-       //                 d.getElementsByTagName("bibtex:title").item(0)).trim());
+        // Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
+        //         XMPSchemaBibtex.getTextContent(
+        //                 d.getElementsByTagName("bibtex:title").item(0)).trim());
 
     }
 
