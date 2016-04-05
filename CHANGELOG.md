@@ -50,6 +50,8 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
 - [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
+- Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
+- Added open buttons to DOI and URL field
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
@@ -86,6 +88,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1001](https://github.com/JabRef/jabref/issues/1001): No NPE when exporting a complete database
 - Fixed [#991](https://github.com/JabRef/jabref/issues/991): Entry is now correctly removed from the BibDatabase
 - Fixed [#1062](https://github.com/JabRef/jabref/issues/1062): Merge entry with DOI information now also applies changes to entry type
+- Fixed [#535](https://github.com/JabRef/jabref/issues/535): Add merge action to right click menu
 
 
 ### Removed
@@ -96,6 +99,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
 - Removed PDF preview functionality
 - Removed Sixpackimporter it is not used in the wild anymore
+- Removed double click listener from DOI and URL field
 
 
 

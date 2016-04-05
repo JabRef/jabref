@@ -170,7 +170,7 @@ public class InternalBibtexFields {
         add(dummy);
 
         dummy = new BibtexSingleField("doi", true, BibtexSingleField.SMALL_W);
-        dummy.setExtras(EnumSet.of(BibtexSingleFieldProperties.EXTERNAL));
+        dummy.setExtras(EnumSet.of(BibtexSingleFieldProperties.DOI));
         add(dummy);
         add(new BibtexSingleField("eid", true, BibtexSingleField.SMALL_W));
 

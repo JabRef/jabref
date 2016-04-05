@@ -1446,12 +1446,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(makeKeyAction);
         tlb.addAction(cleanupEntries);
         tlb.addAction(mergeEntries);
+        tlb.addAction(openConsole);
 
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
-        tlb.addAction(openConsole);
-        tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
@@ -1480,8 +1479,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            tlb.addSeparator();
         }
+        tlb.addSeparator();
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
         tlb.addJToogleButton(fetcherToggle);

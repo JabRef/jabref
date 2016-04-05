@@ -167,7 +167,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
-
         this.frame = frame;
         this.panel = panel;
         this.entry = entry;
@@ -462,8 +461,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
                     fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER));
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.EXTERNAL)) {
-            // Add external viewer listener for "pdf" and "url" fields.
-            return FieldExtraComponents.getExternalExtraComponent(editor, this);
+            return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.JOURNAL_NAMES)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
@@ -472,16 +470,16 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         } else if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     getStoreFieldAction());
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.BROWSE)) {
-            return FieldExtraComponents.getBrowseExtraComponent(frame, editor, this);
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.URL)) {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
+        } else if (fieldExtras.contains(BibtexSingleFieldProperties.DOI)) {
+            return FieldExtraComponents.getDoiExtraComponent(panel, editor);
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.SET_OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.MONTH)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this, this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         }
         return Optional.empty();
     }
@@ -494,9 +492,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         source.setLineWrap(true);
         source.setTabSize(GUIGlobals.INDENT);
         source.addFocusListener(new FieldEditorFocusListener());
-        // Add the global focus listener, so a menu item can see if this field
-        // was focused when
-        // an action was called.
+        // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.focusListener);
         source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
@@ -507,7 +503,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
-
     }
 
     public void updateSource() {
@@ -841,13 +836,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     }
 
     private void setField(String fieldName, String newFieldData) {
-
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).updateField(fieldName, newFieldData);
             }
         }
-
     }
 
     /**
@@ -1377,29 +1370,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
             panel.runCommand(Actions.SAVE);
 
-        }
-    }
-
-    class ExternalViewerListener extends MouseAdapter {
-        @Override
-        public void mouseClicked(MouseEvent evt) {
-            if (evt.getClickCount() == 2) {
-                TextArea tf = (TextArea) evt.getSource();
-
-                if (tf.getText().isEmpty()) {
-                    return;
-                }
-
-                tf.selectAll();
-
-                String link = tf.getText(); // get selected ? String
-
-                try {
-                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, tf.getFieldName());
-                } catch (IOException ex) {
-                    LOGGER.warn("Error opening file.", ex);
-                }
-            }
         }
     }
 
