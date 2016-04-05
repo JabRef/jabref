@@ -181,7 +181,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         addSeparator();
 
         add(typeMenu);
-        add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
 
         add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
 
@@ -197,11 +196,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
-
-        floatMarked.addActionListener(e -> {
-            Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
-            panel.mainTable.refreshSorting(); // Bad remote access
-        });
 
         // create disabledIcons for all menu entries
         frame.createDisabledIconsForMenuEntries(this);
@@ -235,10 +229,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
         }
-
-        addSeparator();
-        floatMarked.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
-        add(floatMarked);
     }
 
 
