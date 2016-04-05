@@ -59,7 +59,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         this.panel = panel;
         JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
-        boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
+        boolean multiple = areMultipleEntriesSelected();
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibEntry be = null;
@@ -96,7 +96,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
-            addSeparator();
         } else if (be != null) {
             String marked = be.getField(InternalBibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
@@ -107,7 +106,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(markSpecific);
                 add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
             }
-            addSeparator();
         }
 
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
@@ -142,8 +140,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(readStatusMenu);
             }
 
-            addSeparator();
         }
+
+        addSeparator();
 
         add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
@@ -186,6 +185,17 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(frame.getMassSetField());
         add(frame.getManageKeywords());
+        add(new GeneralAction(Actions.MERGE_ENTRIES,
+                Localization.lang("Merge entries") + "...",
+                IconTheme.JabRefIcon.MERGE_ENTRIES.getSmallIcon()) {
+
+            {
+                if (!(areExactlyTwoEntriesSelected())) {
+                    this.setEnabled(false);
+                }
+            }
+
+        });
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
@@ -204,6 +214,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         // create disabledIcons for all menu entries
         frame.createDisabledIconsForMenuEntries(this);
+    }
+
+    private boolean areMultipleEntriesSelected() {
+        return panel.mainTable.getSelectedRowCount() > 1;
+    }
+
+    private boolean areExactlyTwoEntriesSelected() {
+        return panel.mainTable.getSelectedRowCount() == 2;
     }
 
     /**
