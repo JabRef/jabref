@@ -1,13 +1,10 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
-
 import java.util.Calendar;
 
 public class YearUtil {
 
     private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
-
 
     /**
      * Will convert a two digit year using the following scheme (describe at
@@ -44,8 +41,8 @@ public class YearUtil {
             return year;
         }
 
-        Integer yearNumber = StringUtil.intValueOfWithNull(year);
-        if(yearNumber == null) {
+        Integer yearNumber = intValueOfWithNull(year);
+        if (yearNumber == null) {
             return year;
         }
 
@@ -61,21 +58,41 @@ public class YearUtil {
             return 0;
         }
 
-        Integer yearNumber = StringUtil.intValueOfWithNull(year);
-        if(yearNumber == null) {
+        Integer yearNumber = intValueOfWithNull(year);
+        if (yearNumber == null) {
             return 0;
         }
 
         return new Year(thisYear).toFourDigitYear(yearNumber);
     }
 
+    private static Integer intValueOfWithNull(String str) {
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            return null;
+        }
+
+        int ival = 0;
+        for (; ; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                return null;
+            }
+        }
+    }
 
     private static class Year {
 
         private final int year;
         private final int century;
         private final int yearShort;
-
 
         public Year(int year) {
             this.year = year;
