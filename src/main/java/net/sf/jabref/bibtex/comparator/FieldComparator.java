@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.logic.config.SaveOrderConfig;
@@ -93,7 +94,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     private FieldType determineFieldType() {
         if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
-        } else if("author".equals(this.field[0]) || "editor".equals(this.field[0])) {
+        } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
             return FieldType.NAME;
         } else if ("year".equals(this.field[0])) {
             return FieldType.YEAR;

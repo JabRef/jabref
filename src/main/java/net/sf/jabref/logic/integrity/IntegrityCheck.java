@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -41,11 +41,7 @@ public class IntegrityCheck {
             return result;
         }
 
-        for (String fieldName : entry.getFieldNames()) {
-            if (InternalBibtexFields.getFieldExtras(fieldName).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
-                result.addAll(new AuthorNameChecker(fieldName).check(entry));
-            }
-        }
+        result.addAll(new AuthorNameChecker().check(entry));
 
         if (!bibDatabaseContext.isBiblatexMode()) {
             result.addAll(new TitleChecker().check(entry));
@@ -160,29 +156,26 @@ public class IntegrityCheck {
 
     private static class AuthorNameChecker implements Checker {
 
-        private final String field;
-
-        private AuthorNameChecker(String field) {
-            this.field = field;
-        }
-
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
-            if (!value.isPresent()) {
-                return Collections.emptyList();
-            }
+            List<IntegrityMessage> result = new ArrayList<>();
+            for (String field : entry.getFieldNames()) {
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+                    Optional<String> value = entry.getFieldOptional(field);
+                    if (!value.isPresent()) {
+                        return Collections.emptyList();
+                    }
 
-            String valueTrimmedAndLowerCase = value.get().trim().toLowerCase();
-            if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should start with a name"), entry, field));
-            } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should end with a name"), entry, field));
+                    String valueTrimmedAndLowerCase = value.get().trim().toLowerCase();
+                    if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
+                        result.add(new IntegrityMessage(Localization.lang("should start with a name"), entry, field));
+                    } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
+                        result.add(new IntegrityMessage(Localization.lang("should end with a name"), entry, field));
+                    }
+                }
             }
-
-            return Collections.emptyList();
+            return result;
         }
-
     }
 
     private static class BracketChecker implements Checker {

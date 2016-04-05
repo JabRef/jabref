@@ -29,7 +29,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
@@ -1376,7 +1376,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             } else {
                 String field = INSPECTION_FIELDS.get(i - PAD);
-                if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                     return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib)
                             .orElse("");
                 } else {

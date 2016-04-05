@@ -17,7 +17,7 @@ package net.sf.jabref.model;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -143,7 +143,7 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+        if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthorLastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();

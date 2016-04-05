@@ -32,7 +32,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
@@ -308,7 +308,7 @@ public class FieldExtraComponents {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                 storeFieldAction, false,
                 InternalBibtexFields.getFieldExtras(editor.getFieldName())
-                        .contains(BibtexSingleFieldProperties.PERSON_NAMES) ? " and " : ", ");
+                        .contains(FieldProperties.PERSON_NAMES) ? " and " : ", ");
         contentSelectors.add(ws);
         return Optional.of(ws);
     }
@@ -343,4 +343,25 @@ public class FieldExtraComponents {
 
     }
 
+    /**
+     * Return a dropdown list with the gender alternatives for fields with GENDER
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+
+    public static Optional<JComponent> getGenderExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+        final String[] optionValues = {"", "sf", "sm", "sp", "pf", "pm", "pn", "pp"};
+        final String[] optionDescriptions = {"", Localization.lang("Female name"), Localization.lang("Male name"),
+                Localization.lang("Neuter name"), Localization.lang("Female names"), Localization.lang("Male names"),
+                Localization.lang("Neuter names"), Localization.lang("Mixed names")};
+        JComboBox<String> gender = new JComboBox<>(optionDescriptions);
+        gender.addActionListener(actionEvent -> {
+            fieldEditor.setText(optionValues[gender.getSelectedIndex()]);
+            entryEditor.updateField(fieldEditor);
+        });
+        return Optional.of(gender);
+
+    }
 }
