@@ -63,7 +63,7 @@ public class XMPSchemaBibtex extends XMPSchema {
     public static XMPSchemaBibtex parseFromXml(Element e) throws XmpParsingException {
         DomXmpParser parser = new DomXmpParser();
         XMPMetadata meta = parser.parse(e.toString().getBytes());
-        XMPSchemaBibtex schema = (XMPSchemaBibtex)meta.getSchema(XMPSchemaBibtex.KEY);
+        XMPSchemaBibtex schema = (XMPSchemaBibtex)meta.getSchema(XMPSchemaBibtex.class);
         return schema;
     }
 
