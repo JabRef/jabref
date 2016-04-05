@@ -34,7 +34,8 @@ public class AutoLinkFilesAction extends AbstractAction {
     public void actionPerformed(ActionEvent event) {
         List<BibEntry> entries = JabRef.jrf.getCurrentBasePanel().getSelectedEntries();
         if (entries.isEmpty()) {
-            JabRef.jrf.getCurrentBasePanel().output(Localization.lang("No entries selected."));
+            JabRef.jrf.getCurrentBasePanel()
+                    .output(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
         JDialog diag = new JDialog(JabRef.jrf, true);
@@ -48,9 +49,9 @@ public class AutoLinkFilesAction extends AbstractAction {
                             JabRef.jrf.getCurrentBasePanel().undoManager.addEdit(nc);
                             JabRef.jrf.getCurrentBasePanel().markBaseChanged();
                         }
-                        JabRef.jrf.output(Localization.lang("Finished autosetting external links."));
+                        JabRef.jrf.output(Localization.lang("Finished automatically setting external links."));
                     } else {
-                        JabRef.jrf.output(Localization.lang("Finished autosetting external links.") + " "
+                        JabRef.jrf.output(Localization.lang("Finished automatically setting external links.") + " "
                                 + Localization.lang("No files found."));
                     }
                 } , diag);

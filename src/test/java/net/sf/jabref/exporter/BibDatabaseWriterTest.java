@@ -1,32 +1,49 @@
 package net.sf.jabref.exporter;
 
-import com.google.common.base.Charsets;
-import net.sf.jabref.*;
-import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.google.common.base.Charsets;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.IdGenerator;
 
 public class BibDatabaseWriterTest {
 
@@ -261,7 +278,7 @@ public class BibDatabaseWriterTest {
                 new Defaults(BibDatabaseMode.BIBTEX));
 
         databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
-        try (Scanner scanner = new Scanner(testBibtexFile)) {
+        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
             assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
@@ -294,7 +311,7 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         assertEquals(Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}" + Globals.NEWLINE + "}" + Globals.NEWLINE,
+                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}," + Globals.NEWLINE + "}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -324,13 +341,14 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeSaveActions() throws Exception {
-        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
+                Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + Globals.NEWLINE
-                + "title[LowerCaseChanger]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, stringWriter.toString());
+                + "title[lower_case]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -367,7 +385,7 @@ public class BibDatabaseWriterTest {
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: databaseType:BibLaTeX;}" + Globals.NEWLINE,
+        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: databaseType:biblatex;}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -419,5 +437,93 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
 
         assertEquals("", stringWriter.toString());
+    }
+
+    @Test
+    public void writeEntriesSorted() throws IOException {
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
+                new SaveOrderConfig.SortCriterion("year", true),
+                new SaveOrderConfig.SortCriterion("abstract", false));
+        metaData.setSaveOrderConfig(saveOrderConfig);
+
+        BibEntry firstEntry = new BibEntry();
+        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setField("author", "A");
+        firstEntry.setField("year", "2000");
+
+        BibEntry secondEntry = new BibEntry();
+        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setField("author", "A");
+        secondEntry.setField("year", "2010");
+
+        BibEntry thirdEntry = new BibEntry();
+        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setField("author", "B");
+        thirdEntry.setField("year", "2000");
+
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
+        database.insertEntry(firstEntry);
+
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, database.getEntries(), new SavePreferences());
+
+        assertEquals(
+                Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {A}," + Globals.NEWLINE +
+                "  year   = {2000}," + Globals.NEWLINE +
+                "}"  + Globals.NEWLINE + Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {A}," + Globals.NEWLINE +
+                "  year   = {2010}," + Globals.NEWLINE +
+                "}" + Globals.NEWLINE + Globals.NEWLINE +
+                "@Article{," + Globals.NEWLINE +
+                "  author = {B}," + Globals.NEWLINE +
+                "  year   = {2000}," + Globals.NEWLINE +
+                "}" + Globals.NEWLINE + Globals.NEWLINE +
+                "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
+                Globals.NEWLINE
+                , stringWriter.toString());
+    }
+
+    @Test
+    public void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws IOException {
+        BibEntry firstEntry = new BibEntry(IdGenerator.next());
+        firstEntry.setType(BibtexEntryTypes.ARTICLE);
+        firstEntry.setField("author", "A");
+        firstEntry.setField("year", "2010");
+
+        BibEntry secondEntry = new BibEntry(IdGenerator.next());
+        secondEntry.setType(BibtexEntryTypes.ARTICLE);
+        secondEntry.setField("author", "B");
+        secondEntry.setField("year", "2000");
+
+        BibEntry thirdEntry = new BibEntry(IdGenerator.next());
+        thirdEntry.setType(BibtexEntryTypes.ARTICLE);
+        thirdEntry.setField("author", "A");
+        thirdEntry.setField("year", "2000");
+
+        database.insertEntry(firstEntry);
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
+
+        SavePreferences preferences = new SavePreferences().withSaveInOriginalOrder(false);
+        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, database.getEntries(), preferences);
+
+        assertEquals(
+                Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {A}," + Globals.NEWLINE +
+                        "  year   = {2010}," + Globals.NEWLINE +
+                        "}" + Globals.NEWLINE + Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {B}," + Globals.NEWLINE +
+                        "  year   = {2000}," + Globals.NEWLINE +
+                        "}" + Globals.NEWLINE + Globals.NEWLINE +
+                        "@Article{," + Globals.NEWLINE +
+                        "  author = {A}," + Globals.NEWLINE +
+                        "  year   = {2000}," + Globals.NEWLINE +
+                        "}"  + Globals.NEWLINE
+                , stringWriter.toString());
     }
 }

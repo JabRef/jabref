@@ -27,7 +27,6 @@ import net.sf.jabref.groups.EntryTableTransferHandler;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.gui.actions.*;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
@@ -41,6 +40,7 @@ import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
+import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -60,10 +60,8 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.openoffice.OpenOfficePanel;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.importer.DbImportAction;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -74,11 +72,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The main window of the application.
@@ -212,11 +207,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save database"),
             Localization.lang("Save database"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
-            Localization.menuTitle("Save database as ..."), Localization.lang("Save database as ..."),
+            Localization.menuTitle("Save database as..."), Localization.lang("Save database as..."),
             Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
-            Localization.menuTitle("Save selected as ..."), Localization.lang("Save selected as ..."));
+            Localization.menuTitle("Save selected as..."), Localization.lang("Save selected as..."));
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             Localization.menuTitle("Save selected as plain BibTeX..."),
             Localization.lang("Save selected as plain BibTeX..."));
@@ -447,8 +442,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private GeneralFetcher generalFetcher;
 
-    private final List<Action> fetcherActions = new LinkedList<>();
-
     private GroupSelector groupSelector;
 
     private int previousTabCount = -1;
@@ -661,24 +654,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    /**
-     * Tries to open a browser with the given URL
-     * <p>
-     * All errors are logged
-     *
-     * @param url the url to open
-     */
-    public void openBrowser(String url) {
-        try {
-            JabRefDesktop.openBrowser(url);
-            output(Localization.lang("External viewer called") + '.');
-        } catch (IOException ex) {
-            output(Localization.lang("Error") + ": " + ex.getMessage());
-            LOGGER.debug("Cannot open browser.", ex);
-        }
-    }
-
-    public void refreshTitleAndTabs() {
+    private void refreshTitleAndTabs() {
         setWindowTitle();
         updateAllTabTitles();
     }
@@ -1037,7 +1013,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * handle the color of active and inactive JTabbedPane tabs
      */
-    public void markActiveBasePanel() {
+    private void markActiveBasePanel() {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
@@ -1079,7 +1055,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return enableToggle(a, false);
     }
 
-    class GeneralAction extends MnemonicAwareAction {
+    private class GeneralAction extends MnemonicAwareAction {
 
         private final String command;
 
@@ -1151,7 +1127,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu edit = JabRefFrame.subMenu(Localization.menuTitle("Edit"));
         JMenu search = JabRefFrame.subMenu(Localization.menuTitle("Search"));
         JMenu groups = JabRefFrame.subMenu(Localization.menuTitle("Groups"));
-        JMenu bibtex = JabRefFrame.subMenu(Localization.menuTitle("BibTeX"));
+        JMenu bibtex = JabRefFrame.subMenu("&BibTeX");
         JMenu quality = JabRefFrame.subMenu(Localization.menuTitle("Quality"));
         JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
         JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
@@ -1161,7 +1137,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         file.add(newBibtexDatabaseAction);
         file.add(newBiblatexDatabaseAction);
-        file.add(getOpenDatabaseAction()); //opendatabaseaction
+        file.add(getOpenDatabaseAction());
         file.add(mergeDatabaseAction);
         file.add(save);
         file.add(saveAs);
@@ -1246,13 +1222,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         edit.add(getManageKeywords());
+        edit.add(getMassSetField());
         edit.addSeparator();
         edit.add(selectAll);
         mb.add(edit);
 
         search.add(normalSearch);
         search.add(replaceAll);
-        search.add(getMassSetField());
         search.addSeparator();
         search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
@@ -1445,12 +1421,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(makeKeyAction);
         tlb.addAction(cleanupEntries);
         tlb.addAction(mergeEntries);
+        tlb.addAction(openConsole);
 
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
-        tlb.addAction(openConsole);
-        tlb.addSeparator();
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
@@ -1479,8 +1454,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            tlb.addSeparator();
         }
+        tlb.addSeparator();
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
         tlb.addJToogleButton(fetcherToggle);
@@ -1505,14 +1480,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         });
     }
 
-    public void stopShowingSearchResults() {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            getBasePanelAt(i).getFilterSearchToggle().stop();
-        }
-    }
-
-
-
     private void initActions() {
         openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
@@ -1526,8 +1493,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, dbConnect, dbExport, focusTable,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
-
-        openDatabaseOnlyActions.addAll(fetcherActions);
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
@@ -1696,7 +1661,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class SelectKeysAction extends AbstractAction {
+    private class SelectKeysAction extends AbstractAction {
 
         public SelectKeysAction() {
             super(Localization.lang("Customize key bindings"));
@@ -1716,7 +1681,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * The action concerned with closing the window.
      */
-    class CloseAction extends MnemonicAwareAction {
+    private class CloseAction extends MnemonicAwareAction {
 
         public CloseAction() {
             putValue(Action.NAME, Localization.menuTitle("Quit"));
@@ -1730,7 +1695,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class ShowPrefsAction extends MnemonicAwareAction {
+    private class ShowPrefsAction extends MnemonicAwareAction {
 
         public ShowPrefsAction() {
             super(IconTheme.JabRefIcon.PREFERENCES.getIcon());
@@ -1767,17 +1732,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    /**
-     * Set the preview active state for all BasePanel instances.
-     *
-     * @param enabled
-     */
-    public void setPreviewActive(boolean enabled) {
-        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-            getBasePanelAt(i).setPreviewActive(enabled);
-        }
     }
 
     public void removeCachedEntryEditors() {
@@ -1864,7 +1818,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
-    class ChangeTabAction extends MnemonicAwareAction {
+    private class ChangeTabAction extends MnemonicAwareAction {
 
         private final boolean next;
 
@@ -1895,7 +1849,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * kept track of by Globals.focusListener, and we call the action stored under the
      * relevant name in its action map.
      */
-    class EditAction extends MnemonicAwareAction {
+    private class EditAction extends MnemonicAwareAction {
 
         private final String command;
 
@@ -1918,7 +1872,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class CustomizeExportsAction extends MnemonicAwareAction {
+    private class CustomizeExportsAction extends MnemonicAwareAction {
 
         public CustomizeExportsAction() {
             putValue(Action.NAME, Localization.menuTitle("Manage custom exports"));
@@ -1931,7 +1885,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class CustomizeImportsAction extends MnemonicAwareAction {
+    private class CustomizeImportsAction extends MnemonicAwareAction {
 
         public CustomizeImportsAction() {
             putValue(Action.NAME, Localization.menuTitle("Manage custom imports"));
@@ -1944,7 +1898,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class CustomizeEntryTypeAction extends MnemonicAwareAction {
+    private class CustomizeEntryTypeAction extends MnemonicAwareAction {
 
         public CustomizeEntryTypeAction() {
             putValue(Action.NAME, Localization.menuTitle("Customize entry types"));
@@ -1958,7 +1912,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class GenFieldsCustomizationAction extends MnemonicAwareAction {
+    private class GenFieldsCustomizationAction extends MnemonicAwareAction {
 
         public GenFieldsCustomizationAction() {
             putValue(Action.NAME, Localization.menuTitle("Set up general fields"));
@@ -1973,7 +1927,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class DatabasePropertiesAction extends MnemonicAwareAction {
+    private class DatabasePropertiesAction extends MnemonicAwareAction {
 
         private DatabasePropertiesDialog propertiesDialog;
 
@@ -1993,7 +1947,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
-    class BibtexKeyPatternAction extends MnemonicAwareAction {
+    private class BibtexKeyPatternAction extends MnemonicAwareAction {
 
         private BibtexKeyPatternDialog bibtexKeyPatternDialog;
 
@@ -2017,7 +1971,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
-    class IncreaseTableFontSizeAction extends MnemonicAwareAction {
+    private class IncreaseTableFontSizeAction extends MnemonicAwareAction {
 
         public IncreaseTableFontSizeAction() {
             putValue(Action.NAME, Localization.menuTitle("Increase table font size"));
@@ -2037,7 +1991,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    class DecreaseTableFontSizeAction extends MnemonicAwareAction {
+    private class DecreaseTableFontSizeAction extends MnemonicAwareAction {
 
         public DecreaseTableFontSizeAction() {
             putValue(Action.NAME, Localization.menuTitle("Decrease table font size"));
@@ -2098,7 +2052,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JOptionPane.showMessageDialog(this, message);
     }
 
-    public int showSaveDialog(String filename) {
+    private int showSaveDialog(String filename) {
         Object[] options = {Localization.lang("Save changes"),
                 Localization.lang("Discard changes"),
                 Localization.lang("Return to JabRef")};
@@ -2181,7 +2135,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return open;
     }
 
-    public class CloseDatabaseAction extends MnemonicAwareAction {
+    private class CloseDatabaseAction extends MnemonicAwareAction {
 
         public CloseDatabaseAction() {
             super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
@@ -2196,7 +2150,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public class CloseAllDatabasesAction extends MnemonicAwareAction {
+    private class CloseAllDatabasesAction extends MnemonicAwareAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -2208,7 +2162,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public class CloseOtherDatabasesAction extends MnemonicAwareAction {
+    private class CloseOtherDatabasesAction extends MnemonicAwareAction {
 
         @Override
         public void actionPerformed(ActionEvent e) {

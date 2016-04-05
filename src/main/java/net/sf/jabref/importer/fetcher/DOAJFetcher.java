@@ -69,7 +69,7 @@ public class DOAJFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("Search canceled"));
+                            status.setStatus(Localization.lang("%0 import canceled", "DOAJ"));
                             return false;
                         }
 
@@ -113,7 +113,7 @@ public class DOAJFetcher implements EntryFetcher {
             }
         } catch (UnirestException e) {
             LOGGER.warn("Problem searching DOAJ", e);
-            status.setStatus(Localization.lang("Search canceled"));
+            status.setStatus(Localization.lang("%0 import canceled", "DOAJ"));
             return false;
         }
 

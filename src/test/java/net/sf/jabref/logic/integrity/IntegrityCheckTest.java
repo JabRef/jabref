@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,7 +50,7 @@ public class IntegrityCheckTest {
     }
 
     @Test
-    public void testBraketChecks() {
+    public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
         assertCorrect(createContext("title", "{x}x{}x{{}}"));
@@ -104,6 +105,8 @@ public class IntegrityCheckTest {
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
         Mockito.when(metaData.getFileDirectory()).thenReturn(Collections.singletonList("."));
+        // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
+        Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
         assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
         assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));

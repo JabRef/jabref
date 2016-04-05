@@ -15,8 +15,20 @@
 */
 package net.sf.jabref;
 
+import java.awt.Font;
+import java.io.File;
+import java.io.IOException;
+import java.net.Authenticator;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.prefs.BackingStoreException;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.cli.AuxCommandLine;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
@@ -45,21 +57,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.cli.AuxCommandLine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.Authenticator;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
-import java.util.prefs.BackingStoreException;
 
 /**
  * JabRef Main Class - The application gets started here.
@@ -90,7 +89,7 @@ public class JabRef {
         InternalBibtexFields.setNumericFieldsFromPrefs();
 
         /* Build list of Import and Export formats */
-        Globals.importFormatReader.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports();
 
@@ -101,10 +100,10 @@ public class JabRef {
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
         if (remotePreferences.useRemoteServer()) {
 
-            Globals.remoteListener.open(new JabRefMessageHandler(this), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(this), remotePreferences.getPort());
 
-            if (Globals.remoteListener.isOpen()) {
-                Globals.remoteListener.start(); // we are alone, we start the server
+            if (Globals.REMOTE_LISTENER.isOpen()) {
+                Globals.REMOTE_LISTENER.start(); // we are alone, we start the server
             } else {
                 // we are not alone, there is already a server out there, try to contact already running JabRef:
                 if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
@@ -250,7 +249,7 @@ public class JabRef {
                 BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
-                if ((newBase != null) && (!newBase.hasNoEntries())) {
+                if ((newBase != null) && newBase.hasEntries()) {
                     String formatName;
 
                     //read in the export format, take default format if no format entered
@@ -397,7 +396,7 @@ public class JabRef {
                     boolean notSavedMsg = false;
 
                     // write an output, if something could be resolved
-                    if ((newBase != null) && !newBase.hasNoEntries()) {
+                    if ((newBase != null) && newBase.hasEntries()) {
                         String subName = StringUtil.getCorrectFileName(data[1], "bib");
 
                         try {
@@ -465,13 +464,13 @@ public class JabRef {
 
             MetaData metaData = parserResult.getMetaData();
             if (metaData != null) {
-                LOGGER.info(Localization.lang("Regenerating bibtex keys according to metadata"));
+                LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
                     LabelPatternUtil.makeLabel(metaData, database, entry);
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate bibtex keys"));
+                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));
             }
         }
     }
@@ -829,9 +828,9 @@ public class JabRef {
                 try {
                     List<BibEntry> entries;
                     if (OS.WINDOWS) {
-                        entries = Globals.importFormatReader.importFromFile(data[1], data[0], JabRef.jrf);
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRef.jrf);
                     } else {
-                        entries = Globals.importFormatReader.importFromFile(data[1],
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
                                 data[0].replace("~", System.getProperty("user.home")), JabRef.jrf);
                     }
                     return Optional.of(new ParserResult(entries));
@@ -845,9 +844,9 @@ public class JabRef {
 
                 ImportFormatReader.UnknownFormatImport importResult;
                 if (OS.WINDOWS) {
-                    importResult = Globals.importFormatReader.importUnknownFormat(data[0]);
+                    importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(data[0]);
                 } else {
-                    importResult = Globals.importFormatReader
+                    importResult = Globals.IMPORT_FORMAT_READER
                             .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
                 }
 

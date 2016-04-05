@@ -23,6 +23,7 @@ public class Languages {
         LANGUAGES.put("Norsk", "no");
         LANGUAGES.put("Brazilian Portugese", "pt_BR");
         LANGUAGES.put("Russian", "ru");
+        LANGUAGES.put("Svenska", "sv");
         LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Vietnamese", "vi");
         LANGUAGES.put("Simplified Chinese", "zh");

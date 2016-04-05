@@ -5,8 +5,8 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents everything related to a .bib file.
@@ -44,8 +44,9 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseMode getMode() {
-        List<String> data = metaData.getData(MetaData.DATABASE_TYPE);
-        if ((data == null) || data.isEmpty()) {
+        Optional<BibDatabaseMode> mode = metaData.getMode();
+
+        if (!mode.isPresent()) {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
             if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
                 return BibDatabaseMode.BIBLATEX;
@@ -53,7 +54,7 @@ public class BibDatabaseContext {
                 return BibDatabaseMode.BIBTEX;
             }
         }
-        return BibDatabaseMode.valueOf(data.get(0).toUpperCase());
+        return mode.get();
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {

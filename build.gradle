@@ -28,6 +28,8 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'install4j'
 
+apply plugin: 'checkstyle'
+
 apply from: 'eclipse.gradle'
 
 // HACK to disable coverityCheck task when not on CI server
@@ -91,8 +93,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.5.2-1'
-    compile 'org.antlr:antlr4-runtime:4.5.2-1'
+    antlr4 'org.antlr:antlr4:4.5.3'
+    compile 'org.antlr:antlr4-runtime:4.5.3'
 
     compile 'mysql:mysql-connector-java:5.1.38'
     compile 'org.postgresql:postgresql:9.4.1208'
@@ -105,7 +107,7 @@ dependencies {
     compile 'commons-logging:commons-logging:1.2'
 
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.mashape.unirest:unirest-java:1.4.8'
+    compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.5'
     compile 'org.apache.logging.log4j:log4j-api:2.5'
@@ -114,7 +116,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'com.github.tomakehurst:wiremock:1.58'
-	testCompile 'org.assertj:assertj-swing-junit:3.0.2'
+	testCompile 'org.assertj:assertj-swing-junit:3.2.0'
 }
 
 sourceSets {
@@ -327,6 +329,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
             into "build/releases"
         }
     }
+}
+
+checkstyle {
+    // do not use other packages for checkstyle, excluding gen(erated) sources
+    checkstyleMain.source = "src/main/java"
 }
 
 task release(dependsOn: ["media", "releaseJar"]) {

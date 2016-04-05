@@ -247,7 +247,7 @@ public class BibDatabaseWriter {
         }
 
         out.write("% ");
-        out.write(Globals.encPrefix + encoding);
+        out.write(Globals.ENCODING_PREFIX + encoding);
         out.write(Globals.NEWLINE);
     }
 

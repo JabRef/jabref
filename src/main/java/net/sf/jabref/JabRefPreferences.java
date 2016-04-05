@@ -42,15 +42,16 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
-import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.formatter.bibtexfields.*;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -341,13 +342,13 @@ public class JabRefPreferences {
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
-        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.PAGE_NUMBERS));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.DATE));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new MonthFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new CaseKeeper()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HTMLToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.NORMALIZE_PAGES));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.NORMALIZE_DATE));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexCleanupFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()));
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
@@ -355,19 +356,30 @@ public class JabRefPreferences {
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
-    // OpenOffice/LibreOffice preferences
+    /**
+     * The OpenOffice/LibreOffice connection preferences are:
+     * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
+     * OO_EXECUTABLE_PATH path to soffice-file
+     * OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
+     * OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation
+     * OO_SHOW_PANEL true if the OO panel is shown on startup
+     * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
+     * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+     * OO_EXTERNAL_STYLE_FILES list with paths to external style files
+     * STYLES_*_* size and position of "Select style" dialog
+     */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
     public static final String OO_JARS_PATH = "ooJarsPath";
-    public static final String SHOW_OO_PANEL = "showOOPanel";
-    public static final String SYNC_OO_WHEN_CITING = "syncOOWhenCiting";
-    public static final String USE_ALL_OPEN_BASES = "useAllOpenBases";
+    public static final String OO_SHOW_PANEL = "showOOPanel";
+    public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
+    public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
-    public static final String OO_USE_DEFAULT_AUTHORYEAR_STYLE = "ooUseDefaultAuthoryearStyle";
-    public static final String OO_USE_DEFAULT_NUMERICAL_STYLE = "ooUseDefaultNumericalStyle";
-    public static final String OO_CHOOSE_STYLE_DIRECTLY = "ooChooseStyleDirectly";
-    public static final String OO_DIRECT_FILE = "ooDirectFile";
-    public static final String OO_STYLE_DIRECTORY = "ooStyleDirectory";
+    public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static final String STYLES_SIZE_Y = "stylesSizeY";
+    public static final String STYLES_SIZE_X = "stylesSizeX";
+    public static final String STYLES_POS_Y = "stylesPosY";
+    public static final String STYLES_POS_X = "stylesPosX";
 
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
@@ -503,8 +515,8 @@ public class JabRefPreferences {
         defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
-        defaults.put(SIZE_X, 840);
-        defaults.put(SIZE_Y, 680);
+        defaults.put(SIZE_X, 1024);
+        defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
@@ -657,6 +669,36 @@ public class JabRefPreferences {
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
         defaults.put(LIST_OF_FILE_COLUMNS, "");
 
+        // OpenOffice/LibreOffice
+        if (OS.WINDOWS) {
+            defaults.put(JabRefPreferences.OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH
+                    + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH + OpenOfficePreferences.WINDOWS_EXECUTABLE);
+            defaults.put(JabRefPreferences.OO_JARS_PATH,
+                    OpenOfficePreferences.DEFAULT_WINDOWS_PATH + OpenOfficePreferences.WINDOWS_JARS_SUBPATH);
+        } else if (OS.OS_X) {
+            defaults.put(JabRefPreferences.OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH
+                    + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE);
+            defaults.put(JabRefPreferences.OO_JARS_PATH,
+                    OpenOfficePreferences.DEFAULT_OSX_PATH + OpenOfficePreferences.OSX_JARS_SUBPATH);
+        } else { // Linux
+            defaults.put(JabRefPreferences.OO_PATH, "/opt/openoffice.org3");
+            defaults.put(JabRefPreferences.OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
+            defaults.put(JabRefPreferences.OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
+        }
+
+        defaults.put(JabRefPreferences.OO_SYNC_WHEN_CITING, false);
+        defaults.put(JabRefPreferences.OO_SHOW_PANEL, false);
+        defaults.put(JabRefPreferences.OO_USE_ALL_OPEN_BASES, true);
+        defaults.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE,
+                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        defaults.put(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, "");
+        defaults.put(STYLES_POS_X, 0);
+        defaults.put(STYLES_POS_Y, 0);
+        defaults.put(STYLES_SIZE_X, 600);
+        defaults.put(STYLES_SIZE_Y, 400);
+
         defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
         defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
@@ -681,7 +723,8 @@ public class JabRefPreferences {
         defaults.put(DEFAULT_LABEL_PATTERN, "[authors3][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
-        defaults.put(PREVIEW_0, "<font face=\"arial\">"
+        defaults.put(PREVIEW_0,
+                "<font face=\"sans-serif\">"
                 + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                 + "\\end{bibtexkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
@@ -700,7 +743,8 @@ public class JabRefPreferences {
                 + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
                 + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
                 + "</dd>__NEWLINE__<p></p></font>");
-        defaults.put(PREVIEW_1, "<font face=\"arial\">"
+        defaults.put(PREVIEW_1,
+                "<font face=\"sans-serif\">"
                 + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                 + "\\end{bibtexkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
@@ -768,8 +812,7 @@ public class JabRefPreferences {
         defaults.put(VALUE_DELIMITERS2, 1);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        // TODO l10n issue
-        defaults.put(EMAIL_SUBJECT, "References");
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
@@ -1336,4 +1379,5 @@ public class JabRefPreferences {
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));
     }
+
 }

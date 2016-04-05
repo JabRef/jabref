@@ -8,14 +8,12 @@ public enum BibtexSingleFieldProperties {
     DATEPICKER,
     JOURNAL_NAMES,
     EXTERNAL,
-    BROWSE,
+    DOI,
     SET_OWNER,
     MONTH,
     FILE_EDITOR,
     NUMERIC,
     PERSON_NAMES;
 
-    public static final EnumSet<BibtexSingleFieldProperties> ALL_OPTS = EnumSet
-            .allOf(BibtexSingleFieldProperties.class);
-
+    public static final EnumSet<BibtexSingleFieldProperties> ALL_OPTS = EnumSet.allOf(BibtexSingleFieldProperties.class);
 }

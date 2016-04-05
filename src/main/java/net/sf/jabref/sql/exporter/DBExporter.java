@@ -67,6 +67,7 @@ public abstract class DBExporter extends DBImporterExporter {
 
     private static final Log LOGGER = LogFactory.getLog(DBExporter.class);
 
+
     /**
      * Method for the exportDatabase methods.
      *
@@ -111,8 +112,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
             query.append(insert).append('\'').append(entry.getId())
-                    .append("', (SELECT entry_types_id FROM entry_types WHERE label='")
-.append(entry.getType())
+                    .append("', (SELECT entry_types_id FROM entry_types WHERE label='").append(entry.getType())
                     .append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
@@ -134,8 +134,8 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
             query.append(", '").append(database_id).append("');");
-            SQLUtil.processQuery(out, query.toString());
         }
+        SQLUtil.processQuery(out, query.toString());
     }
 
     /**
@@ -149,8 +149,7 @@ public abstract class DBExporter extends DBImporterExporter {
      */
 
     private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
-            final int database_id)
-            throws SQLException {
+            final int database_id) throws SQLException {
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
             ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
@@ -179,7 +178,7 @@ public abstract class DBExporter extends DBImporterExporter {
                 }
             }
 
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
                 currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
             }
             //Unfortunatley, AutoCloseable throws only Exception
@@ -202,7 +201,7 @@ public abstract class DBExporter extends DBImporterExporter {
         List<String> existentTypes = new ArrayList<>();
         if (out instanceof Connection) {
             try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types");
-                 ResultSet rs = sm.getResultSet()) {
+                    ResultSet rs = sm.getResultSet()) {
                 while (rs.next()) {
                     existentTypes.add(rs.getString(1));
                 }
@@ -250,8 +249,7 @@ public abstract class DBExporter extends DBImporterExporter {
      * @param database_id Id of jabref database to which the groups/entries are part of
      */
     private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
-            final int database_id)
-            throws SQLException {
+            final int database_id) throws SQLException {
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null;
@@ -283,8 +281,8 @@ public abstract class DBExporter extends DBImporterExporter {
                 + group.getTypeId() + "')" + ", " + (searchField != null ? '\'' + searchField + '\'' : "NULL") + ", "
                 + (searchExpr != null ? '\'' + searchExpr + '\'' : "NULL") + ", "
                 + (caseSens != null ? '\'' + caseSens + '\'' : "NULL") + ", "
-                + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '"
-                + database_id + "');");
+                + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '" + database_id
+                + "');");
         // recurse on child nodes (depth-first traversal)
         try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
@@ -300,7 +298,7 @@ public abstract class DBExporter extends DBImporterExporter {
                     ((Statement) response).close();
                 }
             }
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
                 ++currentID;
                 currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
             }
@@ -327,7 +325,7 @@ public abstract class DBExporter extends DBImporterExporter {
             }
         }
         if (quantity == 0) {
-            String[] typeNames = new String[]{AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
+            String[] typeNames = new String[] {AllEntriesGroup.ID, ExplicitGroup.ID, KeywordGroup.ID, SearchGroup.ID};
             for (String typeName : typeNames) {
                 String insert = "INSERT INTO group_types (label) VALUES ('" + typeName + "');";
                 SQLUtil.processQuery(out, insert);
@@ -396,7 +394,7 @@ public abstract class DBExporter extends DBImporterExporter {
             return;
         }
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
-             PrintStream fout = new PrintStream(writer)) {
+                PrintStream fout = new PrintStream(writer)) {
             performExport(database, metaData, entriesToExport, fout, "file");
         }
     }
@@ -449,7 +447,7 @@ public abstract class DBExporter extends DBImporterExporter {
     }
 
     private String getDBName(Vector<Vector<String>> matrix, DBStrings databaseStrings, JabRefFrame frame,
-                             DBImportExportDialog dialogo) throws Exception {
+            DBImportExportDialog dialogo) throws Exception {
         String dbName = "";
         if (matrix.size() > 1) {
             if (dialogo.hasDBSelected) {
@@ -473,8 +471,7 @@ public abstract class DBExporter extends DBImporterExporter {
             }
         } else {
             dbName = JOptionPane.showInputDialog(frame, Localization.lang("Please enter the desired name:"),
-                    Localization.lang("SQL Export"),
-                    JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("SQL Export"), JOptionPane.INFORMATION_MESSAGE);
         }
         return dbName;
     }

@@ -138,36 +138,28 @@ public class JSTORFetcher2 implements EntryFetcher {
      */
     private List<String> getCitations(String query, ImportInspector dialog, OutputPrinter status) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
-        try {
-            urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name())
-                    + JSTORFetcher2.SEARCH_URL_END;
-            int count = 1;
-            String[] numberOfRefs = new String[2];
-            int refsRequested;
-            int numberOfPagesRequested = JSTORFetcher2.MAX_PAGES_TO_LOAD;
+        List<String> ids = new ArrayList<>();
+        urlQuery = JSTORFetcher2.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name())
+                + JSTORFetcher2.SEARCH_URL_END;
+        int count = 1;
+        String[] numberOfRefs = new String[2];
+        int refsRequested;
+        int numberOfPagesRequested = JSTORFetcher2.MAX_PAGES_TO_LOAD;
 
-            String nextPage;
-            while ((count <= Math.min(JSTORFetcher2.MAX_PAGES_TO_LOAD, numberOfPagesRequested))
-                    && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
-                // If user has cancelled the import, return null to signal this:
-                if ((count == 1) && nextPage.equals(JSTORFetcher2.CANCELLED)) {
-                    return null;
-                }
-                //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + numberOfRefs[0]);
-                //System.out.println("JSTORFetcher2 getCitations numberofrefs=" + " refsRequested=" + numberOfRefs[1]);
-                refsRequested = Integer.valueOf(numberOfRefs[1]);
-                //System.out.println("JSTORFetcher2 getCitations refsRequested=" + Integer.valueOf(refsRequested));
-                numberOfPagesRequested = ((refsRequested - 1 - ((refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE)) / JSTORFetcher2.REFS_PER_PAGE) + 1;
-                //System.out.println("JSTORFetcher2 getCitations numberOfPagesRequested=" + Integer.valueOf(numberOfPagesRequested));
-                urlQuery = nextPage;
-                //System.out.println("JSTORFetcher2 getcitations count=" + Integer.valueOf(count) + " ids=" + ids);
-                count++;
+        String nextPage;
+        while ((count <= Math.min(JSTORFetcher2.MAX_PAGES_TO_LOAD, numberOfPagesRequested))
+                && ((nextPage = getCitationsFromUrl(urlQuery, ids, count, numberOfRefs, dialog, status)) != null)) {
+            // If user has cancelled the import, return null to signal this:
+            if ((count == 1) && nextPage.equals(JSTORFetcher2.CANCELLED)) {
+                return null;
             }
-            return ids;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            refsRequested = Integer.valueOf(numberOfRefs[1]);
+            numberOfPagesRequested = ((refsRequested - 1 - ((refsRequested - 1) % JSTORFetcher2.REFS_PER_PAGE))
+                    / JSTORFetcher2.REFS_PER_PAGE) + 1;
+            urlQuery = nextPage;
+            count++;
         }
+        return ids;
     }
 
     private String getCitationsFromUrl(String urlQuery, List<String> ids, int count,
@@ -185,12 +177,9 @@ public class JSTORFetcher2 implements EntryFetcher {
         if (count == 1) { //  Readin the numberofhits (only once)
             Matcher mn = JSTORFetcher2.numberofhits.matcher(pageEntire);
             if (mn.find()) {
-                //System.out.println("JSTORFetcher2 getCitationsFromUrl numberofhits=" + mn.group(1));
                 numberOfRefs[0] = mn.group(1);
                 countOfRefs = Integer.valueOf(numberOfRefs[0]);
-                //System.out.println("JSTORFetcher2 getCitationsFromUrl numberofrefs[0]=" + Integer.valueOf(numberOfRefs[0]));
             } else {
-                //System.out.println("JSTORFetcher2 getCitationsFromUrl cant find numberofhits=");
                 numberOfRefs[0] = "0";
             }
             while (true) {
@@ -199,7 +188,7 @@ public class JSTORFetcher2 implements EntryFetcher {
                         + Localization.lang("Number of references to fetch?"), Integer.toString(countOfRefs));
 
                 if (strCount == null) {
-                    status.setStatus(Localization.lang("JSTOR import cancelled"));
+                    status.setStatus(Localization.lang("%0 import canceled", "JSTOR"));
                     return JSTORFetcher2.CANCELLED;
                 }
 

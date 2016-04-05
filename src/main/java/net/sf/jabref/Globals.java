@@ -25,8 +25,6 @@ import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class Globals {
 
@@ -34,25 +32,26 @@ public class Globals {
     public static final String FOLDER_FIELD = "folder";
     public static final String DIR_SUFFIX = "Directory";
 
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
     // JabRef version info
     public static final BuildInfo BUILD_INFO = new BuildInfo();
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE = "This file was created with JabRef";
-    public static final String encPrefix = "Encoding: ";
+    public static final String ENCODING_PREFIX = "Encoding: ";
     // Newlines
     // will be overridden in initialization due to feature #857 @ JabRef.java
     public static String NEWLINE = System.lineSeparator();
 
     // Remote listener
-    public static RemoteListenerServerLifecycle remoteListener = new RemoteListenerServerLifecycle();
+    public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
 
-    public static final ImportFormatReader importFormatReader = new ImportFormatReader();
+    public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
 
     public static final String FILETYPE_PREFS_EXT = "_dir";
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
+
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
@@ -65,20 +64,19 @@ public class Globals {
     public static JournalAbbreviationLoader journalAbbreviationLoader;
 
     private static KeyBindingPreferences keyPrefs;
+
     public static KeyBindingPreferences getKeyPrefs() {
-        if(keyPrefs == null) {
+        if (keyPrefs == null) {
             keyPrefs = new KeyBindingPreferences(prefs);
         }
         return keyPrefs;
     }
 
-    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 
     // Background tasks
     public static GlobalFocusListener focusListener;
     public static FileUpdateMonitor fileUpdateMonitor;
     public static StreamEavesdropper streamEavesdropper;
-
 
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
@@ -92,7 +90,6 @@ public class Globals {
 
     // Autosave manager
     public static AutoSaveManager autoSaveManager;
-
 
     public static void startAutoSaveManager(JabRefFrame frame) {
         Globals.autoSaveManager = new AutoSaveManager(frame);

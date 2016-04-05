@@ -15,40 +15,39 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FieldContentSelector;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.date.DatePickerButton;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLUtil;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.date.DatePickerButton;
-import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.MonthUtil;
 
 public class FieldExtraComponents {
 
@@ -103,50 +102,109 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Return a "Browse" button for fields with EXTRA_BROWSE
-     *
-     * @param frame
-     * @param fieldEditor
-     * @param entryEditor
-     * @return
-     */
-    public static Optional<JComponent> getBrowseExtraComponent(JabRefFrame frame, FieldEditor fieldEditor,
-            EntryEditor entryEditor) {
-        JButton but = new JButton(Localization.lang("Browse"));
-        ((JComponent) fieldEditor).addMouseListener(entryEditor.new ExternalViewerListener());
-
-        but.addActionListener(e -> {
-            String dir = fieldEditor.getText();
-
-            if (dir.isEmpty()) {
-                dir = Globals.prefs.get(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, "");
-            }
-
-            String chosenFile = FileDialogs.getNewFile(frame, new File(dir), '.' + fieldEditor.getFieldName(),
-                    JFileChooser.OPEN_DIALOG, false);
-
-            if (chosenFile != null) {
-                File newFile = new File(chosenFile);
-                fieldEditor.setText(newFile.getPath());
-                Globals.prefs.put(fieldEditor.getFieldName() + Globals.FILETYPE_PREFS_EXT, newFile.getPath());
-                entryEditor.updateField(fieldEditor);
-            }
-        });
-
-        return Optional.of(but);
-    }
-
-    /**
      * Set up a mouse listener for opening an external viewer for with with EXTRA_EXTERNAL
      *
      * @param fieldEditor
-     * @param entryEditor
+     * @param panel
      * @return
      */
-    public static Optional<JComponent> getExternalExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
-        ((JComponent) fieldEditor).addMouseListener(entryEditor.new ExternalViewerListener());
+    public static Optional<JComponent> getExternalExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
+        JPanel controls = new JPanel();
+        controls.setLayout(new BorderLayout());
+        JButton button = new JButton(Localization.lang("Open"));
+        button.setEnabled(false);
+        button.addActionListener(actionEvent -> {
+            try {
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+            } catch (IOException ex) {
+                panel.output(Localization.lang("Unable to open link."));
+            }
+        });
 
-        return Optional.empty();
+        controls.add(button, BorderLayout.SOUTH);
+
+        // enable/disable button
+        JTextComponent url = (JTextComponent) fieldEditor;
+
+        DocumentListener documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkUrl(documentEvent);
+            }
+
+            private void checkUrl(DocumentEvent documentEvent) {
+                if (URLUtil.isURL(url.getText())) {
+                    button.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                }
+            }
+        };
+        url.getDocument().addDocumentListener(documentListener);
+
+        return Optional.of(controls);
+    }
+
+    /**
+     * Set up a mouse listener for opening an external viewer and fetching by DOI
+     *
+     * @param fieldEditor
+     * @param panel
+     * @return
+     */
+    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
+        JPanel controls = new JPanel();
+        controls.setLayout(new BorderLayout());
+        JButton button = new JButton(Localization.lang("Open"));
+        button.setEnabled(false);
+        button.addActionListener(actionEvent -> {
+            try {
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+            } catch (IOException ex) {
+                panel.output(Localization.lang("Unable to open link."));
+            }
+        });
+        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
+        fetchButton.setEnabled(false);
+        fetchButton.addActionListener(actionEvent -> new MergeEntryDOIDialog(panel));
+
+        controls.add(button, BorderLayout.NORTH);
+        controls.add(fetchButton, BorderLayout.SOUTH);
+
+        // enable/disable button
+        JTextComponent doi = (JTextComponent) fieldEditor;
+
+        DocumentListener documentListener = new DocumentListener() {
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkDoi(documentEvent);
+            }
+
+            private void checkDoi(DocumentEvent documentEvent) {
+                Optional<DOI> doiUrl = DOI.build(doi.getText());
+                if(doiUrl.isPresent()) {
+                    button.setEnabled(true);
+                    fetchButton.setEnabled(true);
+                }
+            }
+        };
+        doi.getDocument().addDocumentListener(documentListener);
+
+        return Optional.of(controls);
     }
 
     /**

@@ -8,8 +8,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,11 +22,11 @@ public class AuthorListParameterTest {
             { "von Berlichingen zu Hornberg, Johann Gottfried",
                     authorList(new Author("Johann Gottfried", "J. G.", "von", "Berlichingen zu Hornberg", null)) },
             //{ "Robert and Sons, Inc.", authorList(new Author(null, null, null, "Robert and Sons, Inc.", null)) },
-            //{ "al-Ṣāliḥ, Abdallāh", authorList(new Author("Abdallāh", "A.", null, "al-Ṣāliḥ", null)) },
-            { "de la Vallée Poussin, Jean Charles Gabriel",
-                    authorList(new Author("Jean Charles Gabriel", "J. C. G.", "de la", "Vallée Poussin", null)) },
-            { "de la Vallée Poussin, J. C. G.",
-                    authorList(new Author("J. C. G.", "J. C. G.", "de la", "Vallée Poussin", null))},
+                //{ "al-Ṣāliḥ, Abdallāh", authorList(new Author("Abdallāh", "A.", null, "al-Ṣāliḥ", null)) },
+                {"de la Vallée Poussin, Jean Charles Gabriel",
+                        authorList(new Author("Jean Charles Gabriel", "J. C. G.", "de la", "Vallée Poussin", null))},
+                {"de la Vallée Poussin, J. C. G.",
+                        authorList(new Author("J. C. G.", "J. C. G.", "de la", "Vallée Poussin", null))},
             { "{K}ent-{B}oswell, E. S.", authorList(new Author("E. S.", "E. S.", null, "{K}ent-{B}oswell", null)) },
         });
     }

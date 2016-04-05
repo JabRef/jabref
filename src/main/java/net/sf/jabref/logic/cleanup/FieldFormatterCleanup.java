@@ -14,14 +14,14 @@
 
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.entry.BibEntry;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats a given entry field with the specified formatter.
@@ -113,15 +113,6 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public String toString() {
-        return field + ": " + formatter.getKey();
-    }
-
-    /**
-     * Returns a description of what this cleanup operation does.
-     *
-     * @return the description of this cleanup
-     */
-    public String getDescription() {
-        return String.format(formatter.getDescription(), field);
+        return field + ": " + formatter.getName();
     }
 }

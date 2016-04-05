@@ -80,16 +80,16 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Converts unicode characters in %s to their LaTeX equivalent.");
+        return Localization.lang("Converts Unicode characters to LaTeX encoding.");
     }
 
     @Override
     public String getName() {
-        return "UnicodeConverter";
+        return Localization.lang("Unicode to LaTeX");
     }
 
     @Override
     public String getKey() {
-        return "UnicodeConverter";
+        return "unicode_to_latex";
     }
 }

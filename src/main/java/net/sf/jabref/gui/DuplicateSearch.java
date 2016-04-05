@@ -149,7 +149,7 @@ public class DuplicateSearch implements Runnable {
                 }
 
                 synchronized (duplicates) {
-                    panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size() + ' '
+                    panel.output(Localization.lang("Duplicates found") + ": " + duplicates.size() + ' '
                             + Localization.lang("pairs processed") + ": " + dupliC);
                 }
                 ce.end();

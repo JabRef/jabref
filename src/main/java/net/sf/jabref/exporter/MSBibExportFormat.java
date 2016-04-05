@@ -32,7 +32,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -42,7 +41,7 @@ import net.sf.jabref.model.entry.BibEntry;
 class MSBibExportFormat extends ExportFormat {
 
     public MSBibExportFormat() {
-        super(Localization.lang("MS Office 2007"), "MSBib", null, null, ".xml");
+        super("MS Office 2007", "MSBib", null, null, ".xml");
     }
 
     @Override

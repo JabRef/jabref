@@ -19,14 +19,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This class is used to represent customized entry types.
  */
 public class CustomEntryType implements EntryType {
-    private static final Log LOGGER = LogFactory.getLog(CustomEntryType.class);
 
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final String name;

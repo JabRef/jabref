@@ -52,7 +52,7 @@ public class ImportFormats {
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
-        SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
+        SortedSet<ImportFormat> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
 
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;

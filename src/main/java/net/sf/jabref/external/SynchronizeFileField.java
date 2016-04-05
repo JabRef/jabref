@@ -15,10 +15,18 @@
  */
 package net.sf.jabref.external;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.*;
+import javax.swing.*;
+
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -26,16 +34,9 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.*;
-import java.util.List;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -68,7 +69,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
     @Override
     public void init() {
-        Collection<BibEntry> col = panel.database().getEntries();
+        Collection<BibEntry> col = panel.getDatabase().getEntries();
         goOn = true;
         sel = new ArrayList<>(col);
 
@@ -91,7 +92,7 @@ public class SynchronizeFileField extends AbstractWorker {
     @Override
     public void run() {
         if (!goOn) {
-            panel.output(Localization.lang("No entries selected."));
+            panel.output(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
         entriesChangedCount = 0;
@@ -101,7 +102,7 @@ public class SynchronizeFileField extends AbstractWorker {
         int progressBarMax = (autoSet ? weightAutoSet * sel.size() : 0) + (checkExisting ? sel.size() : 0);
         panel.frame().setProgressBarMaximum(progressBarMax);
         int progress = 0;
-        final NamedCompound ce = new NamedCompound(Localization.lang("Autoset file links."));
+        final NamedCompound ce = new NamedCompound(Localization.lang("Automatically set file links"));
 
         Set<BibEntry> changedEntries = new HashSet<>();
 
@@ -109,7 +110,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (autoSet) {
             Collection<BibEntry> entries = new ArrayList<>(sel);
 
-            // Start the autosetting process:
+            // Start the automatically setting process:
             Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext().getMetaData(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
@@ -275,12 +276,14 @@ public class SynchronizeFileField extends AbstractWorker {
         private boolean canceled = true;
         private final MetaData metaData;
         private final JRadioButton autoSetUnset = new JRadioButton(
-                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Do not overwrite existing links."),
+                Localization.lang("Automatically set file links") + ". "
+                        + Localization.lang("Do not overwrite existing links."),
                 true);
         private final JRadioButton autoSetAll = new JRadioButton(
-                Localization.lang("Autoset file links.") + ' ' + Localization.lang("Allow overwriting existing links."),
+                Localization.lang("Automatically set file links") + ". "
+                        + Localization.lang("Allow overwriting existing links."),
                 false);
-        private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not autoset"), false);
+        private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not automatically set"), false);
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
 
 
@@ -315,11 +318,11 @@ public class SynchronizeFileField extends AbstractWorker {
             FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
             JLabel description = new JLabel("<HTML>" + Localization.lang(
-                    "Attempt to autoset file links for your entries. Autoset works if "
-                            + "a file in your file directory or a subdirectory<BR>is named identically to an entry's BibTeX key, plus extension.")
+                    "Attempt to automatically set file links for your entries. Automatically setting works if "
+                            + "a file in your file directory<BR>or a subdirectory is named identically to an entry's BibTeX key, plus extension.")
                     + "</HTML>");
 
-            builder.addSeparator(Localization.lang("Autoset")).xy(1, 1);
+            builder.addSeparator(Localization.lang("Automatically set file links")).xy(1, 1);
             builder.add(description).xy(1, 3);
             builder.add(autoSetUnset).xy(1, 5);
             builder.add(autoSetAll).xy(1, 6);

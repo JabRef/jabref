@@ -204,7 +204,7 @@ public class MergeEntries {
         int tmpLabelWidth;
         for (String field : joint) {
             jointStrings[row - 2] = field;
-            label = new JLabel(CaseChangers.UPPER_FIRST.format(field));
+            label = new JLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mergePanel.add(label, cc.xy(1, row));

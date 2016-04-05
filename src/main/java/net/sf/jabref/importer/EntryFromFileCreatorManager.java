@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -55,7 +55,7 @@ public final class EntryFromFileCreatorManager {
         entryCreators = new ArrayList<>(10);
         entryCreators.add(new EntryFromPDFCreator());
 
-        // add a creator for each ExternalFileType if there is no specialised
+        // add a creator for each ExternalFileType if there is no specialized
         // creator existing.
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
@@ -101,12 +101,12 @@ public final class EntryFromFileCreatorManager {
     }
 
     /**
-     * Trys to add a entry for each file in the List.
+     * Tries to add a entry for each file in the List.
      *
      * @param files
      * @param database
      * @param entryType
-     * @return List of unexcpected import event messages including failures.
+     * @return List of unexpected import event messages including failures.
      */
     public List<String> addEntrysFromFiles(List<File> files,
             BibDatabase database, EntryType entryType,
@@ -142,11 +142,9 @@ public final class EntryFromFileCreatorManager {
             if (creator == null) {
                 importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
             } else {
-                Optional<BibEntry> entry = creator.createEntry(f,
-                        generateKeywordsFromPathToFile);
-                if (entry.isPresent()) {
-                    importGUIMessages.add("Problem importing " + f.getPath()
-                    + ": Entry could not be created.");
+                Optional<BibEntry> entry = creator.createEntry(f, generateKeywordsFromPathToFile);
+                if (!entry.isPresent()) {
+                    importGUIMessages.add("Problem importing " + f.getPath() + ": Entry could not be created.");
                     continue;
                 }
                 if (entryType != null) {
@@ -164,8 +162,7 @@ public final class EntryFromFileCreatorManager {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
                     if (database.insertEntry(entry.get())) {
-                        importGUIMessages.add("Problem importing " + f.getPath()
-                        + ": Insert into BibDatabase failed.");
+                        importGUIMessages.add("Problem importing " + f.getPath() + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {
@@ -180,9 +177,7 @@ public final class EntryFromFileCreatorManager {
             }
         }
 
-        System.out.println("count = " + count);
         if ((count > 0) && (panel != null)) {
-            System.out.println("adding edit");
             ce.end();
             panel.undoManager.addEdit(ce);
         }

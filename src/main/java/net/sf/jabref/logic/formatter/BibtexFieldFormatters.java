@@ -1,23 +1,29 @@
 package net.sf.jabref.logic.formatter;
 
 import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+
 import java.util.Arrays;
 import java.util.List;
 
 public class BibtexFieldFormatters {
-    public static final PageNumbersFormatter PAGE_NUMBERS = new PageNumbersFormatter();
-    public static final SuperscriptFormatter SUPERSCRIPTS = new SuperscriptFormatter();
-    public static final DateFormatter DATE = new DateFormatter();
-    public static final MonthFormatter MONTH_FORMATTER = new MonthFormatter();
-    public static final AuthorsFormatter AUTHORS_FORMATTER = new AuthorsFormatter();
-    public static final LatexFormatter LATEX_FORMATTER = new LatexFormatter();
-    public static final UnitFormatter UNIT_FORMATTER = new UnitFormatter();
+    public static final NormalizePagesFormatter NORMALIZE_PAGES = new NormalizePagesFormatter();
+    public static final OrdinalsToSuperscriptFormatter
+            ORDINALS_TO_LATEX_SUPERSCRIPT = new OrdinalsToSuperscriptFormatter();
+    public static final NormalizeDateFormatter NORMALIZE_DATE = new NormalizeDateFormatter();
+    public static final NormalizeMonthFormatter NORMALIZE_MONTH = new NormalizeMonthFormatter();
+    public static final NormalizeNamesFormatter NORMALIZE_PERSON_NAMES = new NormalizeNamesFormatter();
+    public static final LatexCleanupFormatter LATEX_CLEANUP = new LatexCleanupFormatter();
+    public static final UnitsToLatexFormatter UNITS_TO_LATEX = new UnitsToLatexFormatter();
     public static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
-    public static final HTMLToLatexFormatter HTML_TO_LATEX = new HTMLToLatexFormatter();
+    public static final HtmlToLatexFormatter HTML_TO_LATEX = new HtmlToLatexFormatter();
     public static final UnicodeToLatexFormatter UNICODE_TO_LATEX = new UnicodeToLatexFormatter();
-    public static final EraseFormatter ERASE = new EraseFormatter();
+    public static final LatexToUnicodeFormatter LATEX_TO_UNICODE = new LatexToUnicodeFormatter();
+    public static final ClearFormatter CLEAR = new ClearFormatter();
 
-    public static final List<Formatter> ALL = Arrays.asList(PAGE_NUMBERS, SUPERSCRIPTS, DATE, AUTHORS_FORMATTER,
-            LATEX_FORMATTER, MONTH_FORMATTER, UNIT_FORMATTER, REMOVE_BRACES_FORMATTER, HTML_TO_LATEX, UNICODE_TO_LATEX,
-            ERASE);
+    public static final List<Formatter> ALL = Arrays.asList(NORMALIZE_PAGES, ORDINALS_TO_LATEX_SUPERSCRIPT,
+            NORMALIZE_DATE, NORMALIZE_PERSON_NAMES, LATEX_CLEANUP, NORMALIZE_MONTH, UNITS_TO_LATEX,
+            REMOVE_BRACES_FORMATTER, HTML_TO_LATEX, UNICODE_TO_LATEX, CLEAR);
+
+    public static final List<Formatter> CONVERTERS = Arrays.asList(HTML_TO_LATEX, UNICODE_TO_LATEX, LATEX_TO_UNICODE);
 }

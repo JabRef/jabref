@@ -106,7 +106,7 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IOException e) {
             status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            Collections.emptyList();
+            return Collections.emptyList();
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
@@ -214,7 +214,7 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.jrf.getCurrentBasePanel().database(), e);
+                    LabelPatternUtil.makeLabel(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.jrf.getCurrentBasePanel().getDatabase(), e);
 
                     res.add(e);
                 }

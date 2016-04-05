@@ -20,7 +20,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.logic.fetcher.FindFullText;
+import net.sf.jabref.logic.fulltext.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -68,8 +68,10 @@ public class FindFullTextAction extends AbstractWorker {
         if (result.isPresent()) {
             List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory();
             if (dirs.isEmpty()) {
-                // FIXME: Localization
-                JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(basePanel.frame(),
+                        Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                + " -> " + Localization.lang("External programs"),
+                        Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String bibtexKey = entry.getCiteKey();
@@ -93,7 +95,7 @@ public class FindFullTextAction extends AbstractWorker {
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }
         else {
-            String message = Localization.lang("Full text article download failed");
+            String message = Localization.lang("Full text document download failed");
             basePanel.output(message);
             JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
         }

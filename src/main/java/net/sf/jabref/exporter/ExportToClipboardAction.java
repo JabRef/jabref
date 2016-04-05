@@ -69,7 +69,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().isEmpty()) {
-            message = Localization.lang("No entries selected.");
+            message = Localization.lang("This operation requires one or more entries to be selected.");
             getCallBack().update();
             return;
         }

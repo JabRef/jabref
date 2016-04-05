@@ -18,8 +18,6 @@ package net.sf.jabref.logic.xmp;
 import java.io.IOException;
 import java.util.*;
 
-import javax.xml.transform.TransformerException;
-
 import net.sf.jabref.*;
 
 import net.sf.jabref.model.entry.*;
