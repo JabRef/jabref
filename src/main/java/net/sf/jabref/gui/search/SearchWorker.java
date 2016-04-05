@@ -48,7 +48,6 @@ class SearchWorker extends SwingWorker<List<BibEntry>,Void> {
     @Override
     protected void done() {
         if(isCancelled()) {
-            System.out.println("CANCELED");
             return;
         }
 
