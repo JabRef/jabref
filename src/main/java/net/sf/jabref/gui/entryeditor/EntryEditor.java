@@ -461,7 +461,6 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
                     fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER));
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.EXTERNAL)) {
-            // Add external viewer listener for "pdf" and "url" fields.
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(BibtexSingleFieldProperties.JOURNAL_NAMES)) {
             // Add controls for switching between abbreviated and full journal names.
