@@ -2,7 +2,6 @@ package net.sf.jabref.gui.search;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Not reusable. Always create a new instance for each search!
  */
-class SearchWorker extends SwingWorker<List<BibEntry>,Void> {
+class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
 
@@ -47,7 +46,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>,Void> {
 
     @Override
     protected void done() {
-        if(isCancelled()) {
+        if (isCancelled()) {
             return;
         }
 
@@ -61,7 +60,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>,Void> {
     private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
 
         // check if still the current query
-        if(!basePanel.getSearchBar().isStillValidQuery(searchQuery)) {
+        if (!basePanel.getSearchBar().isStillValidQuery(searchQuery)) {
             // do not update - another search was already issued
             return;
         }
