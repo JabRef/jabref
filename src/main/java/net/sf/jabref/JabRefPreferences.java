@@ -42,7 +42,6 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
-import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -515,8 +514,8 @@ public class JabRefPreferences {
         defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
-        defaults.put(SIZE_X, 840);
-        defaults.put(SIZE_Y, 680);
+        defaults.put(SIZE_X, 1024);
+        defaults.put(SIZE_Y, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.FALSE);
         defaults.put(AUTO_RESIZE_MODE, JTable.AUTO_RESIZE_ALL_COLUMNS);
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
@@ -812,8 +811,7 @@ public class JabRefPreferences {
         defaults.put(VALUE_DELIMITERS2, 1);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
-        // TODO l10n issue
-        defaults.put(EMAIL_SUBJECT, "References");
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);

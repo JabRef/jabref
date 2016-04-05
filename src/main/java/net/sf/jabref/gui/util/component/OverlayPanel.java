@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2016 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -27,7 +28,7 @@
 
 // created by : r.nagel 04.11.2004
 
-package net.sf.jabref.wizard.text.gui;
+package net.sf.jabref.gui.util.component;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +36,7 @@ import java.awt.*;
 /**
  * Supports an underlying text for JComponent
  */
-class OverlayPanel extends JPanel {
+public class OverlayPanel extends JPanel {
 
     private final JLabel label;
 
@@ -45,7 +46,7 @@ class OverlayPanel extends JPanel {
         this.setLayout(layout);
 
         label = new JLabel(text);
-        label.setFont(new Font("dialog", Font.ITALIC, 18));
+        label.setFont(new Font(label.getFont().getName(), Font.ITALIC, 18));
         label.setForeground(new Color(224, 220, 220));
         label.setLocation(0, 0);
 
@@ -62,7 +63,7 @@ class OverlayPanel extends JPanel {
         int len = label.getWidth();
 
         Dimension dim = this.getSize();
-        if (dim.height > 25 && dim.width > len + 10) {
+        if ((dim.height > 25) && (dim.width > (len + 10))) {
             int x = (dim.width - len) / 2;
             int y = dim.height / 2;
 

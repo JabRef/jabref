@@ -17,7 +17,6 @@ package net.sf.jabref.gui.util.component;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 
 /**

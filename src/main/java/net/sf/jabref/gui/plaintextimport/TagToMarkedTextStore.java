@@ -1,5 +1,6 @@
 /*
  Copyright (C) 2004 R. Nagel
+ Copyright (C) 2016 JabRef Contributors.
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -31,76 +32,82 @@
 //
 // modified :
 
-package net.sf.jabref.wizard.text;
+package net.sf.jabref.gui.plaintextimport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.text.StyledDocument;
 
 public class TagToMarkedTextStore {
 
-    private final Map<String, LinkedList<TMarkedStoreItem>> tagMap;
-
-
-    private static class TMarkedStoreItem {
-
-        int start;
-        int end;
-    }
-
-
-
+    private final Map<String, List<TMarkedStoreItem>> tagMap;
 
     public TagToMarkedTextStore() {
-        tagMap = new HashMap<>(10);
+        tagMap = new HashMap<>();
     }
 
     /** appends a selection property for tag */
     public void appendPosition(String tag, int start, int end) {
-        LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
+        List<TMarkedStoreItem> ll = tagMap.get(tag);
         if (ll == null) {
-            ll = new LinkedList<>();
+            ll = new ArrayList<>();
             tagMap.put(tag, ll);
         }
 
-        TMarkedStoreItem item = new TMarkedStoreItem();
-        ll.add(item);
-        item.end = end;
-        item.start = start;
+        ll.add(new TMarkedStoreItem(start, end));
     }
 
     /** insert selection properties for tag, old entries were deleted */
     public void insertPosition(String tag, int start, int end) {
-        LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
+        List<TMarkedStoreItem> ll = tagMap.get(tag);
 
         if (ll == null) {
-            ll = new LinkedList<>();
+            ll = new ArrayList<>();
             tagMap.put(tag, ll);
         } else {
             ll.clear();
         }
 
-        TMarkedStoreItem item = new TMarkedStoreItem();
-        ll.add(item);
-        item.end = end;
-        item.start = start;
+        ll.add(new TMarkedStoreItem(start, end));
     }
 
     /** set the Style for the tag if an entry is available */
     public void setStyleForTag(String tag, String style, StyledDocument doc) {
-        LinkedList<TMarkedStoreItem> ll = tagMap.get(tag);
+        List<TMarkedStoreItem> ll = tagMap.get(tag);
 
         if (ll != null) {
             // iterate over all saved selections
             for (TMarkedStoreItem item : ll) {
                 if (item != null) {
-                    doc.setCharacterAttributes(item.start, item.end
-                            - item.start, doc.getStyle(style), true);
+                    doc.setCharacterAttributes(item.getStart(), item.getLength(), doc.getStyle(style), true);
                 }
             }
         }
+    }
+
+
+    private static class TMarkedStoreItem {
+
+        private final int start;
+        private final int end;
+
+
+        public TMarkedStoreItem(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public int getStart() {
+            return start;
+        }
+
+        public int getLength() {
+            return end - start;
+        }
+
     }
 
 }

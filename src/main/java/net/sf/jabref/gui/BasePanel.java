@@ -46,6 +46,7 @@ import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.FocusRequester;
@@ -76,7 +77,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.specialfields.*;
 import net.sf.jabref.sql.*;
 import net.sf.jabref.sql.exporter.DBExporter;
-import net.sf.jabref.wizard.text.gui.TextInputDialog;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -600,7 +601,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (entries.isEmpty()) { // None selected. Inform the user to select entries first.
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("First select the entries you want keys to be generated for."),
-                            Localization.lang("Autogenerate BibTeX key"), JOptionPane.INFORMATION_MESSAGE);
+                            Localization.lang("Autogenerate BibTeX keys"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
                 frame.block();
@@ -819,7 +820,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 (BaseAction) () -> JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
                     final List<BibEntry> bes = mainTable.getSelectedEntries();
                     if (bes.size() != 1) {
-                        output(Localization.lang("No entries or multiple entries selected."));
+                        output(Localization.lang("This operation requires exactly one item to be selected."));
                         return;
                     }
 
@@ -905,7 +906,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             String id = IdGenerator.next();
             BibEntry bibEntry = new BibEntry(id, tp.getName());
-            TextInputDialog tidialog = new TextInputDialog(frame, "import", true, bibEntry);
+            TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
             tidialog.setLocationRelativeTo(BasePanel.this);
             tidialog.setVisible(true);
 
@@ -921,7 +922,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 List<BibEntry> bes = mainTable.getSelectedEntries();
                 if (bes.isEmpty()) {
-                    output(Localization.lang("No entries selected."));
+                    output(Localization.lang("This operation requires one or more entries to be selected."));
                     return;
                 }
                 NamedCompound ce = new NamedCompound(Localization.lang("Unmark entries"));
@@ -963,7 +964,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Quality.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Quality.getInstance(),
                         Quality.getInstance().getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle quality"), Localization.lang("Toggled quality for %0 entries")));
+                        Localization.lang("Toggle quality assured"),
+                        Localization.lang("Toggled quality for %0 entries")));
         actions.put(Printed.getInstance().getValues().get(0).getActionName(), new SpecialFieldAction(frame,
                 Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue().get(), true,
                 Localization.lang("Toggle print status"), Localization.lang("Toggled print status for %0 entries")));
@@ -2072,7 +2074,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
             } else {
-                output(Localization.lang("No entries or multiple entries selected."));
+                output(Localization.lang("This operation requires exactly one item to be selected."));
             }
 
         }

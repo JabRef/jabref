@@ -248,9 +248,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 UpdateField.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP)); // set timestamp and owner
 
-                boolean markEntries = !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                        && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                        || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
+                boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {
                     if (markEntries) {
                         EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));

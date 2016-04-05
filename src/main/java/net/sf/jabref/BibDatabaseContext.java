@@ -5,7 +5,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 

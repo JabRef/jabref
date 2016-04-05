@@ -164,6 +164,8 @@ public class BibDatabase {
     /**
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
+     *
+     * @return false if the insert was done without a duplicate warning
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
         Objects.requireNonNull(entry);

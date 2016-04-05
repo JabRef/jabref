@@ -343,9 +343,9 @@ public class DroppedFileHandler {
             }
         };
 
-        linkInPlace.setText(Localization.lang("Leave file in its current directory."));
-        copyRadioButton.setText(Localization.lang("Copy file to file directory."));
-        moveRadioButton.setText(Localization.lang("Move file to file directory."));
+        linkInPlace.setText(Localization.lang("Leave file in its current directory"));
+        copyRadioButton.setText(Localization.lang("Copy file to file directory"));
+        moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:

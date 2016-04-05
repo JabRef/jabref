@@ -28,6 +28,8 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'install4j'
 
+apply plugin: 'checkstyle'
+
 apply from: 'eclipse.gradle'
 
 // HACK to disable coverityCheck task when not on CI server
@@ -327,6 +329,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
             into "build/releases"
         }
     }
+}
+
+checkstyle {
+    // do not use other packages for checkstyle, excluding gen(erated) sources
+    checkstyleMain.source = "src/main/java"
 }
 
 task release(dependsOn: ["media", "releaseJar"]) {
