@@ -50,7 +50,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         dupes = new HashMap<>();
 
         HashMap<String, BibEntry> foundKeys = new HashMap<>();
-        BibDatabase db = panel.database();
+        BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
             // Only handle keys that are actually set:
@@ -106,8 +106,8 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();
-                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
-                ce.addEdit(new UndoableKeyChange(panel.database(), entry, oldKey, entry.getCiteKey()));
+                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
             }
             ce.end();
             panel.undoManager.addEdit(ce);

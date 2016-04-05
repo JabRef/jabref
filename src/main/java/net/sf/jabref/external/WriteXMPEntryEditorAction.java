@@ -15,23 +15,22 @@
  */
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPUtil;
-
-import javax.swing.*;
-import javax.xml.transform.TransformerException;
-
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+import javax.xml.transform.TransformerException;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Write XMP action for EntryEditor toolbar.
@@ -123,7 +122,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
                     } else {
                         try {
-                            XMPUtil.writeXMP(file, entry, panel.database());
+                            XMPUtil.writeXMP(file, entry, panel.getDatabase());
                             if (files.size() == 1) {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }

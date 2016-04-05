@@ -232,7 +232,7 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.getCurrentBasePanel().database(),
+                                format.performExport(frame.getCurrentBasePanel().getDatabase(),
                                         frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
                                         finFile.getPath(), frame
                                                 .getCurrentBasePanel().getEncoding(), finEntries);

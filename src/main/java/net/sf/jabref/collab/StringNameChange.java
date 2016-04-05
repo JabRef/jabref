@@ -56,7 +56,7 @@ class StringNameChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
-        if (panel.database().hasStringLabel(disk)) {
+        if (panel.getDatabase().hasStringLabel(disk)) {
             // The name to change to is already in the database, so we can't comply.
             LOGGER.info("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
                     + "is already in use.");
@@ -67,8 +67,8 @@ class StringNameChange extends Change {
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, disk, content);
             try {
-                panel.database().addString(bs);
-                undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
+                panel.getDatabase().addString(bs);
+                undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
