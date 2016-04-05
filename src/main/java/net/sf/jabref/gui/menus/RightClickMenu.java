@@ -161,7 +161,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
 
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
@@ -183,6 +182,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(typeMenu);
         add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
+
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
 
         add(frame.getMassSetField());
         add(frame.getManageKeywords());
