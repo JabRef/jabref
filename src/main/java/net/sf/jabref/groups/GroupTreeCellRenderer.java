@@ -112,7 +112,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                BasePanel currentBasePanel = JabRef.jrf.getCurrentBasePanel();
+                BasePanel currentBasePanel = JabRef.mainFrame.getCurrentBasePanel();
                 if(currentBasePanel != null) {
                     for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
                         if (group.contains(entry)) {

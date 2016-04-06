@@ -39,7 +39,7 @@ public class JabRefMessageHandler implements MessageHandler {
 
         for (int i = 0; i < loaded.get().size(); i++) {
             ParserResult pr = loaded.get().elementAt(i);
-            JabRef.jrf.addParserResult(pr, i == 0);
+            JabRef.mainFrame.addParserResult(pr, i == 0);
         }
     }
 }

@@ -22,7 +22,7 @@ public class SpecialFieldDatabaseChangeListener implements
             NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));
             SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
             nc.end();
-            JabRef.jrf.getCurrentBasePanel().undoManager.addEdit(nc);
+            JabRef.mainFrame.getCurrentBasePanel().undoManager.addEdit(nc);
         }
     }
 
