@@ -525,12 +525,21 @@ public class JabRef {
             String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
 
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                lookFeel = systemLookFeel;
+                // FIXME: Problems with OpenJDK and GTK L&F
+                // See https://github.com/JabRef/jabref/issues/393, https://github.com/JabRef/jabref/issues/638
+                if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
+                    // Metal L&F
+                    lookFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+                    LOGGER.warn("There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.");
+                } else {
+                    lookFeel = systemLookFeel;
+                }
             } else {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
 
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
+            // FIXME: Open JDK problem
+            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel) && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
