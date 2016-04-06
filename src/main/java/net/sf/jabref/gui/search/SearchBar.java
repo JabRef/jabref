@@ -23,6 +23,7 @@ import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -50,9 +51,9 @@ public class SearchBar extends JPanel {
 
     private static final Log LOGGER = LogFactory.getLog(SearchBar.class);
 
-    public static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
-    public static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
-    public static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
+    private static final Color NO_RESULTS_COLOR = new Color(232, 202, 202);
+    private static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
+    private static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
     private final JButton openCurrentResultsInDialog;
     private final JButton globalSearch;
@@ -239,7 +240,7 @@ public class SearchBar extends JPanel {
     /**
      * Save current settings.
      */
-    public void updatePreferences() {
+    private void updatePreferences() {
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FLOAT, searchMode == SearchMode.FLOAT);
         Globals.prefs.putBoolean(JabRefPreferences.SEARCH_MODE_FILTER, searchMode == SearchMode.FILTER);
 
@@ -267,8 +268,7 @@ public class SearchBar extends JPanel {
 
         this.currentResults.setText("");
 
-        basePanel.stopShowingFloatSearch();
-        basePanel.getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -276,10 +276,16 @@ public class SearchBar extends JPanel {
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     }
 
+    private SearchWorker worker;
+
     /**
      * Performs a new search based on the current search query.
      */
     private void performSearch() {
+        if(worker != null) {
+            worker.cancel(true);
+        }
+
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             clearSearch();
@@ -295,9 +301,8 @@ public class SearchBar extends JPanel {
             return;
         }
 
-        SearchWorker worker = new SearchWorker(basePanel, searchQuery, searchMode);
-        worker.getWorker().run();
-        worker.getCallBack().update();
+        worker = new SearchWorker(basePanel, searchQuery, searchMode);
+        worker.execute();
     }
 
     private void informUserAboutInvalidSearchQuery() {
@@ -308,8 +313,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
 
-        basePanel.stopShowingFloatSearch();
-        basePanel.getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
         searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));
@@ -330,7 +334,7 @@ public class SearchBar extends JPanel {
         return searchQueryHighlightObservable;
     }
 
-    public boolean isStillValidQuery(SearchQuery query) {
+    boolean isStillValidQuery(SearchQuery query) {
         return query.getQuery().equals(this.searchField.getText())
                 && (query.isRegularExpression() == regularExp.isSelected())
                 && (query.isCaseSensitive() == caseSensitive.isSelected());
@@ -340,7 +344,7 @@ public class SearchBar extends JPanel {
         return new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
     }
 
-    public void updateResults(int matched, String description, boolean grammarBasedSearch) {
+    void updateResults(int matched, String description, boolean grammarBasedSearch) {
         if (matched == 0) {
             // nothing found
             this.currentResults.setText(Localization.lang("No results found."));

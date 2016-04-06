@@ -537,7 +537,7 @@ public class JabRef {
             } else {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
-
+            
             // FIXME: Open JDK problem
             if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel) && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
@@ -571,20 +571,12 @@ public class JabRef {
             int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
-            Double zoomLevel = null;
             for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
-                    if (zoomLevel == null) {
-                        // zoomLevel not yet set, calculate it based on the first found font
-                        zoomLevel = (double) fontSize / (double) font.getSize();
-                    }
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
-            }
-            if (zoomLevel != null) {
-                GUIGlobals.zoomLevel = zoomLevel;
             }
         }
     }

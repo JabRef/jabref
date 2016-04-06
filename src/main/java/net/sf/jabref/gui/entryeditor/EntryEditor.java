@@ -911,7 +911,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             setUI(new VerticalLabelUI(false));
             setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
             setHorizontalAlignment(SwingConstants.RIGHT);
-            setFont(GUIGlobals.typeNameFont);
+            setFont(new Font("dialog", Font.ITALIC + Font.BOLD, 18));
 
             // Add a mouse listener so the user can right-click the type label to change the entry type:
             addMouseListener(new MouseAdapter() {
