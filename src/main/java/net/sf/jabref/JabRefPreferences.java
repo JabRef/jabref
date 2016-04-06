@@ -317,7 +317,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
     public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
-    public static final String USER_FILE_DIR = "userFileDir";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
@@ -856,7 +855,6 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
         try {
             defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
             defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name

@@ -1,14 +1,11 @@
 package net.sf.jabref;
 
+import java.io.File;
+import java.util.*;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Represents everything related to a .bib file.
@@ -120,9 +117,10 @@ public class BibDatabaseContext {
         // 1. metadata user-specific directory
         String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
         List<String> metaDataDirectory = metaData.getData(key);
-        if (metaDataDirectory == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
-            metaDataDirectory = metaData.getData(key);
+        if (metaDataDirectory == null || metaDataDirectory.isEmpty()) {
+            if(metaData.getDefaultFileDirectory().isPresent()) {
+                metaDataDirectory = Collections.singletonList(metaData.getDefaultFileDirectory().get());
+            }
         }
 
         // 2. metadata general directory

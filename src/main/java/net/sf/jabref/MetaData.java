@@ -437,6 +437,10 @@ public class MetaData implements Iterable<String> {
         putData(FILE_DIRECTORY, Collections.singletonList(path));
     }
 
+    public void clearDefaultFileDirectory() {
+        remove(FILE_DIRECTORY);
+    }
+
     public void setUserFileDirectory(String user, String path) {
         putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path));
     }
