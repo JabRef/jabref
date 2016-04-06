@@ -1,4 +1,6 @@
 /*  Copyright (C) 2003-2015 JabRef contributors.
+    Copyright (C) 2016 Scott Townsend
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -167,6 +169,66 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.autoGenerateKeysBeforeSaving();
 
             if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                // Check for external modifications to alleviate multiuser concurrency issue when near
+                // simultaneous saves occur to a shared database file:
+                if (panel.isUpdatedExternally()
+                        || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
+                    String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
+                            Localization.lang("Cancel")};
+                    int answer = JOptionPane.showOptionDialog(panel.frame(),
+                            Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                            Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
+
+                    if (answer == JOptionPane.CANCEL_OPTION) {
+                        cancelled = true;
+                        return;
+                    } else if (answer == JOptionPane.YES_OPTION) {
+                        cancelled = true;
+
+                        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+
+                            if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                                // TODO: GUI handling of the situation when the externally modified file keeps being locked.
+                                LOGGER.error("File locked, this will be trouble.");
+                            }
+
+                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
+                                    panel.getBibDatabaseContext().getDatabaseFile());
+                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+                            if (scanner.changesFound()) {
+                                scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
+                                    if (resolved) {
+                                        panel.setUpdatedExternally(false);
+                                        SwingUtilities.invokeLater(
+                                                (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                                    } else {
+                                        cancelled = true;
+                                    }
+                                });
+                            }
+                        });
+
+                        return;
+                    } else { // User indicated to store anyway.
+                                 // See if the database has the protected flag set:
+                        List<String> pd = panel.getBibDatabaseContext().getMetaData()
+                                .getData(Globals.PROTECTED_FLAG_META);
+                        boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
+                        if (databaseProtectionFlag) {
+                            JOptionPane.showMessageDialog(frame,
+                                    Localization
+                                            .lang("Database is protected. Cannot save until external changes have been reviewed."),
+                                    Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
+                            cancelled = true;
+                            return;
+                        } else {
+                            panel.setUpdatedExternally(false);
+                            panel.getSidePaneManager().hide("fileUpdate");
+                        }
+                    }
+                }
+
                 // Save the database:
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getEncoding());
 
