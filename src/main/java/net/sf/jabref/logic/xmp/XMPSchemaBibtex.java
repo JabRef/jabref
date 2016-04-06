@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,8 +32,6 @@ import org.apache.xmpbox.type.TextType;
 import org.apache.xmpbox.xml.DomXmpParser;
 import org.apache.xmpbox.xml.XmpParsingException;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class XMPSchemaBibtex extends XMPSchema {
 
@@ -62,13 +60,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         super(parent, XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.KEY);
     }
 
-    public static XMPSchemaBibtex parseFromXml(Element e) throws XmpParsingException {
-        DomXmpParser parser = new DomXmpParser();
-        XMPMetadata meta = parser.parse(e.toString().getBytes());
-        XMPSchemaBibtex schema = (XMPSchemaBibtex) meta.getSchema(XMPSchemaBibtex.class);
-        return schema;
-    }
-
     /**
      * Uses XMPSchema methods
      *
@@ -95,18 +86,13 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     private static String getContents(ArrayProperty seqList) {
         List<String> seq = seqList.getElementsAsString();
-        StringBuffer result = null;
 
+        StringJoiner joiner = new StringJoiner(" and ");
         for(String item: seq){
-            if (result == null) {
-                result = new StringBuffer();
-            } else {
-                result.append(" and ");
-            }
-            result.append(item);
+            joiner.add(item);
         }
 
-        return result.toString();
+        return joiner.toString();
     }
 
     /**

@@ -61,19 +61,6 @@ public class XMPSchemaBibtexTest {
     }
 
     @Test
-    public void testXMPSchemaBibtexElement()
-            throws ParserConfigurationException, XmpParsingException {
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-                .newInstance();
-        DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        Element e = builder.newDocument().createElement("rdf:Description");
-
-        XMPSchemaBibtex bibtex = XMPSchemaBibtex.parseFromXml(e);
-
-        Assert.assertNotNull(bibtex.getUnqualifiedTextProperty("rdf:Description"));
-    }
-
-    @Test
     public void testGetSetPersonList() throws IOException {
         XMPMetadata xmp = XMPMetadata.createXMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
