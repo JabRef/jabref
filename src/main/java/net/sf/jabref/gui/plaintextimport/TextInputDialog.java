@@ -234,8 +234,9 @@ public class TextInputDialog extends JDialog {
 
         try {
             document.insertString(0, "", document.getStyle("regular"));
-        } catch (BadLocationException ignored) {
-            // Ignored
+        } catch (BadLocationException ex) {
+            LOGGER.warn("Problem setting style", ex);
+
         }
 
         OverlayPanel testPanel = new OverlayPanel(textPane, Localization.lang("paste text here"));
@@ -715,8 +716,8 @@ public class TextInputDialog extends JDialog {
 
     private class MenuTextForTagAction extends AbstractAction {
 
-        String field;
-        Boolean overrideField;
+        private final String field;
+        private final Boolean overrideField;
         public MenuTextForTagAction(String field, Boolean overrideField) {
             super(field);
             this.field = field;
