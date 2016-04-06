@@ -31,6 +31,7 @@ package net.sf.jabref.model.database;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
@@ -415,9 +416,11 @@ public class BibDatabase {
         }
     }
 
+    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
     private String resolveContent(String result, Set<String> usedIds) {
         String res = result;
-        if (res.matches(".*#[^#]+#.*")) {
+        if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;
