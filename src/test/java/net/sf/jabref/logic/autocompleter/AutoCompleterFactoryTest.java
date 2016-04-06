@@ -2,10 +2,23 @@ package net.sf.jabref.logic.autocompleter;
 
 import static org.mockito.Mockito.*;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class AutoCompleterFactoryTest {
+    @Before
+    public void setup() {
+        Globals.prefs = mock(JabRefPreferences.class);
+    }
+
+    @After
+    public void teardown() {
+        Globals.prefs = null;
+    }
 
     @Test(expected = NullPointerException.class)
     public void initFactoryWithNullPreferenceThrowsException() {
