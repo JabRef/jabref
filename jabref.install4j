@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="6.0.4" transformSequenceNumber="5">
+<install4j version="6.1.1" transformSequenceNumber="5">
   <directoryPresets config="./buildres/JabRef.VisualElementsManifest.xml" />
   <application name="JabRef" distributionSourceDir="" applicationId="0034-7691-1464-4754" mediaDir="build/install4j" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="JabRef" publisher="JabRef Community" publisherWeb="http://www.jabref.org/" version="DEV" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" macVolumeId="780dfea2d33a0244" javaMinVersion="1.8" javaMaxVersion="" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="true" languageSelectionInPrincipalLanguage="false">
@@ -73,6 +73,7 @@
           <archive location="${compiler:buildFileName}" failOnError="false" />
         </classPath>
         <nativeLibraryDirectories />
+        <vmOptions />
       </java>
       <includedFiles />
       <unextractableFiles />
@@ -161,10 +162,104 @@
             </actions>
             <formComponents />
           </screen>
+          <screen name="" id="178" customizedId="" beanClass="com.install4j.runtime.beans.screens.FormScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
+            <serializedBean>
+              <java class="java.beans.XMLDecoder">
+                <object class="com.install4j.runtime.beans.screens.FormScreen">
+                  <void property="subTitle">
+                    <string>Choose for which users you want to install Jabref.</string>
+                  </void>
+                  <void property="title">
+                    <string>Installation Scope</string>
+                  </void>
+                </object>
+              </java>
+            </serializedBean>
+            <condition />
+            <validation />
+            <preActivation />
+            <postActivation />
+            <actions>
+              <action name="" id="184" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
+                      <void property="script">
+                        <object class="com.install4j.api.beans.ScriptProperty">
+                          <void property="value">
+                            <string>int selection = (int) context.getVariable("installForAllUsers");
+if (selection == 0) {
+  context.setInstallationDirectory(context.getInstallationDirectory());
+} else {
+  context.setInstallationDirectory(new File(System.getProperty("user.home")));   
+}
+return true;</string>
+                          </void>
+                        </object>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <condition />
+              </action>
+            </actions>
+            <formComponents>
+              <formComponent name="" id="181" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.MultilineLabelComponent">
+                      <void property="labelText">
+                        <string>Select whether you want to install JabRef for yourself or for all users of this computer. 
+Note: An installation for all users requires admin privileges.</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="183" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.SpacerComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.SpacerComponent" />
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+              <formComponent name="" id="182" customizedId="" beanClass="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent" enabled="true" commentSet="false" comment="" insetTop="" insetLeft="" insetBottom="" insetRight="" resetInitOnPrevious="false">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.formcomponents.RadiobuttonsComponent">
+                      <void property="radioButtonLabels">
+                        <array class="java.lang.String" length="2">
+                          <void index="0">
+                            <string>Install for everyone using this computer</string>
+                          </void>
+                          <void index="1">
+                            <string>Install just for me</string>
+                          </void>
+                        </array>
+                      </void>
+                      <void property="variableName">
+                        <string>installForAllUsers</string>
+                      </void>
+                    </object>
+                  </java>
+                </serializedBean>
+                <initScript />
+                <visibilityScript />
+              </formComponent>
+            </formComponents>
+          </screen>
           <screen name="" id="4" customizedId="" beanClass="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen" />
+                <object class="com.install4j.runtime.beans.screens.InstallationDirectoryScreen">
+                  <void property="suggestAppDir">
+                    <boolean>false</boolean>
+                  </void>
+                </object>
               </java>
             </serializedBean>
             <condition>!context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
@@ -331,7 +426,7 @@
               <action name="" id="86" customizedId="" beanClass="com.install4j.runtime.beans.actions.desktop.AddToDockAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                                      <object class="com.install4j.runtime.beans.actions.desktop.AddToDockAction">
+                    <object class="com.install4j.runtime.beans.actions.desktop.AddToDockAction">
                       <void property="executable">
                         <object class="java.io.File">
                           <string>JabRef</string>
