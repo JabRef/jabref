@@ -54,8 +54,8 @@ class StringRemoveChange extends Change {
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
 
         try {
-            panel.database().removeString(inMem.getId());
-            undoEdit.addEdit(new UndoableRemoveString(panel, panel.database(), string));
+            panel.getDatabase().removeString(inMem.getId());
+            undoEdit.addEdit(new UndoableRemoveString(panel, panel.getDatabase(), string));
         } catch (Exception ex) {
             LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }

@@ -1,23 +1,19 @@
 package net.sf.jabref.logic.auxparser;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AuxParserTest {
 
@@ -36,7 +32,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
+            assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
             assertEquals(0, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
@@ -59,7 +55,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
+            assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
             assertEquals(1, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());
@@ -97,7 +93,7 @@ public class AuxParserTest {
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
 
-            assertFalse(auxResult.getGeneratedBibDatabase().hasNoEntries());
+            assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
             assertEquals(0, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
             assertEquals(2, newDB.getEntries().size());

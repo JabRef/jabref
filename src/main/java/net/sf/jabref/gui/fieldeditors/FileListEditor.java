@@ -199,7 +199,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
-        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
+        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
 
@@ -395,9 +395,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
-                    frame.output(Localization.lang("Finished autosetting external links."));
+                    frame.output(Localization.lang("Finished automatically setting external links."));
                 } else {
-                    frame.output(Localization.lang("Finished autosetting external links.")
+                    frame.output(Localization.lang("Finished automatically setting external links.")
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before

@@ -59,4 +59,16 @@ public class URLUtilTest {
                 URLUtil.cleanGoogleSearchURL("https://www.google.fr/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAAahUKEwjJurHd2sfHAhWBsxQKHSrEAaM&url=ftp%3A%2F%2Fmoz.com%2Fugc%2Fthe-ultimate-guide-to-the-google-search-parameters&ei=0THeVYmOJIHnUqqIh5gK&usg=AFQjCNHnid_r_d2LP8_MqvI7lQnTC3lB_g&sig2=ICzxDroG2ENTJSUGmdhI2w")
         );
     }
+
+    @Test
+    public void isURLshouldAcceptValidURL() {
+        Assert.assertTrue(URLUtil.isURL("http://www.google.com"));
+        Assert.assertTrue(URLUtil.isURL("https://www.google.com"));
+    }
+
+    @Test
+    public void isURLshouldRejectInvalidURL() {
+        Assert.assertFalse(URLUtil.isURL("www.google.com"));
+        Assert.assertFalse(URLUtil.isURL("google.com"));
+    }
 }

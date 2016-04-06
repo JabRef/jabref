@@ -36,7 +36,6 @@ public interface Formatter {
 
     /**
      * Returns a description of the formatter.
-     * The string "%s" serves as a placeholder for the field name, see java.util.Formatter.
      *
      * @return the description string, always non empty
      */

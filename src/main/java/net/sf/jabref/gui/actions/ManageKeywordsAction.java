@@ -208,7 +208,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);

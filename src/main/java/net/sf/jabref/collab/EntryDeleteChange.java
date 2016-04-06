@@ -15,6 +15,8 @@
  */
 package net.sf.jabref.collab;
 
+import javax.swing.*;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -28,8 +30,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
 
 class EntryDeleteChange extends Change {
 
@@ -60,8 +60,8 @@ class EntryDeleteChange extends Change {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        panel.database().removeEntry(memEntry);
-        undoEdit.addEdit(new UndoableRemoveEntry(panel.database(), memEntry, panel));
+        panel.getDatabase().removeEntry(memEntry);
+        undoEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), memEntry, panel));
         secondary.removeEntry(tmpEntry);
         return true;
     }

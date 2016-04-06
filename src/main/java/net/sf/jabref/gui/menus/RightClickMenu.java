@@ -59,7 +59,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         this.panel = panel;
         JMenu typeMenu = new ChangeEntryTypeMenu().getChangeEntryTypeMenu(panel);
         // Are multiple entries selected?
-        boolean multiple = panel.mainTable.getSelectedRowCount() > 1;
+        boolean multiple = areMultipleEntriesSelected();
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibEntry be = null;
@@ -69,7 +69,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
-        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy special"));
+        JMenu copySpecialMenu = new JMenu(Localization.lang("Copy") + "...");
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
         copySpecialMenu
@@ -96,7 +96,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
-            addSeparator();
         } else if (be != null) {
             String marked = be.getField(InternalBibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
@@ -107,7 +106,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(markSpecific);
                 add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
             }
-            addSeparator();
         }
 
         if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
@@ -142,8 +140,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 add(readStatusMenu);
             }
 
-            addSeparator();
         }
+
+        addSeparator();
 
         add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
@@ -161,8 +160,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
-
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
                 if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
@@ -171,6 +168,10 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
+        addSeparator();
+
+        add(typeMenu);
+
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
                 if (!(isFieldSetForSelectedEntry("doi"))) {
@@ -178,14 +179,20 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
                 }
             }
         });
-
-        addSeparator();
-
-        add(typeMenu);
-        add(new GeneralAction(Actions.PLAIN_TEXT_IMPORT, Localization.lang("Plain text import")));
-
         add(frame.getMassSetField());
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
         add(frame.getManageKeywords());
+        add(new GeneralAction(Actions.MERGE_ENTRIES,
+                Localization.lang("Merge entries") + "...",
+                IconTheme.JabRefIcon.MERGE_ENTRIES.getSmallIcon()) {
+
+            {
+                if (!(areExactlyTwoEntriesSelected())) {
+                    this.setEnabled(false);
+                }
+            }
+
+        });
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
@@ -197,13 +204,16 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         groupMoveTo = add(new GeneralAction(Actions.MOVE_TO_GROUP, Localization.lang("Move to group")));
         add(groupMoveTo);
 
-        floatMarked.addActionListener(e -> {
-            Globals.prefs.putBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES, floatMarked.isSelected());
-            panel.mainTable.refreshSorting(); // Bad remote access
-        });
-
         // create disabledIcons for all menu entries
         frame.createDisabledIconsForMenuEntries(this);
+    }
+
+    private boolean areMultipleEntriesSelected() {
+        return panel.mainTable.getSelectedRowCount() > 1;
+    }
+
+    private boolean areExactlyTwoEntriesSelected() {
+        return panel.mainTable.getSelectedRowCount() == 2;
     }
 
     /**
@@ -234,10 +244,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
         }
-
-        addSeparator();
-        floatMarked.setSelected(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
-        add(floatMarked);
     }
 
 

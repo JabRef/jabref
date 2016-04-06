@@ -55,8 +55,8 @@ class PreambleChange extends Change {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        panel.database().setPreamble(disk);
-        undoEdit.addEdit(new UndoablePreambleChange(panel.database(), panel, mem, disk));
+        panel.getDatabase().setPreamble(disk);
+        undoEdit.addEdit(new UndoablePreambleChange(panel.getDatabase(), panel, mem, disk));
         secondary.setPreamble(disk);
         return true;
     }

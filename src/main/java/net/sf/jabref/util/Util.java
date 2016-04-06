@@ -289,9 +289,9 @@ public class Util {
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
      *                         parameter can be null, which means that no callback will be notified.
-     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the automatically setting. This
      *                         parameter can be null, which means that no progress update will be shown.
-     * @return the thread performing the autosetting
+     * @return the thread performing the automatically setting
      */
     public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
@@ -300,7 +300,7 @@ public class Util {
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.setTitle(Localization.lang("Autosetting links"));
+            diag.setTitle(Localization.lang("Automatically setting file links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
             diag.getContentPane().add(label, BorderLayout.SOUTH);
 
@@ -437,9 +437,9 @@ public class Util {
      *                         parameter can be null, which means that no callback will be notified. The passed ActionEvent is
      *                         constructed with (this, id, ""), where id is 1 if something has been done and 0 if nothing has been
      *                         done.
-     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the automatically setting. This
      *                         parameter can be null, which means that no progress update will be shown.
-     * @return the runnable able to perform the autosetting
+     * @return the runnable able to perform the automatically setting
      */
     public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<BibEntry> entries = new ArrayList<>();

@@ -17,10 +17,10 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
@@ -54,7 +54,7 @@ public class BibtexImporter extends ImportFormat {
     @Override
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
             throws IOException {
-        ParserResult pr = BibtexParser.parse(new InputStreamReader(in));
+        ParserResult pr = BibtexParser.parse(ImportFormatReader.getReaderDefaultEncoding(in));
         return new ArrayList<>(pr.getDatabase().getEntries());
     }
 

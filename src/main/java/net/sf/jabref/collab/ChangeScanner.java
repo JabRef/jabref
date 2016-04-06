@@ -75,7 +75,7 @@ public class ChangeScanner implements Runnable {
     public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
         this.panel = bp;
         this.frame = frame;
-        this.inMem = bp.database();
+        this.inMem = bp.getDatabase();
         this.mdInMem = bp.getBibDatabaseContext().getMetaData();
         this.f = file;
     }

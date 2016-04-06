@@ -70,7 +70,7 @@ public class ExportFormats {
                 "listrefs", "listrefs", "listrefs", ".html"));
         ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML table (with Abstract & BibTeX)"),
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html"));
-        ExportFormats.putFormat(new ExportFormat(Localization.lang("Harvard RTF"), "harvard", "harvard",
+        ExportFormats.putFormat(new ExportFormat("Harvard RTF", "harvard", "harvard",
                 "harvard", ".rtf"));
         ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690rtf", "iso690RTF", "iso690rtf", ".rtf"));
         ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690txt", "iso690", "iso690txt", ".txt"));

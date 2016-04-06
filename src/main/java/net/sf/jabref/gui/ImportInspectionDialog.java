@@ -373,7 +373,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // database (if
             // applicable) and against entries already in the table.
             if ((panel != null) && (DuplicateCheck
-                    .containsDuplicate(panel.database(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
+                    .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
                     || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
                 deselectAllDuplicates.setEnabled(true);
@@ -443,7 +443,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database = new BibDatabase();
             localMetaData = new MetaData();
         } else {
-            database = panel.database();
+            database = panel.getDatabase();
             localMetaData = panel.getBibDatabaseContext().getMetaData();
         }
 
@@ -478,7 +478,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database = new BibDatabase();
             localMetaData = new MetaData();
         } else {
-            database = panel.database();
+            database = panel.getDatabase();
             localMetaData = panel.getBibDatabaseContext().getMetaData();
         }
 
@@ -609,7 +609,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
-                                Localization.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
+                                Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                                 Localization.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
                                 cbm, Localization.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
@@ -631,8 +631,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // See if we should remove any old entries for duplicate resolving:
             if (!entriesToDelete.isEmpty()) {
                 for (BibEntry entry : entriesToDelete) {
-                    ce.addEdit(new UndoableRemoveEntry(panel.database(), entry, panel));
-                    panel.database().removeEntry(entry);
+                    ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+                    panel.getDatabase().removeEntry(entry);
                 }
             }
 
@@ -661,17 +661,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
 
                 // Mark entries if we should
-                if (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                        && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                                || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP))) {
+                if (EntryMarker.shouldMarkEntries()) {
                     for (BibEntry entry : selected) {
                         EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                     }
                 }
                 // Check if we should unmark entries before adding the new ones:
                 if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                    for (BibEntry entry : panel.database().getEntries()) {
-                        EntryMarker.unmarkEntry(entry, true, panel.database(), ce);
+                    for (BibEntry entry : panel.getDatabase().getEntries()) {
+                        EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
                     }
                 }
 
@@ -720,8 +718,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
 
                     entry.setId(IdGenerator.next());
-                    panel.database().insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(panel.database(), entry, panel));
+                    panel.getDatabase().insertEntry(entry);
+                    ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
 
                 }
 
@@ -984,7 +982,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Is this the duplicate icon column, and is there an icon?
             if ((col == DUPL_COL) && (glTable.getValueAt(row, col) != null)) {
                 BibEntry first = sortedList.get(row);
-                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.database(), first, panel.getBibDatabaseContext().getMode());
+                Optional<BibEntry> other = DuplicateCheck.containsDuplicate(panel.getDatabase(), first, panel.getBibDatabaseContext().getMode());
                 if (other.isPresent()) {
                     // This will be true if the duplicate is in the existing
                     // database.
@@ -1140,7 +1138,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private class AutoSetLinks extends JMenuItem implements ActionListener {
 
         public AutoSetLinks() {
-            super(Localization.lang("Autoset external links"));
+            super(Localization.lang("Automatically set file links"));
             addActionListener(this);
         }
 

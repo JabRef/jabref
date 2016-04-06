@@ -60,11 +60,14 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             return Optional.empty();
         }
 
-        PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), JabRef.jrf.getCurrentBasePanel().mainTable, -1);
+        PdfImporter pi = new PdfImporter(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), JabRef.mainFrame.getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
-        assert res.getEntries().size() == 1;
-        return Optional.of(res.getEntries().get(0));
+        if (res.getEntries().size() == 1) {
+            return Optional.of(res.getEntries().get(0));
+        } else {
+            return Optional.empty();
+        }
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntryDataFromXMP(pdfFile, entry);

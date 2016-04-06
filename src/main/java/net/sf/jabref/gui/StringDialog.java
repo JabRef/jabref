@@ -290,7 +290,7 @@ class StringDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ? Localization.lang("Name") :
+            return col == 0 ? Localization.lang("Label") :
                 Localization.lang("Content");
         }
 
@@ -464,11 +464,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.UNDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.UNDO);
         }
     }
 
@@ -481,11 +477,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.REDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.REDO);
         }
     }
 }

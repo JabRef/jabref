@@ -4,6 +4,10 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.OS;
 
 import javax.swing.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.util.Objects;
@@ -14,7 +18,9 @@ import java.util.List;
 
 public class KeyBindingPreferences {
 
-    private int SHORTCUT_MASK = -1;
+    private static final Log LOGGER = LogFactory.getLog(KeyBindingPreferences.class);
+
+    private int shortcutMask = -1;
 
     private final JabRefPreferences prefs;
 
@@ -62,15 +68,15 @@ public class KeyBindingPreferences {
                 modifiers = modifiers | InputEvent.ALT_MASK;
             }
 
-            if (SHORTCUT_MASK == -1) {
+            if (shortcutMask == -1) {
                 try {
-                    SHORTCUT_MASK = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-                } catch (Throwable ignored) {
-                    // Ignored
+                    shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+                } catch (AWTError | HeadlessException e) {
+                    LOGGER.warn("Problem geting shortcut mask", e);
                 }
             }
 
-            return KeyStroke.getKeyStroke(keyCode, SHORTCUT_MASK + modifiers);
+            return KeyStroke.getKeyStroke(keyCode, shortcutMask + modifiers);
         }
     }
 

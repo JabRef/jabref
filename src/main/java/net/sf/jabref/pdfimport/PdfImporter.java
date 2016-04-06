@@ -207,7 +207,7 @@ public class PdfImporter {
         entry = localRes.get(0);
 
         // insert entry to database and link file
-        panel.database().insertEntry(entry);
+        panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         FileListTableModel tm = new FileListTableModel();
         File toLink = new File(fileName);
@@ -254,9 +254,9 @@ public class PdfImporter {
         }
 
         // insert entry to database and link file
-        panel.database().insertEntry(entry);
+        panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
+        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
         panel.highlightEntry(entry);
@@ -280,7 +280,7 @@ public class PdfImporter {
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, type.getName());
             try {
-                panel.database().insertEntry(be);
+                panel.getDatabase().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
                 ArrayList<BibEntry> list = new ArrayList<>();
@@ -288,7 +288,7 @@ public class PdfImporter {
                 UpdateField.setAutomaticFields(list, true, true);
 
                 // Create an UndoableInsertEntry object.
-                panel.undoManager.addEdit(new UndoableInsertEntry(panel.database(), be, panel));
+                panel.undoManager.addEdit(new UndoableInsertEntry(panel.getDatabase(), be, panel));
                 panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
                         + Localization.lang("entry") + ".");
 

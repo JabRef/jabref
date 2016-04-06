@@ -18,7 +18,6 @@ package net.sf.jabref.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -185,14 +184,9 @@ public class JSTORFetcher implements EntryFetcher {
      */
     private static String getCitations(String ticket, String query) throws IOException {
         String urlQuery;
-        try {
-            urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS +
- "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query="
-                    + URLEncoder.encode(query, StandardCharsets.UTF_8.name()) +
-                    "&wc=on&citationAction=saveAll";
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        urlQuery = "http://www.jstor.org/search/BasicResults?hp=" + JSTORFetcher.MAX_CITATIONS
+                + "&si=1&gw=jtx&jtxsi=1&jcpsi=1&artsi=1&Query="
+                + URLEncoder.encode(query, StandardCharsets.UTF_8.name()) + "&wc=on&citationAction=saveAll";
 
         URL url = new URL(urlQuery);
         URLConnection conn = url.openConnection();

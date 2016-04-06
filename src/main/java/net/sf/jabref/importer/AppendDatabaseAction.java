@@ -132,7 +132,7 @@ public class AppendDatabaseAction implements BaseAction {
         BibDatabase fromDatabase = pr.getDatabase();
         ArrayList<BibEntry> appendedEntries = new ArrayList<>();
         ArrayList<BibEntry> originalEntries = new ArrayList<>();
-        BibDatabase database = panel.database();
+        BibDatabase database = panel.getDatabase();
 
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
         MetaData meta = pr.getMetaData();

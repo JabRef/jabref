@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;

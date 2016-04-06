@@ -15,24 +15,24 @@
  */
 package net.sf.jabref.gui.actions;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.*;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.*;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -85,7 +85,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         rename = new JRadioButton(Localization.lang("Rename field to") + ":");
         rename.setToolTipText(Localization.lang("Move contents of a field into a field with a different name"));
 
-        Set<String> allFields = frame.getCurrentBasePanel().database().getAllVisibleFields();
+        Set<String> allFields = frame.getCurrentBasePanel().getDatabase().getAllVisibleFields();
 
         for (String f : allFields) {
             field.addItem(f);
@@ -206,7 +206,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         Collection<BibEntry> entryList;
         // If all entries should be treated, change the entries array:
         if (all.isSelected()) {
-            entryList = bp.database().getEntries();
+            entryList = bp.getDatabase().getEntries();
         } else {
             entryList = entries;
         }

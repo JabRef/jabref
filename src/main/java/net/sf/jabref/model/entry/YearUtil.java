@@ -6,7 +6,6 @@ public class YearUtil {
 
     private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
 
-
     /**
      * Will convert a two digit year using the following scheme (describe at
      * http://www.filemaker.com/help/02-Adding%20and%20view18.html):
@@ -42,21 +41,58 @@ public class YearUtil {
             return year;
         }
 
-        try {
-            int yearNumber = Integer.parseInt(year);
-            return String.valueOf(new Year(thisYear).toFourDigitYear(yearNumber));
-        } catch (NumberFormatException e) {
+        Integer yearNumber = intValueOfWithNull(year);
+        if (yearNumber == null) {
             return year;
         }
+
+        return String.valueOf(new Year(thisYear).toFourDigitYear(yearNumber));
     }
 
+    public static int toFourDigitYearWithInts(String year) {
+        return YearUtil.toFourDigitYearWithInts(year, YearUtil.CURRENT_YEAR);
+    }
+
+    private static int toFourDigitYearWithInts(String year, int thisYear) {
+        if ((year == null) || (year.length() != 2)) {
+            return 0;
+        }
+
+        Integer yearNumber = intValueOfWithNull(year);
+        if (yearNumber == null) {
+            return 0;
+        }
+
+        return new Year(thisYear).toFourDigitYear(yearNumber);
+    }
+
+    private static Integer intValueOfWithNull(String str) {
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            return null;
+        }
+
+        int ival = 0;
+        for (; ; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                return null;
+            }
+        }
+    }
 
     private static class Year {
 
         private final int year;
         private final int century;
         private final int yearShort;
-
 
         public Year(int year) {
             this.year = year;

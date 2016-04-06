@@ -194,23 +194,19 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
         LinkedHashMap<String, JLabel> res = new LinkedHashMap<>();
-        try {
-            urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER,
-                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            int count = 1;
-            String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
-                    && (count < 2)) {
-                urlQuery = nextPage;
-                count++;
-                if (stopFetching) {
-                    break;
-                }
+
+        urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER,
+                URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
+        int count = 1;
+        String nextPage;
+        while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null) && (count < 2)) {
+            urlQuery = nextPage;
+            count++;
+            if (stopFetching) {
+                break;
             }
-            return res;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
+        return res;
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
