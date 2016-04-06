@@ -29,6 +29,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+
+import com.jgoodies.forms.debug.FormDebugPanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.gui.JabRefFrame;
@@ -125,7 +127,7 @@ class FileTab extends JPanel implements PrefsTab {
             promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
         });
 
-        FormLayout layout = new FormLayout("left:pref, 4dlu, fill:pref", "");
+        FormLayout layout = new FormLayout("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""); // left:pref, 4dlu, fill:pref
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Localization.lang("General"));
@@ -158,37 +160,28 @@ class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
 
         builder.appendSeparator(Localization.lang("External file links"));
-        JPanel pan = new JPanel();
-        builder.append(pan);
-
+        builder.nextLine();
         lab = new JLabel(Localization.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
         BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
         builder.append(new JButton(browse));
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(bibLocationAsFileDir, 3);
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(matchStartsWithKey, 3);
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(matchExactKeyOnly, 3);
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
         builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"), HelpFiles.regularExpressionSearchHelp).getHelpButton());
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(runAutoFileSearch, 3);
         builder.nextLine();
-        builder.append(new JPanel());
         builder.append(allowFileAutoOpenBrowse);
         builder.nextLine();
 
@@ -207,7 +200,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(promptBeforeUsingAutoSave);
         builder.nextLine();
 
-        pan = builder.getPanel();
+        JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new BorderLayout());
         add(pan, BorderLayout.CENTER);
