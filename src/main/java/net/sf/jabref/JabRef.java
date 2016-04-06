@@ -572,20 +572,12 @@ public class JabRef {
             int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
             UIDefaults defaults = UIManager.getDefaults();
             Enumeration<Object> keys = defaults.keys();
-            Double zoomLevel = null;
             for (Object key : Collections.list(keys)) {
                 if ((key instanceof String) && ((String) key).endsWith(".font")) {
                     FontUIResource font = (FontUIResource) UIManager.get(key);
-                    if (zoomLevel == null) {
-                        // zoomLevel not yet set, calculate it based on the first found font
-                        zoomLevel = (double) fontSize / (double) font.getSize();
-                    }
                     font = new FontUIResource(font.getName(), font.getStyle(), fontSize);
                     defaults.put(key, font);
                 }
-            }
-            if (zoomLevel != null) {
-                GUIGlobals.zoomLevel = zoomLevel;
             }
         }
     }
