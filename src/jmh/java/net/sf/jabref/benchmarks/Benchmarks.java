@@ -34,7 +34,7 @@ public class Benchmarks {
         Globals.prefs = JabRefPreferences.getInstance();
 
         Random randomizer = new Random();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1000; i++) {
             BibEntry entry = new BibEntry();
             entry.setCiteKey("id" + i);
             entry.setField("title", "This is my title " + i);
