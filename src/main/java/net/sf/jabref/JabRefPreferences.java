@@ -461,9 +461,6 @@ public class JabRefPreferences {
         defaults.put(BIBLATEX_DEFAULT_MODE, false);
 
         if (OS.OS_X) {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");
-            //defaults.put(JabRefPreferences.PSVIEWER, "/Applications/Preview.app");
-            //defaults.put("htmlviewer", "/Applications/Safari.app");
             defaults.put(EMACS_PATH, "emacsclient");
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
@@ -471,9 +468,6 @@ public class JabRefPreferences {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 
         } else if (OS.WINDOWS) {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "cmd.exe /c start /b");
-            //defaults.put(JabRefPreferences.PSVIEWER, "cmd.exe /c start /b");
-            //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
             defaults.put(EMACS_23, true);
@@ -481,17 +475,13 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "Arial");
 
         } else {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "evince");
-            //defaults.put(JabRefPreferences.PSVIEWER, "gv");
-            //defaults.put("htmlviewer", "firefox");
+            // Linux
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(FONT_FAMILY, "SansSerif");
 
-            // linux
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
-
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 

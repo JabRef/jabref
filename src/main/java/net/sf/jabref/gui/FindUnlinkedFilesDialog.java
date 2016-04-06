@@ -963,7 +963,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                JabRefDesktop.openExternalViewer(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }

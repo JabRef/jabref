@@ -28,8 +28,8 @@ public class TestUtils {
      * Closes the current instance of JabRef.
      */
     public static void closeJabRef() {
-        if (JabRef.jrf != null) {
-            JabRef.jrf.dispose();
+        if (JabRef.mainFrame != null) {
+            JabRef.mainFrame.dispose();
         }
     }
 
