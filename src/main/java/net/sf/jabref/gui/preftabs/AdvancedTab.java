@@ -15,30 +15,21 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
-import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Optional;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -57,7 +48,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
         this.jabRef = jabRef;
         preferences = prefs;
-        this.remotePreferences = new RemotePreferences(preferences);
+        remotePreferences = new RemotePreferences(preferences);
 
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
