@@ -29,7 +29,7 @@ class HtmlTransferable implements Transferable {
     private static final int HTML = 0;
     private static final int STRING = 1;
 
-    private static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format"); // charset could be read via JabRef.frame.getCurrentBasePanel().getEncoding()
+    private static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format"); // charset could be read via JabRef.mainFrame.getCurrentBasePanel().getEncoding()
 
     private static final DataFlavor[] FLAVORS = {HtmlTransferable.HTML_FLAVOR, DataFlavor.stringFlavor};
 
