@@ -1,6 +1,20 @@
 ## Prerequisites:
 * Java Development Kit ([Download JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
 
+An indication that `JAVA_HOME` is not correctly set or no JDK is installed is following error message:
+
+```
+compileJava FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> java.lang.ExceptionInInitializerError (no error message)
+```
+
+
+
 ### Ensure you have a Java SDK installed
 * In the command line (terminal in Linux, cmd in Windows) run `javac -version`
 * If `javac` is not found, check your PATH environment variable, your JAVA_HOME environment variable or install the most recent SDK
