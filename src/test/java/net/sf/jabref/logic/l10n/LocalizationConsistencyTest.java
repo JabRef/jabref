@@ -3,10 +3,16 @@ package net.sf.jabref.logic.l10n;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class LocalizationConsistencyTest {
 
@@ -23,8 +29,65 @@ public class LocalizationConsistencyTest {
                 missing.removeAll(nonEnglishKeys);
                 List<String> obsolete = new LinkedList<>(nonEnglishKeys);
                 obsolete.removeAll(englishKeys);
+
                 assertEquals("Missing keys of " + lang, Collections.emptyList(), missing);
                 assertEquals("Obsolete keys of " + lang, Collections.emptyList(), obsolete);
+            }
+        }
+    }
+
+    private static class DuplicationDetectionProperties extends Properties {
+
+        private static final long serialVersionUID = 1L;
+
+        private final List<String> duplicates = new LinkedList<>();
+
+        public DuplicationDetectionProperties() {
+            super();
+        }
+
+        /**
+         * @param defaults
+         */
+        public DuplicationDetectionProperties(Properties defaults) {
+            super(defaults);
+        }
+
+        /**
+         * Overriding the HashTable put() so we can check for duplicates
+         */
+        public synchronized Object put(Object key, Object value) {
+            // Have we seen this key before?
+            if (get(key) != null) {
+                duplicates.add(String.valueOf(key));
+            }
+
+            return super.put(key, value);
+        }
+
+        public List<String> getDuplicates() {
+            return duplicates;
+        }
+    }
+
+    @Test
+    public void ensureNoDuplicates() throws IOException {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            for (String lang : Languages.LANGUAGES.values()) {
+                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
+
+                // read in
+                DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
+                try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
+                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                List<String> duplicates = properties.getDuplicates();
+
+                assertEquals("Duplicate keys of " + lang, Collections.emptyList(), duplicates);
             }
         }
     }
@@ -32,7 +95,7 @@ public class LocalizationConsistencyTest {
     @Test
     public void keyValueShouldBeEqualForEnglishPropertiesMenu() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "Menu", "en"));
-        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+        for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
             String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
             String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("&", ""));
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
@@ -42,7 +105,7 @@ public class LocalizationConsistencyTest {
     @Test
     public void keyValueShouldBeEqualForEnglishPropertiesMessages() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
-        for(Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
+        for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
             String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
             String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue());
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
