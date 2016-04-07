@@ -52,6 +52,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
 - Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
 - Added open buttons to DOI and URL field
+- Move Look & Feel settings from advanced to appearance tab in preferences
 
 - Move PDF file directory configuration from external tab to file tab in preferences
 
