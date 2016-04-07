@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,6 +54,7 @@ public class LocalizationConsistencyTest {
         /**
          * Overriding the HashTable put() so we can check for duplicates
          */
+        @Override
         public synchronized Object put(Object key, Object value) {
             // Have we seen this key before?
             if (get(key) != null) {

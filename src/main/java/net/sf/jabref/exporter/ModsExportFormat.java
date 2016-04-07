@@ -16,8 +16,6 @@
 package net.sf.jabref.exporter;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.mods.MODSDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 

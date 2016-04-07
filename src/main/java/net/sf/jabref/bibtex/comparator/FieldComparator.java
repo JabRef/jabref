@@ -74,7 +74,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     public FieldComparator(String field, boolean reversed) {
         this.fieldName = Objects.requireNonNull(field);
         this.field = fieldName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-        fieldType = determineFieldType(this.field[0]);
+        fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
 
         if(fieldType == FieldType.MONTH) {
@@ -89,7 +89,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
-    private FieldType determineFieldType(String s) {
+    private FieldType determineFieldType() {
         if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
         } else if("author".equals(this.field[0]) || "editor".equals(this.field[0])) {
@@ -124,7 +124,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
 
         // Catch all cases involving null:
-        if (f1 == null && f2 == null) {
+        if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if(f1 == null) {
             return multiplier;
@@ -161,8 +161,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Else none of them were parseable, and we can fall back on comparing strings.
         }
 
-        String ours = ((String) f1).toLowerCase();
-        String theirs = ((String) f2).toLowerCase();
+        String ours = f1.toLowerCase();
+        String theirs = f2.toLowerCase();
         return COLLATOR.compare(ours, theirs) * multiplier;
     }
 

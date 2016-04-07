@@ -11,10 +11,9 @@ import java.util.List;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 
