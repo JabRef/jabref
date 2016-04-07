@@ -15,28 +15,18 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.event.ItemListener;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.push.*;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.external.ExternalFileTypeEditor;
+import net.sf.jabref.external.push.PushToApplication;
+import net.sf.jabref.external.push.PushToApplicationButton;
+import net.sf.jabref.external.push.PushToApplications;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
+
+import javax.swing.*;
+import java.awt.*;
 
 class ExternalTab extends JPanel implements PrefsTab {
     private final JabRefPreferences prefs;
