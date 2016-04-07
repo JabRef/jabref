@@ -165,7 +165,7 @@
                       <void property="script">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>if (Util.hasFullAdminRights()) {
+                            <string>if (Util.isDirectoryWritable(context.getInstallationDirectory())) {
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
   context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));   
