@@ -18,11 +18,13 @@ package net.sf.jabref.logic.autocompleter;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Delivers possible completions for a given string based on the key fields of the added items.
+ * Delivers auto-completions for BibTeX keys.
+ * Only applied for auto-completion inside crossref fields.
  *
  * @author kahlert, cordes
  */
 class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
+    private static final int SHORTEST_WORD_TO_ADD = 1;
 
     public BibtexKeyAutoCompleter(AutoCompletePreferences preferences) {
         super(preferences);
@@ -30,6 +32,7 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
 
     @Override
     public boolean isSingleUnitField() {
+        // TODO: Why is this not a single unit field?
         return false;
     }
 
@@ -38,19 +41,19 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
      * The bibtex key of the entry will be added to the index.
      */
     @Override
-    public void addBibtexEntry(BibEntry entry) {
+    public void addToIndex(BibEntry entry) {
         if (entry == null) {
             return;
         }
 
         String key = entry.getCiteKey();
         if (key != null) {
-            addItemToIndex(key.trim());
+            insertIntoIndex(key.trim());
         }
     }
 
     @Override
     protected int getLengthOfShortestWordToAdd() {
-        return 1;
+        return SHORTEST_WORD_TO_ADD;
     }
 }

@@ -28,7 +28,7 @@ class AutoCompleters {
      */
     public void addEntry(BibEntry bibEntry) {
         for (AutoCompleter<String> autoCompleter : autoCompleters.values()) {
-            autoCompleter.addBibtexEntry(bibEntry);
+            autoCompleter.addToIndex(bibEntry);
         }
     }
 

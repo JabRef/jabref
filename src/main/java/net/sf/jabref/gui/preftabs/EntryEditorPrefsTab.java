@@ -81,7 +81,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
 
         shortestToComplete = new JSpinner(
-                new SpinnerNumberModel(autoCompletePreferences.getShortestLengthToComplete(), 1, 5, 1));
+                new SpinnerNumberModel(autoCompletePreferences.getMinLengthToComplete(), 1, 5, 1));
 
         // allowed name formats
         autoCompFF = new JRadioButton(Localization.lang("Autocomplete names in 'Firstname Lastname' format only"));
@@ -185,7 +185,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         disableOnMultiple.setSelected(prefs.getBoolean(JabRefPreferences.DISABLE_ON_MULTIPLE_SELECTION));
         autoComplete.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
-        shortestToComplete.setValue(autoCompletePreferences.getShortestLengthToComplete());
+        shortestToComplete.setValue(autoCompletePreferences.getMinLengthToComplete());
 
         if (autoCompletePreferences.getOnlyCompleteFirstLast()) {
             autoCompFF.setSelected(true);

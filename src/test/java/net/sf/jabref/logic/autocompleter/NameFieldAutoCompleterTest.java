@@ -39,7 +39,7 @@ public class NameFieldAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
-        autoCompleter.addBibtexEntry(null);
+        autoCompleter.addToIndex(null);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -51,7 +51,7 @@ public class NameFieldAutoCompleterTest {
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -64,7 +64,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -77,7 +77,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Testname");
         Assert.assertEquals(Arrays.asList("Testname"), result);
@@ -90,22 +90,9 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Test");
-        Assert.assertEquals(Arrays.asList("Testname"), result);
-    }
-
-    @Test
-    public void completeLowercaseNameReturnsName() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Testname");
-        autoCompleter.addBibtexEntry(entry);
-
-        List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Arrays.asList("Testname"), result);
     }
 
@@ -116,7 +103,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete(null);
         Assert.assertEquals(Collections.emptyList(), result);
@@ -129,7 +116,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -142,10 +129,10 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testNameOne");
-        autoCompleter.addBibtexEntry(entryOne);
+        autoCompleter.addToIndex(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testNameTwo");
-        autoCompleter.addBibtexEntry(entryTwo);
+        autoCompleter.addToIndex(entryTwo);
 
         List<String> result = autoCompleter.complete("testName");
         Assert.assertEquals(Arrays.asList("testNameOne", "testNameTwo"), result);
@@ -154,12 +141,12 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
+        when(preferences.getMinLengthToComplete()).thenReturn(100);
         NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -172,7 +159,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("osta");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -185,7 +172,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Vas");
         Assert.assertEquals(Arrays.asList("Vassilis Kostakos"), result);
@@ -198,7 +185,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Jos");
         Assert.assertEquals(Arrays.asList("Joseph M. Reagle, Jr."), result);
@@ -211,7 +198,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Eric");
         Assert.assertEquals(Arrays.asList("Eric von Hippel"), result);
@@ -225,7 +212,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Honig Bär");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Bä");
         Assert.assertEquals(Arrays.asList("Bär, Honig"), result);
@@ -238,7 +225,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Kosta");
         Assert.assertEquals(Arrays.asList("Kostakos, V.", "Kostakos, Vassilis"), result);
@@ -252,7 +239,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Kosta");
         Assert.assertEquals(Arrays.asList("Kostakos, Vassilis"), result);
@@ -266,7 +253,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Rea");
         Assert.assertEquals(Arrays.asList("Reagle, Jr., J. M."), result);
@@ -280,7 +267,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Kosta");
         Assert.assertEquals(Arrays.asList("Kostakos, V."), result);
@@ -294,7 +281,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("von");
         Assert.assertEquals(Arrays.asList("von Hippel, E."), result);
@@ -307,7 +294,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Kostakos, Va");
         Assert.assertEquals(Arrays.asList("Kostakos, Vassilis"), result);
@@ -321,7 +308,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Kosta");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -335,7 +322,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("Vas");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -348,7 +335,7 @@ public class NameFieldAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "nam");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("n");
         Assert.assertEquals(Arrays.asList("nam"), result);

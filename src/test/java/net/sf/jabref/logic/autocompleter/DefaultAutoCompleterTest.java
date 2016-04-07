@@ -39,7 +39,7 @@ public class DefaultAutoCompleterTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         DefaultAutoCompleter autoCompleter = new DefaultAutoCompleter("field", preferences);
 
-        autoCompleter.addBibtexEntry(null);
+        autoCompleter.addToIndex(null);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -51,7 +51,7 @@ public class DefaultAutoCompleterTest {
         DefaultAutoCompleter autoCompleter = new DefaultAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -64,7 +64,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -77,7 +77,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("testValue");
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -90,22 +90,9 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
-        Assert.assertEquals(Arrays.asList("testValue"), result);
-    }
-
-    @Test
-    public void completeLowercaseValueReturnsValue() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        DefaultAutoCompleter autoCompleter = new DefaultAutoCompleter("field", preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
-
-        List<String> result = autoCompleter.complete("testvalue");
         Assert.assertEquals(Arrays.asList("testValue"), result);
     }
 
@@ -116,7 +103,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete(null);
         Assert.assertEquals(Collections.emptyList(), result);
@@ -129,7 +116,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -142,10 +129,10 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testValueOne");
-        autoCompleter.addBibtexEntry(entryOne);
+        autoCompleter.addToIndex(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testValueTwo");
-        autoCompleter.addBibtexEntry(entryTwo);
+        autoCompleter.addToIndex(entryTwo);
 
         List<String> result = autoCompleter.complete("testValue");
         Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
@@ -158,7 +145,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "val");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("va");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -167,12 +154,12 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
+        when(preferences.getMinLengthToComplete()).thenReturn(100);
         DefaultAutoCompleter autoCompleter = new DefaultAutoCompleter("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -185,7 +172,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("val");
         Assert.assertEquals(Arrays.asList("value"), result);
@@ -198,7 +185,7 @@ public class DefaultAutoCompleterTest {
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.addToIndex(entry);
 
         List<String> result = autoCompleter.complete("lue");
         Assert.assertEquals(Collections.emptyList(), result);

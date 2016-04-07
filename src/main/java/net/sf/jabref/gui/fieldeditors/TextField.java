@@ -158,7 +158,7 @@ public class TextField extends JTextField implements FieldEditor {
     @Override
     public void clearAutoCompleteSuggestion() {
         if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
+            autoCompleteListener.clearAutoCompletion(this);
         }
     }
 

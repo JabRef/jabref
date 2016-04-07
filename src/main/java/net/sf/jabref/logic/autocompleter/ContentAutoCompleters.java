@@ -27,7 +27,7 @@ public class ContentAutoCompleters extends AutoCompleters {
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences);
         List<String> completeFields = preferences.getCompleteNames();
         for (String field : completeFields) {
-            AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(field);
+            AutoCompleter<String> autoCompleter = autoCompleterFactory.forField(field);
             put(field, autoCompleter);
         }
 
@@ -47,7 +47,7 @@ public class ContentAutoCompleters extends AutoCompleters {
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey()) != null) {
                 List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
                 if (items != null) {
-                    items.forEach(ac::addItemToIndex);
+                    items.forEach(ac::insertIntoIndex);
                 }
             }
         }
@@ -61,7 +61,7 @@ public class ContentAutoCompleters extends AutoCompleters {
         AutoCompleter<String> autoCompleter = get("journal");
         if(autoCompleter != null) {
             for (Abbreviation abbreviation : abbreviationLoader.getRepository().getAbbreviations()) {
-                autoCompleter.addItemToIndex(abbreviation.getName());
+                autoCompleter.insertIntoIndex(abbreviation.getName());
             }
         }
     }

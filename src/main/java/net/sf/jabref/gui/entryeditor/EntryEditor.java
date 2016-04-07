@@ -1133,7 +1133,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
                         // See if we need to update an AutoCompleter instance:
                         AutoCompleter<String> aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
                         if (aComp != null) {
-                            aComp.addBibtexEntry(entry);
+                            aComp.addToIndex(entry);
                         }
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.

@@ -44,7 +44,7 @@ public class AutoCompletePreferences {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public int getShortestLengthToComplete() {
+    public int getMinLengthToComplete() {
         return preferences.getInt(PREF_SHORTEST_TO_COMPLETE);
     }
 

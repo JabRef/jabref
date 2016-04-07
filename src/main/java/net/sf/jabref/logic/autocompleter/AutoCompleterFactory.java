@@ -15,27 +15,26 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
+import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Returns an autocompleter to a given fieldname.
- *
- * @author kahlert, cordes
+ * Returns an autocompleter for a given field name.
  */
 public class AutoCompleterFactory {
-
     private final AutoCompletePreferences preferences;
-
 
     public AutoCompleterFactory(AutoCompletePreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public AutoCompleter<String> getFor(String fieldName) {
+    public AutoCompleter<String> forField(String fieldName) {
         Objects.requireNonNull(fieldName);
 
-        if ("author".equals(fieldName) || "editor".equals(fieldName)) {
+        if (InternalBibtexFields.getFieldExtras(fieldName).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
         } else if ("crossref".equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
@@ -49,5 +48,4 @@ public class AutoCompleterFactory {
     public AutoCompleter<String> getPersonAutoCompleter() {
         return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
     }
-
 }

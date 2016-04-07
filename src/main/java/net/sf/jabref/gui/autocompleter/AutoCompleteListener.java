@@ -24,38 +24,18 @@ import org.apache.commons.logging.LogFactory;
 
 import java.awt.event.*;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * Created by Morten O. Alver, 16 Feb. 2007
- */
 public class AutoCompleteListener extends KeyAdapter implements FocusListener {
-
-    //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
     private final AutoCompleter<String> completer;
-
-    // These variables keep track of the situation from time to time.
-    private String toSetIn; // null indicates that there are no completions available
-    private String lastBeginning; // the letters, the user has typed until know
-    private int lastCaretPosition = -1;
-    private List<String> lastCompletions;
-    private int lastShownCompletion;
-    private boolean consumeEnterKey = true;
-
-    // This field is set if the focus listener should call another focus listener
-    // after finishing. This is needed because the autocomplete listener must
-    // run before the focus listener responsible for storing the current edit.
+    private Optional<AutoCompleteState> currentCompletion;
     private FocusListener nextFocusListener;
 
     public AutoCompleteListener(AutoCompleter<String> completer) {
-        //    	if (logger.getHandlers().length == 0) {
-        //	    	logger.setLevel(Level.FINEST);
-        //	    	ConsoleHandler ch = new ConsoleHandler();
-        //	    	ch.setLevel(Level.FINEST);
-        //	    	logger.addHandler(ch);
-        //    	}
         this.completer = completer;
+        currentCompletion = Optional.empty();
     }
 
     /**
@@ -65,380 +45,186 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
      * @param listener The listener to call.
      */
     public void setNextFocusListener(FocusListener listener) {
-        this.nextFocusListener = listener;
-    }
-
-    /**
-     * This setting determines whether the autocomplete listener should consume the Enter key stroke when it leads to
-     * accepting a completion. If set to false, the JTextComponent will receive the Enter key press after the completion
-     * is done. The default value if true.
-     *
-     * @param t true to indicate that the Enter key should be consumed, false that it should be forwarded
-     */
-    public void setConsumeEnterKey(boolean t) {
-        this.consumeEnterKey = t;
+        nextFocusListener = listener;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if ((toSetIn != null) && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
-            JTextComponent comp = (JTextComponent) e.getSource();
-
-            // replace typed characters by characters from completion
-            lastBeginning = lastCompletions.get(lastShownCompletion);
-
-            int end = comp.getSelectionEnd();
-            comp.select(end, end);
-            toSetIn = null;
-            if (consumeEnterKey) {
-                e.consume();
-            }
-        }
-        // Cycle through alternative completions when user presses PGUP/PGDN:
-        else if ((e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) && (toSetIn != null)) {
-            cycle((JTextComponent) e.getSource(), 1);
-            e.consume();
-        } else if ((e.getKeyCode() == KeyEvent.VK_PAGE_UP) && (toSetIn != null)) {
-            cycle((JTextComponent) e.getSource(), -1);
-            e.consume();
-        }
-        //        else if ((e.getKeyCode() == KeyEvent.VK_BACK_SPACE)) {
-        //        	StringBuffer currentword = getCurrentWord((JTextComponent) e.getSource());
-        //        	// delete last char to obey semantics of back space
-        //        	currentword.deleteCharAt(currentword.length()-1);
-        //        	doCompletion(currentword, e);
-        //        }
-        else if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-                // shift is OK, everything else leads to a reset
-                LOGGER.debug("Special case: shift pressed. No action.");
-            } else {
-                resetAutoCompletion();
-            }
-        } else {
-            LOGGER.debug("Special case: defined character, but not caught above");
-        }
-    }
-
-    private void cycle(JTextComponent comp, int increment) {
-        assert (lastCompletions != null);
-        assert (!lastCompletions.isEmpty());
-        lastShownCompletion += increment;
-        if (lastShownCompletion >= lastCompletions.size()) {
-            lastShownCompletion = 0;
-        } else if (lastShownCompletion < 0) {
-            lastShownCompletion = lastCompletions.size() - 1;
-        }
-        String sno = lastCompletions.get(lastShownCompletion);
-        toSetIn = sno.substring(lastBeginning.length() - 1);
-
-        StringBuilder alltext = new StringBuilder(comp.getText());
-
-        int oldSelectionStart = comp.getSelectionStart();
-        int oldSelectionEnd = comp.getSelectionEnd();
-
-        // replace prefix with new prefix
-        int startPos = comp.getSelectionStart() - lastBeginning.length();
-        alltext.delete(startPos, oldSelectionStart);
-        alltext.insert(startPos, sno.subSequence(0, lastBeginning.length()));
-
-        // replace suffix with new suffix
-        alltext.delete(oldSelectionStart, oldSelectionEnd);
-        //int cp = oldSelectionEnd - deletedChars;
-        alltext.insert(oldSelectionStart, toSetIn.substring(1));
-
-        LOGGER.debug(alltext.toString());
-        comp.setText(alltext.toString());
-        //comp.setCaretPosition(cp+toSetIn.length()-1);
-        comp.select(oldSelectionStart, (oldSelectionStart + toSetIn.length()) - 1);
-        lastCaretPosition = comp.getCaretPosition();
-        LOGGER.debug("ToSetIn: '" + toSetIn + "'");
-    }
-
-    /**
-     * If user cancels autocompletion by a) entering another letter than the completed word (and there is no other auto
-     * completion) b) space the casing of the letters has to be kept
-     *
-     * Global variable "lastBeginning" keeps track of typed letters. We rely on this variable to reconstruct the text
-     *
-     * @param wordSeperatorTyped indicates whether the user has typed a white space character or a
-     */
-    private void setUnmodifiedTypedLetters(JTextComponent comp, boolean lastBeginningContainsTypedCharacter,
-            boolean wordSeperatorTyped) {
-        if (lastBeginning == null) {
-            LOGGER.debug("No last beginning found");
-            // There was no previous input (if the user typed a word, where no autocompletion is available)
-            // Thus, there is nothing to replace
+        // no auto completions available
+        if (!currentCompletion.isPresent()) {
             return;
         }
-        LOGGER.debug("lastBeginning: >" + lastBeginning + '<');
-        if (comp.getSelectedText() == null) {
-            // if there is no selection
-            // the user has typed the complete word, but possibly with a different casing
-            // we need a replacement
-            if (wordSeperatorTyped) {
-                LOGGER.debug("Replacing complete word");
-            } else {
-                // if user did not press a white space character (space, ...),
-                // then we do not do anything
-                return;
-            }
-        } else {
-            LOGGER.debug("Selected text " + comp.getSelectedText() + " will be removed");
-            // remove completion suggestion
-            comp.replaceSelection("");
+
+        AutoCompleteState completion = currentCompletion.get();
+        int keyCode = e.getKeyCode();
+        JTextComponent textField = (JTextComponent) e.getSource();
+
+        if (keyCode == KeyEvent.VK_ENTER) {
+            // ENTER inserts auto-completion
+            insertSuggestion(textField, e);
+            // reset state
+            clearAutoCompletion(textField);
+        } else if (keyCode == KeyEvent.VK_PAGE_DOWN) {
+            // Cycle through alternative completions
+            completion.previousSuggestion();
+            insertSuggestion(textField, e);
+        } else if (keyCode == KeyEvent.VK_PAGE_UP) {
+            // Cycle through alternative completions
+            completion.nextSuggestion();
+            insertSuggestion(textField, e);
         }
-
-        lastCaretPosition = comp.getCaretPosition();
-
-        int endIndex = lastCaretPosition - lastBeginning.length();
-        if (lastBeginningContainsTypedCharacter) {
-            // the current letter is NOT contained in comp.getText(), but in lastBeginning
-            // thus lastBeginning.length() is one too large
-            endIndex++;
-        }
-        String text = comp.getText();
-        comp.setText(text.substring(0, endIndex).concat(lastBeginning).concat(text.substring(lastCaretPosition)));
-        if (lastBeginningContainsTypedCharacter) {
-            // the current letter is NOT contained in comp.getText()
-            // Thus, cursor position also did not get updated
-            lastCaretPosition++;
-        }
-        comp.setCaretPosition(lastCaretPosition);
-        lastBeginning = null;
-    }
-
-    /**
-     * Start a new completion attempt (instead of treating a continuation of an existing word or an interrupt of the
-     * current word)
-     */
-    private void startCompletion(StringBuffer currentword, KeyEvent e) {
-        JTextComponent comp = (JTextComponent) e.getSource();
-
-        List<String> completed = findCompletions(currentword.toString());
-        String prefix = completer.getPrefix();
-        String cWord = (prefix != null) && (!prefix.isEmpty()) ? currentword.toString()
-                .substring(prefix.length()) : currentword.toString();
-
-        LOGGER.debug("StartCompletion currentword: >" + currentword + "'<' prefix: >" + prefix + "'<' cword: >" + cWord
-                + '<');
-
-        int no = 0; // We use the first word in the array of completions.
-        if ((completed != null) && (!completed.isEmpty())) {
-            lastShownCompletion = 0;
-            lastCompletions = completed;
-            String sno = completed.get(no);
-
-            // these two lines obey the user's input
-            //toSetIn = Character.toString(ch);
-            //toSetIn = toSetIn.concat(sno.substring(cWord.length()));
-            // BUT we obey the completion
-            toSetIn = sno.substring(cWord.length() - 1);
-
-            LOGGER.debug("toSetIn: >" + toSetIn + '<');
-
-            StringBuilder alltext = new StringBuilder(comp.getText());
-            int cp = comp.getCaretPosition();
-            alltext.insert(cp, toSetIn);
-            comp.setText(alltext.toString());
-            comp.setCaretPosition(cp);
-            comp.select(cp + 1, (cp + 1 + sno.length()) - cWord.length());
-            e.consume();
-            lastCaretPosition = comp.getCaretPosition();
-            char ch = e.getKeyChar();
-
-            LOGGER.debug("Appending >" + ch + '<');
-
-            if (cWord.length() <= 1) {
-                lastBeginning = Character.toString(ch);
-            } else {
-                lastBeginning = cWord.substring(0, cWord.length() - 1).concat(Character.toString(ch));
-            }
-        }
-
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
-        LOGGER.debug("key typed event caught " + e.getKeyCode());
-        char ch = e.getKeyChar();
-        if (ch == '\n') {
-            // this case is handled at keyPressed(e)
+        char newChar = e.getKeyChar();
+        JTextComponent textField = (JTextComponent) e.getSource();
+
+        // this case is handled at keyPressed(e)
+        if (newChar == KeyEvent.VK_ENTER) {
             return;
         }
 
-        if ((e.getModifiers() | InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
-            // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
-            if (Character.isLetter(ch) || Character.isDigit(ch)
-                    || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
-                JTextComponent comp = (JTextComponent) e.getSource();
+        // only handle plain key or SHIFT+key
+        if ((e.getModifiers() | InputEvent.SHIFT_MASK) != InputEvent.SHIFT_MASK) {
+            return;
+        }
 
-                if (toSetIn == null) {
-                    LOGGER.debug("toSetIn is null");
-                } else {
-                    LOGGER.debug("toSetIn: >" + toSetIn + '<');
-                }
+        // don't do auto completion inside words
+        if (!atEndOfWord(textField)) {
+            return;
+        }
 
-                // The case-insensitive system is a bit tricky here
-                // If keyword is "TODO" and user types "tO", then this is treated as "continue" as the "O" matches the "O"
-                // If keyword is "TODO" and user types "To", then this is treated as "discont" as the "o" does NOT match the "O".
-
-                if ((toSetIn != null) && (toSetIn.length() > 1) && (ch == toSetIn.charAt(1))) {
-                    // User continues on the word that was suggested.
-                    LOGGER.debug("cont");
-
-                    toSetIn = toSetIn.substring(1);
-                    if (!toSetIn.isEmpty()) {
-                        int cp = comp.getCaretPosition();
-                        //comp.setCaretPosition(cp+1-toSetIn.);
-                        comp.select((cp + 1) - toSetIn.length(), cp);
-                        lastBeginning = lastBeginning + ch;
-
-                        e.consume();
-                        lastCaretPosition = comp.getCaretPosition();
-
-                        lastCompletions = findCompletions(lastBeginning);
-                        lastShownCompletion = 0;
-                        for (int i = 0; i < lastCompletions.size(); i++) {
-                            String lastCompletion = lastCompletions.get(i);
-                            if (lastCompletion.endsWith(toSetIn)) {
-                                lastShownCompletion = i;
-                                break;
-                            }
-
-                        }
-                        if (toSetIn.length() < 2) {
-                            // User typed the last character of the autocompleted word
-                            // We have to replace the automcompletion word by the typed word.
-                            // This helps if the user presses "space" after the completion
-                            // "space" indicates that the user does NOT want the autocompletion,
-                            // but the typed word
-                            String text = comp.getText();
-                            comp.setText(text.substring(0, lastCaretPosition - lastBeginning.length()) + lastBeginning
-                                    + text.substring(lastCaretPosition));
-                            // there is no selected text, therefore we are not updating the selection
-                            toSetIn = null;
-                        }
-                        return;
-                    }
-                }
-
-                if ((toSetIn != null) && ((toSetIn.length() <= 1) || (ch != toSetIn.charAt(1)))) {
-                    // User discontinues the word that was suggested.
-                    lastBeginning = lastBeginning + ch;
-
-                    LOGGER.debug("discont toSetIn: >" + toSetIn + "'<' lastBeginning: >" + lastBeginning + '<');
-
-                    List<String> completed = findCompletions(lastBeginning);
-                    if ((completed != null) && (!completed.isEmpty())) {
-                        lastShownCompletion = 0;
-                        lastCompletions = completed;
-                        String sno = completed.get(0);
-                        // toSetIn = string used for autocompletion last time
-                        // this string has to be removed
-                        // lastCaretPosition is the position of the caret after toSetIn.
-                        int lastLen = toSetIn.length() - 1;
-                        toSetIn = sno.substring(lastBeginning.length() - 1);
-                        String text = comp.getText();
-                        //we do not use toSetIn as we want to obey the casing of "sno"
-                        comp.setText(text.substring(0, (lastCaretPosition - lastLen - lastBeginning.length()) + 1) + sno
-                                + text.substring(lastCaretPosition));
-                        int startSelect = (lastCaretPosition + 1) - lastLen;
-                        int endSelect = (lastCaretPosition + toSetIn.length()) - lastLen;
-                        comp.select(startSelect, endSelect);
-
-                        lastCaretPosition = comp.getCaretPosition();
-                        e.consume();
-                        return;
-                    } else {
-                        setUnmodifiedTypedLetters(comp, true, false);
-                        e.consume();
-                        toSetIn = null;
-                        return;
-                    }
-                }
-
-                LOGGER.debug("case else");
-
-                comp.replaceSelection("");
-
-                StringBuffer currentword = getCurrentWord(comp);
-
-                // only "real characters" end up here
-                assert (!Character.isISOControl(ch));
-                currentword.append(ch);
-                startCompletion(currentword, e);
-                return;
+        if (Character.isLetter(newChar) || Character.isDigit(newChar) || Character.isWhitespace(newChar)) {
+            // User continues on the word that was suggested.
+            if (currentCompletion.isPresent() && currentCompletion.get().continuesSuggestion(newChar)) {
+                // update currentWord inside auto-completion
+                currentCompletion.get().updateState(newChar);
+                // update highlighting
+                insertKeyAndSuggestion(textField, e);
             } else {
-                if (Character.isWhitespace(ch)) {
-                    assert (!completer.isSingleUnitField());
-                    LOGGER.debug("whitespace && !singleUnitField");
-                    // start a new search if end-of-field is reached
-
-                    // replace displayed letters with typed letters
-                    setUnmodifiedTypedLetters((JTextComponent) e.getSource(), false, true);
-                    resetAutoCompletion();
-                    return;
+                // start new completion attempt
+                // delete selection if auto-completion is active
+                if (currentCompletion.isPresent()) {
+                    textField.replaceSelection("");
                 }
+                String word = getCurrentWord(textField).toString() + newChar;
+                startCompletion(word, textField);
+                insertKeyAndSuggestion(textField, e);
+            }
+        } else {
+            // Some other key like backspace has been entered, state may have changed
+            clearAutoCompletion(textField);
+        }
+    }
 
-                LOGGER.debug("No letter/digit/whitespace or CHAR_UNDEFINED");
-                // replace displayed letters with typed letters
-                setUnmodifiedTypedLetters((JTextComponent) e.getSource(), false, !Character.isISOControl(ch));
-                resetAutoCompletion();
-                return;
+    private void startCompletion(String currentWord, JTextComponent textField) {
+        // reset state
+        clearAutoCompletion(textField);
+        // try to find suggestions for current word
+        List<String> suggestions = completer.complete(currentWord);
+
+        if (suggestions == null || suggestions.isEmpty()) {
+            return;
+        }
+        currentCompletion = Optional.of(new AutoCompleteState(currentWord, suggestions, textField.getCaretPosition()));
+    }
+
+    // DANGER: typed key will also be inserted here!
+    private void insertKeyAndSuggestion(JTextComponent textField, KeyEvent e) {
+        if (!currentCompletion.isPresent()) {
+            return;
+        }
+
+        AutoCompleteState completion = currentCompletion.get();
+
+        String suggestedWord = completion.getSuggestedWord();
+        // remove old suggestion
+        textField.replaceSelection("");
+        StringBuilder fieldText = new StringBuilder(textField.getText());
+        // insert suggested substring
+        int caretPosition = currentCompletion.get().getRealCaretPosition();
+        // DANGER: typed key will also be inserted here!
+        String keyAndWord = completion.getSuggestedWord().substring(completion.getCurrentWord().length() - 1);
+        fieldText.insert(caretPosition, keyAndWord);
+        textField.setText(fieldText.toString());
+        // highlight suggested substring
+        textField.select(caretPosition + 1, (caretPosition + 1 + suggestedWord.length()) - completion.getCurrentWord().length());
+        // prevent insertion of typed key
+        e.consume();
+    }
+
+    private void insertSuggestion(JTextComponent textField, KeyEvent e) {
+        if (!currentCompletion.isPresent()) {
+            return;
+        }
+
+        AutoCompleteState completion = currentCompletion.get();
+
+        String suggestedWord = completion.getSuggestedWord();
+        // remove old suggestion
+        textField.replaceSelection("");
+        StringBuilder fieldText = new StringBuilder(textField.getText());
+        // insert suggested substring
+        int caretPosition = currentCompletion.get().getRealCaretPosition();
+        String word = completion.getSuggestedWord().substring(completion.getCurrentWord().length());
+        fieldText.insert(caretPosition + 1, word);
+        textField.setText(fieldText.toString());
+        // highlight suggested substring
+        textField.select(caretPosition + 1, (caretPosition + 1 + suggestedWord.length()) - completion.getCurrentWord().length());
+        // prevent usual action of ENTER/PGUP/PGDN
+        e.consume();
+    }
+
+    private boolean atEndOfWord(JTextComponent textField) {
+        int nextCharPosition = textField.getCaretPosition();
+
+        // position not at the end of input
+        if(nextCharPosition < textField.getText().length()) {
+            char nextChar = textField.getText().charAt(nextCharPosition);
+            if (!Character.isWhitespace(nextChar)) {
+                return false;
             }
         }
-        resetAutoCompletion();
+        return true;
     }
 
-    /**
-     * Resets the auto completion data in a way that no leftovers are there
-     */
-    private void resetAutoCompletion() {
-        LOGGER.debug("Resetting autocompletion");
-        toSetIn = null;
-        lastBeginning = null;
-    }
+    private StringBuffer getCurrentWord(JTextComponent textField) {
+        final int caretPosition = textField.getCaretPosition();
 
-    private List<String> findCompletions(String beginning) {
-        return completer.complete(beginning);
-    }
-
-    private StringBuffer getCurrentWord(JTextComponent comp) {
-        StringBuffer res = new StringBuffer();
-        String upToCaret;
+        StringBuffer result = new StringBuffer();
 
         try {
-            upToCaret = comp.getText(0, comp.getCaretPosition());
-            // We now have the text from the start of the field up to the caret position.
+            // text from the start of the field up to the current caret/cursor position
+            String textBeforeCaret = textField.getText(0, caretPosition);
             // In most fields, we are only interested in the currently edited word, so we
-            // seek from the caret backward to the closest space:
+            // seek from the textBeforeCaret backward to the closest space:
             if (!completer.isSingleUnitField()) {
-                if ((comp.getCaretPosition() < comp.getText().length())
-                        && Character.isWhitespace(comp.getText().charAt(comp.getCaretPosition()))) {
-                    // caret is in the middle of the text AND current character is a whitespace
-                    // that means: a new word is started and there is no current word
-                    return new StringBuffer();
+                // textBeforeCaret is in the middle of the text AND last character is a whitespace
+                // that means: a new word is started and there is no current word
+                if (caretPosition < textField.getText().length() && Character.isWhitespace(textField.getText().charAt(caretPosition - 1))) {
+                    return new StringBuffer(0);
                 }
 
-                int piv = upToCaret.length() - 1;
-                while ((piv >= 0) && !Character.isWhitespace(upToCaret.charAt(piv))) {
+                // find word
+                int piv = textBeforeCaret.length() - 1;
+                while ((piv >= 0) && !Character.isWhitespace(textBeforeCaret.charAt(piv))) {
                     piv--;
                 }
                 // piv points to whitespace char or piv is -1
-                // copy everything from the next char up to the end of "upToCaret"
-                res.append(upToCaret.substring(piv + 1));
+                // copy everything from the next char up to the end of "caretPosition"
+                result.append(textBeforeCaret.substring(piv + 1));
             } else {
                 // For fields such as "journal" it is more reasonable to try to complete on the entire
-                // text field content, so we skip the searching and keep the entire part up to the caret:
-                res.append(upToCaret);
+                // text field content, so we skip the searching and keep the entire part up to the textBeforeCaret:
+                result.append(textBeforeCaret);
             }
-            LOGGER.debug("AutoCompListener: " + res);
         } catch (BadLocationException ignore) {
-            // Ignored
+            // potentially thrown by textField.getText()
+            LOGGER.warn("Cannot extract text from field. Wrong caret position given.");
         }
 
-        return res;
+        return result;
     }
 
     @Override
@@ -450,25 +236,20 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     @Override
     public void focusLost(FocusEvent event) {
-        if (toSetIn != null) {
-            JTextComponent comp = (JTextComponent) event.getSource();
-            clearCurrentSuggestion(comp);
+        if (currentCompletion.isPresent()) {
+            // comment this when debugging!
+            clearAutoCompletion((JTextComponent) event.getSource());
         }
         if (nextFocusListener != null) {
             nextFocusListener.focusLost(event);
         }
     }
 
-    public void clearCurrentSuggestion(JTextComponent comp) {
-        if (toSetIn != null) {
-            int selStart = comp.getSelectionStart();
-            String text = comp.getText();
-            comp.setText(text.substring(0, selStart) + text.substring(comp.getSelectionEnd()));
-            comp.setCaretPosition(selStart);
-            lastCompletions = null;
-            lastShownCompletion = 0;
-            lastCaretPosition = -1;
-            toSetIn = null;
+    public void clearAutoCompletion(JTextComponent textField) {
+        if (currentCompletion.isPresent()) {
+            textField.replaceSelection("");
+            textField.setCaretPosition(textField.getSelectionStart());
+            currentCompletion = Optional.empty();
         }
     }
 }

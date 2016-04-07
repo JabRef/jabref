@@ -1256,7 +1256,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void databaseChanged(DatabaseChangeEvent e) {
             if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                searchAutoCompleter.addBibtexEntry(e.getEntry());
+                searchAutoCompleter.addToIndex(e.getEntry());
             }
         }
     }
@@ -1518,7 +1518,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
         searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibEntry entry : database.getEntries()) {
-            searchAutoCompleter.addBibtexEntry(entry);
+            searchAutoCompleter.addToIndex(entry);
         }
     }
 

@@ -22,7 +22,7 @@ public interface AutoCompleter<E> {
      * Add a BibEntry to this AutoCompleter.
      * @note The AutoCompleter itself decides which information should be stored for later completion.
      */
-    void addBibtexEntry(BibEntry entry);
+    void addToIndex(BibEntry entry);
 
     /**
      * States whether the field consists of multiple values (false) or of a single value (true)
@@ -33,25 +33,19 @@ public interface AutoCompleter<E> {
     boolean isSingleUnitField();
 
     /**
-     * Unclear what this method should do.
-     * TODO: Remove this method once the AutoCompleteListener is removed.
-     */
-    String getPrefix();
-
-    /**
      * Returns one or more possible completions for a given string. The returned
      * completion depends on which informations were stored while adding
      * BibtexEntries. If no suggestions for completions are found, then an empty list is returned.
      *
-     * @see AutoCompleter#addBibtexEntry(BibEntry)
+     * @see AutoCompleter#addToIndex(BibEntry)
      */
     List<E> complete(String toComplete);
 
     /**
      * Directly adds an item to the AutoCompleter.
      * This method should be called only if the information does not comes directly from a BibEntry.
-     * Otherwise the {@link #addBibtexEntry(BibEntry)} is preferred.
+     * Otherwise the {@link #addToIndex(BibEntry)} is preferred.
      * @param item item to add
      */
-    void addItemToIndex(E item);
+    void insertIntoIndex(E item);
 }
