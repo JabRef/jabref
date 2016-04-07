@@ -21,10 +21,12 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.logic.layout.format.JournalAbbreviator;
-import net.sf.jabref.logic.layout.format.NameFormatter;
-import net.sf.jabref.logic.layout.format.NotFoundFormatter;
+import net.sf.jabref.logic.layout.format.*;
+import net.sf.jabref.logic.layout.format.Number;
+import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -282,7 +284,6 @@ class LayoutEntry {
         }
     }
 
-    // added section - begin (arudert)
     /**
      * Do layout for general formatters (no bibtex-entry fields).
      *
@@ -358,29 +359,144 @@ class LayoutEntry {
         }
 
     }
-    // added section - end (arudert)
 
-    private static LayoutFormatter getLayoutFormatterByClassName(String className,
-            JournalAbbreviationRepository repostiory)
+    private static LayoutFormatter getLayoutFormatterByName(String name, JournalAbbreviationRepository repository)
             throws Exception {
 
-        if (className.isEmpty()) {
+        if (name.isEmpty()) {
             return null;
         }
 
-        if ("JournalAbbreviator".equals(className)) {
-            return new JournalAbbreviator(repostiory);
-        }
-
-        try {
-            String prefix = "net.sf.jabref.logic.layout.format.";
-            return (LayoutFormatter) Class.forName(prefix + className).newInstance();
-        } catch (ClassNotFoundException ex) {
-            throw new Exception("Formatter not found: " + className);
-        } catch (InstantiationException ex) {
-            throw new Exception(className + " cannot be instantiated.");
-        } catch (IllegalAccessException ex) {
-            throw new Exception(className + " cannot be accessed.");
+        switch (name) {
+        case "HTMLToLatexFormatter": // For backward compatibility
+        case "HtmlToLatex":
+            return new HtmlToLatexFormatter();
+        case "UnicodeToLatexFormatter": // For backward compatibility
+        case "UnicodeToLatex":
+            return new UnicodeToLatexFormatter();
+        case "OOPreFormatter":
+            return new OOPreFormatter();
+        case "AuthorAbbreviator":
+            return new AuthorAbbreviator();
+        case "AuthorAndsCommaReplacer":
+            return new AuthorAndsCommaReplacer();
+        case "AuthorAndsReplacer":
+            return new AuthorAndsReplacer();
+        case "AuthorFirstAbbrLastCommas":
+            return new AuthorFirstAbbrLastCommas();
+        case "AuthorFirstAbbrLastOxfordCommas":
+            return new AuthorFirstAbbrLastOxfordCommas();
+        case "AuthorFirstFirst":
+            return new AuthorFirstFirst();
+        case "AuthorFirstFirstCommas":
+            return new AuthorFirstFirstCommas();
+        case "AuthorFirstLastCommas":
+            return new AuthorFirstLastCommas();
+        case "AuthorFirstLastOxfordCommas":
+            return new AuthorFirstLastOxfordCommas();
+        case "AuthorLastFirst":
+            return new AuthorLastFirst();
+        case "AuthorLastFirstAbbrCommas":
+            return new AuthorLastFirstAbbrCommas();
+        case "AuthorLastFirstAbbreviator":
+            return new AuthorLastFirstAbbreviator();
+        case "AuthorLastFirstAbbrOxfordCommas":
+            return new AuthorLastFirstAbbrOxfordCommas();
+        case "AuthorLastFirstCommas":
+            return new AuthorLastFirstCommas();
+        case "AuthorLastFirstOxfordCommas":
+            return new AuthorLastFirstOxfordCommas();
+        case "AuthorLF_FF":
+            return new AuthorLF_FF();
+        case "AuthorLF_FFAbbr":
+            return new AuthorLF_FFAbbr();
+        case "AuthorNatBib":
+            return new AuthorNatBib();
+        case "AuthorOrgSci":
+            return new AuthorOrgSci();
+        case "CompositeFormat":
+            return new CompositeFormat();
+        case "CreateBibORDFAuthors":
+            return new CreateBibORDFAuthors();
+        case "CreateDocBookAuthors":
+            return new CreateDocBookAuthors();
+        case "CurrentDate":
+            return new CurrentDate();
+        case "DOICheck":
+            return new DOICheck();
+        case "DOIStrip":
+            return new DOIStrip();
+        case "FirstPage":
+            return new FirstPage();
+        case "FormatPagesForHTML":
+            return new FormatPagesForHTML();
+        case "FormatPagesForXML":
+            return new FormatPagesForXML();
+        case "GetOpenOfficeType":
+            return new GetOpenOfficeType();
+        case "HTMLChars":
+            return new HTMLChars();
+        case "HTMLParagraphs":
+            return new HTMLParagraphs();
+        case "Iso690FormatDate":
+            return new Iso690FormatDate();
+        case "Iso690NamesAuthors":
+            return new Iso690NamesAuthors();
+        case "JournalAbbreviator":
+            return new JournalAbbreviator(repository);
+        case "LastPage":
+            return new LastPage();
+        case "FormatChars": // For backward compatibility
+        case "LatexToUnicode":
+            return new LatexToUnicodeFormatter();
+        case "NameFormatter":
+            return new NameFormatter();
+        case "NoSpaceBetweenAbbreviations":
+            return new NoSpaceBetweenAbbreviations();
+        case "Ordinal":
+            return new Ordinal();
+        case "RemoveBrackets":
+            return new RemoveBrackets();
+        case "RemoveBracketsAddComma":
+            return new RemoveBracketsAddComma();
+        case "RemoveLatexCommands":
+            return new RemoveLatexCommands();
+        case "RemoveTilde":
+            return new RemoveTilde();
+        case "RemoveWhitespace":
+            return new RemoveWhitespace();
+        case "RisKeywords":
+            return new RisKeywords();
+        case "RisMonth":
+            return new RisMonth();
+        case "RTFChars":
+            return new RTFChars();
+        case "ToLowerCase":
+            return new ToLowerCase();
+        case "ToUpperCase":
+            return new ToUpperCase();
+        case "XMLChars":
+            return new XMLChars();
+        case "Default":
+            return new Default();
+        case "FileLink":
+            return new FileLink();
+        case "Number":
+            return new Number();
+        case "RisAuthors":
+            return new RisAuthors();
+        case "Authors":
+            return new Authors();
+        case "IfPlural":
+            return new IfPlural();
+        case "Replace":
+            return new Replace();
+        case "WrapContent":
+            return new WrapContent();
+        case "WrapFileLinks":
+            return new WrapFileLinks();
+        default:
+            return new NotFoundFormatter(name);
         }
     }
 
@@ -416,7 +532,7 @@ class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = LayoutEntry.getLayoutFormatterByClassName(className, repository);
+                LayoutFormatter f = LayoutEntry.getLayoutFormatterByName(className, repository);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
