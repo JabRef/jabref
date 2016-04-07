@@ -588,7 +588,7 @@ public class JabRefPreferences {
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
 
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, 0);
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);

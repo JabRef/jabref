@@ -68,18 +68,14 @@ public class MergeEntries {
             Localization.lang("Show diff") + " - " + Localization.lang("word"),
             Localization.lang("Show diff") + " - " + Localization.lang("character")};
 
-    private static final String CHANGE_ADDITION_START = "<span class=cadd>";
-    private static final String CHANGE_REMOVAL_START = "<span class=cdel>";
     private static final String ADDITION_START = "<span class=add>";
     private static final String REMOVAL_START = "<span class=del>";
     private static final String TAG_END = "</span>";
     private static final String HTML_START = "<html><body>";
     private static final String HTML_END = "</body></html>";
     private static final String BODY_STYLE = "body{font:sans-serif}";
-    private static final String CHANGE_ADDITION_STYLE = ".cadd{color:green;text-decoration:underline}";
     private static final String ADDITION_STYLE = ".add{color:blue;text-decoration:underline}";
-    private static final String CHANGE_REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
-    private static final String REMOVAL_STYLE = ".cdel{color:green;text-decoration:line-through;}";
+    private static final String REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
 
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
@@ -348,7 +344,6 @@ public class MergeEntries {
         for (String field : fields) {
             String leftString = leftEntry.getField(field);
             String rightString = rightEntry.getField(field);
-            String tmpLeftString;
             switch (diffMode.getSelectedIndex()) {
             case 0: // Plain text
                 break;
@@ -357,16 +352,6 @@ public class MergeEntries {
                 break;
             case 2: // Latexdiff style - character
                 rightString = generateDiffHighlighting(leftString, rightString, "");
-                break;
-            case 3: // Symmetric - word
-                tmpLeftString = generateSymmetricHighlighting(rightString, leftString, " ");
-                rightString = generateSymmetricHighlighting(leftString, rightString, " ");
-                leftString = tmpLeftString;
-                break;
-            case 4: // Symmetric - character
-                tmpLeftString = generateSymmetricHighlighting(rightString, leftString, "");
-                rightString = generateSymmetricHighlighting(leftString, rightString, "");
-                leftString = tmpLeftString;
                 break;
             default: // Shouldn't happen
                 break;
@@ -389,8 +374,6 @@ public class MergeEntries {
         sheet.addRule(BODY_STYLE);
         sheet.addRule(ADDITION_STYLE);
         sheet.addRule(REMOVAL_STYLE);
-        sheet.addRule(CHANGE_ADDITION_STYLE);
-        sheet.addRule(CHANGE_REMOVAL_STYLE);
         pane.setEditable(false);
         return pane;
     }
@@ -423,45 +406,6 @@ public class MergeEntries {
                     }
                     stringList.set((startPos + offset) - 1,
                             stringList.get((startPos + offset) - 1) + TAG_END);
-                    break;
-                case INSERT:
-                    stringList.add(delta.getOriginal().getPosition(),
-                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
-                    break;
-                default:
-                    break;
-                }
-            }
-            return String.join(separator, stringList);
-        }
-        return modifiedString;
-    }
-
-    private String generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
-        if ((baseString != null) && (modifiedString != null)) {
-            List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
-            List<Delta<String>> deltaList = new ArrayList<>(
-                    DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas());
-            Collections.reverse(deltaList);
-            for (Delta<String> delta : deltaList) {
-                int startPos = delta.getOriginal().getPosition();
-                List<String> lines = delta.getOriginal().getLines();
-                int offset = 0;
-                switch (delta.getType()) {
-                case CHANGE:
-                    for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? CHANGE_REMOVAL_START : "") + line);
-                        offset++;
-                    }
-                    stringList.set((startPos + offset) - 1,
-                            stringList.get((startPos + offset) - 1) + TAG_END + separator
-                                    + CHANGE_ADDITION_START + String.join(separator, delta.getRevised().getLines())
-                                    + TAG_END);
-                    break;
-                case DELETE:
-                    for (offset = 0; offset <= (lines.size() - 1); offset++) {
-                        stringList.set(startPos + offset, "");
-                    }
                     break;
                 case INSERT:
                     stringList.add(delta.getOriginal().getPosition(),
@@ -521,7 +465,7 @@ public class MergeEntries {
         // Update the PreviewPanel
         entryPreview.setEntry(mergedEntry);
 
-        // Update the Bibtex source view
+        // Update the BibTeX source view
         StringWriter writer = new StringWriter();
         try {
             new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, writer, databaseType);
