@@ -41,6 +41,9 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+import difflib.Delta;
+import difflib.DiffUtils;
+
 /**
  * @author Oscar Gustafsson
  *
@@ -61,8 +64,9 @@ public class MergeEntries {
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry")};
-    private static final String[] DIFF_MODES = {"Plain text",
-            "Latexdiff style - word", "Latexdiff style - character", "Symmetric - word", "Symmetric - character"};
+    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
+            Localization.lang("Show diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show diff") + " - " + Localization.lang("character")};
 
     private static final String CHANGE_ADDITION_START = "<span class=cadd>";
     private static final String CHANGE_REMOVAL_START = "<span class=cdel>";
@@ -71,6 +75,12 @@ public class MergeEntries {
     private static final String TAG_END = "</span>";
     private static final String HTML_START = "<html><body>";
     private static final String HTML_END = "</body></html>";
+    private static final String BODY_STYLE = "body{font:sans-serif}";
+    private static final String CHANGE_ADDITION_STYLE = ".cadd{color:green;text-decoration:underline}";
+    private static final String ADDITION_STYLE = ".add{color:blue;text-decoration:underline}";
+    private static final String CHANGE_REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
+    private static final String REMOVAL_STYLE = ".cdel{color:green;text-decoration:line-through;}";
+
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
@@ -206,7 +216,7 @@ public class MergeEntries {
         int row = 2;
         int maxLabelWidth = -1;
         for (String field : allFields) {
-            JLabel label = boldFontLabel(CaseChangers.UPPER_FIRST.format(field));
+            JLabel label = boldFontLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
             mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
             String leftString = leftEntry.getField(field);
             String rightString = rightEntry.getField(field);
@@ -288,6 +298,7 @@ public class MergeEntries {
 
         sourceView = new JTextArea();
         sourceView.setLineWrap(true);
+        sourceView.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         mainPanel.add(new JScrollPane(sourceView), cc.xyw(8, 8, 4));
         sourceView.setEditable(false);
 
@@ -375,11 +386,11 @@ public class MergeEntries {
         JTextPane pane = new JTextPane();
         pane.setContentType(CONTENT_TYPE);
         StyleSheet sheet = ((HTMLEditorKit) pane.getEditorKit()).getStyleSheet();
-        sheet.addRule("body{font:helvetica}");
-        sheet.addRule(".cadd{color:green;text-decoration:underline}");
-        sheet.addRule(".add{color:blue;text-decoration:underline}");
-        sheet.addRule(".del{color:red;text-decoration:line-through;}");
-        sheet.addRule(".cdel{color:green;text-decoration:line-through;}");
+        sheet.addRule(BODY_STYLE);
+        sheet.addRule(ADDITION_STYLE);
+        sheet.addRule(REMOVAL_STYLE);
+        sheet.addRule(CHANGE_ADDITION_STYLE);
+        sheet.addRule(CHANGE_REMOVAL_STYLE);
         pane.setEditable(false);
         return pane;
     }
