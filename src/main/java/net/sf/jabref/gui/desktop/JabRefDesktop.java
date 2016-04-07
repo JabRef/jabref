@@ -33,21 +33,17 @@ import java.util.regex.Pattern;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
-    private static final NativeDesktop ND_LINUX = new Linux();
-    private static final NativeDesktop ND_WINDOWS = new Windows();
-    private static final NativeDesktop ND_MAC = new OSX();
-    private static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
+
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
-
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
-
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, String initialFieldName)
-            throws IOException {
+    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink,
+            String initialFieldName) throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
         if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
@@ -74,7 +70,7 @@ public class JabRefDesktop {
             }
         } else if ("doi".equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
-            if(doiUrl.isPresent()) {
+            if (doiUrl.isPresent()) {
                 link = doiUrl.get().getURLAsASCIIString();
             }
             // should be opened in browser
@@ -171,20 +167,20 @@ public class JabRefDesktop {
 
         String cancelMessage = Localization.lang("Unable to open file.");
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
-                Localization.lang("Change file type"),
-                Localization.lang("Cancel")};
+                Localization.lang("Change file type"), Localization.lang("Cancel")};
         String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
+        int answer = JOptionPane.showOptionDialog(frame,
+                Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),
                 Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options, defOption);
         if (answer == JOptionPane.CANCEL_OPTION) {
             frame.output(cancelMessage);
             return false;
-        }
-        else if (answer == JOptionPane.YES_OPTION) {
+        } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
+                    IconTheme.JabRefIcon.FILE.getSmallIcon());
             ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {
@@ -226,8 +222,7 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
-                        oldValue, newValue);
+                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
                 frame.getCurrentBasePanel().undoManager.addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
@@ -266,20 +261,19 @@ public class JabRefDesktop {
             return;
         }
 
-        String absolutePath = file.getAbsolutePath();
-        absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
+        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
         NATIVE_DESKTOP.openConsole(absolutePath);
     }
 
     // TODO: Move to OS.java
     public static NativeDesktop getNativeDesktop() {
-        if(OS.WINDOWS) {
-            return ND_WINDOWS;
-        } else if(OS.OS_X) {
-            return ND_MAC;
-        } else if(OS.LINUX) {
-            return ND_LINUX;
+        if (OS.WINDOWS) {
+            return new Windows();
+        } else if (OS.OS_X) {
+            return new OSX();
+        } else if (OS.LINUX) {
+            return new Linux();
         }
-        return ND_DEFAULT;
+        return new DefaultDesktop();
     }
 }
