@@ -123,8 +123,8 @@ public class SilverPlatterImporter extends ImportFormat {
                             h.put("editor",
                                     AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                         } else {
-                            h.put("author", AuthorList
-                                    .fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                            h.put("author",
+                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                         }
                     } else if ("AB".equals(f3)) {
                         h.put("abstract", frest);
@@ -143,10 +143,13 @@ public class SilverPlatterImporter extends ImportFormat {
                                 h.put("year", yr);
                                 frest = frest.substring(m);
                                 m = frest.indexOf(':');
+                                int issueIndex = frest.indexOf('(');
+                                int endIssueIndex = frest.indexOf(')');
                                 if (m >= 0) {
                                     String pg = frest.substring(m + 1).trim();
                                     h.put("pages", pg);
-                                    h.put("volume", frest.substring(1, m));
+                                    h.put("volume", frest.substring(1, issueIndex).trim());
+                                    h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
                                 }
                             }
                         }
@@ -197,14 +200,9 @@ public class SilverPlatterImporter extends ImportFormat {
                     if (titleO != null) {
                         String title = ((String) titleO).trim();
                         int inPos = title.indexOf("\" in ");
-                        int pgPos = title.lastIndexOf(' ');
                         if (inPos > 1) {
-                            h.put("title", title.substring(1, inPos));
+                            h.put("title", title.substring(0, inPos));
                         }
-                        if (pgPos > inPos) {
-                            h.put("pages", title.substring(pgPos).replace("-", "--"));
-                        }
-
                     }
 
                 }
