@@ -79,8 +79,6 @@ public class GUIGlobals {
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
-    public static final double PE_HEIGHT = 2;
-
     //	Constants controlling formatted bibtex output.
     public static final int INDENT = 4;
     public static final int LINE_LENGTH = 65; // Maximum

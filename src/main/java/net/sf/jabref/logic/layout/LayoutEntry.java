@@ -78,9 +78,7 @@ class LayoutEntry {
 
     public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationRepository repository) {
         this.repository = repository;
-        List<StringInt> blockEntries = null;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
-        LayoutEntry le;
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
 
@@ -90,6 +88,7 @@ class LayoutEntry {
 
         type = layoutType;
         text = blockEnd;
+        List<StringInt> blockEntries = null;
         for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {
             switch (parsedEntry.i) {
             case LayoutHelper.IS_FIELD_START:
@@ -101,9 +100,9 @@ class LayoutEntry {
             case LayoutHelper.IS_GROUP_END:
                 if (blockStart.equals(parsedEntry.s)) {
                     blockEntries.add(parsedEntry);
-                    le = new LayoutEntry(blockEntries,
-                            parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START : LayoutHelper.IS_FIELD_START,
-                            repository);
+                    int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
+                            LayoutHelper.IS_FIELD_START;
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, repository);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -346,7 +345,7 @@ class LayoutEntry {
         } else {
             text = v.get(0).trim();
 
-            option = LayoutEntry.getOptionalLayout(v.get(1), repository);
+            option = getOptionalLayout(v.get(1));
             // See if there was an undefined formatter:
             for (LayoutFormatter anOption : option) {
                 if (anOption instanceof NotFoundFormatter) {
@@ -360,13 +359,8 @@ class LayoutEntry {
 
     }
 
-    private static LayoutFormatter getLayoutFormatterByName(String name, JournalAbbreviationRepository repository)
-            throws Exception {
-
-        if (name.isEmpty()) {
-            return null;
-        }
-
+    private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
+        
         switch (name) {
         case "HTMLToLatexFormatter": // For backward compatibility
         case "HtmlToLatex":
@@ -503,11 +497,9 @@ class LayoutEntry {
     /**
      * Return an array of LayoutFormatters found in the given formatterName
      * string (in order of appearance).
-     * @param repository
      *
      */
-    private static List<LayoutFormatter> getOptionalLayout(String formatterName,
-            JournalAbbreviationRepository repository) {
+    private List<LayoutFormatter> getOptionalLayout(String formatterName) {
 
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
 
@@ -532,7 +524,7 @@ class LayoutEntry {
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = LayoutEntry.getLayoutFormatterByName(className, repository);
+                LayoutFormatter f = getLayoutFormatterByName(className);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
