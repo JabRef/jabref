@@ -158,14 +158,14 @@
                 </serializedBean>
                 <condition />
               </action>
-              <action name="" id="184" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+              <action name="" id="184" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
                       <void property="script">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>if (Util.isDirectoryWritable(context.getInstallationDirectory())) {
+                            <string>if (Util.hasFullAdminRights()) {
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
   context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));   
