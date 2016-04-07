@@ -26,7 +26,7 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Thread)
 public class Benchmarks {
 
-    StringReader bibtexStringReader;
+    String bibtexString;
     BibDatabase database = new BibDatabase();
 
     @Setup
@@ -50,12 +50,13 @@ public class Benchmarks {
         databaseWriter.writePartOfDatabase(stringWriter,
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
-        String bibtexString = stringWriter.toString();
-        bibtexStringReader = new StringReader(bibtexString);
+        bibtexString = stringWriter.toString();
+
     }
 
     @Benchmark
     public ParserResult parse() throws IOException {
+        StringReader bibtexStringReader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(bibtexStringReader);
         return parser.parse();
     }
