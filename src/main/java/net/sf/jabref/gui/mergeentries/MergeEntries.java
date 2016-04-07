@@ -353,10 +353,10 @@ public class MergeEntries {
             case 0: // Plain text
                 break;
             case 1: // Latexdiff style - word
-                rightString = generateLatexdiffHighlighting(leftString, rightString, " ");
+                rightString = generateDiffHighlighting(leftString, rightString, " ");
                 break;
             case 2: // Latexdiff style - character
-                rightString = generateLatexdiffHighlighting(leftString, rightString, "");
+                rightString = generateDiffHighlighting(leftString, rightString, "");
                 break;
             case 3: // Symmetric - word
                 tmpLeftString = generateSymmetricHighlighting(rightString, leftString, " ");
@@ -395,7 +395,8 @@ public class MergeEntries {
         return pane;
     }
 
-    private String generateLatexdiffHighlighting(String baseString, String modifiedString, String separator) {
+    public static String generateDiffHighlighting(String baseString, String modifiedString, String separator) {
+        Objects.requireNonNull(separator);
         if ((baseString != null) && (modifiedString != null)) {
             List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
             List<Delta<String>> deltaList = new ArrayList<>(
