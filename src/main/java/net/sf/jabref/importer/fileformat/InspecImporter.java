@@ -125,14 +125,15 @@ public class InspecImporter extends ImportFormat {
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
-                            String yr = frest.substring(m - 5, m);
+                            String yr = frest.substring(m - 5, m).trim();
                             h.put("year", yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
                                 h.put("pages", pg);
-                                h.put("volume", frest.substring(1, m));
+                                String vol = frest.substring(1, m).trim();
+                                h.put("volume", vol);
                             }
                         }
                     }
