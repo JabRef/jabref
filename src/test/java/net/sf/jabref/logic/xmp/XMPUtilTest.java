@@ -1356,4 +1356,91 @@ public class XMPUtilTest {
         }
     }
 
+    @Test
+    public void testParsing() throws XmpParsingException {
+        String testData = "<?xpacket begin=\"ï»¿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?><x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n" +
+                "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:description>\n" +
+                "        <rdf:Alt>\n" +
+                "          <rdf:li xml:lang=\"x-default\">The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</rdf:li>\n" +
+                "        </rdf:Alt>\n" +
+                "      </dc:description>\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Kelly Clarkson</rdf:li>\n" +
+                "          <rdf:li>Ozzy Osbourne</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:relation>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>bibtex/bibtexkey/Clarkson06</rdf:li>\n" +
+                "          <rdf:li>bibtex/booktitle/Catch-22</rdf:li>\n" +
+                "          <rdf:li>bibtex/journal/International Journal of High Fidelity</rdf:li>\n" +
+                "          <rdf:li>bibtex/pdf/YeKis03 - Towards.pdf</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:relation>\n" +
+                "      <dc:contributor>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Huey Duck</rdf:li>\n" +
+                "          <rdf:li>Dewey Duck</rdf:li>\n" +
+                "          <rdf:li>Louie Duck</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:contributor>\n" +
+                "      <dc:subject>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>peanut</rdf:li>\n" +
+                "          <rdf:li>butter</rdf:li>\n" +
+                "          <rdf:li>jelly</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:subject>\n" +
+                "      <dc:title>\n" +
+                "        <rdf:Alt>\n" +
+                "          <rdf:li xml:lang=\"x-default\">Hypersonic ultra-sound</rdf:li>\n" +
+                "        </rdf:Alt>\n" +
+                "      </dc:title>\n" +
+                "      <dc:date>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>1982-07</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:date>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>InProceedings</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "    <rdf:Description xmlns:bibtex=\"http://jabref.sourceforge.net/bibteXMP/\" rdf:about=\"\">\n" +
+                "      <bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>\n" +
+                "      <bibtex:author>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Kelly Clarkson</rdf:li>\n" +
+                "          <rdf:li>Ozzy Osbourne</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </bibtex:author>\n" +
+                "      <bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>\n" +
+                "      <bibtex:booktitle>Catch-22</bibtex:booktitle>\n" +
+                "      <bibtex:editor>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Huey Duck</rdf:li>\n" +
+                "          <rdf:li>Dewey Duck</rdf:li>\n" +
+                "          <rdf:li>Louie Duck</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </bibtex:editor>\n" +
+                "      <bibtex:journal>International Journal of High Fidelity</bibtex:journal>\n" +
+                "      <bibtex:keywords>peanut, butter, jelly</bibtex:keywords>\n" +
+                "      <bibtex:month>#jul#</bibtex:month>\n" +
+                "      <bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>\n" +
+                "      <bibtex:title>Hypersonic ultra-sound</bibtex:title>\n" +
+                "      <bibtex:year>1982</bibtex:year>\n" +
+                "      <bibtex:entrytype>inproceedings</bibtex:entrytype>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>\n" +
+                "</x:xmpmeta><?xpacket end=\"w\"?>";
+        InputStream is = new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_8));
+        DomXmpParser parser = new DomXmpParser();
+        XMPMetadata meta = parser.parse(is);
+    }
+
 }
