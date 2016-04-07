@@ -60,6 +60,7 @@ public class ImportFormatReaderTest {
         result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "ovid", 1});
         result.add(new Object[] {"fileformat/Endnote.entries.enw", "refer", 5});
         result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "msbib", 1});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
         return result;
     }
 

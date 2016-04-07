@@ -105,6 +105,8 @@ public class ImportFormatReader {
     }
 
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+        Objects.requireNonNull(importer);
+        Objects.requireNonNull(filename);
         File file = new File(filename);
 
         try (InputStream stream = new FileInputStream(file);
@@ -160,7 +162,7 @@ public class ImportFormatReader {
             sb.append('\n');
         }
 
-        return sb.toString(); //.substring(0, res.length()-1);
+        return sb.toString();
     }
 
 
@@ -207,7 +209,7 @@ public class ImportFormatReader {
      * @throws IOException
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
-
+        Objects.requireNonNull(filename);
 
         // First, see if it is a BibTeX file:
         try {
