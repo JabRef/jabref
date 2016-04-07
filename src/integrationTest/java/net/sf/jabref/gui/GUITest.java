@@ -18,9 +18,7 @@ import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 public class GUITest extends AssertJSwingJUnitTestCase {
-
     private AWTExceptionHandler awtExceptionHandler;
-
 
     @Override
     protected void onSetUp() {
@@ -78,7 +76,6 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         exitJabRef(mainFrame);
     }
 
-    @Ignore
     @Test
     public void testOpenAndSavePreferences() {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
