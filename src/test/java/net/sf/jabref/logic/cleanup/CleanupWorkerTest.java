@@ -1,5 +1,11 @@
 package net.sf.jabref.logic.cleanup;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+
 import net.sf.jabref.*;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.FieldChange;
@@ -11,19 +17,9 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
-
 import static org.mockito.Mockito.mock;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
 
 public class CleanupWorkerTest {
 
@@ -48,8 +44,7 @@ public class CleanupWorkerTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        metaData.setFile(bibFolder.newFile("test.bib"));
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
         worker = new CleanupWorker(context, mock(JournalAbbreviationRepository.class));
     }
 

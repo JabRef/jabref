@@ -32,8 +32,8 @@ public class RenamePdfCleanupTest {
         when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey");
 
         MetaData metaData = new MetaData();
-        metaData.setFile(testFolder.newFile("test.bib"));
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        context.setDatabaseFile(testFolder.newFile("test.bib"));
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
 
         File tempFile = testFolder.newFile("toot.tmp");

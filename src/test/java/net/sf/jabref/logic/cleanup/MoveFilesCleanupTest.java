@@ -1,23 +1,19 @@
 package net.sf.jabref.logic.cleanup;
 
+import java.io.File;
+import java.io.IOException;
+
 import net.sf.jabref.*;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MoveFilesCleanupTest {
 
@@ -35,8 +31,7 @@ public class MoveFilesCleanupTest {
         pdfFolder = bibFolder.newFolder();
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        metaData.setFile(bibFolder.newFile("test.bib"));
-        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
 
         cleanup = new MoveFilesCleanup(databaseContext);
     }

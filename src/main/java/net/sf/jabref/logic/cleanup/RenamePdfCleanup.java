@@ -13,30 +13,28 @@
 */
 package net.sf.jabref.logic.cleanup;
 
+import java.io.File;
+import java.util.*;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.util.Util;
-
-import java.io.File;
-import java.util.*;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private final List<String> paths;
     private final BibDatabaseContext databaseContext;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
     private final JournalAbbreviationRepository repository;
 
 
-    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
+    public RenamePdfCleanup(Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
             JournalAbbreviationRepository repository) {
-        this.paths = paths;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.repository = repository;
@@ -64,7 +62,8 @@ public class RenamePdfCleanup implements CleanupJob {
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
-            Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
+            Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
+                    databaseContext.getFileDirectory());
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 continue;
@@ -96,7 +95,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
                 File parent = (new File(realOldFilename)).getParentFile();
                 String newFileEntryFileName;
-                if ((parent == null) || paths.contains(parent.getAbsolutePath())) {
+                if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
                     newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(
