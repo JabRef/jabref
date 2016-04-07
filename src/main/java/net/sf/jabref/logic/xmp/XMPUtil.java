@@ -29,6 +29,7 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibEntryWriter;

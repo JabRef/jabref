@@ -13,12 +13,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model.entry;
+package net.sf.jabref.logic;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,6 +42,14 @@ public class TypedBibEntry {
         this.entry = Objects.requireNonNull(entry);
         this.database = Objects.requireNonNull(database);
         this.mode = mode;
+    }
+
+    public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {
+        this(entry, databaseContext.getDatabase(), databaseContext.getMode());
+    }
+
+    public TypedBibEntry(BibEntry entry, BibDatabase database, BibDatabaseMode mode) {
+        this(entry, Optional.of(database), mode);
     }
 
     /**
@@ -61,5 +75,33 @@ public class TypedBibEntry {
         } else {
             return EntryUtil.capitalizeFirst(entry.getType());
         }
+    }
+
+    /**
+     * Gets a list of linked files.
+     *
+     * @return the list of linked files, is never null but can be empty
+     */
+    public List<ParsedFileField> getFiles() {
+        //Extract the path
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        if (!oldValue.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        return FileField.parse(oldValue.get());
+    }
+
+    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+
+        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        String newValue = FileField.getStringRepresentation(files);
+
+        if(oldValue.isPresent() && oldValue.get().equals(newValue)) {
+            return Optional.empty();
+        }
+
+        entry.setField(Globals.FILE_FIELD, newValue);
+        return Optional.of(new FieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(""), newValue));
     }
 }

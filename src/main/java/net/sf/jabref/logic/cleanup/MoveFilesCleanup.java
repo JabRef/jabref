@@ -23,24 +23,47 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.logic.TypedBibEntry;
 
-public class RelativePathsCleanup implements CleanupJob {
+public class MoveFilesCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
 
-    public RelativePathsCleanup(BibDatabaseContext databaseContext) {
+    public MoveFilesCleanup(BibDatabaseContext databaseContext) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        if(!databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+            return new ArrayList<>();
+        }
+
+        List<String> paths = databaseContext.getFileDirectory();
+        String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
+        Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
+        if(!targetDirectory.isPresent()) {
+            return new ArrayList<>();
+        }
+
         TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
         List<ParsedFileField> fileList = typedEntry.getFiles();
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
         for (ParsedFileField fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
-            String newFileName = FileUtil.shortenFileName(new File(oldFileName), databaseContext.getFileDirectory())
-                    .toString();
+
+            Optional<File> oldFile = FileUtil.expandFilename(oldFileName, paths);
+            if(!oldFile.isPresent() || !oldFile.get().exists()) {
+                continue;
+            }
+
+            File targetFile = new File(targetDirectory.get(), oldFile.get().getName());
+            if(targetFile.exists()) {
+                // We do not overwrite already existing files
+                continue;
+            }
+
+            oldFile.get().renameTo(targetFile);
+            String newFileName = targetFile.getName();
 
             ParsedFileField newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {

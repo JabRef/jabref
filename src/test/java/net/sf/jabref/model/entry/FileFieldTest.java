@@ -22,14 +22,14 @@ public class FileFieldTest {
     public void parseCorrectInput() {
         String input = "Desc:File.PDF:PDF";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("Desc", "File.PDF", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("Desc", "File.PDF", "PDF")), FileField.parse(input));
     }
 
     @Test
     public void ingoreMissingDescription() {
         String input = ":wei2005ahp.pdf:PDF";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
     }
 
     @Test
@@ -37,29 +37,29 @@ public class FileFieldTest {
         String single = "wei2005ahp.pdf";
         String multiple = "wei2005ahp.pdf;other.pdf";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("", "wei2005ahp.pdf", "")), FileField.parse(single));
-        assertEquals(Arrays.asList(new FileField.ParsedFileField("", "wei2005ahp.pdf", ""), new FileField.ParsedFileField("", "other.pdf", "")), FileField.parse(multiple));
+        assertEquals(Collections.singletonList(new ParsedFileField("", "wei2005ahp.pdf", "")), FileField.parse(single));
+        assertEquals(Arrays.asList(new ParsedFileField("", "wei2005ahp.pdf", ""), new ParsedFileField("", "other.pdf", "")), FileField.parse(multiple));
     }
 
     @Test
     public void escapedCharactersInDescription() {
         String input = "test\\:\\;:wei2005ahp.pdf:PDF";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("test:;", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("test:;", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
     }
 
     @Test
     public void handleXmlCharacters() {
         String input = "test&#44\\;st\\:\\;:wei2005ahp.pdf:PDF";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("test&#44;st:;", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("test&#44;st:;", "wei2005ahp.pdf", "PDF")), FileField.parse(input));
     }
 
     @Test
     public void handleEscapedFilePath() {
         String input = "desc:C\\:\\\\test.pdf:PDF";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("desc", "C:\\test.pdf", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("desc", "C:\\test.pdf", "PDF")), FileField.parse(input));
     }
 
     @Test
@@ -68,16 +68,16 @@ public class FileFieldTest {
         String fileOnly = ":file.pdf";
         String typeOnly = "::file.pdf";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("", "file.pdf", "")), FileField.parse(descOnly));
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("", "file.pdf", "")), FileField.parse(fileOnly));
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("", "file.pdf", "")), FileField.parse(typeOnly));
+        assertEquals(Collections.singletonList(new ParsedFileField("", "file.pdf", "")), FileField.parse(descOnly));
+        assertEquals(Collections.singletonList(new ParsedFileField("", "file.pdf", "")), FileField.parse(fileOnly));
+        assertEquals(Collections.singletonList(new ParsedFileField("", "file.pdf", "")), FileField.parse(typeOnly));
     }
 
     @Test
     public void tooManySeparators() {
         String input = "desc:file.pdf:PDF:asdf";
 
-        assertEquals(Collections.singletonList(new FileField.ParsedFileField("desc", "file.pdf", "PDF")), FileField.parse(input));
+        assertEquals(Collections.singletonList(new ParsedFileField("desc", "file.pdf", "PDF")), FileField.parse(input));
     }
 
     @Test

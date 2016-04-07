@@ -23,6 +23,8 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -350,9 +352,9 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (FileField.ParsedFileField file : fileList) {
-                expandFilename(file.link, fileDirs).ifPresent(result::add);
+            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
+            for (ParsedFileField file : fileList) {
+                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
             }
         }
 

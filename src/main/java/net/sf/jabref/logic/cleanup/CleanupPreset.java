@@ -55,6 +55,9 @@ public class CleanupPreset {
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
             activeJobs.add(CleanupStep.CLEAN_UP_DOI);
         }
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
+            activeJobs.add(CleanupStep.MOVE_PDF);
+        }
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE)) {
             activeJobs.add(CleanupStep.MAKE_PATHS_RELATIVE);
         }
@@ -99,6 +102,10 @@ public class CleanupPreset {
         return isActive(CleanupStep.FIX_FILE_LINKS);
     }
 
+    public boolean isMovePDF() {
+        return isActive(CleanupStep.MOVE_PDF);
+    }
+
     public boolean isMakePathsRelative() {
         return isActive(CleanupStep.MAKE_PATHS_RELATIVE);
     }
@@ -123,6 +130,7 @@ public class CleanupPreset {
 
         preferences.putBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS, isActive(CleanupStep.CLEAN_UP_SUPERSCRIPTS));
         preferences.putBoolean(JabRefPreferences.CLEANUP_DOI, isActive(CleanupStep.CLEAN_UP_DOI));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, isActive(CleanupStep.MOVE_PDF));
         preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, isActive(CleanupStep.MAKE_PATHS_RELATIVE));
         preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, isActive(CleanupStep.RENAME_PDF));
         preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS,
@@ -168,6 +176,7 @@ public class CleanupPreset {
          * Converts to BibLatex format
          */
         CONVERT_TO_BIBLATEX,
+        MOVE_PDF,
         FIX_FILE_LINKS
     }
 }
