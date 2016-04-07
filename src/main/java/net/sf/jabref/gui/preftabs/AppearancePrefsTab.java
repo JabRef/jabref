@@ -111,7 +111,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         final JComboBox<String> clName = classNamesLAF;
         customLAF.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
 
-        // TODO: Why not on OSX?
+        // only the default L&F shows the the OSX specific first dropdownmenu
         if (!OS.OS_X) {
             JPanel pan = new JPanel();
             builder.appendSeparator(Localization.lang("Look and feel"));
