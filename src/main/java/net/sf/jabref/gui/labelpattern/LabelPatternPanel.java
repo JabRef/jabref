@@ -104,9 +104,12 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (EntryType type : EntryTypes.getAllValues(panel.getBibDatabaseContext().getMode())) {
-            textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
-            y++;
+        // check if DB is open
+        if(panel != null) {
+            for (EntryType type : EntryTypes.getAllValues(panel.getBibDatabaseContext().getMode())) {
+                textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
+                y++;
+            }
         }
 
         con.fill = GridBagConstraints.BOTH;
