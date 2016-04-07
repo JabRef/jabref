@@ -14,52 +14,48 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.logic.TypedBibEntry;
 
 public class RelativePathsCleanup implements CleanupJob {
 
-    private final List<String> paths;
+    private final BibDatabaseContext databaseContext;
 
-    public RelativePathsCleanup(List<String> paths) {
-        this.paths = paths;
+    public RelativePathsCleanup(BibDatabaseContext databaseContext) {
+        this.databaseContext = Objects.requireNonNull(databaseContext);
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
-        if (!oldValue.isPresent()) {
-            return new ArrayList<>();
-        }
-
-        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
-        List<FileField.ParsedFileField> newFileList = new ArrayList<>();
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
+        List<ParsedFileField> fileList = typedEntry.getFiles();
+        List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
-        for (FileField.ParsedFileField flEntry : fileList) {
-            String oldFileName = flEntry.link;
-            String newFileName = FileUtil.shortenFileName(new File(oldFileName), paths).toString();
+        for (ParsedFileField fileEntry : fileList) {
+            String oldFileName = fileEntry.getLink();
+            String newFileName = FileUtil.shortenFileName(new File(oldFileName), databaseContext.getFileDirectory())
+                    .toString();
 
-            FileField.ParsedFileField newFlEntry = flEntry;
+            ParsedFileField newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {
-                newFlEntry = new FileField.ParsedFileField(flEntry.description, newFileName, flEntry.fileType);
+                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
                 changed = true;
             }
-            newFileList.add(newFlEntry);
+            newFileList.add(newFileEntry);
         }
         if (changed) {
-            String newValue = FileField.getStringRepresentation(newFileList);
-            assert (!oldValue.get().equals(newValue));
-            entry.setField(Globals.FILE_FIELD, newValue);
-            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
-            return Collections.singletonList(change);
+            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            if(change.isPresent()) {
+                return Collections.singletonList(change.get());
+            } else {
+                return Collections.emptyList();
+            }
         }
         return new ArrayList<>();
     }

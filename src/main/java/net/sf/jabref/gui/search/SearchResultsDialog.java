@@ -123,7 +123,7 @@ public class SearchResultsDialog {
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
                 .get(JabRefPreferences.PREVIEW_1);
-        preview = new PreviewPanel(null, new MetaData(), layoutFile);
+        preview = new PreviewPanel(null, null, layoutFile);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -349,12 +349,12 @@ public class SearchResultsDialog {
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                p.getBibDatabaseContext().getMetaData(), fl.type)).actionPerformed(null);
+                                p.getBibDatabaseContext(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
                     entry.getFieldOptional("url").ifPresent(link -> { try {
-                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext().getMetaData(), link, "url");
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, "url");
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
@@ -391,9 +391,8 @@ public class SearchResultsDialog {
                     if ((description == null) || (description.trim().isEmpty())) {
                         description = flEntry.link;
                     }
-                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.get().getIcon(), p.getBibDatabaseContext().getMetaData(),
-                            flEntry.type));
+                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.link,
+                            flEntry.type.get().getIcon(), p.getBibDatabaseContext(), flEntry.type));
                     count++;
                 }
 
@@ -417,8 +416,8 @@ public class SearchResultsDialog {
                 BibEntry entry = listEvent.getSourceList().get(0);
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
-                // Update the preview's metadata reference:
-                preview.setMetaData(p.getBibDatabaseContext().getMetaData());
+                // Update the preview's database context:
+                preview.setDatabaseContext(p.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);

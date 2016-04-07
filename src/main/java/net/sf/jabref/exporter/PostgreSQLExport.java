@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
@@ -38,7 +39,7 @@ public class PostgreSQLExport extends ExportFormat {
     /**
      * First method called when user starts the export.
      *
-     * @param database
+     * @param databaseContext
      *            The bibtex database from which to export.
      * @param file
      *            The filename to which the export should be writtten.
@@ -51,12 +52,12 @@ public class PostgreSQLExport extends ExportFormat {
      *             error message is shown to the user.
      */
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exist
-            new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(database, metaData, entries,
+            new DBExporterAndImporterFactory().getExporter("POSTGRESQL").exportDatabaseAsFile(databaseContext, entries,
                     file, encoding);
         }
 

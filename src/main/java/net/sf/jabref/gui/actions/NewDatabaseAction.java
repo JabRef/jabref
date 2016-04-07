@@ -32,8 +32,7 @@ public class NewDatabaseAction extends MnemonicAwareAction {
         // Create a new, empty, database.
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         bibDatabaseContext.setMode(mode);
-        jabRefFrame.addTab(bibDatabaseContext.getDatabase(), null, bibDatabaseContext.getMetaData(),
-                Globals.prefs.getDefaultEncoding(), true);
+        jabRefFrame.addTab(bibDatabaseContext, Globals.prefs.getDefaultEncoding(), true);
         jabRefFrame.output(Localization.lang("New %0 database created.", mode.getFormattedName()));
     }
 }

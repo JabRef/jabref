@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
@@ -55,12 +56,12 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exists
-            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, entries);
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), databaseContext.getDatabase(), entries);
         }
     }
 

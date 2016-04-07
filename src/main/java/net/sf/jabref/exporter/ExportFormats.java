@@ -212,10 +212,8 @@ public class ExportFormats {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
-                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                            .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-                    // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                            .getFileDirectory().toArray(new String[0]);
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -232,10 +230,8 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.getCurrentBasePanel().getDatabase(),
-                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                                        finFile.getPath(), frame
-                                                .getCurrentBasePanel().getEncoding(), finEntries);
+                                format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                                        finFile.getPath(), frame.getCurrentBasePanel().getEncoding(), finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {

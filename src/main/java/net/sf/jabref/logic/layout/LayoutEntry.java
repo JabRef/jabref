@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.format.JournalAbbreviator;
 import net.sf.jabref.logic.layout.format.NameFormatter;
@@ -285,11 +286,11 @@ class LayoutEntry {
     /**
      * Do layout for general formatters (no bibtex-entry fields).
      *
-     * @param database
+     * @param databaseContext
      *            Bibtex Database
      * @return
      */
-    public String doLayout(BibDatabase database, Charset encoding) {
+    public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
@@ -306,7 +307,7 @@ class LayoutEntry {
             throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
 
         case LayoutHelper.IS_OPTION_FIELD:
-            String field = BibDatabase.getText(text, database);
+            String field = BibDatabase.getText(text, databaseContext.getDatabase());
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     field = anOption.format(field);
@@ -323,11 +324,11 @@ class LayoutEntry {
             return encoding.displayName();
 
         case LayoutHelper.IS_FILENAME:
-            File f = Globals.prefs.databaseFile;
+            File f = databaseContext.getDatabaseFile();
             return f == null ? "" : f.getName();
 
         case LayoutHelper.IS_FILEPATH:
-            File f2 = Globals.prefs.databaseFile;
+            File f2 = databaseContext.getDatabaseFile();
             return f2 == null ? "" : f2.getPath();
 
         default:

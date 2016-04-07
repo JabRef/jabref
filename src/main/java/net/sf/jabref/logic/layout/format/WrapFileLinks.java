@@ -22,6 +22,7 @@ import net.sf.jabref.model.entry.FileField;
 
 import java.util.*;
 
+import net.sf.jabref.model.entry.ParsedFileField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -144,12 +145,12 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
         StringBuilder sb = new StringBuilder();
         // Build the list containing the links:
-        List<FileField.ParsedFileField> fileList = FileField.parse(field);
+        List<ParsedFileField> fileList = FileField.parse(field);
 
         int piv = 1; // counter for relevant iterations
-        for (FileField.ParsedFileField flEntry : fileList) {
+        for (ParsedFileField flEntry : fileList) {
             // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.fileType.equalsIgnoreCase(fileType)) {
+            if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {
 
                 for (FormatEntry entry : format) {
                     switch (entry.getType()) {
@@ -171,7 +172,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = Globals.prefs.fileDirForDatabase;
                         }
 
-                        Optional<File> f = FileUtil.expandFilename(flEntry.link, Arrays.asList(dirs));
+                        Optional<File> f = FileUtil.expandFilename(flEntry.getLink(), Arrays.asList(dirs));
 
                         /*
                          * Stumbled over this while investigating
@@ -186,7 +187,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                                 sb.append(replaceStrings(f.get().getPath()));
                             }
                         } else {
-                            sb.append(replaceStrings(flEntry.link));
+                            sb.append(replaceStrings(flEntry.getLink()));
                         }
 
                         break;
@@ -197,18 +198,18 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                          *
                          * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
                          */
-                        sb.append(replaceStrings(flEntry.link));//f.toURI().toString();
+                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
 
                         break;
                     case FILE_EXTENSION:
-                        FileUtil.getFileExtension(flEntry.link)
+                        FileUtil.getFileExtension(flEntry.getLink())
                                 .ifPresent(extension -> sb.append(replaceStrings(extension)));
                         break;
                     case FILE_TYPE:
-                        sb.append(replaceStrings(flEntry.fileType));
+                        sb.append(replaceStrings(flEntry.getFileType()));
                         break;
                     case FILE_DESCRIPTION:
-                        sb.append(replaceStrings(flEntry.description));
+                        sb.append(replaceStrings(flEntry.getDescription()));
                         break;
                     default:
                         break;

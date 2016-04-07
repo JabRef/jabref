@@ -39,8 +39,7 @@ class EntryAddChange extends Change {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
-        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(),
-                Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 

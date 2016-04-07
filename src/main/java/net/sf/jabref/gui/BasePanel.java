@@ -521,9 +521,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         frame.output(Localization.lang("Attempting SQL export..."));
                         final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
                         final DBExporter exporter = factory.getExporter(dbs.getServerType());
-                        exporter.exportDatabaseToDBMS(database, bibDatabaseContext.getMetaData(),
-                                getDatabase().getEntries(),
-                                dbs, frame);
+                        exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
                         dbs.isConfigValid(true);
                     } catch (Exception ex) {
                         final String preamble = Localization
@@ -824,14 +822,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                     FileListEntry flEntry = tableModel.getEntry(0);
                     ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                            flEntry.type.get().getIcon(), bibDatabaseContext.getMetaData(), flEntry.type);
+                            flEntry.type.get().getIcon(), bibDatabaseContext, flEntry.type);
                     item.openLink();
                 }));
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
             JabRefExecutorService.INSTANCE.execute(() -> {
                 final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                        bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD));
+                        bibDatabaseContext.getFileDirectory());
                 for (final File f : files) {
                     try {
                         JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
@@ -2010,8 +2008,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         output(Localization.lang("No url defined") + '.');
                     } else {
                         try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext.getMetaData(), entry.link,
-                                    entry.type);
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
@@ -2020,7 +2017,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 } else {
                     try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext.getMetaData(), link.toString(), field);
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.toString(), field);
                         output(Localization.lang("External viewer called") + '.');
                     } catch (IOException ex) {
                         output(Localization.lang("Error") + ": " + ex.getMessage());
@@ -2330,9 +2327,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD).size() > 0) {
-                final List<String> mdDirs = basePanel.getBibDatabaseContext().getMetaData()
-                        .getFileDirectory(Globals.FILE_FIELD);
+            if (basePanel.getBibDatabaseContext().getFileDirectory().size() > 0) {
+                final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));
 
@@ -2360,8 +2356,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                                 .getExternalFileTypeByExt(extension.get());
                         if (type.isPresent()) {
                             try {
-                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext().getMetaData(),
-                                        filepath, type);
+                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext(), filepath,
+                                        type);
                                 basePanel.output(Localization.lang("External viewer called") + '.');
                                 return Optional.of(filepath);
                             } catch (IOException ex) {

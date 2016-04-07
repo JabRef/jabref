@@ -131,9 +131,10 @@ public class ImportFormatReader {
             if (!importer.isRecognizedFormat(bis)) {
                 throw new IOException("Wrong file format");
             }
+        }
 
-            bis.reset();
-
+        try (InputStream stream = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(stream)) {
             return importer.importEntries(bis, status);
         }
     }

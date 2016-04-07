@@ -15,6 +15,21 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
@@ -34,20 +49,6 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
 
 public class FieldExtraComponents {
 
@@ -115,7 +116,7 @@ public class FieldExtraComponents {
         button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
             } catch (IOException ex) {
                 panel.output(Localization.lang("Unable to open link."));
             }
@@ -166,7 +167,7 @@ public class FieldExtraComponents {
         button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
             } catch (IOException ex) {
                 panel.output(Localization.lang("Unable to open link."));
             }

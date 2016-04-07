@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -219,14 +220,11 @@ public class DatabasePropertiesDialog extends JDialog {
         }
         saveOrderPanel.setEnabled(selected);
 
-        List<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
-        if (fileD == null) {
-            fileDir.setText("");
+        Optional<String> fileD = metaData.getDefaultFileDirectory();
+        if (fileD.isPresent()) {
+            fileDir.setText(fileD.get().trim());
         } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (!(fileD.isEmpty())) {
-                fileDir.setText((fileD.get(0)).trim());
-            }
+            fileDir.setText("");
         }
 
         List<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
@@ -275,9 +273,9 @@ public class DatabasePropertiesDialog extends JDialog {
 
         String text = fileDir.getText().trim();
         if (text.isEmpty()) {
-            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
+            metaData.clearDefaultFileDirectory();
         } else {
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), Arrays.asList(text));
+            metaData.setDefaultFileDirectory(text);
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         text = fileDirIndv.getText().trim();

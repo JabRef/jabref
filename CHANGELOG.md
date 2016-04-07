@@ -22,6 +22,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - The mass edit function "Set/clear/rename fields" is now in the Edit menu
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
+- Add "Move linked files to default file directory" as cleanup procedure
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
 - All fields in a bib entry are written without any leading and trailing whitespace 
 - Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
@@ -52,6 +53,9 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
 - Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
 - Added open buttons to DOI and URL field
+- Move Look & Feel settings from advanced to appearance tab in preferences
+
+- Move PDF file directory configuration from external tab to file tab in preferences
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings

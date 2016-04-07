@@ -24,6 +24,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
  * Search class for files. <br>
@@ -46,7 +47,7 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
-        possibleFilePaths = Optional.ofNullable(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory()).orElse(new ArrayList<>());
 
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));
@@ -75,11 +76,11 @@ class DatabaseFileLookup {
         Objects.requireNonNull(entry);
 
         String fileField = entry.getField(Globals.FILE_FIELD);
-        List<FileField.ParsedFileField> entries = FileField.parse(fileField);
+        List<ParsedFileField> entries = FileField.parse(fileField);
 
         List<File> fileLinks = new ArrayList<>();
-        for (FileField.ParsedFileField field : entries) {
-            String link = field.link;
+        for (ParsedFileField field : entries) {
+            String link = field.getLink();
 
             // Do not query external file links (huge performance leak)
             if(link.contains("//")) {

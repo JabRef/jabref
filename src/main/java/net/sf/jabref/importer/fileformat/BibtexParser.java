@@ -299,17 +299,12 @@ public class BibtexParser {
      * @return the text read so far
      */
     private String dumpTextReadSoFarToString() {
-        StringBuilder entry = new StringBuilder();
-        while (!pureTextFromFile.isEmpty()) {
-            entry.append(pureTextFromFile.pollFirst());
-        }
-
-        String result = entry.toString();
-        int indexOfAt = entry.indexOf("@");
+        String result = getPureTextFromFile();
+        int indexOfAt = result.indexOf("@");
 
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
-            return purgeEOFCharacters(entry);
+            return purgeEOFCharacters(result);
         } else {
 
             //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
@@ -332,10 +327,17 @@ public class BibtexParser {
                 }
             }
 
-            result = result.substring(runningIndex + 1);
-
-            return result;
+            return result.substring(runningIndex + 1);
         }
+    }
+
+    private String getPureTextFromFile() {
+        StringBuilder entry = new StringBuilder();
+        while (!pureTextFromFile.isEmpty()) {
+            entry.append(pureTextFromFile.pollFirst());
+        }
+
+        return entry.toString();
     }
 
     /**
@@ -343,10 +345,10 @@ public class BibtexParser {
      *
      * @return a String without eof characters
      */
-    private String purgeEOFCharacters(StringBuilder input) {
+    private String purgeEOFCharacters(String input) {
 
         StringBuilder remainingText = new StringBuilder();
-        for (Character character : input.toString().toCharArray()) {
+        for (Character character : input.toCharArray()) {
             if (!(isEOFCharacter(character))) {
                 remainingText.append(character);
             }
@@ -441,7 +443,7 @@ public class BibtexParser {
         int character = pushbackReader.read();
 
         if(! isEOFCharacter(character)) {
-            pureTextFromFile.offerLast(Character.valueOf((char) character));
+            pureTextFromFile.offerLast((char) character);
         }
         if (character == '\n') {
             line++;
@@ -454,7 +456,7 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(character);
-        if(pureTextFromFile.getLast().charValue() == character) {
+        if(pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
     }

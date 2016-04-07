@@ -42,7 +42,7 @@ import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.TypedBibEntry;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

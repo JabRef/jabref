@@ -267,8 +267,8 @@ public class JabRef {
                         // We have an ExportFormat instance:
                         try {
                             System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                            format.performExport(newBase, pr.getMetaData(), data[1], pr.getEncoding(),
-                                    newBase.getEntries());
+                            BibDatabaseContext databaseContext = new BibDatabaseContext(newBase, pr.getMetaData());
+                            format.performExport(databaseContext, data[1], pr.getEncoding(), newBase.getEntries());
                         } catch (Exception ex) {
                             System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                                     + ex.getMessage());
@@ -339,10 +339,9 @@ public class JabRef {
                     if (!theFile.isAbsolute()) {
                         theFile = theFile.getAbsoluteFile();
                     }
-                    MetaData metaData = pr.getMetaData();
-                    metaData.setFile(theFile);
-                    Globals.prefs.fileDirForDatabase = metaData.getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-                    Globals.prefs.databaseFile = metaData.getFile();
+                    BibDatabaseContext databaseContext = pr.getDatabaseContext();
+                    databaseContext.setDatabaseFile(theFile);
+                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
                     System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format == null) {
@@ -350,7 +349,7 @@ public class JabRef {
                     } else {
                         // We have an ExportFormat instance:
                         try {
-                            format.performExport(pr.getDatabase(), pr.getMetaData(), data[0], pr.getEncoding(), null);
+                            format.performExport(pr.getDatabaseContext(), data[0], pr.getEncoding(), null);
                         } catch (Exception ex) {
                             System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                                     + ex.getMessage());
@@ -439,13 +438,8 @@ public class JabRef {
     private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
-
-            MetaData metaData = parserResult.getMetaData();
-
-            if (metaData != null) {
-                LOGGER.info(Localization.lang("Automatically setting file links"));
-                Util.autoSetLinks(database.getEntries(), metaData);
-            }
+            LOGGER.info(Localization.lang("Automatically setting file links"));
+            Util.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
         }
     }
 
@@ -525,12 +519,21 @@ public class JabRef {
             String systemLookFeel = UIManager.getSystemLookAndFeelClassName();
 
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL)) {
-                lookFeel = systemLookFeel;
+                // FIXME: Problems with OpenJDK and GTK L&F
+                // See https://github.com/JabRef/jabref/issues/393, https://github.com/JabRef/jabref/issues/638
+                if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
+                    // Metal L&F
+                    lookFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+                    LOGGER.warn("There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.");
+                } else {
+                    lookFeel = systemLookFeel;
+                }
             } else {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
-
-            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel)) {
+            
+            // FIXME: Open JDK problem
+            if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel) && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
                 Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());

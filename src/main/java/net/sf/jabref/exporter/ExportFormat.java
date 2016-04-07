@@ -163,20 +163,19 @@ public class ExportFormat implements IExportFormat {
     /**
      * Perform the export of {@code database}.
      *
-     * @param database   The database to export from.
-     * @param metaData   The database's meta data.
+     * @param databaseContext the database to export from.
      * @param file       the file to write the resulting export to
      * @param encoding   The encoding of the database
      * @param entries    Contains all entries that should be exported.
      * @throws IOException if a problem occurred while trying to write to {@code writer}
      *                     or read from required resources.
      * @throws Exception   if any other error occurred during export.
-     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase, MetaData, String, Charset, List)
+     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabaseContext, String, Charset, List)
      */
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
@@ -216,7 +215,7 @@ public class ExportFormat implements IExportFormat {
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(database, encoding));
+                ps.write(beginLayout.doLayout(databaseContext, encoding));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -227,11 +226,8 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
-                    new BibDatabaseContext(database, metaData, defaults), entries, savePrefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePrefs);
 
             // Load default layout
             Layout defLayout;
@@ -275,7 +271,7 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, database));
+                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
             }
 
             // Print footer
@@ -292,7 +288,7 @@ public class ExportFormat implements IExportFormat {
 
             // Write footer
             if ((endLayout != null) && (this.encoding != null)) {
-                ps.write(endLayout.doLayout(database, this.encoding));
+                ps.write(endLayout.doLayout(databaseContext, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 

@@ -311,7 +311,7 @@ public class MergeEntries {
         mainPanel.add(label, cc.xyw(1, 6, 6));
 
         String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
-        pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
+        pp = new PreviewPanel(null, mergedEntry, null, layoutString);
         // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(pp, cc.xyw(1, 8, 6));
 

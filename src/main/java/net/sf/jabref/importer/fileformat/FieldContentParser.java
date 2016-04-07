@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -28,10 +29,13 @@ import java.util.List;
  * writing the same fields.
  */
 public class FieldContentParser {
-    private final List<String> multiLineFields;
+    private final HashSet<String> multiLineFields;
+
+    // 's' matches a space, tab, new line, carriage return.
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     public FieldContentParser() {
-        multiLineFields = new ArrayList<>();
+        multiLineFields = new HashSet<>();
         // the following two are also coded in net.sf.jabref.exporter.LatexFieldFormatter.format(String, String)
         multiLineFields.add("abstract");
         multiLineFields.add("review");
@@ -43,27 +47,21 @@ public class FieldContentParser {
     /**
      * Performs the reformatting
      *
-     * @param text2     StringBuffer containing the field to format. bibtexField contains field name according to field
-     * @param bibtexField
-     * @return The formatted field content. The StringBuffer returned may or may not be the same as the argument given.
+     * @param fieldContent the content to format
+     * @param bibtexField the name of the bibtex field
+     * @return the formatted field content.
      */
-    public StringBuilder format(StringBuilder text2, String bibtexField) {
+    public String format(String fieldContent, String bibtexField) {
 
-        // Unify line breaks
-        String text = StringUtil.unifyLineBreaksToConfiguredLineBreaks(text2.toString());
-
-        // Do not format multiline fields
         if (multiLineFields.contains(bibtexField)) {
-            return new StringBuilder(text);
+            // Unify line breaks
+            return StringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent);
         }
 
-        // 's' matches a space, tab, new line, carriage return.
-        text = text.replaceAll("\\s+", " ");
-
-        return new StringBuilder(text);
+        return WHITESPACE.matcher(fieldContent).replaceAll(" ");
     }
 
-    public String format(String content, String bibtexField) {
-        return format(new StringBuilder(content), bibtexField).toString();
+    public String format(StringBuilder fieldContent, String bibtexField) {
+        return format(fieldContent.toString(), bibtexField);
     }
 }

@@ -18,9 +18,7 @@ import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 public class GUITest extends AssertJSwingJUnitTestCase {
-
     private AWTExceptionHandler awtExceptionHandler;
-
 
     @Override
     protected void onSetUp() {
