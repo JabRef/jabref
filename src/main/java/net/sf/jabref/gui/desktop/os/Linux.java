@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class Linux implements NativeDesktop {
@@ -51,7 +52,7 @@ public class Linux implements NativeDesktop {
         } else if (desktopSession.contains("kde")) {
             cmd = "dolphin --select " + filePath;
         } else {
-            cmd = "xdg-open " + filePath.substring(0, filePath.lastIndexOf(File.separator));
+            cmd = "xdg-open " + Paths.get(filePath).toAbsolutePath().getParent().toString();
         }
 
         Runtime.getRuntime().exec(cmd);
