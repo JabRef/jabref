@@ -93,22 +93,6 @@ public class ImportFormatReader {
         return Optional.empty();
     }
 
-    public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
-            throws IOException {
-        Optional<ImportFormat> importer = getByCliId(format);
-
-        if (!importer.isPresent()) {
-            throw new IllegalArgumentException("Unknown import format: " + format);
-        }
-
-        List<BibEntry> res = importer.get().importEntries(in, status);
-
-        // Remove all empty entries
-        BibDatabases.purgeEmptyEntries(res);
-
-        return res;
-    }
-
     public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
         Optional<ImportFormat> importer = getByCliId(format);
@@ -121,6 +105,8 @@ public class ImportFormatReader {
     }
 
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+        Objects.requireNonNull(importer);
+        Objects.requireNonNull(filename);
         File file = new File(filename);
 
         try (InputStream stream = new FileInputStream(file);
@@ -137,40 +123,6 @@ public class ImportFormatReader {
                 BufferedInputStream bis = new BufferedInputStream(stream)) {
             return importer.importEntries(bis, status);
         }
-    }
-
-    /**
-     * All custom importers.
-     * <p>
-     * <p>Elements are in default order.</p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
-    public SortedSet<ImportFormat> getCustomImportFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<>();
-        for (ImportFormat format : formats) {
-            if (format.isCustomImporter()) {
-                result.add(format);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * All built-in importers.
-     * <p>
-     * <p>Elements are in default order.</p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
-    public SortedSet<ImportFormat> getBuiltInInputFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<>();
-        for (ImportFormat format : formats) {
-            if (!format.isCustomImporter()) {
-                result.add(format);
-            }
-        }
-        return result;
     }
 
     /**
@@ -210,101 +162,10 @@ public class ImportFormatReader {
             sb.append('\n');
         }
 
-        return sb.toString(); //.substring(0, res.length()-1);
+        return sb.toString();
     }
 
-    /**
-     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
-     *
-     * @param name
-     * @return The name after expanding initials.
-     */
-    public static String expandAuthorInitials(String name) {
-        String[] authors = name.split(" and ");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].contains(", ")) {
-                String[] names = authors[i].split(", ");
-                if (names.length > 0) {
-                    sb.append(names[0]);
-                    if (names.length > 1) {
-                        sb.append(", ");
-                    }
-                }
-                for (int j = 1; j < names.length; j++) {
-                    if (j == 1) {
-                        sb.append(ImportFormatReader.expandAll(names[j]));
-                    } else {
-                        sb.append(names[j]);
-                    }
-                    if (j < (names.length - 1)) {
-                        sb.append(", ");
-                    }
-                }
 
-            } else {
-                String[] names = authors[i].split(" ");
-                if (names.length > 0) {
-                    sb.append(ImportFormatReader.expandAll(names[0]));
-                }
-                for (int j = 1; j < names.length; j++) {
-                    sb.append(' ');
-                    sb.append(names[j]);
-                }
-            }
-            if (i < (authors.length - 1)) {
-                sb.append(" and ");
-            }
-        }
-
-        return sb.toString().trim();
-    }
-
-    //------------------------------------------------------------------------------
-
-    private static String expandAll(String s) {
-        //System.out.println("'"+s+"'");
-        // Avoid arrayindexoutof.... :
-        if (s.isEmpty()) {
-            return s;
-        }
-        // If only one character (uppercase letter), add a dot and return immediately:
-        if ((s.length() == 1) && Character.isLetter(s.charAt(0)) &&
-                Character.isUpperCase(s.charAt(0))) {
-            return s + ".";
-        }
-        StringBuilder sb = new StringBuilder();
-        char c = s.charAt(0);
-        char d = 0;
-        for (int i = 1; i < s.length(); i++) {
-            d = s.charAt(i);
-            if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                    Character.isLetter(d) && Character.isUpperCase(d)) {
-                sb.append(c);
-                sb.append(". ");
-            } else {
-                sb.append(c);
-            }
-            c = d;
-        }
-        if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                Character.isLetter(d) && Character.isUpperCase(d)) {
-            sb.append(c);
-            sb.append(". ");
-        } else {
-            sb.append(c);
-        }
-        return sb.toString().trim();
-    }
-
-    //==================================================
-    // Set a field, unless the string to set is empty.
-    //==================================================
-    public static void setIfNecessary(BibEntry be, String field, String content) {
-        if (!"".equals(content)) {
-            be.setField(field, content);
-        }
-    }
 
     public static InputStreamReader getUTF8Reader(File f) throws IOException {
         return getReader(f, StandardCharsets.UTF_8);
@@ -348,7 +209,7 @@ public class ImportFormatReader {
      * @throws IOException
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
-
+        Objects.requireNonNull(filename);
 
         // First, see if it is a BibTeX file:
         try {
