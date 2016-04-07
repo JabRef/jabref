@@ -107,7 +107,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     public final JabRefFrame frame;
 
-    private final MetaData metaData;
+    private final BibDatabaseContext bibDatabaseContext;
 
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -187,11 +187,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
-        this.metaData = (panel == null) ? new MetaData() : panel.getBibDatabaseContext().getMetaData();
+        this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.fields = Arrays.copyOf(fields, fields.length);
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(null, metaData, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -230,8 +230,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         popup.add(deleteListener);
         popup.addSeparator();
-        if (!newDatabase) {
-            GroupTreeNode node = metaData.getGroups();
+        if (!newDatabase && bibDatabaseContext != null) {
+            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are
             // groups that can be added to.
@@ -870,7 +870,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                panel.getBibDatabaseContext().getMetaData(), fl.type))
+                                panel.getBibDatabaseContext(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -929,7 +929,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
+                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -951,7 +951,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.getFieldOptional(fieldName).ifPresent(link -> {
                 try {
-                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open link", ex);
                 }
@@ -1114,7 +1114,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     bibtexKey = entry.getCiteKey();
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, metaData, bibtexKey);
+            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey);
             try {
                 def.download(this);
             } catch (IOException ex) {
@@ -1165,7 +1165,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                    .execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, metaData, e -> {
+                    .execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
                             entries.getReadWriteLock().writeLock().lock();
                             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
@@ -1194,8 +1194,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             entry = selectionModel.getSelected().get(0);
             FileListEntry flEntry = new FileListEntry("", "");
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true,
-                    metaData);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, bibDatabaseContext);
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel localModel = new FileListTableModel();

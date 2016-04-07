@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import javax.xml.transform.OutputKeys;
@@ -52,12 +53,12 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Do not export if no entries
-            OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, entries);
+            OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), databaseContext.getDatabase(), entries);
         }
     }
 

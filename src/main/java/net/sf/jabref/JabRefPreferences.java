@@ -316,7 +316,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
     public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
-    public static final String USER_FILE_DIR = "userFileDir";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
@@ -418,11 +417,6 @@ public class JabRefPreferences {
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public String[] fileDirForDatabase;
-
-    // Similarly to the previous variable, this is a global that can be used during
-    // the export of a database if the database filename should be output. If a database
-    // is tied to a file on disk, this variable is set to that file before export starts:
-    public File databaseFile;
 
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
@@ -849,7 +843,6 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
         try {
             defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
             defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name

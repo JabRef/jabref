@@ -46,7 +46,7 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
-        possibleFilePaths = Optional.ofNullable(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory()).orElse(new ArrayList<>());
 
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));

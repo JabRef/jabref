@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
@@ -37,7 +38,7 @@ public class MySQLExport extends ExportFormat {
     /**
      * First method called when user starts the export.
      *
-     * @param database The bibtex database from which to export.
+     * @param databaseContext The bibtex database from which to export.
      * @param file The filename to which the export should be writtten.
      * @param encodingToUse The encoding to use.
      * @param entries The entries to export.
@@ -45,13 +46,13 @@ public class MySQLExport extends ExportFormat {
      *             to the user.
      */
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encodingToUse, List<BibEntry> entries)
                     throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exist
-            new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(database, metaData, entries, file,
+            new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(databaseContext, entries, file,
                     encodingToUse);
         }
 

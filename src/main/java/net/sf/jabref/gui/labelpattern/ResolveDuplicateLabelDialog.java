@@ -72,7 +72,7 @@ class ResolveDuplicateLabelDialog {
             //cb.add(new JPanel(), BorderLayout.CENTER);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.LAYOUT);
+            PreviewPanel pp = new PreviewPanel(null, entry, null, ResolveDuplicateLabelDialog.LAYOUT);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
             b.add(new JScrollPane(pp)).xy(3, row);

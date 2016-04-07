@@ -33,10 +33,10 @@ import java.util.regex.Pattern;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
-    public static final NativeDesktop ND_LINUX = new Linux();
-    public static final NativeDesktop ND_WINDOWS = new Windows();
-    public static final NativeDesktop ND_MAC = new OSX();
-    public static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
+    private static final NativeDesktop ND_LINUX = new Linux();
+    private static final NativeDesktop ND_WINDOWS = new Windows();
+    private static final NativeDesktop ND_MAC = new OSX();
+    private static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
 
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
@@ -46,13 +46,13 @@ public class JabRefDesktop {
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(MetaData metaData, String initialLink, String initialFieldName)
+    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, String initialFieldName)
             throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
         if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = metaData.getFileDirectory(fieldName);
+            List<String> dir = databaseContext.getFileDirectory(fieldName);
 
             Optional<File> file = FileUtil.expandFilename(link, dir);
 
@@ -117,13 +117,13 @@ public class JabRefDesktop {
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
+     * @param databaseContext
+     *            The database this file belongs to.
      * @param link
      *            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link,
+    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
             final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
@@ -135,7 +135,7 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(metaData, link);
+            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link);
             if (tmp.isPresent()) {
                 file = tmp.get();
             }
@@ -166,7 +166,7 @@ public class JabRefDesktop {
         }
     }
 
-    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
+    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, BibDatabaseContext databaseContext,
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");
@@ -195,7 +195,7 @@ public class JabRefDesktop {
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                 // Finally, open the file:
-                return openExternalFileAnyFormat(metaData, link, Optional.of(newType));
+                return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -221,7 +221,7 @@ public class JabRefDesktop {
                 throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, databaseContext);
             editor.setVisible(true, false);
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
@@ -232,7 +232,7 @@ public class JabRefDesktop {
                 frame.getCurrentBasePanel().undoManager.addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(metaData, flEntry.link, flEntry.type);
+                return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);

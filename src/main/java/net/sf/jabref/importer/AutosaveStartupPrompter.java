@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
@@ -76,8 +77,9 @@ public class AutosaveStartupPrompter implements Runnable {
                 pr = JabRef.openBibFile(fileToLoad.getPath(), true);
                 if ((pr != null) && !pr.isInvalid()) {
                     loaded.add(pr);
-                    BasePanel panel = frame.addTab(pr.getDatabase(), file,
-                            pr.getMetaData(), pr.getEncoding(), first);
+                    BibDatabaseContext databaseContext = pr.getDatabaseContext();
+                    databaseContext.setDatabaseFile(file);
+                    BasePanel panel = frame.addTab(databaseContext, pr.getEncoding(), first);
                     location.put(pr, frame.getBasePanelCount() - 1);
                     if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();
