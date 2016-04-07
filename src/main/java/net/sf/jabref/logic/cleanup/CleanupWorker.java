@@ -27,11 +27,14 @@ import java.util.Objects;
 
 public class CleanupWorker {
 
+    private final List<String> paths;
     private final BibDatabaseContext databaseContext;
     private final JournalAbbreviationRepository repository;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationRepository repository) {
+    public CleanupWorker(List<String> paths, BibDatabaseContext databaseContext,
+            JournalAbbreviationRepository repository) {
+        this.paths = Objects.requireNonNull(paths);
         this.databaseContext = databaseContext;
         this.repository = repository;
     }
@@ -73,10 +76,10 @@ public class CleanupWorker {
             jobs.add(new MoveFilesCleanup(databaseContext));
         }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(databaseContext));
+            jobs.add(new RelativePathsCleanup(paths, databaseContext));
         }
         if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
+            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), databaseContext,
                     repository);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();

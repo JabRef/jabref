@@ -25,9 +25,11 @@ import net.sf.jabref.logic.TypedBibEntry;
 
 public class RelativePathsCleanup implements CleanupJob {
 
+    private final List<String> paths;
     private final BibDatabaseContext databaseContext;
 
-    public RelativePathsCleanup(BibDatabaseContext databaseContext) {
+    public RelativePathsCleanup(List<String> paths, BibDatabaseContext databaseContext) {
+        this.paths = paths;
         this.databaseContext = Objects.requireNonNull(databaseContext);
     }
 
@@ -39,7 +41,6 @@ public class RelativePathsCleanup implements CleanupJob {
         boolean changed = false;
         for (ParsedFileField fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
-            List<String> paths = databaseContext.getMetaData().getFileDirectory();
             String newFileName = FileUtil.shortenFileName(new File(oldFileName), paths).toString();
 
             ParsedFileField newFileEntry = fileEntry;
