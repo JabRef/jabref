@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,19 +15,21 @@
  */
 package net.sf.jabref.logic.xmp;
 
-import java.io.IOException;
 import java.util.*;
 
 import net.sf.jabref.*;
 
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibDatabase;
-import org.apache.jempbox.xmp.XMPMetadata;
-import org.apache.jempbox.xmp.XMPSchema;
+import org.apache.xmpbox.XMPMetadata;
+import org.apache.xmpbox.schema.XMPSchema;
+import org.apache.xmpbox.type.AbstractField;
+import org.apache.xmpbox.type.ArrayProperty;
+import org.apache.xmpbox.type.Attribute;
+import org.apache.xmpbox.type.TextType;
+import org.apache.xmpbox.xml.DomXmpParser;
+import org.apache.xmpbox.xml.XmpParsingException;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class XMPSchemaBibtex extends XMPSchema {
 
@@ -53,21 +55,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param parent
      */
     public XMPSchemaBibtex(XMPMetadata parent) {
-        super(parent, XMPSchemaBibtex.KEY, XMPSchemaBibtex.NAMESPACE);
-    }
-
-    /**
-     * Create schema from an existing XML element.
-     *
-     * @param e
-     *            The existing XML element.
-     */
-    public XMPSchemaBibtex(Element e, String namespace) {
-        super(e, XMPSchemaBibtex.KEY);
-    }
-
-    private static String makeProperty(String propertyName) {
-        return XMPSchemaBibtex.KEY + ':' + propertyName;
+        super(parent, XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.KEY);
     }
 
     /**
@@ -77,7 +65,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @return
      */
     public List<String> getPersonList(String field) {
-        return getSequenceList(field);
+        return getUnqualifiedSequenceValueList(field);
     }
 
     /**
@@ -90,84 +78,19 @@ public class XMPSchemaBibtex extends XMPSchema {
         AuthorList list = AuthorList.parse(value);
 
         for (Author author : list.getAuthors()) {
-            addSequenceValue(field, author.getFirstLast(false));
+            addUnqualifiedSequenceValue(field, author.getFirstLast(false));
         }
     }
 
-    @Override
-    public String getTextProperty(String field) {
-        return super.getTextProperty(makeProperty(field));
-    }
+    private static String getContents(ArrayProperty seqList) {
+        List<String> seq = seqList.getElementsAsString();
 
-    @Override
-    public void setTextProperty(String field, String value) {
-        super.setTextProperty(makeProperty(field), value);
-    }
-
-    @Override
-    public List<String> getBagList(String bagName) {
-        return super.getBagList(makeProperty(bagName));
-    }
-
-    @Override
-    public void removeBagValue(String bagName, String value) {
-        super.removeBagValue(makeProperty(bagName), value);
-    }
-
-    @Override
-    public void addBagValue(String bagName, String value) {
-        super.addBagValue(makeProperty(bagName), value);
-    }
-
-    @Override
-    public List<String> getSequenceList(String seqName) {
-        return super.getSequenceList(makeProperty(seqName));
-    }
-
-    @Override
-    public void removeSequenceValue(String seqName, String value) {
-        super.removeSequenceValue(makeProperty(seqName), value);
-    }
-
-    @Override
-    public void addSequenceValue(String seqName, String value) {
-        super.addSequenceValue(makeProperty(seqName), value);
-    }
-
-    @Override
-    public List<Calendar> getSequenceDateList(String seqName) throws IOException {
-        return super.getSequenceDateList(makeProperty(seqName));
-    }
-
-    @Override
-    public void removeSequenceDateValue(String seqName, Calendar date) {
-        super.removeSequenceDateValue(makeProperty(seqName), date);
-    }
-
-    @Override
-    public void addSequenceDateValue(String field, Calendar date) {
-        super.addSequenceDateValue(makeProperty(field), date);
-    }
-
-    private static String getContents(NodeList seqList) {
-
-        Element seqNode = (Element) seqList.item(0);
-        StringBuffer seq = null;
-
-        NodeList items = seqNode.getElementsByTagName("rdf:li");
-        for (int j = 0; j < items.getLength(); j++) {
-            Element li = (Element) items.item(j);
-            if (seq == null) {
-                seq = new StringBuffer();
-            } else {
-                seq.append(" and ");
-            }
-            seq.append(XMPSchemaBibtex.getTextContent(li));
+        StringJoiner joiner = new StringJoiner(" and ");
+        for(String item: seq){
+            joiner.add(item);
         }
-        if (seq != null) {
-            return seq.toString();
-        }
-        return null;
+
+        return joiner.toString();
     }
 
     /**
@@ -175,11 +98,11 @@ public class XMPSchemaBibtex extends XMPSchema {
      * are concatenated using " and ".
      *
      * @return Map from name of textproperty (String) to value (String). For
-     *         instance: "year" => "2005". Empty map if none found.
+     * instance: "year" => "2005". Empty map if none found.
      * @throws TransformerException
      */
     public static Map<String, String> getAllProperties(XMPSchema schema, String namespaceName) {
-        NodeList nodes = schema.getElement().getChildNodes();
+        List<AbstractField> nodes = schema.getAllProperties();
 
         Map<String, String> result = new HashMap<>();
 
@@ -187,55 +110,33 @@ public class XMPSchemaBibtex extends XMPSchema {
             return result;
         }
 
-        // Check child-nodes first
-        int n = nodes.getLength();
+        for (AbstractField node : nodes) {
 
-        for (int i = 0; i < n; i++) {
-            Node node = nodes.item(i);
-            if ((node.getNodeType() != Node.ATTRIBUTE_NODE)
-                    && (node.getNodeType() != Node.ELEMENT_NODE)) {
-                continue;
-            }
+            String nodeName = node.getPropertyName();
 
-            String nodeName = node.getNodeName();
+            if (node instanceof ArrayProperty) {
+                ArrayProperty seqList = ((ArrayProperty) node);
 
-            String[] split = nodeName.split(":");
 
-            if ((split.length == 2) && split[0].equals(namespaceName)) {
-                NodeList seqList = ((Element) node).getElementsByTagName("rdf:Seq");
-                if (seqList.getLength() > 0) {
+                String seq = XMPSchemaBibtex.getContents(seqList);
 
-                    String seq = XMPSchemaBibtex.getContents(seqList);
-
-                    if (seq != null) {
-                        result.put(split[1], seq);
-                    }
-                } else {
-                    NodeList bagList = ((Element) node).getElementsByTagName("rdf:Bag");
-                    if (bagList.getLength() > 0) {
-
-                        String seq = XMPSchemaBibtex.getContents(bagList);
-
-                        if (seq != null) {
-                            result.put(split[1], seq);
-                        }
-                    } else {
-                        result.put(split[1], XMPSchemaBibtex.getTextContent(node));
-                    }
+                if (seq != null) {
+                    result.put(nodeName, seq);
                 }
+            } else if (node instanceof TextType) {
+                TextType text = (TextType) node;
+                result.put(nodeName, text.getStringValue());
             }
         }
 
         // Then check Attributes
-        NamedNodeMap attrs = schema.getElement().getAttributes();
-        int m = attrs.getLength();
-        for (int j = 0; j < m; j++) {
-            Node attr = attrs.item(j);
+        List<Attribute> attrs = schema.getAllAttributes();
+        for (Attribute attribute : attrs) {
 
-            String nodeName = attr.getNodeName();
+            String nodeName = attribute.getName();
             String[] split = nodeName.split(":");
             if ((split.length == 2) && split[0].equals(namespaceName)) {
-                result.put(split[1], attr.getNodeValue());
+                result.put(split[1], attribute.getValue());
             }
         }
 
@@ -262,14 +163,11 @@ public class XMPSchemaBibtex extends XMPSchema {
         return result;
     }
 
-
-
     public void setBibtexEntry(BibEntry entry) {
         setBibtexEntry(entry, null);
     }
 
     /**
-     *
      * @param entry
      * @param database maybenull
      */
@@ -291,14 +189,14 @@ public class XMPSchemaBibtex extends XMPSchema {
             if ("author".equals(field) || "editor".equals(field)) {
                 setPersonList(field, value);
             } else {
-                setTextProperty(field, value);
+                setTextPropertyValueAsSimple(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextPropertyValueAsSimple("entrytype", entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
+        String type = getUnqualifiedTextPropertyValue("entrytype");
         BibEntry e = new BibEntry(IdGenerator.next(), type);
 
         // Get Text Properties
@@ -306,27 +204,6 @@ public class XMPSchemaBibtex extends XMPSchema {
         text.remove("entrytype");
         e.setField(text);
         return e;
-    }
-
-    /**
-     * Taken from DOM2Utils.java:
-     *
-     * JBoss, the OpenSource EJB server
-     *
-     * Distributable under LGPL license. See terms of license at gnu.org.
-     */
-    public static String getTextContent(Node node) {
-        boolean hasTextContent = false;
-        StringBuilder buffer = new StringBuilder();
-        NodeList nlist = node.getChildNodes();
-        for (int i = 0; i < nlist.getLength(); i++) {
-            Node child = nlist.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE) {
-                buffer.append(child.getNodeValue());
-                hasTextContent = true;
-            }
-        }
-        return hasTextContent ? buffer.toString() : "";
     }
 
 }

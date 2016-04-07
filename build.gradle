@@ -81,9 +81,9 @@ dependencies {
 
     compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
 
-    compile 'org.apache.pdfbox:pdfbox:1.8.11'
-    compile 'org.apache.pdfbox:fontbox:1.8.11'
-    compile 'org.apache.pdfbox:jempbox:1.8.11'
+    compile 'org.apache.pdfbox:pdfbox:2.0.0'
+    compile 'org.apache.pdfbox:fontbox:2.0.0'
+    compile 'org.apache.pdfbox:xmpbox:2.0.0'
 
     compile 'commons-cli:commons-cli:1.3.1'
 

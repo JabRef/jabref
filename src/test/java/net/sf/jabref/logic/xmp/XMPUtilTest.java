@@ -5,6 +5,7 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
+import net.sf.jabref.logic.util.io.XMLUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
@@ -12,13 +13,17 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-import org.apache.jempbox.xmp.*;
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
-import org.apache.pdfbox.util.XMLUtil;
+import org.apache.xmpbox.XMPMetadata;
+import org.apache.xmpbox.schema.DublinCoreSchema;
+import org.apache.xmpbox.schema.XMPBasicSchema;
+import org.apache.xmpbox.schema.XMPMediaManagementSchema;
+import org.apache.xmpbox.schema.XMPSchema;
+import org.apache.xmpbox.xml.DomXmpParser;
+import org.apache.xmpbox.xml.XmpParsingException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -83,9 +88,8 @@ public class XMPUtilTest {
      *
      * @param xmpString
      * @throws IOException
-     * @throws COSVisitorException
      */
-    public void writeManually(File tempFile, String xmpString) throws IOException, COSVisitorException {
+    public void writeManually(File tempFile, String xmpString) throws IOException {
 
         try (PDDocument document = PDDocument.load(tempFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
@@ -101,7 +105,7 @@ public class XMPUtilTest {
             }
             ByteArrayInputStream in = new ByteArrayInputStream(bs.toByteArray());
 
-            PDMetadata metadataStream = new PDMetadata(document, in, false);
+            PDMetadata metadataStream = new PDMetadata(document, in);
             catalog.setMetadata(metadataStream);
 
             document.save(tempFile.getAbsolutePath());
@@ -197,7 +201,7 @@ public class XMPUtilTest {
      * Create a temporary PDF-file with a single empty page.
      */
     @Before
-    public void setUp() throws IOException, COSVisitorException {
+    public void setUp() throws IOException {
 
         pdfFile = File.createTempFile("JabRef", ".pdf");
 
@@ -232,11 +236,11 @@ public class XMPUtilTest {
 
     /**
      * Most basic test for reading.
+     *
      * @throws IOException
-     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPSimple() throws COSVisitorException, IOException {
+    public void testReadXMPSimple() throws IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n"
                 + "<bibtex:title>Beach sand convolution by surf-wave optimzation</bibtex:title>\n"
@@ -257,11 +261,11 @@ public class XMPUtilTest {
 
     /**
      * Is UTF8 handling working? This is because Java by default uses the platform encoding or a special UTF-kind.
+     *
      * @throws IOException
-     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPUTF8() throws COSVisitorException, IOException {
+    public void testReadXMPUTF8() throws IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n" + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
@@ -282,7 +286,7 @@ public class XMPUtilTest {
     /**
      * Make sure that the privacy filter works.
      *
-     * @throws IOException Should not happen.
+     * @throws IOException          Should not happen.
      * @throws TransformerException Should not happen.
      */
     @Test
@@ -329,11 +333,11 @@ public class XMPUtilTest {
 
     /**
      * Are authors and editors correctly read?
+     *
      * @throws IOException
-     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPSeq() throws COSVisitorException, IOException {
+    public void testReadXMPSeq() throws IOException {
 
         String bibtex = "<bibtex:author><rdf:Seq>\n" + "  <rdf:li>Kelly Clarkson</rdf:li>"
                 + "  <rdf:li>Ozzy Osbourne</rdf:li>" + "</rdf:Seq></bibtex:author>" + "<bibtex:editor><rdf:Seq>"
@@ -355,12 +359,11 @@ public class XMPUtilTest {
 
     /**
      * Is the XMPEntryType correctly set?
-     * @throws IOException
-     * @throws COSVisitorException
      *
+     * @throws IOException
      */
     @Test
-    public void testReadXMPEntryType() throws COSVisitorException, IOException {
+    public void testReadXMPEntryType() throws IOException {
 
         String bibtex = "<bibtex:entrytype>ARticle</bibtex:entrytype>";
 
@@ -386,7 +389,7 @@ public class XMPUtilTest {
                 return null;
             } else {
                 try (InputStream is = meta.createInputStream();
-                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                     InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     // trim() for killing padding end-newline
                     return CharStreams.toString(reader).trim();
                 }
@@ -396,11 +399,11 @@ public class XMPUtilTest {
 
     /**
      * Test whether the helper function work correctly.
+     *
      * @throws IOException
-     * @throws COSVisitorException
      */
     @Test
-    public void testWriteReadManually() throws COSVisitorException, IOException {
+    public void testWriteReadManually() throws IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n" + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
@@ -421,9 +424,9 @@ public class XMPUtilTest {
 
     /**
      * Test that readXMP and writeXMP work together.
+     *
      * @throws IOException
      * @throws TransformerException
-     *
      */
     @Test
     public void testReadWriteXMP() throws IOException, TransformerException {
@@ -450,12 +453,11 @@ public class XMPUtilTest {
 
     /**
      * Are newlines in the XML processed correctly?
-     * @throws IOException
-     * @throws COSVisitorException
      *
+     * @throws IOException
      */
     @Test
-    public void testNewlineHandling() throws COSVisitorException, IOException {
+    public void testNewlineHandling() throws IOException {
 
         String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
                 + "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n"
@@ -475,12 +477,11 @@ public class XMPUtilTest {
 
     /**
      * Test whether XMP.readFile can deal with text-properties that are not element-nodes, but attribute-nodes
-     * @throws IOException
-     * @throws COSVisitorException
      *
+     * @throws IOException
      */
     @Test
-    public void testAttributeRead() throws COSVisitorException, IOException {
+    public void testAttributeRead() throws IOException {
 
         // test 1 has attributes
         String bibtex = t2XMP();
@@ -570,28 +571,32 @@ public class XMPUtilTest {
 
                 XMPMetadata meta;
                 if (metaRaw == null) {
-                    meta = new XMPMetadata();
+                    meta = XMPMetadata.createXMPMetadata();
                 } else {
-                    meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+                    try {
+                        DomXmpParser parser = new DomXmpParser();
+                        meta = parser.parse(metaRaw.createInputStream());
+                    } catch (XmpParsingException e1) {
+                        throw new IOException(e1);
+                    }
                 }
-                meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
 
-                List<XMPSchema> schemas = meta.getSchemas();
+                meta.getTypeMapping().addNewNameSpace(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class.toString());
+
+                List<XMPSchema> schemas = meta.getAllSchemas();
 
                 Assert.assertEquals(4, schemas.size());
 
-                schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
+                XMPSchema schema = meta.getSchema(XMPSchemaBibtex.NAMESPACE);
+                Assert.assertNotNull(schema);
 
-                schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schemas.get(0);
-                Assert.assertEquals("application/pdf", dc.getFormat());
+                DublinCoreSchema dublin = meta.getDublinCoreSchema();
+                Assert.assertNotNull(dublin);
+                Assert.assertEquals("application/pdf", dublin.getFormat());
 
-                schemas = meta.getSchemasByNamespaceURI(XMPSchemaBasic.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaBasic bs = (XMPSchemaBasic) schemas.get(0);
-                Assert.assertEquals("Acrobat PDFMaker 7.0.7", bs.getCreatorTool());
+                XMPBasicSchema basic = meta.getXMPBasicSchema();
+                Assert.assertNotNull(basic);
+                Assert.assertEquals("Acrobat PDFMaker 7.0.7", basic.getCreatorTool());
 
                 Calendar c = Calendar.getInstance();
                 c.clear();
@@ -603,7 +608,7 @@ public class XMPUtilTest {
                 c.set(Calendar.SECOND, 24);
                 c.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 
-                Calendar other = bs.getCreateDate();
+                Calendar other = basic.getCreateDate();
 
                 Assert.assertEquals(c.get(Calendar.YEAR), other.get(Calendar.YEAR));
                 Assert.assertEquals(c.get(Calendar.MONTH), other.get(Calendar.MONTH));
@@ -613,10 +618,9 @@ public class XMPUtilTest {
                 Assert.assertEquals(c.get(Calendar.SECOND), other.get(Calendar.SECOND));
                 Assert.assertTrue(c.getTimeZone().hasSameRules(other.getTimeZone()));
 
-                schemas = meta.getSchemasByNamespaceURI(XMPSchemaMediaManagement.NAMESPACE);
-                Assert.assertEquals(1, schemas.size());
-                XMPSchemaMediaManagement mm = (XMPSchemaMediaManagement) schemas.get(0);
-                Assert.assertEquals("17", mm.getSequenceList("xapMM:VersionID").get(0));
+                XMPMediaManagementSchema media = meta.getXMPMediaManagementSchema();
+                Assert.assertNotNull(media);
+                Assert.assertEquals("17", media.getUnqualifiedSequenceValueList("xapMM:VersionID").get(0));
 
             }
         }
@@ -646,40 +650,44 @@ public class XMPUtilTest {
 
             XMPMetadata meta;
             if (metaRaw == null) {
-                meta = new XMPMetadata();
+                meta = XMPMetadata.createXMPMetadata();
             } else {
-                meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
+                try {
+                    DomXmpParser parser = new DomXmpParser();
+                    meta = parser.parse(metaRaw.createInputStream());
+                } catch (XmpParsingException e1) {
+                    throw new IOException(e1);
+                }
             }
-            meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
 
-            List<XMPSchema> schemas = meta.getSchemas();
+            meta.getTypeMapping().addNewNameSpace(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class.toString());
+
+            List<XMPSchema> schemas = meta.getAllSchemas();
 
             Assert.assertEquals(4, schemas.size());
 
-            schemas = meta.getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-            Assert.assertEquals(1, schemas.size());
+            XMPSchema schema = meta.getSchema(XMPSchemaBibtex.NAMESPACE);
+            Assert.assertNotNull(schema);
 
-            schemas = meta.getSchemasByNamespaceURI(XMPSchemaDublinCore.NAMESPACE);
-            Assert.assertEquals(1, schemas.size());
-            XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schemas.get(0);
-            Assert.assertEquals("application/pdf", dc.getFormat());
+            DublinCoreSchema dublin = meta.getDublinCoreSchema();
+            Assert.assertNotNull(dublin);
+            Assert.assertEquals("application/pdf", dublin.getFormat());
 
-            schemas = meta.getSchemasByNamespaceURI(XMPSchemaBasic.NAMESPACE);
-            Assert.assertEquals(1, schemas.size());
-            XMPSchemaBasic bs = (XMPSchemaBasic) schemas.get(0);
-            Assert.assertEquals("Acrobat PDFMaker 7.0.7", bs.getCreatorTool());
+            XMPBasicSchema basic = meta.getXMPBasicSchema();
+            Assert.assertNotNull(basic);
+            Assert.assertEquals("Acrobat PDFMaker 7.0.7", basic.getCreatorTool());
 
             Calendar c = Calendar.getInstance();
             c.clear();
             c.set(Calendar.YEAR, 2006);
-            c.set(Calendar.MONTH, 7);
+            c.set(Calendar.MONTH, Calendar.AUGUST);
             c.set(Calendar.DATE, 7);
             c.set(Calendar.HOUR, 14);
             c.set(Calendar.MINUTE, 44);
             c.set(Calendar.SECOND, 24);
             c.setTimeZone(TimeZone.getTimeZone("GMT+2"));
 
-            Calendar other = bs.getCreateDate();
+            Calendar other = basic.getCreateDate();
 
             Assert.assertEquals(c.get(Calendar.YEAR), other.get(Calendar.YEAR));
             Assert.assertEquals(c.get(Calendar.MONTH), other.get(Calendar.MONTH));
@@ -689,10 +697,9 @@ public class XMPUtilTest {
             Assert.assertEquals(c.get(Calendar.SECOND), other.get(Calendar.SECOND));
             Assert.assertTrue(c.getTimeZone().hasSameRules(other.getTimeZone()));
 
-            schemas = meta.getSchemasByNamespaceURI(XMPSchemaMediaManagement.NAMESPACE);
-            Assert.assertEquals(1, schemas.size());
-            XMPSchemaMediaManagement mm = (XMPSchemaMediaManagement) schemas.get(0);
-            Assert.assertEquals("17", mm.getSequenceList("xapMM:VersionID").get(0));
+            XMPMediaManagementSchema media = meta.getXMPMediaManagementSchema();
+            Assert.assertNotNull(media);
+            Assert.assertEquals("17", media.getUnqualifiedSequenceValueList("xapMM:VersionID").get(0));
 
         }
     }
@@ -861,7 +868,7 @@ public class XMPUtilTest {
     }
 
     @Test
-    public void testReadWriteDC() throws IOException, TransformerException {
+    public void testReadWriteDC() throws IOException, TransformerException, XmpParsingException {
         List<BibEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
@@ -891,42 +898,41 @@ public class XMPUtilTest {
                 return;
             }
 
-            XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-            meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+            DomXmpParser parser = new DomXmpParser();
+            XMPMetadata meta = parser.parse(metaRaw.createInputStream());
+            meta.getTypeMapping().addNewNameSpace(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class.toString());
 
             // Check Dublin Core
-            List<XMPSchema> schemas = meta.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
-            Assert.assertEquals(1, schemas.size());
 
-            XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas.iterator().next();
-            Assert.assertNotNull(dcSchema);
+            DublinCoreSchema dublin = meta.getDublinCoreSchema();
+            Assert.assertNotNull(dublin);
 
-            Assert.assertEquals("Hypersonic ultra-sound", dcSchema.getTitle());
-            Assert.assertEquals("1982-07", dcSchema.getSequenceList("dc:date").get(0));
-            Assert.assertEquals("Kelly Clarkson", dcSchema.getCreators().get(0));
-            Assert.assertEquals("Ozzy Osbourne", dcSchema.getCreators().get(1));
-            Assert.assertEquals("Huey Duck", dcSchema.getContributors().get(0));
-            Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
-            Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-            Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
-            Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
-            Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
-            Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
+            Assert.assertEquals("Hypersonic ultra-sound", dublin.getTitle());
+            Assert.assertEquals("1982-07", dublin.getUnqualifiedSequenceValueList("dc:date").get(0));
+            Assert.assertEquals("Kelly Clarkson", dublin.getCreators().get(0));
+            Assert.assertEquals("Ozzy Osbourne", dublin.getCreators().get(1));
+            Assert.assertEquals("Huey Duck", dublin.getContributors().get(0));
+            Assert.assertEquals("Dewey Duck", dublin.getContributors().get(1));
+            Assert.assertEquals("Louie Duck", dublin.getContributors().get(2));
+            Assert.assertEquals("InProceedings".toLowerCase(), dublin.getTypes().get(0).toLowerCase());
+            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dublin.getRelations().get(0));
+            Assert.assertEquals("peanut", dublin.getSubjects().get(0));
+            Assert.assertEquals("butter", dublin.getSubjects().get(1));
+            Assert.assertEquals("jelly", dublin.getSubjects().get(2));
 
             /**
              * Bibtexkey, Journal, pdf, booktitle
              */
-            Assert.assertEquals(4, dcSchema.getRelationships().size());
+            Assert.assertEquals(4, dublin.getRelations().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
+            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dublin).get());
 
         }
 
     }
 
     @Test
-    public void testWriteSingleUpdatesDCAndInfo() throws IOException, TransformerException {
+    public void testWriteSingleUpdatesDCAndInfo() throws IOException, TransformerException, XmpParsingException {
         List<BibEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
@@ -955,36 +961,35 @@ public class XMPUtilTest {
                 Assert.fail();
             }
 
-            XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-            meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+            DomXmpParser parser = new DomXmpParser();
+            XMPMetadata meta = parser.parse(metaRaw.createInputStream());
+            meta.getTypeMapping().addNewNameSpace(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class.toString());
 
             // Check Dublin Core
-            List<XMPSchema> schemas = meta.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
 
-            Assert.assertEquals(1, schemas.size());
+            DublinCoreSchema dublin = meta.getDublinCoreSchema();
+            Assert.assertNotNull(dublin);
 
-            XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas.iterator().next();
-            Assert.assertNotNull(dcSchema);
+            Assert.assertEquals("Hypersonic ultra-sound", dublin.getTitle());
+            Assert.assertEquals("1982-07", dublin.getUnqualifiedSequenceValueList("dc:date").get(0));
+            Assert.assertEquals("Kelly Clarkson", dublin.getCreators().get(0));
+            Assert.assertEquals("Ozzy Osbourne", dublin.getCreators().get(1));
+            Assert.assertEquals("Huey Duck", dublin.getContributors().get(0));
+            Assert.assertEquals("Dewey Duck", dublin.getContributors().get(1));
+            Assert.assertEquals("Louie Duck", dublin.getContributors().get(2));
+            Assert.assertEquals("InProceedings".toLowerCase(), dublin.getTypes().get(0).toLowerCase());
+            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dublin.getRelations().get(0));
+            Assert.assertEquals("peanut", dublin.getSubjects().get(0));
+            Assert.assertEquals("butter", dublin.getSubjects().get(1));
+            Assert.assertEquals("jelly", dublin.getSubjects().get(2));
 
-            Assert.assertEquals("Hypersonic ultra-sound", dcSchema.getTitle());
-            Assert.assertEquals("1982-07", dcSchema.getSequenceList("dc:date").get(0));
-            Assert.assertEquals("Kelly Clarkson", dcSchema.getCreators().get(0));
-            Assert.assertEquals("Ozzy Osbourne", dcSchema.getCreators().get(1));
-            Assert.assertEquals("Huey Duck", dcSchema.getContributors().get(0));
-            Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
-            Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
-            Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
-            Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
-            Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
-            Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
 
             /**
              * Bibtexkey, Journal, pdf, booktitle
              */
-            Assert.assertEquals(4, dcSchema.getRelationships().size());
+            Assert.assertEquals(4, dublin.getRelations().size());
 
-            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get());
+            assertEqualsBibtexEntry(t3BibtexEntry(), XMPUtil.getBibtexEntryFromDublinCore(dublin).get());
 
         }
     }
@@ -1010,40 +1015,38 @@ public class XMPUtilTest {
 
         Assert.assertTrue(metadata.isPresent());
 
-        List<XMPSchema> schemas = metadata.get().getSchemas();
+        List<XMPSchema> schemas = metadata.get().getAllSchemas();
         Assert.assertEquals(2, schemas.size());
-        schemas = metadata.get().getSchemasByNamespaceURI(XMPSchemaBibtex.NAMESPACE);
-        Assert.assertEquals(1, schemas.size());
+        XMPSchema schema = metadata.get().getSchema(XMPSchemaBibtex.NAMESPACE);
+        Assert.assertNotNull(schema);
         XMPSchemaBibtex bib = (XMPSchemaBibtex) schemas.get(0);
 
-        List<String> authors = bib.getSequenceList("author");
+        List<String> authors = bib.getUnqualifiedSequenceValueList("author");
         Assert.assertEquals(4, authors.size());
         Assert.assertEquals("K. Crowston", authors.get(0));
         Assert.assertEquals("H. Annabi", authors.get(1));
         Assert.assertEquals("J. Howison", authors.get(2));
         Assert.assertEquals("C. Masango", authors.get(3));
 
-        Assert.assertEquals("article", bib.getTextProperty("entrytype"));
+        Assert.assertEquals("article", bib.getUnqualifiedTextPropertyValue("entrytype"));
         Assert.assertEquals("Effective work practices for floss development: A model and propositions",
-                bib.getTextProperty("title"));
+                bib.getUnqualifiedTextPropertyValue("title"));
         Assert.assertEquals("Hawaii International Conference On System Sciences (HICSS)",
-                bib.getTextProperty("booktitle"));
-        Assert.assertEquals("2005", bib.getTextProperty("year"));
-        Assert.assertEquals("oezbek", bib.getTextProperty("owner"));
-        Assert.assertEquals("http://james.howison.name/publications.html", bib.getTextProperty("url"));
+                bib.getUnqualifiedTextPropertyValue("booktitle"));
+        Assert.assertEquals("2005", bib.getUnqualifiedTextPropertyValue("year"));
+        Assert.assertEquals("oezbek", bib.getUnqualifiedTextPropertyValue("owner"));
+        Assert.assertEquals("http://james.howison.name/publications.html", bib.getUnqualifiedTextPropertyValue("url"));
 
     }
 
     /**
      * Test whether the command-line client works correctly with writing a single entry
+     *
      * @throws IOException
      * @throws TransformerException
-     * @throws COSVisitorException
-     *
-
      */
     @Test
-    public void testCommandLineSingleBib() throws IOException, TransformerException, COSVisitorException {
+    public void testCommandLineSingleBib() throws IOException, TransformerException {
 
         // First check conversion from .bib to .xmp
         File tempBib = File.createTempFile("JabRef", ".bib");
@@ -1054,7 +1057,7 @@ public class XMPUtilTest {
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {tempBib.getAbsolutePath()});
+                XMPUtil.main(new String[]{tempBib.getAbsolutePath()});
                 System.setOut(oldOut);
                 String xmp = s.toString();
 
@@ -1074,11 +1077,10 @@ public class XMPUtilTest {
     /**
      * @throws IOException
      * @throws TransformerException
-     * @throws COSVisitorException
      * @depends XMPUtil.writeXMP
      */
     @Test
-    public void testCommandLineSinglePdf() throws IOException, TransformerException, COSVisitorException {
+    public void testCommandLineSinglePdf() throws IOException, TransformerException {
         {
             // Write XMP to file
 
@@ -1089,7 +1091,7 @@ public class XMPUtilTest {
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {pdfFile.getAbsolutePath()});
+                XMPUtil.main(new String[]{pdfFile.getAbsolutePath()});
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
@@ -1109,7 +1111,7 @@ public class XMPUtilTest {
         try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
+            XMPUtil.main(new String[]{"-x", pdfFile.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
             String xmp = s.toString();
@@ -1138,9 +1140,9 @@ public class XMPUtilTest {
 
     /**
      * Test whether the command-line client can pick one of several entries from a bibtex file
+     *
      * @throws IOException
      * @throws TransformerException
-     *
      */
     @Test
     @Ignore
@@ -1155,7 +1157,7 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                     System.setOut(new PrintStream(s));
-                    XMPUtil.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                    XMPUtil.main(new String[]{"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
                 }
@@ -1170,7 +1172,7 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
                 try {
-                    XMPUtil.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                    XMPUtil.main(new String[]{"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
                 }
@@ -1189,6 +1191,7 @@ public class XMPUtilTest {
 
     /**
      * Test whether the command-line client can deal with several bibtex entries.
+     *
      * @throws IOException
      * @throws TransformerException
      */
@@ -1207,7 +1210,7 @@ public class XMPUtilTest {
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                XMPUtil.main(new String[]{tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 System.setOut(oldOut);
             }
             List<BibEntry> l = XMPUtil.readXMP(pdfFile);
@@ -1241,9 +1244,9 @@ public class XMPUtilTest {
 
     /**
      * Test that readXMP and writeXMP work together.
+     *
      * @throws IOException
      * @throws TransformerException
-     *
      * @throws Exception
      */
     @Test
@@ -1287,14 +1290,14 @@ public class XMPUtilTest {
     /**
      * A better testcase for resolveStrings. Makes sure that also the document information and dublin core are written
      * correctly.
-     * <p/>
+     * <p>
      * Data was contributed by Philip K.F. Hölzenspies (p.k.f.holzenspies [at] utwente.nl).
      *
      * @throws IOException
      * @throws TransformerException
      */
     @Test
-    public void testResolveStrings2() throws IOException, TransformerException {
+    public void testResolveStrings2() throws IOException, TransformerException, XmpParsingException {
 
         try (FileReader fr = new FileReader("src/test/resources/net/sf/jabref/util/twente.bib")) {
             ParserResult result = BibtexParser.parse(fr);
@@ -1329,21 +1332,19 @@ public class XMPUtilTest {
                         Assert.fail();
                     }
 
-                    XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
-                    meta.addXMLNSMapping(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class);
+                    DomXmpParser parser = new DomXmpParser();
+                    XMPMetadata meta = parser.parse(metaRaw.createInputStream());
+                    meta.getTypeMapping().addNewNameSpace(XMPSchemaBibtex.NAMESPACE, XMPSchemaBibtex.class.toString());
 
-                    List<XMPSchema> schemas = meta.getSchemasByNamespaceURI("http://purl.org/dc/elements/1.1/");
+                    DublinCoreSchema dublin = meta.getDublinCoreSchema();
 
-                    Assert.assertEquals(1, schemas.size());
+                    Assert.assertNotNull(dublin);
 
-                    XMPSchemaDublinCore dcSchema = (XMPSchemaDublinCore) schemas.iterator().next();
-                    Assert.assertNotNull(dcSchema);
+                    Assert.assertEquals("David Patterson", dublin.getCreators().get(0));
+                    Assert.assertEquals("Arvind", dublin.getCreators().get(1));
+                    Assert.assertEquals("Krste Asanov\\'\\i{}c", dublin.getCreators().get(2));
 
-                    Assert.assertEquals("David Patterson", dcSchema.getCreators().get(0));
-                    Assert.assertEquals("Arvind", dcSchema.getCreators().get(1));
-                    Assert.assertEquals("Krste Asanov\\'\\i{}c", dcSchema.getCreators().get(2));
-
-                    b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get();
+                    b = XMPUtil.getBibtexEntryFromDublinCore(dublin).get();
                     Assert.assertNotNull(b);
                     Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author")));
                 }
@@ -1353,6 +1354,93 @@ public class XMPUtilTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testParsing() throws XmpParsingException {
+        String testData = "<?xpacket begin=\"ï»¿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?><x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n" +
+                "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
+                "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
+                "      <dc:description>\n" +
+                "        <rdf:Alt>\n" +
+                "          <rdf:li xml:lang=\"x-default\">The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</rdf:li>\n" +
+                "        </rdf:Alt>\n" +
+                "      </dc:description>\n" +
+                "      <dc:creator>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Kelly Clarkson</rdf:li>\n" +
+                "          <rdf:li>Ozzy Osbourne</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:creator>\n" +
+                "      <dc:relation>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>bibtex/bibtexkey/Clarkson06</rdf:li>\n" +
+                "          <rdf:li>bibtex/booktitle/Catch-22</rdf:li>\n" +
+                "          <rdf:li>bibtex/journal/International Journal of High Fidelity</rdf:li>\n" +
+                "          <rdf:li>bibtex/pdf/YeKis03 - Towards.pdf</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:relation>\n" +
+                "      <dc:contributor>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>Huey Duck</rdf:li>\n" +
+                "          <rdf:li>Dewey Duck</rdf:li>\n" +
+                "          <rdf:li>Louie Duck</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:contributor>\n" +
+                "      <dc:subject>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>peanut</rdf:li>\n" +
+                "          <rdf:li>butter</rdf:li>\n" +
+                "          <rdf:li>jelly</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:subject>\n" +
+                "      <dc:title>\n" +
+                "        <rdf:Alt>\n" +
+                "          <rdf:li xml:lang=\"x-default\">Hypersonic ultra-sound</rdf:li>\n" +
+                "        </rdf:Alt>\n" +
+                "      </dc:title>\n" +
+                "      <dc:date>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>1982-07</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </dc:date>\n" +
+                "      <dc:format>application/pdf</dc:format>\n" +
+                "      <dc:type>\n" +
+                "        <rdf:Bag>\n" +
+                "          <rdf:li>InProceedings</rdf:li>\n" +
+                "        </rdf:Bag>\n" +
+                "      </dc:type>\n" +
+                "    </rdf:Description>\n" +
+                "    <rdf:Description xmlns:bibtex=\"http://jabref.sourceforge.net/bibteXMP/\" rdf:about=\"\">\n" +
+                "      <bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development ï¿½ open source software ï¿½ that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>\n" +
+                "      <bibtex:author>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Kelly Clarkson</rdf:li>\n" +
+                "          <rdf:li>Ozzy Osbourne</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </bibtex:author>\n" +
+                "      <bibtex:bibtexkey>Clarkson06</bibtex:bibtexkey>\n" +
+                "      <bibtex:booktitle>Catch-22</bibtex:booktitle>\n" +
+                "      <bibtex:editor>\n" +
+                "        <rdf:Seq>\n" +
+                "          <rdf:li>Huey Duck</rdf:li>\n" +
+                "          <rdf:li>Dewey Duck</rdf:li>\n" +
+                "          <rdf:li>Louie Duck</rdf:li>\n" +
+                "        </rdf:Seq>\n" +
+                "      </bibtex:editor>\n" +
+                "      <bibtex:journal>International Journal of High Fidelity</bibtex:journal>\n" +
+                "      <bibtex:keywords>peanut, butter, jelly</bibtex:keywords>\n" +
+                "      <bibtex:month>#jul#</bibtex:month>\n" +
+                "      <bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>\n" +
+                "      <bibtex:title>Hypersonic ultra-sound</bibtex:title>\n" +
+                "      <bibtex:year>1982</bibtex:year>\n" +
+                "      <bibtex:entrytype>inproceedings</bibtex:entrytype>\n" +
+                "    </rdf:Description>\n" +
+                "  </rdf:RDF>\n" +
+                "</x:xmpmeta><?xpacket end=\"w\"?>";
+        InputStream is = new ByteArrayInputStream(testData.getBytes(StandardCharsets.UTF_8));
+        DomXmpParser parser = new DomXmpParser();
+        XMPMetadata meta = parser.parse(is);
     }
 
 }
