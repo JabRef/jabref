@@ -29,10 +29,7 @@ public class AutoCompleteState {
     }
 
     public boolean continuesSuggestion(char newChar) {
-        if (!getSuggestedWord().startsWith(currentWord + newChar)) {
-            return false;
-        }
-        return true;
+        return !getSuggestedWord().startsWith(currentWord + newChar);
     }
 
     public void updateState(char newChar) {

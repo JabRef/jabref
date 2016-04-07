@@ -11,12 +11,12 @@ import org.junit.Test;
 
 public class AutoCompleterFactoryTest {
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = mock(JabRefPreferences.class);
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         Globals.prefs = null;
     }
 
