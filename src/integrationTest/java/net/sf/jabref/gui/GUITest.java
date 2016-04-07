@@ -76,6 +76,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         exitJabRef(mainFrame);
     }
 
+    @Ignore
     @Test
     public void testOpenAndSavePreferences() {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
