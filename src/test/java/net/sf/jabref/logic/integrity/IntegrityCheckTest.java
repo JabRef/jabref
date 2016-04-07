@@ -1,5 +1,9 @@
 package net.sf.jabref.logic.integrity;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 import net.sf.jabref.*;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -9,14 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -104,7 +100,7 @@ public class IntegrityCheckTest {
     @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
-        Mockito.when(metaData.getFileDirectory()).thenReturn(Collections.singletonList("."));
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
@@ -118,10 +114,10 @@ public class IntegrityCheckTest {
         File bibFile = testFolder.newFile("lit.bib");
         testFolder.newFile("file.pdf");
 
-        MetaData metaData = new MetaData();
-        metaData.setFile(bibFile);
+        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        databaseContext.setDatabaseFile(bibFile);
 
-        assertCorrect(createContext("file", ":file.pdf:PDF", metaData));
+        assertCorrect(databaseContext);
     }
 
     @Test

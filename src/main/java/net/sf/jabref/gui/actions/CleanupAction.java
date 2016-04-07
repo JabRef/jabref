@@ -15,6 +15,10 @@
  */
 package net.sf.jabref.gui.actions;
 
+import java.util.List;
+import java.util.Objects;
+import javax.swing.*;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -30,10 +34,6 @@ import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Objects;
 
 public class CleanupAction extends AbstractWorker {
 
@@ -160,8 +160,7 @@ public class CleanupAction extends AbstractWorker {
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
-        CleanupWorker cleaner = new CleanupWorker(
-                bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD), bibDatabaseContext,
+        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext.getFileDirectory(), bibDatabaseContext,
                 Globals.journalAbbreviationLoader.getRepository());
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 

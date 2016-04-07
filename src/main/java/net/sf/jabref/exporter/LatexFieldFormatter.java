@@ -15,14 +15,15 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
@@ -171,7 +172,7 @@ public class LatexFieldFormatter {
             }
         }
 
-        return parser.format(stringBuilder.toString(), fieldName);
+        return parser.format(stringBuilder, fieldName);
     }
 
     private boolean shouldResolveStrings(String fieldName) {

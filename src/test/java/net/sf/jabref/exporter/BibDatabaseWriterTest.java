@@ -126,7 +126,9 @@ public class BibDatabaseWriterTest {
                 new SavePreferences());
 
         assertEquals(Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE, stringWriter.toString());
+                "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+                + "@Comment{jabref-meta: databaseType:bibtex;}"
+                + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -139,7 +141,10 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE, stringWriter.toString());
+                "@Article{," + Globals.NEWLINE + "}"
+                + Globals.NEWLINE + Globals.NEWLINE
+                + "@Comment{jabref-meta: databaseType:bibtex;}"
+                + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -263,6 +268,8 @@ public class BibDatabaseWriterTest {
         assertEquals(
                 Globals.NEWLINE +
                         "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+                        + "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + Globals.NEWLINE + Globals.NEWLINE
                         + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
                 stringWriter.toString());
     }
@@ -295,7 +302,8 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
                 new SavePreferences());
 
-        assertEquals("presaved serialization", stringWriter.toString());
+        assertEquals("presaved serialization" + Globals.NEWLINE + "@Comment{jabref-meta: databaseType:bibtex;}"
+                + Globals.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -311,7 +319,10 @@ public class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry), preferences);
 
         assertEquals(Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}," + Globals.NEWLINE + "}" + Globals.NEWLINE,
+                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}," + Globals.NEWLINE + "}"
+                        + Globals.NEWLINE + Globals.NEWLINE
+                        + "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + Globals.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -481,6 +492,8 @@ public class BibDatabaseWriterTest {
                 "  author = {B}," + Globals.NEWLINE +
                 "  year   = {2000}," + Globals.NEWLINE +
                 "}" + Globals.NEWLINE + Globals.NEWLINE +
+                "@Comment{jabref-meta: databaseType:bibtex;}"
+                 + Globals.NEWLINE + Globals.NEWLINE +
                 "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
                 Globals.NEWLINE
                 , stringWriter.toString());
@@ -523,7 +536,10 @@ public class BibDatabaseWriterTest {
                         "@Article{," + Globals.NEWLINE +
                         "  author = {A}," + Globals.NEWLINE +
                         "  year   = {2000}," + Globals.NEWLINE +
-                        "}"  + Globals.NEWLINE
+                        "}"
+                        + Globals.NEWLINE + Globals.NEWLINE +
+                        "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + Globals.NEWLINE
                 , stringWriter.toString());
     }
 }

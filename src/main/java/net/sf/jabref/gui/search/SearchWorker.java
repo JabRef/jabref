@@ -1,22 +1,24 @@
 package net.sf.jabref.gui.search;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
  * Not reusable. Always create a new instance for each search!
  */
-class SearchWorker extends AbstractWorker {
+class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
 
@@ -26,9 +28,7 @@ class SearchWorker extends AbstractWorker {
     private final SearchQuery searchQuery;
     private final SearchMode mode;
 
-    private final List<BibEntry> matchedEntries = new LinkedList<>();
-
-    public SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchMode mode) {
+    SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchMode mode) {
         this.basePanel = Objects.requireNonNull(basePanel);
         this.database = Objects.requireNonNull(basePanel.getDatabase());
         this.searchQuery = Objects.requireNonNull(searchQuery);
@@ -36,23 +36,31 @@ class SearchWorker extends AbstractWorker {
         LOGGER.debug("Search (" + this.mode.getDisplayName() + "): " + this.searchQuery);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.Worker#run()
-     */
     @Override
-    public void run() {
+    protected List<BibEntry> doInBackground() throws Exception {
         // Search the current database
-        this.matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
+        List<BibEntry> matchedEntries = new LinkedList<>();
+        matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
+        return matchedEntries;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.AbstractWorker#update()
-     */
     @Override
-    public void update() {
+    protected void done() {
+        if (isCancelled()) {
+            return;
+        }
+
+        try {
+            updateUIWithSearchResult(get());
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("something went wrong during the search", e);
+        }
+    }
+
+    private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
 
         // check if still the current query
-        if(!basePanel.getSearchBar().isStillValidQuery(searchQuery)) {
+        if (!basePanel.getSearchBar().isStillValidQuery(searchQuery)) {
             // do not update - another search was already issued
             return;
         }
@@ -62,29 +70,26 @@ class SearchWorker extends AbstractWorker {
             entry.setSearchHit(false);
         }
 
-        for (BibEntry entry : this.matchedEntries) {
+        for (BibEntry entry : matchedEntries) {
             entry.setSearchHit(true);
         }
 
-        basePanel.stopShowingFloatSearch();
-        basePanel.getFilterSearchToggle().stop();
+        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         // Show the result in the chosen way:
         switch (mode) {
         case FLOAT:
-            basePanel.getFilterSearchToggle().stop();
-            basePanel.startShowingFloatSearch();
+            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
             break;
         case FILTER:
-            basePanel.stopShowingFloatSearch();
-            basePanel.getFilterSearchToggle().start();
+            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
             break;
         default:
             break;
         }
 
         // select first match (i.e., row) if there is any
-        int hits = this.matchedEntries.size();
+        int hits = matchedEntries.size();
         if ((hits > 0) && (basePanel.mainTable.getRowCount() > 0)) {
             basePanel.mainTable.setSelected(0);
         }

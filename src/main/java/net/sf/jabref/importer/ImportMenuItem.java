@@ -182,8 +182,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
             } else {
                 if (openInNew) {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
-                            Globals.prefs.getDefaultEncoding(), true);
+                    frame.addTab(bibtexResult.getDatabaseContext(), Globals.prefs.getDefaultEncoding(), true);
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {

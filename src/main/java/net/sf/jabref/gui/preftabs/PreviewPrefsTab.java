@@ -144,8 +144,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         testButton.addActionListener(e -> {
             PreviewPrefsTab.getTestEntry();
             try {
-                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                        layout1.getText());
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, layout1.getText());
                 testPanel.setPreferredSize(new Dimension(800, 350));
                 JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException ex) {
@@ -160,8 +159,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         testButton2.addActionListener(e -> {
             PreviewPrefsTab.getTestEntry();
             try {
-                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, new MetaData(),
-                        layout2.getText());
+                PreviewPanel testPanel = new PreviewPanel(null, PreviewPrefsTab.entry, null, layout2.getText());
                 testPanel.setPreferredSize(new Dimension(800, 350));
                 JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
                         JOptionPane.PLAIN_MESSAGE);

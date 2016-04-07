@@ -15,15 +15,12 @@
  */
 package net.sf.jabref.logic.util.strings;
 
-import net.sf.jabref.Globals;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
+import net.sf.jabref.Globals;
 
 public class StringUtil {
 
@@ -485,6 +482,36 @@ public class StringUtil {
             }
             if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
                 throw new NumberFormatException(str);
+            }
+        }
+    }
+
+    /**
+     * Optimized method for converting a String into an Integer
+     *
+     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     *
+     * @param str the String holding an Integer value
+     * @return the int value of str or null if not possible
+     */
+    public static Integer intValueOfWithNull(String str) {
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            return null;
+        }
+
+        int ival = 0;
+        for (;; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                return null;
             }
         }
     }

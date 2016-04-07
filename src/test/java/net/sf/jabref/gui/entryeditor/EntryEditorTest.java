@@ -24,13 +24,13 @@ public class EntryEditorTest {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField("author", "Brigitte Laurant");
         FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
+        EntryEditor editor = new EntryEditor(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
-        AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("author");
+        AutoCompleter<String> autoCompleter = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("author");
 
         List<String> result = autoCompleter.complete("Hans");
         Assert.assertEquals(Arrays.asList("Hans Meiser"), result);
@@ -45,13 +45,13 @@ public class EntryEditorTest {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField("journal", "Testtext");
         FieldEditor authorTextField = new TextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), bibEntry);
+        EntryEditor editor = new EntryEditor(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
-        AutoCompleter<String> autoCompleter = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("journal");
+        AutoCompleter<String> autoCompleter = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("journal");
 
         List<String> result = autoCompleter.complete("Ne");
         Assert.assertEquals(Arrays.asList("New Testtext"), result);

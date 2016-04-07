@@ -24,10 +24,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import net.sf.jabref.*;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
@@ -186,4 +187,7 @@ public class ParserResult {
         this.errorMessage = errorMessage;
     }
 
+    public BibDatabaseContext getDatabaseContext() {
+        return new BibDatabaseContext(base, metaData, file);
+    }
 }

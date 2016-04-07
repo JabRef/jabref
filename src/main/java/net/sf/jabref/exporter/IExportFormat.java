@@ -15,8 +15,7 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.MetaData;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.filechooser.FileFilter;
@@ -44,10 +43,7 @@ public interface IExportFormat {
     /**
      * Perform the export.
      *
-     * @param database
-     *            The database to export from.
-     * @param metaData
-     *            The database's metadata.
+     * @param databaseContext the database to export from.
      * @param file
      *            The filename to write to.
      * @param encoding
@@ -57,7 +53,7 @@ public interface IExportFormat {
      *            should be exported. If null, all entries will be exported.
      * @throws Exception
      */
-    void performExport(BibDatabase database, MetaData metaData, String file, Charset encoding, List<BibEntry> entries)
+    void performExport(BibDatabaseContext databaseContext, String file, Charset encoding, List<BibEntry> entries)
             throws Exception;
 
 }

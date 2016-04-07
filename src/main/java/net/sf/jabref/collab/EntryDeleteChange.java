@@ -54,8 +54,7 @@ class EntryDeleteChange extends Change {
 
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally);
 
-        PreviewPanel pp = new PreviewPanel(null, memEntry, null, new MetaData(),
-                Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        PreviewPanel pp = new PreviewPanel(null, memEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 

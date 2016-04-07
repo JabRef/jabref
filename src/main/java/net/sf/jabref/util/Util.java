@@ -20,6 +20,7 @@
 
 package net.sf.jabref.util;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -243,10 +244,10 @@ public class Util {
      * Shortcut method if links are set without using the GUI
      *
      * @param entries  the entries for which links should be set
-     * @param metaData the meta data for the BibDatabase for which links are set
+     * @param databaseContext the database for which links are set
      */
-    public static void autoSetLinks(Collection<BibEntry> entries, MetaData metaData) {
-        autoSetLinks(entries, null, null, null, metaData, null, null);
+    public static void autoSetLinks(Collection<BibEntry> entries, BibDatabaseContext databaseContext) {
+        autoSetLinks(entries, null, null, null, databaseContext, null, null);
     }
 
     /**
@@ -256,15 +257,15 @@ public class Util {
      * @param ce
      * @param changedEntries
      * @param singleTableModel
-     * @param metaData
+     * @param databaseContext
      * @param callback
      * @param diag
      * @return
      */
-    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         List<BibEntry> entries = new ArrayList<>(1);
         entries.add(entry);
-        return autoSetLinks(entries, ce, changedEntries, singleTableModel, metaData, callback, diag);
+        return autoSetLinks(entries, ce, changedEntries, singleTableModel, databaseContext, callback, diag);
     }
 
     /**
@@ -284,7 +285,7 @@ public class Util {
      *                         introduced as a bibtexentry does not (yet) support the function getListTableModel() and the
      *                         FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the
      *                         search has succeeded.
-     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
      *                         parameter can be null, which means that no callback will be notified.
@@ -292,7 +293,7 @@ public class Util {
      *                         parameter can be null, which means that no progress update will be shown.
      * @return the thread performing the automatically setting
      */
-    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.size() - 1);
@@ -313,7 +314,7 @@ public class Util {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = databaseContext.getFileDirectory();
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
@@ -430,7 +431,7 @@ public class Util {
      * @param entry            The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
      *                         removed.
-     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
      *                         parameter can be null, which means that no callback will be notified. The passed ActionEvent is
@@ -440,11 +441,11 @@ public class Util {
      *                         parameter can be null, which means that no progress update will be shown.
      * @return the runnable able to perform the automatically setting
      */
-    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return autoSetLinks(entries, null, null, singleTableModel, databaseContext, callback, diag);
     }
 
     /**

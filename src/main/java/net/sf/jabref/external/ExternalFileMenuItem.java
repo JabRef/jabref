@@ -43,28 +43,26 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
 
     private final BibEntry entry;
     private final String link;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private Optional<ExternalFileType> fileType;
     private final JabRefFrame frame;
     private String fieldName;
 
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
-            String link, Icon icon,
-            MetaData metaData,
-            Optional<ExternalFileType> fileType) {
+    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name, String link, Icon icon,
+            BibDatabaseContext databaseContext, Optional<ExternalFileType> fileType) {
         super(name, icon);
         this.frame = frame;
         this.entry = entry;
         this.link = link;
-        this.metaData = metaData;
+        this.databaseContext = databaseContext;
         this.fileType = fileType;
         addActionListener(this);
     }
 
-    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name,
-            String link, Icon icon, MetaData metaData, String fieldName) {
-        this(frame, entry, name, link, icon, metaData, Optional.empty());
+    public ExternalFileMenuItem(JabRefFrame frame, BibEntry entry, String name, String link, Icon icon,
+            BibDatabaseContext databaseContext, String fieldName) {
+        this(frame, entry, name, link, icon, databaseContext, Optional.empty());
         this.fieldName = fieldName;
     }
 
@@ -93,16 +91,16 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;
                 } else {
-                    JabRefDesktop.openExternalViewer(frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(databaseContext, link, fieldName);
                     return true;
                 }
             }
 
             if (type.isPresent() && (type.get() instanceof UnknownExternalFileType)) {
-                return JabRefDesktop.openExternalFileUnknown(frame, entry, metaData, link,
+                return JabRefDesktop.openExternalFileUnknown(frame, entry, databaseContext, link,
                         (UnknownExternalFileType) type.get());
             } else {
-                return JabRefDesktop.openExternalFileAnyFormat(metaData, link, type);
+                return JabRefDesktop.openExternalFileAnyFormat(databaseContext, link, type);
             }
 
         } catch (IOException e1) {

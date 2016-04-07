@@ -40,15 +40,15 @@ public class MetaData implements Iterable<String> {
     public static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    public static final String DATABASE_TYPE = "databaseType";
-    public static final String GROUPSVERSION = "groupsversion";
-    public static final String GROUPSTREE = "groupstree";
-    public static final String GROUPS = "groups";
+    private static final String DATABASE_TYPE = "databaseType";
+    private static final String GROUPSVERSION = "groupsversion";
+    private static final String GROUPSTREE = "groupstree";
+    private static final String GROUPS = "groups";
     private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
-    private File file; // The File where this base gets saved.
+
     private boolean groupTreeValid = true;
 
     private AbstractLabelPattern labelPattern;
@@ -179,82 +179,11 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
-     * Look up the directory set up for the given field type for this database.
-     * If no directory is set up, return that defined in global preferences.
-     * There can be up to three directory definitions for these files:
-     * the database's metadata can specify a general directory and/or a user-specific directory
-     * or the preferences can specify one.
-     * <p>
-     * The settings are prioritized in the following order and the first defined setting is used:
-     * 1. metadata user-specific directory
-     * 2. metadata general directory
-     * 3. preferences directory
-     * 4. bib file directory
-     *
-     * @param fieldName The field type
-     * @return The default directory for this field type.
-     */
-    public List<String> getFileDirectory(String fieldName) {
-        List<String> fileDirs = new ArrayList<>();
-
-        // 1. metadata user-specific directory
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
-        List<String> metaData = getData(key);
-        if (metaData == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
-            metaData = getData(key);
-        }
-
-        // 2. metadata general directory
-        if ((metaData != null) && !metaData.isEmpty()) {
-            String dir;
-            dir = metaData.get(0);
-            // If this directory is relative, we try to interpret it as relative to
-            // the file path of this bib file:
-            if (!new File(dir).isAbsolute() && (file != null)) {
-                String relDir;
-                if (".".equals(dir)) {
-                    // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = file.getParent();
-                } else {
-                    relDir = file.getParent() + File.separator + dir;
-                }
-                // If this directory actually exists, it is very likely that the
-                // user wants us to use it:
-                if (new File(relDir).exists()) {
-                    dir = relDir;
-                }
-            }
-            fileDirs.add(dir);
-        } else {
-            // 3. preferences directory?
-            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
-            if (dir != null) {
-                fileDirs.add(dir);
-            }
-        }
-
-        // 4. bib file directory
-        if (getFile() != null) {
-            String parentDir = getFile().getParent();
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                fileDirs.add(0, parentDir);
-            } else {
-                fileDirs.add(parentDir);
-            }
-        }
-
-        return fileDirs;
-    }
-
-    /**
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
      * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
-     * @return true if parsing was successful, false otherwise
      */
     private void putGroups(List<String> orderedData, BibDatabase db, int version) {
         try {
@@ -304,14 +233,6 @@ public class MetaData implements Iterable<String> {
             return res.toString();
         }
         return null;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 
     public DBStrings getDBStrings() {
@@ -514,6 +435,10 @@ public class MetaData implements Iterable<String> {
 
     public void setDefaultFileDirectory(String path) {
         putData(FILE_DIRECTORY, Collections.singletonList(path));
+    }
+
+    public void clearDefaultFileDirectory() {
+        remove(FILE_DIRECTORY);
     }
 
     public void setUserFileDirectory(String user, String path) {

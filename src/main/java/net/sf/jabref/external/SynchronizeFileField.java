@@ -24,9 +24,9 @@ import javax.swing.*;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -75,7 +75,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // Ask about rules for the operation:
         if (optDiag == null) {
-            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext().getMetaData());
+            optDiag = new SynchronizeFileField.OptionsDialog(panel.frame(), panel.getBibDatabaseContext());
         }
         optDiag.setLocationRelativeTo(panel.frame());
         optDiag.setVisible(true);
@@ -111,7 +111,7 @@ public class SynchronizeFileField extends AbstractWorker {
             Collection<BibEntry> entries = new ArrayList<>(sel);
 
             // Start the automatically setting process:
-            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext().getMetaData(), null, null);
+            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
         progress += sel.size() * weightAutoSet;
@@ -128,7 +128,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     tableModel.setContentDontGuessTypes(old);
 
                     // We need to specify which directories to search in for Util.expandFilename:
-                    List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+                    List<String> dirsS = panel.getBibDatabaseContext().getFileDirectory();
                     List<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -165,7 +165,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             case 1:
                                 // Assign new file.
                                 FileListEntryEditor flEditor = new FileListEntryEditor
-                                (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext().getMetaData());
+                                (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
                                 flEditor.setVisible(true, true);
                                 break;
                             case 2:
@@ -221,7 +221,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User wants to change the type of this link.
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
-                                        (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext().getMetaData());
+                                        (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
                                 editor.setVisible(true, false);
                             }
                         }
@@ -274,7 +274,7 @@ public class SynchronizeFileField extends AbstractWorker {
         private final JButton ok = new JButton(Localization.lang("OK"));
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private boolean canceled = true;
-        private final MetaData metaData;
+        private final BibDatabaseContext databaseContext;
         private final JRadioButton autoSetUnset = new JRadioButton(
                 Localization.lang("Automatically set file links") + ". "
                         + Localization.lang("Do not overwrite existing links."),
@@ -287,9 +287,9 @@ public class SynchronizeFileField extends AbstractWorker {
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
 
 
-        public OptionsDialog(JFrame parent, MetaData metaData) {
+        public OptionsDialog(JFrame parent, BibDatabaseContext databaseContext) {
             super(parent, Localization.lang("Synchronize file links"), true);
-            this.metaData = metaData;
+            this.databaseContext = databaseContext;
             ok.addActionListener(e -> {
                 canceled = false;
                 dispose();
@@ -357,7 +357,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 canceled = true;
             }
 
-            List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = databaseContext.getFileDirectory();
             if (dirs.isEmpty()) {
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

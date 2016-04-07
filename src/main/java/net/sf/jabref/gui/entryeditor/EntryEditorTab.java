@@ -143,8 +143,7 @@ class EntryEditorTab {
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
             if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.FILE_EDITOR)) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext().getMetaData(), field,
-                        null, parent);
+                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;
             } else {

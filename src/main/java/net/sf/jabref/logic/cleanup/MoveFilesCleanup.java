@@ -37,7 +37,7 @@ public class MoveFilesCleanup implements CleanupJob {
             return new ArrayList<>();
         }
 
-        List<String> paths = databaseContext.getMetaData().getFileDirectory();
+        List<String> paths = databaseContext.getFileDirectory();
         String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
         Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
         if(!targetDirectory.isPresent()) {

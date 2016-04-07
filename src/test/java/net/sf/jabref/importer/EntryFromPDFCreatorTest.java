@@ -41,7 +41,7 @@ public class EntryFromPDFCreatorTest {
         // Needed to initialize ExternalFileTypes
         entryCreator = new EntryFromPDFCreator();
         // Needed for PdfImporter - still not enough
-        JabRef.jrf = mock(JabRefFrame.class);
+        JabRef.mainFrame = mock(JabRefFrame.class);
     }
 
     @Test

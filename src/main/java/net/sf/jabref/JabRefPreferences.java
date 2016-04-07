@@ -316,7 +316,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
     public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
-    public static final String USER_FILE_DIR = "userFileDir";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
@@ -420,11 +419,6 @@ public class JabRefPreferences {
     // string to be formatted and possible formatter arguments.
     public String[] fileDirForDatabase;
 
-    // Similarly to the previous variable, this is a global that can be used during
-    // the export of a database if the database filename should be output. If a database
-    // is tied to a file on disk, this variable is set to that file before export starts:
-    public File databaseFile;
-
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
     // It is set before the export starts:
@@ -462,9 +456,6 @@ public class JabRefPreferences {
         defaults.put(BIBLATEX_DEFAULT_MODE, false);
 
         if (OS.OS_X) {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "/Applications/Preview.app");
-            //defaults.put(JabRefPreferences.PSVIEWER, "/Applications/Preview.app");
-            //defaults.put("htmlviewer", "/Applications/Safari.app");
             defaults.put(EMACS_PATH, "emacsclient");
             defaults.put(EMACS_23, true);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
@@ -472,9 +463,6 @@ public class JabRefPreferences {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
 
         } else if (OS.WINDOWS) {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "cmd.exe /c start /b");
-            //defaults.put(JabRefPreferences.PSVIEWER, "cmd.exe /c start /b");
-            //defaults.put("htmlviewer", "cmd.exe /c start /b");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
             defaults.put(EMACS_23, true);
@@ -482,17 +470,13 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "Arial");
 
         } else {
-            //defaults.put(JabRefPreferences.PDFVIEWER, "evince");
-            //defaults.put(JabRefPreferences.PSVIEWER, "gv");
-            //defaults.put("htmlviewer", "firefox");
+            // Linux
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(FONT_FAMILY, "SansSerif");
 
-            // linux
             defaults.put(EMACS_PATH, "gnuclient");
             defaults.put(EMACS_23, false);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
-
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
@@ -860,7 +844,6 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
         try {
             defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
             defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name

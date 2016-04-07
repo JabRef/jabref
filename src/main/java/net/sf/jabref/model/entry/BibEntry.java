@@ -24,16 +24,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -601,5 +592,9 @@ public class BibEntry {
 
     public List<String> getSeparatedKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
+    }
+
+    public Collection<String> getFieldValues() {
+        return fields.values();
     }
 }
