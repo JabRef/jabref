@@ -2,6 +2,7 @@ package net.sf.jabref.importer;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,6 +22,7 @@ public class ImportFormatReaderTest {
     private final int count;
     public final String format;
 
+
     public ImportFormatReaderTest(String resource, String format, int count) {
         this.resourceName = resource;
         this.format = format;
@@ -36,21 +38,29 @@ public class ImportFormatReaderTest {
 
     @Test
     public void testImportUnknownFormat() {
-        String risFileName = ImportFormatReaderTest.class.getResource(resourceName).getFile();
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(risFileName);
+        String fileName = ImportFormatReaderTest.class.getResource(resourceName).getFile();
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(fileName);
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
+    }
+
+    @Test
+    public void testImportFormatFromFile() throws IOException {
+        String fileName = ImportFormatReaderTest.class.getResource(resourceName).getFile();
+        OutputPrinter nullPrinter = new OutputPrinterToNull();
+        assertEquals(count, reader.importFromFile(format, fileName, nullPrinter).size());
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")
     public static Collection<Object[]> importFormats() {
         Collection<Object[]> result = new ArrayList<>();
-        result.add(new Object[] {"fileformat/RisImporterTest1.ris", "RIS", 1});
-        result.add(new Object[] {"fileformat/IsiImporterTest1.isi", "ISI", 1});
-        result.add(new Object[] {"fileformat/SilverPlatterImporterTest1.txt", "SilverPlatter", 1});
-        result.add(new Object[] {"fileformat/RepecNepImporterTest2.txt", "RepecNep", 1});
-        result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "Ovid", 1});
-        result.add(new Object[] {"fileformat/Endnote.entries.enw", "Endnote", 5});
-        result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "MsBib", 1});
+        result.add(new Object[] {"fileformat/RisImporterTest1.ris", "ris", 1});
+        result.add(new Object[] {"fileformat/IsiImporterTest1.isi", "isi", 1});
+        result.add(new Object[] {"fileformat/SilverPlatterImporterTest1.txt", "silverplatter", 1});
+        result.add(new Object[] {"fileformat/RepecNepImporterTest2.txt", "repecnep", 1});
+        result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "ovid", 1});
+        result.add(new Object[] {"fileformat/Endnote.entries.enw", "refer", 5});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "msbib", 1});
         return result;
     }
+
 }
