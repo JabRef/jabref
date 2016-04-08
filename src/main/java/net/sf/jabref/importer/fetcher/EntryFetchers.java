@@ -36,8 +36,6 @@ public class EntryFetchers {
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new ISBNtoBibTeXFetcher());
-        //entryFetchers.add(new JSTORFetcher()); // currently not working - why are there 2 different versions?
-        //entryFetchers.add(new JSTORFetcher2()); // see also https://github.com/koppor/jabref/issues/66
         entryFetchers.add(new MedlineFetcher());
         entryFetchers.add(new OAI2Fetcher());
         // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
