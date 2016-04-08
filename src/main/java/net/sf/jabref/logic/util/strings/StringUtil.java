@@ -649,7 +649,7 @@ public class StringUtil {
                         sb.append(", ");
                     }
                 }
-    
+
             } else {
                 String[] names = authors[i].split(" ");
                 if (names.length > 0) {
@@ -664,12 +664,11 @@ public class StringUtil {
                 sb.append(" and ");
             }
         }
-    
+
         return sb.toString().trim();
     }
 
-    public static String expandAll(String s) {
-        //System.out.println("'"+s+"'");
+    private static String expandAll(String s) {
         // Avoid arrayindexoutof.... :
         if (s.isEmpty()) {
             return s;
@@ -686,7 +685,17 @@ public class StringUtil {
             d = s.charAt(i);
             if (Character.isLetter(c) && Character.isUpperCase(c) &&
                     Character.isLetter(d) && Character.isUpperCase(d)) {
+                // AA -> A. A.
                 sb.append(c);
+                sb.append(". ");
+            } else if (Character.isLetter(c) && Character.isUpperCase(c) &&
+                    ('-' == d)) {
+                // A-A -> A.-A.
+                sb.append(c);
+                sb.append(".");
+            } else if ((c == '.') && Character.isLetter(d)
+                    && Character.isUpperCase(d)) {
+                // A.A. -> A. A.
                 sb.append(". ");
             } else {
                 sb.append(c);
