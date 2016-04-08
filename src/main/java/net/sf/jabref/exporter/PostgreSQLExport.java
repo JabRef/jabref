@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;

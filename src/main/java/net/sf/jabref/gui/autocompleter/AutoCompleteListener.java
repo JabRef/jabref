@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.gui.autocompleter;
 
-import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.BadLocationException;
 

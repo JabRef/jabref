@@ -61,7 +61,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
