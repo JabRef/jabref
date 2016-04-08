@@ -1,13 +1,11 @@
 package net.sf.jabref.logic.util.strings;
 
-import static org.junit.Assert.*;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.FileField;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class StringUtilTest {
 
@@ -290,6 +288,7 @@ public class StringUtilTest {
     public void testExpandAuthorInitialsAddDot() {
         assertEquals("O.", StringUtil.expandAuthorInitials("O"));
         assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO."));
         assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
         assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
         assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
@@ -313,6 +312,9 @@ public class StringUtilTest {
         assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
         assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
         assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
+        assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
+        assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
+        assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
     }
 
 }

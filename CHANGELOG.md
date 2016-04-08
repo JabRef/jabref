@@ -58,6 +58,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Move PDF file directory configuration from external tab to file tab in preferences
 
 ### Fixed
+- Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
 - Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup
 - Fixed [#845](https://github.com/JabRef/jabref/issues/845): Add checkboxes for highlighting in groups menu, fixes other toggle highlighting as well for all toggle buttons
