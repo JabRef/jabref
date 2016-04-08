@@ -28,6 +28,7 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -161,8 +162,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Else none of them were parseable, and we can fall back on comparing strings.
         }
 
-        String ours = f1.toLowerCase();
-        String theirs = f2.toLowerCase();
+        String ours = f1.toLowerCase(Locale.ENGLISH);
+        String theirs = f2.toLowerCase(Locale.ENGLISH);
         return COLLATOR.compare(ours, theirs) * multiplier;
     }
 
