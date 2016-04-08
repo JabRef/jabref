@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
@@ -73,7 +73,7 @@ public class MainTableColumn {
      */
     public boolean isNameColumn() {
         for (String field : bibtexFields) {
-            if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                 return true;
             }
         }

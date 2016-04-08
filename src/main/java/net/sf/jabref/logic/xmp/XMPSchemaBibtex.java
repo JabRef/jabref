@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.util.*;
 
 import net.sf.jabref.*;
-
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibDatabase;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -288,7 +289,7 @@ public class XMPSchemaBibtex extends XMPSchema {
             if (value == null) {
                 value = "";
             }
-            if ("author".equals(field) || "editor".equals(field)) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);
