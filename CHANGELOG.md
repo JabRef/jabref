@@ -37,8 +37,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 
 
-
-
 ## [3.3] - 2016-04-17
 
 ### Changed
