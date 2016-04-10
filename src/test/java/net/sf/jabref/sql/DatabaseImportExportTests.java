@@ -53,10 +53,40 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToMySQLSingleEntrySingleGroup() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntrySingleGroup();
+        DatabaseType databaseType = DatabaseType.MYSQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("mysql", "localhost", "root", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToPostgresSingleEntry() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
+        DatabaseType databaseType = DatabaseType.POSTGRESQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("postgresql", "localhost", "postgres", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
+    public void testExportToPostgresSingleEntrySingleGroup() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntrySingleGroup();
         DatabaseType databaseType = DatabaseType.POSTGRESQL;
 
         String databaseName = "jabref";
@@ -82,6 +112,8 @@ public class DatabaseImportExportTests {
             assertEquals(1, results.size());
             BibtexEntryAssert.assertEquals(databaseContext.getDatabase().getEntries(),
                     results.get(0).getDatabaseContext().getDatabase().getEntries());
+
+            assertEquals(databaseContext.getMetaData().getGroups(), results.get(0).getDatabaseContext().getMetaData().getGroups());
         }
     }
 
@@ -89,19 +121,7 @@ public class DatabaseImportExportTests {
     public void testExportToFileSingleEntry() throws Exception {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
         for (DatabaseType databaseType : DatabaseType.values()) {
-            DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
-
-            Path tempFile = Files.createTempFile("jabref", "database-export" + databaseType.getFormattedName());
-            exporter.exportDatabaseAsFile(databaseContext,
-                    databaseContext.getDatabase().getEntries(),
-                    tempFile.toAbsolutePath().toString(),
-                    StandardCharsets.UTF_8);
-
-            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry.sql");
-            assertEquals(
-                    String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
-                    String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
-            );
+            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry.sql", databaseType);
         }
     }
 
@@ -109,20 +129,24 @@ public class DatabaseImportExportTests {
     public void testExportToFileSingleEntrySingleGroup() throws Exception {
         BibDatabaseContext databaseContext = createContextWithSingleEntrySingleGroup();
         for (DatabaseType databaseType : DatabaseType.values()) {
-            DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
-
-            Path tempFile = Files.createTempFile("jabref", "database-export" + databaseType.getFormattedName());
-            exporter.exportDatabaseAsFile(databaseContext,
-                    databaseContext.getDatabase().getEntries(),
-                    tempFile.toAbsolutePath().toString(),
-                    StandardCharsets.UTF_8);
-
-            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group.sql");
-            assertEquals(
-                    String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
-                    String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
-            );
+            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group.sql", databaseType);
         }
+    }
+
+    private void testExportToFile(BibDatabaseContext databaseContext, String path, DatabaseType databaseType) throws Exception {
+        DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
+
+        Path tempFile = Files.createTempFile("jabref", "database-export" + databaseType.getFormattedName());
+        exporter.exportDatabaseAsFile(databaseContext,
+                databaseContext.getDatabase().getEntries(),
+                tempFile.toAbsolutePath().toString(),
+                StandardCharsets.UTF_8);
+
+        Path expectSqlFile = Paths.get(path);
+        assertEquals(
+                String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
+                String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
+        );
     }
 
     private BibDatabaseContext createContextWithSingleEntry() {
