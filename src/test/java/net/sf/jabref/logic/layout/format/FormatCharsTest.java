@@ -29,10 +29,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import net.sf.jabref.logic.formatter.bibtexfields.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 
-public class LatexToUnicodeFormatterTest {
+public class FormatCharsTest {
 
     @Test
     public void testPlainFormat() {
@@ -52,7 +53,7 @@ public class LatexToUnicodeFormatterTest {
 
     @Test
     public void testEquations() {
-        LayoutFormatter layout = new LatexToUnicodeFormatter();
+        LayoutFormatter layout = new FormatChars();
 
         assertEquals("$", layout.format("\\$"));
         assertEquals("σ", layout.format("$\\sigma$"));

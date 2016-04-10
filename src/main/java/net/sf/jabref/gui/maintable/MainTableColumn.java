@@ -2,8 +2,7 @@ package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -22,7 +21,7 @@ public class MainTableColumn {
 
     private final Optional<BibDatabase> database;
 
-    private final LayoutFormatter toUnicode = new LatexToUnicodeFormatter();
+    private final LatexToUnicodeFormatter toUnicode = new LatexToUnicodeFormatter();
 
     public MainTableColumn(String columnName) {
         this.columnName = columnName;
