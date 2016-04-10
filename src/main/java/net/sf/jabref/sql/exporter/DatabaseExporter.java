@@ -82,14 +82,14 @@ public class DatabaseExporter {
         List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(databaseContext, entriesToExport, savePrefs);
         GroupTreeNode gtn = databaseContext.getMetaData().getGroups();
 
-        final int database_id = DatabaseUtil.getDatabaseIDByName(databaseContext, out, dbName);
-        DatabaseUtil.removeAllRecordsForAGivenDB(out, database_id);
+        final int databaseID = DatabaseUtil.getDatabaseIDByName(databaseContext, out, dbName);
+        DatabaseUtil.removeAllRecordsForAGivenDB(out, databaseID);
         populateEntryTypesTable(out, databaseContext.getMode());
-        populateEntriesTable(database_id, entries, out);
-        populateStringTable(databaseContext.getDatabase(), out, database_id);
+        populateEntriesTable(databaseID, entries, out);
+        populateStringTable(databaseContext.getDatabase(), out, databaseID);
         populateGroupTypesTable(out);
-        populateGroupsTable(gtn, 0, 1, out, database_id);
-        populateEntryGroupsTable(gtn, 0, 1, out, database_id);
+        populateGroupsTable(gtn, 0, 1, out, databaseID);
+        populateEntryGroupsTable(gtn, 0, 1, out, databaseID);
     }
 
     /**

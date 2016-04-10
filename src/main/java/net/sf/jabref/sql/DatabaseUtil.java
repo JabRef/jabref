@@ -45,9 +45,8 @@ public class DatabaseUtil {
                     return getDatabaseIDByName(databaseContext, out, dbName);
                 }
             }
-        }
-        // in case of text export there will be only 1 bib exported
-        else {
+        } else {
+            // in case of text export there will be only 1 bib exported
             insertJabRefDatabase(databaseContext, out, dbName);
             return 1;
         }

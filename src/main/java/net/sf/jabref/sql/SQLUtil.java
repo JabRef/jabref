@@ -295,13 +295,12 @@ final public class SQLUtil {
      * @param qry  The DML statements to be executed
      */
     private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
-        try (Statement stmnt = conn.createStatement(); ResultSet resultSet = stmnt.executeQuery(qry)) {
-            SQLWarning warn = stmnt.getWarnings();
-            if (warn != null) {
-                LOGGER.warn(warn);
-            }
-            return stmnt;
+        Statement stmnt = conn.createStatement();
+        SQLWarning warn = stmnt.getWarnings();
+        if (warn != null) {
+            LOGGER.warn(warn);
         }
+        return stmnt;
     }
 
 }
