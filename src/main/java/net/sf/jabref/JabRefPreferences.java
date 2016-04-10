@@ -1274,6 +1274,17 @@ public class JabRefPreferences {
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_PRIOPT, number);
     }
 
+    public void purgeCustomEntryTypes() {
+        int number = 0;
+        if(getCustomEntryType(number) != null) {
+            number++;
+        }
+
+        for(int i = 0; i < number; i++) {
+            purgeCustomEntryTypes(i);
+        }
+    }
+
     /**
      * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
      *

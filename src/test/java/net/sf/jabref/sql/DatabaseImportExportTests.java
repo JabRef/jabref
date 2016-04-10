@@ -3,28 +3,21 @@ package net.sf.jabref.sql;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
-import net.sf.jabref.sql.DatabaseType;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.sql.importer.DatabaseImporter;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,6 +26,8 @@ public class DatabaseImportExportTests {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
+        Globals.prefs.purgeCustomEntryTypes();
+        CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
     }
 
     @Test
