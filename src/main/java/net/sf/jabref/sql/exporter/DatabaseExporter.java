@@ -393,7 +393,7 @@ public class DatabaseExporter {
      *
      * @param out The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void createTables(Object out) throws SQLException {
+    public void createTables(Object out) throws SQLException {
         for(Database.Table table : Database.Table.values()) {
             SQLUtil.processQuery(out, database.getCreateTableSQL(table));
         }

@@ -51,6 +51,7 @@ public class DatabaseImportExportTests {
 
         DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
         try (Connection connection = exporter.connectToDB(strings)) {
+            exporter.createTables(connection);
             exporter.performExport(databaseContext,
                     databaseContext.getDatabase().getEntries(),
                     connection, databaseName);
