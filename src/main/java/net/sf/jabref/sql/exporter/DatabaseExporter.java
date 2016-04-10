@@ -162,29 +162,34 @@ public class DatabaseExporter {
                         + '\'' + parentID + "' AND label=" + '\'' + grp.getName() + "')" + ");");
             }
         }
-        // recurse on child nodes (depth-first traversal)
-        try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
-                "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
-                        + database_id + "' AND parent_id='" + parentID + "';")) {
-            // setting values to ID and myID to be used in case of textual SQL
-            // export
-            ++currentID;
-            int myID = currentID;
-            if (response instanceof Statement) {
-                try (ResultSet rs = ((Statement) response).getResultSet()) {
-                    rs.next();
-                    myID = rs.getInt("groups_id");
-                } finally {
-                    ((Statement) response).close();
+
+        if(out instanceof Connection) {
+
+            // recurse on child nodes (depth-first traversal)
+            try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
+                    "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
+                            + database_id + "' AND parent_id='" + parentID + "';")) {
+                // setting values to ID and myID to be used in case of textual SQL
+                // export
+                ++currentID;
+                int myID = currentID;
+                if (response instanceof Statement) {
+                    try (ResultSet rs = ((Statement) response).getResultSet()) {
+                        rs.next();
+                        myID = rs.getInt("groups_id");
+                    } finally {
+                        ((Statement) response).close();
+                    }
                 }
+
+                for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+                    currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+                }
+                //Unfortunatley, AutoCloseable throws only Exception
+            } catch (Exception e) {
+                LOGGER.warn("Cannot close resource", e);
             }
 
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
-                currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
-            }
-            //Unfortunatley, AutoCloseable throws only Exception
-        } catch (Exception e) {
-            LOGGER.warn("Cannot close resource", e);
         }
         return currentID;
     }
@@ -289,28 +294,33 @@ public class DatabaseExporter {
                 + (caseSens != null ? '\'' + caseSens + '\'' : "NULL") + ", "
                 + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '" + database_id
                 + "');");
-        // recurse on child nodes (depth-first traversal)
-        try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
-                "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
-                        + database_id + "' AND parent_id='" + parentID + "';")) {
-            // setting values to ID and myID to be used in case of textual SQL
-            // export
-            int myID = currentID;
-            if (response instanceof Statement) {
-                try (ResultSet rs = ((Statement) response).getResultSet()) {
-                    rs.next();
-                    myID = rs.getInt("groups_id");
-                } finally {
-                    ((Statement) response).close();
+
+        if(out instanceof Connection) {
+
+            // recurse on child nodes (depth-first traversal)
+            try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
+                    "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
+                            + database_id + "' AND parent_id='" + parentID + "';")) {
+                // setting values to ID and myID to be used in case of textual SQL
+                // export
+                int myID = currentID;
+                if (response instanceof Statement) {
+                    try (ResultSet rs = ((Statement) response).getResultSet()) {
+                        rs.next();
+                        myID = rs.getInt("groups_id");
+                    } finally {
+                        ((Statement) response).close();
+                    }
                 }
+                for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+                    ++currentID;
+                    currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+                }
+                //Unfortunatley, AutoCloseable throws only Exception
+            } catch (Exception e) {
+                LOGGER.warn("Cannot close resource", e);
             }
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
-                ++currentID;
-                currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
-            }
-            //Unfortunatley, AutoCloseable throws only Exception
-        } catch (Exception e) {
-            LOGGER.warn("Cannot close resource", e);
+
         }
         return currentID;
     }

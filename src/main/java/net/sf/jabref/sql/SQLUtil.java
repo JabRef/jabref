@@ -225,7 +225,14 @@ final public class SQLUtil {
      * @return the result of the statement
      */
     public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
-        return null;
+        if(out instanceof Connection) {
+            return processQueryWithResults((Connection) out, query);
+        } else if(out instanceof PrintStream) {
+            return processQueryWithResults((PrintStream) out, query);
+        } else {
+            LOGGER.error("Cannot process the query " + query + " on the given output");
+            return null;
+        }
     }
 
     public static AutoCloseable processQueryWithResults(Connection out, String query) throws SQLException {
