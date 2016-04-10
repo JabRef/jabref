@@ -68,7 +68,7 @@ public class SidePaneManager {
     }
 
     public synchronized boolean hasComponent(String name) {
-        return components.get(name) != null;
+        return components.containsKey(name);
     }
 
     public synchronized boolean isComponentVisible(String name) {

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -1026,7 +1026,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param _command The name of the command to run.
      */
     public void runCommand(final String _command) {
-        if (actions.get(_command) == null) {
+        if (!actions.containsKey(_command)) {
             LOGGER.info("No action defined for '" + _command + '\'');
             return;
         }
@@ -1448,7 +1448,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null) && this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT;
+        boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -2346,7 +2346,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             } else {
                 result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
             }
-            if (result.get(entry) != null) {
+            if (result.containsKey(entry)) {
                 final List<File> res = result.get(entry);
                 if (!res.isEmpty()) {
                     final String filepath = res.get(0).getPath();

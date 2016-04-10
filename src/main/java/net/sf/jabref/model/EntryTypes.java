@@ -75,7 +75,7 @@ public class EntryTypes {
             if (!ALL_TYPES.get(toLowerCase).equals(STANDARD_TYPES.get(toLowerCase))) {
                 ALL_TYPES.remove(toLowerCase);
 
-                if (STANDARD_TYPES.get(toLowerCase) != null) {
+                if (STANDARD_TYPES.containsKey(toLowerCase)) {
                     // In this case the user has removed a customized version
                     // of a standard type. We reinstate the standard type.
                     addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));

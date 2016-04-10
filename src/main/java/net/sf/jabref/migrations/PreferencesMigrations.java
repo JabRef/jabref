@@ -69,7 +69,7 @@ public class PreferencesMigrations {
         encodingMap.put("Big5_HKSCS", "Big5-HKSCS");
         encodingMap.put("EUC_JP", "EUC-JP");
 
-        if (encodingMap.get(defaultEncoding) != null) {
+        if (encodingMap.containsKey(defaultEncoding)) {
             prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }

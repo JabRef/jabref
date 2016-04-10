@@ -431,11 +431,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public String getNumCitationMarker(List<Integer> number, int minGroupingCount, boolean inList) {
         String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
-        if (inList && (citProperties.get(BRACKET_BEFORE_IN_LIST) != null)) {
+        if (inList && (citProperties.containsKey(BRACKET_BEFORE_IN_LIST))) {
             bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
         }
         String bracketAfter = getStringCitProperty(BRACKET_AFTER);
-        if (inList && (citProperties.get(BRACKET_AFTER_IN_LIST) != null)) {
+        if (inList && (citProperties.containsKey(BRACKET_AFTER_IN_LIST))) {
             bracketAfter = getStringCitProperty(BRACKET_AFTER_IN_LIST);
         }
         // Sort the numbers:
