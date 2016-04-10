@@ -127,6 +127,7 @@ public class DatabaseImportExportTests {
 
     private BibDatabaseContext createContextWithSingleEntry() {
         BibEntry entry = new BibEntry("id1");
+        entry.setCiteKey("einstein");
         entry.setType("article");
         entry.setField("author", "Albert Einstein");
         entry.setField("title", "Die grundlage der allgemeinen relativitätstheorie}");
