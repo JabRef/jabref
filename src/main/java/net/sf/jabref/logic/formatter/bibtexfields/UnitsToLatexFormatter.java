@@ -139,7 +139,7 @@ public class UnitsToLatexFormatter implements Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Converts units in %s to LaTeX code.");
+        return Localization.lang("Converts units to LaTeX formatting.");
     }
 
     @Override
