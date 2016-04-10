@@ -5,6 +5,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class NormalizeNamesFormatterTest {
     private NormalizeNamesFormatter formatter;
 
@@ -16,12 +19,6 @@ public class NormalizeNamesFormatterTest {
     @After
     public void tearDown() {
         formatter = null;
-    }
-
-    @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
     }
 
     @Test

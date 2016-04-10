@@ -9,6 +9,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class UnicodeConverterTest {
 
     private final UnicodeToLatexFormatter conv = new UnicodeToLatexFormatter();
@@ -22,12 +25,6 @@ public class UnicodeConverterTest {
     public void testBasic() {
         assertEquals("aaa", conv.format("aaa"));
     }
-
-    @Test
-    public void testEmpty() {
-        assertEquals("", conv.format(""));
-    }
-
 
     @Test
     public void testUnicodeCombiningAccents() {
@@ -44,16 +41,6 @@ public class UnicodeConverterTest {
     @Test
     public void testUnicodeSingle() {
         assertEquals("a", conv.format("a"));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testUnicodeNull() {
-        conv.format(null);
-    }
-
-    @Test
-    public void testUnicodeEmpty() {
-        assertEquals("", conv.format(""));
     }
 
 }

@@ -7,6 +7,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class OrdinalsToSuperscriptFormatterTest {
     private OrdinalsToSuperscriptFormatter formatter;
 
@@ -21,23 +24,12 @@ public class OrdinalsToSuperscriptFormatterTest {
     }
 
     @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
-    }
-
-    @Test
     public void replacesSuperscript() {
         expectCorrect("1st", "1\\textsuperscript{st}");
         expectCorrect("2nd", "2\\textsuperscript{nd}");
         expectCorrect("3rd", "3\\textsuperscript{rd}");
         expectCorrect("4th", "4\\textsuperscript{th}");
         expectCorrect("21th", "21\\textsuperscript{th}");
-    }
-
-    @Test
-    public void replaceSuperscriptsEmptyFields() {
-        expectCorrect("", "");
     }
 
     @Test

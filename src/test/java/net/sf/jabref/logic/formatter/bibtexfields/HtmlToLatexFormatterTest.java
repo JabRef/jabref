@@ -7,6 +7,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class HtmlToLatexFormatterTest {
 
     private HtmlToLatexFormatter htmlToLatexFormatter;
@@ -35,11 +38,6 @@ public class HtmlToLatexFormatterTest {
     @Test
     public void testBasic() {
         assertEquals("aaa", htmlToLatexFormatter.format("aaa"));
-    }
-
-    @Test
-    public void testHTMLEmpty() {
-        assertEquals("", htmlToLatexFormatter.format(""));
     }
 
     @Test

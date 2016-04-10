@@ -3,11 +3,13 @@ package net.sf.jabref.logic.formatter;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class CaseChangersTest {
 
     @Test
     public void testChangeCaseLower() {
-        Assert.assertEquals("", CaseChangers.TO_LOWER_CASE.format(""));
         Assert.assertEquals("lower", CaseChangers.TO_LOWER_CASE.format("LOWER"));
         Assert.assertEquals("lower {UPPER}", CaseChangers.TO_LOWER_CASE.format("LOWER {UPPER}"));
         Assert.assertEquals("lower {U}pper", CaseChangers.TO_LOWER_CASE.format("LOWER {U}PPER"));
@@ -15,7 +17,6 @@ public class CaseChangersTest {
 
     @Test
     public void testChangeCaseUpper() {
-        Assert.assertEquals("", CaseChangers.TO_UPPER_CASE.format(""));
         Assert.assertEquals("LOWER", CaseChangers.TO_UPPER_CASE.format("LOWER"));
         Assert.assertEquals("UPPER", CaseChangers.TO_UPPER_CASE.format("upper"));
         Assert.assertEquals("UPPER", CaseChangers.TO_UPPER_CASE.format("UPPER"));
@@ -25,7 +26,6 @@ public class CaseChangersTest {
 
     @Test
     public void testChangeCaseUpperFirst() {
-        Assert.assertEquals("", CaseChangers.TO_SENTENCE_CASE.format(""));
         Assert.assertEquals("Upper first", CaseChangers.TO_SENTENCE_CASE.format("upper First"));
         Assert.assertEquals("Upper first", CaseChangers.TO_SENTENCE_CASE.format("uPPER FIRST"));
         Assert.assertEquals("Upper {NOT} first", CaseChangers.TO_SENTENCE_CASE.format("upper {NOT} FIRST"));
@@ -34,7 +34,6 @@ public class CaseChangersTest {
 
     @Test
     public void testChangeCaseUpperEachFirst() {
-        Assert.assertEquals("", CaseChangers.CAPITALIZE.format(""));
         Assert.assertEquals("Upper Each First", CaseChangers.CAPITALIZE.format("upper each First"));
         Assert.assertEquals("Upper Each First {NOT} {this}", CaseChangers.CAPITALIZE.format("upper each first {NOT} {this}"));
         Assert.assertEquals("Upper Each First {N}ot {t}his", CaseChangers.CAPITALIZE.format("upper each first {N}OT {t}his"));
@@ -42,7 +41,6 @@ public class CaseChangersTest {
 
     @Test
     public void testChangeCaseTitle() {
-        Assert.assertEquals("", CaseChangers.TO_TITLE_CASE.format(""));
         Assert.assertEquals("Upper Each First", CaseChangers.TO_TITLE_CASE.format("upper each first"));
         Assert.assertEquals("An Upper Each First And", CaseChangers.TO_TITLE_CASE.format("an upper each first and"));
         Assert.assertEquals("An Upper Each of the and First And", CaseChangers.TO_TITLE_CASE.format("an upper each of the and first and"));
