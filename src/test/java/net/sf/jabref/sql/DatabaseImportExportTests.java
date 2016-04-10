@@ -49,6 +49,25 @@ public class DatabaseImportExportTests {
         strings.setPassword("");
         strings.setDbPreferences(new DBStringsPreferences("mysql", "localhost", "root", "jabref"));
 
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
+    public void testExportToPostgresSingleEntry() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntry();
+        DatabaseType databaseType = DatabaseType.POSTGRESQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("postgresql", "localhost", "postgres", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings) throws Exception {
         DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
         try (Connection connection = exporter.connectToDB(strings)) {
             exporter.createTables(connection);
