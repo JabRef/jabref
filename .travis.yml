@@ -3,6 +3,10 @@ jdk:
   - oraclejdk8
 sudo: false
 
+services:
+  - postgresql
+  - mysql
+
 before_install:
   - chmod +x gradlew
 
