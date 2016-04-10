@@ -48,7 +48,7 @@ public class DatabaseImportExportTests {
                     tempFile.toAbsolutePath().toString(),
                     StandardCharsets.UTF_8);
 
-            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry-" + databaseType.getFormattedName() + ".sql");
+            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry.sql");
             assertEquals(
                     String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
                     String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
@@ -69,7 +69,7 @@ public class DatabaseImportExportTests {
                     tempFile.toAbsolutePath().toString(),
                     StandardCharsets.UTF_8);
 
-            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group-" + databaseType.getFormattedName() + ".sql");
+            Path expectSqlFile = Paths.get("src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group.sql");
             assertEquals(
                     String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
                     String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
