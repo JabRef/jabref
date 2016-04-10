@@ -75,7 +75,7 @@ public class DatabaseExporter {
      * @param entriesToExport The list of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
+    public void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
             Object out, String dbName) throws Exception {
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
