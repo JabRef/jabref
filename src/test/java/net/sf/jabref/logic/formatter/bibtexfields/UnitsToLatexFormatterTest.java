@@ -5,13 +5,18 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class UnitsToLatexFormatterTest {
+
+    private final UnitsToLatexFormatter formatter = new UnitsToLatexFormatter();
+
+
     @Test
     public void test() {
-        UnitsToLatexFormatter uf = new UnitsToLatexFormatter();
-
-        assertEquals("1~{A}", uf.format("1 A"));
-        assertEquals("1\\mbox{-}{mA}", uf.format("1-mA"));
+        assertEquals("1~{A}", formatter.format("1 A"));
+        assertEquals("1\\mbox{-}{mA}", formatter.format("1-mA"));
     }
 
 }

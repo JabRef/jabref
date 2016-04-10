@@ -1,28 +1,14 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class NormalizeNamesFormatterTest {
-    private NormalizeNamesFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new NormalizeNamesFormatter();
-    }
-
-    @After
-    public void tearDown() {
-        formatter = null;
-    }
-
-    @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
-    }
+    private final NormalizeNamesFormatter formatter = new NormalizeNamesFormatter();
 
     @Test
     public void testNormalizeAuthorList() {
