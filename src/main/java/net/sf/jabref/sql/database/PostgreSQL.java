@@ -117,10 +117,10 @@ public class PostgreSQL implements Database {
         Connection conn = connect(url,
                 dbStrings.getDbPreferences().getUsername(), dbStrings.getPassword());
 
-        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn,
-                "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDbPreferences().getDatabase()
-                        + '\'');
-                ResultSet rs = statement.getResultSet()) {
+        String query = "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDbPreferences().getDatabase()
+                + '\'';
+        try (Statement statement = (Statement) conn.createStatement();
+             ResultSet rs = statement.executeQuery(query)) {
 
             rs.next();
             if (rs.getInt("alreadyThere") == 0) {

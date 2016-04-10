@@ -166,21 +166,16 @@ public class DatabaseExporter {
         if(out instanceof Connection) {
 
             // recurse on child nodes (depth-first traversal)
-            try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
-                    "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
-                            + database_id + "' AND parent_id='" + parentID + "';")) {
+            String query = "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
+                    + database_id + "' AND parent_id='" + parentID + "';";
+            try (Statement statement = ((Connection) out).createStatement();
+                ResultSet resultSet = statement.executeQuery(query)) {
                 // setting values to ID and myID to be used in case of textual SQL
                 // export
                 ++currentID;
                 int myID = currentID;
-                if (response instanceof Statement) {
-                    try (ResultSet rs = ((Statement) response).getResultSet()) {
-                        rs.next();
-                        myID = rs.getInt("groups_id");
-                    } finally {
-                        ((Statement) response).close();
-                    }
-                }
+                resultSet.next();
+                myID = resultSet.getInt("groups_id");
 
                 for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
                     currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
@@ -206,8 +201,8 @@ public class DatabaseExporter {
 
         List<String> existentTypes = new ArrayList<>();
         if (out instanceof Connection) {
-            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out, "SELECT label FROM entry_types");
-                    ResultSet rs = sm.getResultSet()) {
+            try (Statement sm = (Statement) ((Connection) out).createStatement();
+                    ResultSet rs = sm.executeQuery("SELECT label FROM entry_types")) {
                 while (rs.next()) {
                     existentTypes.add(rs.getString(1));
                 }
@@ -298,20 +293,15 @@ public class DatabaseExporter {
         if(out instanceof Connection) {
 
             // recurse on child nodes (depth-first traversal)
-            try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
+            try (Statement statement = ((Connection) out).createStatement();
+                 ResultSet rs = statement.executeQuery(
                     "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
                             + database_id + "' AND parent_id='" + parentID + "';")) {
                 // setting values to ID and myID to be used in case of textual SQL
                 // export
                 int myID = currentID;
-                if (response instanceof Statement) {
-                    try (ResultSet rs = ((Statement) response).getResultSet()) {
-                        rs.next();
-                        myID = rs.getInt("groups_id");
-                    } finally {
-                        ((Statement) response).close();
-                    }
-                }
+                rs.next();
+                myID = rs.getInt("groups_id");
                 for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
                     ++currentID;
                     currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
@@ -334,8 +324,8 @@ public class DatabaseExporter {
     private static void populateGroupTypesTable(Object out) throws SQLException {
         int quantity = 0;
         if (out instanceof Connection) {
-            try (Statement sm = (Statement) SQLUtil.processQueryWithResults(out,
-                    "SELECT COUNT(*) AS amount FROM group_types"); ResultSet res = sm.getResultSet()) {
+            try (Statement sm = ((Connection) out).createStatement();
+                    ResultSet res = sm.executeQuery("SELECT COUNT(*) AS amount FROM group_types")) {
                 res.next();
                 quantity = res.getInt("amount");
             }
@@ -500,8 +490,8 @@ public class DatabaseExporter {
 
     private Vector<Vector<String>> createExistentDBNamesMatrix(DBStrings databaseStrings) throws Exception {
         try (Connection conn = this.connectToDB(databaseStrings);
-                Statement statement = SQLUtil.queryAllFromTable(conn, "jabref_database");
-                ResultSet rs = statement.getResultSet()) {
+                Statement statement = conn.createStatement();
+                ResultSet rs = statement.executeQuery(SQLUtil.queryAllFromTable( "jabref_database"))) {
 
             Vector<String> v;
             Vector<Vector<String>> matrix = new Vector<>();

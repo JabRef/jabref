@@ -35,9 +35,9 @@ public class DatabaseUtil {
      */
     public static int getDatabaseIDByName(BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
         if (out instanceof Connection) {
-            try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
-                    "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
-                    ResultSet rs = response.getResultSet()) {
+            String query = "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';";
+            try (Statement statement = (Statement) ((Connection) out).createStatement();
+                 ResultSet rs = statement.executeQuery(query)) {
                 if (rs.next()) {
                     return rs.getInt("database_id");
                 } else {

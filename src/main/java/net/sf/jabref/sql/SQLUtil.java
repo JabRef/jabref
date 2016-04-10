@@ -176,9 +176,8 @@ final public class SQLUtil {
      * @return a ResultSet with the query result returned from the DB
      * @throws SQLException
      */
-    public static Statement queryAllFromTable(Connection conn, String tableName) throws SQLException {
-        String query = "SELECT * FROM " + tableName + ';';
-        return (Statement) SQLUtil.processQueryWithResults(conn, query);
+    public static String queryAllFromTable(String tableName) throws SQLException {
+        return "SELECT * FROM " + tableName + ';';
     }
 
     /**
@@ -218,33 +217,6 @@ final public class SQLUtil {
     }
 
     /**
-     * Utility method for processing DML with proper output
-     *
-     * @param out   The output (PrintStream or Connection) object to which the DML should be sent
-     * @param query The DML statements to be processed
-     * @return the result of the statement
-     */
-    public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
-        if(out instanceof Connection) {
-            return processQueryWithResults((Connection) out, query);
-        } else if(out instanceof PrintStream) {
-            return processQueryWithResults((PrintStream) out, query);
-        } else {
-            LOGGER.error("Cannot process the query " + query + " on the given output");
-            return null;
-        }
-    }
-
-    public static AutoCloseable processQueryWithResults(Connection out, String query) throws SQLException {
-        return SQLUtil.executeQueryWithResults(out, query);
-    }
-
-    public static AutoCloseable processQueryWithResults(PrintStream out, String query) throws SQLException {
-        out.println(query);
-        return out;
-    }
-
-    /**
      * This routine returns the JDBC url corresponding to the DBStrings input.
      *
      * @param dbStrings The DBStrings to use to make the connection
@@ -266,7 +238,7 @@ final public class SQLUtil {
      * @throws SQLException
      */
     public static String processQueryWithSingleResult(Connection conn, String query) throws SQLException {
-        try (Statement sm = SQLUtil.executeQueryWithResults(conn, query); ResultSet rs = sm.getResultSet()) {
+        try (Statement sm = conn.createStatement(); ResultSet rs = sm.executeQuery(query)) {
             rs.next();
             return rs.getString(1);
         }
@@ -286,21 +258,6 @@ final public class SQLUtil {
                 LOGGER.warn(warn);
             }
         }
-    }
-
-    /**
-     * Utility method for executing DML
-     *
-     * @param conn The DML Connection object that will execute the SQL
-     * @param qry  The DML statements to be executed
-     */
-    private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
-        Statement stmnt = conn.createStatement();
-        SQLWarning warn = stmnt.getWarnings();
-        if (warn != null) {
-            LOGGER.warn(warn);
-        }
-        return stmnt;
     }
 
 }

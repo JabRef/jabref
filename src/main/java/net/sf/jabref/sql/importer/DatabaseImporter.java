@@ -74,8 +74,9 @@ public class DatabaseImporter {
      * @throws SQLException
      */
     private List<String> readColumnNames(Connection conn) throws SQLException {
-        try (Statement statement = (Statement) SQLUtil.processQueryWithResults(conn, database.getReadColumnNamesQuery());
-                ResultSet rsColumns = statement.getResultSet()) {
+        String query = database.getReadColumnNamesQuery();
+        try (Statement statement = (Statement) conn.createStatement();
+             ResultSet rsColumns = statement.executeQuery(query)) {
             List<String> colNames = new ArrayList<>();
             while (rsColumns.next()) {
                 colNames.add(rsColumns.getString(1));
@@ -106,15 +107,16 @@ public class DatabaseImporter {
             }
             jabrefDBsb.deleteCharAt(jabrefDBsb.length() - 1).append(')');
 
-            try (Statement statement = SQLUtil.queryAllFromTable(conn,
+            String query = SQLUtil.queryAllFromTable(
                     "jabref_database WHERE database_name IN " + jabrefDBsb.toString());
-                    ResultSet rsDatabase = statement.getResultSet()) {
+            try (Statement statement = conn.createStatement();
+                 ResultSet rsDatabase = statement.executeQuery(query)) {
                 while (rsDatabase.next()) {
                     BibDatabase database = new BibDatabase();
                     // Find entry type IDs and their mappings to type names:
                     HashMap<String, EntryType> types = new HashMap<>();
-                    try (Statement entryTypes = SQLUtil.queryAllFromTable(conn, "entry_types");
-                            ResultSet rsEntryType = entryTypes.getResultSet()) {
+                    try (Statement entryTypes = conn.createStatement();
+                            ResultSet rsEntryType = entryTypes.executeQuery(SQLUtil.queryAllFromTable("entry_types"))) {
                         while (rsEntryType.next()) {
                             Optional<EntryType> entryType = EntryTypes.getType(rsEntryType.getString("label"), mode);
                             if (entryType.isPresent()) {
@@ -128,9 +130,9 @@ public class DatabaseImporter {
                     final String database_id = rsDatabase.getString("database_id");
                     // Read the entries and create BibEntry instances:
                     HashMap<String, BibEntry> entries = new HashMap<>();
-                    try (Statement entryStatement = SQLUtil.queryAllFromTable(conn,
-                            "entries WHERE database_id= '" + database_id + "';");
-                            ResultSet rsEntries = entryStatement.getResultSet()) {
+                    try (Statement entryStatement = conn.createStatement();
+                            ResultSet rsEntries = entryStatement.executeQuery(SQLUtil.queryAllFromTable(
+                                    "entries WHERE database_id= '" + database_id + "';"))) {
                         while (rsEntries.next()) {
                             String id = rsEntries.getString("entries_id");
                             BibEntry entry = new BibEntry(IdGenerator.next(), types.get(rsEntries.getString("entry_types_id")).getName());
@@ -148,9 +150,9 @@ public class DatabaseImporter {
                         }
                     }
                     // Import strings and preamble:
-                    try (Statement stringStatement = SQLUtil.queryAllFromTable(conn,
-                            "strings WHERE database_id='" + database_id + '\'');
-                            ResultSet rsStrings = stringStatement.getResultSet()) {
+                    try (Statement stringStatement = conn.createStatement();
+                            ResultSet rsStrings = stringStatement.executeQuery(SQLUtil.queryAllFromTable(
+                                    "strings WHERE database_id='" + database_id + '\''))) {
                         while (rsStrings.next()) {
                             String label = rsStrings.getString("label");
                             String content = rsStrings.getString("content");
@@ -193,9 +195,9 @@ public class DatabaseImporter {
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
         GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
 
-        try (Statement statement = SQLUtil.queryAllFromTable(conn,
-                "groups WHERE database_id='" + database_id + "' ORDER BY groups_id");
-                ResultSet rsGroups = statement.getResultSet()) {
+        String query = SQLUtil.queryAllFromTable("groups WHERE database_id='" + database_id + "' ORDER BY groups_id");
+        try (Statement statement = conn.createStatement();
+             ResultSet rsGroups = statement.executeQuery(query)) {
             while (rsGroups.next()) {
                 AbstractGroup group = null;
                 String typeId = findGroupTypeName(rsGroups.getString("group_types_id"), conn);
@@ -239,8 +241,8 @@ public class DatabaseImporter {
                     }
                 }
 
-                try (Statement entryGroup = SQLUtil.queryAllFromTable(conn, "entry_group");
-                        ResultSet rsEntryGroup = entryGroup.getResultSet()) {
+                try (Statement entryGroup = conn.createStatement();
+                        ResultSet rsEntryGroup = entryGroup.executeQuery(SQLUtil.queryAllFromTable("entry_group"))) {
                     while (rsEntryGroup.next()) {
                         String entryId = rsEntryGroup.getString("entries_id");
                         String groupId = rsEntryGroup.getString("groups_id");
