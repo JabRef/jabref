@@ -146,7 +146,7 @@ public class EntryTypes {
 
     public static void removeAllCustomEntryTypes() {
         for(BibDatabaseMode type : BibDatabaseMode.values()) {
-            for(String typeName : getAllTypes(type)) {
+            for(String typeName : new HashSet<>(getAllTypes(type))) {
                 getType(typeName, type).ifPresent(entryType -> {
                     if (entryType instanceof CustomEntryType) {
                         removeType(typeName, type);

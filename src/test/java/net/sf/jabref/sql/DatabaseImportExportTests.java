@@ -61,7 +61,8 @@ public class DatabaseImportExportTests {
         try (Connection connection = importer.connectToDB(strings)) {
             List<DBImporterResult> results = importer.performImport(strings, Collections.singletonList(databaseName), databaseContext.getMode());
             assertEquals(1, results.size());
-            BibtexEntryAssert.assertEquals(databaseContext.getDatabase().getEntries(), results.get(0).getDatabaseContext().getDatabase().getEntries());
+            BibtexEntryAssert.assertEquals(databaseContext.getDatabase().getEntries(),
+                    results.get(0).getDatabaseContext().getDatabase().getEntries());
         }
     }
 
