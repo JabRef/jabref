@@ -136,6 +136,11 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         return Localization.lang("Converts HTML code to LaTeX code.");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "<strong>JabRef</strong>";
+    }
+
     private int readTag(String text, int position) {
         // Have just read the < character that starts the tag.
         int index = text.indexOf('>', position);

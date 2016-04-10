@@ -20,4 +20,9 @@ public class UnicodeToLatexFormatterTest {
     public void formatMultipleUnicodeCharacters() {
         assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("\u00E5\u00E4\u00F6"));
     }
+
+    @Test
+    public void formatExample() {
+        assertEquals("M{\\\"{o}}nch", formatter.format(formatter.getExampleInput()));
+    }
 }

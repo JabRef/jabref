@@ -57,4 +57,8 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("A 32\u00A0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
+    @Test
+    public void formatExample() {
+        assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
+    }
 }

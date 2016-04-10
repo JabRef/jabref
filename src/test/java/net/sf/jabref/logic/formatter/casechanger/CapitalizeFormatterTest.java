@@ -17,4 +17,9 @@ public class CapitalizeFormatterTest {
         Assert.assertEquals("Upper Each First {N}ot {t}his", formatter.format("upper each first {N}OT {t}his"));
     }
 
+    @Test
+    public void formatExample() {
+        Assert.assertEquals("I Have {a} Dream", formatter.format(formatter.getExampleInput()));
+    }
+
 }

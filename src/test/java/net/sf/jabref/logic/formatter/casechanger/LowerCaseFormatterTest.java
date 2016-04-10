@@ -17,4 +17,9 @@ public class LowerCaseFormatterTest {
         Assert.assertEquals("lower {U}pper", formatter.format("LOWER {U}PPER"));
     }
 
+    @Test
+    public void formatExample() {
+        Assert.assertEquals("kde {Amarok}", formatter.format(formatter.getExampleInput()));
+    }
+
 }

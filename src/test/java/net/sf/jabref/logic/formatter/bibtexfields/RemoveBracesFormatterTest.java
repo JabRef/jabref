@@ -63,4 +63,10 @@ public class RemoveBracesFormatterTest {
         // We opt here for a conservative approach although one could argue that "A} and {B}" is also a valid return
         assertEquals("{A} and {B}}", formatter.format("{A} and {B}}"));
     }
+
+    @Test
+    public void formatExample() {
+        assertEquals("In CDMA", formatter.format(formatter.getExampleInput()));
+    }
+
 }

@@ -45,6 +45,11 @@ public class MinifyNameListFormatter implements Formatter {
         return Localization.lang("Shortens lists of persons if there are more than 2 persons to \"et al.\".");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "Stefan Kolb and Simon Harrer and Oliver Kopp";
+    }
+
     private String abbreviateAuthor(String authorField) {
         // single author
         String authorSeparator = " and ";

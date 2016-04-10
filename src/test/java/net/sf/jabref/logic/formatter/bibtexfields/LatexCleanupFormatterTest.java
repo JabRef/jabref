@@ -13,13 +13,16 @@ public class LatexCleanupFormatterTest {
 
     @Test
     public void test() {
-
         assertEquals("$\\alpha\\beta$", formatter.format("$\\alpha$$\\beta$"));
         assertEquals("{VLSI DSP}", formatter.format("{VLSI} {DSP}"));
         assertEquals("\\textbf{VLSI} {DSP}", formatter.format("\\textbf{VLSI} {DSP}"));
-
         assertEquals("A ${\\Delta\\Sigma}$ modulator for {FPGA DSP}",
                 formatter.format("A ${\\Delta}$${\\Sigma}$ modulator for {FPGA} {DSP}"));
+    }
+
+    @Test
+    public void formatExample() {
+        assertEquals("{VLSI DSP}", formatter.format(formatter.getExampleInput()));
     }
 
 

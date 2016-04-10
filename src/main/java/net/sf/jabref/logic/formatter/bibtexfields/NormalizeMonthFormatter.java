@@ -33,4 +33,10 @@ public class NormalizeMonthFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Normalize month to BibTeX standard abbreviation.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "December";
+    }
+
 }

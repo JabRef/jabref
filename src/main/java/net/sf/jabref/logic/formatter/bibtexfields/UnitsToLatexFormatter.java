@@ -143,6 +143,11 @@ public class UnitsToLatexFormatter implements Formatter {
     }
 
     @Override
+    public String getExampleInput() {
+        return "1 Hz";
+    }
+
+    @Override
     public String getName() {
         return Localization.lang("Units to LaTeX");
     }

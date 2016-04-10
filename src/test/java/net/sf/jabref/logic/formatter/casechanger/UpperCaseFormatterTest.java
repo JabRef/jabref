@@ -20,4 +20,8 @@ public class UpperCaseFormatterTest {
         Assert.assertEquals("UPPER {l}OWER", formatter.format("upper {l}ower"));
     }
 
+    @Test
+    public void formatExample() {
+        Assert.assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
+    }
 }

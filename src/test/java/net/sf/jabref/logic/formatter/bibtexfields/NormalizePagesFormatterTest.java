@@ -51,6 +51,11 @@ public class NormalizePagesFormatterTest {
         expectCorrect("12", "12");
     }
 
+    @Test
+    public void formatExample() {
+        expectCorrect(formatter.getExampleInput(), "1--2");
+    }
+
     private void expectCorrect(String input, String expected) {
         Assert.assertEquals(expected, formatter.format(input));
     }
