@@ -10,14 +10,14 @@ import org.junit.Test;
  */
 public class ProtectTermsFormatterTest {
 
+    private final ProtectTermsFormatter formatter = new ProtectTermsFormatter();
+
     @Test
     public void test() {
-        ProtectTermsFormatter ck = new ProtectTermsFormatter();
-
-        assertEquals("{VLSI}", ck.format("VLSI"));
-        assertEquals("{VLSI}", ck.format("{VLSI}"));
-        assertEquals("VLsI", ck.format("VLsI"));
-        assertEquals("{VLSI} {VLSI}", ck.format("VLSI {VLSI}"));
+        assertEquals("{VLSI}", formatter.format("VLSI"));
+        assertEquals("{VLSI}", formatter.format("{VLSI}"));
+        assertEquals("VLsI", formatter.format("VLsI"));
+        assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
     }
 
 }

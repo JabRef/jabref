@@ -1,19 +1,14 @@
 package net.sf.jabref.logic.formatter.minifier;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
  */
 public class MinifyNameListFormatterTest {
-    private MinifyNameListFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new MinifyNameListFormatter();
-    }
+    private final MinifyNameListFormatter formatter = new MinifyNameListFormatter();
 
     @Test
     public void minifyAuthorNames() {

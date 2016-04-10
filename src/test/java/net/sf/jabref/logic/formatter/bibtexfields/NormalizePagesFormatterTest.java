@@ -2,19 +2,14 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
  */
 public class NormalizePagesFormatterTest {
-    private NormalizePagesFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new NormalizePagesFormatter();
-    }
+    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
 
     @Test
     public void formatSinglePageResultsInNoChange() {

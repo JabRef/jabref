@@ -9,13 +9,15 @@ import static org.junit.Assert.*;
  */
 public class UnicodeToLatexFormatterTest {
 
+    private final UnicodeToLatexFormatter formatter = new UnicodeToLatexFormatter();
+
     @Test
     public void formatWithoutUnicodeCharactersReturnsSameString() {
-        assertEquals("abc", new UnicodeToLatexFormatter().format("abc"));
+        assertEquals("abc", formatter.format("abc"));
     }
 
     @Test
     public void formatMultipleUnicodeCharacters() {
-        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", new UnicodeToLatexFormatter().format("\u00E5\u00E4\u00F6"));
+        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("\u00E5\u00E4\u00F6"));
     }
 }
