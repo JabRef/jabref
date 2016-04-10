@@ -21,7 +21,7 @@ public class PostgreSQL implements Database {
             throws IllegalAccessException, InstantiationException, ClassNotFoundException, SQLException {
         loadDriver();
 
-        return DriverManager.getConnection(url, username, password);
+        return DriverManager.getConnection(url + "/", username, password);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class PostgreSQL implements Database {
 
         String url = SQLUtil.createJDBCurl(dbStrings, false);
 
-        Connection conn = connect(url,
+        Connection conn = connect(url + "/",
                 dbStrings.getDbPreferences().getUsername(), dbStrings.getPassword());
 
         String query = "SELECT count(*) AS alreadyThere FROM pg_database WHERE datname='" + dbStrings.getDbPreferences().getDatabase()
