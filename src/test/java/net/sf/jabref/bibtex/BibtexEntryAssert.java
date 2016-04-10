@@ -68,6 +68,19 @@ public class BibtexEntryAssert {
         assertEquals(shouldBeInputStream, asIsEntries.get(0));
     }
 
+    public static void assertEquals(List<BibEntry> expectedEntries, InputStream asIsInputStream)
+            throws UnsupportedEncodingException, IOException {
+        Assert.assertNotNull(asIsInputStream);
+        Assert.assertNotNull(expectedEntries);
+
+        try (Reader reader = new InputStreamReader(asIsInputStream, StandardCharsets.UTF_8)) {
+            BibtexParser parser = new BibtexParser(reader);
+            ParserResult result = parser.parse();
+
+            assertEquals(expectedEntries, result.getDatabase().getEntries());
+        }
+    }
+
     /**
      * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
      * compared to the given entry

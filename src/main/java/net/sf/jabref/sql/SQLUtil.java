@@ -188,7 +188,13 @@ final public class SQLUtil {
      * @param dml The DML statements to be processed
      */
     public static void processQuery(Object out, String dml) throws SQLException {
-        LOGGER.error("Cannot process the query " + dml + " on the given output");
+        if(out instanceof Connection) {
+            processQuery((Connection) out, dml);
+        } else if(out instanceof PrintStream) {
+            processQuery((PrintStream) out, dml);
+        } else {
+            LOGGER.error("Cannot process the query " + dml + " on the given output");
+        }
     }
 
     /**

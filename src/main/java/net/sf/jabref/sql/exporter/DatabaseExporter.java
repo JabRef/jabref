@@ -145,6 +145,12 @@ public class DatabaseExporter {
 
     private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
             final int database_id) throws SQLException {
+
+        if(cursor == null) {
+            // no groups passed
+            return -1;
+        }
+
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
             ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
@@ -245,6 +251,11 @@ public class DatabaseExporter {
      */
     private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
             final int database_id) throws SQLException {
+
+        if(cursor == null) {
+            // no groups passed
+            return -1;
+        }
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null;
