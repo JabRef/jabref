@@ -33,7 +33,6 @@ import com.jgoodies.looks.Options;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -157,7 +156,7 @@ public class FieldContentSelector extends JComponent {
         manage.addActionListener(e -> {
             ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, metaData,
                     editor.getFieldName());
-            PositionWindow.placeDialog(csd, frame);
+            csd.setLocationRelativeTo(frame);
 
             // Calling setVisible(true) will open the modal dialog and block
             // for the dialog to close.

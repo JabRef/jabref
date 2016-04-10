@@ -29,6 +29,7 @@ import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ParserResult;
 
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.bibtex.BibEntryWriter;
@@ -594,9 +595,9 @@ public class XMPUtil {
                  * Bibtex-Fields used: editor
                  */
 
-                AuthorList list = AuthorList.getAuthorList(authors);
+                AuthorList list = AuthorList.parse(authors);
 
-                for (AuthorList.Author author : list.getAuthorList()) {
+                for (Author author : list.getAuthors()) {
                     dcSchema.addContributor(author.getFirstLast(false));
                 }
                 continue;
@@ -626,11 +627,10 @@ public class XMPUtil {
              */
             if ("author".equals(field)) {
                 String authors = resolvedEntry.getField(field);
-                AuthorList list = AuthorList.getAuthorList(authors);
+                AuthorList list = AuthorList.parse(authors);
 
-                int n = list.size();
-                for (int i = 0; i < n; i++) {
-                    dcSchema.addCreator(list.getAuthor(i).getFirstLast(false));
+                for (Author author : list.getAuthors()) {
+                    dcSchema.addCreator(author.getFirstLast(false));
                 }
                 continue;
             }

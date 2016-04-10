@@ -260,7 +260,7 @@ public class SidePaneManager {
         sidep.setComponents(visible);
         if (visible.isEmpty()) {
             if (sidep.isVisible()) {
-                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.getSplitPane().getDividerLocation());
             }
             sidep.setVisible(false);
         } else {
@@ -269,9 +269,9 @@ public class SidePaneManager {
             if (!wasVisible) {
                 int width = Globals.prefs.getInt(JabRefPreferences.SIDE_PANE_WIDTH);
                 if (width > 0) {
-                    frame.contentPane.setDividerLocation(width);
+                    frame.getSplitPane().setDividerLocation(width);
                 } else {
-                    frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                    frame.getSplitPane().setDividerLocation(getPanel().getPreferredSize().width);
                 }
             }
         }

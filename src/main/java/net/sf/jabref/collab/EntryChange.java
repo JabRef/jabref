@@ -150,9 +150,17 @@ class EntryChange extends Change {
 
         @Override
         public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-            entry.setField(field, onDisk);
+            if (onDisk == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, onDisk);
+            }
             undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
-            tmpEntry.setField(field, onDisk);
+            if (onDisk == null) {
+                tmpEntry.clearField(field);
+            } else {
+                tmpEntry.setField(field, onDisk);
+            }
             return true;
         }
 

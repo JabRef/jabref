@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -54,7 +55,7 @@ public final class EntryFromFileCreatorManager {
         entryCreators = new ArrayList<>(10);
         entryCreators.add(new EntryFromPDFCreator());
 
-        // add a creator for each ExternalFileType if there is no specialised
+        // add a creator for each ExternalFileType if there is no specialized
         // creator existing.
         Collection<ExternalFileType> fileTypes = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
@@ -68,7 +69,8 @@ public final class EntryFromFileCreatorManager {
     private boolean hasSpecialisedCreatorForExternalFileType(
             ExternalFileType externalFileType) {
         for (EntryFromFileCreator entryCreator : entryCreators) {
-            if ((entryCreator.getExternalFileType() == null) || (entryCreator.getExternalFileType().getExtension() == null)) {
+            if ((entryCreator.getExternalFileType() == null)
+                    || (entryCreator.getExternalFileType().getExtension().isEmpty())) {
                 continue;
             }
             if (entryCreator.getExternalFileType().getExtension().equals(
@@ -99,12 +101,12 @@ public final class EntryFromFileCreatorManager {
     }
 
     /**
-     * Trys to add a entry for each file in the List.
+     * Tries to add a entry for each file in the List.
      *
      * @param files
      * @param database
      * @param entryType
-     * @return List of unexcpected import event messages including failures.
+     * @return List of unexpected import event messages including failures.
      */
     public List<String> addEntrysFromFiles(List<File> files,
             BibDatabase database, EntryType entryType,
@@ -140,34 +142,31 @@ public final class EntryFromFileCreatorManager {
             if (creator == null) {
                 importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
             } else {
-                BibEntry entry = creator.createEntry(f,
-                        generateKeywordsFromPathToFile);
-                if (entry == null) {
-                    importGUIMessages.add("Problem importing " + f.getPath()
-                    + ": Entry could not be created.");
+                Optional<BibEntry> entry = creator.createEntry(f, generateKeywordsFromPathToFile);
+                if (!entry.isPresent()) {
+                    importGUIMessages.add("Problem importing " + f.getPath() + ": Entry could not be created.");
                     continue;
                 }
                 if (entryType != null) {
-                    entry.setType(entryType);
+                    entry.get().setType(entryType);
                 }
-                if (entry.getId() == null) {
-                    entry.setId(IdGenerator.next());
+                if (entry.get().getId() == null) {
+                    entry.get().setId(IdGenerator.next());
                 }
                 /*
                  * TODO: database.insertEntry(BibEntry) is not sensible. Why
                  * does 'true' mean "There were duplicates", while 'false' means
                  * "Everything alright"?
                  */
-                if (!database.containsEntryWithId(entry.getId())) {
+                if (!database.containsEntryWithId(entry.get().getId())) {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
-                    if (database.insertEntry(entry)) {
-                        importGUIMessages.add("Problem importing " + f.getPath()
-                        + ": Insert into BibDatabase failed.");
+                    if (database.insertEntry(entry.get())) {
+                        importGUIMessages.add("Problem importing " + f.getPath() + ": Insert into BibDatabase failed.");
                     } else {
                         count++;
                         if (panel != null) {
-                            ce.addEdit(new UndoableInsertEntry(database, entry, panel));
+                            ce.addEdit(new UndoableInsertEntry(database, entry.get(), panel));
                         }
                     }
                 }
@@ -178,9 +177,7 @@ public final class EntryFromFileCreatorManager {
             }
         }
 
-        System.out.println("count = " + count);
         if ((count > 0) && (panel != null)) {
-            System.out.println("adding edit");
             ce.end();
             panel.undoManager.addEdit(ce);
         }

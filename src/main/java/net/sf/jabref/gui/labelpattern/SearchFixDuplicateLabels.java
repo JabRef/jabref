@@ -50,7 +50,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         dupes = new HashMap<>();
 
         HashMap<String, BibEntry> foundKeys = new HashMap<>();
-        BibDatabase db = panel.database();
+        BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
             // Only handle keys that are actually set:
@@ -87,15 +87,15 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
     @Override
     public void update() {
         List<BibEntry> toGenerateFor = new ArrayList<>();
-        for (String key : dupes.keySet()) {
-            ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel, key, dupes.get(key));
+        for (Map.Entry<String, List<BibEntry>> dupeEntry : dupes.entrySet()) {
+            ResolveDuplicateLabelDialog rdld = new ResolveDuplicateLabelDialog(panel, dupeEntry.getKey(), dupeEntry.getValue());
             rdld.show();
             if (rdld.isOkPressed()) {
                 List<JCheckBox> cbs = rdld.getCheckBoxes();
                 for (int i = 0; i < cbs.size(); i++) {
                     if (cbs.get(i).isSelected()) {
                         // The checkbox for entry i has been selected, so we should generate a new key for it:
-                        toGenerateFor.add(dupes.get(key).get(i));
+                        toGenerateFor.add(dupeEntry.getValue().get(i));
                     }
                 }
             }
@@ -103,11 +103,11 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
         // Do the actual generation:
         if (!toGenerateFor.isEmpty()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate keys"));
+            NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();
-                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.database(), entry);
-                ce.addEdit(new UndoableKeyChange(panel.database(), entry, oldKey, entry.getCiteKey()));
+                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
             }
             ce.end();
             panel.undoManager.addEdit(ce);

@@ -1,4 +1,5 @@
-- [ ] Change in CHANGELOG.md described?
-- [ ] Changes in pull request outlined? (What, why, ...)
-- [ ] Tests created for changes?
-- [ ] Tests green?
+<describe the changes you have made here: what, why, ...>
+
+- [ ] Change in CHANGELOG.md described
+- [ ] Tests created for changes
+- [ ] Screenshots added (for bigger UI changes)

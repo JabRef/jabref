@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -35,7 +36,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
@@ -77,7 +77,8 @@ public class DatabasePropertiesDialog extends JDialog {
     private JRadioButton saveInOriginalOrder;
     private JRadioButton saveInSpecifiedOrder;
 
-    private final JCheckBox protect = new JCheckBox(Localization.lang("Refuse to save the database before external changes have been reviewed."));
+    private final JCheckBox protect = new JCheckBox(
+            Localization.lang("Refuse to save the database before external changes have been reviewed."));
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
 
@@ -106,9 +107,9 @@ public class DatabasePropertiesDialog extends JDialog {
         browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
 
         setupSortOrderConfiguration();
-
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, left:pref, 4dlu, pref:grow",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 140dlu, pref,"));
+        FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 160dlu, pref,");
+        FormBuilder builder = FormBuilder.create().layout(form);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         builder.add(Localization.lang("Database encoding")).xy(1, 1);
@@ -142,6 +143,7 @@ public class DatabasePropertiesDialog extends JDialog {
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
+        bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -218,14 +220,11 @@ public class DatabasePropertiesDialog extends JDialog {
         }
         saveOrderPanel.setEnabled(selected);
 
-        List<String> fileD = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
-        if (fileD == null) {
-            fileDir.setText("");
+        Optional<String> fileD = metaData.getDefaultFileDirectory();
+        if (fileD.isPresent()) {
+            fileDir.setText(fileD.get().trim());
         } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (!(fileD.isEmpty())) {
-                fileDir.setText((fileD.get(0)).trim());
-            }
+            fileDir.setText("");
         }
 
         List<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
@@ -274,9 +273,9 @@ public class DatabasePropertiesDialog extends JDialog {
 
         String text = fileDir.getText().trim();
         if (text.isEmpty()) {
-            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR));
+            metaData.clearDefaultFileDirectory();
         } else {
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR), Arrays.asList(text));
+            metaData.setDefaultFileDirectory(text);
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
         text = fileDirIndv.getText().trim();
@@ -326,8 +325,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         boolean changed = saveOrderConfigChanged || !newEncoding.equals(oldEncoding)
-                || !oldFileVal.equals(fileDir.getText())
-                || !oldFileIndvVal.equals(fileDirIndv.getText())
+                || !oldFileVal.equals(fileDir.getText()) || !oldFileIndvVal.equals(fileDirIndv.getText())
                 || (oldProtectVal != protect.isSelected()) || saveActionsChanged;
         // ... if so, mark base changed. Prevent the Undo button from removing
         // change marking:

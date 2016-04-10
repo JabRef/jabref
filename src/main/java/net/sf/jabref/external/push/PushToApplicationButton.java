@@ -188,16 +188,10 @@ public class PushToApplicationButton implements ActionListener {
     }
 
 
-    public static void showSettingsDialog(Object parent, PushToApplication toApp, JPanel options) {
+    public static void showSettingsDialog(JFrame parent, PushToApplication toApp, JPanel options) {
 
         final BooleanHolder okPressed = new BooleanHolder(false);
-        JDialog dg;
-        if (parent instanceof JDialog) {
-            dg = new JDialog((JDialog) parent, Localization.lang("Settings"), true);
-        } else {
-            dg = new JDialog((JFrame) parent, Localization.lang("Settings"), true);
-        }
-        final JDialog diag = dg;
+        final JDialog diag = new JDialog(parent, Localization.lang("Settings"), true);
         options.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         diag.getContentPane().add(options, BorderLayout.CENTER);
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -227,11 +221,8 @@ public class PushToApplicationButton implements ActionListener {
             }
         });
         diag.pack();
-        if (parent instanceof JDialog) {
-            diag.setLocationRelativeTo((JDialog) parent);
-        } else {
-            diag.setLocationRelativeTo((JFrame) parent);
-        }
+        diag.setLocationRelativeTo(parent);
+
         // Show the dialog:
         diag.setVisible(true);
         // If the user pressed Ok, ask the PushToApplication implementation

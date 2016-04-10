@@ -194,42 +194,35 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private Map<String, JLabel> getCitations(String query) throws IOException {
         String urlQuery;
         LinkedHashMap<String, JLabel> res = new LinkedHashMap<>();
-        try {
-            urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER,
-                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            int count = 1;
-            String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null)
-                    && (count < 2)) {
-                urlQuery = nextPage;
-                count++;
-                if (stopFetching) {
-                    break;
-                }
+
+        urlQuery = GoogleScholarFetcher.SEARCH_URL.replace(GoogleScholarFetcher.QUERY_MARKER,
+                URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
+        int count = 1;
+        String nextPage;
+        while (((nextPage = getCitationsFromUrl(urlQuery, res)) != null) && (count < 2)) {
+            urlQuery = nextPage;
+            count++;
+            if (stopFetching) {
+                break;
             }
-            return res;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
+        return res;
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
         URL url = new URL(urlQuery);
         String cont = new URLDownload(url).downloadToString();
-        //save("query.html", cont);
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
+
         while (m.find()) {
             String link = m.group(1).replace("&amp;", "&");
             String pText;
-            //System.out.println("regionStart: "+m.start());
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = GoogleScholarFetcher.TITLE_START_PATTERN.matcher(part);
             Matcher titleE = GoogleScholarFetcher.TITLE_END_PATTERN.matcher(part);
             boolean fS = titleS.find();
             boolean fE = titleE.find();
-            //System.out.println("fs = "+fS+", fE = "+fE);
-            //System.out.println(titleS.end()+" : "+titleE.start());
             if (fS && fE) {
                 if (titleS.end() < titleE.start()) {
                     pText = part.substring(titleS.end(), titleE.start());

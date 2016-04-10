@@ -25,6 +25,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -86,10 +87,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return null;
+            return Collections.emptyList();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return null;
+            return Collections.emptyList();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -105,7 +106,7 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IOException e) {
             status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return null;
+            return Collections.emptyList();
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
@@ -213,7 +214,7 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.jrf.getCurrentBasePanel().database(), e);
+                    LabelPatternUtil.makeLabel(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.mainFrame.getCurrentBasePanel().getDatabase(), e);
 
                     res.add(e);
                 }
@@ -222,7 +223,7 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return null;
+            return Collections.emptyList();
         }
 
         return res;

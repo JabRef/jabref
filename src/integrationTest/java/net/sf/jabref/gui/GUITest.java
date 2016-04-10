@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import net.sf.jabref.JabRefMain;
+import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
@@ -17,7 +18,6 @@ import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 public class GUITest extends AssertJSwingJUnitTestCase {
-
     private AWTExceptionHandler awtExceptionHandler;
 
     @Override
@@ -64,12 +64,14 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         newDatabase(mainFrame);
 
         mainFrame.menuItemWithPath("BibTeX", "New entry...").click();
-        findDialog(EntryTypeDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+        findDialog(EntryTypeDialog.class).withTimeout(10_000).using(robot())
+                .button(new GenericTypeMatcher<JButton>(JButton.class) {
 
-            @Override protected boolean isMatching(@Nonnull JButton jButton) {
-                return "Book".equals(jButton.getText());
-            }
-        }).click();
+                    @Override
+                    protected boolean isMatching(@Nonnull JButton jButton) {
+                        return "Book".equals(jButton.getText());
+                    }
+                }).click();
 
         exitJabRef(mainFrame);
     }
@@ -82,12 +84,14 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
         robot().waitForIdle();
 
-        findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+        findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot())
+                .button(new GenericTypeMatcher<JButton>(JButton.class) {
 
-            @Override protected boolean isMatching(@Nonnull JButton jButton) {
-                return "OK".equals(jButton.getText());
-            }
-        }).click();
+                    @Override
+                    protected boolean isMatching(@Nonnull JButton jButton) {
+                        return "OK".equals(jButton.getText());
+                    }
+                }).click();
 
         exitJabRef(mainFrame);
     }
@@ -112,4 +116,25 @@ public class GUITest extends AssertJSwingJUnitTestCase {
         exitJabRef(mainFrame);
     }
 
+    @Test
+    public void testDatabasePropertiesDialog() {
+
+        FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
+        newDatabase(mainFrame);
+
+        mainFrame.menuItemWithPath("File", "Database properties").click();
+
+        robot().waitForIdle();
+
+        findDialog(DatabasePropertiesDialog.class).withTimeout(10_000).using(robot())
+                .button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+                    @Override
+                    protected boolean isMatching(@Nonnull JButton jButton) {
+                        return "OK".equals(jButton.getText());
+                    }
+                }).click();
+
+        exitJabRef(mainFrame);
+    }
 }

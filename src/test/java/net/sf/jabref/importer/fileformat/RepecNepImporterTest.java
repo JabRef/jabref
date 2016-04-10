@@ -20,7 +20,7 @@ public class RepecNepImporterTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new RepecNepImporter();
     }
@@ -81,7 +81,6 @@ public class RepecNepImporterTest {
             BibtexEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
-
 
     @Test
     public final void testGetFormatName() {

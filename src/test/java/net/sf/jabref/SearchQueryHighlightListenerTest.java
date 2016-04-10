@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 public class SearchQueryHighlightListenerTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -59,7 +59,8 @@ public class SearchQueryHighlightListenerTest {
         Assert.assertEquals(content.indexOf(contentToHighlight1), highlight[0].getStartOffset());
 
         //end of ... word
-        Assert.assertEquals(content.indexOf(contentToHighlight1) + contentToHighlight1.length(), highlight[0].getEndOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight1) + contentToHighlight1.length(),
+                highlight[0].getEndOffset());
 
         //add another word "content" and refresh highlighting
         ta.highlightPattern(Optional.of(Pattern.compile("(Word|Content)")));
@@ -73,7 +74,8 @@ public class SearchQueryHighlightListenerTest {
         Assert.assertEquals(content.indexOf(contentToHighlight2), highlight[1].getStartOffset());
 
         //end of ... content
-        Assert.assertEquals(content.indexOf(contentToHighlight2) + contentToHighlight2.length(), highlight[1].getEndOffset());
+        Assert.assertEquals(content.indexOf(contentToHighlight2) + contentToHighlight2.length(),
+                highlight[1].getEndOffset());
 
         //remove everything and check if highlighting is vanished
         ta.highlightPattern(Optional.empty());

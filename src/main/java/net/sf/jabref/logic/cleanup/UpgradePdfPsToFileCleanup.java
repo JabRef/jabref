@@ -24,6 +24,7 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
  * Collects file links from the given set of fields, and add them to the list contained in the file field.
@@ -43,7 +44,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(Globals.FILE_FIELD);
 
-        List<FileField.ParsedFileField> fileList = new ArrayList<>(FileField.parse(oldFileContent));
+        List<ParsedFileField> fileList = new ArrayList<>(FileField.parse(oldFileContent));
         int oldItemCount = fileList.size();
         for (String field : fields) {
             entry.getFieldOptional(field).ifPresent(o -> {
@@ -51,7 +52,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
                     return;
                 }
                 File f = new File(o);
-                FileField.ParsedFileField flEntry = new FileField.ParsedFileField(f.getName(), o,
+                ParsedFileField flEntry = new ParsedFileField(f.getName(), o,
                         ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
                 fileList.add(flEntry);
 

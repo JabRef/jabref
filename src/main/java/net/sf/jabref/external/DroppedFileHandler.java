@@ -111,8 +111,6 @@ public class DroppedFileHandler {
      *
      * @param fileName  The name of the dragged file.
      * @param fileType  The FileType associated with the file.
-     * @param localFile Indicate whether this is a local file, or a remote file copied
-     *                  to a local temporary file.
      * @param mainTable The MainTable the file was dragged to.
      * @param dropRow   The row where the file was dropped.
      */
@@ -125,8 +123,6 @@ public class DroppedFileHandler {
     /**
      * @param fileName  The name of the dragged file.
      * @param fileType  The FileType associated with the file.
-     * @param localFile Indicate whether this is a local file, or a remote file copied
-     *                  to a local temporary file.
      * @param entry     The target entry for the drop.
      */
     public void handleDroppedfile(String fileName, ExternalFileType fileType, BibEntry entry) {
@@ -139,8 +135,7 @@ public class DroppedFileHandler {
         }
 
         // Show dialog
-        boolean newEntry = false;
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.getDatabase())) {
             return;
         }
 
@@ -153,7 +148,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -180,11 +175,16 @@ public class DroppedFileHandler {
     }
 
     public void linkPdfToEntry(String fileName, BibEntry entry) {
-        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+        Optional<ExternalFileType> optFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
+        if (!optFileType.isPresent()) {
+            LOGGER.warn("No file type with extension 'pdf' registered.");
+            return;
+        }
+
+        ExternalFileType fileType = optFileType.get();
         // Show dialog
-        boolean newEntry = false;
-        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, newEntry, false, panel.database())) {
+        if (!showLinkMoveCopyRenameDialog(fileName, fileType, entry, panel.getDatabase())) {
             return;
         }
 
@@ -198,7 +198,7 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -237,7 +237,7 @@ public class DroppedFileHandler {
         }
 
         JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several bibtex-records.")
+                Localization.lang("The PDF contains one or several BibTeX-records.")
                         + "\n"
                         + Localization.lang("Do you want to import these as new entries into the current database?"));
 
@@ -272,7 +272,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -305,11 +305,11 @@ public class DroppedFileHandler {
     //
     // @return true if user pushed "OK", false otherwise
     //
-    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType,
-                                                 BibEntry entry, boolean newEntry, final boolean multipleEntries, BibDatabase database) {
+    private boolean showLinkMoveCopyRenameDialog(String linkFileName, ExternalFileType fileType, BibEntry entry,
+            BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -336,27 +336,14 @@ public class DroppedFileHandler {
 
             @Override
             public void stateChanged(ChangeEvent arg0) {
-                renameCheckBox.setEnabled(!linkInPlace.isSelected()
-                        && !multipleEntries);
-                renameToTextBox.setEnabled(!linkInPlace.isSelected()
-                        && !multipleEntries);
-                if (multipleEntries) {
-                    renameToTextBox.setText(Localization.lang("Multiple entries"));
-                }
+                renameCheckBox.setEnabled(!linkInPlace.isSelected());
+                renameToTextBox.setEnabled(!linkInPlace.isSelected());
             }
         };
 
-        if (multipleEntries) {
-            linkInPlace.setText(Localization.lang("Leave files in their current directory."));
-            copyRadioButton.setText(Localization.lang("Copy files to file directory."));
-
-            moveRadioButton.setText(Localization.lang("Move files to file directory."));
-        } else {
-            linkInPlace.setText(Localization.lang("Leave file in its current directory."));
-            copyRadioButton.setText(Localization.lang("Copy file to file directory."));
-            moveRadioButton.setText(Localization.lang("Move file to file directory."));
-        }
-
+        linkInPlace.setText(Localization.lang("Leave file in its current directory"));
+        copyRadioButton.setText(Localization.lang("Copy file to file directory"));
+        moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
@@ -411,7 +398,7 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -471,7 +458,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename,
                            NamedCompound edits) {
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -515,14 +502,13 @@ public class DroppedFileHandler {
      * the given name.
      *
      * @param fileName The name of the source file.
-     * @param fileType The FileType associated with the file.
      * @param toFile   The destination filename. An existing path-component will be removed.
      * @param edits    TODO we should be able to undo this!
      * @return
      */
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

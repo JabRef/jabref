@@ -18,6 +18,9 @@ package net.sf.jabref;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
@@ -30,21 +33,22 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
 public class MetaData implements Iterable<String> {
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
     public static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    public static final String DATABASE_TYPE = "databaseType";
-    public static final String GROUPSVERSION = "groupsversion";
-    public static final String GROUPSTREE = "groupstree";
-    public static final String GROUPS = "groups";
+    private static final String DATABASE_TYPE = "databaseType";
+    private static final String GROUPSVERSION = "groupsversion";
+    private static final String GROUPSTREE = "groupstree";
+    private static final String GROUPS = "groups";
     private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
-    private File file; // The File where this base gets saved.
+
     private boolean groupTreeValid = true;
 
     private AbstractLabelPattern labelPattern;
@@ -59,6 +63,7 @@ public class MetaData implements Iterable<String> {
      * it has been passed.
      */
     public MetaData(Map<String, String> inData, BibDatabase db) {
+        Objects.requireNonNull(inData);
         boolean groupsTreePresent = false;
         List<String> flatGroupsData = null;
         List<String> treeGroupsData = null;
@@ -66,33 +71,31 @@ public class MetaData implements Iterable<String> {
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
 
-        if (inData != null) {
-            for (Map.Entry<String, String> entry : inData.entrySet()) {
-                StringReader data = new StringReader(entry.getValue());
-                String unit;
-                List<String> orderedData = new ArrayList<>();
-                // We must allow for ; and \ in escape sequences.
-                try {
-                    while ((unit = getNextUnit(data)) != null) {
-                        orderedData.add(unit);
-                    }
-                } catch (IOException ex) {
-                    System.err.println("Weird error while parsing meta data.");
+        for (Map.Entry<String, String> entry : inData.entrySet()) {
+            StringReader data = new StringReader(entry.getValue());
+            String unit;
+            List<String> orderedData = new ArrayList<>();
+            // We must allow for ; and \ in escape sequences.
+            try {
+                while ((unit = getNextUnit(data)) != null) {
+                    orderedData.add(unit);
                 }
-                if (GROUPSVERSION.equals(entry.getKey())) {
-                    if (!orderedData.isEmpty()) {
-                        groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
-                    }
-                } else if (GROUPSTREE.equals(entry.getKey())) {
-                    groupsTreePresent = true;
-                    treeGroupsData = orderedData; // save for later user
-                    // actual import operation is handled later because "groupsversion"
-                    // tag might not yet have been read
-                } else if (GROUPS.equals(entry.getKey())) {
-                    flatGroupsData = orderedData;
-                } else {
-                    putData(entry.getKey(), orderedData);
+            } catch (IOException ex) {
+                LOGGER.error("Weird error while parsing meta data.", ex);
+            }
+            if (GROUPSVERSION.equals(entry.getKey())) {
+                if (!orderedData.isEmpty()) {
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                 }
+            } else if (GROUPSTREE.equals(entry.getKey())) {
+                groupsTreePresent = true;
+                treeGroupsData = orderedData; // save for later user
+                // actual import operation is handled later because "groupsversion"
+                // tag might not yet have been read
+            } else if (GROUPS.equals(entry.getKey())) {
+                flatGroupsData = orderedData;
+            } else {
+                putData(entry.getKey(), orderedData);
             }
         }
 
@@ -176,82 +179,11 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
-     * Look up the directory set up for the given field type for this database.
-     * If no directory is set up, return that defined in global preferences.
-     * There can be up to three directory definitions for these files:
-     * the database's metadata can specify a general directory and/or a user-specific directory
-     * or the preferences can specify one.
-     * <p>
-     * The settings are prioritized in the following order and the first defined setting is used:
-     * 1. metadata user-specific directory
-     * 2. metadata general directory
-     * 3. preferences directory
-     * 4. bib file directory
-     *
-     * @param fieldName The field type
-     * @return The default directory for this field type.
-     */
-    public List<String> getFileDirectory(String fieldName) {
-        List<String> fileDirs = new ArrayList<>();
-
-        // 1. metadata user-specific directory
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
-        List<String> metaData = getData(key);
-        if (metaData == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
-            metaData = getData(key);
-        }
-
-        // 2. metadata general directory
-        if ((metaData != null) && !metaData.isEmpty()) {
-            String dir;
-            dir = metaData.get(0);
-            // If this directory is relative, we try to interpret it as relative to
-            // the file path of this bib file:
-            if (!new File(dir).isAbsolute() && (file != null)) {
-                String relDir;
-                if (".".equals(dir)) {
-                    // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = file.getParent();
-                } else {
-                    relDir = file.getParent() + File.separator + dir;
-                }
-                // If this directory actually exists, it is very likely that the
-                // user wants us to use it:
-                if (new File(relDir).exists()) {
-                    dir = relDir;
-                }
-            }
-            fileDirs.add(dir);
-        } else {
-            // 3. preferences directory?
-            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
-            if (dir != null) {
-                fileDirs.add(dir);
-            }
-        }
-
-        // 4. bib file directory
-        if (getFile() != null) {
-            String parentDir = getFile().getParent();
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                fileDirs.add(0, parentDir);
-            } else {
-                fileDirs.add(parentDir);
-            }
-        }
-
-        return fileDirs;
-    }
-
-    /**
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
      * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
-     * @return true if parsing was successful, false otherwise
      */
     private void putGroups(List<String> orderedData, BibDatabase db, int version) {
         try {
@@ -260,7 +192,7 @@ public class MetaData implements Iterable<String> {
             groupTreeValid = true;
         } catch (Exception e) {
             // we cannot really do anything about this here
-            System.err.println(e);
+            LOGGER.error("Problem parsing groups from MetaData", e);
             groupTreeValid = false;
         }
     }
@@ -301,14 +233,6 @@ public class MetaData implements Iterable<String> {
             return res.toString();
         }
         return null;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 
     public DBStrings getDBStrings() {
@@ -392,7 +316,7 @@ public class MetaData implements Iterable<String> {
         if (this.getData(SAVE_ACTIONS) == null) {
             return new FieldFormatterCleanups(false, new ArrayList<>());
         } else {
-            boolean enablementStatus = this.getData(SAVE_ACTIONS).get(0).equals("enabled");
+            boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
             String formatterString = this.getData(SAVE_ACTIONS).get(1);
             return new FieldFormatterCleanups(enablementStatus, formatterString);
         }
@@ -403,7 +327,7 @@ public class MetaData implements Iterable<String> {
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase()));
+        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase(Locale.ENGLISH)));
     }
 
     public boolean isProtected() {
@@ -440,7 +364,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> serialize() throws IOException {
+    public Map<String, String> serialize() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 
@@ -459,7 +383,7 @@ public class MetaData implements Iterable<String> {
 
             String serializedItem = stringBuilder.toString();
             // Only add non-empty values
-            if (!serializedItem.isEmpty() && !serializedItem.equals(";")) {
+            if (!serializedItem.isEmpty() && !";".equals(serializedItem)) {
                 serializedMetaData.put(metaItem.getKey(), serializedItem);
             }
         }
@@ -498,7 +422,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName()));
+        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
     }
 
     public void markAsProtected() {
@@ -511,6 +435,10 @@ public class MetaData implements Iterable<String> {
 
     public void setDefaultFileDirectory(String path) {
         putData(FILE_DIRECTORY, Collections.singletonList(path));
+    }
+
+    public void clearDefaultFileDirectory() {
+        remove(FILE_DIRECTORY);
     }
 
     public void setUserFileDirectory(String user, String path) {

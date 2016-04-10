@@ -16,7 +16,7 @@ public class FileHistoryTest {
     private List<String> oldFileNames;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         prefs = JabRefPreferences.getInstance();
         oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_FILES);
     }
@@ -25,7 +25,7 @@ public class FileHistoryTest {
     public void restore() {
         prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
     }
-    
+
     @Test
     public void testFileHistory() {
         FileHistory fh = new FileHistory(prefs);

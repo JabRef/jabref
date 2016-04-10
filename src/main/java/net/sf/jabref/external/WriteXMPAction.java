@@ -30,7 +30,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -121,17 +120,17 @@ public class WriteXMPAction extends AbstractWorker {
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory("pdf");
             FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
             // Then check the "file" field:
-            dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            dirs = panel.getBibDatabaseContext().getFileDirectory();
             if (entry.hasField(Globals.FILE_FIELD)) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(entry.getField(Globals.FILE_FIELD));
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.type != null) && "pdf".equalsIgnoreCase(flEntry.type.getName())) {
+                    if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
                         FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
                     }
                 }
@@ -263,7 +262,7 @@ public class WriteXMPAction extends AbstractWorker {
         public void open() {
             progressArea.setText("");
             canceled = false;
-            PositionWindow.placeDialog(optDiag, panel.frame());
+            optDiag.setLocationRelativeTo(panel.frame());
 
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);

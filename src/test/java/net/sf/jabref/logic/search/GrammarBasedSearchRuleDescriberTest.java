@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class GrammarBasedSearchRuleDescriberTest {
 
     @Test
-    public void testSimpleQuery() throws Exception {
+    public void testSimpleQuery() {
         String query = "a=b";
         evaluate(query, true, true, "This search contains entries in which the field <b>&#97;</b> " +
                 "contains the regular expression <b>&#98;</b>. " +
@@ -26,7 +26,7 @@ public class GrammarBasedSearchRuleDescriberTest {
     }
 
     @Test
-    public void testComplexQuery() throws Exception {
+    public void testComplexQuery() {
         String query = "not a=b and c=e or e=\"x\"";
         evaluate(query, true, true, "This search contains entries in which not ((the field <b>&#97;</b> "
                 + "contains the regular expression <b>&#98;</b> and the field <b>&#99;</b> contains the "

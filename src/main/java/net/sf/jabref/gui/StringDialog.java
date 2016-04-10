@@ -60,6 +60,9 @@ class StringDialog extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
+    public static final String STRINGS_TITLE = Localization.lang("Strings for database");
+
+
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
         super(frame);
         this.panel = panel;
@@ -135,9 +138,9 @@ class StringDialog extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
+            setTitle(STRINGS_TITLE + ": " + GUIGlobals.UNTITLED_TITLE);
         } else {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
+            setTitle(STRINGS_TITLE + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
         }
         pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
@@ -287,7 +290,7 @@ class StringDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ? Localization.lang("Name") :
+            return col == 0 ? Localization.lang("Label") :
                 Localization.lang("Content");
         }
 
@@ -424,9 +427,8 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = Localization.lang("Really delete the selected") + ' '
-                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
-                        : Localization.lang("entry")) + '?';
+                String msg = (sel.length > 1 ? Localization.lang("Really delete the selected %0 entries?",
+                        Integer.toString(sel.length)) : Localization.lang("Really delete the selected entry?"));
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.YES_OPTION) {
@@ -462,11 +464,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.UNDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.UNDO);
         }
     }
 
@@ -479,11 +477,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.REDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.REDO);
         }
     }
 }

@@ -511,7 +511,7 @@ public class TestVM {
     }
 
     @Test
-    public void testFormatName() throws RecognitionException, IOException {
+    public void testFormatName() throws RecognitionException {
         VM vm = new VM(
                 "FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
                         + "EXECUTE {format}");

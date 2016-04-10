@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.bibtexfields.EraseFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -82,7 +82,7 @@ public class DoiCleanup implements CleanupJob {
     }
 
     private void removeFieldValue(BibEntry entry, String field, List<FieldChange> changes) {
-        CleanupJob eraser = new FieldFormatterCleanup(field, new EraseFormatter());
+        CleanupJob eraser = new FieldFormatterCleanup(field, new ClearFormatter());
         changes.addAll(eraser.cleanup(entry));
     }
 }

@@ -72,7 +72,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -92,8 +92,8 @@ public class MoveFileAction extends AbstractAction {
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;
-            if (flEntry.type != null) {
-                extension = "." + flEntry.type.getExtension();
+            if (flEntry.type.isPresent()) {
+                extension = "." + flEntry.type.get().getExtension();
             }
 
             File newFile = null;
@@ -106,7 +106,7 @@ public class MoveFileAction extends AbstractAction {
                     String suggName = Util
                             .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
                                     Globals.journalAbbreviationLoader.getRepository())
-                            .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
+                            .concat(flEntry.type.isPresent() ? "." + flEntry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));

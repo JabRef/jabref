@@ -85,39 +85,34 @@ public class SaveDatabaseAction extends AbstractWorker {
                 if (answer == JOptionPane.CANCEL_OPTION) {
                     cancelled = true;
                     return;
-                }
-                else if (answer == JOptionPane.YES_OPTION) {
+                } else if (answer == JOptionPane.YES_OPTION) {
                     cancelled = true;
 
-                    JabRefExecutorService.INSTANCE.execute(new Runnable() {
+                    JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
 
-                        @Override
-                        public void run() {
+                        if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                            // TODO: GUI handling of the situation when the externally modified file keeps being locked.
+                            LOGGER.error("File locked, this will be trouble.");
+                        }
 
-                            if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
-                                // TODO: GUI handling of the situation when the externally modified file keeps being locked.
-                                LOGGER.error("File locked, this will be trouble.");
-                            }
-
-                            ChangeScanner scanner = new ChangeScanner(panel.frame(), panel, panel.getBibDatabaseContext().getDatabaseFile());
-                            JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
-                            if (scanner.changesFound()) {
-                                scanner.displayResult(resolved -> {
-                                    if (resolved) {
-                                        panel.setUpdatedExternally(false);
-                                        SwingUtilities.invokeLater(
-                                                (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
-                                    } else {
-                                        cancelled = true;
-                                    }
-                                });
-                            }
+                        ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
+                                panel.getBibDatabaseContext().getDatabaseFile());
+                        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+                        if (scanner.changesFound()) {
+                            scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
+                                if (resolved) {
+                                    panel.setUpdatedExternally(false);
+                                    SwingUtilities.invokeLater(
+                                            (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                                } else {
+                                    cancelled = true;
+                                }
+                            });
                         }
                     });
 
                     return;
-                }
-                else { // User indicated to store anyway.
+                } else { // User indicated to store anyway.
                        // See if the database has the protected flag set:
                     List<String> pd = panel.getBibDatabaseContext().getMetaData().getData(Globals.PROTECTED_FLAG_META);
                     boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
@@ -365,12 +360,12 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         if (f != null) {
             File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
-            panel.getBibDatabaseContext().getMetaData().setFile(f);
+            panel.getBibDatabaseContext().setDatabaseFile(f);
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
             runCommand();
             // If the operation failed, revert the file field and return:
             if (!success) {
-                panel.getBibDatabaseContext().getMetaData().setFile(oldFile);
+                panel.getBibDatabaseContext().setDatabaseFile(oldFile);
                 return;
             }
             // Register so we get notifications about outside changes to the file.

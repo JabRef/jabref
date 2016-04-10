@@ -35,7 +35,6 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.DuplicateCheck;
@@ -76,7 +75,7 @@ public class ChangeScanner implements Runnable {
     public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
         this.panel = bp;
         this.frame = frame;
-        this.inMem = bp.database();
+        this.inMem = bp.getDatabase();
         this.mdInMem = bp.getBibDatabaseContext().getMetaData();
         this.f = file;
     }
@@ -84,7 +83,6 @@ public class ChangeScanner implements Runnable {
     @Override
     public void run() {
         try {
-            //long startTime = System.currentTimeMillis();
 
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
@@ -132,7 +130,7 @@ public class ChangeScanner implements Runnable {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater((Runnable) () -> {
                 ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                PositionWindow.placeDialog(dial, frame);
+                dial.setLocationRelativeTo(frame);
                 dial.setVisible(true);
                 fup.scanResultsResolved(dial.isOkPressed());
                 if (dial.isOkPressed()) {
@@ -286,25 +284,9 @@ public class ChangeScanner implements Runnable {
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
                             disk.getEntryAt(bestMatchI));
                     changes.add(ec);
-
-                    // Create an undo edit to represent this change:
-                    //NamedCompound ce = new NamedCompound("Modified entry");
-                    //ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(bestMatchI), panel));
-                    //ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    //ce.end();
-                    //changes.add(ce);
-
-                    //System.out.println("Possible match for entry:");
-                    //System.out.println("----------------------------------------------");
-
                 } else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
                     changes.add(ec);
-                    /*NamedCompound ce = new NamedCompound("Removed entry");
-                    ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    ce.end();
-                    changes.add(ce);*/
-
                 }
 
             }
@@ -329,13 +311,8 @@ public class ChangeScanner implements Runnable {
                         EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
                         changes.add(ec);
                     }
-                    /*NamedCompound ce = new NamedCompound("Added entry");
-                    ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
-                    ce.end();
-                    changes.add(ce);*/
                 }
             }
-            //System.out.println("Suspected new entries in file: "+(disk.getEntryCount()-used.size()));
         }
     }
 

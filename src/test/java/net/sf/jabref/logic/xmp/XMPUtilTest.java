@@ -12,8 +12,6 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jempbox.xmp.*;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -27,7 +25,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 import javax.xml.transform.TransformerException;
@@ -40,8 +37,6 @@ import java.util.*;
  * Limitations: The test suite only handles UTF8. Not UTF16.
  */
 public class XMPUtilTest {
-
-    private static final Log LOGGER = LogFactory.getLog(XMPUtilTest.class);
 
     /**
      * The PDF file that basically all operations are done upon.
@@ -87,9 +82,10 @@ public class XMPUtilTest {
      * Write a manually constructed xmp-string to file
      *
      * @param xmpString
-     * @throws Exception
+     * @throws IOException
+     * @throws COSVisitorException
      */
-    public void writeManually(File tempFile, String xmpString) throws Exception {
+    public void writeManually(File tempFile, String xmpString) throws IOException, COSVisitorException {
 
         try (PDDocument document = PDDocument.load(tempFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
@@ -197,8 +193,6 @@ public class XMPUtilTest {
                 + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
     }
 
-
-
     /**
      * Create a temporary PDF-file with a single empty page.
      */
@@ -238,9 +232,11 @@ public class XMPUtilTest {
 
     /**
      * Most basic test for reading.
+     * @throws IOException
+     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPSimple() throws Exception {
+    public void testReadXMPSimple() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n"
                 + "<bibtex:title>Beach sand convolution by surf-wave optimzation</bibtex:title>\n"
@@ -261,11 +257,11 @@ public class XMPUtilTest {
 
     /**
      * Is UTF8 handling working? This is because Java by default uses the platform encoding or a special UTF-kind.
-     *
-     * @throws Exception
+     * @throws IOException
+     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPUTF8() throws Exception {
+    public void testReadXMPUTF8() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n" + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
@@ -333,11 +329,11 @@ public class XMPUtilTest {
 
     /**
      * Are authors and editors correctly read?
-     *
-     * @throws Exception
+     * @throws IOException
+     * @throws COSVisitorException
      */
     @Test
-    public void testReadXMPSeq() throws Exception {
+    public void testReadXMPSeq() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:author><rdf:Seq>\n" + "  <rdf:li>Kelly Clarkson</rdf:li>"
                 + "  <rdf:li>Ozzy Osbourne</rdf:li>" + "</rdf:Seq></bibtex:author>" + "<bibtex:editor><rdf:Seq>"
@@ -359,11 +355,12 @@ public class XMPUtilTest {
 
     /**
      * Is the XMPEntryType correctly set?
+     * @throws IOException
+     * @throws COSVisitorException
      *
-     * @throws Exception
      */
     @Test
-    public void testReadXMPEntryType() throws Exception {
+    public void testReadXMPEntryType() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:entrytype>ARticle</bibtex:entrytype>";
 
@@ -389,7 +386,7 @@ public class XMPUtilTest {
                 return null;
             } else {
                 try (InputStream is = meta.createInputStream();
-                        InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
                     // trim() for killing padding end-newline
                     return CharStreams.toString(reader).trim();
                 }
@@ -399,11 +396,11 @@ public class XMPUtilTest {
 
     /**
      * Test whether the helper function work correctly.
-     *
-     * @throws Exception
+     * @throws IOException
+     * @throws COSVisitorException
      */
     @Test
-    public void testWriteReadManually() throws Exception {
+    public void testWriteReadManually() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:year>2003</bibtex:year>\n" + "<bibtex:title>�pt�mz�t��n</bibtex:title>\n"
                 + "<bibtex:bibtexkey>OezbekC06</bibtex:bibtexkey>\n";
@@ -424,11 +421,12 @@ public class XMPUtilTest {
 
     /**
      * Test that readXMP and writeXMP work together.
+     * @throws IOException
+     * @throws TransformerException
      *
-     * @throws Exception
      */
     @Test
-    public void testReadWriteXMP() throws Exception {
+    public void testReadWriteXMP() throws IOException, TransformerException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.}," + "\n"
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
@@ -452,11 +450,12 @@ public class XMPUtilTest {
 
     /**
      * Are newlines in the XML processed correctly?
+     * @throws IOException
+     * @throws COSVisitorException
      *
-     * @throws Exception
      */
     @Test
-    public void testNewlineHandling() throws Exception {
+    public void testNewlineHandling() throws COSVisitorException, IOException {
 
         String bibtex = "<bibtex:title>\nHallo\nWorld \nthis \n is\n\nnot \n\nan \n\n exercise \n \n.\n \n\n</bibtex:title>\n"
                 + "<bibtex:tabs>\nHallo\tWorld \tthis \t is\t\tnot \t\tan \t\n exercise \t \n.\t \n\t</bibtex:tabs>\n"
@@ -476,11 +475,12 @@ public class XMPUtilTest {
 
     /**
      * Test whether XMP.readFile can deal with text-properties that are not element-nodes, but attribute-nodes
+     * @throws IOException
+     * @throws COSVisitorException
      *
-     * @throws Exception
      */
     @Test
-    public void testAttributeRead() throws Exception {
+    public void testAttributeRead() throws COSVisitorException, IOException {
 
         // test 1 has attributes
         String bibtex = t2XMP();
@@ -735,8 +735,8 @@ public class XMPUtilTest {
 
             if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
 
-                AuthorList expectedAuthors = AuthorList.getAuthorList(expected.getField(field));
-                AuthorList actualAuthors = AuthorList.getAuthorList(actual.getField(field));
+                AuthorList expectedAuthors = AuthorList.parse(expected.getField(field));
+                AuthorList actualAuthors = AuthorList.parse(actual.getField(field));
                 Assert.assertEquals(expectedAuthors, actualAuthors);
             } else {
                 Assert.assertEquals("comparing " + field, expected.getField(field), actual.getField(field));
@@ -990,7 +990,7 @@ public class XMPUtilTest {
     }
 
     @Test
-    public void testReadRawXMP() throws Exception {
+    public void testReadRawXMP() throws IOException, TransformerException {
 
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
@@ -1036,11 +1036,14 @@ public class XMPUtilTest {
 
     /**
      * Test whether the command-line client works correctly with writing a single entry
+     * @throws IOException
+     * @throws TransformerException
+     * @throws COSVisitorException
      *
-     * @throws Exception
+
      */
     @Test
-    public void testCommandLineSingleBib() throws Exception {
+    public void testCommandLineSingleBib() throws IOException, TransformerException, COSVisitorException {
 
         // First check conversion from .bib to .xmp
         File tempBib = File.createTempFile("JabRef", ".bib");
@@ -1069,10 +1072,13 @@ public class XMPUtilTest {
     }
 
     /**
+     * @throws IOException
+     * @throws TransformerException
+     * @throws COSVisitorException
      * @depends XMPUtil.writeXMP
      */
     @Test
-    public void testCommandLineSinglePdf() throws Exception {
+    public void testCommandLineSinglePdf() throws IOException, TransformerException, COSVisitorException {
         {
             // Write XMP to file
 
@@ -1132,12 +1138,13 @@ public class XMPUtilTest {
 
     /**
      * Test whether the command-line client can pick one of several entries from a bibtex file
+     * @throws IOException
+     * @throws TransformerException
      *
-     * @throws Exception
      */
     @Test
     @Ignore
-    public void testCommandLineByKey() throws Exception {
+    public void testCommandLineByKey() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
         try (FileWriter fileWriter = new FileWriter(tempBib)) {
@@ -1147,7 +1154,7 @@ public class XMPUtilTest {
             { // First try canh05
                 PrintStream oldOut = System.out;
                 try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                System.setOut(new PrintStream(s));
+                    System.setOut(new PrintStream(s));
                     XMPUtil.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
@@ -1182,10 +1189,12 @@ public class XMPUtilTest {
 
     /**
      * Test whether the command-line client can deal with several bibtex entries.
+     * @throws IOException
+     * @throws TransformerException
      */
     @Test
     @Ignore
-    public void testCommandLineSeveral() throws Exception {
+    public void testCommandLineSeveral() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
 
@@ -1232,11 +1241,13 @@ public class XMPUtilTest {
 
     /**
      * Test that readXMP and writeXMP work together.
+     * @throws IOException
+     * @throws TransformerException
      *
      * @throws Exception
      */
     @Test
-    public void testResolveStrings() throws Exception {
+    public void testResolveStrings() throws IOException, TransformerException {
         ParserResult original = BibtexParser
                 .parse(new StringReader("@string{ crow = \"Crowston, K.\"}\n" + "@string{ anna = \"Annabi, H.\"}\n"
                         + "@string{ howi = \"Howison, J.\"}\n" + "@string{ masa = \"Masango, C.\"}\n"
@@ -1257,8 +1268,8 @@ public class XMPUtilTest {
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
-        Assert.assertEquals(AuthorList.getAuthorList("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-                AuthorList.getAuthorList(x.getField("author")));
+        Assert.assertEquals(AuthorList.parse("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
+                AuthorList.parse(x.getField("author")));
     }
 
     @Test(expected = EncryptionNotSupportedException.class)
@@ -1290,7 +1301,7 @@ public class XMPUtilTest {
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 
-            AuthorList originalAuthors = AuthorList.getAuthorList(
+            AuthorList originalAuthors = AuthorList.parse(
                     "Patterson, David and Arvind and Asanov\\'\\i{}c, Krste and Chiou, Derek and Hoe, James and Kozyrakis, Christos and Lu, S{hih-Lien} and Oskin, Mark and Rabaey, Jan and Wawrzynek, John");
 
             try {
@@ -1299,16 +1310,16 @@ public class XMPUtilTest {
                 // Test whether we the main function can load the bibtex correctly
                 BibEntry b = XMPUtil.readXMP(pdfFile).get(0);
                 Assert.assertNotNull(b);
-                Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author")));
 
                 // Next check from Document Information
                 try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
 
                     Assert.assertEquals(originalAuthors,
-                            AuthorList.getAuthorList(document.getDocumentInformation().getAuthor()));
+                            AuthorList.parse(document.getDocumentInformation().getAuthor()));
 
                     b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get();
-                    Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author")));
 
                     // Now check from Dublin Core
                     PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1334,7 +1345,7 @@ public class XMPUtilTest {
 
                     b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema).get();
                     Assert.assertNotNull(b);
-                    Assert.assertEquals(originalAuthors, AuthorList.getAuthorList(b.getField("author")));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author")));
                 }
             } finally {
                 if (!pdfFile.delete()) {

@@ -1,21 +1,20 @@
 package net.sf.jabref.logic.integrity;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -49,7 +48,7 @@ public class IntegrityCheckTest {
     }
 
     @Test
-    public void testBraketChecks() {
+    public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
         assertCorrect(createContext("title", "{x}x{}x{{}}"));
@@ -60,7 +59,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : Arrays.asList("author", "editor")) {
+        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));
@@ -103,7 +102,9 @@ public class IntegrityCheckTest {
     @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
-        Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
+        Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
         assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
         assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));
@@ -115,10 +116,10 @@ public class IntegrityCheckTest {
         File bibFile = testFolder.newFile("lit.bib");
         testFolder.newFile("file.pdf");
 
-        MetaData metaData = new MetaData();
-        metaData.setFile(bibFile);
+        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        databaseContext.setDatabaseFile(bibFile);
 
-        assertCorrect(createContext("file", ":file.pdf:PDF", metaData));
+        assertCorrect(databaseContext);
     }
 
     @Test

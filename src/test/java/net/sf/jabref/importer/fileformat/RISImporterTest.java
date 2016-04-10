@@ -9,13 +9,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class RISImporterTest {
 
     private RisImporter risImporter;
 
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         risImporter = new RisImporter();
     }

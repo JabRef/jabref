@@ -36,9 +36,31 @@ public interface Formatter {
 
     /**
      * Returns a description of the formatter.
-     * The string "%s" serves as a placeholder for the field name, see java.util.Formatter.
      *
      * @return the description string, always non empty
      */
     String getDescription();
+
+    /**
+     * Returns a default hashcode of the formatter based on its key.
+     *
+     * @return the hash of the key of the formatter
+     */
+    default int defaultHashCode() {
+        return getKey().hashCode();
+    }
+
+    /**
+     * Indicates whether some other object is the same formatter as this one based on the key.
+     *
+     * @param obj the object to compare the formatter to
+     * @return true if the object is a formatter with the same key
+     */
+    default boolean defaultEquals(Object obj) {
+        if(obj instanceof Formatter) {
+            return getKey().equals(((Formatter)obj).getKey());
+        } else {
+            return false;
+        }
+    }
 }

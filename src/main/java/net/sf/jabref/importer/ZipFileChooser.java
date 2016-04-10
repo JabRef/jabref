@@ -53,7 +53,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -141,7 +140,7 @@ class ZipFileChooser extends JDialog {
         getContentPane().add(optionsPanel, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        PositionWindow.placeDialog(this, importCustomizationDialog);
+        this.setLocationRelativeTo(importCustomizationDialog);
         new FocusRequester(table);
     }
 

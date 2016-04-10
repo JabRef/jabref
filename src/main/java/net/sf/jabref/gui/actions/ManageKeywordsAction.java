@@ -58,7 +58,6 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -209,7 +208,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -264,7 +263,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        PositionWindow.placeDialog(diag, frame);
+        diag.setLocationRelativeTo(frame);
         diag.setVisible(true);
         if (cancelled) {
             return;

@@ -103,7 +103,7 @@ public class BibteXMLImporter extends ImportFormat {
             // Start the parser. It reads the file and calls methods of the handler.
             parser.parse(stream, handler);
             // When you're done, report the results stored by your handler object
-            bibItems = handler.getItems();
+            bibItems.addAll(handler.getItems());
 
         } catch (javax.xml.parsers.ParserConfigurationException e) {
             LOGGER.error("Error with XML parser configuration", e);

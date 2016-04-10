@@ -3,25 +3,27 @@ package net.sf.jabref.exporter;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.IdentityFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class FieldFormatterCleanupsTest {
 
     private BibEntry entry;
+
 
     @BeforeClass
     public static void setUpPreferences() {
@@ -46,9 +48,12 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkSimpleUseCase() throws IOException {
+    public void checkSimpleUseCase() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[IdentityFormatter]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[identity]");
+
+        FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
+        assertEquals(Collections.singletonList(identityInTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
@@ -56,30 +61,24 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void invalidSaveActionSting() throws IOException {
+    public void invalidSaveActionSting() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title");
 
+        assertEquals(Collections.emptyList(), actions.getConfiguredActions());
+
         actions.applySaveActions(entry);
 
         assertEquals("Educational session 1", entry.getField("title"));
     }
 
     @Test
-    public void checkLowerCaseSaveAction() throws IOException {
+    public void checkLowerCaseSaveAction() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case]");
 
-        actions.applySaveActions(entry);
-
-        assertEquals("educational session 1", entry.getField("title"));
-    }
-
-    @Test
-    public void checkTwoSaveActionsForOneField() throws IOException {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter]");
-
-        assertEquals(2, actions.getConfiguredActions().size());
+        FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
+        assertEquals(Collections.singletonList(lowerCaseTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
@@ -87,34 +86,42 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkThreeSaveActionsForOneField() throws IOException {
+    public void checkTwoSaveActionsForOneField() {
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity]");
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[LowerCaseChanger,IdentityFormatter,DateFormatter]");
-
-        assertEquals(3, actions.getConfiguredActions().size());
+        FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
+        FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
+        assertEquals(Arrays.asList(lowerCaseTitle, identityInTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
         assertEquals("educational session 1", entry.getField("title"));
     }
 
+    @Test
+    public void checkThreeSaveActionsForOneField() {
+
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity,normalize_date]");
+
+        FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
+        FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
+        FieldFormatterCleanup normalizeDatesInTitle = new FieldFormatterCleanup("title", new NormalizeDateFormatter());
+        assertEquals(Arrays.asList(lowerCaseTitle, identityInTitle, normalizeDatesInTitle), actions.getConfiguredActions());
+
+        actions.applySaveActions(entry);
+
+        assertEquals("educational session 1", entry.getField("title"));
+    }
 
     @Test
-    public void checkMultipleSaveActions() throws IOException {
+    public void checkMultipleSaveActions() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter]title[LowerCaseChanger]");
-
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[normalize_page_numbers]title[lower_case]");
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
-        assertEquals(2, formatterCleanups.size());
-
-        for (FieldFormatterCleanup cleanup : formatterCleanups) {
-            if (cleanup.getField().equals("title")) {
-                assertEquals("LowerCaseChanger", cleanup.getFormatter().getKey());
-            } else if (cleanup.getField().equals("pages")) {
-                assertEquals("PageNumbersFormatter", cleanup.getFormatter().getKey());
-            }
-        }
+        FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
+        FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
+        assertEquals(Arrays.asList(normalizePages, lowerCaseTitle), formatterCleanups);
 
         actions.applySaveActions(entry);
 
@@ -123,22 +130,16 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void checkMultipleSaveActionsWithMultipleFormatters() throws IOException {
+    public void checkMultipleSaveActionsWithMultipleFormatters() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[PageNumbersFormatter,DateFormatter]title[LowerCaseChanger]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
+                "pages[normalize_page_numbers,normalize_date]title[lower_case]");
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
-        assertEquals(3, formatterCleanups.size());
-
-        for (FieldFormatterCleanup cleanup : formatterCleanups) {
-            if (cleanup.getField().equals("title")) {
-                assertEquals("LowerCaseChanger", cleanup.getFormatter().getKey());
-            } else if (cleanup.getField().equals("pages")) {
-                if (!("PageNumbersFormatter".equals(cleanup.getFormatter().getKey()) || "DateFormatter".equals(cleanup.getFormatter().getKey()))) {
-                    fail("Wrong formatter for pages field: " + cleanup.getFormatter().getKey());
-                }
-            }
-        }
+        FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
+        FieldFormatterCleanup normalizeDatesInPages = new FieldFormatterCleanup("pages", new NormalizeDateFormatter());
+        FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
+        assertEquals(Arrays.asList(normalizePages, normalizeDatesInPages, lowerCaseTitle), formatterCleanups);
 
         actions.applySaveActions(entry);
 
@@ -147,19 +148,10 @@ public class FieldFormatterCleanupsTest {
     }
 
     @Test
-    public void eraseFormatterRemovesField() {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[EraseFormatter]");
+    public void clearFormatterRemovesField() {
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[clear]");
         actions.applySaveActions(entry);
 
         assertEquals(Optional.empty(), entry.getFieldOptional("mont"));
-    }
-
-    @Test
-    public void getDescriptionCallsFormatter() {
-        Formatter formatter = mock(Formatter.class);
-        FieldFormatterCleanup cleanup = new FieldFormatterCleanup("testField", formatter);
-        when(formatter.getDescription()).thenReturn("Format field %s");
-
-        assertEquals("Format field testField", cleanup.getDescription());
     }
 }

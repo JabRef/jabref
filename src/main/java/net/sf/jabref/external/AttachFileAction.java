@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -25,12 +26,13 @@ public class AttachFileAction implements BaseAction {
     @Override
     public void action() {
         if (panel.getSelectedEntries().size() != 1) {
-            return; // TODO: display error message?
+            panel.output(Localization.lang("This operation requires exactly one item to be selected."));
+            return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        FileListEntry flEntry = new FileListEntry("", "", null);
+        FileListEntry flEntry = new FileListEntry("", "");
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
-                panel.getBibDatabaseContext().getMetaData());
+                panel.getBibDatabaseContext());
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();

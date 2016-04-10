@@ -7,18 +7,18 @@ import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.MetaData;
+import net.sf.jabref.BibDatabaseContext;
 
 public class DatabaseUtil {
 
-    public static void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, MetaData metadata)
+    public static void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, BibDatabaseContext databaseContext)
             throws SQLException {
         if (dialogo.removeAction) {
             if ((dialogo.selectedInt <= 0) && dialogo.isExporter()) {
                 JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                removeAGivenDB(conn, getDatabaseIDByName(metadata, conn, dbName));
+                removeAGivenDB(conn, getDatabaseIDByName(databaseContext, conn, dbName));
             }
         }
     }
@@ -28,13 +28,12 @@ public class DatabaseUtil {
      * exported before, the method returns the id, otherwise it calls the method that inserts a new row and returns the
      * ID for this new database
      *
-     * @param metaData The MetaData object containing the database information
+     * @param databaseContext the database
      * @param out The output (PrintStream or Connection) object to which the DML should be written.
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
-    public static int getDatabaseIDByName(MetaData metaData, Object out, String dbName) throws SQLException {
-
+    public static int getDatabaseIDByName(BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
         if (out instanceof Connection) {
             try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
                     "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
@@ -42,14 +41,14 @@ public class DatabaseUtil {
                 if (rs.next()) {
                     return rs.getInt("database_id");
                 } else {
-                    insertJabRefDatabase(metaData, out, dbName);
-                    return getDatabaseIDByName(metaData, out, dbName);
+                    insertJabRefDatabase(databaseContext, out, dbName);
+                    return getDatabaseIDByName(databaseContext, out, dbName);
                 }
             }
         }
         // in case of text export there will be only 1 bib exported
         else {
-            insertJabRefDatabase(metaData, out, dbName);
+            insertJabRefDatabase(databaseContext, out, dbName);
             return 1;
         }
     }
@@ -75,17 +74,17 @@ public class DatabaseUtil {
     /**
      * This method creates a new row into jabref_database table enabling to export more than one .bib
      *
-     * @param metaData The MetaData object containing the groups information
+     * @param databaseContext the database
      * @param out The output (PrintStream or Connection) object to which the DML should be written.
      *
      * @throws SQLException
      */
-    private static void insertJabRefDatabase(final MetaData metaData, Object out, String dbName) throws SQLException {
+    private static void insertJabRefDatabase(final BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
         String path;
-        if (metaData.getFile() == null) {
+        if (databaseContext.getDatabaseFile() == null) {
             path = dbName;
         } else {
-            path = metaData.getFile().getAbsolutePath();
+            path = databaseContext.getDatabaseFile().getAbsolutePath();
         }
         SQLUtil.processQuery(out,
                 "INSERT INTO jabref_database(database_name, md5_path) VALUES ('" + dbName + "', md5('" + path + "'));");

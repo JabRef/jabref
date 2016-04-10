@@ -1,6 +1,5 @@
 # coding=utf-8
 import os
-import re
 import sys
 
 res_dir = "src/main/resources/l10n"
@@ -59,6 +58,18 @@ def append_keys_to_file(filename, keys):
         f.write(key + "=\n")
     f.close()
 
+def remove_keys_from_file(filename, keys):
+    lines = open(filename).readlines()
+    lines_to_write = []
+    for line in lines:
+        add = True
+        for key in keys:
+            if(line.startswith(key+"=")):
+                add = False
+        if add:
+            lines_to_write.append(line)
+    open(filename, 'w').writelines(lines_to_write)
+
 
 def compare_property_files_to_main_property_file(main_properties_file, other_properties_files, append_missing_keys_to_other_properties_files):
     keys_in_properties_file = get_keys_from_lines(read_all_lines(main_properties_file))
@@ -86,6 +97,10 @@ def compare_property_files_to_main_property_file(main_properties_file, other_pro
             print "----> Possible obsolete keys (not in English language file):"
             for key in keys_obsolete:
                 print key
+
+            if append_missing_keys_to_other_properties_files:
+                remove_keys_from_file(other_properties_file, keys_obsolete)
+                
             print ""
 
 
@@ -151,8 +166,8 @@ Option can be one of the following:
         file are missing. Additionally, the program will list keys in the other files which are
         not present in the English file - possible obsolete keys.
         
-        If the -u option is specified, all missing keys will automatically be added to the files.
-        There is currently no option to remove obsolete keys automatically.
+        If the -u option is specified, all missing keys will automatically be added to the files
+        and all obsolete keys will be automatically removed.
 """
 
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):

@@ -15,10 +15,8 @@
 */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -34,7 +32,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -50,13 +48,17 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super(Localization.lang("OpenOffice Calc"), "oocalc", null, null, ".sxc");
+        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, ".sxc");
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), database, entries);
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        if (!entries.isEmpty()) { // Do not export if no entries
+            OpenOfficeDocumentCreator.exportOpenOfficeCalc(new File(file), databaseContext.getDatabase(), entries);
+        }
     }
 
     private static void storeOpenOfficeFile(File file, InputStream source) throws Exception {

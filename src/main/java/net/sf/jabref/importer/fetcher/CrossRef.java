@@ -27,31 +27,45 @@ public class CrossRef {
         Objects.requireNonNull(entry);
         Optional<DOI> doi = Optional.empty();
 
-        // Only title lookup by now
-        // FIXME: this is way too less, e.g. service interaction patterns
-        // need author last names at least
+        // title is minimum requirement
         String title = entry.getField("title");
+
         if ((title == null) || title.isEmpty()) {
             return doi;
         }
 
+        String query = enhanceQuery(title, entry);
+
         try {
             HttpResponse<JsonNode> response = Unirest.get(API_URL + "/works")
-                    .queryString("query", title)
+                    .queryString("query", query)
                     .queryString("rows", "1")
                     .asJson();
 
             JSONArray items = response.getBody().getObject().getJSONObject("message").getJSONArray("items");
             String dataTitle = items.getJSONObject(0).getJSONArray("title").getString(0);
             String dataDOI = items.getJSONObject(0).getString("DOI");
-            // Only return if entry.title == result.title
-            if (dataTitle.equals(title)) {
-                LOGGER.info("DOI " + dataDOI + "for " + title + "found.");
-                return DOI.build(dataDOI);
-            }
+            LOGGER.info("DOI " + dataDOI + "for " + title + "found.");
+            return DOI.build(dataDOI);
         } catch (UnirestException e) {
             LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);
         }
         return doi;
+    }
+
+    private static String enhanceQuery(String query, BibEntry entry) {
+        // author
+        String author = entry.getField("author");
+        if (author != null && !author.isEmpty()) {
+            query = query.concat("+" + author);
+        }
+
+        // year
+        String year = entry.getField("year");
+        if (year != null && !year.isEmpty()) {
+            query = query.concat("+" + year);
+        }
+
+        return query;
     }
 }

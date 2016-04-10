@@ -17,6 +17,7 @@ package net.sf.jabref.gui;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -191,5 +192,11 @@ public class EntryMarker {
             return 0;
         }
 
+    }
+
+    public static boolean shouldMarkEntries() {
+        return (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
+                && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
+                        || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)));
     }
 }

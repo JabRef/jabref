@@ -29,6 +29,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.bibtex.BibtexSingleField;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -117,12 +118,11 @@ public class FieldWeightDialog extends JDialog {
     }
 
     private void storeSettings() {
-        for (JSlider slider : sliders.keySet()) {
-            SliderInfo sInfo = sliders.get(slider);
+        for (Map.Entry<JSlider, SliderInfo> sliderEntry : sliders.entrySet()) {
             // Only list the value if it has changed:
-            if (sInfo.originalValue != slider.getValue()) {
-                double weight = (BibtexSingleField.MAX_FIELD_WEIGHT * slider.getValue()) / 100d;
-                InternalBibtexFields.setFieldWeight(sInfo.fieldName, weight);
+            if (sliderEntry.getValue().originalValue != sliderEntry.getKey().getValue()) {
+                double weight = (BibtexSingleField.MAX_FIELD_WEIGHT * sliderEntry.getKey().getValue()) / 100d;
+                InternalBibtexFields.setFieldWeight(sliderEntry.getValue().fieldName, weight);
             }
         }
         frame.removeCachedEntryEditors();

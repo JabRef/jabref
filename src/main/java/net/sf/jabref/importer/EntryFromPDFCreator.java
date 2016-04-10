@@ -34,11 +34,11 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
     }
 
     private static ExternalFileType getPDFExternalFileType() {
-        ExternalFileType pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
-        if (pdfFileType == null) {
+        Optional<ExternalFileType> pdfFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
+        if (!pdfFileType.isPresent()) {
             return new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall", IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         }
-        return pdfFileType;
+        return pdfFileType.get();
     }
 
     /*
@@ -60,19 +60,22 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             return Optional.empty();
         }
 
-        PdfImporter pi = new PdfImporter(JabRef.jrf, JabRef.jrf.getCurrentBasePanel(), JabRef.jrf.getCurrentBasePanel().mainTable, -1);
+        PdfImporter pi = new PdfImporter(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), JabRef.mainFrame.getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
-        ImportPdfFilesResult res = pi.importPdfFiles(fileNames, JabRef.jrf);
-        assert res.getEntries().size() == 1;
-        return Optional.of(res.getEntries().get(0));
+        ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
+        if (res.getEntries().size() == 1) {
+            return Optional.of(res.getEntries().get(0));
+        } else {
+            return Optional.empty();
+        }
 
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntryDataFromXMP(pdfFile, entry);
-        
+
         if (entry.getField("title") == null) {
         	entry.setField("title", pdfFile.getName());
         }
-        
+
         return entry;*/
     }
 

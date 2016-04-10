@@ -29,7 +29,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -185,7 +184,7 @@ class ReplaceStringDialog extends JDialog {
         pack();
         //setSize(400, 170);
 
-        PositionWindow.placeDialog(this, parent);
+        this.setLocationRelativeTo(parent);
     }
 
     public boolean okPressed() {

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 JabRef contributors
+/* Copyright (C) 2003-2016 JabRef contributors
 Copyright (C) 2003 David Weitzman, Morten O. Alver
 
 All programs in this directory and
@@ -29,17 +29,13 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.entry.MonthUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+
+import net.sf.jabref.model.entry.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A bibliography database.
@@ -52,12 +48,22 @@ public class BibDatabase {
      * State attributes
      */
     private final List<BibEntry> entries = Collections.synchronizedList(new ArrayList<>());
-    // use a map instead of a set since i need to know how many of each key is in there
-    private final Map<String, Integer> allKeys = new HashMap<>();
+
     private String preamble;
     // All file contents below the last entry in the file
     private String epilog = "";
     private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+
+    /**
+     * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
+     */
+    private final DuplicationChecker duplicationChecker = new DuplicationChecker();
+
+    /**
+     * contains all entry.getID() of the current database
+     */
+    private final Set<String> internalIDs = new HashSet<>();
+
 
     /**
      * Configuration
@@ -69,10 +75,6 @@ public class BibDatabase {
      */
     private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
 
-    public BibDatabaseMode getBibType() {
-        return BibDatabaseModeDetection.inferMode(this);
-    }
-
     /**
      * Returns the number of entries.
      */
@@ -81,10 +83,10 @@ public class BibDatabase {
     }
 
     /**
-     * Checks if the database contains no entries.
+     * Checks if the database contains entries.
      */
-    public boolean hasNoEntries() {
-        return entries.isEmpty();
+    public boolean hasEntries() {
+        return !entries.isEmpty();
     }
 
     /**
@@ -101,7 +103,7 @@ public class BibDatabase {
      * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
     public boolean containsEntryWithId(String id) {
-        return entries.stream().anyMatch(entry -> entry.getId() == id);
+        return internalIDs.contains(id);
     }
 
     public List<BibEntry> getEntries() {
@@ -156,32 +158,40 @@ public class BibDatabase {
     /**
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
+     *
+     * @return false if the insert was done without a duplicate warning
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
+        Objects.requireNonNull(entry);
+
         String id = entry.getId();
         if (containsEntryWithId(id)) {
             throw new KeyCollisionException("ID is already in use, please choose another");
         }
 
+        internalIDs.add(id);
         entries.add(entry);
-
         fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
-
-        return checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
      * Removes the given entry.
+     * The Entry is removed based on the id {@link BibEntry#id}
      */
-    public synchronized void removeEntry(BibEntry oldValue) {
-        if (oldValue == null) {
-            return;
+    public synchronized void removeEntry(BibEntry toBeDeleted) {
+        Objects.requireNonNull(toBeDeleted);
+
+        boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        if (anyRemoved) {
+            internalIDs.remove(toBeDeleted.getId());
+            duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
+            fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, toBeDeleted));
         }
+    }
 
-        entries.remove(oldValue.getId());
-
-        removeKeyFromSet(oldValue.getCiteKey());
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, oldValue));
+    public int getNumberOfKeyOccurrences(String key) {
+        return duplicationChecker.getNumberOfKeyOccurrences(key);
     }
 
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
@@ -191,7 +201,7 @@ public class BibDatabase {
         } else {
             entry.setField(BibEntry.KEY_FIELD, key);
         }
-        return checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
 
     /**
@@ -318,7 +328,7 @@ public class BibDatabase {
      *
      * @param entries A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
-     *                references stored in the databasee.
+     *                references stored in the database.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
@@ -340,7 +350,7 @@ public class BibDatabase {
      *
      * @param entry   A BibEntry in which all strings of the form #xxx# will be
      *                resolved against the hash map of string references stored in
-     *                the databasee.
+     *                the database.
      * @param inPlace If inPlace is true then the given BibEntry will be
      *                modified, if false then a copy is made using close made before
      *                resolving the strings.
@@ -349,14 +359,18 @@ public class BibDatabase {
      * given BibtexEntries is modified.
      */
     public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
-        if (!inPlace) {
-            entry = (BibEntry) entry.clone();
+
+        BibEntry resultingEntry;
+        if (inPlace) {
+            resultingEntry = entry;
+        } else {
+            resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (String field : entry.getFieldNames()) {
-            entry.setField(field, this.resolveForStrings(entry.getField(field)));
+        for (String field : resultingEntry.getFieldNames()) {
+            resultingEntry.setField(field, this.resolveForStrings(resultingEntry.getField(field)));
         }
-        return entry;
+        return resultingEntry;
     }
 
     /**
@@ -402,8 +416,11 @@ public class BibDatabase {
         }
     }
 
-    private String resolveContent(String res, Set<String> usedIds) {
-        if (res.matches(".*#[^#]+#.*")) {
+    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
+    private String resolveContent(String result, Set<String> usedIds) {
+        String res = result;
+        if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
             int piv = 0;
             int next;
@@ -449,89 +466,7 @@ public class BibDatabase {
         return res;
     }
 
-    //##########################################
-    //  usage:
-    //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
-    //############################################
-    // if the newkey already exists and is not the same as oldkey it will give a warning
-    // else it will add the newkey to the to set and remove the oldkey
-    private boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
-        // LOGGER.debug(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
-        boolean duplicate;
-        if (oldKey == null) {// this is a new entry so don't bother removing oldKey
-            duplicate = addKeyToSet(newKey);
-        } else {
-            if (oldKey.equals(newKey)) {// were OK because the user did not change keys
-                duplicate = false;
-            } else {// user changed the key
-
-                // removed the oldkey
-                // But what if more than two have the same key?
-                // this means that user can add another key and would not get a warning!
-                // consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
-                // removes this key from the allKey. then I add another key xxx. I don't get a warning!
-                // i need a way to count the number of keys of each type
-                // hashmap=>int (increment each time)
-
-                removeKeyFromSet(oldKey);
-                duplicate = addKeyToSet(newKey);
-            }
-        }
-        if (duplicate) {
-            LOGGER.warn("Warning there is a duplicate key: " + newKey);
-        }
-        return duplicate;
-    }
-
-    /**
-     * Returns the number of occurrences of the given key in this database.
-     */
-    public int getNumberOfKeyOccurrences(String key) {
-        Object o = allKeys.get(key);
-        if (o == null) {
-            return 0;
-        } else {
-            return (Integer) o;
-        }
-
-    }
-
-    //========================================================
-    // keep track of all the keys to warn if there are duplicates
-    //========================================================
-    private boolean addKeyToSet(String key) {
-        if ((key == null) || key.isEmpty()) {
-            return false;//don't put empty key
-        }
-        boolean exists = false;
-        if (allKeys.containsKey(key)) {
-            // warning
-            exists = true;
-            allKeys.put(key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
-        } else {
-            allKeys.put(key, 1);
-        }
-        return exists;
-    }
-
-    //========================================================
-    // reduce the number of keys by 1. if this number goes to zero then remove from the set
-    // note: there is a good reason why we should not use a hashset but use hashmap instead
-    //========================================================
-    private void removeKeyFromSet(String key) {
-        if ((key == null) || key.isEmpty()) {
-            return;
-        }
-        if (allKeys.containsKey(key)) {
-            Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
-            if (tI == 1) {
-                allKeys.remove(key);
-            } else {
-                allKeys.put(key, tI - 1);//decrementInteger( tI ));
-            }
-        }
-    }
 
     private void fireDatabaseChanged(DatabaseChangeEvent e) {
         for (DatabaseChangeListener tmpListener : changeListeners) {

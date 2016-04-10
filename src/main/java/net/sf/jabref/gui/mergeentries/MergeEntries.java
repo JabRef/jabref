@@ -31,7 +31,6 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.PreviewPanel;
@@ -49,7 +48,7 @@ import com.jgoodies.forms.layout.ColumnSpec;
 
 public class MergeEntries {
 
-    private static final Log LOGGER = LogFactory.getLog(Globals.class);
+    private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
     // Headings
     private final String[] columnHeadings = {Localization.lang("Field"),
@@ -204,7 +203,7 @@ public class MergeEntries {
         int tmpLabelWidth;
         for (String field : joint) {
             jointStrings[row - 2] = field;
-            label = new JLabel(CaseChangers.UPPER_FIRST.format(field));
+            label = new JLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
             font = label.getFont();
             label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
             mergePanel.add(label, cc.xy(1, row));
@@ -311,7 +310,7 @@ public class MergeEntries {
         mainPanel.add(label, cc.xyw(1, 6, 6));
 
         String layoutString = Globals.prefs.get(JabRefPreferences.PREVIEW_0);
-        pp = new PreviewPanel(null, mergedEntry, null, new MetaData(), layoutString);
+        pp = new PreviewPanel(null, mergedEntry, null, layoutString);
         // JScrollPane jsppp = new JScrollPane(pp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         mainPanel.add(pp, cc.xyw(1, 8, 6));
 

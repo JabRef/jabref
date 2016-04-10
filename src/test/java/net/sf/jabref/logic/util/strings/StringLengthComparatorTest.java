@@ -12,7 +12,7 @@ public class StringLengthComparatorTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         slc = new StringLengthComparator();
     }
 

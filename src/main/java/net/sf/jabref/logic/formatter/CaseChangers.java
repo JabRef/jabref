@@ -29,12 +29,13 @@ import java.util.*;
  * This can be done by starting at the letter position and moving forward and backword to see if there is a '{' and '}, respectively.
  */
 public class CaseChangers {
-    public static final LowerCaseChanger LOWER = new LowerCaseChanger();
-    public static final UpperCaseChanger UPPER = new UpperCaseChanger();
-    public static final UpperFirstCaseChanger UPPER_FIRST = new UpperFirstCaseChanger();
-    public static final UpperEachFirstCaseChanger UPPER_EACH_FIRST = new UpperEachFirstCaseChanger();
-    public static final TitleCaseChanger TITLE = new TitleCaseChanger();
-    public static final CaseKeeper CASE_KEEPER = new CaseKeeper();
+    public static final LowerCaseFormatter TO_LOWER_CASE = new LowerCaseFormatter();
+    public static final UpperCaseFormatter TO_UPPER_CASE = new UpperCaseFormatter();
+    public static final SentenceCaseFormatter TO_SENTENCE_CASE = new SentenceCaseFormatter();
+    public static final CapitalizeFormatter CAPITALIZE = new CapitalizeFormatter();
+    public static final TitleCaseFormatter TO_TITLE_CASE = new TitleCaseFormatter();
+    public static final ProtectTermsFormatter PROTECT_CAPITALS = new ProtectTermsFormatter();
 
-    public static final List<Formatter> ALL = Arrays.asList(LOWER, UPPER, UPPER_FIRST, UPPER_EACH_FIRST, TITLE, CASE_KEEPER);
+    public static final List<Formatter> ALL = Arrays.asList(TO_LOWER_CASE, TO_UPPER_CASE, TO_SENTENCE_CASE, CAPITALIZE, TO_TITLE_CASE,
+            PROTECT_CAPITALS);
 }

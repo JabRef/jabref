@@ -13,8 +13,16 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Added missing German translations
+- Swedish is added as a language option (still not a complete translation)
+- The OpenOffice/LibreOffice style file handling is changed to have only a single list of available style and you need to add your custom styles again
+- OpenOffice/LibreOffice style files are now always read and written with the same default encoding as for the database (found in the preferences)
+- The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
+- PDFs can be automatically fetched from IEEE (given that you have access without logging in)
+- The mass edit function "Set/clear/rename fields" is now in the Edit menu
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
+- Add "Move linked files to default file directory" as cleanup procedure
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
 - All fields in a bib entry are written without any leading and trailing whitespace 
 - Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
@@ -40,6 +48,14 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Integrity check now also checks broken file links, abbreviations in journal and booktitle, and incorrect use of proceedings with page numbers
 - PdfContentImporter does not write the content of the first page into the review field any more
 - Implemented [#462](https://github.com/JabRef/jabref/issues/462): Add new action to open console where opened database file is located. New button, menu entry and shortcut (CTRL+SHIFT+J) for this action have also been added.
+- [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
+- [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
+- [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
+- Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
+- Added open buttons to DOI and URL field
+- Move Look & Feel settings from advanced to appearance tab in preferences
+
+- Move PDF file directory configuration from external tab to file tab in preferences
 
 ### Fixed
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
@@ -73,6 +89,12 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#649](https://github.com/JabRef/jabref/issues/649): Key bindings are now working in the preview panel
 - Fixed [#410](https://github.com/JabRef/jabref/issues/410): Find unlinked files no longer freezes when extracting entry from PDF content
 - Fixed [#936](https://github.com/JabRef/jabref/issues/936): Preview panel is now updated when an entry is cut/deleted
+- Fixed [#1001](https://github.com/JabRef/jabref/issues/1001): No NPE when exporting a complete database
+- Fixed [#991](https://github.com/JabRef/jabref/issues/991): Entry is now correctly removed from the BibDatabase
+- Fixed [#1062](https://github.com/JabRef/jabref/issues/1062): Merge entry with DOI information now also applies changes to entry type
+- Fixed [#535](https://github.com/JabRef/jabref/issues/535): Add merge action to right click menu
+- Fixed [#1115](https://github.com/JabRef/jabref/issues/1115): Wrong warning message when importing duplicate entries
+
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
@@ -82,6 +104,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
 - Removed PDF preview functionality
 - Removed Sixpackimporter it is not used in the wild anymore
+- Removed double click listener from DOI and URL field
 
 
 

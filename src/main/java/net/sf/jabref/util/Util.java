@@ -20,9 +20,10 @@
 
 package net.sf.jabref.util;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.RegExpFileSearch;
@@ -42,7 +43,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -52,8 +52,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
-import javax.swing.undo.AbstractUndoableEdit;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,8 +68,6 @@ import java.util.regex.Pattern;
 public class Util {
 
     private static final Log LOGGER = LogFactory.getLog(Util.class);
-
-    private static final EasyDateFormat DATE_FORMATTER = new EasyDateFormat();
 
     public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
@@ -100,69 +96,7 @@ public class Util {
         return s.toString();
     }
 
-    /**
-     * Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
-     * field is also set. Preferences are checked to see if these options are enabled.
-     *
-     * @param bibs List of bibtex entries
-     */
-    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp, boolean markEntries) {
 
-        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
-        boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
-
-        // Do not need to do anything if all options are disabled
-        if (!(globalSetOwner || globalSetTimeStamp || markEntries)) {
-            return;
-        }
-
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
-
-        // Iterate through all entries
-        for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalBibtexFields.OWNER)));
-            boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
-            setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
-            if (markEntries) {
-                EntryMarker.markEntry(curEntry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-            }
-        }
-    }
-
-    /**
-     * Sets empty or non-existing owner fields of a bibtex entry to a specified default value. Timestamp field is also
-     * set. Preferences are checked to see if these options are enabled.
-     *
-     * @param entry              The entry to set fields for.
-     * @param overwriteOwner     Indicates whether owner should be set if it is already set.
-     * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
-     */
-    public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
-        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = net.sf.jabref.util.Util.DATE_FORMATTER.getCurrentDate();
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(InternalBibtexFields.OWNER)));
-        boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
-                && (overwriteTimestamp || (!entry.hasField(timeStampField)));
-
-        setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
-    }
-
-    private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp, String timeStampField, String timeStamp) {
-
-        // Set owner field if this option is enabled:
-        if (setOwner) {
-            // Set owner field to default value
-            entry.setField(InternalBibtexFields.OWNER, owner);
-        }
-
-        if (setTimeStamp) {
-            entry.setField(timeStampField, timeStamp);
-        }
-    }
 
     /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
@@ -216,60 +150,6 @@ public class Util {
         return targetName;
     }
 
-    /**
-     * Updating a field will result in the entry being reformatted on save
-     *
-     * @param ce indicates the undo named compound. May be null
-     */
-    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce) {
-        net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
-    }
-
-    /**
-     * Updating a non-displayable field does not result in the entry being reformatted on save
-     *
-     * @param ce indicates the undo named compound. May be null
-     */
-    public static void updateNonDisplayableField(BibEntry be, String field, String newValue, NamedCompound ce) {
-        boolean changed = be.hasChanged();
-        net.sf.jabref.util.Util.updateField(be, field, newValue, ce, false);
-        be.setChanged(changed);
-    }
-
-    /**
-     * Undoable change of field value
-     *
-     * @param ce indicates the undo named compound. May be null
-     */
-    public static void updateField(BibEntry be, String field, String newValue, NamedCompound ce, Boolean nullFieldIfValueIsTheSame) {
-        String writtenValue = null;
-        String oldValue = null;
-        if (be.hasField(field)) {
-            oldValue = be.getField(field);
-            if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
-                // If the new field value is null or the old and the new value are the same and flag is set
-                // Clear the field
-                be.clearField(field);
-            } else if (!oldValue.equals(newValue)) {
-                // Update
-                writtenValue = newValue;
-                be.setField(field, newValue);
-            }
-        } else {
-            // old field value not set
-            if (newValue == null) {
-                // Do nothing
-                return;
-            } else {
-                // Set new value
-                writtenValue = newValue;
-                be.setField(field, newValue);
-            }
-        }
-        if (ce != null) {
-            ce.addEdit(new UndoableFieldChange(be, field, oldValue, writtenValue));
-        }
-    }
 
     /**
      * Binds ESC-Key to cancel button
@@ -358,31 +238,15 @@ public class Util {
         // return true; // found no side effects
     }
 
-    public static boolean updateTimeStampIsSet() {
-        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP) && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
-    }
-
-    /**
-     * Updates the timestamp of the given entry, nests the given undaoableEdit in a named compound, and returns that
-     * named compound
-     */
-    public static NamedCompound doUpdateTimeStamp(BibEntry entry, AbstractUndoableEdit undoableEdit) {
-        NamedCompound ce = new NamedCompound(undoableEdit.getPresentationName());
-        ce.addEdit(undoableEdit);
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timestamp = DATE_FORMATTER.getCurrentDate();
-        updateField(entry, timeStampField, timestamp, ce);
-        return ce;
-    }
 
     /**
      * Shortcut method if links are set without using the GUI
      *
      * @param entries  the entries for which links should be set
-     * @param metaData the meta data for the BibDatabase for which links are set
+     * @param databaseContext the database for which links are set
      */
-    public static void autoSetLinks(Collection<BibEntry> entries, MetaData metaData) {
-        autoSetLinks(entries, null, null, null, metaData, null, null);
+    public static void autoSetLinks(Collection<BibEntry> entries, BibDatabaseContext databaseContext) {
+        autoSetLinks(entries, null, null, null, databaseContext, null, null);
     }
 
     /**
@@ -392,15 +256,15 @@ public class Util {
      * @param ce
      * @param changedEntries
      * @param singleTableModel
-     * @param metaData
+     * @param databaseContext
      * @param callback
      * @param diag
      * @return
      */
-    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         List<BibEntry> entries = new ArrayList<>(1);
         entries.add(entry);
-        return autoSetLinks(entries, ce, changedEntries, singleTableModel, metaData, callback, diag);
+        return autoSetLinks(entries, ce, changedEntries, singleTableModel, databaseContext, callback, diag);
     }
 
     /**
@@ -420,22 +284,22 @@ public class Util {
      *                         introduced as a bibtexentry does not (yet) support the function getListTableModel() and the
      *                         FileListEntryEditor editor holds an instance of that table model and does not reconstruct it after the
      *                         search has succeeded.
-     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
      *                         parameter can be null, which means that no callback will be notified.
-     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the automatically setting. This
      *                         parameter can be null, which means that no progress update will be shown.
-     * @return the thread performing the autosetting
+     * @return the thread performing the automatically setting
      */
-    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
             final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.size() - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            diag.setTitle(Localization.lang("Autosetting links"));
+            diag.setTitle(Localization.lang("Automatically setting file links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
             diag.getContentPane().add(label, BorderLayout.SOUTH);
 
@@ -449,7 +313,7 @@ public class Util {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = databaseContext.getFileDirectory();
                 for (String dirs1 : dirsS) {
                     dirs.add(new File(dirs1));
                 }
@@ -498,12 +362,12 @@ public class Util {
                         }
                         if (!alreadyHas) {
                             foundAny = true;
-                            ExternalFileType type;
+                            Optional<ExternalFileType> type;
                             Optional<String> extension = FileUtil.getFileExtension(f);
                             if (extension.isPresent()) {
                                 type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {
-                                type = new UnknownExternalFileType("");
+                                type = Optional.of(new UnknownExternalFileType(""));
                             }
                             FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
@@ -566,21 +430,21 @@ public class Util {
      * @param entry            The BibEntry to find links for.
      * @param singleTableModel The table model to insert links into. Already existing links are not duplicated or
      *                         removed.
-     * @param metaData         The MetaData providing the relevant file directory, if any.
+     * @param databaseContext  The database providing the relevant file directory, if any.
      * @param callback         An ActionListener that is notified (on the event dispatch thread) when the search is finished.
      *                         The ActionEvent has id=0 if no new links were added, and id=1 if one or more links were added. This
      *                         parameter can be null, which means that no callback will be notified. The passed ActionEvent is
      *                         constructed with (this, id, ""), where id is 1 if something has been done and 0 if nothing has been
      *                         done.
-     * @param diag             An instantiated modal JDialog which will be used to display the progress of the autosetting. This
+     * @param diag             An instantiated modal JDialog which will be used to display the progress of the automatically setting. This
      *                         parameter can be null, which means that no progress update will be shown.
-     * @return the runnable able to perform the autosetting
+     * @return the runnable able to perform the automatically setting
      */
-    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final MetaData metaData, final ActionListener callback, final JDialog diag) {
+    public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        return autoSetLinks(entries, null, null, singleTableModel, metaData, callback, diag);
+        return autoSetLinks(entries, null, null, singleTableModel, databaseContext, callback, diag);
     }
 
     /**

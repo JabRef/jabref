@@ -206,7 +206,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("g").
                 longOpt("generateBibtexKeys").
-                desc(Localization.lang("Regenerate all keys for the entries in a bibtex file"))
+                desc(Localization.lang("Regenerate all keys for the entries in a BibTeX file"))
                 .build());
 
         options.addOption(Option.builder("asfl").
@@ -224,7 +224,7 @@ public class JabRefCLI {
     public void printUsage() {
         String header = "";
 
-        String importFormats = Globals.importFormatReader.getImportFormatList();
+        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
         String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
 
         String outFormats = ExportFormats.getConsoleExportList(70, 20, "");

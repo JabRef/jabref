@@ -127,7 +127,7 @@ public class ExternalFileTypeEntryEditor {
         if (OS.WINDOWS) {
             application.getDocument().addDocumentListener(new DocumentListener() {
 
-                private void handle(DocumentEvent e) {
+                private void handle() {
                     if (application.getText().isEmpty()) {
                         useDefault.setSelected(true);
                     } else {
@@ -136,18 +136,18 @@ public class ExternalFileTypeEntryEditor {
                 }
 
                 @Override
-                public void insertUpdate(DocumentEvent e) {
-                    handle(e);
+                public void insertUpdate(DocumentEvent documentEvent) {
+                    handle();
                 }
 
                 @Override
                 public void removeUpdate(DocumentEvent documentEvent) {
-                    handle(documentEvent);
+                    handle();
                 }
 
                 @Override
                 public void changedUpdate(DocumentEvent documentEvent) {
-                    handle(documentEvent);
+                    handle();
                 }
             });
         }
@@ -200,7 +200,7 @@ public class ExternalFileTypeEntryEditor {
         name.setText(entry.getName());
         extension.setText(entry.getExtension());
         mimeType.setText(entry.getMimeType());
-        application.setText(entry.getOpenWith());
+        application.setText(entry.getOpenWithApplication());
         icon.setIcon(entry.getIcon());
         if (application.getText().isEmpty()) {
             useDefault.setSelected(true);

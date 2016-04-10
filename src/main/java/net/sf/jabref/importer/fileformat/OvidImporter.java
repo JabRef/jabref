@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -88,9 +89,8 @@ public class OvidImporter extends ImportFormat {
 
                 i++;
             }
-
-            return false;
         }
+        return false;
     }
 
     /**
@@ -99,22 +99,23 @@ public class OvidImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String line;
-        while ((line = in.readLine()) != null) {
-            if (!line.isEmpty() && (line.charAt(0) != ' ')) {
-                sb.append("__NEWFIELD__");
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (!line.isEmpty() && (line.charAt(0) != ' ')) {
+                    sb.append("__NEWFIELD__");
+                }
+                sb.append(line);
+                sb.append('\n');
             }
-            sb.append(line);
-            sb.append('\n');
         }
 
         String[] items = sb.toString().split(OVID_PATTERN_STRING);
 
         for (int i = 1; i < items.length; i++) {
-            HashMap<String, String> h = new HashMap<>();
+            Map<String, String> h = new HashMap<>();
             String[] fields = items[i].split("__NEWFIELD__");
             for (String field : fields) {
                 int linebreak = field.indexOf('\n');

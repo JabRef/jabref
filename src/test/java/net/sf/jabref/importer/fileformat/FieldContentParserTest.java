@@ -23,7 +23,7 @@ public class FieldContentParserTest {
     }
 
     @Test
-    public void unifiesLineBreaks() throws Exception {
+    public void unifiesLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
         String expected = "I\nunify\nline\nbreaks.".replace("\n", Globals.NEWLINE);
         String processed = parser.format(new StringBuilder(original), "abstract").toString();
@@ -32,7 +32,7 @@ public class FieldContentParserTest {
     }
 
     @Test
-    public void retainsWhitespaceForMultiLineFields() throws Exception {
+    public void retainsWhitespaceForMultiLineFields() {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
         String formatted = original.replace("\n", Globals.NEWLINE);
 
@@ -44,7 +44,7 @@ public class FieldContentParserTest {
     }
 
     @Test
-    public void removeWhitespaceFromNonMultiLineFields() throws Exception {
+    public void removeWhitespaceFromNonMultiLineFields() {
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "I should not include additional whitespaces or tabs.";
 

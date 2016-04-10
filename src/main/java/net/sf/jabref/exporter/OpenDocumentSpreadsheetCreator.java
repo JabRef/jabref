@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.xml.transform.OutputKeys;
@@ -34,7 +34,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -51,13 +51,17 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Localization.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
+        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods");
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, entries);
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        if (!entries.isEmpty()) { // Only export if entries exists
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), databaseContext.getDatabase(), entries);
+        }
     }
 
     private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {

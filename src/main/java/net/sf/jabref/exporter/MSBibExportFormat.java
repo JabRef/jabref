@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -30,9 +30,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -42,16 +40,22 @@ import net.sf.jabref.model.entry.BibEntry;
 class MSBibExportFormat extends ExportFormat {
 
     public MSBibExportFormat() {
-        super(Localization.lang("MS Office 2007"), "MSBib", null, null, ".xml");
+        super("MS Office 2007", "MSBib", null, null, ".xml");
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws IOException {
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+
+        if (entries.isEmpty()) { // Only export if entries exist
+            return;
+        }
         // forcing to use UTF8 output format for some problems with
         // xml export in other encodings
         SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
-        MSBibDatabase md = new MSBibDatabase(database, entries);
+        MSBibDatabase md = new MSBibDatabase(databaseContext.getDatabase(), entries);
         try (VerifyingWriter ps = ss.getWriter()) {
 
         // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES

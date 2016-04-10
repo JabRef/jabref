@@ -69,7 +69,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().isEmpty()) {
-            message = Localization.lang("No entries selected.");
+            message = Localization.lang("This operation requires one or more entries to be selected.");
             getCallBack().update();
             return;
         }
@@ -100,10 +100,8 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-        // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory().toArray(new String[0]);
 
         File tmp = null;
         try {
@@ -114,8 +112,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
-            format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
-                    tmp.getPath(), panel.getEncoding(), entries);
+            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {

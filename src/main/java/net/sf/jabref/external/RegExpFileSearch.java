@@ -83,7 +83,7 @@ public class RegExpFileSearch {
 
     /**
      * Searches the given directory and filename pattern for a file for the
-     * bibtexentry.
+     * bibtex entry.
      *
      * Used to fix:
      *
@@ -98,7 +98,7 @@ public class RegExpFileSearch {
      * Syntax scheme for file:
      * <ul>
      * <li>* Any subDir</li>
-     * <li>** Any subDir (recursiv)</li>
+     * <li>** Any subDir (recursive)</li>
      * <li>[key] Key from bibtex file and database</li>
      * <li>.* Anything else is taken to be a Regular expression.</li>
      * </ul>
@@ -123,10 +123,7 @@ public class RegExpFileSearch {
             String extensionRegExp) {
         ArrayList<File> res = new ArrayList<>();
         for (File directory : dirs) {
-            List<File> tmp = RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp);
-            if (tmp != null) {
-                res.addAll(tmp);
-            }
+            res.addAll(RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp));
         }
         return res;
     }
@@ -145,7 +142,7 @@ public class RegExpFileSearch {
             root = new File(directory);
         }
         if (!root.exists()) {
-            return null;
+            return Collections.emptyList();
         }
         List<File> res = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
 
@@ -179,11 +176,14 @@ public class RegExpFileSearch {
      */
     private static List<File> findFile(BibEntry entry, File directory, String file, String extensionRegExp) {
 
-        ArrayList<File> res = new ArrayList<>();
+        List<File> res = new ArrayList<>();
 
+        File actualDirectory;
         if (file.startsWith("/")) {
-            directory = new File(".");
+            actualDirectory = new File(".");
             file = file.substring(1);
+        } else {
+            actualDirectory = directory;
         }
 
         // Escape handling...
@@ -208,19 +208,19 @@ public class RegExpFileSearch {
                 dirToProcess = Util.expandBrackets(dirToProcess, entry, null);
 
                 if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                    directory = new File(dirToProcess + '/');
+                    actualDirectory = new File(dirToProcess + '/');
                     continue;
                 }
                 if (".".equals(dirToProcess)) { // Stay in current directory
                     continue;
                 }
                 if ("..".equals(dirToProcess)) {
-                    directory = new File(directory.getParent());
+                    actualDirectory = new File(actualDirectory.getParent());
                     continue;
                 }
                 if ("*".equals(dirToProcess)) { // Do for all direct subdirs
 
-                    File[] subDirs = directory.listFiles();
+                    File[] subDirs = actualDirectory.listFiles();
                     if (subDirs != null) {
                         String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
                         for (File subDir : subDirs) {
@@ -233,7 +233,7 @@ public class RegExpFileSearch {
                 // Do for all direct and indirect subdirs
                 if ("**".equals(dirToProcess)) {
                     List<File> toDo = new LinkedList<>();
-                    toDo.add(directory);
+                    toDo.add(actualDirectory);
 
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
@@ -267,7 +267,7 @@ public class RegExpFileSearch {
         final Pattern toMatch = Pattern.compile('^'
                 + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$', Pattern.CASE_INSENSITIVE);
 
-        File[] matches = directory.listFiles(new FilenameFilter() {
+        File[] matches = actualDirectory.listFiles(new FilenameFilter() {
 
             @Override
             public boolean accept(File arg0, String arg1) {

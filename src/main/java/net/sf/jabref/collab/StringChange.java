@@ -77,16 +77,14 @@ class StringChange extends Change {
             String newId = IdGenerator.next();
             BibtexString bs = new BibtexString(newId, label, disk);
             try {
-                panel.database().addString(bs);
-                undoEdit.addEdit(new UndoableInsertString(panel, panel.database(), bs));
+                panel.getDatabase().addString(bs);
+                undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
         } else {
             string.setContent(disk);
             undoEdit.addEdit(new UndoableStringChange(panel, string, false, mem, disk));
-            // Update tmp databse:
-
         }
 
         // Update tmp database:

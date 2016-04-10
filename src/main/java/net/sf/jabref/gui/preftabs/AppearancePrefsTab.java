@@ -18,8 +18,12 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.*;
 
+import net.sf.jabref.logic.util.OS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,25 +31,52 @@ import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.ColorSetupPanel;
+
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
-
     private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
+
     private final JCheckBox colorCodes;
     private final JCheckBox overrideFonts;
     private final JCheckBox showGrid;
     private final ColorSetupPanel colorPanel = new ColorSetupPanel();
-    private Font font = GUIGlobals.CURRENTFONT;
+    private Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
     private final JTextField rowPadding;
+    // Look & Feel
+    private final JComboBox<String> classNamesLAF;
+    private String currentLAF = "";
+    private boolean useDefaultLAF;
+    private final JCheckBox customLAF;
 
+    static class LookAndFeel {
+        private static final List<String> looks = Arrays.asList(
+                UIManager.getSystemLookAndFeelClassName(),
+                UIManager.getCrossPlatformLookAndFeelClassName(),
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
+                "com.jgoodies.looks.windows.WindowsLookAndFeel");
+
+        public static List<String> getAvailableLookAndFeels() {
+            List<String> lookAndFeels = new ArrayList<>();
+
+            for (String l : looks) {
+                try {
+                    // Try to find L&F
+                    Class.forName(l);
+                    lookAndFeels.add(l);
+                } catch (ClassNotFoundException ignored) {
+                    // Ignored
+                }
+            }
+            return lookAndFeels;
+        }
+    }
 
     /**
      * Customization of appearance parameters.
@@ -69,10 +100,49 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         showGrid = new JCheckBox(Localization.lang("Show gridlines"));
 
-        FormLayout layout = new FormLayout
-                ("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref",
-                        "");
+        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:pref, 4dlu, fill:60dlu, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
+
+        customLAF = new JCheckBox(Localization.lang("Use other look and feel"));
+        // Only list L&F which are available
+        List<String> lookAndFeels = LookAndFeel.getAvailableLookAndFeels();
+        classNamesLAF = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
+        classNamesLAF.setEditable(true);
+        final JComboBox<String> clName = classNamesLAF;
+        customLAF.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
+
+        // only the default L&F shows the the OSX specific first dropdownmenu
+        if (!OS.OS_X) {
+            JPanel pan = new JPanel();
+            builder.appendSeparator(Localization.lang("Look and feel"));
+            JLabel lab = new JLabel(
+                    Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
+            builder.nextLine();
+            builder.append(pan);
+            builder.append(lab);
+            builder.nextLine();
+            builder.append(pan);
+            builder.append(customLAF);
+            builder.nextLine();
+            builder.append(pan);
+            JPanel pan2 = new JPanel();
+            lab = new JLabel(Localization.lang("Class name") + ':');
+            pan2.add(lab);
+            pan2.add(classNamesLAF);
+            builder.append(pan2);
+            builder.nextLine();
+            builder.append(pan);
+            lab = new JLabel(Localization
+                    .lang("Note that you must specify the fully qualified class name for the look and feel,"));
+            builder.append(lab);
+            builder.nextLine();
+            builder.append(pan);
+            lab = new JLabel(
+                    Localization.lang("and the class must be available in your classpath next time you start JabRef."));
+            builder.append(lab);
+            builder.nextLine();
+        }
+
         builder.leadingColumnOffset(2);
         JLabel lab;
         builder.appendSeparator(Localization.lang("General"));
@@ -113,7 +183,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
 
         fontButton.addActionListener(
-                e -> new FontSelectorDialog(null, GUIGlobals.CURRENTFONT).getSelectedFont().ifPresent(x -> font = x));
+                e -> new FontSelectorDialog(null, GUIGlobals.currentFont).getSelectedFont().ifPresent(x -> usedFont = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -122,6 +192,13 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
+        // L&F
+        useDefaultLAF = prefs.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL);
+        currentLAF = prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
+        customLAF.setSelected(!useDefaultLAF);
+        classNamesLAF.setSelectedItem(currentLAF);
+        classNamesLAF.setEnabled(!useDefaultLAF);
+
         colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
         fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
         rowPadding.setText(String.valueOf(prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING)));
@@ -133,20 +210,24 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         colorPanel.setValues();
     }
 
-    /**
-     * Store changes to table preferences. This method is called when
-     * the user clicks Ok.
-     *
-     */
     @Override
     public void storeSettings() {
+        // L&F
+        prefs.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !customLAF.isSelected());
+        prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
+        if (customLAF.isSelected() == useDefaultLAF || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())) {
+            JOptionPane.showMessageDialog(null,
+                    Localization.lang("You have changed the look and feel setting.").concat(" ")
+                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                    Localization.lang("Changed look and feel settings"), JOptionPane.WARNING_MESSAGE);
+        }
 
         prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
-        prefs.put(JabRefPreferences.FONT_FAMILY, font.getFamily());
-        prefs.putInt(JabRefPreferences.FONT_STYLE, font.getStyle());
-        prefs.putInt(JabRefPreferences.FONT_SIZE, font.getSize());
+        prefs.put(JabRefPreferences.FONT_FAMILY, usedFont.getFamily());
+        prefs.putInt(JabRefPreferences.FONT_STYLE, usedFont.getStyle());
+        prefs.putInt(JabRefPreferences.FONT_SIZE, usedFont.getSize());
         prefs.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS, overrideFonts.isSelected());
-        GUIGlobals.CURRENTFONT = font;
+        GUIGlobals.currentFont = usedFont;
         colorPanel.storeSettings();
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {

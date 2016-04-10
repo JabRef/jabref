@@ -94,7 +94,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         String outputStr;
         switch (besLength) {
         case 0:
-            outputStr = Localization.lang("No entries selected.");
+            outputStr = Localization.lang("This operation requires one or more entries to be selected.");
             break;
         case 1:
             frame.getCurrentBasePanel().markBaseChanged();

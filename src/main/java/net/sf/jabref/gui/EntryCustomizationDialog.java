@@ -26,13 +26,14 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.*;
-import net.sf.jabref.model.EntryTypes;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.*;
 
 public class EntryCustomizationDialog extends JDialog implements ListSelectionListener, ActionListener {
@@ -371,7 +372,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             // Invalidate associated cached entry editor
             bp.entryEditors.remove(typeName);
 
-            for (BibEntry entry : bp.database().getEntries()) {
+            for (BibEntry entry : bp.getDatabase().getEntries()) {
                 EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(entry::setType);
             }
         }

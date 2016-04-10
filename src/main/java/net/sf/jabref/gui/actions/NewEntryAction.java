@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -48,7 +47,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         String thisType = type;
         if (thisType == null) {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
-            PositionWindow.placeDialog(etd, jabRefFrame);
+            etd.setLocationRelativeTo(jabRefFrame);
             etd.setVisible(true);
             EntryType tp = etd.getChoice();
             if (tp == null) {

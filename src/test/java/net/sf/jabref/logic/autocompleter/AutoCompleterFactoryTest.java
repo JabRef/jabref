@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class AutoCompleterFactoryTest {
 
     @Test(expected = NullPointerException.class)

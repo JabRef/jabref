@@ -38,6 +38,7 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -374,8 +375,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                NamedCompound compound = new NamedCompound("SpecialFieldSync");
                 for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 }
                 LOGGER.info("Synchronized special fields based on keywords");
             }
@@ -430,15 +432,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (line.startsWith(Globals.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(Globals.encPrefix)) {
+                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(Globals.encPrefix.length());
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));

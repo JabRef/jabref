@@ -18,16 +18,15 @@ package net.sf.jabref.gui;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import org.apache.commons.logging.Log;
@@ -42,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -68,7 +68,7 @@ public class FileListEntryEditor {
     private ConfirmCloseFileListEntryEditor externalConfirm;
 
     private FileListEntry entry;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private boolean okPressed;
     private boolean okDisabledExternally;
     private boolean openBrowseWhenShown;
@@ -78,9 +78,9 @@ public class FileListEntryEditor {
 
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
-            boolean showOpenButton, MetaData metaData) {
+            boolean showOpenButton, BibDatabaseContext databaseContext) {
         this.entry = entry;
-        this.metaData = metaData;
+        this.databaseContext = databaseContext;
 
         ActionListener okAction = e -> {
             // If OK button is disabled, ignore this event:
@@ -182,7 +182,7 @@ public class FileListEntryEditor {
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
-        PositionWindow.placeDialog(diag, frame);
+        diag.setLocationRelativeTo(frame);
         diag.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -206,19 +206,16 @@ public class FileListEntryEditor {
 
             // Check if this looks like a remote link:
             if (FileListEntryEditor.REMOTE_LINK_PATTERN.matcher(link.getText()).matches()) {
-                ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
-                if (type != null) {
-                    types.setSelectedItem(type);
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+                if (type.isPresent()) {
+                    types.setSelectedItem(type.get());
                     return;
                 }
             }
 
             // Try to guess the file type:
             String theLink = link.getText().trim();
-            ExternalFileType type = ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink);
-            if (type != null) {
-                types.setSelectedItem(type);
-            }
+            ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink).ifPresent(types::setSelectedItem);
         }
     }
 
@@ -226,7 +223,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
         if (type != null) {
             try {
-                JabRefDesktop.openExternalFileAnyFormat(metaData, link.getText(), type);
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, link.getText(), Optional.of(type));
             } catch (IOException e) {
                 LOGGER.error("File could not be opened", e);
             }
@@ -277,8 +274,8 @@ public class FileListEntryEditor {
         types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        if ((entry.type != null) && !(entry.type instanceof UnknownExternalFileType)) {
-            types.setSelectedItem(entry.type);
+        if ((entry.type.isPresent()) && !(entry.type.get() instanceof UnknownExternalFileType)) {
+            types.setSelectedItem(entry.type.get());
         } else if ((entry.link != null) && (!entry.link.isEmpty())) {
             checkExtension();
         }
@@ -289,7 +286,7 @@ public class FileListEntryEditor {
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = metaData.getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = databaseContext.getFileDirectory();
             if (dirs.isEmpty()) {
                 link = this.link.getText().trim();
             } else {
@@ -319,7 +316,7 @@ public class FileListEntryEditor {
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
         entry.description = descriptionText;
-        entry.type = type;
+        entry.type = Optional.ofNullable(type);
         entry.link = link;
     }
 
@@ -354,7 +351,7 @@ public class FileListEntryEditor {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                List<String> dirsS = metaData.getFileDirectory(Globals.FILE_FIELD);
+                List<String> dirsS = databaseContext.getFileDirectory();
                 newFile = FileUtil.shortenFileName(newFile, dirsS);
 
                 comp.setText(newFile.getPath());

@@ -22,7 +22,6 @@ import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 
@@ -220,10 +219,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                         dialog.setVisible(true);
                         if (dialog.isOkPressed()) {
                             final ImportInspectionDialog d2 = new ImportInspectionDialog(frame,
-                                    frame.getCurrentBasePanel(), InternalBibtexFields.DEFAULT_INSPECTION_FIELDS,
-                                    activeFetcher.getTitle(), false);
+                                    frame.getCurrentBasePanel(), activeFetcher.getTitle(), false);
                             d2.addCallBack(activeFetcher);
-                            PositionWindow.placeDialog(d2, frame);
+                            d2.setLocationRelativeTo(frame);
                             d2.setVisible(true);
                             JabRefExecutorService.INSTANCE.execute(() -> {
                                 pFetcher.getEntries(dialog.getSelection(), d2);
@@ -238,9 +236,9 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                    activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
-            PositionWindow.placeDialog(dialog, frame);
+            dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(() -> {
@@ -282,7 +280,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void componentClosing() {
         super.componentClosing();
-        frame.fetcherToggle.setSelected(false);
+        frame.setFetcherToggle(false);
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 

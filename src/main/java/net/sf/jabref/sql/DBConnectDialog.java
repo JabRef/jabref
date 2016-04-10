@@ -84,8 +84,8 @@ public class DBConnectDialog extends JDialog {
         rhs.add(pwdPassword);
 
         // setup label text
-        lblServerType.setText(Localization.lang("Server type" + ':'));
-        lblServerHostname.setText(Localization.lang("Server hostname" + ':'));
+        lblServerType.setText(Localization.lang("Server type") + ':');
+        lblServerHostname.setText(Localization.lang("Server hostname") + ':');
         lblDatabase.setText(Localization.lang("Database") + ':');
         lblUsername.setText(Localization.lang("Username") + ':');
         lblPassword.setText(Localization.lang("Password") + ':');

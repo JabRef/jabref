@@ -67,30 +67,26 @@ public class DatabaseExporter {
         this.database = database;
     }
 
+
     /**
      * Method for the exportDatabase methods.
      *
-     * @param database The DBTYPE of the database
-     * @param database The BibDatabase to export
-     * @param metaData The MetaData object containing the groups information
-     * @param entriesToExport   The list of the entries to export.
+     * @param databaseContext the database to export
+     * @param entriesToExport The list of the entries to export.
      * @param out      The output (PrintStream or Connection) object to which the DML should be written.
      */
-    private void performExport(final BibDatabase database, final MetaData metaData, List<BibEntry> entriesToExport,
+    private void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
             Object out, String dbName) throws Exception {
-        Defaults defaults = new Defaults(
-                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, metaData, defaults);
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, entriesToExport, savePrefs);
-        GroupTreeNode gtn = metaData.getGroups();
+        List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(databaseContext, entriesToExport, savePrefs);
+        GroupTreeNode gtn = databaseContext.getMetaData().getGroups();
 
-        final int database_id = DatabaseUtil.getDatabaseIDByName(metaData, out, dbName);
+        final int database_id = DatabaseUtil.getDatabaseIDByName(databaseContext, out, dbName);
         DatabaseUtil.removeAllRecordsForAGivenDB(out, database_id);
-        populateEntryTypesTable(out, bibDatabaseContext.getMode());
+        populateEntryTypesTable(out, databaseContext.getMode());
         populateEntriesTable(database_id, entries, out);
-        populateStringTable(database, out, database_id);
+        populateStringTable(databaseContext.getDatabase(), out, database_id);
         populateGroupTypesTable(out);
         populateGroupsTable(gtn, 0, 1, out, database_id);
         populateEntryGroupsTable(gtn, 0, 1, out, database_id);
@@ -111,8 +107,7 @@ public class DatabaseExporter {
                 + ", database_id) VALUES (";
         for (BibEntry entry : entries) {
             query.append(insert).append('\'').append(entry.getId())
-                    .append("', (SELECT entry_types_id FROM entry_types WHERE label='")
-                    .append(entry.getType())
+                    .append("', (SELECT entry_types_id FROM entry_types WHERE label='").append(entry.getType())
                     .append("'), '").append(entry.getCiteKey()).append('\'');
             for (int i = 0; i < SQLUtil.getAllFields().size(); i++) {
                 query.append(", ");
@@ -134,8 +129,8 @@ public class DatabaseExporter {
                 }
             }
             query.append(", '").append(database_id).append("');");
-            SQLUtil.processQuery(out, query.toString());
         }
+        SQLUtil.processQuery(out, query.toString());
     }
 
     /**
@@ -149,8 +144,7 @@ public class DatabaseExporter {
      */
 
     private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
-            final int database_id)
-            throws SQLException {
+            final int database_id) throws SQLException {
         // if this group contains entries...
         if (cursor.getGroup() instanceof ExplicitGroup) {
             ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
@@ -179,7 +173,7 @@ public class DatabaseExporter {
                 }
             }
 
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
                 currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
             }
             //Unfortunatley, AutoCloseable throws only Exception
@@ -250,8 +244,7 @@ public class DatabaseExporter {
      * @param database_id Id of jabref database to which the groups/entries are part of
      */
     private int populateGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Object out,
-            final int database_id)
-            throws SQLException {
+            final int database_id) throws SQLException {
 
         AbstractGroup group = cursor.getGroup();
         String searchField = null;
@@ -283,8 +276,8 @@ public class DatabaseExporter {
                 + group.getTypeId() + "')" + ", " + (searchField != null ? '\'' + searchField + '\'' : "NULL") + ", "
                 + (searchExpr != null ? '\'' + searchExpr + '\'' : "NULL") + ", "
                 + (caseSens != null ? '\'' + caseSens + '\'' : "NULL") + ", "
-                + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '"
-                + database_id + "');");
+                + (regExp != null ? '\'' + regExp + '\'' : "NULL") + ", " + hierContext.ordinal() + ", '" + database_id
+                + "');");
         // recurse on child nodes (depth-first traversal)
         try (AutoCloseable response = SQLUtil.processQueryWithResults(out,
                 "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
@@ -300,7 +293,7 @@ public class DatabaseExporter {
                     ((Statement) response).close();
                 }
             }
-            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+            for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements();) {
                 ++currentID;
                 currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
             }
@@ -389,13 +382,12 @@ public class DatabaseExporter {
      * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified output file.
      *
-     * @param database The BibDatabase to export
-     * @param metaData The MetaData object containing the groups information
+     * @param databaseContext the database to export
      * @param entriesToExport   The list of the entries to export.
      * @param file     The name of the file to which the DML should be written
      * @param encoding The encoding to be used
      */
-    public void exportDatabaseAsFile(final BibDatabase database, final MetaData metaData,
+    public void exportDatabaseAsFile(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, String file, Charset encoding) throws Exception {
         // open output file
         File outfile = new File(file);
@@ -404,8 +396,8 @@ public class DatabaseExporter {
             return;
         }
         try (BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(outfile));
-             PrintStream fout = new PrintStream(writer)) {
-            performExport(database, metaData, entriesToExport, fout, "file");
+                PrintStream fout = new PrintStream(writer)) {
+            performExport(databaseContext, entriesToExport, fout, "file");
         }
     }
 
@@ -413,12 +405,11 @@ public class DatabaseExporter {
      * Accepts the BibDatabase and MetaData, generates the DML required to create and populate SQL database tables,
      * and writes this DML to the specified SQL database.
      *
-     * @param database        The BibDatabase to export
-     * @param metaData        The MetaData object containing the groups information
+     * @param databaseContext the database to export
      * @param entriesToExport The list of the entries to export.
      * @param databaseStrings The necessary database connection information
      */
-    public void exportDatabaseToDBMS(final BibDatabase database, final MetaData metaData,
+    public void exportDatabaseToDBMS(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
         Connection conn = null;
@@ -431,18 +422,18 @@ public class DatabaseExporter {
                     DBImportExportDialog.DialogType.EXPORTER);
             if (dialogo.removeAction) {
                 dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                DatabaseUtil.removeDB(dialogo, dbName, conn, metaData);
+                DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
                 redisplay = true;
             } else if (dialogo.hasDBSelected) {
                 dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                performExport(database, metaData, entriesToExport, conn, dbName);
+                performExport(databaseContext, entriesToExport, conn, dbName);
             }
             if (!conn.getAutoCommit()) {
                 conn.commit();
                 conn.setAutoCommit(true);
             }
             if (redisplay) {
-                exportDatabaseToDBMS(database, metaData, entriesToExport, databaseStrings, frame);
+                exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
             }
         } catch (SQLException ex) {
             if ((conn != null) && !conn.getAutoCommit()) {
@@ -481,8 +472,7 @@ public class DatabaseExporter {
             }
         } else {
             dbName = JOptionPane.showInputDialog(frame, Localization.lang("Please enter the desired name:"),
-                    Localization.lang("SQL Export"),
-                    JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("SQL Export"), JOptionPane.INFORMATION_MESSAGE);
         }
         return dbName;
     }

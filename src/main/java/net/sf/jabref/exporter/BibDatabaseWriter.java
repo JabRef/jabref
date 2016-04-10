@@ -81,11 +81,13 @@ public class BibDatabaseWriter {
      */
     public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort,
             SavePreferences preferences) {
+        Objects.requireNonNull(bibDatabaseContext);
+        Objects.requireNonNull(entriesToSort);
 
         //if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             List<BibEntry> result = new LinkedList<>();
-            result.addAll(bibDatabaseContext.getDatabase().getEntries());
+            result.addAll(entriesToSort);
             return result;
         }
 
@@ -245,7 +247,7 @@ public class BibDatabaseWriter {
         }
 
         out.write("% ");
-        out.write(Globals.encPrefix + encoding);
+        out.write(Globals.ENCODING_PREFIX + encoding);
         out.write(Globals.NEWLINE);
     }
 

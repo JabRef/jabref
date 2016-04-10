@@ -15,10 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.*;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
@@ -27,7 +24,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +33,6 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -66,21 +61,16 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * If a database is set, the preview will attempt to resolve strings in the
      * previewed entry using that database.
      */
-    private Optional<BibDatabase> database = Optional.empty();
+    private Optional<BibDatabaseContext> databaseContext = Optional.empty();
 
     private Optional<Layout> layout = Optional.empty();
 
     /**
      * must not be null, must always be set during constructor, but can change over time
      */
-    private MetaData metaData;
-
-    /**
-     * must not be null, must always be set during constructor, but can change over time
-     */
     private String layoutFile;
 
-    private final Optional<BasePanel> panel;
+    private final Optional<BasePanel> basePanel;
 
     private JEditorPane previewPane;
 
@@ -96,23 +86,20 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     /**
-     * @param database
-     *            (may be null) Optionally used to resolve strings.
+     * @param databaseContext
+     *            (may be null) Optionally used to resolve strings and for resolving pdf directories for links.
      * @param entry
      *            (may be null) If given this entry is shown otherwise you have
      *            to call setEntry to make something visible.
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
-     * @param metaData
-     *            (must be given) Used for resolving pdf directories for links.
      * @param layoutFile
      *            (must be given) Used for layout
      */
-    public PreviewPanel(BibDatabase database, BibEntry entry,
-                        BasePanel panel, MetaData metaData, String layoutFile) {
-        this(panel, metaData, layoutFile);
-        this.database = Optional.ofNullable(database);
+    public PreviewPanel(BibDatabaseContext databaseContext, BibEntry entry,
+                        BasePanel panel, String layoutFile) {
+        this(panel, databaseContext, layoutFile);
         setEntry(entry);
     }
 
@@ -121,15 +108,15 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
-     * @param metaData
-     *            (must be given) Used for resolving pdf directories for links.
+     * @param databaseContext
+     *            (may be null) Used for resolving pdf directories for links.
      * @param layoutFile
      *            (must be given) Used for layout
      */
-    public PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile) {
+    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, String layoutFile) {
         super(new BorderLayout(), true);
 
-        this.metaData = Objects.requireNonNull(metaData);
+        this.databaseContext = Optional.ofNullable(databaseContext);
         this.layoutFile = Objects.requireNonNull(layoutFile);
         updateLayout();
 
@@ -137,7 +124,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         this.printAction = new PrintAction();
         this.copyPreviewAction = new CopyPreviewAction();
 
-        this.panel = Optional.ofNullable(panel);
+        this.basePanel = Optional.ofNullable(panel);
 
         createPreviewPane();
 
@@ -157,7 +144,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
          * If we have been given a panel and the preference option
          * previewPrintButton is set, show the tool bar
          */
-        if (this.panel.isPresent()
+        if (this.basePanel.isPresent()
                 && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
             add(createToolBar(), BorderLayout.LINE_START);
         }
@@ -188,7 +175,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         JPopupMenu menu = new JPopupMenu();
         menu.add(this.printAction);
         menu.add(this.copyPreviewAction);
-        this.panel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
+        this.basePanel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
         return menu;
     }
 
@@ -228,26 +215,22 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setEditable(false);
         previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
         previewPane.setContentType("text/html");
-        previewPane.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
-                if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        String address = hyperlinkEvent.getURL().toString();
-                        JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData,
-                                address, "url");
-                    } catch (IOException e) {
-                        LOGGER.warn("Could not open external viewer", e);
-                    }
+        previewPane.addHyperlinkListener(hyperlinkEvent -> {
+            if ((hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) && PreviewPanel.this.databaseContext
+                    .isPresent()) {
+                try {
+                    String address = hyperlinkEvent.getURL().toString();
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, "url");
+                } catch (IOException e) {
+                    LOGGER.warn("Could not open external viewer", e);
                 }
             }
         });
 
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
+    public void setDatabaseContext(BibDatabaseContext databaseContext) {
+        this.databaseContext = Optional.ofNullable(databaseContext);
     }
 
     public void updateLayout(String layoutFormat) {
@@ -290,9 +273,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
         entry.ifPresent(entry ->
-                layout.ifPresent(layout ->
-                        sb.append(layout.doLayout(entry, database.orElse(null), highlightPattern))
-                )
+                layout.ifPresent(layout -> sb.append(layout
+                        .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null),
+                                highlightPattern)))
         );
         String newValue = sb.toString();
 
@@ -321,8 +304,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     @Override
-    public void highlightPattern(Optional<Pattern> highlightPattern) {
-        this.highlightPattern = highlightPattern;
+    public void highlightPattern(Optional<Pattern> newPattern) {
+        this.highlightPattern = newPattern;
         update();
     }
 
@@ -350,6 +333,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
                     JOptionPane.showMessageDialog(PreviewPanel.this,
                             Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
                             Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
+                    LOGGER.info("Could not print preview", e);
                 }
             });
         }
@@ -364,7 +348,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         }
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.ifPresent(BasePanel::hideBottomComponent);
+            basePanel.ifPresent(BasePanel::hideBottomComponent);
         }
 
 

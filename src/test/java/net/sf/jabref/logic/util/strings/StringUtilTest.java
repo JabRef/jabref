@@ -27,7 +27,7 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testUnifyLineBreaks() throws Exception {
+    public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
         assertEquals(Globals.NEWLINE, result);
@@ -284,6 +284,35 @@ public class StringUtilTest {
     public void testReplaceSpecialCharacters() {
         assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
         assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
+    }
+
+    @Test
+    public void testExpandAuthorInitialsAddDot() {
+        assertEquals("O.", StringUtil.expandAuthorInitials("O"));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
+        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
+        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
+        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("AO Moore"));
+        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
+        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
+        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
+        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
+        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
+    }
+
+    @Test
+    public void testExpandAuthorInitialsDoNotAddDot() {
+        assertEquals("O.", StringUtil.expandAuthorInitials("O."));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("A. O."));
+        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A.-O."));
+        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O. Moore"));
+        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("A. O. Moore"));
+        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
+        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
+        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
+        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
+        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
     }
 
 }

@@ -42,7 +42,7 @@ public class BibtexSingleField {
     // the extras data
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    private Set<BibtexSingleFieldProperties> extras = EnumSet.noneOf(BibtexSingleFieldProperties.class);
+    private Set<FieldProperties> extras = EnumSet.noneOf(FieldProperties.class);
 
     // a comma separated list of alternative bibtex-fieldnames, e.g.
     // "LCCN" is the same like "lib-congress"
@@ -115,13 +115,13 @@ public class BibtexSingleField {
         return flags.contains(Flag.WRITEABLE);
     }
 
-    public void setExtras(Set<BibtexSingleFieldProperties> pExtras) {
+    public void setExtras(Set<FieldProperties> pExtras) {
         extras = pExtras;
     }
 
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    public Set<BibtexSingleFieldProperties> getExtras() {
+    public Set<FieldProperties> getExtras() {
         return extras;
     }
 
@@ -153,15 +153,15 @@ public class BibtexSingleField {
      */
     public BibtexSingleField setNumeric(boolean numeric) {
         if (numeric) {
-            extras.add(BibtexSingleFieldProperties.NUMERIC);
+            extras.add(FieldProperties.NUMERIC);
         } else {
-            extras.remove(BibtexSingleFieldProperties.NUMERIC);
+            extras.remove(FieldProperties.NUMERIC);
         }
         return this;
     }
 
     public boolean isNumeric() {
-        return extras.contains(BibtexSingleFieldProperties.NUMERIC);
+        return extras.contains(FieldProperties.NUMERIC);
     }
 
 }

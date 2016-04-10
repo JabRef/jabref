@@ -155,6 +155,19 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         LOGGER.debug("ToSetIn: '" + toSetIn + "'");
     }
 
+    private boolean atEndOfWord(JTextComponent textField) {
+        int nextCharPosition = textField.getCaretPosition();
+
+        // position not at the end of input
+        if(nextCharPosition < textField.getText().length()) {
+            char nextChar = textField.getText().charAt(nextCharPosition);
+            if (!Character.isWhitespace(nextChar)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * If user cancels autocompletion by a) entering another letter than the completed word (and there is no other auto
      * completion) b) space the casing of the letters has to be kept
@@ -264,6 +277,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         char ch = e.getKeyChar();
         if (ch == '\n') {
             // this case is handled at keyPressed(e)
+            return;
+        }
+
+        // don't do auto completion inside words
+        if (!atEndOfWord((JTextComponent) e.getSource())) {
             return;
         }
 

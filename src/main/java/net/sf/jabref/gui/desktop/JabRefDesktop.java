@@ -33,26 +33,22 @@ import java.util.regex.Pattern;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
-    public static final NativeDesktop ND_LINUX = new Linux();
-    public static final NativeDesktop ND_WINDOWS = new Windows();
-    public static final NativeDesktop ND_MAC = new OSX();
-    public static final NativeDesktop ND_DEFAULT = new DefaultDesktop();
+
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
-
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
-
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
+
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */
-    public static void openExternalViewer(MetaData metaData, String initialLink, String initialFieldName)
-            throws IOException {
+    public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink,
+            String initialFieldName) throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
         if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = metaData.getFileDirectory(fieldName);
+            List<String> dir = databaseContext.getFileDirectory(fieldName);
 
             Optional<File> file = FileUtil.expandFilename(link, dir);
 
@@ -74,7 +70,7 @@ public class JabRefDesktop {
             }
         } else if ("doi".equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
-            if(doiUrl.isPresent()) {
+            if (doiUrl.isPresent()) {
                 link = doiUrl.get().getURLAsASCIIString();
             }
             // should be opened in browser
@@ -117,13 +113,14 @@ public class JabRefDesktop {
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
-     * @param metaData
-     *            The MetaData for the database this file belongs to.
+     * @param databaseContext
+     *            The database this file belongs to.
      * @param link
      *            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
-    public static boolean openExternalFileAnyFormat(final MetaData metaData, String link, final ExternalFileType fileType) throws IOException {
+    public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
+            final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
@@ -134,17 +131,17 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(metaData, link);
+            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link);
             if (tmp.isPresent()) {
                 file = tmp.get();
             }
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (fileType != null)) {
+        if ((httpLink || file.exists()) && (type.isPresent())) {
             // Open the file:
             String filePath = httpLink ? link : file.getPath();
-            openExternalFilePlatformIndependent(fileType, filePath);
+            openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
             // No file matched the name, or we didn't know the file type.
@@ -152,34 +149,38 @@ public class JabRefDesktop {
         }
     }
 
-    private static void openExternalFilePlatformIndependent(ExternalFileType fileType, String filePath) throws IOException {
-        String application = fileType.getOpenWith();
-        if("".equals(application)) {
-            NATIVE_DESKTOP.openFile(filePath, fileType.getExtension());
-        } else {
-            NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+    private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
+            throws IOException {
+        if (fileType.isPresent()) {
+            String application = fileType.get().getOpenWithApplication();
+
+            if (application.isEmpty()) {
+                NATIVE_DESKTOP.openFile(filePath, fileType.get().getExtension());
+            } else {
+                NATIVE_DESKTOP.openFileWithApplication(filePath, application);
+            }
         }
     }
 
-    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, MetaData metaData,
+    public static boolean openExternalFileUnknown(JabRefFrame frame, BibEntry entry, BibDatabaseContext databaseContext,
             String link, UnknownExternalFileType fileType) throws IOException {
 
         String cancelMessage = Localization.lang("Unable to open file.");
         String[] options = new String[] {Localization.lang("Define '%0'", fileType.getName()),
-                Localization.lang("Change file type"),
-                Localization.lang("Cancel")};
+                Localization.lang("Change file type"), Localization.lang("Cancel")};
         String defOption = options[0];
-        int answer = JOptionPane.showOptionDialog(frame, Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
+        int answer = JOptionPane.showOptionDialog(frame,
+                Localization.lang("This external link is of the type '%0', which is undefined. What do you want to do?",
                         fileType.getName()),
                 Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, options, defOption);
         if (answer == JOptionPane.CANCEL_OPTION) {
             frame.output(cancelMessage);
             return false;
-        }
-        else if (answer == JOptionPane.YES_OPTION) {
+        } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
+                    IconTheme.JabRefIcon.FILE.getSmallIcon());
             ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {
@@ -190,7 +191,7 @@ public class JabRefDesktop {
                 Collections.sort(fileTypes);
                 ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
                 // Finally, open the file:
-                return openExternalFileAnyFormat(metaData, link, newType);
+                return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -216,18 +217,17 @@ public class JabRefDesktop {
                 throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, metaData);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, databaseContext);
             editor.setVisible(true, false);
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
-                        oldValue, newValue);
+                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
                 frame.getCurrentBasePanel().undoManager.addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(metaData, flEntry.link, flEntry.type);
+                return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
             } else {
                 // Cancelled:
                 frame.output(cancelMessage);
@@ -252,7 +252,7 @@ public class JabRefDesktop {
      * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
-        ExternalFileType fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
     }
 
@@ -261,20 +261,19 @@ public class JabRefDesktop {
             return;
         }
 
-        String absolutePath = file.getAbsolutePath();
-        absolutePath = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator) + 1);
+        String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
         NATIVE_DESKTOP.openConsole(absolutePath);
     }
 
     // TODO: Move to OS.java
     public static NativeDesktop getNativeDesktop() {
-        if(OS.WINDOWS) {
-            return ND_WINDOWS;
-        } else if(OS.OS_X) {
-            return ND_MAC;
-        } else if(OS.LINUX) {
-            return ND_LINUX;
+        if (OS.WINDOWS) {
+            return new Windows();
+        } else if (OS.OS_X) {
+            return new OSX();
+        } else if (OS.LINUX) {
+            return new Linux();
         }
-        return ND_DEFAULT;
+        return new DefaultDesktop();
     }
 }

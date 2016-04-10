@@ -24,15 +24,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,8 +96,11 @@ public class BibEntry {
      * Sets this entry's type.
      */
     public void setType(String type) {
-        if (type == null) {
-            type = DEFAULT_TYPE;
+        String newType;
+        if ((type == null) || type.isEmpty()) {
+            newType = DEFAULT_TYPE;
+        } else {
+            newType = type;
         }
 
         String oldType = this.type;
@@ -114,9 +109,9 @@ public class BibEntry {
             // We set the type before throwing the changeEvent, to enable
             // the change listener to access the new value if the change
             // sets off a change in database sorting etc.
-            this.type = type.toLowerCase();
+            this.type = newType.toLowerCase(Locale.ENGLISH);
             changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType == null ? null : oldType, type);
+            firePropertyChangedEvent(TYPE_HEADER, oldType, newType);
         } catch (PropertyVetoException pve) {
             LOGGER.warn(pve);
         }
@@ -177,7 +172,7 @@ public class BibEntry {
     private String normalizeFieldName(String fieldName) {
         Objects.requireNonNull(fieldName, "field name must not be null");
 
-        return fieldName.toLowerCase();
+        return fieldName.toLowerCase(Locale.ENGLISH);
     }
 
     /**
@@ -541,11 +536,16 @@ public class BibEntry {
         } else {
             newValue = String.join(", ", keywords);
         }
-        if ((oldValue == null) && (newValue == null)) {
+        if (newValue == null) {
+            if (oldValue != null) {
+                this.clearField("keywords");
+                changed = true;
+            }
             return;
         }
         if ((oldValue == null) || !oldValue.equals(newValue)) {
             this.setField("keywords", newValue);
+            changed = true;
         }
     }
 
@@ -592,5 +592,9 @@ public class BibEntry {
 
     public List<String> getSeparatedKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
+    }
+
+    public Collection<String> getFieldValues() {
+        return fields.values();
     }
 }

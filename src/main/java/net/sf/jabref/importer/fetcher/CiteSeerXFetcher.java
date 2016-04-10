@@ -17,9 +17,9 @@ package net.sf.jabref.importer.fetcher;
 
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.logic.formatter.bibtexfields.AuthorsFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -111,24 +110,20 @@ public class CiteSeerXFetcher implements EntryFetcher {
      */
     private List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
-        try {
-            urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
-                    URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            int count = 1;
-            String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
-                urlQuery = nextPage;
-                count++;
-                if (stopFetching) {
-                    break;
-                }
+        List<String> ids = new ArrayList<>();
+        urlQuery = CiteSeerXFetcher.SEARCH_URL.replace(CiteSeerXFetcher.QUERY_MARKER,
+                URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
+        int count = 1;
+        String nextPage;
+        while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
+                && (count < CiteSeerXFetcher.MAX_PAGES_TO_LOAD)) {
+            urlQuery = nextPage;
+            count++;
+            if (stopFetching) {
+                break;
             }
-            return ids;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
+        return ids;
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
@@ -159,7 +154,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField("author", new AuthorsFormatter().format(authors));
+                entry.setField("author", new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:

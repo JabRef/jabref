@@ -84,45 +84,29 @@ public class ImportFormatReader {
      * @param cliId CLI-Id
      * @return Import Format or <code>null</code> if none matches
      */
-    private ImportFormat getByCliId(String cliId) {
+    private Optional<ImportFormat> getByCliId(String cliId) {
         for (ImportFormat format : formats) {
             if (format.getCLIId().equals(cliId)) {
-                return format;
+                return Optional.of(format);
             }
         }
-        return null;
-    }
-
-    public List<BibEntry> importFromStream(String format, InputStream in, OutputPrinter status)
-            throws IOException {
-        ImportFormat importer = getByCliId(format);
-
-        if (importer == null) {
-            throw new IllegalArgumentException("Unknown import format: " + format);
-        }
-
-        List<BibEntry> res = importer.importEntries(in, status);
-
-        // Remove all empty entries
-        if (res != null) {
-            BibDatabases.purgeEmptyEntries(res);
-        }
-
-        return res;
+        return Optional.empty();
     }
 
     public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
             throws IOException {
-        ImportFormat importer = getByCliId(format);
+        Optional<ImportFormat> importer = getByCliId(format);
 
-        if (importer == null) {
+        if (!importer.isPresent()) {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importFromFile(importer, filename, status);
+        return importFromFile(importer.get(), filename, status);
     }
 
     public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+        Objects.requireNonNull(importer);
+        Objects.requireNonNull(filename);
         File file = new File(filename);
 
         try (InputStream stream = new FileInputStream(file);
@@ -133,45 +117,12 @@ public class ImportFormatReader {
             if (!importer.isRecognizedFormat(bis)) {
                 throw new IOException("Wrong file format");
             }
+        }
 
-            bis.reset();
-
+        try (InputStream stream = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(stream)) {
             return importer.importEntries(bis, status);
         }
-    }
-
-    /**
-     * All custom importers.
-     * <p>
-     * <p>Elements are in default order.</p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
-    public SortedSet<ImportFormat> getCustomImportFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<>();
-        for (ImportFormat format : formats) {
-            if (format.isCustomImporter()) {
-                result.add(format);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * All built-in importers.
-     * <p>
-     * <p>Elements are in default order.</p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
-    public SortedSet<ImportFormat> getBuiltInInputFormats() {
-        SortedSet<ImportFormat> result = new TreeSet<>();
-        for (ImportFormat format : formats) {
-            if (!format.isCustomImporter()) {
-                result.add(format);
-            }
-        }
-        return result;
     }
 
     /**
@@ -211,101 +162,10 @@ public class ImportFormatReader {
             sb.append('\n');
         }
 
-        return sb.toString(); //.substring(0, res.length()-1);
+        return sb.toString();
     }
 
-    /**
-     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
-     *
-     * @param name
-     * @return The name after expanding initials.
-     */
-    public static String expandAuthorInitials(String name) {
-        String[] authors = name.split(" and ");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].contains(", ")) {
-                String[] names = authors[i].split(", ");
-                if (names.length > 0) {
-                    sb.append(names[0]);
-                    if (names.length > 1) {
-                        sb.append(", ");
-                    }
-                }
-                for (int j = 1; j < names.length; j++) {
-                    if (j == 1) {
-                        sb.append(ImportFormatReader.expandAll(names[j]));
-                    } else {
-                        sb.append(names[j]);
-                    }
-                    if (j < (names.length - 1)) {
-                        sb.append(", ");
-                    }
-                }
 
-            } else {
-                String[] names = authors[i].split(" ");
-                if (names.length > 0) {
-                    sb.append(ImportFormatReader.expandAll(names[0]));
-                }
-                for (int j = 1; j < names.length; j++) {
-                    sb.append(' ');
-                    sb.append(names[j]);
-                }
-            }
-            if (i < (authors.length - 1)) {
-                sb.append(" and ");
-            }
-        }
-
-        return sb.toString().trim();
-    }
-
-    //------------------------------------------------------------------------------
-
-    private static String expandAll(String s) {
-        //System.out.println("'"+s+"'");
-        // Avoid arrayindexoutof.... :
-        if (s.isEmpty()) {
-            return s;
-        }
-        // If only one character (uppercase letter), add a dot and return immediately:
-        if ((s.length() == 1) && Character.isLetter(s.charAt(0)) &&
-                Character.isUpperCase(s.charAt(0))) {
-            return s + ".";
-        }
-        StringBuilder sb = new StringBuilder();
-        char c = s.charAt(0);
-        char d = 0;
-        for (int i = 1; i < s.length(); i++) {
-            d = s.charAt(i);
-            if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                    Character.isLetter(d) && Character.isUpperCase(d)) {
-                sb.append(c);
-                sb.append(". ");
-            } else {
-                sb.append(c);
-            }
-            c = d;
-        }
-        if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                Character.isLetter(d) && Character.isUpperCase(d)) {
-            sb.append(c);
-            sb.append(". ");
-        } else {
-            sb.append(c);
-        }
-        return sb.toString().trim();
-    }
-
-    //==================================================
-    // Set a field, unless the string to set is empty.
-    //==================================================
-    public static void setIfNecessary(BibEntry be, String field, String content) {
-        if (!"".equals(content)) {
-            be.setField(field, content);
-        }
-    }
 
     public static InputStreamReader getUTF8Reader(File f) throws IOException {
         return getReader(f, StandardCharsets.UTF_8);
@@ -349,13 +209,13 @@ public class ImportFormatReader {
      * @throws IOException
      */
     public UnknownFormatImport importUnknownFormat(String filename) {
-
+        Objects.requireNonNull(filename);
 
         // First, see if it is a BibTeX file:
         try {
             ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
                     Globals.prefs.getDefaultEncoding());
-            if (!pr.getDatabase().hasNoEntries() || !pr.getDatabase().hasNoStrings()) {
+            if (pr.getDatabase().hasEntries() || !pr.getDatabase().hasNoStrings()) {
                 pr.setFile(new File(filename));
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }
@@ -381,12 +241,8 @@ public class ImportFormatReader {
                 List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
 
                 int entryCount;
-                if (entries == null) {
-                    entryCount = 0;
-                } else {
-                    BibDatabases.purgeEmptyEntries(entries);
-                    entryCount = entries.size();
-                }
+                BibDatabases.purgeEmptyEntries(entries);
+                entryCount = entries.size();
 
                 if (entryCount > bestResultCount) {
                     bestResult = entries;

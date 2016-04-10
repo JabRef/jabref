@@ -65,9 +65,11 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * JabRef cycles through all available import formats. No error messages or feedback
      * is displayed from individual import formats in this case.
      *
-     * If importing in a specified format, and null or an empty list is returned, JabRef reports
+     * If importing in a specified format, and an empty list is returned, JabRef reports
      * that no entries were found. If an IOException is thrown, JabRef displays the exception's
      * message in unmodified form.
+     *
+     * This method should never return null. Return an empty list instead.
      *
      * TODO the return type should be changed to "ParseResult" as the parser could use a different encoding than the default encoding
      */

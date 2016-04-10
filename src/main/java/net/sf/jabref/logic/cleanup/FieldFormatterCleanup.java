@@ -14,14 +14,14 @@
 
 package net.sf.jabref.logic.cleanup;
 
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.entry.BibEntry;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats a given entry field with the specified formatter.
@@ -49,16 +49,16 @@ public class FieldFormatterCleanup implements CleanupJob {
      * Runs the formatter on the specified field in the given entry.
      *
      * If the formatter returns an empty string, then the field is removed.
-     * @param field the field on which to run the formatter
+     * @param fieldKey the field on which to run the formatter
      * @param entry the entry to be cleaned up
      * @return a list of changes of the entry
      */
-    private List<FieldChange> cleanupSingleField(String field, BibEntry entry) {
-        if (!entry.hasField(field)) {
+    private List<FieldChange> cleanupSingleField(String fieldKey, BibEntry entry) {
+        if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
             return new ArrayList<>();
         }
-        String oldValue = entry.getField(field);
+        String oldValue = entry.getField(fieldKey);
 
         // Run formatter
         String newValue = formatter.format(oldValue);
@@ -67,11 +67,11 @@ public class FieldFormatterCleanup implements CleanupJob {
             return new ArrayList<>();
         } else {
             if(newValue.isEmpty()) {
-                entry.clearField(field);
+                entry.clearField(fieldKey);
             } else {
-                entry.setField(field, newValue);
+                entry.setField(fieldKey, newValue);
             }
-            FieldChange change = new FieldChange(entry, field, oldValue, newValue);
+            FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
             return Collections.singletonList(change);
         }
     }
@@ -113,15 +113,6 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public String toString() {
-        return field + ": " + formatter.getKey();
-    }
-
-    /**
-     * Returns a description of what this cleanup operation does.
-     *
-     * @return the description of this cleanup
-     */
-    public String getDescription() {
-        return String.format(formatter.getDescription(), field);
+        return field + ": " + formatter.getName();
     }
 }
