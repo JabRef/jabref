@@ -94,7 +94,6 @@ public class EntryTypes {
      */
     public static Optional<EntryType> getType(String name, BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getType(name) : BIBTEX.getType(name);
-
     }
 
     /**
@@ -142,6 +141,18 @@ public class EntryTypes {
             BIBLATEX.removeType(name);
         } else {
             BIBTEX.removeType(name);
+        }
+    }
+
+    public static void removeAllCustomEntryTypes() {
+        for(BibDatabaseMode type : BibDatabaseMode.values()) {
+            for(String typeName : getAllTypes(type)) {
+                getType(typeName, type).ifPresent(entryType -> {
+                    if (entryType instanceof CustomEntryType) {
+                        removeType(typeName, type);
+                    }
+                });
+            }
         }
     }
 }

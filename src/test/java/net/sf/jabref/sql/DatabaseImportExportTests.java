@@ -8,6 +8,7 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
@@ -33,11 +34,8 @@ public class DatabaseImportExportTests {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        Globals.prefs.purgeCustomEntryTypes();
-        CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
+        EntryTypes.removeAllCustomEntryTypes();
     }
-
-
 
     @Test
     public void testExportToMySQLSingleEntry() throws Exception {
