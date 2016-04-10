@@ -5,6 +5,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -169,7 +170,11 @@ public class DatabaseImportExportTests {
 
     private BibDatabaseContext createContextWithSingleEntrySingleGroup() {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
-        databaseContext.getMetaData().setGroups(new GroupTreeNode(new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING)));
+
+        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
+        KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING);
+        root.add(new GroupTreeNode(group));
+        databaseContext.getMetaData().setGroups(root);
         return databaseContext;
     }
 

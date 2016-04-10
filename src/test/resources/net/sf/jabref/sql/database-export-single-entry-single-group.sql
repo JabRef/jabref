@@ -26,4 +26,4 @@ INSERT INTO group_types (label) VALUES ('AllEntriesGroup:');
 INSERT INTO group_types (label) VALUES ('ExplicitGroup:');
 INSERT INTO group_types (label) VALUES ('KeywordGroup:');
 INSERT INTO group_types (label) VALUES ('SearchGroup:');
-INSERT INTO groups (label, parent_id, group_types_id, search_field, search_expression, case_sensitive, reg_exp, hierarchical_context, database_id) VALUES ('test', 0, (SELECT group_types_id FROM group_types where label='KeywordGroup:'), 'asdf', 'fdas', '0', '1', 2, '1');
+INSERT INTO groups (label, parent_id, group_types_id, search_field, search_expression, case_sensitive, reg_exp, hierarchical_context, database_id) VALUES ('All entries', 0, (SELECT group_types_id FROM group_types where label='AllEntriesGroup:'), NULL, NULL, NULL, NULL, 0, '1');
