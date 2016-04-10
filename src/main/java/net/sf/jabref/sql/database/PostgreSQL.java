@@ -115,7 +115,7 @@ public class PostgreSQL implements Database {
         // requires that the database is already there
         String url = SQLUtil.createJDBCurl(dbStrings, true);
 
-        Connection conn = connect(url + "/",
+        Connection conn = connect(url,
                 dbStrings.getDbPreferences().getUsername(), dbStrings.getPassword());
 
         createPLPGSQLFunction(conn);

@@ -121,7 +121,8 @@ public class MySQL implements Database {
 
         Connection conn = connect(url, dbStrings.getDbPreferences().getUsername(), dbStrings.getPassword());
 
-        SQLUtil.processQuery(conn, "CREATE DATABASE IF NOT EXISTS `" + dbStrings.getDbPreferences().getDatabase() + '`');
+        String query = "CREATE DATABASE IF NOT EXISTS `" + dbStrings.getDbPreferences().getDatabase() + '`';
+        SQLUtil.processQuery(conn, query);
         conn.setCatalog(dbStrings.getDbPreferences().getDatabase());
 
         return conn;
