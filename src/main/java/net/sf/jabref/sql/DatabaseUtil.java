@@ -18,9 +18,14 @@ public class DatabaseUtil {
                 JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                removeAGivenDB(conn, getDatabaseIDByName(databaseContext, conn, dbName));
+                removeDB(dbName, conn, databaseContext);
             }
         }
+    }
+
+    public static void removeDB(String dbName, Connection conn, BibDatabaseContext databaseContext)
+            throws SQLException {
+        removeAGivenDB(conn, getDatabaseIDByName(databaseContext, conn, dbName));
     }
 
     /**

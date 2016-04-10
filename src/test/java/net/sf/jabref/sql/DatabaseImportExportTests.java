@@ -98,6 +98,10 @@ public class DatabaseImportExportTests {
     }
 
     private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings) throws Exception {
+        try (Connection connection = new DBExporterAndImporterFactory().getExporter(databaseType).connectToDB(strings)) {
+            DatabaseUtil.removeDB(databaseName, connection, databaseContext);
+        }
+
         DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
         try (Connection connection = exporter.connectToDB(strings)) {
             exporter.createTables(connection);
