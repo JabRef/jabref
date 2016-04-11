@@ -16,7 +16,6 @@ script:
   - ./gradlew test integrationTest
 
 after_script:
-  - ./gradlew jacocoTestReport coveralls
   - bash <(curl -s https://codecov.io/bash)
 
 # cache gradle dependencies
