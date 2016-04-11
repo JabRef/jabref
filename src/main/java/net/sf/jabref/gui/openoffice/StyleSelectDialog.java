@@ -20,8 +20,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -218,22 +216,6 @@ class StyleSelectDialog {
         PositionWindow pw = new PositionWindow(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
                 JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        diag.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
     }
 
     private void setupTable() {

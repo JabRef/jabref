@@ -589,22 +589,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
 
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        this.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
-
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
 
