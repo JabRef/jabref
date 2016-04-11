@@ -39,9 +39,6 @@ public class MergeEntriesDialog extends JDialog {
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
 
-    private PositionWindow pw;
-
-
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
     private static final String MARGIN = "5px";
 
@@ -123,8 +120,9 @@ public class MergeEntriesDialog extends JDialog {
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
 
-        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X, JabRefPreferences.MERGEENTRIES_POS_Y,
-                JabRefPreferences.MERGEENTRIES_SIZE_X, JabRefPreferences.MERGEENTRIES_SIZE_Y);
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
 
         // Show what we've got

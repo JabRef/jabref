@@ -49,7 +49,6 @@ public class MergeEntryDOIDialog extends JDialog {
     private BibEntry doiEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
-    private PositionWindow pw;
 
     private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
 
@@ -123,7 +122,7 @@ public class MergeEntryDOIDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
-        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();

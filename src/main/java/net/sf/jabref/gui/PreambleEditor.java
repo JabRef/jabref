@@ -45,9 +45,6 @@ class PreambleEditor extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
-    private final PositionWindow pw;
-
-
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base) {
         super(baseFrame);
         this.panel = panel;
@@ -99,7 +96,7 @@ class PreambleEditor extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
         setTitle(Localization.lang("Edit preamble"));
 
-        pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
                 JabRefPreferences.PREAMBLE_SIZE_X, JabRefPreferences.PREAMBLE_SIZE_Y);
         pw.setWindowPosition();
     }
