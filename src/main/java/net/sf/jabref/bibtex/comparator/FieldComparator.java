@@ -22,7 +22,6 @@ import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.YearUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.text.Collator;
@@ -56,8 +55,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             return Collator.getInstance();
         }
     }
-
-
 
     enum FieldType {
         NAME, TYPE, YEAR, MONTH, OTHER;
@@ -139,7 +136,10 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
-            return Integer.compare(YearUtil.toFourDigitYearWithInts(f1), YearUtil.toFourDigitYearWithInts(f2)) * multiplier;
+            Integer f1year = StringUtil.intValueOfWithNull(f1);
+            Integer f2year = StringUtil.intValueOfWithNull(f2);
+            int comparisonResult = Integer.compare(f1year == null ? 0 : f1year, f2year == null ? 0 : f2year);
+            return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
             return Integer.compare(MonthUtil.getMonth(f1).number, MonthUtil.getMonth(f2).number) * multiplier;
         }
