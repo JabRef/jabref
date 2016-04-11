@@ -133,7 +133,7 @@ public class BibtexEntryTests {
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
 
         Assert.assertEquals("2003-12",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {03}, month = #DEC# }"))
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #DEC# }"))
                         .getPublicationDate());
 
     }
