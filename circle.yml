@@ -17,17 +17,9 @@ dependencies:
 
 test:
   override:
-    - ./gradlew test
+    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace || exit 0
   post:
-# USES TOO MUCH RAM    - if [[ ! -z $COVERITY_ACCESS_TOKEN ]] ; then ./gradlew coverityCheck || true ; fi
-    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
-    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-    # We use JaCoCo instead of Cobertura for measuring code coverage
-    - ./gradlew jacocoTestReport coveralls
-    - bash <(curl -s https://codecov.io/bash)
     # if you change something here, please also adapt deployment->release->commands
-    # clean has to be done to ensure that the dev information is included in Help/About
-    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
     - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
 
 deployment:
