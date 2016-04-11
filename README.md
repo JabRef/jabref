@@ -1,6 +1,6 @@
 # JabRef Development Version
 
-[![CircleCI](https://img.shields.io/circleci/project/JabRef/jabref/master.svg)](https://circleci.com/gh/JabRef/jabref)
+[![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Coverity Status](https://badges.ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)](https://ondemand.coverity.com/streams/tslj9m8e2149d8elggiskktgpc)
