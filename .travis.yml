@@ -16,7 +16,7 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
-  - ./gradlew test integrationTest
+  - ./gradlew check integrationTest
 
 after_script:
   - bash <(curl -s https://codecov.io/bash)
