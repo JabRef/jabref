@@ -83,7 +83,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         // IEEE
         builder.nextLine();
-        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplorer"));
+        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplore"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);

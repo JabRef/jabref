@@ -54,7 +54,7 @@ public class Author {
 
     public static String addDotIfAbbreviation(String name) {
         // Avoid arrayindexoutof.... :
-        if (name == null || name.isEmpty()) {
+        if ((name == null) || name.isEmpty()) {
             return name;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
@@ -74,7 +74,7 @@ public class Author {
 
             if(currentChar == '.') {
                 // A.A. -> A. A.
-                if(i + 1 < name.length() && Character.isUpperCase(name.charAt(i + 1))) {
+                if(((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
                     sb.append(' ');
                 }
             }
@@ -91,7 +91,7 @@ public class Author {
                 continue;
             }
 
-            if(i + 1 >= name.length()) {
+            if((i + 1) >= name.length()) {
                 // Current character is last character in input, so append dot
                 sb.append('.');
                 continue;
@@ -113,7 +113,7 @@ public class Author {
             boolean nextWordIsUppercase = true;
             for (int j = i + 1; j < name.length(); j++) {
                 char furtherChar = name.charAt(j);
-                if(Character.isWhitespace(furtherChar) || furtherChar == '-' || furtherChar == '~' || furtherChar == '.') {
+                if(Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
                     // end of word
                     break;
                 }
@@ -163,7 +163,6 @@ public class Author {
         // nested construct is there, check for "proper" nesting
         int i = 0;
         int level = 0;
-        loop:
         while (i < s.length()) {
             char c = s.charAt(i);
             switch (c) {
@@ -172,9 +171,8 @@ public class Author {
                 break;
             case '}':
                 level--;
-                if (level == -1) {
-                    // the improper nesting
-                    break loop;
+                if (level == -1) { // improper nesting
+                    return false;
                 }
                 break;
             default:

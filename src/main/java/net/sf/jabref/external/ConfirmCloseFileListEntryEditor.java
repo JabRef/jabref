@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,7 @@ import net.sf.jabref.gui.FileListEntry;
  * is ready to close when Ok is pressed, or whether there is a problem that needs to be
  * resolved first.
  */
+@FunctionalInterface
 public interface ConfirmCloseFileListEntryEditor {
 
     boolean confirmClose(FileListEntry entry);
