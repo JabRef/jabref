@@ -145,22 +145,6 @@ class StringDialog extends JDialog {
         pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
     }
 
 

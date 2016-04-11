@@ -102,22 +102,6 @@ class PreambleEditor extends JDialog {
         pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
                 JabRefPreferences.PREAMBLE_SIZE_X, JabRefPreferences.PREAMBLE_SIZE_Y);
         pw.setWindowPosition();
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
-
     }
 
     private void setupJTextComponent(JTextComponent ta) {
