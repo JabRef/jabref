@@ -13,7 +13,7 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
-  - ./gradlew test integrationTest --info
+  - ./gradlew test integrationTest
 
 # cache gradle dependencies
 cache:
