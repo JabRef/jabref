@@ -103,23 +103,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         openFiles(filesToOpen, true);
     }
 
-    class OpenItSwingHelper implements Runnable {
-
-        private final BasePanel basePanel;
-        private final boolean raisePanel;
-
-        OpenItSwingHelper(BasePanel basePanel, boolean raisePanel) {
-            this.basePanel = basePanel;
-            this.raisePanel = raisePanel;
-        }
-
-        @Override
-        public void run() {
-            frame.addTab(basePanel, raisePanel);
-
-        }
-    }
-
     /**
      * Opens the given file. If null or 404, nothing happens
      *
@@ -172,7 +155,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            JabRefExecutorService.INSTANCE.execute(() -> {
                 for (File theFile : theFiles) {
                     openTheFile(theFile, raisePanel);
                 }
@@ -294,13 +277,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
                 final ParserResult finalReferenceToResult = result;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true);
-                    }
-                });
+                SwingUtilities.invokeLater(
+                        () -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
             }
 
         }
@@ -337,7 +315,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, raisePanel));
+        SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
                 + database.getEntryCount() + " " + Localization.lang("entries") + ".");
@@ -355,7 +333,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        Optional<Charset> suppliedEncoding = Optional.empty();
+        Optional<Charset> suppliedEncoding;
         try (Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen)) {
             suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf8Reader);
         }
