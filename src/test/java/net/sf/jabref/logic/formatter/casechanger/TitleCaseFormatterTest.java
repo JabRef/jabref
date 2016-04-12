@@ -24,4 +24,8 @@ public class TitleCaseFormatterTest {
                 formatter.format("AN UPPER FIRST WITH {A}ND WITHOUT {C}URLY {b}rackets"));
     }
 
+    @Test
+    public void formatExample() {
+        Assert.assertEquals("{BPMN} Conformance in Open Source Engines", formatter.format(formatter.getExampleInput()));
+    }
 }

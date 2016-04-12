@@ -32,4 +32,10 @@ public class CapitalizeFormatter implements Formatter {
         return Localization.lang(
                 "Changes the first letter of all words to capital case and the remaining letters to lower case.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "I have {a} DREAM";
+    }
+
 }

@@ -9,12 +9,15 @@ import static org.junit.Assert.*;
 
 public class ClearFormatterTest {
 
+    private final ClearFormatter formatter = new ClearFormatter();
+
+
     /**
      * Check whether the clear formatter really returns the empty string for the empty string
      */
     @Test
     public void formatReturnsEmptyForEmptyString() throws Exception {
-        assertEquals("", new ClearFormatter().format(""));
+        assertEquals("", formatter.format(""));
     }
 
     /**
@@ -22,6 +25,11 @@ public class ClearFormatterTest {
      */
     @Test
     public void formatReturnsEmptyForSomeString() throws Exception {
-        assertEquals("", new ClearFormatter().format("test"));
+        assertEquals("", formatter.format("test"));
+    }
+
+    @Test
+    public void formatExample() {
+        assertEquals("", formatter.format(formatter.getExampleInput()));
     }
 }

@@ -52,6 +52,11 @@ public class ProtectTermsFormatter implements Formatter {
     }
 
     @Override
+    public String getExampleInput() {
+        return "In CDMA";
+    }
+
+    @Override
     public String getName() {
         return Localization.lang("Protect terms");
     }

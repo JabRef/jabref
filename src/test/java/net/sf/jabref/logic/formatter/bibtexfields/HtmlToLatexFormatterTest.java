@@ -59,4 +59,9 @@ public class HtmlToLatexFormatterTest {
         assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));
         assertEquals("{\\\"{a}}b", formatter.format("a&#x308;b"));
     }
+
+    @Test
+    public void formatExample() {
+        assertEquals("JabRef", formatter.format(formatter.getExampleInput()));
+    }
 }

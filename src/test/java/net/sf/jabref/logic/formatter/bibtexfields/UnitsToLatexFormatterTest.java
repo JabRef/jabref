@@ -19,4 +19,9 @@ public class UnitsToLatexFormatterTest {
         assertEquals("1\\mbox{-}{mA}", formatter.format("1-mA"));
     }
 
+    @Test
+    public void formatExample() {
+        assertEquals("1~{Hz}", formatter.format(formatter.getExampleInput()));
+    }
+
 }

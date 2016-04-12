@@ -45,4 +45,9 @@ public class NormalizeNamesFormatter implements Formatter {
         return Localization.lang("Normalizes lists of persons to the BibTeX standard.");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "Albert Einstein and Alan Turing";
+    }
+
 }

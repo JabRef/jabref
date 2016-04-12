@@ -41,4 +41,10 @@ public class LowerCaseFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Changes all letters to lower case.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "KDE {Amarok}";
+    }
+
 }

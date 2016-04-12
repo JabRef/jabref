@@ -71,6 +71,11 @@ public class FormatterTest {
         assertFalse(formatter.getDescription().isEmpty());
     }
 
+    @Test
+    public void getExampleInputAlwaysNonEmpty() {
+        assertFalse(formatter.getExampleInput().isEmpty());
+    }
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
         // all classes implementing {@link net.sf.jabref.logic.formatter.Formatter}
