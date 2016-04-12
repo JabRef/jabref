@@ -6,6 +6,9 @@ sudo: false
 before_install:
   - chmod +x gradlew
 
+# skip installation as this is also done during the script step
+install: true
+
 # allow gui testing on travis
 before_script:
   - "export DISPLAY=:99.0"
@@ -13,7 +16,10 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
-  - ./gradlew test integrationTest
+  - ./gradlew check integrationTest
+
+after_script:
+  - bash <(curl -s https://codecov.io/bash)
 
 # cache gradle dependencies
 cache:
