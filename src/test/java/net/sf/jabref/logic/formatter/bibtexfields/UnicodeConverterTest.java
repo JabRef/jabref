@@ -27,12 +27,6 @@ public class UnicodeConverterTest {
     }
 
     @Test
-    public void testEmpty() {
-        assertEquals("", formatter.format(""));
-    }
-
-
-    @Test
     public void testUnicodeCombiningAccents() {
         assertEquals("{\\\"{a}}", formatter.format("a\u0308"));
         assertEquals("{\\\"{a}}b", formatter.format("a\u0308b"));
