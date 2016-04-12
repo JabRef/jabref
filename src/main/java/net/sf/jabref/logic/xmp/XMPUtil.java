@@ -135,23 +135,6 @@ public class XMPUtil {
             } catch (BadSecurityHandlerException | CryptographyException e) {
                 LOGGER.error("Cannot handle encrypted PDF: " + e.getMessage());
                 throw new EncryptedPdfsNotSupportedException();
-            } catch (NoClassDefFoundError e) {
-                // This is to avoid following exception:
-                // Exception in thread "JabRef CachedThreadPool" java.lang.NoClassDefFoundError: org/bouncycastle/jce/provider/BouncyCastleProvider
-                // at org.apache.pdfbox.pdmodel.PDDocument.openProtection(PDDocument.java:1611)
-                // at net.sf.jabref.logic.xmp.XMPUtil.loadWithAutomaticDecryption(XMPUtil.java:133)
-                // This exception occurs if JabRef is compiled without 'org.bouncycastle:bcprov-jdk15on' (meaning, without the BouncyCastle library), which may happen in some countries not allowing cryptography.
-                // See for instance http://www.bouncycastle.org/wiki/display/JA1/Frequently+Asked+Questions#FrequentlyAskedQuestions-11.WhatisBouncyCastle%27sexportclassificationintheUnitedStatesofAmerica?
-                // See also https://sourceforge.net/p/jabref/bugs/1257/ and http://stackoverflow.com/a/2929228/873282
-                if (e.getMessage().equals("org/bouncycastle/jce/provider/BouncyCastleProvider")) {
-                    LOGGER.warn(
-                            "Java Bouncy Castle library not found. This might have been removed due redistribution restrictions. Please download and install it. For more information see http://www.bouncycastle.org/.");
-                    // We convert it to a EncryptionNotSupportedException as this is handled properly by the caller
-                    throw new EncryptedPdfsNotSupportedException();
-                } else {
-                    // we really cannot deal with it
-                    throw e;
-                }
             }
         }
         return doc;
