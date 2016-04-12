@@ -630,7 +630,7 @@ public class XMPUtil {
                  */
                 String publicationDate = entry.getPublicationDate();
                 if (publicationDate != null) {
-                    dcSchema.addUnqualifiedSequenceValue("dc:date", publicationDate);
+                    dcSchema.addUnqualifiedSequenceValue("date", publicationDate);
                 }
                 continue;
             }
@@ -881,9 +881,9 @@ public class XMPUtil {
         meta.removeSchema(meta.getDublinCoreSchema());
 
         for (BibEntry entry : resolvedEntries) {
-            DublinCoreSchema dcSchema = new DublinCoreSchema(meta);
+
+            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();
             XMPUtil.writeToDCSchema(dcSchema, entry, null);
-            meta.addSchema(dcSchema);
         }
 
         // Save to stream and then input that stream to the PDF
