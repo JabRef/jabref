@@ -56,7 +56,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -475,8 +475,7 @@ public class TextInputDialog extends JDialog {
                         entry.setField(fieldName, txt);
                     } else {
                         // insert a new name with an additional "and"
-                        if (InternalBibtexFields.getFieldExtras(fieldName)
-                                .contains(BibtexSingleFieldProperties.PERSON_NAMES)) {
+                        if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
                             entry.setField(fieldName, old + " and " + txt);
                         } else if ("keywords".equals(fieldName)) {
                             // Add keyword

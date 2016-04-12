@@ -15,19 +15,20 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.YearUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -55,8 +56,6 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
-
-
     enum FieldType {
         NAME, TYPE, YEAR, MONTH, OTHER;
     }
@@ -74,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     public FieldComparator(String field, boolean reversed) {
         this.fieldName = Objects.requireNonNull(field);
         this.field = fieldName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
-        fieldType = determineFieldType(this.field[0]);
+        fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
 
         if(fieldType == FieldType.MONTH) {
@@ -89,10 +88,10 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
-    private FieldType determineFieldType(String s) {
+    private FieldType determineFieldType() {
         if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
-        } else if("author".equals(this.field[0]) || "editor".equals(this.field[0])) {
+        } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
             return FieldType.NAME;
         } else if ("year".equals(this.field[0])) {
             return FieldType.YEAR;
@@ -124,7 +123,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
 
         // Catch all cases involving null:
-        if (f1 == null && f2 == null) {
+        if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if(f1 == null) {
             return multiplier;
@@ -137,7 +136,10 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
-            return Integer.compare(YearUtil.toFourDigitYearWithInts(f1), YearUtil.toFourDigitYearWithInts(f2)) * multiplier;
+            Integer f1year = StringUtil.intValueOfWithNull(f1);
+            Integer f2year = StringUtil.intValueOfWithNull(f2);
+            int comparisonResult = Integer.compare(f1year == null ? 0 : f1year, f2year == null ? 0 : f2year);
+            return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
             return Integer.compare(MonthUtil.getMonth(f1).number, MonthUtil.getMonth(f2).number) * multiplier;
         }
@@ -161,8 +163,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             // Else none of them were parseable, and we can fall back on comparing strings.
         }
 
-        String ours = ((String) f1).toLowerCase();
-        String theirs = ((String) f2).toLowerCase();
+        String ours = f1.toLowerCase(Locale.ENGLISH);
+        String theirs = f2.toLowerCase(Locale.ENGLISH);
         return COLLATOR.compare(ours, theirs) * multiplier;
     }
 

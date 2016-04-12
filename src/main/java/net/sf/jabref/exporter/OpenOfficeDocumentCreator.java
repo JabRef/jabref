@@ -17,7 +17,6 @@ package net.sf.jabref.exporter;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;

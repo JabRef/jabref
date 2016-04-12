@@ -243,7 +243,15 @@ public class AuthorListParser {
         String lastPart = lastPartStart < 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN,
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
-        return new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart);
+
+        if(firstPart != null && lastPart != null && lastPart.equals(lastPart.toUpperCase()) && lastPart.length() < 5) {
+            // The last part is a small string in complete upper case, so interpret it as initial of the first name
+            // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
+            // The length < 5 constraint should allow for "Smith S.H." as input
+            return new Author(lastPart, lastPart, vonPart, firstPart, jrPart);
+        } else {
+            return new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart);
+        }
     }
 
     /**
@@ -302,7 +310,7 @@ public class AuthorListParser {
      *
      * @return <CODE>TOKEN_EOF</CODE> -- no more tokens, <CODE>TOKEN_COMMA</CODE> --
      * token is comma, <CODE>TOKEN_AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.), <CODE>TOKEN_WORD</CODE> --
+     * "and" (or "And", or "aND", etc.) or a colon, <CODE>TOKEN_WORD</CODE> --
      * token is a word; additional information is given in global
      * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
@@ -324,6 +332,11 @@ public class AuthorListParser {
         if (original.charAt(tokenStart) == ',') {
             tokenEnd++;
             return TOKEN_COMMA;
+        }
+        // Colon is considered to separate names like "and"
+        if (original.charAt(tokenStart) == ';') {
+            tokenEnd++;
+            return TOKEN_AND;
         }
         tokenAbbr = -1;
         tokenTerm = ' ';
@@ -366,7 +379,7 @@ public class AuthorListParser {
             if (c == '\\') {
                 currentBackslash = tokenEnd;
             }
-            if ((bracesLevel == 0) && ((",~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
+            if ((bracesLevel == 0) && ((",;~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
                 break;
             }
             // Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to

@@ -18,7 +18,6 @@ package net.sf.jabref.gui;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.*;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
@@ -55,7 +54,6 @@ import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -590,22 +588,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        this.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
@@ -1718,7 +1700,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
         SwingUtilities.invokeLater(() -> {
             ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
-                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    Localization.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.entryListComplete();
             diag.setLocationRelativeTo(JabRefFrame.this);

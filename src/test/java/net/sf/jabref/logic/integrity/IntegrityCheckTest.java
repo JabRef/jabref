@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.util.*;
 
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,7 +59,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : Arrays.asList("author", "editor")) {
+        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));

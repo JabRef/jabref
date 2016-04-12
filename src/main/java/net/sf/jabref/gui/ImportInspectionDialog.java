@@ -29,6 +29,7 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import net.sf.jabref.*;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
@@ -117,8 +118,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final DefaultEventSelectionModel<BibEntry> selectionModel;
 
-    private final String[] fields;
-
     private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -166,6 +165,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
+    private static final List<String> INSPECTION_FIELDS = Arrays.asList("author", "title", "year", BibEntry.KEY_FIELD);
+
     private static final int DUPL_COL = 1;
     private static final int FILE_COL = 2;
     private static final int URL_COL = 3;
@@ -183,12 +184,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @param panel
      * @param fields
      */
-    public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String[] fields,
-            String undoName, boolean newDatabase) {
+    public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
-        this.fields = Arrays.copyOf(fields, fields.length);
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
@@ -230,7 +229,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         popup.add(deleteListener);
         popup.addSeparator();
-        if (!newDatabase && bibDatabaseContext != null) {
+        if (!newDatabase && (bibDatabaseContext != null)) {
             GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are
@@ -777,8 +776,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
-        for (int i = 0; i < fields.length; i++) {
-            int width = InternalBibtexFields.getFieldLength(fields[i]);
+        for (int i = 0; i < INSPECTION_FIELDS.size(); i++) {
+            int width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
             glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -1240,10 +1239,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         }
         // Remaining columns:
-        for (int i = PAD; i < (PAD + fields.length); i++) {
+        for (int i = PAD; i < (PAD + INSPECTION_FIELDS.size()); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            comparators.add(new FieldComparator(fields[i - PAD]));
+            comparators.add(new FieldComparator(INSPECTION_FIELDS.get(i - PAD)));
         }
 
         // Set initial sort columns:
@@ -1331,7 +1330,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         @Override
         public int getColumnCount() {
-            return PAD + fields.length;
+            return PAD + INSPECTION_FIELDS.size();
         }
 
         @Override
@@ -1340,7 +1339,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return EntryUtil.capitalizeFirst(fields[i - PAD]);
+                return EntryUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
             }
             return "";
         }
@@ -1376,8 +1375,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     return null;
                 }
             } else {
-                String field = fields[i - PAD];
-                if ("author".equals(field) || "editor".equals(field)) {
+                String field = INSPECTION_FIELDS.get(i - PAD);
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                     return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib)
                             .orElse("");
                 } else {

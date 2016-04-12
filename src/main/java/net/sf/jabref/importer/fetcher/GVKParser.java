@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -366,10 +366,10 @@ public class GVKParser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField("author", ImportFormatReader.expandAuthorInitials(author));
+            result.setField("author", StringUtil.expandAuthorInitials(author));
         }
         if (editor != null) {
-            result.setField("editor", ImportFormatReader.expandAuthorInitials(editor));
+            result.setField("editor", StringUtil.expandAuthorInitials(editor));
         }
         if (title != null) {
             result.setField("title", title);

@@ -2,29 +2,15 @@ package net.sf.jabref.logic.formatter;
 
 
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class OrdinalsToSuperscriptFormatterTest {
-    private OrdinalsToSuperscriptFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new OrdinalsToSuperscriptFormatter();
-    }
-
-    @After
-    public void tearDown() {
-        formatter = null;
-    }
-
-    @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
-    }
+    private final OrdinalsToSuperscriptFormatter formatter = new OrdinalsToSuperscriptFormatter();
 
     @Test
     public void replacesSuperscript() {
@@ -33,11 +19,6 @@ public class OrdinalsToSuperscriptFormatterTest {
         expectCorrect("3rd", "3\\textsuperscript{rd}");
         expectCorrect("4th", "4\\textsuperscript{th}");
         expectCorrect("21th", "21\\textsuperscript{th}");
-    }
-
-    @Test
-    public void replaceSuperscriptsEmptyFields() {
-        expectCorrect("", "");
     }
 
     @Test

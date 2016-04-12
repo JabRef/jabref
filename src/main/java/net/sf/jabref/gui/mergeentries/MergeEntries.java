@@ -31,7 +31,6 @@ import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.PreviewPanel;

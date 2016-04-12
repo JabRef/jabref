@@ -33,7 +33,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
@@ -142,7 +142,7 @@ class EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldExtras(field).contains(BibtexSingleFieldProperties.FILE_EDITOR)) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.FILE_EDITOR)) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;

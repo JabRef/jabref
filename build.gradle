@@ -220,7 +220,8 @@ javadoc {
 
 test {
     testLogging {
-        exceptionFormat "full" // default is "short"
+        events "failed"
+        exceptionFormat "short"
     }
 }
 

@@ -1,28 +1,14 @@
 package net.sf.jabref.logic.formatter.minifier;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class MinifyNameListFormatterTest {
-    private MinifyNameListFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new MinifyNameListFormatter();
-    }
-
-    @After
-    public void tearDown() {
-        formatter = null;
-    }
-
-    @Test
-    public void returnsFormatterName() {
-        Assert.assertNotNull(formatter.getName());
-        Assert.assertNotEquals("", formatter.getName());
-    }
+    private final MinifyNameListFormatter formatter = new MinifyNameListFormatter();
 
     @Test
     public void minifyAuthorNames() {
@@ -31,11 +17,6 @@ public class MinifyNameListFormatterTest {
         expectCorrect("Simon Harrer and Jörg Lenhard", "Simon Harrer and Jörg Lenhard");
         expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz", "Simon Harrer and others");
         expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz and others", "Simon Harrer and others");
-    }
-
-    @Test
-    public void formatEmptyFields() {
-        expectCorrect("", "");
     }
 
     private void expectCorrect(String input, String expected) {

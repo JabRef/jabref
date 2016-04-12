@@ -13,7 +13,6 @@ import java.util.List;
 
 import net.sf.jabref.BibDatabaseContext;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

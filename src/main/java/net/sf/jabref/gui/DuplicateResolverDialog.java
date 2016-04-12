@@ -16,9 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import javax.swing.*;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -57,8 +54,6 @@ public class DuplicateResolverDialog extends JDialog {
     private final JPanel options = new JPanel();
     private DuplicateResolverResult status = DuplicateResolverResult.NOT_CHOSEN;
     private MergeEntries me;
-    private PositionWindow pw;
-
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
         super(frame, Localization.lang("Possible duplicate entries"), true);
@@ -131,25 +126,10 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        pw = new PositionWindow(this, JabRefPreferences.DUPLICATES_POS_X, JabRefPreferences.DUPLICATES_POS_Y,
-                JabRefPreferences.DUPLICATES_SIZE_X, JabRefPreferences.DUPLICATES_SIZE_Y);
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.DUPLICATES_POS_X,
+                JabRefPreferences.DUPLICATES_POS_Y, JabRefPreferences.DUPLICATES_SIZE_X,
+                JabRefPreferences.DUPLICATES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
 
         both.requestFocus();
 

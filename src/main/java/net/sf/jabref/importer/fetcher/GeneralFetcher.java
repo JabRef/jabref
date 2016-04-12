@@ -18,7 +18,6 @@ package net.sf.jabref.importer.fetcher;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -220,8 +219,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                         dialog.setVisible(true);
                         if (dialog.isOkPressed()) {
                             final ImportInspectionDialog d2 = new ImportInspectionDialog(frame,
-                                    frame.getCurrentBasePanel(), InternalBibtexFields.DEFAULT_INSPECTION_FIELDS,
-                                    activeFetcher.getTitle(), false);
+                                    frame.getCurrentBasePanel(), activeFetcher.getTitle(), false);
                             d2.addCallBack(activeFetcher);
                             d2.setLocationRelativeTo(frame);
                             d2.setVisible(true);
@@ -238,7 +236,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
             final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, activeFetcher.getTitle(), false);
+                    activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
             dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);

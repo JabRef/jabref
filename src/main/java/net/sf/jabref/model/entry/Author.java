@@ -38,18 +38,98 @@ public class Author {
      * @param von       the von part of the author's name (may consist of several
      *                  tokens, like "de la" in "Charles Louis Xavier Joseph de la
      *                  Vall{\'e}e Poussin")
-     * @param last      the lats name of the author (may consist of several
+     * @param last      the last name of the author (may consist of several
      *                  tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier
      *                  Joseph de la Vall{\'e}e Poussin")
      * @param jr        the junior part of the author's name (may consist of
      *                  several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
     public Author(String first, String firstabbr, String von, String last, String jr) {
-        firstPart = removeStartAndEndBraces(first);
+        firstPart = addDotIfAbbreviation(removeStartAndEndBraces(first));
         firstAbbr = removeStartAndEndBraces(firstabbr);
         vonPart = removeStartAndEndBraces(von);
         lastPart = removeStartAndEndBraces(last);
         jrPart = removeStartAndEndBraces(jr);
+    }
+
+    public static String addDotIfAbbreviation(String name) {
+        // Avoid arrayindexoutof.... :
+        if (name == null || name.isEmpty()) {
+            return name;
+        }
+        // If only one character (uppercase letter), add a dot and return immediately:
+        if ((name.length() == 1) && Character.isLetter(name.charAt(0)) &&
+                Character.isUpperCase(name.charAt(0))) {
+            return name + ".";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        char lastChar = name.charAt(0);
+        for (int i = 0; i < name.length(); i++) {
+            if(i > 0) {
+                lastChar = name.charAt(i - 1);
+            }
+            char currentChar = name.charAt(i);
+            sb.append(currentChar);
+
+            if(currentChar == '.') {
+                // A.A. -> A. A.
+                if(i + 1 < name.length() && Character.isUpperCase(name.charAt(i + 1))) {
+                    sb.append(' ');
+                }
+            }
+
+            boolean currentIsUppercaseLetter = Character.isLetter(currentChar) && Character.isUpperCase(currentChar);
+            if(!currentIsUppercaseLetter) {
+                // No uppercase letter, hence nothing to do
+                continue;
+            }
+
+            boolean lastIsLowercaseLetter = Character.isLetter(lastChar) && Character.isLowerCase(lastChar);
+            if(lastIsLowercaseLetter) {
+                // previous character was lowercase (probably an acronym like JabRef) -> don't change anything
+                continue;
+            }
+
+            if(i + 1 >= name.length()) {
+                // Current character is last character in input, so append dot
+                sb.append('.');
+                continue;
+            }
+
+            char nextChar = name.charAt(i + 1);
+            if ('-' == nextChar) {
+                // A-A -> A.-A.
+                sb.append(".");
+                continue;
+            }
+            if('.' == nextChar) {
+                // Dot already there, so nothing to do
+                continue;
+            }
+
+            // AA -> A. A.
+            // Only append ". " if the rest of the 'word' is uppercase
+            boolean nextWordIsUppercase = true;
+            for (int j = i + 1; j < name.length(); j++) {
+                char furtherChar = name.charAt(j);
+                if(Character.isWhitespace(furtherChar) || furtherChar == '-' || furtherChar == '~' || furtherChar == '.') {
+                    // end of word
+                    break;
+                }
+
+                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
+                if(!furtherIsUppercaseLetter) {
+                    nextWordIsUppercase = false;
+                    break;
+                }
+            }
+            if(nextWordIsUppercase) {
+                sb.append(". ");
+            }
+        }
+
+        return sb.toString().trim();
     }
 
     @Override

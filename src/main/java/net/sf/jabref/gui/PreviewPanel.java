@@ -24,7 +24,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -217,7 +216,7 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
         previewPane.setContentType("text/html");
         previewPane.addHyperlinkListener(hyperlinkEvent -> {
-            if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED && PreviewPanel.this.databaseContext
+            if ((hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) && PreviewPanel.this.databaseContext
                     .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
