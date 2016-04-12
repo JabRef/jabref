@@ -77,6 +77,11 @@ public class NormalizePagesFormatter implements Formatter {
     }
 
     @Override
+    public String getExampleInput() {
+        return "1 - 2";
+    }
+
+    @Override
     public int hashCode() {
         return defaultHashCode();
     }

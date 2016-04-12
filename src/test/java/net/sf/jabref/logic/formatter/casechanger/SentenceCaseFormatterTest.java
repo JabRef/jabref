@@ -19,4 +19,9 @@ public class SentenceCaseFormatterTest {
         Assert.assertEquals("Upper {N}ot first", formatter.format("upper {N}OT FIRST"));
     }
 
+    @Test
+    public void formatExample() {
+        Assert.assertEquals("I have {Aa} dream", formatter.format(formatter.getExampleInput()));
+    }
+
 }

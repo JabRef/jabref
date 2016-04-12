@@ -42,6 +42,14 @@ public interface Formatter {
     String getDescription();
 
     /**
+     * Returns an example input string of the formatter.
+     * This example is used as input to the formatter to demonstrate its functionality
+     *
+     * @return the example input string, always non empty
+     */
+    String getExampleInput();
+
+    /**
      * Returns a default hashcode of the formatter based on its key.
      *
      * @return the hash of the key of the formatter

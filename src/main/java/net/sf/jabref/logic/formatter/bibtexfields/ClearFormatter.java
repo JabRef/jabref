@@ -27,4 +27,10 @@ public class ClearFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Clears the field completely.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "Obsolete text";
+    }
+
 }

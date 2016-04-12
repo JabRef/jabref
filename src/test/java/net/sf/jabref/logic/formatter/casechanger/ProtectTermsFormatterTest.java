@@ -20,4 +20,9 @@ public class ProtectTermsFormatterTest {
         assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
     }
 
+    @Test
+    public void formatExample() {
+        assertEquals("In {CDMA}", formatter.format(formatter.getExampleInput()));
+    }
+
 }

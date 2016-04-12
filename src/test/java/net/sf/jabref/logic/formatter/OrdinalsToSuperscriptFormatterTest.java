@@ -2,6 +2,9 @@ package net.sf.jabref.logic.formatter;
 
 
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,6 +50,11 @@ public class OrdinalsToSuperscriptFormatterTest {
     @Test
     public void ignoreSuperscriptsInsideWords() {
         expectCorrect("1st 1stword words1st inside1stwords", "1\\textsuperscript{st} 1stword words1st inside1stwords");
+    }
+
+    @Test
+    public void formatExample() {
+        assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
     }
 
     private void expectCorrect(String input, String expected) {

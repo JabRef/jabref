@@ -19,6 +19,11 @@ public class MinifyNameListFormatterTest {
         expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz and others", "Simon Harrer and others");
     }
 
+    @Test
+    public void formatExample() {
+        expectCorrect(formatter.getExampleInput(), "Stefan Kolb and others");
+    }
+
     private void expectCorrect(String input, String expected) {
         Assert.assertEquals(expected, formatter.format(input));
     }

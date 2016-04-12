@@ -210,4 +210,9 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
         return Localization.lang("Converts LaTeX encoding to Unicode characters.");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "M{\\\"{o}}nch";
+    }
+
 }

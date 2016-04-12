@@ -71,4 +71,10 @@ public class OrdinalsToSuperscriptFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Converts ordinals to LaTeX superscripts.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "11th";
+    }
+
 }

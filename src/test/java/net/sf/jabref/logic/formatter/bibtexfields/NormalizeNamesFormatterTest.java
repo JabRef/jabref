@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -93,4 +95,10 @@ public class NormalizeNamesFormatterTest {
     private void expectCorrect(String input, String expected) {
         Assert.assertEquals(expected, formatter.format(input));
     }
+
+    @Test
+    public void formatExample() {
+        assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
+    }
+
 }

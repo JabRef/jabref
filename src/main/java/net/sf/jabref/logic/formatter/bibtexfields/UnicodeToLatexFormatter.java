@@ -84,6 +84,11 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
     }
 
     @Override
+    public String getExampleInput() {
+        return "Mönch";
+    }
+
+    @Override
     public String getName() {
         return Localization.lang("Unicode to LaTeX");
     }
