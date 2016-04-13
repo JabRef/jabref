@@ -192,7 +192,7 @@ public class JabRefDesktop {
                 // Finally, open the file:
                 return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));
             } else {
-                // Cancelled:
+                // Canceled:
                 frame.output(cancelMessage);
                 return false;
             }
@@ -228,7 +228,7 @@ public class JabRefDesktop {
                 // Finally, open the link:
                 return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
             } else {
-                // Cancelled:
+                // Canceled:
                 frame.output(cancelMessage);
                 return false;
             }

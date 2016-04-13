@@ -36,7 +36,7 @@ import org.jdesktop.swingx.VerticalLayout;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- * Returns null if cancelled.
+ * Returns null if canceled.
  */
 public class EntryTypeDialog extends JDialog implements ActionListener {
     private EntryType type;

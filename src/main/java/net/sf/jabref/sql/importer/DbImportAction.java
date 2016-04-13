@@ -167,7 +167,7 @@ public class DbImportAction extends AbstractWorker {
                         frame.output(Localization.lang("%0 databases will be imported",
                                 Integer.toString(databases.size())));
                     } else {
-                        frame.output(Localization.lang("Importing cancelled"));
+                        frame.output(Localization.lang("Importing canceled"));
                     }
                 }
             }
@@ -178,7 +178,7 @@ public class DbImportAction extends AbstractWorker {
             JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
                     Localization.lang("Import from SQL database"), JOptionPane.ERROR_MESSAGE);
             frame.output(Localization.lang("Error importing from database"));
-            LOGGER.error("Error importing from databae", ex);
+            LOGGER.error("Error importing from database", ex);
         }
     }
 

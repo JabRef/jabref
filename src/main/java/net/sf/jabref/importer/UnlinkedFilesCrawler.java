@@ -52,7 +52,7 @@ public class UnlinkedFilesCrawler {
      * resolve its recursion and return what it has saved so far.
      */
     public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
-        /* Cancellation of the search from outside! */
+        /* Cancelation of the search from outside! */
         if ((state == null) || !state.get()) {
             return null;
         }

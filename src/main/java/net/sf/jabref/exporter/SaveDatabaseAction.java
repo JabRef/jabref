@@ -44,14 +44,14 @@ import java.util.List;
  * save operations when closing a database or quitting the applications.
  *
  * The operations run synchronously, but offload the save operation from the event thread using Spin.
- * Callers can query whether the operation was cancelled, or whether it was successful.
+ * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
     private final BasePanel panel;
     private final JabRefFrame frame;
     private boolean success;
-    private boolean cancelled;
+    private boolean canceled;
     private boolean fileLockedError;
 
     private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
@@ -64,7 +64,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     @Override
     public void init() throws Throwable {
         success = false;
-        cancelled = false;
+        canceled = false;
         fileLockedError = false;
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             saveAs();
@@ -83,10 +83,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                         null, opts, opts[0]);
 
                 if (answer == JOptionPane.CANCEL_OPTION) {
-                    cancelled = true;
+                    canceled = true;
                     return;
                 } else if (answer == JOptionPane.YES_OPTION) {
-                    cancelled = true;
+                    canceled = true;
 
                     JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
 
@@ -105,7 +105,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                                     SwingUtilities.invokeLater(
                                             (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
                                 } else {
-                                    cancelled = true;
+                                    canceled = true;
                                 }
                             });
                         }
@@ -119,7 +119,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     if (databaseProtectionFlag) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),
                                 Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
-                        cancelled = true;
+                        canceled = true;
                     }
                     else {
                         panel.setUpdatedExternally(false);
@@ -141,7 +141,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             frame.output(Localization.lang("Saved database") + " '" + panel.getBibDatabaseContext().getDatabaseFile().getPath() + "'.");
             frame.setWindowTitle();
             frame.updateAllTabTitles();
-        } else if (!cancelled) {
+        } else if (!canceled) {
             if (fileLockedError) {
                 // TODO: user should have the option to override the lock file.
                 frame.output(Localization.lang("Could not save, file locked by another JabRef instance."));
@@ -153,7 +153,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled || (panel.getBibDatabaseContext().getDatabaseFile() == null)) {
+        if (canceled || (panel.getBibDatabaseContext().getDatabaseFile() == null)) {
             return;
         }
 
@@ -346,8 +346,8 @@ public class SaveDatabaseAction extends AbstractWorker {
             chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
                     JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
-                cancelled = true;
-                return; // cancelled
+                canceled = true;
+                return; // canceled
             }
             f = new File(chosenFile);
             // Check if the file already exists:
@@ -390,12 +390,12 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     /**
-     * Query whether the last operation was cancelled.
+     * Query whether the last operation was canceled.
      *
-     * @return true if the last Save/SaveAs operation was cancelled from the file dialog or from another
+     * @return true if the last Save/SaveAs operation was canceled from the file dialog or from another
      * query dialog, false otherwise.
      */
-    public boolean isCancelled() {
-        return cancelled;
+    public boolean isCanceled() {
+        return canceled;
     }
 }

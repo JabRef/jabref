@@ -602,7 +602,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             List<BibEntry> entries;
             int numSelected;
-            boolean cancelled;
+            boolean canceled;
 
 
             // Run first, in EDT:
@@ -647,7 +647,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
                             if (answer == JOptionPane.NO_OPTION) {
                                 // Ok, break off the operation.
-                                cancelled = true;
+                                canceled = true;
                                 return;
                             }
                             // No need to check more entries, because the user has already confirmed
@@ -686,7 +686,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void update() {
                 database.setFollowCrossrefs(true);
-                if (cancelled) {
+                if (canceled) {
                     frame.unblock();
                     return;
                 }
@@ -1205,7 +1205,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             etd.setVisible(true);
             actualType = etd.getChoice();
         }
-        if (actualType != null) { // Only if the dialog was not cancelled.
+        if (actualType != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {

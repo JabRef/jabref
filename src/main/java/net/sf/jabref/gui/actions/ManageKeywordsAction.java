@@ -81,7 +81,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
 
-    private boolean cancelled;
+    private boolean canceled;
 
     private final Set<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
 
@@ -142,14 +142,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         ok.addActionListener(e -> {
-            cancelled = false;
+            canceled = false;
             diag.dispose();
         });
 
         Action cancelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                cancelled = true;
+                canceled = true;
                 diag.dispose();
             }
         };
@@ -264,14 +264,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         // Lazy creation of the dialog:
         createDialog();
 
-        cancelled = true;
+        canceled = true;
 
         fillKeyWordList();
 
         diag.pack();
         diag.setLocationRelativeTo(frame);
         diag.setVisible(true);
-        if (cancelled) {
+        if (canceled) {
             return;
         }
 

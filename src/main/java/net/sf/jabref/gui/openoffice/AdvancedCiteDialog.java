@@ -104,7 +104,7 @@ class AdvancedCiteDialog {
         diag.setVisible(true);
     }
 
-    public boolean cancelled() {
+    public boolean canceled() {
         return !okPressed;
     }
 

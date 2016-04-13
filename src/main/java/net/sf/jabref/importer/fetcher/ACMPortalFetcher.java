@@ -415,7 +415,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
 
-    // This method is called by the dialog when the user has cancelled or
+    // This method is called by the dialog when the user has canceled or
     //signaled a stop. It is expected that any long-running fetch operations
     //will stop after this method is called.
     @Override

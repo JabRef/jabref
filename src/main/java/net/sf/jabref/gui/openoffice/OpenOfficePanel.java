@@ -528,7 +528,7 @@ public class OpenOfficePanel extends AbstractWorker {
         if (addPageInfo) {
             AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
             acd.showDialog();
-            if (acd.cancelled()) {
+            if (acd.canceled()) {
                 return;
             }
             if (!acd.getPageInfo().isEmpty()) {

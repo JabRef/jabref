@@ -205,7 +205,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     /**
-     * This method is called by the dialog when the user has cancelled the import.
+     * This method is called by the dialog when the user has canceled the import.
      */
     @Override
     public void stopFetching() {

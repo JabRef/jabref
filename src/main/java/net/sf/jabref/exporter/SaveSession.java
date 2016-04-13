@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * characters could be saved, and if not, which characters were not encodable.
  * <p>
  * After saving is finished, the client should close the Writer. If the save should be put into effect, call commit(),
- * otherwise call cancel(). When cancelling, the temporary file is simply deleted and the target file remains unchanged.
+ * otherwise call cancel(). When canceling, the temporary file is simply deleted and the target file remains unchanged.
  * When committing, the temporary file is copied to the target file after making a backup if requested and if the target
  * file already existed, and finally the temporary file is deleted.
  * <p>

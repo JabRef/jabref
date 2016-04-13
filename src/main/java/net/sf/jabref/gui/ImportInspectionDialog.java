@@ -1314,7 +1314,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     public interface CallBack {
 
         /**
-         * This method is called by the dialog when the user has cancelled or
+         * This method is called by the dialog when the user has canceled or
          * signaled a stop. It is expected that any long-running fetch
          * operations will stop after this method is called.
          */

@@ -31,7 +31,7 @@ public class WaitForSaveOperation implements ActionListener {
     private final JabRefFrame frame;
     private final JDialog diag;
     private final Timer t = new Timer(500, this);
-    private boolean cancelled;
+    private boolean canceled;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {
@@ -48,7 +48,7 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addButton(cancel);
         bb.addGlue();
         cancel.addActionListener(e -> {
-            cancelled = true;
+            canceled = true;
             t.stop();
             diag.dispose();
         });
@@ -69,8 +69,8 @@ public class WaitForSaveOperation implements ActionListener {
 
     }
 
-    public boolean cancelled() {
-        return cancelled;
+    public boolean canceled() {
+        return canceled;
     }
 
     @Override
