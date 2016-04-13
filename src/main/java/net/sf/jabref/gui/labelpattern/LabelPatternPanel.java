@@ -26,6 +26,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
 
 import javax.swing.*;
@@ -104,12 +105,20 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        // check if DB is open
-        if(panel != null) {
-            for (EntryType type : EntryTypes.getAllValues(panel.getBibDatabaseContext().getMode())) {
-                textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
-                y++;
+        BibDatabaseMode mode;
+        // check mode of currently used DB
+        if (panel != null) {
+            mode = panel.getBibDatabaseContext().getMode();
+        } else { // use preferences value if no DB is open
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+                mode = BibDatabaseMode.BIBLATEX;
+            } else {
+                mode = BibDatabaseMode.BIBTEX;
             }
+        }
+        for (EntryType type : EntryTypes.getAllValues(mode)) {
+            textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
+            y++;
         }
 
         con.fill = GridBagConstraints.BOTH;
