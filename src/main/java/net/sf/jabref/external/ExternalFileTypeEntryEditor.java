@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -254,7 +255,7 @@ public class ExternalFileTypeEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(null, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(null, initial, Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

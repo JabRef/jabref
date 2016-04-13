@@ -17,13 +17,12 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -38,24 +37,14 @@ public class BibtexImporter extends ImportFormat {
      *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
+    public boolean isRecognizedFormat(InputStream in) {
+        Objects.requireNonNull(in);
         return true;
     }
 
-    /**
-     * Parses the given input stream.
-     * Only plain bibtex entries are returned.
-     * That especially means that metadata is ignored.
-     *
-     * @param in the inputStream to read from
-     * @param status the OutputPrinter to put status to
-     * @return a list of BibTeX entries contained in the given inputStream
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
-            throws IOException {
-        ParserResult pr = BibtexParser.parse(ImportFormatReader.getReaderDefaultEncoding(in));
-        return new ArrayList<>(pr.getDatabase().getEntries());
+    public ParserResult importDatabase(InputStream in) throws IOException {
+        return BibtexParser.parse(ImportFormatReader.getReaderDefaultEncoding(in));
     }
 
     @Override
@@ -64,8 +53,13 @@ public class BibtexImporter extends ImportFormat {
     }
 
     @Override
-    public String getExtensions() {
-        return "bib";
+    public List<String> getExtensions() {
+        return Collections.singletonList("bib");
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

@@ -39,6 +39,7 @@ package net.sf.jabref.gui.auximport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -264,9 +265,7 @@ public class FromAuxDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(frame,
-                    new File(comp.getText()),
-                    ".aux",
+            String chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Collections.singletonList(".aux"),
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

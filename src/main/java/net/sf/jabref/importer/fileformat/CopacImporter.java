@@ -20,10 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -37,30 +38,26 @@ public class CopacImporter extends ImportFormat {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "Copac";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getId() {
         return "cpc";
     }
 
+    @Override
+    public String getDescription() {
+        return null;
+    }
 
-
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
@@ -77,15 +74,9 @@ public class CopacImporter extends ImportFormat {
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null) {
-            throw new IOException("No stream given.");
-        }
+    public ParserResult importDatabase(InputStream stream) throws IOException {
+        Objects.requireNonNull(stream);
 
         List<String> entries = new LinkedList<>();
         StringBuilder sb = new StringBuilder();
@@ -166,7 +157,7 @@ public class CopacImporter extends ImportFormat {
             results.add(b);
         }
 
-        return results;
+        return new ParserResult(results);
     }
 
     private static void setOrAppend(BibEntry b, String field, String value, String separator) {

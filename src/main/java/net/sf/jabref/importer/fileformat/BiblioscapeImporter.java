@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -32,37 +32,29 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class BiblioscapeImporter extends ImportFormat {
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "Biblioscape";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "biblioscape";
+    public List<String> getExtensions() {
+        return null;
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
+    public boolean isRecognizedFormat(InputStream in) {
+        Objects.requireNonNull(in);
         return true;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(InputStream stream) throws IOException {
 
         List<BibEntry> bibItems = new ArrayList<>();
         BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
@@ -291,12 +283,12 @@ public class BiblioscapeImporter extends ImportFormat {
             }
             // continuation (folding) of previous line
             if (previousLine == null) {
-                return Collections.emptyList();
+                return new ParserResult();
             }
             previousLine.append(line.trim());
         }
 
-        return bibItems;
+        return new ParserResult(bibItems);
     }
 
 }

@@ -22,6 +22,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.zip.ZipFile;
 
 import javax.swing.*;
@@ -54,8 +56,7 @@ public class ImportCustomizationDialog extends JDialog {
 
     /**
      *
-     * @param frame_
-     * @throws HeadlessException
+     * @param frame
      */
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
@@ -77,20 +78,22 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
-            String chosenFileStr = null;
             CustomImporter importer = new CustomImporter();
-            importer.setBasePath(
-                    FileDialogs.getNewDir(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    "", Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
+            importer.setBasePath(FileDialogs
+                    .getNewDir(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+                            Collections.emptyList(), Localization.lang("Select Classpath of New Importer"),
+                            JFileChooser.CUSTOM_DIALOG, false));
+            String chosenFileStr = null;
             if (importer.getBasePath() != null) {
-                chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
-                        Localization.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
+                chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(),
+                        Collections.singletonList(".class"), Localization.lang("Select new ImportFormat Subclass"),
+                        JFileChooser.CUSTOM_DIALOG, false);
             }
             if (chosenFileStr != null) {
                 try {
                     importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
                     importer.setName(importer.getInstance().getFormatName());
-                    importer.setCliId(importer.getInstance().getCLIId());
+                    importer.setCliId(importer.getInstance().getId());
                     addOrReplaceImporter(importer);
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
@@ -108,8 +111,8 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
         addFromJarButton.addActionListener(e -> {
             String basePath = FileDialogs.getNewFile(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    ".zip,.jar", Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Arrays.asList(".zip", ".jar"),
+                    Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
 
             if (basePath != null) {
                 try (ZipFile zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ)) {

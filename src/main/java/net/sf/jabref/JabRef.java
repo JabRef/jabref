@@ -20,20 +20,47 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Vector;
 import java.util.prefs.BackingStoreException;
-import javax.swing.*;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyBluer;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.cli.AuxCommandLine;
-import net.sf.jabref.exporter.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.exporter.AutoSaveManager;
+import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.exporter.IExportFormat;
+import net.sf.jabref.exporter.SaveException;
+import net.sf.jabref.exporter.SavePreferences;
+import net.sf.jabref.exporter.SaveSession;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.AutosaveStartupPrompter;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.ImportInspectionCommandLine;
+import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -57,6 +84,9 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
+
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.theme.SkyBluer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -802,14 +832,20 @@ public class JabRef {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
-                    List<BibEntry> entries;
+                    ParserResult parserResult;
                     if (OS.WINDOWS) {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRef.mainFrame);
+                        Path file = Paths.get(data[0]);
+                        parserResult = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
                     } else {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
-                                data[0].replace("~", System.getProperty("user.home")), JabRef.mainFrame);
+                        Path file = Paths.get(data[0].replace("~", System.getProperty("user.home")));
+                        parserResult = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
                     }
-                    return Optional.of(new ParserResult(entries));
+
+                    if(parserResult.hasWarnings()) {
+                        mainFrame.showMessage(parserResult.getErrorMessage());
+                    }
+
+                    return Optional.of(parserResult);
                 } catch (IllegalArgumentException ex) {
                     System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
                     return Optional.empty();

@@ -34,7 +34,7 @@ public class OvidImporterTest {
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals("ovid", importer.getCLIId());
+        Assert.assertEquals("ovid", importer.getId());
     }
 
     @Test

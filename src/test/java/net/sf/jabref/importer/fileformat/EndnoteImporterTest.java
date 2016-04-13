@@ -34,7 +34,7 @@ public class EndnoteImporterTest {
 
     @Test
     public void testGetCLIId() {
-        assertEquals("refer", importer.getCLIId());
+        assertEquals("refer", importer.getId());
     }
 
     @Test

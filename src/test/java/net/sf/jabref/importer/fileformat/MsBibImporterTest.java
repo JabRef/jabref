@@ -62,7 +62,7 @@ public class MsBibImporterTest {
     @Test
     public final void testGetCommandLineId() {
         MsBibImporter testImporter = new MsBibImporter();
-        Assert.assertEquals("msbib", testImporter.getCommandLineId());
+        Assert.assertEquals("msbib", testImporter.getId());
     }
 
 }

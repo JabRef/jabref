@@ -22,14 +22,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.formatter.CaseChangers;
-import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -57,29 +58,26 @@ public class IsiImporter extends ImportFormat {
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "ISI";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getId() {
         return "isi";
     }
 
+    @Override
+    public String getDescription() {
+        return null;
+    }
 
-
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
@@ -105,8 +103,6 @@ public class IsiImporter extends ImportFormat {
         }
         return false;
     }
-
-
 
     public static void processSubSup(Map<String, String> map) {
 
@@ -156,15 +152,9 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null) {
-            throw new IOException("No stream given.");
-        }
+    public ParserResult importDatabase(InputStream stream) throws IOException {
+        Objects.requireNonNull(stream);
 
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -355,7 +345,7 @@ public class IsiImporter extends ImportFormat {
 
             bibitems.add(b);
         }
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 
     private static String parsePages(String value) {

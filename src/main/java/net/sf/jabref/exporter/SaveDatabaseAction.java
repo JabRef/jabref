@@ -15,29 +15,36 @@
 */
 package net.sf.jabref.exporter;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
-import javax.swing.*;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.List;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -343,8 +350,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         String chosenFile = null;
         File f = null;
         while (f == null) {
-            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
-                    JFileChooser.SAVE_DIALOG, false, null);
+            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+                    Collections.singletonList(".bib"), JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
                 cancelled = true;
                 return; // cancelled

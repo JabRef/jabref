@@ -5,14 +5,15 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RepecNepImporterTest {
 
@@ -45,11 +46,6 @@ public class RepecNepImporterTest {
                 Assert.assertFalse(testImporter.isRecognizedFormat(stream));
             }
         }
-    }
-
-    @Test(expected = IOException.class)
-    public final void testImportEntriesNull() throws IOException {
-        testImporter.importEntries(null, new OutputPrinterToNull());
     }
 
     @Test
@@ -90,7 +86,7 @@ public class RepecNepImporterTest {
 
     @Test
     public final void testGetCliId() {
-        Assert.assertEquals("repecnep", testImporter.getCLIId());
+        Assert.assertEquals("repecnep", testImporter.getId());
     }
 
     @Test
@@ -100,10 +96,5 @@ public class RepecNepImporterTest {
                 + "To import papers either save a NEP message as a text file and then import or\n"
                 + "copy&paste the papers you want to import and make sure, one of the first lines\n"
                 + "contains the line \"nep.repec.org\".", testImporter.getDescription());
-    }
-
-    @Test
-    public final void testGetExtensions() {
-        Assert.assertEquals(".txt", testImporter.getExtensions());
     }
 }

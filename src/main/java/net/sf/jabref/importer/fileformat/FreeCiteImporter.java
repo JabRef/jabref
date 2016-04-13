@@ -25,8 +25,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import javax.xml.stream.XMLInputFactory;
@@ -34,17 +34,17 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This importer parses text format citations using the online API of FreeCite -
@@ -56,21 +56,21 @@ public class FreeCiteImporter extends ImportFormat {
 
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
-        // TODO: We don't know how to recognize text files, therefore we return
-        // "false"
+        Objects.requireNonNull(in);
+        // TODO: We don't know how to recognize text files, therefore we return "false"
         return false;
     }
 
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
+    public ParserResult importDatabase(InputStream in)
             throws IOException {
         try (Scanner scan = new Scanner(in)) {
             String text = scan.useDelimiter("\\A").next();
-            return importEntries(text, status);
+            return importEntries(text);
         }
     }
 
-    public List<BibEntry> importEntries(String text, OutputPrinter status) {
+    public ParserResult importEntries(String text) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
@@ -87,10 +87,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return Collections.emptyList();
+            return new ParserResult();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return Collections.emptyList();
+            return new ParserResult();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -104,13 +104,11 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IllegalStateException e) {
             LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return Collections.emptyList();
+            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
-
         List<BibEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -214,8 +212,8 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRef.mainFrame.getCurrentBasePanel().getDatabase(), e);
-
+                    LabelPatternUtil.makeLabel(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
+                                JabRef.mainFrame.getCurrentBasePanel().getDatabase(), e);
                     res.add(e);
                 }
                 parser.next();
@@ -223,15 +221,25 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return Collections.emptyList();
+            return new ParserResult();
         }
 
-        return res;
+        return new ParserResult(res);
     }
 
     @Override
     public String getFormatName() {
         return "text citations";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

@@ -1,36 +1,34 @@
 package net.sf.jabref.importer;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ImportFormatReaderTest {
+public class ImportFormatReaderIntegrationTest {
 
     private ImportFormatReader reader;
 
-    private final String resourceName;
     private final int count;
     public final String format;
-    private final String fileName;
+    private final Path file;
 
 
-    public ImportFormatReaderTest(String resource, String format, int count) throws URISyntaxException {
-        this.resourceName = resource;
+    public ImportFormatReaderIntegrationTest(String resource, String format, int count) throws URISyntaxException {
         this.format = format;
         this.count = count;
-        this.fileName = Paths.get(ImportFormatReaderTest.class.getResource(resourceName).toURI()).toString();
+        this.file = Paths.get(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
 
     }
 
@@ -43,14 +41,13 @@ public class ImportFormatReaderTest {
 
     @Test
     public void testImportUnknownFormat() {
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(fileName);
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 
     @Test
     public void testImportFormatFromFile() throws IOException {
-        OutputPrinter nullPrinter = new OutputPrinterToNull();
-        assertEquals(count, reader.importFromFile(format, fileName, nullPrinter).size());
+        assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")

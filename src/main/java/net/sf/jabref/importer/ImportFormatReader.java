@@ -15,25 +15,54 @@
 */
 package net.sf.jabref.importer;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import net.sf.jabref.importer.fileformat.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.importer.fileformat.BiblioscapeImporter;
+import net.sf.jabref.importer.fileformat.BibteXMLImporter;
+import net.sf.jabref.importer.fileformat.BibtexImporter;
+import net.sf.jabref.importer.fileformat.CopacImporter;
+import net.sf.jabref.importer.fileformat.EndnoteImporter;
+import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.importer.fileformat.InspecImporter;
+import net.sf.jabref.importer.fileformat.IsiImporter;
+import net.sf.jabref.importer.fileformat.MedlineImporter;
+import net.sf.jabref.importer.fileformat.MedlinePlainImporter;
+import net.sf.jabref.importer.fileformat.MsBibImporter;
+import net.sf.jabref.importer.fileformat.OvidImporter;
+import net.sf.jabref.importer.fileformat.PdfContentImporter;
+import net.sf.jabref.importer.fileformat.PdfXmpImporter;
+import net.sf.jabref.importer.fileformat.RepecNepImporter;
+import net.sf.jabref.importer.fileformat.RisImporter;
+import net.sf.jabref.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
 
 public class ImportFormatReader {
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
     /**
-     * all import formats, in the default order of import formats
+     * All import formats.
+     * Sorted accordingly to {@link ImportFormat#compareTo}, which defaults to alphabetically by the name
      */
     private final SortedSet<ImportFormat> formats = new TreeSet<>();
 
@@ -86,14 +115,14 @@ public class ImportFormatReader {
      */
     private Optional<ImportFormat> getByCliId(String cliId) {
         for (ImportFormat format : formats) {
-            if (format.getCLIId().equals(cliId)) {
+            if (format.getId().equals(cliId)) {
                 return Optional.of(format);
             }
         }
         return Optional.empty();
     }
 
-    public List<BibEntry> importFromFile(String format, String filename, OutputPrinter status)
+    public ParserResult importFromFile(String format, Path file)
             throws IOException {
         Optional<ImportFormat> importer = getByCliId(format);
 
@@ -101,28 +130,18 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importFromFile(importer.get(), filename, status);
+        return importFromFile(importer.get(), file);
     }
 
-    public List<BibEntry> importFromFile(ImportFormat importer, String filename, OutputPrinter status) throws IOException {
+    public ParserResult importFromFile(ImportFormat importer, Path file) throws IOException {
         Objects.requireNonNull(importer);
-        Objects.requireNonNull(filename);
-        File file = new File(filename);
+        Objects.requireNonNull(file);
 
-        try (InputStream stream = new FileInputStream(file);
-                BufferedInputStream bis = new BufferedInputStream(stream)) {
-
-            bis.mark(Integer.MAX_VALUE);
-
-            if (!importer.isRecognizedFormat(bis)) {
-                throw new IOException("Wrong file format");
-            }
+        if(!importer.isRecognizedFormat(file)) {
+            throw new IOException("Wrong file format");
         }
 
-        try (InputStream stream = new FileInputStream(file);
-                BufferedInputStream bis = new BufferedInputStream(stream)) {
-            return importer.importEntries(bis, status);
-        }
+        return importer.importDatabase(file);
     }
 
     /**
@@ -158,7 +177,7 @@ public class ImportFormatReader {
             }
 
             sb.append(" : ");
-            sb.append(imFo.getCLIId());
+            sb.append(imFo.getId());
             sb.append('\n');
         }
 
@@ -199,6 +218,9 @@ public class ImportFormatReader {
         }
     }
 
+    public UnknownFormatImport importUnknownFormat(String filename) {
+        return importUnknownFormat(Paths.get(filename));
+    }
 
     /**
      * Tries to import a file by iterating through the available import filters,
@@ -208,25 +230,20 @@ public class ImportFormatReader {
      *
      * @throws IOException
      */
-    public UnknownFormatImport importUnknownFormat(String filename) {
-        Objects.requireNonNull(filename);
+    public UnknownFormatImport importUnknownFormat(Path file) {
+        Objects.requireNonNull(file);
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult pr = OpenDatabaseAction.loadDatabase(new File(filename),
+            ParserResult pr = OpenDatabaseAction.loadDatabase(file.toFile(),
                     Globals.prefs.getDefaultEncoding());
             if (pr.getDatabase().hasEntries() || !pr.getDatabase().hasNoStrings()) {
-                pr.setFile(new File(filename));
+                pr.setFile(file.toFile());
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
             }
         } catch (IOException ignore) {
             // Ignored
         }
-
-        // we don't use a provided OutputPrinter (such as the JabRef frame),
-        // as we don't want to see any outputs from failed importers:
-        // we expect failures and do not want to report them to the user
-        OutputPrinterToNull nullOutput = new OutputPrinterToNull();
 
         // stores ref to best result, gets updated at the next loop
         List<BibEntry> bestResult = null;
@@ -235,14 +252,16 @@ public class ImportFormatReader {
 
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
-
             try {
+                if(!imFo.isRecognizedFormat(file)) {
+                    continue;
+                }
 
-                List<BibEntry> entries = importFromFile(imFo, filename, nullOutput);
+                ParserResult parserResult = importFromFile(imFo, file);
+                List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
-                int entryCount;
                 BibDatabases.purgeEmptyEntries(entries);
-                entryCount = entries.size();
+                int entryCount = entries.size();
 
                 if (entryCount > bestResultCount) {
                     bestResult = entries;

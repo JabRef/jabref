@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
@@ -158,8 +159,8 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
-                    JFileChooser.SAVE_DIALOG, false);
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
+                    Collections.singletonList(".xml"), JFileChooser.SAVE_DIALOG, false);
             if (filename == null) {
                 return;
             }
@@ -180,8 +181,8 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), ".xml",
-                    JFileChooser.OPEN_DIALOG, false);
+            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
+                    Collections.singletonList(".xml"), JFileChooser.OPEN_DIALOG, false);
             if (filename != null) {
                 try {
                     prefs.importPreferences(filename);

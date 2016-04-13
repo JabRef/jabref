@@ -51,29 +51,28 @@
 
 package net.sf.jabref.gui.plaintextimport;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.util.component.OverlayPanel;
-import net.sf.jabref.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -110,31 +109,32 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.ClipBoardManager;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.component.OverlayPanel;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class TextInputDialog extends JDialog {
 
@@ -511,8 +511,12 @@ public class TextInputDialog extends JDialog {
         text = text.replace(Globals.NEWLINE, " ");
         text = text.replace("##NEWLINE##", Globals.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
-        if (importedEntries == null) {
+        ParserResult importerResult = fimp.importEntries(text);
+        if(importerResult.hasWarnings()) {
+            frame.showMessage(importerResult.getErrorMessage());
+        }
+        List<BibEntry> importedEntries = importerResult.getDatabase().getEntries();
+        if (importedEntries.isEmpty()) {
             return false;
         } else {
             UpdateField.setAutomaticFields(importedEntries, false, false);

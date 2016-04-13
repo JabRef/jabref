@@ -1,21 +1,22 @@
 package net.sf.jabref.importer.fileformat;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class InspecImportTest {
 
@@ -76,9 +77,11 @@ public class InspecImportTest {
     public void importConferencePaperGivesInproceedings() throws IOException {
         String testInput = "Record.*INSPEC.*\n" +
                 "\n" +
-                "RT ~ Conference-Paper";
+                "RT ~ Conference-Paper\n" +
+                "AU ~ Prechelt, Lutz";
         BibEntry shouldBeEntry = new BibEntry();
         shouldBeEntry.setType("Inproceedings");
+        shouldBeEntry.setField("author", "Prechelt, Lutz");
 
         try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
             List<BibEntry> entries = inspecImp.importEntries(inStream, new OutputPrinterToNull());
@@ -92,9 +95,11 @@ public class InspecImportTest {
     public void importMiscGivesMisc() throws IOException {
         String testInput = "Record.*INSPEC.*\n" +
                 "\n" +
+                "AU ~ Prechelt, Lutz \n" +
                 "RT ~ Misc";
         BibEntry shouldBeEntry = new BibEntry();
         shouldBeEntry.setType("Misc");
+        shouldBeEntry.setField("author", "Prechelt, Lutz");
 
         try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
             List<BibEntry> entries = inspecImp.importEntries(inStream, new OutputPrinterToNull());
@@ -111,7 +116,7 @@ public class InspecImportTest {
 
     @Test
     public void testGetCLIId() {
-        assertEquals("inspec", inspecImp.getCLIId());
+        assertEquals("inspec", inspecImp.getId());
     }
 
 }

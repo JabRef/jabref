@@ -17,14 +17,15 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.nio.charset.Charset;
-
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
@@ -49,6 +50,9 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
 
+    public ParserResult() {
+        this(Collections.emptyList());
+    }
 
     public ParserResult(Collection<BibEntry> entries) {
         this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
@@ -58,6 +62,12 @@ public class ParserResult {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
+    }
+
+    public static ParserResult fromErrorMessage(String message) {
+        ParserResult parserResult = new ParserResult();
+        parserResult.addWarning(message);
+        return parserResult;
     }
 
     /**

@@ -1,8 +1,18 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
@@ -10,22 +20,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
-
-import com.google.common.base.Strings;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -35,7 +32,6 @@ import java.util.regex.Pattern;
  * Integrating XMP support is future work
  */
 public class PdfContentImporter extends ImportFormat {
-    private static final Log LOGGER = LogFactory.getLog(PdfContentImporter.class);
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
     // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
@@ -180,41 +176,24 @@ public class PdfContentImporter extends ImportFormat {
 
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
+        Objects.requireNonNull(in);
         return false;
     }
 
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibEntry> result = new ArrayList<>(1);
+    public ParserResult importDatabase(InputStream in) throws IOException {
+        Objects.requireNonNull(in);
 
+        final ArrayList<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(in)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
-                ImportInspector inspector = new ImportInspector() {
-
-                    @Override
-                    public void toFront() {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void setProgress(int current, int max) {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void addEntry(BibEntry entry) {
-                        // add the entry to the result object
-                        result.add(entry);
-                    }
-                };
-
-                DOI_TO_BIBTEX_FETCHER.processQuery(doi.get().getDOI(), inspector, status);
-                if (!result.isEmpty()) {
-                    return result;
-                }
+                ParserResult parserResult = new ParserResult(result);
+                BibEntry entry = DOI_TO_BIBTEX_FETCHER.getEntryFromDOI(doi.get().getDOI(), parserResult);
+                parserResult.getDatabase().insertEntry(entry);
+                return parserResult;
             }
 
             // idea: split[] contains the different lines
@@ -231,7 +210,7 @@ public class PdfContentImporter extends ImportFormat {
             if (i >= lines.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return result;
+                return new ParserResult();
             }
 
             // we start at the current line
@@ -480,10 +459,12 @@ public class PdfContentImporter extends ImportFormat {
 
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
-            LOGGER.info("Decryption not supported");
-            return Collections.EMPTY_LIST;
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+        } catch(IOException exception) {
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
-        return result;
+
+        return new ParserResult(result);
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {
@@ -587,6 +568,16 @@ public class PdfContentImporter extends ImportFormat {
     @Override
     public String getFormatName() {
         return "PDFcontent";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

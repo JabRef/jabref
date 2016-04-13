@@ -15,15 +15,19 @@
 */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.Globals;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.Collections;
+
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.
@@ -74,15 +78,14 @@ public final class BrowseAction extends AbstractAction {
             }
         }
     }
-
+    
     private String askUser() {
         if (dir) {
-            return FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
+            return FileDialogs.getNewDir(frame, new File(comp.getText()), Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
         } else {
-            return FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
+            return FileDialogs.getNewFile(frame, new File(comp.getText()), Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
         }
     }
-
 }

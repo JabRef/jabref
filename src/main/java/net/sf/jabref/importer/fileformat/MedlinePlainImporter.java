@@ -17,19 +17,19 @@
 
 package net.sf.jabref.importer.fileformat;
 
-import java.util.regex.Pattern;
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -45,27 +45,21 @@ public class MedlinePlainImporter extends ImportFormat {
     private static final Pattern PMC_PATTERN = Pattern.compile("PMC.*-.*");
     private static final Pattern PMCR_PATTERN = Pattern.compile("PMCR.*-.*");
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "MedlinePlain";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "medlineplain";
+    public List<String> getExtensions() {
+        return null;
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
@@ -84,12 +78,8 @@ public class MedlinePlainImporter extends ImportFormat {
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(InputStream stream) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
@@ -285,7 +275,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
 
     }
 }

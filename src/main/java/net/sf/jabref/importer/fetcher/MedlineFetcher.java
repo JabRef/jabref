@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -150,7 +152,7 @@ public class MedlineFetcher implements EntryFetcher {
         if (cleanQuery.matches("\\d+[,\\d+]*")) {
             frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-            List<BibEntry> bibs = MedlineImporter.fetchMedline(cleanQuery, frameOP);
+            List<BibEntry> bibs = fetchMedline(cleanQuery, frameOP);
 
             if (bibs.isEmpty()) {
                 frameOP.showMessage(Localization.lang("No references found"));
@@ -208,7 +210,7 @@ public class MedlineFetcher implements EntryFetcher {
                 // get the ids from entrez
                 result = getIds(searchTerm, i, noToFetch);
 
-                List<BibEntry> bibs = MedlineImporter.fetchMedline(result.ids, frameOP);
+                List<BibEntry> bibs = fetchMedline(result.ids, frameOP);
                 for (BibEntry entry : bibs) {
                     iIDialog.addEntry(entry);
                 }
@@ -222,6 +224,24 @@ public class MedlineFetcher implements EntryFetcher {
         return false;
     }
 
+    /**
+     * Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
+     *
+     * @param id One or several ids, separated by ","
+     *
+     * @return Will return an empty list on error.
+     */
+    private static List<BibEntry> fetchMedline(String id, OutputPrinter status) {
+        String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
+                id;
+        try {
+            URL url = new URL(baseUrl);
+            URLConnection data = url.openConnection();
+            return new MedlineImporter().importEntries(data.getInputStream(), status);
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
 
     static class SearchResult {
 

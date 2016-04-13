@@ -8,15 +8,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class MedlinePlainImporterTest {
 
@@ -99,12 +99,15 @@ public class MedlinePlainImporterTest {
             Assert.assertEquals("inproceedings", testEntry.getType());
             Assert.assertEquals("Inproceedings book title", testEntry.getField("booktitle"));
 
-            testEntry = entries.get(5);
-            Assert.assertEquals("proceedings", testEntry.getType());
+            BibEntry expectedEntry5 = new BibEntry();
+            expectedEntry5.setType("proceedings");
+            expectedEntry5.setField("keywords", "Female");
+            BibtexEntryAssert.assertEquals(expectedEntry5, entries.get(5));
 
-            testEntry = entries.get(6);
-            Assert.assertEquals("misc", testEntry.getType());
-
+            BibEntry expectedEntry6 = new BibEntry();
+            expectedEntry6.setType("misc");
+            expectedEntry6.setField("keywords", "Female");
+            BibtexEntryAssert.assertEquals(expectedEntry6, entries.get(6));
         }
     }
 
@@ -168,13 +171,17 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testAllArticleTypes() throws IOException {
-        try (InputStream stream = streamForString("PMID-22664795" + "\n" + "PT  - journal article" + "\n"
-                + "PT  - classical article" + "\n" + "PT  - corrected and republished article" + "\n"
-                + "PT  - introductory journal article" + "\n" + "PT  - newspaper article");) {
+        try (InputStream stream = streamForString("PMID-22664795" + "\n" +
+                "MH  - Female\n" +
+                "PT  - journal article" + "\n" +
+                "PT  - classical article" + "\n" +
+                "PT  - corrected and republished article" + "\n" +
+                "PT  - introductory journal article" + "\n" + "PT  - newspaper article")) {
             List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setType("article");
+            expectedEntry.setField("keywords", "Female");
             BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
         }
     }
@@ -186,7 +193,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals("medlineplain", importer.getCLIId());
+        Assert.assertEquals("medlineplain", importer.getId());
     }
 
 }

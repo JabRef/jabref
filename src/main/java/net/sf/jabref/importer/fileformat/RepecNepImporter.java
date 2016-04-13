@@ -25,9 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -162,37 +162,21 @@ public class RepecNepImporter extends ImportFormat {
     private String preLine = "";
     private boolean inOverviewSection;
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "REPEC New Economic Papers (NEP)";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public String getId() {
         return "repecnep";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getExtensions()
-     */
     @Override
-    public String getExtensions() {
-        return ".txt";
+    public List<String> getExtensions() {
+        return Collections.singletonList(".txt");
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getDescription()
-     */
     @Override
     public String getDescription() {
         return
@@ -203,10 +187,6 @@ public class RepecNepImporter extends ImportFormat {
                 + "contains the line \"nep.repec.org\".";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#isRecognizedFormat(java.io.InputStream)
-     */
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
         // read the first couple of lines
@@ -427,12 +407,10 @@ public class RepecNepImporter extends ImportFormat {
         return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && "".equals(this.preLine.trim());
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#importEntries(java.io.InputStream)
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(InputStream stream) throws IOException {
+        Objects.requireNonNull(stream);
+
         List<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;
@@ -475,14 +453,11 @@ public class RepecNepImporter extends ImportFormat {
             if (paperNoStr != null) {
                 message += ", paper no. " + paperNoStr + ": ";
             }
-            message += e.getMessage();
+            message += e.getLocalizedMessage();
             LOGGER.error(message, e);
-            if (!(e instanceof IOException)) {
-                e = new IOException(message);
-            }
-            throw (IOException) e;
+            return ParserResult.fromErrorMessage(message);
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 }

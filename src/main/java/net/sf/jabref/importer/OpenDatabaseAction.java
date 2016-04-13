@@ -89,7 +89,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (showDialog) {
             List<String> chosenStrings = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", true);
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
+                    true);
             for (String chosen : chosenStrings) {
                 if (chosen != null) {
                     filesToOpen.add(new File(chosen));

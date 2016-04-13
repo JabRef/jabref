@@ -94,6 +94,8 @@ JT  - Inproceedings book title
 
 PMID-96578310
 PT  - Overall
+MH  - Female
 
 PMID-45984220
-PT  -  
+PT  -
+MH  - Female

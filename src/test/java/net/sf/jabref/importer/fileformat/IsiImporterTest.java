@@ -1,20 +1,21 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
-
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Test cases for the IsiImporter
@@ -28,14 +29,6 @@ public class IsiImporterTest {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-    }
-
-    @Test
-    public void testImportEntriesException() throws IOException {
-        thrown.expect(IOException.class);
-
-        IsiImporter importer = new IsiImporter();
-        importer.importEntries(null, new OutputPrinterToNull());
     }
 
     @Test
@@ -54,7 +47,7 @@ public class IsiImporterTest {
     public void testGetCLIId() {
         IsiImporter importer = new IsiImporter();
 
-        Assert.assertEquals(importer.getCLIId(), "isi");
+        Assert.assertEquals(importer.getId(), "isi");
     }
 
     @Test
@@ -275,12 +268,6 @@ public class IsiImporterTest {
         Assert.assertEquals("Brown, James", IsiImporter.isiAuthorConvert("Brown, James"));
         Assert.assertEquals("Hall, Janet E.", IsiImporter.isiAuthorConvert("Hall, Janet E"));
         Assert.assertEquals("", IsiImporter.isiAuthorConvert(""));
-    }
-
-    @Test
-    public void testGetIsCustomImporter() {
-        IsiImporter importer = new IsiImporter();
-        Assert.assertEquals(false, importer.isCustomImporter());
     }
 
     @Test

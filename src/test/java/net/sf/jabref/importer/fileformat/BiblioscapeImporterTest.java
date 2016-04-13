@@ -29,7 +29,7 @@ public class BiblioscapeImporterTest {
     @Test
     public void testGetCLIID() {
         BiblioscapeImporter importer = new BiblioscapeImporter();
-        Assert.assertEquals(importer.getCLIId(), "biblioscape");
+        Assert.assertEquals(importer.getId(), "biblioscape");
     }
 
     @Test

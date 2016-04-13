@@ -1,19 +1,18 @@
 package net.sf.jabref.importer.fileformat;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This class tests the BibtexImporter.
@@ -96,10 +95,5 @@ public class BibtexImporterTest {
     @Test
     public void testGetFormatName() {
         assertEquals("BibTeX", importer.getFormatName());
-    }
-
-    @Test
-    public void testGetExtensions() {
-        assertEquals("bib", importer.getExtensions());
     }
 }

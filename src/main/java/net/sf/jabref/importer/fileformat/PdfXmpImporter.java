@@ -18,9 +18,9 @@ package net.sf.jabref.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
@@ -34,12 +34,19 @@ public class PdfXmpImporter extends ImportFormat {
         return Localization.lang("XMP-annotated PDF");
     }
 
-    /**
-     * Returns a list of all BibtexEntries found in the inputstream.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        return XMPUtil.readXMP(in);
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public ParserResult importDatabase(InputStream in) throws IOException {
+        Objects.requireNonNull(in);
+        try {
+            return new ParserResult(XMPUtil.readXMP(in));
+        } catch (IOException exception) {
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+        }
     }
 
     /**
@@ -48,16 +55,18 @@ public class PdfXmpImporter extends ImportFormat {
      */
     @Override
     public boolean isRecognizedFormat(InputStream in) throws IOException {
+        Objects.requireNonNull(in);
         return XMPUtil.hasMetadata(in);
     }
 
-    /**
-     * String used to identify this import filter on the command line.
-     * 
-     * @return "xmp"
-     */
-    public String getCommandLineId() {
+    @Override
+    public String getId() {
         return "xmp";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

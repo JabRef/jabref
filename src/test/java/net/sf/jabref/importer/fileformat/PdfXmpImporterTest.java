@@ -1,18 +1,23 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.Before;
-import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class PdfXmpImporterTest {
 
@@ -30,10 +35,11 @@ public class PdfXmpImporterTest {
         assertEquals("XMP-annotated PDF", importer.getFormatName());
     }
 
-    @Test(expected = EncryptedPdfsNotSupportedException.class)
-    public void importEncryptedFileThrowsException() throws IOException {
+    @Test
+    public void importEncryptedFileReturnsError() throws IOException {
         try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            importer.importEntries(is, new OutputPrinterToNull());
+            ParserResult result = importer.importDatabase(is);
+            Assert.assertTrue(result.hasWarnings());
         }
     }
 
@@ -73,6 +79,6 @@ public class PdfXmpImporterTest {
 
     @Test
     public void testGetCommandLineId() {
-        assertEquals("xmp", importer.getCommandLineId());
+        assertEquals("xmp", importer.getId());
     }
 }

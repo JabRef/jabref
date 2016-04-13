@@ -27,7 +27,7 @@ public class RISImporterTest {
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals(risImporter.getCLIId(), "ris");
+        Assert.assertEquals(risImporter.getId(), "ris");
     }
 
     @Test
