@@ -68,7 +68,7 @@ public class CleanupPresetPanel {
         cleanUpBibLatex = new JCheckBox(Localization.lang(
                 "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
-        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run listed field formatters:"),
+        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
                 JabRefPreferences.CLEANUP_DEFAULT_PRESET.getFormatterCleanups());
 
         updateDisplay(cleanupPreset);
