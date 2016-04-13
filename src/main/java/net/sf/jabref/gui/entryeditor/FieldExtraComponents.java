@@ -202,6 +202,9 @@ public class FieldExtraComponents {
                 if(doiUrl.isPresent()) {
                     button.setEnabled(true);
                     fetchButton.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                    fetchButton.setEnabled(false);
                 }
             }
         };
