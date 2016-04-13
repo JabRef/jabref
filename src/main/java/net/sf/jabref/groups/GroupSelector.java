@@ -733,8 +733,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
 
         if (!editModeIndicator) {
-            //            annotationEvent();
-            //        } else {
             updateSelections();
         }
 
@@ -786,10 +784,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             // Show the result in the chosen way:
             if (hideNonHits.isSelected()) {
                 panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FILTER);
-
             } else if (grayOut.isSelected()) {
                 panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FLOAT);
             }
+            panel.mainTable.getTableModel().updateSortOrder();
 
             if (showOverlappingGroupsP) {
                 showOverlappingGroups(matches);
