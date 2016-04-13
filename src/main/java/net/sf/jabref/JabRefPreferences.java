@@ -352,6 +352,10 @@ public class JabRefPreferences {
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
 
+    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
+    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
+    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
+
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
@@ -822,11 +826,12 @@ public class JabRefPreferences {
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
-        defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
+
+        defaults.put(PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
+        defaults.put(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
-        defaults.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        defaults.put(PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);

@@ -20,7 +20,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -132,7 +132,7 @@ public class ImportDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        switch (Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
+        switch (Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
             radioButtonNoMeta.setSelected(true);
             break;
@@ -156,9 +156,9 @@ public class ImportDialog extends JDialog {
 
     private void onOK() {
         this.result = JOptionPane.OK_OPTION;
-        Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
+        Globals.prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
         if (useDefaultPDFImportStyle.isSelected()) {
-            Globals.prefs.putBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, true);
+            Globals.prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, true);
         }
         // checkBoxDoNotShowAgain handled by local variable
         dispose();

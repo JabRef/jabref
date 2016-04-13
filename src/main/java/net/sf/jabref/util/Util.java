@@ -25,8 +25,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,19 +33,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibDatabaseContext;
@@ -60,8 +50,6 @@ import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -69,55 +57,14 @@ import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.KeywordGroup;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.logic.util.io.FileNameCleaner;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * utility functions
  */
 public class Util {
-
-    private static final Log LOGGER = LogFactory.getLog(Util.class);
-
-    public static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
-
-    private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
-
-
-    /**
-     * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
-     * <p>
-     * Unknown Bracket expressions are silently dropped.
-     *
-     * @param bracketString
-     * @param entry
-     * @param database
-     * @return
-     */
-    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
-        Matcher m = Util.SQUARE_BRACKETS_PATTERN.matcher(bracketString);
-        StringBuffer s = new StringBuffer();
-        while (m.find()) {
-            String replacement = getFieldAndFormat(m.group(), entry, database);
-            m.appendReplacement(s, replacement);
-        }
-        m.appendTail(s);
-
-        return s.toString();
-    }
-
-
 
     /**
      * Run an AbstractWorker's methods using Spin features to put each method on the correct thread.
@@ -145,46 +92,6 @@ public class Util {
         clb.update(); // Runs the update() method on the EDT.
     }
 
-    /**
-     * Determines filename provided by an entry in a database
-     *
-     * @param database the database, where the entry is located
-     * @param entry    the entry to which the file should be linked to
-     * @param repository
-     * @return a suggested fileName
-     */
-    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
-            JournalAbbreviationRepository repository) {
-        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
-        StringReader sr = new StringReader(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
-        Layout layout = null;
-        try {
-            layout = new LayoutHelper(sr, repository).getLayoutFromText();
-        } catch (IOException e) {
-            LOGGER.info("Wrong format " + e.getMessage(), e);
-        }
-        if (layout != null) {
-            targetName = layout.doLayout(entry, database);
-        }
-        //Removes illegal characters from filename
-        targetName = FileNameCleaner.cleanFileName(targetName);
-        return targetName;
-    }
-
-
-    /**
-     * Binds ESC-Key to cancel button
-     *
-     * @param rootPane     the pane to bind the action to. Typically, this variable is retrieved by this.getRootPane();
-     * @param cancelAction the action to bind
-     */
-    // TODO: move to GUI
-    public static void bindCloseDialogKeyToCancelAction(JRootPane rootPane, Action cancelAction) {
-        InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap am = rootPane.getActionMap();
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        am.put("close", cancelAction);
-    }
 
     public static boolean warnAssignmentSideEffects(AbstractGroup group, Component parent) {
         return warnAssignmentSideEffects(Collections.singletonList(group), parent);
@@ -274,23 +181,6 @@ public class Util {
         autoSetLinks(entries, null, null, null, databaseContext, null, null);
     }
 
-    /**
-     * Shortcut method for setting a single entry
-     *
-     * @param entry
-     * @param ce
-     * @param changedEntries
-     * @param singleTableModel
-     * @param databaseContext
-     * @param callback
-     * @param diag
-     * @return
-     */
-    public static Runnable autoSetLinks(BibEntry entry, final NamedCompound ce, final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
-        List<BibEntry> entries = new ArrayList<>(1);
-        entries.add(entry);
-        return autoSetLinks(entries, ce, changedEntries, singleTableModel, databaseContext, callback, diag);
-    }
 
     /**
      * Automatically add links for this set of entries, based on the globally stored list of external file types. The
@@ -466,61 +356,8 @@ public class Util {
      * @return the runnable able to perform the automatically setting
      */
     public static Runnable autoSetLinks(final BibEntry entry, final FileListTableModel singleTableModel, final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
-        final Collection<BibEntry> entries = new ArrayList<>();
-        entries.add(entry);
-
-        return autoSetLinks(entries, null, null, singleTableModel, databaseContext, callback, diag);
-    }
-
-    /**
-     * Accepts a string like [author:lower] or [title:abbr] or [auth], whereas the first part signifies the bibtex-field
-     * to get, or the key generator field marker to use, while the others are the modifiers that will be applied.
-     *
-     * @param fieldAndFormat
-     * @param entry
-     * @param database
-     * @return
-     */
-    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
-
-        String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
-
-        int colon = strippedFieldAndFormat.indexOf(':');
-
-        String beforeColon;
-        String afterColon;
-        if (colon == -1) {
-            beforeColon = strippedFieldAndFormat;
-            afterColon = null;
-        } else {
-            beforeColon = strippedFieldAndFormat.substring(0, colon);
-            afterColon = strippedFieldAndFormat.substring(colon + 1);
-        }
-        beforeColon = beforeColon.trim();
-
-        if (beforeColon.isEmpty()) {
-            return "";
-        }
-
-        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
-
-        // If no field value was found, try to interpret it as a key generator field marker:
-        if (fieldValue == null) {
-            fieldValue = LabelPatternUtil.makeLabel(entry, beforeColon);
-        }
-
-        if (fieldValue == null) {
-            return "";
-        }
-
-        if ((afterColon == null) || afterColon.isEmpty()) {
-            return fieldValue;
-        }
-
-        String[] parts = afterColon.split(":");
-        fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
-
-        return fieldValue;
+        return autoSetLinks(Collections.singletonList(entry), null, null, singleTableModel, databaseContext, callback,
+                diag);
     }
 
 }

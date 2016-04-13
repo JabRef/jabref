@@ -13,8 +13,6 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
-
 import javax.swing.*;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +36,7 @@ public class JabRefDesktop {
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
+    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -80,7 +79,7 @@ public class JabRefDesktop {
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
-                link = Util.ARXIV_LOOKUP_PREFIX + link;
+                link = ARXIV_LOOKUP_PREFIX + link;
             }
         }
 

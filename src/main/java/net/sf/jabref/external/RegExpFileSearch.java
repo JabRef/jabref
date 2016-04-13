@@ -15,9 +15,10 @@
  */
 package net.sf.jabref.external;
 
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +46,9 @@ public class RegExpFileSearch {
 
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
 
+    private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
+
+
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories
      * are given.
@@ -59,7 +63,7 @@ public class RegExpFileSearch {
 
         Map<BibEntry, List<File>> res = new HashMap<>();
         for (BibEntry entry : entries) {
-            res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
+            res.put(entry, findFiles(entry, extensions, directories, regExp));
         }
         return res;
     }
@@ -78,7 +82,7 @@ public class RegExpFileSearch {
 
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
-        return RegExpFileSearch.findFile(entry, directories, regularExpression, extensionRegExp);
+        return findFile(entry, directories, regularExpression, extensionRegExp);
     }
 
     /**
@@ -123,7 +127,7 @@ public class RegExpFileSearch {
             String extensionRegExp) {
         List<File> res = new ArrayList<>();
         for (File directory : dirs) {
-            res.addAll(RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp));
+            res.addAll(findFile(entry, directory.getPath(), file, extensionRegExp));
         }
         return res;
     }
@@ -205,7 +209,7 @@ public class RegExpFileSearch {
             for (int i = 0; i < (fileParts.length - 1); i++) {
 
                 String dirToProcess = fileParts[i];
-                dirToProcess = Util.expandBrackets(dirToProcess, entry, null);
+                dirToProcess = expandBrackets(dirToProcess, entry, null);
 
                 if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
                     actualDirectory = new File(dirToProcess + '/');
@@ -225,7 +229,7 @@ public class RegExpFileSearch {
                         String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
                         for (File subDir : subDirs) {
                             if (subDir.isDirectory()) {
-                                res.addAll(RegExpFileSearch.findFile(entry, subDir, restOfFileString, extensionRegExp));
+                                res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
                             }
                         }
                     }
@@ -251,7 +255,7 @@ public class RegExpFileSearch {
                             if (!subDir.isDirectory()) {
                                 continue;
                             }
-                            res.addAll(RegExpFileSearch.findFile(entry, subDir, restOfFileString, extensionRegExp));
+                            res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
                         }
                     }
 
@@ -261,11 +265,10 @@ public class RegExpFileSearch {
         }
 
         // Last step: check if the given file can be found in this directory
-        String filePart = fileParts[fileParts.length - 1].replace("[extension]", RegExpFileSearch.EXT_MARKER);
-        String filenameToLookFor = Util.expandBrackets(filePart, entry, null)
-                .replaceAll(RegExpFileSearch.EXT_MARKER, extensionRegExp);
-        final Pattern toMatch = Pattern.compile('^'
-                + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$', Pattern.CASE_INSENSITIVE);
+        String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
+        String filenameToLookFor = expandBrackets(filePart, entry, null).replaceAll(EXT_MARKER, extensionRegExp);
+        final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
+                Pattern.CASE_INSENSITIVE);
 
         File[] matches = actualDirectory.listFiles(new FilenameFilter() {
 
@@ -278,6 +281,79 @@ public class RegExpFileSearch {
             Collections.addAll(res, matches);
         }
         return res;
+    }
+
+    /**
+     * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
+     * <p>
+     * Unknown Bracket expressions are silently dropped.
+     *
+     * @param bracketString
+     * @param entry
+     * @param database
+     * @return
+     */
+    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
+        Matcher m = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
+        StringBuffer s = new StringBuffer();
+        while (m.find()) {
+            String replacement = getFieldAndFormat(m.group(), entry, database);
+            m.appendReplacement(s, replacement);
+        }
+        m.appendTail(s);
+
+        return s.toString();
+    }
+
+    /**
+     * Accepts a string like [author:lower] or [title:abbr] or [auth], whereas the first part signifies the bibtex-field
+     * to get, or the key generator field marker to use, while the others are the modifiers that will be applied.
+     *
+     * @param fieldAndFormat
+     * @param entry
+     * @param database
+     * @return
+     */
+    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
+
+        String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
+
+        int colon = strippedFieldAndFormat.indexOf(':');
+
+        String beforeColon;
+        String afterColon;
+        if (colon == -1) {
+            beforeColon = strippedFieldAndFormat;
+            afterColon = null;
+        } else {
+            beforeColon = strippedFieldAndFormat.substring(0, colon);
+            afterColon = strippedFieldAndFormat.substring(colon + 1);
+        }
+        beforeColon = beforeColon.trim();
+
+        if (beforeColon.isEmpty()) {
+            return "";
+        }
+
+        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
+
+        // If no field value was found, try to interpret it as a key generator field marker:
+        if (fieldValue == null) {
+            fieldValue = LabelPatternUtil.makeLabel(entry, beforeColon);
+        }
+
+        if (fieldValue == null) {
+            return "";
+        }
+
+        if ((afterColon == null) || afterColon.isEmpty()) {
+            return fieldValue;
+        }
+
+        String[] parts = afterColon.split(":");
+        fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
+
+        return fieldValue;
     }
 
 }

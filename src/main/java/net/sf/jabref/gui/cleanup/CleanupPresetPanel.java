@@ -14,7 +14,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -86,7 +85,7 @@ public class CleanupPresetPanel {
         builder.add(cleanUpMakePathsRelative).xyw(1, 6, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 7, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ")
-                .concat(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+                .concat(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 8);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 9);
         builder.add(cleanUpBibLatex).xyw(1, 10, 2);

@@ -23,7 +23,6 @@ import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.util.Util;
 
 public class RenamePdfCleanup implements CleanupJob {
 
@@ -54,7 +53,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             StringBuilder newFilename = new StringBuilder(
-                    Util.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
+                    FileUtil.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename

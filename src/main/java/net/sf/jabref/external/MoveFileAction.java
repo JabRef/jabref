@@ -23,7 +23,7 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -103,7 +103,7 @@ public class MoveFileAction extends AbstractAction {
                 String chosenFile;
                 if (toFileDir) {
                     // Determine which name to suggest:
-                    String suggName = Util
+                    String suggName = FileUtil
                             .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
                                     Globals.journalAbbreviationLoader.getRepository())
                             .concat(flEntry.type.isPresent() ? "." + flEntry.type.get().getExtension() : "");

@@ -38,10 +38,11 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.gui.util.KeyBinder;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -154,7 +155,7 @@ public class PreferencesDialog extends JDialog {
         buttonBarBuilder.addGlue();
 
         // Key bindings:
-        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
+        KeyBinder.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
 
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));

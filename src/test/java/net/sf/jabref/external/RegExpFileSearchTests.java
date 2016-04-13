@@ -18,38 +18,68 @@ package net.sf.jabref.external;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.layout.format.NameFormatter;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RegExpFileSearchTests {
 
     private static final String filesDirectory = "src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
-
+    private BibDatabase database;
+    private BibEntry entry;
 
     @Before
-    public void setUp(){
+    public void setUp() throws IOException {
         Globals.prefs = JabRefPreferences.getInstance();
+
+        StringReader reader = new StringReader(
+                "@ARTICLE{HipKro03," + "\n" + "  author = {Eric von Hippel and Georg von Krogh}," + "\n"
+                        + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},"
+                        + "\n" + "  journal = {Organization Science}," + "\n" + "  year = {2003}," + "\n"
+                        + "  volume = {14}," + "\n" + "  pages = {209--223}," + "\n" + "  number = {2}," + "\n"
+                        + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},"
+                        + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
+                        + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
+
+        BibtexParser parser = new BibtexParser(reader);
+        ParserResult result = null;
+
+        result = parser.parse();
+
+        database = result.getDatabase();
+        entry = database.getEntryByKey("HipKro03");
+
+        Assert.assertNotNull(database);
+        Assert.assertNotNull(entry);
     }
 
     @Test
     public void testFindFiles() {
         //given
         List<BibEntry> entries = new ArrayList<>();
-        BibEntry entry = new BibEntry("123", BibtexEntryTypes.ARTICLE.getName());
-        entry.setField(BibEntry.KEY_FIELD, "pdfInDatabase");
-        entry.setField("year", "2001");
-        entries.add(entry);
+        BibEntry localEntry = new BibEntry("123", BibtexEntryTypes.ARTICLE.getName());
+        localEntry.setField(BibEntry.KEY_FIELD, "pdfInDatabase");
+        localEntry.setField("year", "2001");
+        entries.add(localEntry);
 
         List<String> extensions = Arrays.asList("pdf");
 
@@ -61,6 +91,81 @@ public class RegExpFileSearchTests {
 
         //then
         assertEquals(1, result.keySet().size());
+    }
+
+    @Test
+    @Ignore
+    public void testFieldAndFormat() {
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[author]", entry, database));
+
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("author", entry, database));
+
+        Assert.assertEquals("",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[unknownkey]", entry, database));
+
+        Assert.assertEquals("", net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[:]", entry, database));
+
+        Assert.assertEquals("", net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[:lower]", entry, database));
+
+        Assert.assertEquals("eric von hippel and georg von krogh",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[author:lower]", entry, database));
+
+        Assert.assertEquals("HipKro03",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[bibtexkey]", entry, database));
+
+        Assert.assertEquals("HipKro03",
+                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[bibtexkey:]", entry, database));
+    }
+
+    @Test
+    @Ignore
+    public void testUserFieldAndFormat() {
+
+        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
+
+        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+
+        try {
+
+            List<String> f = new LinkedList<>(formats);
+            List<String> n = new LinkedList<>(names);
+
+            n.add("testMe123454321");
+            f.add("*@*@test");
+
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, n);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, f);
+
+            Assert.assertEquals("testtest", net.sf.jabref.external.RegExpFileSearch
+                    .getFieldAndFormat("[author:testMe123454321]", entry, database));
+
+        } finally {
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
+        }
+    }
+
+    @Test
+    public void testExpandBrackets() {
+
+        Assert.assertEquals("", RegExpFileSearch.expandBrackets("", entry, database));
+
+        Assert.assertEquals("dropped", RegExpFileSearch.expandBrackets("drop[unknownkey]ped", entry, database));
+
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+                RegExpFileSearch.expandBrackets("[author]", entry, database));
+
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
+
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
+
+        Assert.assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                RegExpFileSearch.expandBrackets("[author] have published [title] in [journal].", entry, database));
     }
 
     @After
