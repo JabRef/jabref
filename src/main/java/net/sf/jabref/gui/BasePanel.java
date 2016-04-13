@@ -2032,7 +2032,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     }
                     if (entry == null) {
-                        output(Localization.lang("No url defined") + '.');
+                        output(Localization.lang("No URL defined") + '.');
                     } else {
                         try {
                             JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);

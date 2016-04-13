@@ -207,7 +207,7 @@ public class IntegrityCheck {
                     counter++;
                 } else if (a == '}') {
                     if (counter == 0) {
-                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly braket"), entry, field));
+                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly bracket"), entry, field));
                     } else {
                         counter--;
                     }
@@ -215,7 +215,7 @@ public class IntegrityCheck {
             }
 
             if (counter > 0) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly braket"), entry, field));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly bracket"), entry, field));
             }
 
             return Collections.emptyList();
