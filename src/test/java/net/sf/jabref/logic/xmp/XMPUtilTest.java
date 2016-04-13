@@ -8,6 +8,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -860,6 +861,34 @@ public class XMPUtilTest {
         assertEqualsBibtexEntry(t3BibtexEntry(), b);
     }
 
+    /**
+     * Tests whether a edit-protected PDF can be read
+     */
+    @Test
+    public void testReadProtectedPDFHasMetaData() throws Exception {
+        try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/write-protected.pdf")) {
+            Assert.assertTrue(XMPUtil.hasMetadata(is));
+        }
+    }
+
+    /**
+     * Tests whether a edit-protected PDF can be read
+     */
+    @Test
+    public void testReadProtectedPDFHasCorrectMetaData() throws Exception {
+        try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/write-protected.pdf")) {
+            List<BibEntry> readEntries = XMPUtil.readXMP(is);
+
+            BibEntry entry = new BibEntry();
+            entry.setType("misc");
+            entry.setField("author", "Firstname Lastname");
+            List<BibEntry> expected = new ArrayList<>(1);
+            expected.add(entry);
+
+            BibtexEntryAssert.assertEquals(expected, readEntries);
+        }
+    }
+
     @Test
     public void testReadWriteDC() throws IOException, TransformerException {
         List<BibEntry> l = new LinkedList<>();
@@ -1272,14 +1301,14 @@ public class XMPUtilTest {
                 AuthorList.parse(x.getField("author")));
     }
 
-    @Test(expected = EncryptionNotSupportedException.class)
+    @Test(expected = EncryptedPdfsNotSupportedException.class)
     public void expectedEncryptionNotSupportedExceptionAtRead() throws IOException {
         try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
             XMPUtil.readXMP(is);
         }
     }
 
-    @Test(expected = EncryptionNotSupportedException.class)
+    @Test(expected = EncryptedPdfsNotSupportedException.class)
     public void expectedEncryptionNotSupportedExceptionAtWrite() throws IOException, TransformerException {
         XMPUtil.writeXMP("src/test/resources/pdfs/encrypted.pdf", t1BibtexEntry(), null);
     }

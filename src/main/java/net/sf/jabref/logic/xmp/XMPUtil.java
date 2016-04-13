@@ -46,10 +46,13 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
+import org.apache.pdfbox.pdmodel.encryption.BadSecurityHandlerException;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 import org.w3c.dom.Document;
 
 /**
@@ -121,6 +124,22 @@ public class XMPUtil {
         return result;
     }
 
+    public static PDDocument loadWithAutomaticDecryption(InputStream inputStream)
+            throws IOException, EncryptedPdfsNotSupportedException {
+        PDDocument doc = PDDocument.load(inputStream);
+        if (doc.isEncrypted()) {
+            // try the empty string as user password
+            StandardDecryptionMaterial sdm = new StandardDecryptionMaterial("");
+            try {
+                doc.openProtection(sdm);
+            } catch (BadSecurityHandlerException | CryptographyException e) {
+                LOGGER.error("Cannot handle encrypted PDF: " + e.getMessage());
+                throw new EncryptedPdfsNotSupportedException();
+            }
+        }
+        return doc;
+    }
+
     /**
      * Try to read the given BibTexEntry from the XMP-stream of the given
      * inputstream containing a PDF-file.
@@ -139,11 +158,7 @@ public class XMPUtil {
 
         List<BibEntry> result = new LinkedList<>();
 
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
-            }
-
+        try (PDDocument document = loadWithAutomaticDecryption(inputStream)) {
             Optional<XMPMetadata> meta = XMPUtil.getXMPMetadata(document);
 
             if (meta.isPresent()) {
@@ -508,13 +523,8 @@ public class XMPUtil {
      * @return The XMPMetadata object found in the file
      */
     private static Optional<XMPMetadata> readRawXMP(InputStream inputStream) throws IOException {
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
-            }
-
+        try (PDDocument document = loadWithAutomaticDecryption(inputStream)) {
             return XMPUtil.getXMPMetadata(document);
-
         }
     }
 
@@ -1036,8 +1046,7 @@ public class XMPUtil {
 
         try (PDDocument document = PDDocument.load(file.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException(
-                        "Error: Cannot add metadata to encrypted document.");
+                throw new EncryptedPdfsNotSupportedException();
             }
 
             if (writePDFInfo && (resolvedEntries.size() == 1)) {
@@ -1083,10 +1092,9 @@ public class XMPUtil {
             try {
                 document.save(file.getAbsolutePath());
             } catch (COSVisitorException e) {
-                throw new TransformerException("Could not write XMP-metadata: "
-                        + e.getLocalizedMessage());
+                LOGGER.debug("Could not write XMP metadata", e);
+                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
-
         }
     }
 
@@ -1265,7 +1273,7 @@ public class XMPUtil {
         try {
             List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream);
             return !bibEntries.isEmpty();
-        } catch (EncryptionNotSupportedException ex) {
+        } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {
