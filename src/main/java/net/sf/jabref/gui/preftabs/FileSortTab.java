@@ -121,6 +121,6 @@ class FileSortTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Localization.lang("Export Sorting");
+        return Localization.lang("Export sorting");
     }
 }

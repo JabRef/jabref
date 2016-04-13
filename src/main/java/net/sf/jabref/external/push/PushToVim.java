@@ -68,7 +68,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     protected void initSettingsPanel() {
         super.initSettingsPanel();
         builder.appendRows("2dlu, p");
-        builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
+        builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
         builder.add(vimServer).xy(3, 3);
         settings = builder.build();
     }

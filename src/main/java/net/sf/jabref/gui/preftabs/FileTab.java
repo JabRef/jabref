@@ -77,7 +77,7 @@ class FileTab extends JPanel implements PrefsTab {
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
-        useRegExpComboBox = new JRadioButton(Localization.lang("Use Regular Expression Search"));
+        useRegExpComboBox = new JRadioButton(Localization.lang("Use regular expression search"));
         ItemListener regExpListener = e -> regExpTextField.setEditable(useRegExpComboBox.isSelected());
         useRegExpComboBox.addItemListener(regExpListener);
         ButtonGroup buttonGroup = new ButtonGroup();

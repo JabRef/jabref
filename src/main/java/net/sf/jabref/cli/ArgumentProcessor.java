@@ -481,7 +481,7 @@ public class ArgumentProcessor {
                 + Localization.lang("Please wait..."));
         Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if ((result == null) || result.isEmpty()) {
+        if (result.isEmpty()) {
             System.out.println(
                     Localization.lang("Query '%0' with fetcher '%1' did not return any results.", query, engine));
             return Optional.empty();

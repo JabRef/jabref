@@ -103,7 +103,7 @@ public class WriteXMPAction extends AbstractWorker {
         }
         optDiag.open();
 
-        panel.output(Localization.lang("Writing XMP metadata..."));
+        panel.output(Localization.lang("Writing XMP-metadata..."));
     }
 
     @Override
@@ -198,7 +198,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent) {
-            super(parent, Localization.lang("Writing XMP metadata for selected entries..."), false);
+            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
             okButton.addActionListener(e -> dispose());

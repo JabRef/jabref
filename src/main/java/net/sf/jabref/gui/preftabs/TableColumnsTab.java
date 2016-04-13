@@ -276,7 +276,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumns = new JList<>(fileTypeNames);
         JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
         listOfFileColumns.setVisibleRowCount(3);
-        extraFileColumns = new JCheckBox(Localization.lang("Show Extra columns"));
+        extraFileColumns = new JCheckBox(Localization.lang("Show extra columns"));
         extraFileColumns.addChangeListener(arg0 -> listOfFileColumns.setEnabled(extraFileColumns.isSelected()));
 
         /*** begin: special table columns and special fields ***/
