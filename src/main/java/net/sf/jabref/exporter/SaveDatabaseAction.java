@@ -340,7 +340,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void saveAs() throws Throwable {
-        String chosenFile = null;
+        String chosenFile;
         File f = null;
         while (f == null) {
             chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",

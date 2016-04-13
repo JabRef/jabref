@@ -21,7 +21,7 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directories only.
      */
-    private final static FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
+    private static final FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
 
     private final BibDatabase database;
 

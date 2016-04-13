@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Abbreviation implements Comparable<Abbreviation> {
 
-    private final static String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
+    private static final String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
 
     private final String name;
     private final String abbreviation;

@@ -25,12 +25,12 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class GeneralRenderer extends DefaultTableCellRenderer {
 
-    private final Color background;
+    private final Color rendererBackground;
     private Color selBackground;
 
     public GeneralRenderer(Color c) {
         super();
-        this.background = c;
+        this.rendererBackground = c;
         setBackground(c);
     }
 
@@ -66,7 +66,7 @@ public class GeneralRenderer extends DefaultTableCellRenderer {
             if (isSelected) {
                 c.setBackground(selBackground);
             } else {
-                c.setBackground(background);
+                c.setBackground(rendererBackground);
             }
             return c;
         }

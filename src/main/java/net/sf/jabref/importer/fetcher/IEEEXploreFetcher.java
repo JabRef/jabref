@@ -166,7 +166,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error while fetching from %0", "IEEEXplore"),
+                status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -183,7 +183,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
         } catch (ConnectException | UnknownHostException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
+            status.showMessage(Localization.lang("Could not connect to %0", getTitle()), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);

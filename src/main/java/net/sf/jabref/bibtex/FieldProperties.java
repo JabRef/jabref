@@ -1,6 +1,7 @@
 package net.sf.jabref.bibtex;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 public enum FieldProperties {
     YES_NO,
@@ -23,7 +24,6 @@ public enum FieldProperties {
     PAGINATION,
     TYPE;
 
-    public static final EnumSet<FieldProperties> ALL_OPTS = EnumSet
-            .allOf(FieldProperties.class);
+    public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 
 }

@@ -856,19 +856,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     item.openLink();
                 }));
 
-        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                        bibDatabaseContext.getFileDirectory());
-                for (final File f : files) {
-                    try {
-                        JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
-                    } catch (IOException e) {
-                        LOGGER.info("Could not open folder", e);
-                    }
+        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
+            final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
+                    bibDatabaseContext.getFileDirectory());
+            for (final File f : files) {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
                 }
-            });
-        });
+            }
+        }));
 
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
@@ -2355,7 +2353,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.getBibDatabaseContext().getFileDirectory().size() > 0) {
+            if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));

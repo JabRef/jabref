@@ -72,7 +72,7 @@ public class SpringerFetcher implements EntryFetcher {
                                         Integer.toString(hits));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("%0 import canceled", "Springer"));
+                            status.setStatus(Localization.lang("%0 import canceled", getTitle()));
                             return false;
                         }
 
@@ -112,7 +112,7 @@ public class SpringerFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", encodedQuery),
-                        Localization.lang("Search %0", "Springer"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {

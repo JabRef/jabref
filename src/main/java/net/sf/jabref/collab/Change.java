@@ -66,7 +66,7 @@ abstract class Change extends DefaultMutableTreeNode {
      * This method returns a JComponent detailing the nature of the change.
      * @return JComponent
      */
-    abstract public JComponent description();
+    public abstract JComponent description();
 
     /**
      * Perform the change. This method is responsible for adding a proper undo edit to
@@ -77,6 +77,6 @@ abstract class Change extends DefaultMutableTreeNode {
      * @param undoEdit NamedCompound The compound to hold the undo edits.
      * @return true if all changes were made, false if not all were accepted.
      */
-    abstract public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit);
+    public abstract boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit);
 
 }

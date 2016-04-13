@@ -87,7 +87,7 @@ public class JournalAbbreviationRepository {
     }
 
     public void addEntries(List<Abbreviation> abbreviationsToAdd) {
-        abbreviationsToAdd.forEach(abbreviation -> addEntry(abbreviation));
+        abbreviationsToAdd.forEach(this::addEntry);
     }
 
     public SortedSet<Abbreviation> getAbbreviations() {

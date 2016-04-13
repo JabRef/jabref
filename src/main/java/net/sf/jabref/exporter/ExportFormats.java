@@ -200,7 +200,7 @@ public class ExportFormats {
                         }
                     }
                     final IExportFormat format = eff.getExportFormat();
-                    List<BibEntry> entries = null;
+                    List<BibEntry> entries;
                     if (selectedOnly) {
                         // Selected entries
                         entries = frame.getCurrentBasePanel().getSelectedEntries();

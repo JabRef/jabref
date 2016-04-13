@@ -261,22 +261,20 @@ class StyleSelectDialog {
 
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(actionEvent -> {
-            getSelectedStyle().ifPresent(style -> {
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = style.getPath();
-                try {
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    LOGGER.warn("Problem open style file editor", e);
+        edit.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+            String link = style.getPath();
+            try {
+                if (type.isPresent()) {
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+                } else {
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
+                            new UnknownExternalFileType("jstyle"));
                 }
-            });
-        });
+            } catch (IOException e) {
+                LOGGER.warn("Problem open style file editor", e);
+            }
+        }));
 
         // Add action listener to "Show" menu item, which is supposed to open the style file in a dialog:
         show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));

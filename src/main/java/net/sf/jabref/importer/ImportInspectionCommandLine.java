@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
         if (fetcher.processQuery(query, ImportInspectionCommandLine.this, status)) {
             return entries;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
