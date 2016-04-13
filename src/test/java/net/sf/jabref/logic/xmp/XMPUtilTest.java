@@ -882,8 +882,7 @@ public class XMPUtilTest {
             BibEntry entry = new BibEntry();
             entry.setType("misc");
             entry.setField("author", "Firstname Lastname");
-            List<BibEntry> expected = new ArrayList<>(1);
-            expected.add(entry);
+            List<BibEntry> expected = Collections.singletonList(entry);
 
             BibtexEntryAssert.assertEquals(expected, readEntries);
         }
