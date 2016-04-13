@@ -45,7 +45,7 @@ public class CrossRef {
             JSONArray items = response.getBody().getObject().getJSONObject("message").getJSONArray("items");
             String dataTitle = items.getJSONObject(0).getJSONArray("title").getString(0);
             String dataDOI = items.getJSONObject(0).getString("DOI");
-            LOGGER.info("DOI " + dataDOI + "for " + title + "found.");
+            LOGGER.info("DOI " + dataDOI + " for " + title + "found.");
             return DOI.build(dataDOI);
         } catch (UnirestException e) {
             LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);

@@ -43,6 +43,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
@@ -131,18 +132,18 @@ public class FieldExtraComponents {
 
         DocumentListener documentListener = new DocumentListener() {
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
-            private void checkUrl(DocumentEvent documentEvent) {
+            private void checkUrl() {
                 if (URLUtil.isURL(url.getText())) {
                     button.setEnabled(true);
                 } else {
@@ -162,9 +163,10 @@ public class FieldExtraComponents {
      * @param panel
      * @return
      */
-    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
+    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, EntryEditor entryEditor, FieldEditor fieldEditor) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
+        // open doi link
         JButton button = new JButton(Localization.lang("Open"));
         button.setEnabled(false);
         button.addActionListener(actionEvent -> {
@@ -174,11 +176,24 @@ public class FieldExtraComponents {
                 panel.output(Localization.lang("Unable to open link."));
             }
         });
+        // lookup doi
+        JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
+        doiButton.addActionListener(actionEvent -> {
+                Optional<DOI> doi = CrossRef.findDOI(entryEditor.getEntry());
+                if (doi.isPresent()) {
+                    JTextComponent field = (JTextComponent) fieldEditor.getTextComponent();
+                    field.setText(doi.get().getDOI());
+                } else {
+                    panel.frame().setStatus(Localization.lang("No DOI found"));
+                }
+        });
+        // fetch bibtex data
         JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> new MergeEntryDOIDialog(panel));
 
         controls.add(button, BorderLayout.NORTH);
+        controls.add(doiButton, BorderLayout.CENTER);
         controls.add(fetchButton, BorderLayout.SOUTH);
 
         // enable/disable button
@@ -186,18 +201,18 @@ public class FieldExtraComponents {
 
         DocumentListener documentListener = new DocumentListener() {
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
-            private void checkDoi(DocumentEvent documentEvent) {
+            private void checkDoi() {
                 Optional<DOI> doiUrl = DOI.build(doi.getText());
                 if(doiUrl.isPresent()) {
                     button.setEnabled(true);
