@@ -37,11 +37,11 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
  */
-public class BibteXMLImporter extends ImportFormat {
+public class BibTeXMLImporter extends ImportFormat {
 
-    private static final Log LOGGER = LogFactory.getLog(BibteXMLImporter.class);
+    private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 
-    private static final Pattern START_PATTERN = Pattern.compile("<bibtex:file .*");
+    private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
 
 
     /**

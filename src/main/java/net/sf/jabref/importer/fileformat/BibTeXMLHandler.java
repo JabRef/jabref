@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.model.entry.IdGenerator;
@@ -32,6 +31,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class BibTeXMLHandler extends DefaultHandler {
 
+    private static final String BIBTEXML_URI = "http://bibtexml.sf.net/";
+
     private List<BibEntry> bibitems;
 
     private BibEntry b; // the entry being read
@@ -39,10 +40,8 @@ class BibTeXMLHandler extends DefaultHandler {
     // XML parsing stuff
     private String currentChars;
 
+
     public List<BibEntry> getItems() {
-        if (bibitems == null) {
-            return Collections.emptyList();
-        }
         return bibitems;
     }
 
@@ -54,11 +53,6 @@ class BibTeXMLHandler extends DefaultHandler {
     }
 
     @Override
-    public void endDocument() {
-        // Empty method
-    }
-
-    @Override
     public void characters(char[] ch, int start, int length) {
         String s = new String(ch, start, length).trim();
         currentChars += s;
@@ -66,41 +60,41 @@ class BibTeXMLHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String local, String raw, Attributes atts) {
-        if ("bibtex:entry".equals(raw)) {
-            String articleID = null;
-            for (int i = 0; i < atts.getLength(); i++) {
-                if ("bibtex:id".equals(atts.getQName(i)) ||
-                        "id".equals(atts.getQName(i))) {
-                    articleID = atts.getValue(i);
+        if (BIBTEXML_URI.equals(uri)) {
+            if ("entry".equals(local)) {
+                b = new BibEntry(IdGenerator.next());
+                // Determine and-set bibtex key
+                String bibtexKey = null;
+                for (int i = 0; i < atts.getLength(); i++) {
+                    String attrURI = atts.getURI(i);
+                    if ((BIBTEXML_URI.equals(attrURI) || "".equals(attrURI)) && "id".equals(atts.getLocalName(i))) {
+                        bibtexKey = atts.getValue(i);
+                    }
                 }
+                if (bibtexKey != null) {
+                    b.setField(BibEntry.KEY_FIELD, bibtexKey);
+                }
+            } else if ("article".equals(local) || "inbook".equals(local) || "book".equals(local)
+                    || "booklet".equals(local) || "incollection".equals(local) || "inproceedings".equals(local)
+                    || "proceedings".equals(local) || "manual".equals(local) || "mastersthesis".equals(local)
+                    || "phdthesis".equals(local) || "techreport".equals(local) || "unpublished".equals(local)
+                    || "misc".equals(local)) {
+                b.setType(local);
             }
-            b = new BibEntry(IdGenerator.next());
-            b.setField(BibEntry.KEY_FIELD, articleID);
-        } else if ("bibtex:article".equals(raw) ||
-                "bibtex:inbook".equals(raw) ||
-                "bibtex:book".equals(raw) ||
-                "bibtex:booklet".equals(raw) ||
-                "bibtex:incollection".equals(raw) ||
-                "bibtex:inproceedings".equals(raw) ||
-                "bibtex:proceedings".equals(raw) ||
-                "bibtex:manual".equals(raw) ||
-                "bibtex:mastersthesis".equals(raw) ||
-                "bibtex:phdthesis".equals(raw) ||
-                "bibtex:techreport".equals(raw) ||
-                "bibtex:unpublished".equals(raw) ||
-                "bibtex:misc".equals(raw) ||
-                "bibtex:other".equals(raw)) {
-            b.setType(local);
         }
         currentChars = "";
     }
 
     @Override
     public void endElement(String uri, String local, String raw) {
-        if ("bibtex:entry".equals(raw)) {
-            bibitems.add(b);
-        } else if (raw.startsWith("bibtex:")) {
-            b.setField(local, currentChars);
+        if (BIBTEXML_URI.equals(uri)) {
+            if ("entry".equals(local)) {
+                bibitems.add(b);
+            } else {
+                if (!currentChars.trim().isEmpty()) {
+                    b.setField(local, currentChars);
+                }
+            }
         }
         currentChars = "";
     }
