@@ -2,7 +2,7 @@ TI- Computing and operational research at the London Hospital
 AU- Barber, Barry
 AU- Abbott, W.
 SE- Computers in medicine series
-PU- London :  Butterworths
+PU- London : Butterworths
 PY- 1972
 PD- x, 102p, leaf : ill., form, port ; 22cm
 IS- 0407517006 (Pbk)
@@ -18,12 +18,13 @@ KW- Hospitals, London, London Hospital and Medical College, Records
     management, Applications of computer systems, to 1971
 HL- Aberdeen ; Birmingham ; Edinburgh ; Trinity College Dublin ;
     UCL (University College London)
-
+DT- TXT
+DT- PDF
 
 TI- Real time systems : management and design
 AU- Tebbs, David
 AU- Collins, Garfield
-PU- London ; New York :  McGraw-Hill
+PU- London ; New York : McGraw-Hill
 PY- 1977
 PD- ix, 357p : ill., forms ; 24cm
 IS- 0070844828
@@ -32,3 +33,4 @@ KW- Real-time data processing - Management
 KW- Real time computer systems, Design
 HL- Aberdeen ; Birmingham ; Edinburgh ; Imperial College ;
     Liverpool ; Manchester ; Oxford ; Trinity College Dublin
+DT- TXT, PDF
