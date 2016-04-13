@@ -16,7 +16,6 @@ import org.junit.runners.Parameterized.Parameters;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 @RunWith(Parameterized.class)
@@ -55,7 +54,7 @@ public class MsBibImporterTestfiles {
         String bibFileName = fileName + ".bib";
         MsBibImporter testImporter = new MsBibImporter();
         try (InputStream is = MsBibImporter.class.getResourceAsStream(xmlFileName)) {
-            List<BibEntry> result = testImporter.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> result = testImporter.importDatabase(is).getDatabase().getEntries();
             BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
         }
     }

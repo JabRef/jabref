@@ -17,7 +17,7 @@ public class PdfContentImporterTest {
     public void doesNotHandleEncryptedPdfs() throws IOException {
         PdfContentImporter importer = new PdfContentImporter();
         try (InputStream is = PdfContentImporter.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            List<BibEntry> result = importer.importEntries(is, null);
+            List<BibEntry> result = importer.importDatabase(is).getDatabase().getEntries();
             assertEquals(Collections.emptyList(), result);
         }
     }

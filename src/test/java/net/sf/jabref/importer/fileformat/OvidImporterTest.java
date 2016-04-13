@@ -13,7 +13,6 @@ import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class OvidImporterTest {
@@ -66,7 +65,7 @@ public class OvidImporterTest {
     public void testImportEmpty() throws IOException {
 
         try (InputStream is = OvidImporter.class.getResourceAsStream("Empty.txt")) {
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(Collections.emptyList(), entries);
         }
     }
@@ -75,7 +74,7 @@ public class OvidImporterTest {
     public void testImportEntries1() throws IOException {
 
         try (InputStream is = OvidImporter.class.getResourceAsStream("OvidImporterTest1.txt")) {
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
@@ -130,7 +129,7 @@ public class OvidImporterTest {
     public void testImportEntries2() throws IOException {
 
         try (InputStream is = OvidImporter.class.getResourceAsStream("OvidImporterTest2.txt")) {
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(Collections.emptyList(), entries);
         }
     }
@@ -141,7 +140,7 @@ public class OvidImporterTest {
         for (int n = 3; n <= 7; n++) {
             try (InputStream is = OvidImporter.class.getResourceAsStream("OvidImporterTest" + n + ".txt");
                     InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
-                List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+                List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
                 Assert.assertNotNull(entries);
                 Assert.assertEquals(1, entries.size());
                 BibtexEntryAssert.assertEquals(nis, entries.get(0));

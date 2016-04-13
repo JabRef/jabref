@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class BiblioscapeImporterTest {
     @Test
     public void testImportEntriesAbortion() throws Throwable {
         try (InputStream is = BiblioscapeImporter.class.getResourceAsStream("BiblioscapeImporterTestCorrupt.txt")) {
-            Assert.assertEquals(Collections.emptyList(), bsImporter.importEntries(is, new OutputPrinterToNull()));
+            Assert.assertEquals(Collections.emptyList(), bsImporter.importDatabase(is).getDatabase().getEntries());
         }
     }
 }

@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -85,11 +84,6 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
             return importDatabase(bufferedStream);
         }
-    }
-
-    @Deprecated
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter printer) throws IOException {
-        return importDatabase(in).getDatabase().getEntries();
     }
 
     /**

@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class MsBibImporterTest {
@@ -39,8 +38,8 @@ public class MsBibImporterTest {
     public final void testImportEntriesEmpty() throws IOException {
         MsBibImporter testImporter = new MsBibImporter();
 
-        List<BibEntry> entries = testImporter.importEntries(
-                MsBibImporterTest.class.getResourceAsStream("MsBibImporterTest.xml"), new OutputPrinterToNull());
+        List<BibEntry> entries = testImporter.importDatabase(
+                MsBibImporterTest.class.getResourceAsStream("MsBibImporterTest.xml")).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), entries);
     }
 
@@ -48,8 +47,8 @@ public class MsBibImporterTest {
     public final void testImportEntriesNotRecognizedFormat() throws IOException {
         MsBibImporter testImporter = new MsBibImporter();
 
-        List<BibEntry> entries = testImporter.importEntries(
-                MsBibImporterTest.class.getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
+        List<BibEntry> entries = testImporter.importDatabase(
+                MsBibImporterTest.class.getResourceAsStream("CopacImporterTest1.txt")).getDatabase().getEntries();
         Assert.assertEquals(0, entries.size());
     }
 

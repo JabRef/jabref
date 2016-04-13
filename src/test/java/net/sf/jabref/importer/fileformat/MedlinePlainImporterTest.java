@@ -11,7 +11,6 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -68,7 +67,7 @@ public class MedlinePlainImporterTest {
         try (InputStream is = MedlinePlainImporter.class
                 .getResourceAsStream("MedlinePlainImporterTestMultipleEntries.txt")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(7, entries.size());
 
             BibEntry testEntry = entries.get(0);
@@ -113,7 +112,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testEmptyFileImport() throws IOException {
-        List<BibEntry> emptyEntries = importer.importEntries(emptyFileStream, new OutputPrinterToNull());
+        List<BibEntry> emptyEntries = importer.importDatabase(emptyFileStream).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), emptyEntries);
     }
 
@@ -132,7 +131,7 @@ public class MedlinePlainImporterTest {
     private void assertImportOfMedlineFileEqualsBibtexFile(String medlineFile, String bibtexFile) throws IOException {
         try (InputStream is = MedlinePlainImporter.class.getResourceAsStream(medlineFile);
                 InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertNotNull(entries);
             Assert.assertEquals(1, entries.size());
             BibtexEntryAssert.assertEquals(nis, entries.get(0));
@@ -146,7 +145,7 @@ public class MedlinePlainImporterTest {
                 + "\n" + "PRIN- Comment7" + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n" + "RPF - Comment10"
                 + "\n" + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13" + "\n"
                 + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16");) {
-            List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> actualEntries = importer.importDatabase(stream).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setField("comment",
@@ -161,7 +160,7 @@ public class MedlinePlainImporterTest {
     @Test
     public void testKeyWords() throws IOException {
         try (InputStream stream = streamForString("PMID-22664795" + "\n" + "MH  - Female" + "\n" + "OT  - Male");) {
-            List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> actualEntries = importer.importDatabase(stream).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setField("keywords", "Female, Male");
@@ -177,7 +176,7 @@ public class MedlinePlainImporterTest {
                 "PT  - classical article" + "\n" +
                 "PT  - corrected and republished article" + "\n" +
                 "PT  - introductory journal article" + "\n" + "PT  - newspaper article")) {
-            List<BibEntry> actualEntries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> actualEntries = importer.importDatabase(stream).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setType("article");

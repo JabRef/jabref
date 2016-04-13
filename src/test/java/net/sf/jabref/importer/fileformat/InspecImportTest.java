@@ -9,7 +9,6 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
@@ -65,7 +64,7 @@ public class InspecImportTest {
         shouldBeEntry.setField("volume", "19");
 
         try (InputStream inStream = InspecImportTest.class.getResourceAsStream("InspecImportTest2.txt")) {
-            List<BibEntry> entries = inspecImp.importEntries(inStream, new OutputPrinterToNull());
+            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             BibtexEntryAssert.assertEquals(shouldBeEntry, entry);
@@ -84,7 +83,7 @@ public class InspecImportTest {
         shouldBeEntry.setField("author", "Prechelt, Lutz");
 
         try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
-            List<BibEntry> entries = inspecImp.importEntries(inStream, new OutputPrinterToNull());
+            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             BibtexEntryAssert.assertEquals(shouldBeEntry, entry);
@@ -102,7 +101,7 @@ public class InspecImportTest {
         shouldBeEntry.setField("author", "Prechelt, Lutz");
 
         try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
-            List<BibEntry> entries = inspecImp.importEntries(inStream, new OutputPrinterToNull());
+            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             BibtexEntryAssert.assertEquals(shouldBeEntry, entry);

@@ -10,7 +10,6 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -51,8 +50,8 @@ public class BiblioscapeImporterTestTypes {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
-        List<BibEntry> bibEntries = bsImporter.importEntries(
-                new ByteArrayInputStream(bsInput.getBytes(StandardCharsets.UTF_8)), new OutputPrinterToNull());
+        List<BibEntry> bibEntries = bsImporter.importDatabase(
+                new ByteArrayInputStream(bsInput.getBytes(StandardCharsets.UTF_8))).getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
         entry.setField("author", "Baklouti, F.");

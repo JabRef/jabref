@@ -16,7 +16,6 @@ import org.junit.runners.Parameterized.Parameters;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 @RunWith(Parameterized.class)
@@ -56,7 +55,7 @@ public class SilverPlatterImporterTest {
     public final void testImportEntries() throws Exception {
         try (InputStream in = SilverPlatterImporter.class.getResourceAsStream(txtName);
                 InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
-            List<BibEntry> entries = testImporter.importEntries(in, new OutputPrinterToNull());
+            List<BibEntry> entries = testImporter.importDatabase(in).getDatabase().getEntries();
             BibtexEntryAssert.assertEquals(bibIn, entries);
         }
     }

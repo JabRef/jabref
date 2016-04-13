@@ -8,7 +8,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -130,7 +129,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTest1.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
@@ -153,7 +152,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTest2.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
             Assert.assertEquals(3, entries.size());
             BibEntry entry = entries.get(0);
             Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
@@ -173,7 +172,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestInspec.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(2, entries.size());
             BibEntry a = entries.get(0);
@@ -215,7 +214,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestWOS.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(2, entries.size());
             BibEntry a = entries.get(0);
@@ -276,7 +275,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IEEEImport1.txt")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
@@ -304,7 +303,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IEEEImport1.txt")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(1, entries.size());
             BibEntry a = entries.get(0);
@@ -332,7 +331,7 @@ public class IsiImporterTest {
         IsiImporter importer = new IsiImporter();
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestMedline.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(2, entries.size());
             BibEntry a = entries.get(0);
@@ -371,7 +370,7 @@ public class IsiImporterTest {
 
         try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestEmpty.isi")) {
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(is).getDatabase().getEntries();
 
             Assert.assertEquals(1, entries.size());
         }

@@ -2,7 +2,6 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.*;
 
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class CopacImporterTest {
 
         try (InputStream stream = CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest1.txt")) {
-            List<BibEntry> entries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(stream).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
 
@@ -77,7 +76,7 @@ public class CopacImporterTest {
 
         try (InputStream stream = CopacImporterTest.class
                 .getResourceAsStream("CopacImporterTest2.txt")) {
-            List<BibEntry> entries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> entries = importer.importDatabase(stream).getDatabase().getEntries();
             Assert.assertEquals(2, entries.size());
             BibEntry one = entries.get(0);
 

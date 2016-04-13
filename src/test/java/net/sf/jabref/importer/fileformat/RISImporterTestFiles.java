@@ -2,7 +2,6 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +50,7 @@ public class RISImporterTestFiles {
     public void testImportEntries() throws IOException {
         try (InputStream risStream = RISImporterTest.class.getResourceAsStream(fileName + ".ris")) {
 
-            List<BibEntry> risEntries = risImporter.importEntries(risStream, new OutputPrinterToNull());
+            List<BibEntry> risEntries = risImporter.importDatabase(risStream).getDatabase().getEntries();
             BibtexEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
 
         }

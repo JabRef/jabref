@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class BibtexImporterTest {
     @Test
     public void testImportEntries() throws IOException {
         try (InputStream stream = BibtexImporterTest.class.getResourceAsStream("BibtexImporter.examples.bib")) {
-            List<BibEntry> bibEntries = importer.importEntries(stream, new OutputPrinterToNull());
+            List<BibEntry> bibEntries = importer.importDatabase(stream).getDatabase().getEntries();
 
             assertEquals(4, bibEntries.size());
 

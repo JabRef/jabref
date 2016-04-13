@@ -2,7 +2,6 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +63,7 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntries0() throws IOException {
         try (InputStream is = EndnoteImporterTest.class.getResourceAsStream("Endnote.entries.enw")) {
-            List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> bibEntries = importer.importDatabase(is).getDatabase().getEntries();
 
             assertEquals(5, bibEntries.size());
 
@@ -111,7 +110,7 @@ public class EndnoteImporterTest {
     public void testImportEntries1() throws IOException {
         String s = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
         InputStream is = new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
-        List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
+        List<BibEntry> bibEntries = importer.importDatabase(is).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
@@ -125,7 +124,7 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntriesBookExample() throws IOException {
         try (InputStream is = EndnoteImporterTest.class.getResourceAsStream("Endnote.book.example.enw")) {
-            List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> bibEntries = importer.importDatabase(is).getDatabase().getEntries();
 
             assertEquals(1, bibEntries.size());
 

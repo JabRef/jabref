@@ -27,10 +27,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.model.entry.EntryType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -41,13 +37,13 @@ import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
@@ -55,6 +51,11 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PdfImporter {
 
@@ -186,15 +187,19 @@ public class PdfImporter {
     }
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
-        BibEntry entry;
         List<BibEntry> localRes = new ArrayList<>();
         PdfXmpImporter importer = new PdfXmpImporter();
         try (InputStream in = new FileInputStream(fileName)) {
-            localRes.addAll(importer.importEntries(in, frame));
+            ParserResult result = importer.importDatabase(in);
+            if(result.hasWarnings()) {
+                frame.showMessage(result.getErrorMessage());
+            }
+            localRes.addAll(result.getDatabase().getEntries());
         } catch (IOException ex) {
             LOGGER.warn("Cannot import entries", ex);
         }
 
+        BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
@@ -234,9 +239,12 @@ public class PdfImporter {
         BibEntry entry;
         try (InputStream in = new FileInputStream(file)) {
             PdfContentImporter contentImporter = new PdfContentImporter();
-            List<BibEntry> localRes = contentImporter.importEntries(in, frame);
+            ParserResult result = contentImporter.importDatabase(in);
+            if(result.hasWarnings()) {
+                frame.showMessage(result.getErrorMessage());
+            }
 
-            if (localRes.isEmpty()) {
+            if (!result.getDatabase().hasEntries()) {
                 // import failed -> generate default entry
                 entry = createNewBlankEntry(fileName);
                 res.add(entry);
@@ -244,7 +252,7 @@ public class PdfImporter {
             }
 
             // only one entry is imported
-            entry = localRes.get(0);
+            entry = result.getDatabase().getEntries().get(0);
         } catch (IOException e) {
             // import failed -> generate default entry
             LOGGER.info("Import failed", e);
@@ -312,22 +320,4 @@ public class PdfImporter {
         }
         return null;
     }
-
-    public MainTable getEntryTable() {
-        return entryTable;
-    }
-
-    public void setEntryTable(MainTable entryTable) {
-        this.entryTable = entryTable;
-    }
-
-    public int getDropRow() {
-        return dropRow;
-    }
-
-    public void setDropRow(int dropRow) {
-        this.dropRow = dropRow;
-    }
-
-
 }

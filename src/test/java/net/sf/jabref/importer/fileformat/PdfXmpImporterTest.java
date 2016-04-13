@@ -7,7 +7,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -46,7 +45,7 @@ public class PdfXmpImporterTest {
     @Test
     public void testImportEntries() throws IOException {
         try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
-            List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
+            List<BibEntry> bibEntries = importer.importDatabase(is).getDatabase().getEntries();
 
             assertEquals(1, bibEntries.size());
 

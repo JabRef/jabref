@@ -48,7 +48,7 @@ public class PdfContentImporterTestFiles {
         String bibFileName = fileName + ".bib";
         PdfContentImporter importer = new PdfContentImporter();
         try (InputStream is = PdfContentImporter.class.getResourceAsStream(pdfFileName)) {
-            List<BibEntry> result = importer.importEntries(is, null);
+            List<BibEntry> result = importer.importDatabase(is).getDatabase().getEntries();
             BibtexEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
         }
     }

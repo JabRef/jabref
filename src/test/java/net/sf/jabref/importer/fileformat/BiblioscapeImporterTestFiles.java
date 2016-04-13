@@ -2,7 +2,6 @@ package net.sf.jabref.importer.fileformat;
 
 import net.sf.jabref.*;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,7 +57,7 @@ public class BiblioscapeImporterTestFiles {
     public void testImportEntries() throws IOException {
         try (InputStream bsStream = BiblioscapeImporterTest.class.getResourceAsStream(fileName + ".txt")) {
 
-            List<BibEntry> bsEntries = bsImporter.importEntries(bsStream, new OutputPrinterToNull());
+            List<BibEntry> bsEntries = bsImporter.importDatabase(bsStream).getDatabase().getEntries();
             Assert.assertEquals(1, bsEntries.size());
             BibtexEntryAssert.assertEquals(BiblioscapeImporterTest.class, fileName + ".bib", bsEntries);
 
