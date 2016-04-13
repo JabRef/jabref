@@ -38,17 +38,8 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 22, 2006
- * Time: 12:06:09 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ImportFormats {
-
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
-
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
