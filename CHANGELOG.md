@@ -56,6 +56,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Move Look & Feel settings from advanced to appearance tab in preferences
 - JabRef installer now automatically determines the user rights and installs to home directory/program dir when user is restricted/admin
 - Move PDF file directory configuration from external tab to file tab in preferences
+- Implemented [#672](https://github.com/JabRef/jabref/issues/672): FileList now distributes its space dependent on the width of its columns
 
 ### Fixed
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
@@ -95,7 +96,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1062](https://github.com/JabRef/jabref/issues/1062): Merge entry with DOI information now also applies changes to entry type
 - Fixed [#535](https://github.com/JabRef/jabref/issues/535): Add merge action to right click menu
 - Fixed [#1115](https://github.com/JabRef/jabref/issues/1115): Wrong warning message when importing duplicate entries
-
+- Fixed [#935](https://github.com/JabRef/jabref/issues/935): PDFs, which are readable, but carry a protection for editing, are treated by the XMP parser and the importer generating a BibTeX entry based on the content.
 
 ### Removed
 - Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field

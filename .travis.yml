@@ -19,6 +19,8 @@ script:
   - ./gradlew check integrationTest
 
 after_script:
+  # enable codecov report
+  - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
 
 # cache gradle dependencies

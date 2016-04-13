@@ -3,6 +3,8 @@ package net.sf.jabref.importer;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,12 +23,15 @@ public class ImportFormatReaderTest {
     private final String resourceName;
     private final int count;
     public final String format;
+    private final String fileName;
 
 
-    public ImportFormatReaderTest(String resource, String format, int count) {
+    public ImportFormatReaderTest(String resource, String format, int count) throws URISyntaxException {
         this.resourceName = resource;
         this.format = format;
         this.count = count;
+        this.fileName = Paths.get(ImportFormatReaderTest.class.getResource(resourceName).toURI()).toString();
+
     }
 
     @Before
@@ -38,14 +43,12 @@ public class ImportFormatReaderTest {
 
     @Test
     public void testImportUnknownFormat() {
-        String fileName = ImportFormatReaderTest.class.getResource(resourceName).getFile();
         ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(fileName);
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 
     @Test
     public void testImportFormatFromFile() throws IOException {
-        String fileName = ImportFormatReaderTest.class.getResource(resourceName).getFile();
         OutputPrinter nullPrinter = new OutputPrinterToNull();
         assertEquals(count, reader.importFromFile(format, fileName, nullPrinter).size());
     }

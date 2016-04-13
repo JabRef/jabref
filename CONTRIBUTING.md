@@ -40,10 +40,9 @@ If you need to merge different Git usernames or email addresses you can do so by
 More information on this can be found via `man git-shortlog`.
 
 
-### Add yourself to the header
-The headers of each `.java` file state the authors.
-These entries should match the modifications done.
-If you do not want to add your real name, add yourself as `JabRef contributors`.
+### Modify the header
+The headers of each `.java` file states "JabREf contributors".
+Author credits are given using the `AUTHORS` file and by using the `git blame` functionality.
 
 For instance,
 
@@ -54,12 +53,12 @@ For instance,
 gets
 
 ```plain
-/*  Copyright (C) 2003-2011 JabRef contributors.
- *  Copyright (C) 2015 Stefan Jauch
+/*  Copyright (C) 2003-2016 JabRef contributors.
 ```
 
 Please, **do not add yourself at `@authors`**.
 We have track this information in the header only.
+
 
 ### Write a good commit message
 See [good commit message] or [commit guidelines section of Pro Git].

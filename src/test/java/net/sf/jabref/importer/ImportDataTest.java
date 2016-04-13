@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * @author Nosh&Dan
@@ -11,12 +12,17 @@ import java.io.File;
  */
 public class ImportDataTest {
 
-    public static final File FILE_IN_DATABASE = new File("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf");
-    public static final File FILE_NOT_IN_DATABASE = new File("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf");
-    public static final File EXISTING_FOLDER = new File("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder");
-    public static final File NOT_EXISTING_FOLDER = new File("notexistingfolder");
-    public static final File NOT_EXISTING_PDF = new File("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/null.pdf");
-    public static final File UNLINKED_FILES_TEST_BIB = new File("src/test/resources/net/sf/jabref/util/unlinkedFilesTestBib.bib");
+    public static final File FILE_IN_DATABASE = Paths
+            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
+    public static final File FILE_NOT_IN_DATABASE = Paths
+            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf").toFile();
+    public static final File EXISTING_FOLDER = Paths
+            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder").toFile();
+    public static final File NOT_EXISTING_FOLDER = Paths.get("notexistingfolder").toFile();
+    public static final File NOT_EXISTING_PDF = Paths
+            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/null.pdf").toFile();
+    public static final File UNLINKED_FILES_TEST_BIB = Paths
+            .get("src/test/resources/net/sf/jabref/util/unlinkedFilesTestBib.bib").toFile();
 
 
     /**
@@ -24,6 +30,7 @@ public class ImportDataTest {
      */
     @Test
     public void testTestingEnvironment() {
+
         Assert.assertTrue(ImportDataTest.EXISTING_FOLDER.exists());
         Assert.assertTrue(ImportDataTest.EXISTING_FOLDER.isDirectory());
 

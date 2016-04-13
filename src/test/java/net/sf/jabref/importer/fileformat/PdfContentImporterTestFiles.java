@@ -34,7 +34,11 @@ public class PdfContentImporterTestFiles {
         // The test folder contains pairs of PDFs and BibTeX files. We check each pair.
         // This method returns the basenames of the available pairs
 
-        Object[][] data = new Object[][] {{"LNCS-minimal"}};
+        Object[][] data = new Object[][] {
+                // minimal PDF, not encrypted
+                {"LNCS-minimal"},
+                // minimal PDF, write-protected, thus encrypted
+                {"LNCS-minimal-protected"}};
         return Arrays.asList(data);
     }
 
