@@ -16,6 +16,8 @@ before_script:
   - sleep 3 # give xvfb some time to start
 
 script:
+  # enable codecov report
+  - ./gradlew jacocoTestReport
   - ./gradlew check integrationTest
 
 after_script:
