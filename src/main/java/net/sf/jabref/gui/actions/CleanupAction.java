@@ -23,8 +23,8 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.CleanupPresetPanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.cleanup.CleanupPresetPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
@@ -49,6 +49,7 @@ public class CleanupAction extends AbstractWorker {
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
     private final CleanupPresetPanel presetPanel;
+
 
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;

@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -40,6 +41,7 @@ import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -108,7 +110,7 @@ public class DatabasePropertiesDialog extends JDialog {
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 160dlu, pref,");
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, fill:pref:grow, 180dlu, fill:pref:grow,");
         FormBuilder builder = FormBuilder.create().layout(form);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
