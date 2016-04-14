@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -52,10 +53,8 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     protected abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
-    public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
-        try (InputStream stream = new FileInputStream(filePath.toFile());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, defaultEncoding))) {
-
+    public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
+        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
             return isRecognizedFormat(bufferedReader);
         }
     }
@@ -84,14 +83,29 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
      *
      * @param filePath the path to the file which should be imported
-     * @param defaultEncoding the encoding used by default to decode the file
+     * @param encoding the encoding used to decode the file
      */
-    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
-        try (InputStream stream = new FileInputStream(filePath.toFile());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, defaultEncoding))) {
-
-            return importDatabase(bufferedReader);
+    public ParserResult importDatabase(Path filePath, Charset encoding) throws IOException {
+        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+            ParserResult parserResult = importDatabase(bufferedReader);
+            parserResult.setEncoding(encoding);
+            parserResult.setFile(filePath.toFile());
+            return parserResult;
         }
+    }
+
+    public static BufferedReader getUTF8Reader(Path filePath) throws IOException {
+        return getReader(filePath, StandardCharsets.UTF_8);
+    }
+
+    public static BufferedReader getUTF16Reader(Path filePath) throws IOException {
+        return getReader(filePath, StandardCharsets.UTF_16);
+    }
+
+    public static BufferedReader getReader(Path filePath, Charset encoding)
+            throws IOException {
+        InputStream stream = new FileInputStream(filePath.toFile());
+        return new BufferedReader(new InputStreamReader(stream, encoding));
     }
 
     /**

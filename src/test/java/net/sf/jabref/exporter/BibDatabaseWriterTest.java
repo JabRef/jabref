@@ -1,23 +1,15 @@
 package net.sf.jabref.exporter;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.google.common.base.Charsets;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
@@ -28,9 +20,9 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.ExplicitGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -44,6 +36,14 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+
+import com.google.common.base.Charsets;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class BibDatabaseWriterTest {
 
@@ -276,9 +276,9 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void roundtrip() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),

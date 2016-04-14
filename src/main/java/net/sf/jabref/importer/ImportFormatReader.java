@@ -15,14 +15,7 @@
 */
 package net.sf.jabref.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -130,18 +123,7 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importFromFile(importer.get(), file);
-    }
-
-    public ParserResult importFromFile(ImportFormat importer, Path file) throws IOException {
-        Objects.requireNonNull(importer);
-        Objects.requireNonNull(file);
-
-        if(!importer.isRecognizedFormat(file, Globals.prefs.getDefaultEncoding())) {
-            throw new IOException("Wrong file format");
-        }
-
-        return importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
+        return importer.get().importDatabase(file, Globals.prefs.getDefaultEncoding());
     }
 
     /**
@@ -182,28 +164,6 @@ public class ImportFormatReader {
         }
 
         return sb.toString();
-    }
-
-
-
-    public static InputStreamReader getUTF8Reader(File f) throws IOException {
-        return getReader(f, StandardCharsets.UTF_8);
-    }
-
-    public static InputStreamReader getUTF16Reader(File f) throws IOException {
-        return getReader(f, StandardCharsets.UTF_16);
-    }
-
-    public static InputStreamReader getReader(File f, Charset charset)
-            throws IOException {
-        return new InputStreamReader(new FileInputStream(f), charset);
-    }
-
-    public static Reader getReaderDefaultEncoding(InputStream in) {
-        InputStreamReader reader;
-        reader = new InputStreamReader(in, Globals.prefs.getDefaultEncoding());
-
-        return reader;
     }
 
     public static class UnknownFormatImport {
@@ -257,7 +217,7 @@ public class ImportFormatReader {
                     continue;
                 }
 
-                ParserResult parserResult = importFromFile(imFo, file);
+                ParserResult parserResult = imFo.importDatabase(file, Globals.prefs.getDefaultEncoding());
                 List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
                 BibDatabases.purgeEmptyEntries(entries);

@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.openoffice;
 
-import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,21 +13,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class OOBibStyleTest {
@@ -139,8 +143,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarker() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -160,8 +164,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testLayout() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
         BibDatabase db = result.getDatabase();

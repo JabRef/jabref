@@ -16,38 +16,44 @@
 package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.migrations.FileLinksUpgradeWarning;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.logic.util.strings.StringUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -328,109 +334,22 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Opens a new database.
      */
     public static ParserResult loadDatabase(File fileToOpen, Charset defaultEncoding) throws IOException {
-
-        // We want to check if there is a JabRef signature in the file, because that would tell us
-        // which character encoding is used. However, to read the signature we must be using a compatible
-        // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
-        // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
-        // 8 bit is most likely, so we try that first:
-        Optional<Charset> suppliedEncoding;
-        try (Reader utf8Reader = ImportFormatReader.getUTF8Reader(fileToOpen)) {
-            suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf8Reader);
-        }
-        // Now if that didn't get us anywhere, we check with the 16 bit encoding:
-        if (!suppliedEncoding.isPresent()) {
-            try (Reader utf16Reader = ImportFormatReader.getUTF16Reader(fileToOpen)) {
-                suppliedEncoding = OpenDatabaseAction.getSuppliedEncoding(utf16Reader);
-            }
-        }
-
         // Open and parse file
-        try (InputStreamReader reader = openFile(fileToOpen, suppliedEncoding, defaultEncoding)) {
-            BibtexParser parser = new BibtexParser(reader);
+        ParserResult result = new BibtexImporter().importDatabase(fileToOpen.toPath(), defaultEncoding);
 
-            ParserResult result = parser.parse();
-            result.setEncoding(Charset.forName(reader.getEncoding()));
-            result.setFile(fileToOpen);
-
-            if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                NamedCompound compound = new NamedCompound("SpecialFieldSync");
-                for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
-                }
-                LOGGER.info("Synchronized special fields based on keywords");
+        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            NamedCompound compound = new NamedCompound("SpecialFieldSync");
+            for (BibEntry entry : result.getDatabase().getEntries()) {
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
             }
-
-            if (!result.getMetaData().isGroupTreeValid()) {
-                result.addWarning(Localization.lang(
-                        "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
-            }
-
-            return result;
+            LOGGER.info("Synchronized special fields based on keywords");
         }
-    }
 
-    /**
-     * Opens the file with the provided encoding. If this fails (or no encoding is provided), then the fallback encoding
-     * will be used.
-     */
-    private static InputStreamReader openFile(File fileToOpen, Optional<Charset> encoding, Charset defaultEncoding)
-            throws IOException {
-        if (encoding.isPresent()) {
-            try {
-                return ImportFormatReader.getReader(fileToOpen, encoding.get());
-            } catch (IOException ex) {
-                LOGGER.warn("Problem getting reader", ex);
-                // The supplied encoding didn't work out, so we use the fallback.
-                return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
-            }
-        } else {
-            // We couldn't find a header with info about encoding. Use fallback:
-            return ImportFormatReader.getReader(fileToOpen, defaultEncoding);
-
+        if (!result.getMetaData().isGroupTreeValid()) {
+            result.addWarning(Localization.lang(
+                    "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
         }
-    }
 
-    /**
-     * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
-     */
-    private static Optional<Charset> getSuppliedEncoding(Reader reader) {
-        try {
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                line = line.trim();
-
-                // Line does not start with %, so there are no comment lines for us and we can stop parsing
-                if (!line.startsWith("%")) {
-                    return Optional.empty();
-                }
-
-                // Only keep the part after %
-                line = line.substring(1).trim();
-
-                if (line.startsWith(Globals.SIGNATURE)) {
-                    // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
-                    // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
-                    // Except if there is already a @ symbol signaling the starting of a BibEntry
-                    Integer atSymbolIndex = line.indexOf('@');
-                    String encoding;
-                    if (atSymbolIndex > 0) {
-                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
-                    } else {
-                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
-                    }
-
-                    return Optional.of(Charset.forName(encoding));
-                } else {
-                    // Line not recognized so stop parsing
-                    return Optional.empty();
-                }
-            }
-        } catch (IOException ignored) {
-            // Ignored
-        }
-        return Optional.empty();
+        return result;
     }
 }

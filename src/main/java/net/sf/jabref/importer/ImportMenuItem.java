@@ -138,7 +138,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
-                        ParserResult pr = Globals.IMPORT_FORMAT_READER.importFromFile(importer, file);
+                        ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
                         if (pr.hasWarnings()) {
                             frame.showMessage(pr.getErrorMessage());
                         }

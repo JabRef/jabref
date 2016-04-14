@@ -17,10 +17,14 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 
 /**
@@ -39,6 +43,31 @@ public class BibtexImporter extends ImportFormat {
     public boolean isRecognizedFormat(BufferedReader reader) {
         Objects.requireNonNull(reader);
         return true;
+    }
+
+    @Override
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
+        // We want to check if there is a JabRef signature in the file, because that would tell us
+        // which character encoding is used. However, to read the signature we must be using a compatible
+        // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
+        // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
+        // 8 bit is most likely, so we try that first:
+        Optional<Charset> suppliedEncoding;
+        try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
+            suppliedEncoding = getSuppliedEncoding(utf8Reader);
+        }
+        // Now if that didn't get us anywhere, we check with the 16 bit encoding:
+        if (!suppliedEncoding.isPresent()) {
+            try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
+                suppliedEncoding = getSuppliedEncoding(utf16Reader);
+            }
+        }
+
+        if(suppliedEncoding.isPresent()) {
+            return super.importDatabase(filePath, suppliedEncoding.get());
+        } else {
+            return super.importDatabase(filePath, defaultEncoding);
+        }
     }
 
     @Override
@@ -61,4 +90,45 @@ public class BibtexImporter extends ImportFormat {
         return null;
     }
 
+    /**
+     * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
+     */
+    private static Optional<Charset> getSuppliedEncoding(BufferedReader reader) {
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                // Line does not start with %, so there are no comment lines for us and we can stop parsing
+                if (!line.startsWith("%")) {
+                    return Optional.empty();
+                }
+
+                // Only keep the part after %
+                line = line.substring(1).trim();
+
+                if (line.startsWith(Globals.SIGNATURE)) {
+                    // Signature line, so keep reading and skip to next line
+                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
+                    // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
+                    // Except if there is already a @ symbol signaling the starting of a BibEntry
+                    Integer atSymbolIndex = line.indexOf('@');
+                    String encoding;
+                    if (atSymbolIndex > 0) {
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
+                    } else {
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
+                    }
+
+                    return Optional.of(Charset.forName(encoding));
+                } else {
+                    // Line not recognized so stop parsing
+                    return Optional.empty();
+                }
+            }
+        } catch (IOException ignored) {
+            // Ignored
+        }
+        return Optional.empty();
+    }
 }
