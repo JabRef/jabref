@@ -1,12 +1,5 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +7,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class CopacImporterTest {
 
@@ -23,15 +25,15 @@ public class CopacImporterTest {
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/importer/fileformat"
      * @return A list of Names
+     * @throws IOException
      */
     public List<String> getTestFiles() {
         List<String> files = new ArrayList<>();
-        File d = new File(System.getProperty("user.dir") + "/src/test/resources/net/sf/jabref/importer/fileformat");
+        File d = new File("src/test/resources/net/sf/jabref/importer/fileformat");
         for (File f : d.listFiles()) {
             files.add(f.getName());
         }
         return files;
-
     }
 
     @BeforeClass

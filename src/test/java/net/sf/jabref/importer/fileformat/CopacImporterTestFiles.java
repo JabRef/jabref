@@ -1,9 +1,16 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,14 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RunWith(Parameterized.class)
 public class CopacImporterTestFiles {
@@ -39,7 +38,7 @@ public class CopacImporterTestFiles {
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() {
         List<String> files = new ArrayList<>();
-        File d = new File(System.getProperty("user.dir") + "/src/test/resources/net/sf/jabref/importer/fileformat");
+        File d = new File("src/test/resources/net/sf/jabref/importer/fileformat");
         for (File f : d.listFiles()) {
             files.add(f.getName());
         }
@@ -56,26 +55,13 @@ public class CopacImporterTestFiles {
 
     @Test
     public void testImportEntries() throws IOException {
-        try (InputStream copacStream = CopacImporterTest.class.getResourceAsStream(fileName)) {
+        String bibFileName = fileName.replace(".txt", ".bib");
 
-            List<BibEntry> copacEntries = copacImporter.importEntries(copacStream, new OutputPrinterToNull());
-            fileName = fileName.replace(".txt", ".bib");
-
-            Assert.assertFalse(copacEntries.isEmpty());
-
-            int size = copacEntries.size();
-
-            // workaround because BibtexEntryAssert can only test 1 entry
-            if (size != 1) {
-                for (int i = 1; i <= size; i++) {
-                    fileName = fileName.replaceAll(".bib", "-" + i + ".bib");
-                    BibtexEntryAssert.assertEquals(CopacImporterTest.class, fileName, copacEntries.get(i - 1));
-                    fileName = fileName.replaceAll("-" + i + ".bib", ".bib");
-                }
-            } else {
-                BibtexEntryAssert.assertEquals(CopacImporterTest.class, fileName, copacEntries);
-            }
+        try (InputStream copacStream = CopacImporterTest.class.getResourceAsStream(fileName);
+                InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
+            BibtexEntryAssert.assertEquals(copacImporter, bibStream, copacStream);
         }
+
     }
 
 }
