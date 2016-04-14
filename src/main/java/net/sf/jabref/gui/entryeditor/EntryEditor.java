@@ -619,9 +619,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
-
-        HashSet<AWTKeyStroke> keys = new HashSet<>(textComponent
-                .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(
+                textComponent.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.clear();
         keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
         textComponent.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);

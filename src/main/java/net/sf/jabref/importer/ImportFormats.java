@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -48,7 +49,7 @@ public class ImportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<ImportFileFilter> filters = new TreeSet<>();
+        Set<ImportFileFilter> filters = new TreeSet<>();
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);

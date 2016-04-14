@@ -49,7 +49,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         // Find all multiple occurences of BibTeX keys.
         dupes = new HashMap<>();
 
-        HashMap<String, BibEntry> foundKeys = new HashMap<>();
+        Map<String, BibEntry> foundKeys = new HashMap<>();
         BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
@@ -63,7 +63,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         dupes.get(key).add(entry);
                     } else {
                         // Construct a list of entries for this key:
-                        ArrayList<BibEntry> al = new ArrayList<>();
+                        List<BibEntry> al = new ArrayList<>();
                         // Add both the first one we found, and the one we found just now:
                         al.add(foundKeys.get(key));
                         al.add(entry);

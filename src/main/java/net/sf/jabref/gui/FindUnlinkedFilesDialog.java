@@ -666,7 +666,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private List<File> getFileListFromNode(CheckableTreeNode node) {
         List<File> filesList = new ArrayList<>();
         Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
-        ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
+        List<CheckableTreeNode> nodesToRemove = new ArrayList<>();
         for (CheckableTreeNode child : Collections.list(children)) {
             if (child.isLeaf() && child.isSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;

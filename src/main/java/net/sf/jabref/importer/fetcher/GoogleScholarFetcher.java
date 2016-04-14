@@ -308,7 +308,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static Map<String, String> getFormElements(String page) {
         Matcher m = GoogleScholarFetcher.INPUT_PATTERN.matcher(page);
-        HashMap<String, String> items = new HashMap<>();
+        Map<String, String> items = new HashMap<>();
         while (m.find()) {
             String name = m.group(2);
             if ((name.length() > 2) && (name.charAt(0) == '"')

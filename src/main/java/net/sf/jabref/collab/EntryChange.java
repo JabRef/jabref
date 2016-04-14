@@ -17,6 +17,7 @@ package net.sf.jabref.collab;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.JComponent;
@@ -58,7 +59,7 @@ class EntryChange extends Change {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
                 + " Modifications agree: " + modificationsAgree);
 
-        TreeSet<String> allFields = new TreeSet<>();
+        Set<String> allFields = new TreeSet<>();
         allFields.addAll(memEntry.getFieldNames());
         allFields.addAll(tmpEntry.getFieldNames());
         allFields.addAll(diskEntry.getFieldNames());

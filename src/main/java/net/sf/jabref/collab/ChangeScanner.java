@@ -206,8 +206,8 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet<String> used = new HashSet<>(disk.getEntryCount());
-        HashSet<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
+        Set<String> used = new HashSet<>(disk.getEntryCount());
+        Set<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -361,9 +361,9 @@ public class ChangeScanner implements Runnable {
             return;
         }
 
-        HashSet<Object> used = new HashSet<>();
-        HashSet<Object> usedInMem = new HashSet<>();
-        HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
+        Set<Object> used = new HashSet<>();
+        Set<Object> usedInMem = new HashSet<>();
+        Set<String> notMatched = new HashSet<>(onTmp.getStringCount());
 
         // First try to match by string names.
         mainLoop:

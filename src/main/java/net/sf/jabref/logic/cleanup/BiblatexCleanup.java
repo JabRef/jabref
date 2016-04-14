@@ -29,7 +29,7 @@ public class BiblatexCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        ArrayList<FieldChange> changes = new ArrayList<>();
+        List<FieldChange> changes = new ArrayList<>();
         for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
             String oldFieldName = alias.getKey();
             String newFieldName = alias.getValue();

@@ -282,7 +282,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
      * Return the current list.
      */
     public List<String> getFields() {
-        ArrayList<String> res = new ArrayList<>(listModel.getSize());
+        List<String> res = new ArrayList<>(listModel.getSize());
         Enumeration<String> elements = listModel.elements();
         while (elements.hasMoreElements()) {
             res.add(elements.nextElement());

@@ -283,7 +283,7 @@ public class PdfImporter {
                 panel.getDatabase().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibEntry> list = new ArrayList<>();
+                List<BibEntry> list = new ArrayList<>();
                 list.add(be);
                 UpdateField.setAutomaticFields(list, true, true);
 

@@ -101,7 +101,7 @@ public class RisImporter extends ImportFormat {
             String startPage = "";
             String endPage = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            Map<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 

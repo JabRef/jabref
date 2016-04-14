@@ -112,7 +112,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            Map<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -267,7 +267,7 @@ public class MedlinePlainImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 // content can never be null so only check if content is empty

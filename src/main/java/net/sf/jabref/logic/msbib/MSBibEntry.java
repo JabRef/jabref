@@ -954,7 +954,7 @@ class MSBibEntry {
 
         // Todo: add check for BibTexEntry types
 
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
 
         if (tag != null) {
             hm.put(BibEntry.KEY_FIELD, tag);

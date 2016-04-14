@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -186,7 +187,7 @@ public class DuplicateCheck {
     }
 
     public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
-        HashSet<String> allFields = new HashSet<>();
+        Set<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
 

@@ -130,8 +130,8 @@ public class AppendDatabaseAction implements BaseAction {
                     throws KeyCollisionException {
 
         BibDatabase fromDatabase = pr.getDatabase();
-        ArrayList<BibEntry> appendedEntries = new ArrayList<>();
-        ArrayList<BibEntry> originalEntries = new ArrayList<>();
+        List<BibEntry> appendedEntries = new ArrayList<>();
+        List<BibEntry> originalEntries = new ArrayList<>();
         BibDatabase database = panel.getDatabase();
 
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));

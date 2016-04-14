@@ -20,6 +20,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Rank extends SpecialField {
 
@@ -28,7 +29,7 @@ public class Rank extends SpecialField {
     private Rank() {
         TEXT_DONE_PATTERN = "Set rank to '%0' for %1 entries";
 
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        List<SpecialFieldValue> values = new ArrayList<>();
         // lab.setName("i");
         values.add(new SpecialFieldValue(this, null, "clearRank", Localization.lang("Clear rank"), null,
                 Localization.lang("No rank information")));

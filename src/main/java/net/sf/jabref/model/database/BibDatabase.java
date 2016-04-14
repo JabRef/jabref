@@ -145,7 +145,7 @@ public class BibDatabase {
     }
 
     public synchronized List<BibEntry> getEntriesByKey(String key) {
-        ArrayList<BibEntry> result = new ArrayList<>();
+        List<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries) {
             if (key.equals(entry.getCiteKey())) {

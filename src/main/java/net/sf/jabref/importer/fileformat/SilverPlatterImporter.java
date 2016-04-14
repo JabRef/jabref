@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -101,7 +102,7 @@ public class SilverPlatterImporter extends ImportFormat {
             }
             String[] entries = sb.toString().split("__::__");
             String type = "";
-            HashMap<String, String> h = new HashMap<>();
+            Map<String, String> h = new HashMap<>();
             for (String entry : entries) {
                 if (entry.trim().length() < 6) {
                     continue;

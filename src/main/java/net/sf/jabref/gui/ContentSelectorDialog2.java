@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.AbstractAction;
@@ -394,7 +395,7 @@ class ContentSelectorDialog2 extends JDialog {
             wordListModels.put(currentField, wordListModel);
             List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
             if (items != null) {
-                TreeSet<String> wordSet = new TreeSet<>(items);
+                Set<String> wordSet = new TreeSet<>(items);
                 int index = 0;
                 for (String s : wordSet) {
                     wordListModel.add(index, s);

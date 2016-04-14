@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
@@ -109,7 +110,7 @@ public class EndnoteImporter extends ImportFormat {
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
         String author;
         String type;
         String editor;
