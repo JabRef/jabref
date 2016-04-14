@@ -2,7 +2,9 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +36,9 @@ public class BibTeXMLImporterTest {
      */
     public List<String> getTestFiles() throws IOException {
         List<String> files = new ArrayList<>();
-        Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH)).forEach(n -> files.add(n.getFileName().toString()));
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
+            stream.forEach(n -> files.add(n.getFileName().toString()));
+        }
         return files;
 
     }
