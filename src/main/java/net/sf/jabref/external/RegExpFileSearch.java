@@ -22,7 +22,6 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.FilenameFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,30 +147,29 @@ public class RegExpFileSearch {
         if (!root.exists()) {
             return Collections.emptyList();
         }
-        List<File> res = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
+        List<File> fileList = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
 
-        if (!res.isEmpty()) {
-            for (int i = 0; i < res.size(); i++) {
-                try {
-                    /**
-                     * [ 1601651 ] PDF subdirectory - missing first character
-                     *
-                     * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
-                     */
-                    // Changed by M. Alver 2007.01.04:
-                    // Remove first character if it is a directory separator character:
-                    String tmp = res.get(i).getCanonicalPath().substring(root.getCanonicalPath().length());
-                    if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
-                        tmp = tmp.substring(1);
-                    }
-                    res.set(i, new File(tmp));
-
-                } catch (IOException e) {
-                    LOGGER.warn("Problem searching", e);
+        List<File> result = new ArrayList<>();
+        for (File tmpFile : fileList) {
+            try {
+                /**
+                 * [ 1601651 ] PDF subdirectory - missing first character
+                 *
+                 * http://sourceforge.net/tracker/index.php?func=detail&aid=1601651&group_id=92314&atid=600306
+                 */
+                // Changed by M. Alver 2007.01.04:
+                // Remove first character if it is a directory separator character:
+                String tmp = tmpFile.getCanonicalPath().substring(root.getCanonicalPath().length());
+                if ((tmp.length() > 1) && (tmp.charAt(0) == File.separatorChar)) {
+                    tmp = tmp.substring(1);
                 }
+                result.add(new File(tmp));
+
+            } catch (IOException e) {
+                LOGGER.warn("Problem searching", e);
             }
         }
-        return res;
+        return result;
     }
 
     /**
@@ -204,61 +202,57 @@ public class RegExpFileSearch {
             return res;
         }
 
-        if (fileParts.length > 1) {
+        for (int i = 0; i < (fileParts.length - 1); i++) {
 
-            for (int i = 0; i < (fileParts.length - 1); i++) {
+            String dirToProcess = fileParts[i];
+            dirToProcess = expandBrackets(dirToProcess, entry, null);
 
-                String dirToProcess = fileParts[i];
-                dirToProcess = expandBrackets(dirToProcess, entry, null);
+            if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
+                actualDirectory = new File(dirToProcess + '/');
+                continue;
+            }
+            if (".".equals(dirToProcess)) { // Stay in current directory
+                continue;
+            }
+            if ("..".equals(dirToProcess)) {
+                actualDirectory = new File(actualDirectory.getParent());
+                continue;
+            }
+            if ("*".equals(dirToProcess)) { // Do for all direct subdirs
 
-                if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                    actualDirectory = new File(dirToProcess + '/');
-                    continue;
-                }
-                if (".".equals(dirToProcess)) { // Stay in current directory
-                    continue;
-                }
-                if ("..".equals(dirToProcess)) {
-                    actualDirectory = new File(actualDirectory.getParent());
-                    continue;
-                }
-                if ("*".equals(dirToProcess)) { // Do for all direct subdirs
-
-                    File[] subDirs = actualDirectory.listFiles();
-                    if (subDirs != null) {
-                        String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
-                        for (File subDir : subDirs) {
-                            if (subDir.isDirectory()) {
-                                res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
-                            }
-                        }
-                    }
-                }
-                // Do for all direct and indirect subdirs
-                if ("**".equals(dirToProcess)) {
-                    List<File> toDo = new LinkedList<>();
-                    toDo.add(actualDirectory);
-
+                File[] subDirs = actualDirectory.listFiles();
+                if (subDirs != null) {
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
-
-                    while (!toDo.isEmpty()) {
-
-                        // Get all subdirs of each of the elements found in toDo
-                        File[] subDirs = toDo.remove(0).listFiles();
-                        if (subDirs == null) {
-                            continue;
-                        }
-
-                        toDo.addAll(Arrays.asList(subDirs));
-
-                        for (File subDir : subDirs) {
-                            if (!subDir.isDirectory()) {
-                                continue;
-                            }
+                    for (File subDir : subDirs) {
+                        if (subDir.isDirectory()) {
                             res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
                         }
                     }
+                }
+            }
+            // Do for all direct and indirect subdirs
+            if ("**".equals(dirToProcess)) {
+                List<File> toDo = new LinkedList<>();
+                toDo.add(actualDirectory);
 
+                String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
+
+                while (!toDo.isEmpty()) {
+
+                    // Get all subdirs of each of the elements found in toDo
+                    File[] subDirs = toDo.remove(0).listFiles();
+                    if (subDirs == null) {
+                        continue;
+                    }
+
+                    toDo.addAll(Arrays.asList(subDirs));
+
+                    for (File subDir : subDirs) {
+                        if (!subDir.isDirectory()) {
+                            continue;
+                        }
+                        res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
+                    }
                 }
 
             } // End process directory information
@@ -270,12 +264,8 @@ public class RegExpFileSearch {
         final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                 Pattern.CASE_INSENSITIVE);
 
-        File[] matches = actualDirectory.listFiles(new FilenameFilter() {
-
-            @Override
-            public boolean accept(File arg0, String arg1) {
-                return toMatch.matcher(arg1).matches();
-            }
+        File[] matches = actualDirectory.listFiles((arg0, arg1) -> {
+            return toMatch.matcher(arg1).matches();
         });
         if ((matches != null) && (matches.length > 0)) {
             Collections.addAll(res, matches);
