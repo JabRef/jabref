@@ -37,6 +37,7 @@ import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibDatabaseWriter {
@@ -323,13 +324,7 @@ public class BibDatabaseWriter {
             }
         }
 
-        StringBuilder suffixSB = new StringBuilder();
-        for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffixSB.append(' ');
-        }
-        String suffix = suffixSB.toString();
-
-        fw.write(STRING_PREFIX + "{" + bs.getName() + suffix + " = ");
+        fw.write(STRING_PREFIX + "{" + bs.getName() + StringUtil.nSpaces(maxKeyLength - bs.getName().length()) + " = ");
         if (bs.getContent().isEmpty()) {
             fw.write("{}");
         } else {

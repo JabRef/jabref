@@ -669,4 +669,32 @@ public class StringUtil {
         return sb.toString().trim();
     }
 
+    /**
+     * Return a String with n spaces
+     *
+     * @param n Number of spaces
+     * @return String with n spaces
+     */
+    public static String nSpaces(int n) {
+        return nCharacters(n, ' ');
+    }
+
+    /**
+     * Return a String with n copies of the char c
+     *
+     * @param n Number of copies
+     * @param c char to copy
+     * @return String with n copies of c
+     */
+    public static String nCharacters(int n, char c) {
+        StringBuilder resultSB = new StringBuilder();
+
+        for (int i = 0; i < n; i++) {
+            resultSB.append(c);
+        }
+
+        return resultSB.toString();
+
+    }
+
 }
