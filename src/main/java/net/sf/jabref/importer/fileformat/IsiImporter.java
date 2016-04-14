@@ -17,7 +17,6 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.model.entry.BibEntry;
@@ -79,27 +77,23 @@ public class IsiImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < 50)) {
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            int i = 0;
-            while (((str = in.readLine()) != null) && (i < 50)) {
-
-                /**
-                 * The following line gives false positives for RIS files, so it
-                 * should not be uncommented. The hypen is a characteristic of the
-                 * RIS format.
-                 *
-                 * str = str.replace(" - ", "")
-                 */
-                if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
-                    return true;
-                }
-
-                i++;
+            /**
+             * The following line gives false positives for RIS files, so it
+             * should not be uncommented. The hypen is a characteristic of the
+             * RIS format.
+             *
+             * str = str.replace(" - ", "")
+             */
+            if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
+                return true;
             }
+
+            i++;
         }
         return false;
     }
@@ -153,38 +147,36 @@ public class IsiImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
-        Objects.requireNonNull(stream);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
-            // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
-            String str;
+        // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
+        // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
+        String str;
 
-            while ((str = in.readLine()) != null) {
-                if (str.length() < 3) {
-                    continue;
-                }
+        while ((str = reader.readLine()) != null) {
+            if (str.length() < 3) {
+                continue;
+            }
 
-                // beginning of a new item
-                if ("PT ".equals(str.substring(0, 3))) {
-                    sb.append("::").append(str);
+            // beginning of a new item
+            if ("PT ".equals(str.substring(0, 3))) {
+                sb.append("::").append(str);
+            } else {
+                String beg = str.substring(0, 3).trim();
+
+                // I could have used the fieldPattern regular expression instead
+                // however this seems to be
+                // quick and dirty and it works!
+                if (beg.length() == 2) {
+                    sb.append(" ## "); // mark the beginning of each field
+                    sb.append(str);
                 } else {
-                    String beg = str.substring(0, 3).trim();
-
-                    // I could have used the fieldPattern regular expression instead
-                    // however this seems to be
-                    // quick and dirty and it works!
-                    if (beg.length() == 2) {
-                        sb.append(" ## "); // mark the beginning of each field
-                        sb.append(str);
-                    } else {
-                        sb.append("EOLEOL"); // mark the end of each line
-                        sb.append(str.trim()); // remove the initial spaces
-                    }
+                    sb.append("EOLEOL"); // mark the end of each line
+                    sb.append(str.trim()); // remove the initial spaces
                 }
             }
         }

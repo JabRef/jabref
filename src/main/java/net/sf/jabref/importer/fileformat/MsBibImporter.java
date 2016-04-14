@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +27,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 /**
  * Importer for the MS Office 2007 XML bibliography format
@@ -37,8 +38,8 @@ import org.w3c.dom.Document;
 public class MsBibImporter extends ImportFormat {
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         /*
             The correct behaviour is to return false if it is certain that the file is
@@ -50,7 +51,7 @@ public class MsBibImporter extends ImportFormat {
             DocumentBuilder dbuild = DocumentBuilderFactory.
                     newInstance().
                     newDocumentBuilder();
-            docin = dbuild.parse(in);
+            docin = dbuild.parse(new InputSource(reader));
         } catch (Exception e) {
             return false;
         }
@@ -58,11 +59,11 @@ public class MsBibImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         MSBibDatabase dbase = new MSBibDatabase();
-        return new ParserResult(dbase.importEntries(in));
+        return new ParserResult(dbase.importEntries(reader));
     }
 
     @Override

@@ -15,8 +15,10 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,13 +42,29 @@ public class PdfXmpImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support importDatabase(BufferedReader reader)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+        Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(in));
+            return new ParserResult(XMPUtil.readXMP(filePath));
         } catch (IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
+    }
+
+    @Override
+    protected boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."
+                        + "Instead use isRecognizedFormat(Path filePath, Charset defaultEncoding).");
     }
 
     /**
@@ -54,9 +72,9 @@ public class PdfXmpImporter extends ImportFormat {
      * contains at least one BibEntry.
      */
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
-        return XMPUtil.hasMetadata(in);
+    public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
+        Objects.requireNonNull(filePath);
+        return XMPUtil.hasMetadata(filePath);
     }
 
     @Override

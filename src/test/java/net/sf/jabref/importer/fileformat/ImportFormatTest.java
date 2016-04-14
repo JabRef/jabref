@@ -1,9 +1,6 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -16,6 +13,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mockito;
+
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
@@ -26,18 +24,12 @@ public class ImportFormatTest {
 
     @Test(expected = NullPointerException.class)
     public void isRecognizedFormatWithNullThrowsException() throws IOException {
-        format.isRecognizedFormat((InputStream)null);
+        format.isRecognizedFormat(null);
     }
 
     @Test(expected = NullPointerException.class)
     public void importDatabaseWithNullThrowsException() throws IOException {
-        format.importDatabase((InputStream)null);
-    }
-
-    @Test
-    public void importDatabaseWithUnrecognizedInputDoesNotReturnNull() throws IOException {
-        InputStream stream = new ByteArrayInputStream("!#!bad string".getBytes(StandardCharsets.UTF_8));
-        Assert.assertNotNull(format.importDatabase(stream));
+        format.importDatabase(null);
     }
 
     @Test

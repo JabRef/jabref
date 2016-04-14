@@ -17,13 +17,11 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
@@ -65,42 +63,36 @@ public class EndnoteImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "%A *" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
+                return true;
             }
         }
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            boolean first = true;
-            while ((str = in.readLine()) != null) {
-                str = str.trim();
-                if (str.indexOf("%0") == 0) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        sb.append(ENDOFRECORD);
-                    }
-                    sb.append(str);
+        String str;
+        boolean first = true;
+        while ((str = reader.readLine()) != null) {
+            str = str.trim();
+            if (str.indexOf("%0") == 0) {
+                if (first) {
+                    first = false;
                 } else {
-                    sb.append(str);
+                    sb.append(ENDOFRECORD);
                 }
-                sb.append('\n');
+                sb.append(str);
+            } else {
+                sb.append(str);
             }
+            sb.append('\n');
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);

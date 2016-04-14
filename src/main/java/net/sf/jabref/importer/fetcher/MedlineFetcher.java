@@ -238,8 +238,9 @@ public class MedlineFetcher implements EntryFetcher {
         try {
             URL url = new URL(baseUrl);
             URLConnection data = url.openConnection();
-            ParserResult result = new MedlineImporter().importDatabase(data.getInputStream());
-            if(result.hasWarnings()) {
+            ParserResult result = new MedlineImporter().importDatabase(
+                    new BufferedReader(new InputStreamReader(data.getInputStream())));
+            if (result.hasWarnings()) {
                 status.showMessage(result.getErrorMessage());
             }
             return result.getDatabase().getEntries();

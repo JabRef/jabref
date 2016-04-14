@@ -1,6 +1,8 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
@@ -34,8 +36,8 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testImportEntriesAbortion() throws Throwable {
-        try (InputStream is = BiblioscapeImporter.class.getResourceAsStream("BiblioscapeImporterTestCorrupt.txt")) {
-            Assert.assertEquals(Collections.emptyList(), bsImporter.importDatabase(is).getDatabase().getEntries());
-        }
+        Path file = Paths.get(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
+        Assert.assertEquals(Collections.emptyList(), bsImporter.importDatabase(file, Charset.defaultCharset())
+                .getDatabase().getEntries());
     }
 }

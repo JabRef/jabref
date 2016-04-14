@@ -17,13 +17,11 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -59,53 +57,46 @@ public class CopacImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         String str;
-
-        while ((str = in.readLine()) != null) {
+        while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
-
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
-        Objects.requireNonNull(stream);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<String> entries = new LinkedList<>();
         StringBuilder sb = new StringBuilder();
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            // Preprocess entries
-            String str;
+        // Preprocess entries
+        String str;
 
-            while ((str = in.readLine()) != null) {
+        while ((str = reader.readLine()) != null) {
 
-                if (str.length() < 4) {
-                    continue;
-                }
+            if (str.length() < 4) {
+                continue;
+            }
 
-                String code = str.substring(0, 4);
+            String code = str.substring(0, 4);
 
-                if ("    ".equals(code)) {
-                    sb.append(' ').append(str.trim());
-                } else {
+            if ("    ".equals(code)) {
+                sb.append(' ').append(str.trim());
+            } else {
 
-                    // begining of a new item
-                    if ("TI- ".equals(str.substring(0, 4))) {
-                        if (sb.length() > 0) {
-                            entries.add(sb.toString());
-                        }
-                        sb = new StringBuilder();
+                // begining of a new item
+                if ("TI- ".equals(str.substring(0, 4))) {
+                    if (sb.length() > 0) {
+                        entries.add(sb.toString());
                     }
-                    sb.append('\n').append(str);
+                    sb = new StringBuilder();
                 }
+                sb.append('\n').append(str);
             }
         }
 

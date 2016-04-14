@@ -1,7 +1,10 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,44 +38,40 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void importEncryptedFileReturnsError() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            ParserResult result = importer.importDatabase(is);
-            Assert.assertTrue(result.hasWarnings());
-        }
+    public void importEncryptedFileReturnsError() throws IOException, URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
+        ParserResult result = importer.importDatabase(file, Charset.defaultCharset());
+        Assert.assertTrue(result.hasWarnings());
     }
 
     @Test
-    public void testImportEntries() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
-            List<BibEntry> bibEntries = importer.importDatabase(is).getDatabase().getEntries();
+    public void testImportEntries() throws IOException, URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-            assertEquals(1, bibEntries.size());
+        assertEquals(1, bibEntries.size());
 
-            BibEntry be0 = bibEntries.get(0);
-            assertEquals("how to annotate a pdf", be0.getField("abstract"));
-            assertEquals("Chris", be0.getField("author"));
-            assertEquals("pdf, annotation", be0.getField("keywords"));
-            assertEquals("The best Pdf ever", be0.getField("title"));
-        }
+        BibEntry be0 = bibEntries.get(0);
+        assertEquals("how to annotate a pdf", be0.getField("abstract"));
+        assertEquals("Chris", be0.getField("author"));
+        assertEquals("pdf, annotation", be0.getField("keywords"));
+        assertEquals("The best Pdf ever", be0.getField("title"));
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
-            assertTrue(importer.isRecognizedFormat(is));
-        }
+    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
+        assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
+    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "empty.pdf");
 
         for (String str : list) {
-            try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream(str)) {
-                assertFalse(importer.isRecognizedFormat(is));
-            }
+            Path file = Paths.get(PdfXmpImporterTest.class.getResource(str).toURI());
+            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 

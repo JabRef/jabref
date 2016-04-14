@@ -1,22 +1,26 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.model.entry.BibEntry;
 
 @RunWith(Parameterized.class)
 public class MsBibImporterTestfiles {
@@ -24,10 +28,12 @@ public class MsBibImporterTestfiles {
     @Parameter
     public String fileName;
 
+    private Path xmlFile;
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() throws URISyntaxException {
         Globals.prefs = JabRefPreferences.getInstance();
+        xmlFile = Paths.get(MsBibImporter.class.getResource(fileName + ".xml").toURI());
     }
 
     @Parameters(name = "{index}: {0}")
@@ -40,23 +46,18 @@ public class MsBibImporterTestfiles {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        String xmlFileName = fileName + ".xml";
         MsBibImporter testImporter = new MsBibImporter();
-        try (InputStream stream = MsBibImporter.class.getResourceAsStream(xmlFileName)) {
-            Assert.assertTrue(testImporter.isRecognizedFormat(stream));
-        }
+        Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, Charset.defaultCharset()));
     }
 
 
     @Test
     public void testImportEntries() throws IOException {
-        String xmlFileName = fileName + ".xml";
+
         String bibFileName = fileName + ".bib";
         MsBibImporter testImporter = new MsBibImporter();
-        try (InputStream is = MsBibImporter.class.getResourceAsStream(xmlFileName)) {
-            List<BibEntry> result = testImporter.importDatabase(is).getDatabase().getEntries();
-            BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
-        }
+        List<BibEntry> result = testImporter.importDatabase(xmlFile, Charset.defaultCharset()).getDatabase().getEntries();
+        BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
     }
 
 }

@@ -17,10 +17,12 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -48,21 +50,20 @@ public class BiblioscapeImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) {
-        Objects.requireNonNull(in);
+    public boolean isRecognizedFormat(BufferedReader reader) {
+        Objects.requireNonNull(reader);
         return true;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
 
         List<BibEntry> bibItems = new ArrayList<>();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
         String line;
         Map<String, String> hm = new HashMap<>();
         Map<String, StringBuilder> lines = new HashMap<>();
         StringBuilder previousLine = null;
-        while ((line = in.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             if (line.isEmpty()) {
                 continue; // ignore empty lines, e.g. at file
             }

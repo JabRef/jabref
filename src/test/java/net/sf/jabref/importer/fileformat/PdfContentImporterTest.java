@@ -1,25 +1,27 @@
 package net.sf.jabref.importer.fileformat;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PdfContentImporterTest {
 
     @Test
-    public void doesNotHandleEncryptedPdfs() throws IOException {
+    public void doesNotHandleEncryptedPdfs() throws IOException, URISyntaxException {
         PdfContentImporter importer = new PdfContentImporter();
-        try (InputStream is = PdfContentImporter.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            List<BibEntry> result = importer.importDatabase(is).getDatabase().getEntries();
-            assertEquals(Collections.emptyList(), result);
-        }
+        Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        List<BibEntry> result = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        assertEquals(Collections.emptyList(), result);
     }
 
 }

@@ -1,8 +1,12 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +17,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -28,29 +33,27 @@ public class InspecImportTest {
     }
 
     @Test
-    public void testIsRecognizedFormatAccept() throws IOException {
+    public void testIsRecognizedFormatAccept() throws IOException, URISyntaxException {
         List<String> testList = Arrays.asList("InspecImportTest.txt", "InspecImportTest2.txt");
         for (String str : testList) {
-            try (InputStream inStream = InspecImportTest.class.getResourceAsStream(str)) {
-                assertTrue(inspecImp.isRecognizedFormat(inStream));
-            }
+            Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
+            assertTrue(inspecImp.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
+    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
         List<String> testList = Arrays.asList("CopacImporterTest1.txt", "CopacImporterTest2.txt",
                 "IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi", "IsiImporterTestWOS.isi",
                 "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "InspecImportTestFalse.txt");
         for (String str : testList) {
-            try (InputStream inStream = InspecImportTest.class.getResourceAsStream(str)) {
-                assertFalse(inspecImp.isRecognizedFormat(inStream));
-            }
+            Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
+            assertFalse(inspecImp.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
     @Test
-    public void testCompleteBibtexEntryOnJournalPaperImport() throws IOException {
+    public void testCompleteBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
 
         BibEntry shouldBeEntry = new BibEntry();
         shouldBeEntry.setType("article");
@@ -63,13 +66,11 @@ public class InspecImportTest {
         shouldBeEntry.setField("pages", "20");
         shouldBeEntry.setField("volume", "19");
 
-        try (InputStream inStream = InspecImportTest.class.getResourceAsStream("InspecImportTest2.txt")) {
-            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
-            assertEquals(1, entries.size());
-            BibEntry entry = entries.get(0);
-            BibtexEntryAssert.assertEquals(shouldBeEntry, entry);
-
-        }
+        Path file = Paths.get(InspecImportTest.class.getResource("InspecImportTest2.txt").toURI());
+        List<BibEntry> entries = inspecImp.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        assertEquals(1, entries.size());
+        BibEntry entry = entries.get(0);
+        BibtexEntryAssert.assertEquals(shouldBeEntry, entry);
     }
 
     @Test
@@ -82,8 +83,8 @@ public class InspecImportTest {
         shouldBeEntry.setType("Inproceedings");
         shouldBeEntry.setField("author", "Prechelt, Lutz");
 
-        try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
-            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
+            List<BibEntry> entries = inspecImp.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             BibtexEntryAssert.assertEquals(shouldBeEntry, entry);
@@ -100,8 +101,8 @@ public class InspecImportTest {
         shouldBeEntry.setType("Misc");
         shouldBeEntry.setField("author", "Prechelt, Lutz");
 
-        try (InputStream inStream = new ByteArrayInputStream(testInput.getBytes())) {
-            List<BibEntry> entries = inspecImp.importDatabase(inStream).getDatabase().getEntries();
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
+            List<BibEntry> entries = inspecImp.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             BibtexEntryAssert.assertEquals(shouldBeEntry, entry);

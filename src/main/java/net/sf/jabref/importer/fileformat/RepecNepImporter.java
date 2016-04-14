@@ -19,15 +19,22 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Objects;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -188,20 +195,18 @@ public class RepecNepImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
-        try (BufferedReader inBR = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            StringBuilder startOfMessage = new StringBuilder();
-            String tmpLine = inBR.readLine();
-            for (int i = 0; (i < 25) && (tmpLine != null); i++) {
-                startOfMessage.append(tmpLine);
-                tmpLine = inBR.readLine();
-            }
-            return startOfMessage.toString().contains("NEP: New Economics Papers")
-                    || startOfMessage.toString().contains("nep.repec.org");
+        StringBuilder startOfMessage = new StringBuilder();
+        String tmpLine = reader.readLine();
+        for (int i = 0; (i < 25) && (tmpLine != null); i++) {
+            startOfMessage.append(tmpLine);
+            tmpLine = reader.readLine();
         }
+        return startOfMessage.toString().contains("NEP: New Economics Papers") || startOfMessage.toString().contains(
+                "nep.repec.org");
     }
 
     private boolean startsWithKeyword(Collection<String> keywords) {
@@ -408,15 +413,14 @@ public class RepecNepImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
-        Objects.requireNonNull(stream);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;
-
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            readLine(in); // skip header and editor information
+        try {
+            readLine(reader); // skip header and editor information
             while (this.lastLine != null) {
 
                 if (this.lastLine.startsWith("-----------------------------")) {
@@ -426,25 +430,25 @@ public class RepecNepImporter extends ImportFormat {
                     BibEntry be = new BibEntry(IdGenerator.next());
                     be.setType("techreport");
                     paperNoStr = this.lastLine.substring(0, this.lastLine.indexOf('.'));
-                    parseTitleString(be, in);
+                    parseTitleString(be, reader);
                     if (startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
-                        parseAdditionalFields(be, false, in);
+                        parseAdditionalFields(be, false, reader);
                     } else {
-                        readLine(in); // skip empty line
-                        parseAuthors(be, in);
-                        readLine(in); // skip empty line
+                        readLine(reader); // skip empty line
+                        parseAuthors(be, reader);
+                        readLine(reader); // skip empty line
                     }
                     if (!startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS)) {
-                        parseAbstract(be, in);
+                        parseAbstract(be, reader);
                     }
-                    parseAdditionalFields(be, true, in);
+                    parseAdditionalFields(be, true, reader);
 
                     bibitems.add(be);
                     paperNoStr = null;
 
                 } else {
                     this.preLine = this.lastLine;
-                    readLine(in);
+                    readLine(reader);
                 }
             }
 

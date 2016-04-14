@@ -137,11 +137,11 @@ public class ImportFormatReader {
         Objects.requireNonNull(importer);
         Objects.requireNonNull(file);
 
-        if(!importer.isRecognizedFormat(file)) {
+        if(!importer.isRecognizedFormat(file, Globals.prefs.getDefaultEncoding())) {
             throw new IOException("Wrong file format");
         }
 
-        return importer.importDatabase(file);
+        return importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
     }
 
     /**
@@ -253,7 +253,7 @@ public class ImportFormatReader {
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
             try {
-                if(!imFo.isRecognizedFormat(file)) {
+                if(!imFo.isRecognizedFormat(file, Globals.prefs.getDefaultEncoding())) {
                     continue;
                 }
 

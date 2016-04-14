@@ -15,16 +15,17 @@
 */
 package net.sf.jabref.importer.fileformat;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Role of an importer for JabRef.
@@ -49,15 +50,13 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * Thus the correct behaviour is to return false if it is certain that the file is
      * not of the suitable type, and true otherwise. Returning true is the safe choice if not certain.
      */
-    public abstract boolean isRecognizedFormat(InputStream in) throws IOException;
+    protected abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
-    public boolean isRecognizedFormat(Path filePath) throws IOException {
+    public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
         try (InputStream stream = new FileInputStream(filePath.toFile());
-                BufferedInputStream bufferedStream = new BufferedInputStream(stream)) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, defaultEncoding))) {
 
-            bufferedStream.mark(Integer.MAX_VALUE);
-
-            return isRecognizedFormat(bufferedStream);
+            return isRecognizedFormat(bufferedReader);
         }
     }
 
@@ -74,15 +73,24 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *
      * This method should never return null.
      *
-     * @param in the input stream to read from
+     * @param input the input to read from
      */
-    public abstract ParserResult importDatabase(InputStream in) throws IOException ;
+    protected abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
 
-    public ParserResult importDatabase(Path filePath) throws IOException {
+    /**
+     * Parse the database in the specified file.
+     *
+     * Importer having the facilities to detect the correct encoding of a file should overwrite this method,
+     * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
+     *
+     * @param filePath the path to the file which should be imported
+     * @param defaultEncoding the encoding used by default to decode the file
+     */
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) throws IOException {
         try (InputStream stream = new FileInputStream(filePath.toFile());
-                BufferedInputStream bufferedStream = new BufferedInputStream(stream)) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, defaultEncoding))) {
 
-            return importDatabase(bufferedStream);
+            return importDatabase(bufferedReader);
         }
     }
 
@@ -128,7 +136,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import
      * </li><li>
-     *   by what criteria it {@link #isRecognizedFormat(InputStream) recognizes} an import format
+     *   by what criteria it {@link #isRecognizedFormat(BufferedReader) recognizes} an import format
      * </li></ul>
      *
      * @return description of the import format

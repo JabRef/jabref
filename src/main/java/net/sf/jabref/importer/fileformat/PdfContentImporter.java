@@ -1,8 +1,10 @@
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -175,17 +177,23 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfContentImporter does not support importDatabase(BufferedReader reader)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
 
+    @Override
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(in)) {
+        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);

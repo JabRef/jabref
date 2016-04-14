@@ -17,7 +17,6 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -72,36 +70,31 @@ public class OvidImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            int i = 0;
-            while (((str = in.readLine()) != null) && (i < MAX_ITEMS)) {
-
-                if (OvidImporter.OVID_PATTERN.matcher(str).find()) {
-                    return true;
-                }
-
-                i++;
+            if (OvidImporter.OVID_PATTERN.matcher(str).find()) {
+                return true;
             }
+
+            i++;
         }
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (!line.isEmpty() && (line.charAt(0) != ' ')) {
-                    sb.append("__NEWFIELD__");
-                }
-                sb.append(line);
-                sb.append('\n');
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (!line.isEmpty() && (line.charAt(0) != ' ')) {
+                sb.append("__NEWFIELD__");
             }
+            sb.append(line);
+            sb.append('\n');
         }
 
         String[] items = sb.toString().split(OVID_PATTERN_STRING);

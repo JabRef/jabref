@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -55,16 +55,16 @@ public class FreeCiteImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        Objects.requireNonNull(in);
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
         // TODO: We don't know how to recognize text files, therefore we return "false"
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream in)
+    public ParserResult importDatabase(BufferedReader reader)
             throws IOException {
-        try (Scanner scan = new Scanner(in)) {
+        try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
             return importEntries(text);
         }

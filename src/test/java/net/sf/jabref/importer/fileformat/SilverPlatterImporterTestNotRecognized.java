@@ -1,15 +1,17 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 
 public class SilverPlatterImporterTestNotRecognized {
 
@@ -27,9 +29,8 @@ public class SilverPlatterImporterTestNotRecognized {
         List<String> notAccept = Arrays.asList("emptyFile.xml", "IsiImporterTest1.isi",
                 "InspecSilverPlatterImporterTest.txt", "oai2.xml", "RisImporterTest1.ris");
         for (String s : notAccept) {
-            try (InputStream stream = SilverPlatterImporter.class.getResourceAsStream(s)) {
-                Assert.assertFalse(testImporter.isRecognizedFormat(stream));
-            }
+            Path file = Paths.get(SilverPlatterImporter.class.getResource(s).toURI());
+            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 

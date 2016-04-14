@@ -17,19 +17,20 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.InputSource;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -59,23 +60,20 @@ public class BibteXMLImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "<bibtex:file *" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (START_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (START_PATTERN.matcher(str).find()) {
+                return true;
             }
-            return false;
         }
+        return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
-        Objects.requireNonNull(stream);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibItems = new ArrayList<>();
 
@@ -91,7 +89,7 @@ public class BibteXMLImporter extends ImportFormat {
             SAXParser parser = parserFactory.newSAXParser(); //May throw exceptions
             BibTeXMLHandler handler = new BibTeXMLHandler();
             // Start the parser. It reads the file and calls methods of the handler.
-            parser.parse(stream, handler);
+            parser.parse(new InputSource(reader), handler);
             // When you're done, report the results stored by your handler object
             bibItems.addAll(handler.getItems());
 

@@ -1,8 +1,8 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -50,8 +50,8 @@ public class BiblioscapeImporterTestTypes {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
-        List<BibEntry> bibEntries = bsImporter.importDatabase(
-                new ByteArrayInputStream(bsInput.getBytes(StandardCharsets.UTF_8))).getDatabase().getEntries();
+        List<BibEntry> bibEntries = bsImporter.importDatabase(new BufferedReader(new StringReader(bsInput)))
+                .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
         entry.setField("author", "Baklouti, F.");

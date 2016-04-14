@@ -15,13 +15,12 @@
  */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 
 /**
@@ -37,14 +36,14 @@ public class BibtexImporter extends ImportFormat {
      *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
-    public boolean isRecognizedFormat(InputStream in) {
-        Objects.requireNonNull(in);
+    public boolean isRecognizedFormat(BufferedReader reader) {
+        Objects.requireNonNull(reader);
         return true;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream in) throws IOException {
-        return BibtexParser.parse(ImportFormatReader.getReaderDefaultEncoding(in));
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        return BibtexParser.parse(reader);
     }
 
     @Override

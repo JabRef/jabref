@@ -1,9 +1,13 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
-
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,10 +35,9 @@ public class RISImporterTest {
     }
 
     @Test
-    public void testIfNotRecognizedFormat() throws IOException {
-        try (InputStream stream = RISImporterTest.class.getResourceAsStream("RisImporterCorrupted.ris")) {
-            Assert.assertFalse(risImporter.isRecognizedFormat(stream));
-        }
+    public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
+        Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
+        Assert.assertFalse(risImporter.isRecognizedFormat(file, Charset.defaultCharset()));
     }
 
 }

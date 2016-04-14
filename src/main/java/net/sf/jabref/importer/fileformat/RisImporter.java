@@ -17,14 +17,12 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -56,31 +54,26 @@ public class RisImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "AU  - *" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
+                return true;
             }
         }
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                sb.append(str);
-                sb.append('\n');
-            }
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+            sb.append('\n');
         }
 
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
@@ -259,14 +252,14 @@ public class RisImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            List<Object> toRemove = new ArrayList<>();
+            List<String> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key.getKey());
                 }
             }
-            for (Object aToRemove : toRemove) {
+            for (String aToRemove : toRemove) {
                 hm.remove(aToRemove);
 
             }

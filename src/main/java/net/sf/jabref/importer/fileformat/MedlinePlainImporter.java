@@ -19,14 +19,12 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -61,33 +59,28 @@ public class MedlinePlainImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
-                        || PMCR_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find() || PMCR_PATTERN.matcher(str)
+                    .find()) {
+                return true;
             }
         }
         return false;
     }
 
     @Override
-    public ParserResult importDatabase(InputStream stream) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                sb.append(str);
-                sb.append('\n');
-            }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            sb.append(str);
+            sb.append('\n');
         }
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("\\n\\n");
