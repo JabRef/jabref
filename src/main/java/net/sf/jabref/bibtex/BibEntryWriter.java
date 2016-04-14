@@ -172,6 +172,6 @@ public class BibEntryWriter {
             actualField = "UNKNOWN";
         }
 
-        return actualField.toLowerCase() + StringUtil.nSpaces(intendation - actualField.length()) + " = ";
+        return actualField.toLowerCase() + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
     }
 }

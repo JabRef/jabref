@@ -324,7 +324,7 @@ public class BibDatabaseWriter {
             }
         }
 
-        fw.write(STRING_PREFIX + "{" + bs.getName() + StringUtil.nSpaces(maxKeyLength - bs.getName().length()) + " = ");
+        fw.write(STRING_PREFIX + "{" + bs.getName() + StringUtil.repeatSpaces(maxKeyLength - bs.getName().length()) + " = ");
         if (bs.getContent().isEmpty()) {
             fw.write("{}");
         } else {

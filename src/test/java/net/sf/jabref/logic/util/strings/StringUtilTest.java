@@ -326,16 +326,16 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testNSpaces() {
-        assertEquals("", StringUtil.nSpaces(0));
-        assertEquals(" ", StringUtil.nSpaces(1));
-        assertEquals("       ", StringUtil.nSpaces(7));
+    public void testRepeatSpaces() {
+        assertEquals("", StringUtil.repeatSpaces(0));
+        assertEquals(" ", StringUtil.repeatSpaces(1));
+        assertEquals("       ", StringUtil.repeatSpaces(7));
     }
 
     @Test
-    public void testNCharacters() {
-        assertEquals("", StringUtil.nCharacters(0, 'a'));
-        assertEquals("a", StringUtil.nCharacters(1, 'a'));
-        assertEquals("aaaaaaa", StringUtil.nCharacters(7, 'a'));
+    public void testRepeat() {
+        assertEquals("", StringUtil.repeat(0, 'a'));
+        assertEquals("a", StringUtil.repeat(1, 'a'));
+        assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
     }
 }

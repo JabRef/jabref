@@ -154,7 +154,7 @@ public class ImportFormatReader {
             sb.append("  ");
             sb.append(imFo.getFormatName());
 
-            sb.append(StringUtil.nSpaces(pad));
+            sb.append(StringUtil.repeatSpaces(pad));
 
             sb.append(" : ");
             sb.append(imFo.getCLIId());

@@ -675,8 +675,8 @@ public class StringUtil {
      * @param n Number of spaces
      * @return String with n spaces
      */
-    public static String nSpaces(int n) {
-        return nCharacters(n, ' ');
+    public static String repeatSpaces(int n) {
+        return repeat(n, ' ');
     }
 
     /**
@@ -686,8 +686,8 @@ public class StringUtil {
      * @param c char to copy
      * @return String with n copies of c
      */
-    public static String nCharacters(int n, char c) {
-        StringBuilder resultSB = new StringBuilder();
+    public static String repeat(int n, char c) {
+        StringBuilder resultSB = new StringBuilder(n);
 
         for (int i = 0; i < n; i++) {
             resultSB.append(c);
