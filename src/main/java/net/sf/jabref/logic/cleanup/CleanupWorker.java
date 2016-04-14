@@ -14,16 +14,16 @@
 
 package net.sf.jabref.logic.cleanup;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 public class CleanupWorker {
 
@@ -88,7 +88,9 @@ public class CleanupWorker {
             jobs.add(new BiblatexCleanup());
         }
 
-        jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
+        if(preset.getFormatterCleanups().isEnabled()) {
+            jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
+        }
 
         return jobs;
     }
