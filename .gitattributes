@@ -2,4 +2,3 @@ gradlew eol=lf
 *.sh eol=lf
 
 CHANGELOG.md merge=union
-src/main/resources/l10n/*.properties merge=union

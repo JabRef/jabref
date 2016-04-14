@@ -379,7 +379,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 for (BibEntry entry : result.getDatabase().getEntries()) {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 }
-                LOGGER.info("Synchronized special fields based on keywords");
+                LOGGER.debug("Synchronized special fields based on keywords");
             }
 
             if (!result.getMetaData().isGroupTreeValid()) {

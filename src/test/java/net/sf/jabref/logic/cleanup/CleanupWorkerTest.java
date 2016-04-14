@@ -291,4 +291,15 @@ public class CleanupWorkerTest {
         Assert.assertEquals(null, entry.getField("journal"));
         Assert.assertEquals("test", entry.getField("journaltitle"));
     }
+
+    @Test
+    public void cleanupWithDisabledFieldFormatterChangesNothing() {
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(false,
+                Collections.singletonList(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()))));
+        BibEntry entry = new BibEntry();
+        entry.setField("month", "01");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals("01", entry.getField("month"));
+    }
 }

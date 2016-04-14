@@ -13,20 +13,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui.dbproperties;
+package net.sf.jabref.gui.cleanup;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,8 +49,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private JComboBox<?> formattersCombobox;
     private JComboBox<String> selectFieldCombobox;
     private JButton addButton;
-    private JLabel descriptionText;
-    private JButton deleteButton;
+    private JTextArea descriptionAreaText;
+    private JButton removeButton;
     private JButton resetButton;
 
     private final FieldFormatterCleanups defaultFormatters;
@@ -79,22 +81,19 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     private void buildLayout(List<FieldFormatterCleanup> actionsToDisplay) {
-        FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("left:pref, 13dlu, left:pref:grow, 4dlu, pref, 4dlu, pref",
-                        "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref,"));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
+                "left:pref, 13dlu, left:pref:grow, 4dlu, pref, 4dlu, pref",
+                "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, fill:pref:grow, 2dlu"));
         builder.add(cleanupEnabled).xyw(1, 1, 7);
-        builder.add(getSelectorPanel()).xyw(3, 3, 5);
-        descriptionText = new JLabel(DESCRIPTION);
-        builder.add(descriptionText).xyw(3, 5, 5);
 
-        actionsList = new JList<>(new SaveActionsListModel(actionsToDisplay));
+        actionsList = new JList<>(new CleanupActionsListModel(actionsToDisplay));
         actionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         actionsList.addMouseMotionListener(new MouseMotionAdapter() {
 
             @Override
             public void mouseMoved(MouseEvent e) {
                 super.mouseMoved(e);
-                SaveActionsListModel m = (SaveActionsListModel) actionsList.getModel();
+                CleanupActionsListModel m = (CleanupActionsListModel) actionsList.getModel();
                 int index = actionsList.locationToIndex(e.getPoint());
                 if (index > -1) {
                     actionsList.setToolTipText(m.getElementAt(index).getFormatter().getDescription());
@@ -102,49 +101,111 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             }
         });
 
-        builder.add(actionsList).xyw(3, 7, 5);
+        actionsList.getModel().addListDataListener(new ListDataListener() {
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                //index0 is sufficient, because of SingleSelection
+                if (e.getIndex0() == 0) {
+                    //when an item gets deleted, the next one becomes the new 0
+                    actionsList.setSelectedIndex(e.getIndex0());
+                }
+                if (e.getIndex0() > 0) {
+                    actionsList.setSelectedIndex(e.getIndex0() - 1);
+                }
+
+            }
+
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                //empty, not needed
+
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                //empty, not needed
+
+            }
+        });
+
+        builder.add(actionsList).xyw(3, 5, 5);
 
         resetButton = new JButton(Localization.lang("Reset"));
-        resetButton.addActionListener(e -> ((SaveActionsListModel) actionsList.getModel()).reset(defaultFormatters));
+        resetButton.addActionListener(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
 
-        builder.add(resetButton).xy(3, 9);
+        removeButton = new JButton(Localization.lang("Remove selected"));
+        removeButton.addActionListener(
+                e -> ((CleanupActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex()));
 
+        builder.add(removeButton).xy(7, 11);
+        builder.add(resetButton).xy(3, 11);
+        builder.add(getSelectorPanel()).xyw(3, 15, 5);
+
+        makeDescriptionTextAreaLikeJLabel();
+        builder.add(descriptionAreaText).xyw(3, 17, 5);
         this.setLayout(new BorderLayout());
         this.add(builder.getPanel(), BorderLayout.WEST);
+
+        updateDescription();
 
         // make sure the layout is set according to the checkbox
         cleanupEnabled.addActionListener(new EnablementStatusListener(fieldFormatterCleanups.isEnabled()));
         cleanupEnabled.setSelected(fieldFormatterCleanups.isEnabled());
+
+    }
+
+    /**
+     * Create a TextArea that looks and behaves like a JLabel. Has the advantage of supporting multine and wordwrap
+     */
+    private void makeDescriptionTextAreaLikeJLabel() {
+
+        descriptionAreaText = new JTextArea(DESCRIPTION);
+        descriptionAreaText.setLineWrap(true);
+        descriptionAreaText.setWrapStyleWord(true);
+        descriptionAreaText.setColumns(6);
+        descriptionAreaText.setEditable(false);
+        descriptionAreaText.setOpaque(false);
+        descriptionAreaText.setFocusable(false);
+        descriptionAreaText.setCursor(null);
+        descriptionAreaText.setFont(UIManager.getFont("Label.font"));
+
     }
 
     private void updateDescription() {
         FieldFormatterCleanup formatterCleanup = getFieldFormatterCleanup();
         if (formatterCleanup != null) {
-            descriptionText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
+            descriptionAreaText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
         } else {
             Formatter selectedFormatter = getFieldFormatter();
             if (selectedFormatter != null) {
-                descriptionText.setText(DESCRIPTION + selectedFormatter.getDescription());
+                descriptionAreaText.setText(DESCRIPTION + selectedFormatter.getDescription());
             } else {
-                descriptionText.setText(DESCRIPTION);
+                descriptionAreaText.setText(DESCRIPTION);
             }
         }
     }
 
+    /**
+     * This panel contains the two comboboxes and the Add button
+     * @return Returns the created JPanel
+     */
     private JPanel getSelectorPanel() {
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-                "left:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, pref:grow", "pref, 2dlu, pref:grow, 2dlu"));
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, pref:grow, 4dlu, right:pref",
+                        "pref, 2dlu, pref:grow, 2dlu"));
 
         List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
+
         selectFieldCombobox = new JComboBox<>(allPlusKey);
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox).xy(1, 1);
 
         List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream()
-                .map(formatter -> formatter.getName()).collect(Collectors.toList());
+                .map(formatter -> formatter.getKey()).collect(Collectors.toList());
         List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream()
                 .map(formatter -> formatter.getDescription()).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
@@ -155,6 +216,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                     boolean cellHasFocus) {
                 if ((-1 < index) && (index < formatterDescriptions.size()) && (value != null)) {
                     setToolTipText(formatterDescriptions.get(index));
+
                 }
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
@@ -162,23 +224,17 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         formattersCombobox.addItemListener(e -> updateDescription());
         builder.add(formattersCombobox).xy(3, 1);
 
-        addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
+        addButton = new JButton(Localization.lang("Add"));
         addButton.addActionListener(e -> {
             FieldFormatterCleanup newAction = getFieldFormatterCleanup();
             if (newAction == null) {
                 return;
             }
 
-            ((SaveActionsListModel) actionsList.getModel()).addSaveAction(newAction);
+            ((CleanupActionsListModel) actionsList.getModel()).addCleanupAction(newAction);
 
         });
         builder.add(addButton).xy(5, 1);
-
-        deleteButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
-        deleteButton.addActionListener(
-                e -> ((SaveActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex()));
-
-        builder.add(deleteButton).xy(7, 1);
 
         return builder.getPanel();
     }
@@ -198,7 +254,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {
-        List<FieldFormatterCleanup> actions = ((SaveActionsListModel) actionsList.getModel()).getAllActions();
+        List<FieldFormatterCleanup> actions = ((CleanupActionsListModel) actionsList.getModel()).getAllActions();
         return new FieldFormatterCleanups(cleanupEnabled.isSelected(), actions);
     }
 
@@ -220,9 +276,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
-        String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
+        String selectedFormatterKey = formattersCombobox.getSelectedItem().toString();
         for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
-            if (formatter.getName().equals(selectedFormatterName)) {
+            if (formatter.getKey().equals(selectedFormatterKey)) {
                 selectedFormatter = formatter;
                 break;
             }
@@ -249,8 +305,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             selectFieldCombobox.setEnabled(status);
             formattersCombobox.setEnabled(status);
             addButton.setEnabled(status);
-            deleteButton.setEnabled(status);
+            removeButton.setEnabled(status);
             resetButton.setEnabled(status);
+
         }
     }
 

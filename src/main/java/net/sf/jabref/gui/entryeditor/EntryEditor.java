@@ -508,12 +508,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     getStoreFieldAction());
         } else if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
-            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
-                    getStoreFieldAction());
+            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.URL)) {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.DOI)) {
-            return FieldExtraComponents.getDoiExtraComponent(panel, editor);
+            return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.YES_NO)) {

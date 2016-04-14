@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
@@ -276,7 +277,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void roundtrip() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
+        File testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib").toFile();
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, encoding));
 

@@ -54,8 +54,10 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
 - Added open buttons to DOI and URL field
 - Move Look & Feel settings from advanced to appearance tab in preferences
+- JabRef installer now automatically determines the user rights and installs to home directory/program dir when user is restricted/admin
 - Move PDF file directory configuration from external tab to file tab in preferences
 - Implemented [#672](https://github.com/JabRef/jabref/issues/672): FileList now distributes its space dependent on the width of its columns
+- Add possibility to lookup DOI from BibTeX entry contents inside the DOI field
 
 ### Fixed
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names

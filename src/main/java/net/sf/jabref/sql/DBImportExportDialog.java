@@ -145,7 +145,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
         b.addButton(cancelButton);
         b.addRelatedGap();
-        JButton removeButton = new JButton(Localization.lang("Remove Selected"));
+        JButton removeButton = new JButton(Localization.lang("Remove selected"));
         b.addButton(removeButton);
 
         b.addGlue();
