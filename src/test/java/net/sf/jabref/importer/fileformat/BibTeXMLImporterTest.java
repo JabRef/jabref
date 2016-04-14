@@ -1,11 +1,18 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -14,27 +21,20 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
-
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
-    private final List<String> testFiles = getTestFiles();
+    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
 
 
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/importer/fileformat"
      * @return A list of Names
+     * @throws IOException
      */
-    public List<String> getTestFiles() {
+    public List<String> getTestFiles() throws IOException {
         List<String> files = new ArrayList<>();
-        File d = new File(System.getProperty("user.dir") + "/src/test/resources/net/sf/jabref/importer/fileformat");
-        for (File f : d.listFiles()) {
-            files.add(f.getName());
-        }
+        Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH)).forEach(n -> files.add(n.getFileName().toString()));
         return files;
 
     }
@@ -56,6 +56,12 @@ public class BibTeXMLImporterTest {
     }
 
     @Test
+    public void testGetItemsEmpty() {
+        BibTeXMLHandler handler = new BibTeXMLHandler();
+        Assert.assertEquals(Collections.emptyList(), handler.getItems());
+    }
+
+    @Test
     public void testGetFormatName() {
         BibTeXMLImporter importer = new BibTeXMLImporter();
         Assert.assertEquals("BibTeXML", importer.getFormatName());
@@ -71,7 +77,7 @@ public class BibTeXMLImporterTest {
     public void testIsRecognizedFormatReject() throws IOException {
         BibTeXMLImporter importer = new BibTeXMLImporter();
 
-        List<String> list = testFiles.stream().filter(n -> !n.startsWith("BibTeXMLImporterTest"))
+        List<String> list = getTestFiles().stream().filter(n -> !n.startsWith("BibTeXMLImporterTest"))
                 .collect(Collectors.toList());
 
         for (String str : list) {
