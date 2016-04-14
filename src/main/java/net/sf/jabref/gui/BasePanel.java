@@ -15,15 +15,67 @@
 */
 package net.sf.jabref.gui;
 
-import ca.odell.glazedlists.event.ListEventListener;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HighlightMatchingGroupPreferences;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.exporter.*;
-import net.sf.jabref.external.*;
+import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.ExportToClipboardAction;
+import net.sf.jabref.exporter.SaveDatabaseAction;
+import net.sf.jabref.exporter.SaveException;
+import net.sf.jabref.exporter.SavePreferences;
+import net.sf.jabref.exporter.SaveSession;
+import net.sf.jabref.external.AttachFileAction;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.external.FindFullTextAction;
+import net.sf.jabref.external.RegExpFileSearch;
+import net.sf.jabref.external.SynchronizeFileField;
+import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.groups.GroupSelector;
 import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
@@ -43,10 +95,20 @@ import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
-import net.sf.jabref.gui.undo.*;
+import net.sf.jabref.gui.undo.CountingUndoManager;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableChangeType;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
-import net.sf.jabref.gui.worker.*;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.gui.worker.CallBack;
+import net.sf.jabref.gui.worker.MarkEntriesAction;
+import net.sf.jabref.gui.worker.SendAsEMailAction;
+import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.importer.AppendDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.FieldChange;
@@ -70,28 +132,27 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.specialfields.*;
-import net.sf.jabref.sql.*;
+import net.sf.jabref.specialfields.Printed;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldAction;
+import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.sql.DBConnectDialog;
+import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.DbConnectAction;
+import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.sql.exporter.DBExporter;
+
+import ca.odell.glazedlists.event.ListEventListener;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import javax.swing.tree.TreePath;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.*;
-import java.util.List;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -303,50 +364,52 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
+        //when you modify this action be sure to adjust Actions.DELETE
+        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (!bes.isEmpty()) {
-                // Create a CompoundEdit to make the action undoable.
-                NamedCompound ce = new NamedCompound(
-                        (bes.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
-                // Loop through the list of entries, and delete them.
-                for (BibEntry be : bes) {
-                    ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
-                    database.removeEntry(be);
-                    ensureNotShowing(be);
-                }
-                frame.output(formatOutputMessage(Localization.lang("Cut"), bes.size()));
-                ce.end();
-                undoManager.addEdit(ce);
-                markBaseChanged();
-
-                //no entry is selected anymore, thus hide the preview panel
-                hideBottomComponent();
+            List<BibEntry> entries = mainTable.getSelectedEntries();
+            if (entries.isEmpty()) {
+                return;
             }
+
+            NamedCompound compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
+            for (BibEntry entry : entries) {
+                compound.addEdit(new UndoableRemoveEntry(database, entry, BasePanel.this));
+                database.removeEntry(entry);
+                ensureNotShowingBottomPanel(entry);
+            }
+            compound.end();
+            undoManager.addEdit(compound);
+
+            frame.output(formatOutputMessage(Localization.lang("Cut"), entries.size()));
+            markBaseChanged();
         });
 
+        //when you modify this action be sure to adjust Actions.CUT,
+        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (!bes.isEmpty()) {
-                if (showDeleteConfirmationDialog(bes.size())) {
-                    // Create a CompoundEdit to make the action undoable.
-                    NamedCompound ce = new NamedCompound(
-                            (bes.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
-                    // Loop through the list of entries, and delete them.
-                    for (BibEntry be : bes) {
-                        ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
-                        database.removeEntry(be);
-                        ensureNotShowing(be);
-                    }
-                    markBaseChanged();
-                    frame.output(formatOutputMessage(Localization.lang("Deleted"), bes.size()));
-                    ce.end();
-                    undoManager.addEdit(ce);
-                }
-                //no entry is selected anymore, thus hide the preview panel
-                hideBottomComponent();
+            List<BibEntry> entries = mainTable.getSelectedEntries();
+            if (entries.isEmpty()) {
+                return;
             }
+            if (!showDeleteConfirmationDialog(entries.size())) {
+                return;
+            }
+
+            NamedCompound compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
+            for (BibEntry entry : entries) {
+                compound.addEdit(new UndoableRemoveEntry(database, entry, BasePanel.this));
+                database.removeEntry(entry);
+                ensureNotShowingBottomPanel(entry);
+            }
+            compound.end();
+            undoManager.addEdit(compound);
+
+            markBaseChanged();
+            frame.output(formatOutputMessage(Localization.lang("Deleted"), entries.size()));
         });
 
         // The action for pasting entries or cell contents.
@@ -1723,13 +1786,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * Closes the entry editor if it is showing the given entry.
-     *
-     * @param be a <code>BibEntry</code> value
+     * Closes the entry editor or preview panel if it is showing the given entry.
      */
-    public void ensureNotShowing(BibEntry be) {
-        if ((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {
-            selectionListener.entryEditorClosing(currentEditor);
+    public void ensureNotShowingBottomPanel(BibEntry entry) {
+        if ((mode == BasePanelMode.SHOWING_EDITOR && currentEditor.getEntry() == entry) ||
+                (mode == BasePanelMode.SHOWING_PREVIEW && currentPreview.getEntry() == entry)) {
+            hideBottomComponent();
         }
     }
 
