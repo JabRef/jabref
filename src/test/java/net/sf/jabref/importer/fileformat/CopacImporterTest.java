@@ -62,7 +62,7 @@ public class CopacImporterTest {
         CopacImporter importer = new CopacImporter();
 
         List<String> list = testFiles.stream().filter(n -> !n.startsWith("CopacImporterTest"))
-                .filter(n -> !n.startsWith("InspecSilverPlatterImporterTest")).collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         for (String str : list) {
             try (InputStream is = CopacImporterTest.class.getResourceAsStream(str)) {
