@@ -706,7 +706,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     private void annotationEvent(GroupTreeNode node) {
-        LOGGER.info("Performing annotation " + node);
+        LOGGER.debug("Performing annotation " + node);
         if (editModeIndicator) {
             updateGroupContent(node);
             panel.markBaseChanged();
@@ -788,6 +788,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FLOAT);
             }
             panel.mainTable.getTableModel().updateSortOrder();
+            panel.mainTable.getTableModel().updateGroupFilter();
+            panel.mainTable.scrollTo(0);
 
             if (showOverlappingGroupsP) {
                 showOverlappingGroups(matches);
