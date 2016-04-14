@@ -163,7 +163,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final MainTableDataModel tableModel;
 
     // To contain instantiated entry editors. This is to save time
-    private BasePanelMode mode;
+    // As most enums, this must not be null
+    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private EntryEditor currentEditor;
 
     private PreviewPanel currentPreview;
