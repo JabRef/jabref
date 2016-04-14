@@ -38,10 +38,10 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Thread)
 public class Benchmarks {
 
-    String bibtexString;
-    BibDatabase database = new BibDatabase();
-    List<String> latexConversionStrings = new ArrayList<>();
-    List<String> htmlConversionStrings = new ArrayList<>();
+    private String bibtexString;
+    private final BibDatabase database = new BibDatabase();
+    private final List<String> latexConversionStrings = new ArrayList<>();
+    private final List<String> htmlConversionStrings = new ArrayList<>();
 
     @Setup
     public void init() throws IOException, SaveException {
@@ -70,10 +70,10 @@ public class Benchmarks {
         int symbolcount = latexSymbols.size();
         StringBuilder sb = new StringBuilder();
         sb.append("{A} \\textbf{bold} ");
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
         sb.append(" {\\it italic} {");
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
         sb.append("} abc");
         latexConversionStrings.add(sb.toString());
 
@@ -81,10 +81,10 @@ public class Benchmarks {
         symbolcount = htmlSymbols.size();
         sb = new StringBuilder();
         sb.append("A <b>bold</b> ");
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
         sb.append(" <it>italic</it> ");
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
         sb.append("&#8211; abc");
         htmlConversionStrings.add(sb.toString());
     }
