@@ -296,8 +296,12 @@ public class StringUtilTest {
         assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
         assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
         assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
+        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O, Jr."));
         assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
         assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
+        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O and O Moore"));
+        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
+                StringUtil.expandAuthorInitials("Moore, O and O Moore and Moore, OO"));
     }
 
     @Test
@@ -310,11 +314,28 @@ public class StringUtilTest {
         assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
         assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
         assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
+        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O., Jr."));
         assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
         assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
         assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
         assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
         assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
+        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O. and O. Moore"));
+        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
+                StringUtil.expandAuthorInitials("Moore, O. and O. Moore and Moore, O. O."));
     }
 
+    @Test
+    public void testRepeatSpaces() {
+        assertEquals("", StringUtil.repeatSpaces(0));
+        assertEquals(" ", StringUtil.repeatSpaces(1));
+        assertEquals("       ", StringUtil.repeatSpaces(7));
+    }
+
+    @Test
+    public void testRepeat() {
+        assertEquals("", StringUtil.repeat(0, 'a'));
+        assertEquals("a", StringUtil.repeat(1, 'a'));
+        assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    }
 }

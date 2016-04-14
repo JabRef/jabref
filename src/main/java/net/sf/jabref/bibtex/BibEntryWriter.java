@@ -172,14 +172,6 @@ public class BibEntryWriter {
             actualField = "UNKNOWN";
         }
 
-        StringBuilder suffixSB = new StringBuilder();
-
-        for (int i = (intendation - actualField.length()); i > 0; i--) {
-            suffixSB.append(' ');
-        }
-
-        String suffix = suffixSB.toString();
-
-        return actualField.toLowerCase() + suffix + " = ";
+        return actualField.toLowerCase() + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
     }
 }
