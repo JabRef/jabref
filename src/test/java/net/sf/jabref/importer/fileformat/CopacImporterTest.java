@@ -1,8 +1,9 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.junit.Test;
 
 public class CopacImporterTest {
 
-    private final List<String> testFiles = getTestFiles();
+    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
 
 
     /**
@@ -27,12 +28,10 @@ public class CopacImporterTest {
      * @return A list of Names
      * @throws IOException
      */
-    public List<String> getTestFiles() {
+    public List<String> getTestFiles() throws IOException {
         List<String> files = new ArrayList<>();
-        File d = new File("src/test/resources/net/sf/jabref/importer/fileformat");
-        for (File f : d.listFiles()) {
-            files.add(f.getName());
-        }
+        Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH)).forEach(n -> files.add(n.getFileName().toString()));
+
         return files;
     }
 
@@ -63,7 +62,7 @@ public class CopacImporterTest {
     public void testIsRecognizedFormatReject() throws IOException {
         CopacImporter importer = new CopacImporter();
 
-        List<String> list = testFiles.stream().filter(n -> !n.startsWith("CopacImporterTest"))
+        List<String> list = getTestFiles().stream().filter(n -> !n.startsWith("CopacImporterTest"))
                 .collect(Collectors.toList());
 
         for (String str : list) {

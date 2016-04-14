@@ -1,8 +1,9 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class CopacImporterTestFiles {
 
     private CopacImporter copacImporter;
+    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
 
     @Parameter
     public String fileName;
@@ -36,12 +38,10 @@ public class CopacImporterTestFiles {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<String> fileNames() {
+    public static Collection<String> fileNames() throws IOException {
         List<String> files = new ArrayList<>();
-        File d = new File("src/test/resources/net/sf/jabref/importer/fileformat");
-        for (File f : d.listFiles()) {
-            files.add(f.getName());
-        }
+        Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH)).forEach(n -> files.add(n.getFileName().toString()));
+
         return files.stream().filter(n -> n.startsWith("CopacImporterTest")).filter(n -> n.endsWith(".txt"))
                 .collect(Collectors.toList());
     }
