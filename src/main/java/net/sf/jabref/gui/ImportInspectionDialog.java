@@ -95,14 +95,9 @@ import java.util.List;
  * soon as possible (it is not really critical, but good style to not contribute
  * any more results via addEntry, call entryListComplete() or dispose(), after
  * receiving this call).
- *
- * @author alver
  */
 public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
-
     private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
-
-    protected ImportInspectionDialog ths = this;
 
     private BasePanel panel;
 
@@ -146,10 +141,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final PreviewPanel preview;
 
-    private boolean generatedKeys; // Set to true after keys have
-    // been
-
-    // generated.
+    private boolean generatedKeys; // Set to true after keys have been generated.
 
     private boolean defaultSelected = true;
 
@@ -158,8 +150,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
 
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
-            Globals.prefs
-            .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
+            Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
@@ -190,6 +181,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.undoName = undoName;
         this.newDatabase = newDatabase;
+        setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
@@ -232,8 +224,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         if (!newDatabase && (bibDatabaseContext != null)) {
             GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
-            groupsAdd.setEnabled(false); // Will get enabled if there are
-            // groups that can be added to.
+            groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
             insertNodes(groupsAdd, node);
             popup.add(groupsAdd);
         }
