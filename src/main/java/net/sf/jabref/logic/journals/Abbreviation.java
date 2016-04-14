@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.journals;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class Abbreviation implements Comparable<Abbreviation> {
 
@@ -59,7 +59,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
         }
         if (o instanceof Abbreviation) {
             Abbreviation that = (Abbreviation) o;
-            return Objects.equal(name, that.name);
+            return Objects.equals(name, that.name);
         }
         return false;
     }
