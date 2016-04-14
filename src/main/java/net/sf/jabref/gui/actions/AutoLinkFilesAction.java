@@ -15,7 +15,6 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 /**
  * This Action may only be used in a menu or button.
@@ -40,7 +39,7 @@ public class AutoLinkFilesAction extends AbstractAction {
         }
         JDialog diag = new JDialog(JabRefGUI.getMainFrame(), true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        Runnable runnable = Util.autoSetLinks(entries, nc, null, null,
+        Runnable runnable = AutoSetLinks.autoSetLinks(entries, nc, null, null,
                 JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), e -> {
                     if (e.getID() > 0) {
                         // entry has been updated in Util.autoSetLinks, only treat nc and status message

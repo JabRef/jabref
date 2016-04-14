@@ -1212,7 +1212,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
             JabRefExecutorService.INSTANCE
-                    .execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
+                    .execute(net.sf.jabref.external.AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
                             entries.getReadWriteLock().writeLock().lock();
                             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());

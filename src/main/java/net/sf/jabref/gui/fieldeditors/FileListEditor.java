@@ -416,7 +416,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, databaseContext, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.external.AutoSetLinks.autoSetLinks(entries, null, null, tableModel, databaseContext, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);

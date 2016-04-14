@@ -94,29 +94,25 @@ public class RegExpFileSearchTests {
     }
 
     @Test
-    @Ignore
     public void testFieldAndFormat() {
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[author]", entry, database));
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                RegExpFileSearch.getFieldAndFormat("[author]", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("author", entry, database));
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                RegExpFileSearch.getFieldAndFormat("author", entry, database));
 
-        Assert.assertEquals("",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[unknownkey]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[unknownkey]", entry, database));
 
-        Assert.assertEquals("", net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[:]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:]", entry, database));
 
-        Assert.assertEquals("", net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[:lower]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:lower]", entry, database));
 
-        Assert.assertEquals("eric von hippel and georg von krogh",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[author:lower]", entry, database));
+        assertEquals("eric von hippel and georg von krogh",
+                RegExpFileSearch.getFieldAndFormat("[author:lower]", entry, database));
 
-        Assert.assertEquals("HipKro03",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[bibtexkey]", entry, database));
+        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey]", entry, database));
 
-        Assert.assertEquals("HipKro03",
-                net.sf.jabref.external.RegExpFileSearch.getFieldAndFormat("[bibtexkey:]", entry, database));
+        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey:]", entry, database));
     }
 
     @Test
@@ -138,8 +134,7 @@ public class RegExpFileSearchTests {
             Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, n);
             Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, f);
 
-            Assert.assertEquals("testtest", net.sf.jabref.external.RegExpFileSearch
-                    .getFieldAndFormat("[author:testMe123454321]", entry, database));
+            assertEquals("testtest", RegExpFileSearch.getFieldAndFormat("[author:testMe123454321]", entry, database));
 
         } finally {
             Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
@@ -150,20 +145,20 @@ public class RegExpFileSearchTests {
     @Test
     public void testExpandBrackets() {
 
-        Assert.assertEquals("", RegExpFileSearch.expandBrackets("", entry, database));
+        assertEquals("", RegExpFileSearch.expandBrackets("", entry, database));
 
-        Assert.assertEquals("dropped", RegExpFileSearch.expandBrackets("drop[unknownkey]ped", entry, database));
+        assertEquals("dropped", RegExpFileSearch.expandBrackets("drop[unknownkey]ped", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+        assertEquals("Eric von Hippel and Georg von Krogh",
                 RegExpFileSearch.expandBrackets("[author]", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
                 RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
                 RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
 
-        Assert.assertEquals(
+        assertEquals(
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 RegExpFileSearch.expandBrackets("[author] have published [title] in [journal].", entry, database));
     }

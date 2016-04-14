@@ -417,7 +417,7 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
-            Util.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
+            AutoSetLinks.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
         }
     }
 
