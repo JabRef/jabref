@@ -170,6 +170,14 @@ public class MainTableDataModel {
         return sortedForUserDefinedTableColumnSorting;
     }
 
+    public void updateGroupFilter() {
+        if(getGroupingState() == DisplayOption.FILTER) {
+            filterGroupToggle.start();
+        } else {
+            filterGroupToggle.stop();
+        }
+    }
+
     public enum DisplayOption {
         FLOAT, FILTER, DISABLED
     }
