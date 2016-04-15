@@ -18,6 +18,7 @@ import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -39,7 +40,8 @@ public class Benchmarks {
 
     String bibtexString;
     BibDatabase database = new BibDatabase();
-    List<String> conversionStrings = new ArrayList<>();
+    List<String> latexConversionStrings = new ArrayList<>();
+    List<String> htmlConversionStrings = new ArrayList<>();
 
     @Setup
     public void init() throws IOException, SaveException {
@@ -73,7 +75,18 @@ public class Benchmarks {
         sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
         sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
         sb.append("} abc");
-        conversionStrings.add(sb.toString());
+        latexConversionStrings.add(sb.toString());
+
+        List<String> htmlSymbols = new ArrayList<>(HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet());
+        symbolcount = htmlSymbols.size();
+        sb = new StringBuilder();
+        sb.append("A <b>bold</b> ");
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(" <it>italic</it> ");
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append("&#8211; abc");
+        htmlConversionStrings.add(sb.toString());
     }
 
     @Benchmark
@@ -112,7 +125,7 @@ public class Benchmarks {
     public List<String> latexToUnicodeConversion() {
         List<String> result = new ArrayList<>(1000);
         LatexToUnicodeFormatter f = new LatexToUnicodeFormatter();
-        for (String s : conversionStrings) {
+        for (String s : latexConversionStrings) {
             result.add(f.format(s));
         }
         return result;
@@ -122,7 +135,17 @@ public class Benchmarks {
     public List<String> latexToHTMLConversion() {
         List<String> result = new ArrayList<>(1000);
         HTMLChars f = new HTMLChars();
-        for (String s : conversionStrings) {
+        for (String s : latexConversionStrings) {
+            result.add(f.format(s));
+        }
+        return result;
+    }
+
+    @Benchmark
+    public List<String> htmlToLatexConversion() {
+        List<String> result = new ArrayList<>(1000);
+        HtmlToLatexFormatter f = new HtmlToLatexFormatter();
+        for (String s : htmlConversionStrings) {
             result.add(f.format(s));
         }
         return result;
