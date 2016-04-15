@@ -70,7 +70,7 @@ public class FieldTextMenu implements MouseListener {
 
             copyAction.setEnabled(copyStatus);
 
-            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+            String data = new ClipBoardManager().getClipboardContents();
             boolean pasteStatus = false;
             if (!data.isEmpty()) {
                 pasteStatus = true;

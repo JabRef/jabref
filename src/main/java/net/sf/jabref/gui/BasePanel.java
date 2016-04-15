@@ -414,46 +414,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // The action for pasting entries or cell contents.
-        // Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 14-Apr-04:
         //  - more robust detection of available content flavors (doesn't only look at first one offered)
         //  - support for parsing string-flavor clipboard contents which are bibtex entries.
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
         actions.put(Actions.PASTE, (BaseAction) () -> {
-            // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
-            Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            if (content != null) {
-                Collection<BibEntry> bes = null;
-                if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
-                    // We have determined that the clipboard data is a set of entries.
-                    try {
-                        bes = (Collection<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
-                    } catch (UnsupportedFlavorException | ClassCastException ex) {
-                        LOGGER.warn("Could not paste this type", ex);
-                    } catch (IOException ex) {
-                        LOGGER.warn("Could not paste", ex);
-                    }
-                } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    try {
-                        BibtexParser bp = new BibtexParser(
-                                new StringReader((String) content.getTransferData(DataFlavor.stringFlavor)));
-                        BibDatabase db = bp.parse().getDatabase();
-                        LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
-                        if (db.hasEntries()) {
-                            bes = db.getEntries();
-                        }
-                    } catch (UnsupportedFlavorException ex) {
-                        LOGGER.warn("Could not paste this type", ex);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not paste", ex);
-                    }
-
-                }
+                Collection<BibEntry> bes = new ClipBoardManager().extractBibEntriesFromClipboard();
 
                 // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
                 // or were parsed from a string
-                if ((bes != null) && (!bes.isEmpty())) {
+                if (!bes.isEmpty()) {
 
                     NamedCompound ce = new NamedCompound(
                             (bes.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
@@ -495,8 +466,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                     highlightEntry(firstBE);
                 }
-            }
-
         });
 
         actions.put(Actions.SELECT_ALL, (BaseAction) mainTable::selectAll);
@@ -540,7 +509,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             String errorMessage = "";
             boolean connectedToDB;
-
 
             // run first, in EDT:
             @Override
