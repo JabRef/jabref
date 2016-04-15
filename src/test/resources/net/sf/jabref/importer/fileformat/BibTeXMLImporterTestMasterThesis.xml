@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="Mustermann2016">
+  <bibtex:mastersthesis>
+    <bibtex:author>Max Mustermann</bibtex:author>
+    <bibtex:title>Java MasterThesis</bibtex:title>
+    <bibtex:year>2016</bibtex:year>
+    <bibtex:month>February</bibtex:month>
+    <bibtex:school>University</bibtex:school>
+    <bibtex:address>Stuttgart</bibtex:address>
+    <bibtex:type>Thesis</bibtex:type>
+    <bibtex:keywords>java</bibtex:keywords>
+  </bibtex:mastersthesis>
+</bibtex:entry>
+</bibtex:file>
