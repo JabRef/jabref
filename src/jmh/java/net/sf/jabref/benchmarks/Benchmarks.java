@@ -18,7 +18,10 @@ import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.layout.format.HTMLChars;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
@@ -36,6 +39,7 @@ public class Benchmarks {
 
     String bibtexString;
     BibDatabase database = new BibDatabase();
+    List<String> conversionStrings = new ArrayList<>();
 
     @Setup
     public void init() throws IOException, SaveException {
@@ -60,6 +64,16 @@ public class Benchmarks {
                 new SavePreferences());
         bibtexString = stringWriter.toString();
 
+        List<String> latexSymbols = new ArrayList<>(HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.values());
+        int symbolcount = latexSymbols.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("{A} \\textbf{bold} ");
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(" {\\it italic} {");
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt()) % symbolcount));
+        sb.append("} abc");
+        conversionStrings.add(sb.toString());
     }
 
     @Benchmark
@@ -92,6 +106,26 @@ public class Benchmarks {
     @Benchmark
     public BibDatabaseMode inferBibDatabaseMode() {
         return BibDatabaseModeDetection.inferMode(database);
+    }
+
+    @Benchmark
+    public List<String> latexToUnicodeConversion() {
+        List<String> result = new ArrayList<>(1000);
+        LatexToUnicodeFormatter f = new LatexToUnicodeFormatter();
+        for (String s : conversionStrings) {
+            result.add(f.format(s));
+        }
+        return result;
+    }
+
+    @Benchmark
+    public List<String> latexToHTMLConversion() {
+        List<String> result = new ArrayList<>(1000);
+        HTMLChars f = new HTMLChars();
+        for (String s : conversionStrings) {
+            result.add(f.format(s));
+        }
+        return result;
     }
 
     public static void main(String[] args) throws IOException, RunnerException {
