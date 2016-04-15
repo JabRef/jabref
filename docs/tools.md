@@ -2,7 +2,6 @@ This page lists some software we consider useful.
 
 ## Browser plugins
 * [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* <s>[ZenHub Browser Extension](https://www.zenhub.io/) - for agile project management</s> - ZenHub is not used in the context of JabRef.
 
 ## git hints
 Here, we collect some helpful git hints
