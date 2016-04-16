@@ -264,32 +264,7 @@ public class VM implements Warn {
          * '}' character isn't a `.', `?', or `!', and pushes this resulting
          * string.
          */
-        buildInFunctions.put("add.period$", context -> {
-            if (stack.isEmpty()) {
-                throw new VMException("Not enough operands on stack for operation add.period$");
-            }
-            Object o1 = stack.pop();
-
-            if (!(o1 instanceof String)) {
-                throw new VMException("Can only add a period to a string for add.period$");
-            }
-
-            String s = (String) o1;
-            Matcher m = ADD_PERIOD_PATTERN.matcher(s);
-
-            if (m.find()) {
-                StringBuffer sb = new StringBuffer();
-                m.appendReplacement(sb, m.group(1));
-                sb.append('.');
-                String group2 = m.group(2);
-                if (group2 != null) {
-                    sb.append(m.group(2));
-                }
-                stack.push(sb.toString());
-            } else {
-                stack.push(s);
-            }
-        });
+        buildInFunctions.put("add.period$", context -> addPeriodFunction());
 
         /**
          * Executes the function whose name is the entry type of an entry.
@@ -549,61 +524,21 @@ public class VM implements Warn {
             }
         });
 
-        buildInFunctions.put("substring$", new BstFunction() {
 
-            /**
-             * Pops the top three literals (they are the two integers literals
-             * len and start, and a string literal, in that order). It pushes
-             * the substring of the (at most) len consecutive characters
-             * starting at the startth character (assuming 1-based indexing) if
-             * start is positive, and ending at the start-th character
-             * (including) from the end if start is negative (where the first
-             * character from the end is the last character).
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.size() < 3) {
-                    throw new VMException("Not enough operands on stack for operation substring$");
-                }
-                Object o1 = stack.pop();
-                Object o2 = stack.pop();
-                Object o3 = stack.pop();
-
-                if (!((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 instanceof String))) {
-                    throw new VMException("Expecting two integers and a string for substring$");
-                }
-
-                Integer len = (Integer) o1;
-                Integer start = (Integer) o2;
-
-                int lenI = len;
-                int startI = start;
-
-                if (lenI > (Integer.MAX_VALUE / 2)) {
-                    lenI = Integer.MAX_VALUE / 2;
-                }
-
-                if (startI > (Integer.MAX_VALUE / 2)) {
-                    startI = Integer.MAX_VALUE / 2;
-                }
-
-                if (startI < (Integer.MIN_VALUE / 2)) {
-                    startI = -Integer.MIN_VALUE / 2;
-                }
-
-                String s = (String) o3;
-
-                if (startI < 0) {
-                    startI += s.length() + 1;
-                    startI = Math.max(1, (startI + 1) - lenI);
-                }
-                stack.push(s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length())));
-            }
-        });
+        /**
+         * Pops the top three literals (they are the two integers literals
+         * len and start, and a string literal, in that order). It pushes
+         * the substring of the (at most) len consecutive characters
+         * starting at the startth character (assuming 1-based indexing) if
+         * start is positive, and ending at the start-th character
+         * (including) from the end if start is negative (where the first
+         * character from the end is the last character).
+         */
+        buildInFunctions.put("substring$", context -> substringFunction());
 
         /**
          * Swaps the top two literals on the stack. text.length$ Pops the
-         * top (string) literal, and pushes the number of text char- acters
+         * top (string) literal, and pushes the number of text characters
          * it contains, where an accented character (more precisely, a
          * \special character", defined in Section 4) counts as a single
          * text character, even if it's missing its matching right brace,
@@ -620,100 +555,18 @@ public class VM implements Warn {
             stack.push(f2);
         });
 
-        buildInFunctions.put("text.length$", new BstFunction() {
-
-            /**
-             * text.length$ Pops the top (string) literal, and pushes the number
-             * of text characters it contains, where an accented character (more
-             * precisely, a "special character", defined in Section 4) counts as
-             * a single text character, even if it's missing its matching right
-             * brace, and where braces don't count as text characters.
-             *
-             * From BibTeXing: For the purposes of counting letters in labels,
-             * BibTEX considers everything contained inside the braces as a
-             * single letter.
-             */
-            @Override
-            public void execute(BstEntry context) {
-                if (stack.isEmpty()) {
-                    throw new VMException("Not enough operands on stack for operation text.length$");
-                }
-                Object o1 = stack.pop();
-
-                if (!(o1 instanceof String)) {
-                    throw new VMException("Can only perform operation on a string text.length$");
-                }
-
-                String s = (String) o1;
-                char[] c = s.toCharArray();
-                int result = 0;
-
-                // Comments from bibtex.web:
-
-                // sp_ptr := str_start[pop_lit1];
-                int i = 0;
-
-                // sp_end := str_start[pop_lit1+1];
-                int n = s.length();
-
-                // sp_brace_level := 0;
-                int braceLevel = 0;
-
-                // while (sp_ptr < sp_end) do begin
-                while (i < n) {
-                    // incr(sp_ptr);
-                    i++;
-                    // if (str_pool[sp_ptr-1] = left_brace) then
-                    // begin
-                    if (c[i - 1] == '{') {
-                        // incr(sp_brace_level);
-                        braceLevel++;
-                        // if ((sp_brace_level = 1) and (sp_ptr < sp_end)) then
-                        if ((braceLevel == 1) && (i < n)) {
-                            // if (str_pool[sp_ptr] = backslash) then
-                            // begin
-                            if (c[i] == '\\') {
-                                // incr(sp_ptr); {skip over the |backslash|}
-                                i++; // skip over backslash
-                                // while ((sp_ptr < sp_end) and (sp_brace_level
-                                // > 0)) do begin
-                                while ((i < n) && (braceLevel > 0)) {
-                                    // if (str_pool[sp_ptr] = right_brace) then
-                                    if (c[i] == '}') {
-                                        // decr(sp_brace_level)
-                                        braceLevel--;
-                                    } else if (c[i] == '{') {
-                                        // incr(sp_brace_level);
-                                        braceLevel++;
-                                    }
-                                    // incr(sp_ptr);
-                                    i++;
-                                    // end;
-                                }
-                                // incr(num_text_chars);
-                                result++;
-                                // end;
-                            }
-                        // end
-                        }
-                    }
-                    // else if (str_pool[sp_ptr-1] = right_brace) then
-                    // begin
-                    else if (c[i - 1] == '}') {
-                        // if (sp_brace_level > 0) then
-                        if (braceLevel > 0) {
-                            // decr(sp_brace_level);
-                            braceLevel--;
-                        // end
-                        }
-                    } else { // else
-                        // incr(num_text_chars);
-                        result++;
-                    }
-                }
-                stack.push(result);
-            }
-        });
+        /**
+         * text.length$ Pops the top (string) literal, and pushes the number
+         * of text characters it contains, where an accented character (more
+         * precisely, a "special character", defined in Section 4) counts as
+         * a single text character, even if it's missing its matching right
+         * brace, and where braces don't count as text characters.
+         *
+         * From BibTeXing: For the purposes of counting letters in labels,
+         * BibTEX considers everything contained inside the braces as a
+         * single letter.
+         */
+        buildInFunctions.put("text.length$", context -> textLengthFunction());
 
         /**
          * Pops the top two literals (the integer literal len and a string
@@ -765,31 +618,7 @@ public class VM implements Warn {
          * second as long as the (integer) literal left on the stack by
          * executing the first is greater than 0.
          */
-        buildInFunctions.put("while$", context -> {
-            if (stack.size() < 2) {
-                throw new VMException("Not enough operands on stack for operation while$");
-            }
-            Object f2 = stack.pop();
-            Object f1 = stack.pop();
-
-            if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
-                    && ((f2 instanceof Identifier) || (f2 instanceof Tree))) {
-                throw new VMException("Expecting two functions for while$.");
-            }
-
-            do {
-                VM.this.executeInContext(f1, context);
-
-                Object i = stack.pop();
-                if (!(i instanceof Integer)) {
-                    throw new VMException("First parameter to while has to return an integer but was " + i);
-                }
-                if ((Integer) i <= 0) {
-                    break;
-                }
-                VM.this.executeInContext(f2, context);
-            } while (true);
-        });
+        buildInFunctions.put("while$", context -> whileFunction(context));
 
         buildInFunctions.put("width$", new WidthFunction(this));
 
@@ -803,6 +632,178 @@ public class VM implements Warn {
             VM.this.bbl.append(s);
         });
 
+    }
+
+    private void textLengthFunction() {
+        if (stack.isEmpty()) {
+            throw new VMException("Not enough operands on stack for operation text.length$");
+        }
+        Object o1 = stack.pop();
+
+        if (!(o1 instanceof String)) {
+            throw new VMException("Can only perform operation on a string text.length$");
+        }
+
+        String s = (String) o1;
+        char[] c = s.toCharArray();
+        int result = 0;
+
+        // Comments from bibtex.web:
+
+        // sp_ptr := str_start[pop_lit1];
+        int i = 0;
+
+        // sp_end := str_start[pop_lit1+1];
+        int n = s.length();
+
+        // sp_brace_level := 0;
+        int braceLevel = 0;
+
+        // while (sp_ptr < sp_end) do begin
+        while (i < n) {
+            // incr(sp_ptr);
+            i++;
+            // if (str_pool[sp_ptr-1] = left_brace) then
+            // begin
+            if (c[i - 1] == '{') {
+                // incr(sp_brace_level);
+                braceLevel++;
+                // if ((sp_brace_level = 1) and (sp_ptr < sp_end)) then
+                if ((braceLevel == 1) && (i < n)) {
+                    // if (str_pool[sp_ptr] = backslash) then
+                    // begin
+                    if (c[i] == '\\') {
+                        // incr(sp_ptr); {skip over the |backslash|}
+                        i++; // skip over backslash
+                        // while ((sp_ptr < sp_end) and (sp_brace_level
+                        // > 0)) do begin
+                        while ((i < n) && (braceLevel > 0)) {
+                            // if (str_pool[sp_ptr] = right_brace) then
+                            if (c[i] == '}') {
+                                // decr(sp_brace_level)
+                                braceLevel--;
+                            } else if (c[i] == '{') {
+                                // incr(sp_brace_level);
+                                braceLevel++;
+                            }
+                            // incr(sp_ptr);
+                            i++;
+                            // end;
+                        }
+                        // incr(num_text_chars);
+                        result++;
+                        // end;
+                    }
+                    // end
+                }
+            }
+            // else if (str_pool[sp_ptr-1] = right_brace) then
+            // begin
+            else if (c[i - 1] == '}') {
+                // if (sp_brace_level > 0) then
+                if (braceLevel > 0) {
+                    // decr(sp_brace_level);
+                    braceLevel--;
+                    // end
+                }
+            } else { // else
+                // incr(num_text_chars);
+                result++;
+            }
+        }
+        stack.push(result);
+    }
+
+    private void whileFunction(BstEntry context) {
+        if (stack.size() < 2) {
+            throw new VMException("Not enough operands on stack for operation while$");
+        }
+        Object f2 = stack.pop();
+        Object f1 = stack.pop();
+
+        if (!((f1 instanceof Identifier) || (f1 instanceof Tree))
+                && ((f2 instanceof Identifier) || (f2 instanceof Tree))) {
+            throw new VMException("Expecting two functions for while$.");
+        }
+
+        do {
+            VM.this.executeInContext(f1, context);
+
+            Object i = stack.pop();
+            if (!(i instanceof Integer)) {
+                throw new VMException("First parameter to while has to return an integer but was " + i);
+            }
+            if ((Integer) i <= 0) {
+                break;
+            }
+            VM.this.executeInContext(f2, context);
+        } while (true);
+    }
+
+    private void substringFunction() {
+        if (stack.size() < 3) {
+            throw new VMException("Not enough operands on stack for operation substring$");
+        }
+        Object o1 = stack.pop();
+        Object o2 = stack.pop();
+        Object o3 = stack.pop();
+
+        if (!((o1 instanceof Integer) && (o2 instanceof Integer) && (o3 instanceof String))) {
+            throw new VMException("Expecting two integers and a string for substring$");
+        }
+
+        Integer len = (Integer) o1;
+        Integer start = (Integer) o2;
+
+        int lenI = len;
+        int startI = start;
+
+        if (lenI > (Integer.MAX_VALUE / 2)) {
+            lenI = Integer.MAX_VALUE / 2;
+        }
+
+        if (startI > (Integer.MAX_VALUE / 2)) {
+            startI = Integer.MAX_VALUE / 2;
+        }
+
+        if (startI < (Integer.MIN_VALUE / 2)) {
+            startI = -Integer.MIN_VALUE / 2;
+        }
+
+        String s = (String) o3;
+
+        if (startI < 0) {
+            startI += s.length() + 1;
+            startI = Math.max(1, (startI + 1) - lenI);
+        }
+        stack.push(s.substring(startI - 1, Math.min((startI - 1) + lenI, s.length())));
+    }
+
+    private void addPeriodFunction() {
+        if (stack.isEmpty()) {
+            throw new VMException("Not enough operands on stack for operation add.period$");
+        }
+        Object o1 = stack.pop();
+
+        if (!(o1 instanceof String)) {
+            throw new VMException("Can only add a period to a string for add.period$");
+        }
+
+        String s = (String) o1;
+        Matcher m = ADD_PERIOD_PATTERN.matcher(s);
+
+        if (m.find()) {
+            StringBuffer sb = new StringBuffer();
+            m.appendReplacement(sb, m.group(1));
+            sb.append('.');
+            String group2 = m.group(2);
+            if (group2 != null) {
+                sb.append(m.group(2));
+            }
+            stack.push(sb.toString());
+        } else {
+            stack.push(s);
+        }
     }
 
     private static CommonTree charStream2CommonTree(CharStream bst) throws RecognitionException {

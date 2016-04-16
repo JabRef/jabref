@@ -75,9 +75,8 @@ public class ADSFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             /* Remove "doi:" scheme identifier */
-            query = query.replaceAll("^(doi:|DOI:)", "");
             /* Allow fetching only 1 key */
-            String key = query;
+            String key = query.replaceAll("^(doi:|DOI:)", "");
             /* Query ADS and load the results into the BibDatabase */
             status.setStatus(Localization.lang("Processing %0", key));
             BibDatabase bd = importADSEntries(key, status);

@@ -54,18 +54,19 @@ public class CrossRef {
     }
 
     private static String enhanceQuery(String query, BibEntry entry) {
+        StringBuilder enhancedQuery = new StringBuilder(query);
         // author
         String author = entry.getField("author");
-        if (author != null && !author.isEmpty()) {
-            query = query.concat("+" + author);
+        if ((author != null) && !author.isEmpty()) {
+            enhancedQuery.append('+').append(author);
         }
 
         // year
         String year = entry.getField("year");
-        if (year != null && !year.isEmpty()) {
-            query = query.concat("+" + year);
+        if ((year != null) && !year.isEmpty()) {
+            enhancedQuery.append('+').append(year);
         }
 
-        return query;
+        return enhancedQuery.toString();
     }
 }
