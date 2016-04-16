@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
-    public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
-    public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
+    public static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
     private final BibDatabase base;
     private MetaData metaData;
     private final Map<String, EntryType> entryTypes;

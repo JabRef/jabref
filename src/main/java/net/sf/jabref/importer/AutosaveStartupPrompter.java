@@ -72,10 +72,10 @@ public class AutosaveStartupPrompter implements Runnable {
                 fileToLoad = AutoSaveManager.getAutoSaveFile(file);
             }
             boolean done = false;
-            ParserResult pr = null;
-            while (!done) {
+            ParserResult pr;
+            do {
                 pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-                if ((pr != null) && !pr.isInvalid()) { // TODO: double-check that pr is never null here and remove check
+                if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(file);
@@ -95,23 +95,17 @@ public class AutosaveStartupPrompter implements Runnable {
                         tryingAutosave = false;
                         fileToLoad = file;
                     } else {
-                        String message;
-                        if (pr == null) {
-                            message = Localization.lang("Error opening file '%0'.", file.getName());
-                        } else {
-                            message = "<html>" + pr.getErrorMessage() + "<p>" +
-                                    Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
-                        }
+                        String message = "<html>" + pr.getErrorMessage() + "<p>"
+                                + Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
                         JOptionPane.showMessageDialog(frame,
                                 message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                         done = true;
                     }
 
                 }
-            }
+            } while (!done);
 
-            if ((pr != null) && !pr.isInvalid()
-                    && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+            if (!pr.isInvalid() && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
             }
         }

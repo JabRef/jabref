@@ -132,8 +132,7 @@ public class ArgumentProcessor {
                     pr = JabRef.openBibFile(aLeftOver, false);
                 }
 
-                if ((pr == null) || (pr == ParserResult.INVALID_FORMAT)) { // TODO: double check that pr in never null here and remove check
-                    // TODO: INVALID_FORMAT and FILE_LOCKED are the same...
+                if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -143,9 +142,9 @@ public class ArgumentProcessor {
                     if (initialStartup) {
                         toImport.add(aLeftOver);
                     } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.INVALID_FORMAT));
+                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.NULL_RESULT));
                     }
-                } else if (pr != ParserResult.FILE_LOCKED) {
+                } else {
                     loaded.add(pr);
                 }
             }
@@ -181,7 +180,7 @@ public class ArgumentProcessor {
                 BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
-                if ((newBase != null) && newBase.hasEntries()) { // TODO: double-check that newBase is never null and remove check
+                if (newBase.hasEntries()) { // TODO: double-check that newBase is never null and remove check
                     String formatName;
 
                     //read in the export format, take default format if no format entered

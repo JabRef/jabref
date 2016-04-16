@@ -234,15 +234,10 @@ public class JabRef {
                 if (fileToOpen.exists()) {
                     ParserResult pr = JabRef.openBibFile(name, false);
 
-                    if (pr != null) { // TODO: Double check that pr is never null here and remove check
-
-                        if (pr == ParserResult.INVALID_FORMAT) { // TODO: INVALID_FORMAT and FILE_LOCKED are the same...
-                            System.out.println(
-                                    Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
-                        } else if (pr != ParserResult.FILE_LOCKED) {
-                            loaded.add(pr);
-                        }
-
+                    if (pr == ParserResult.NULL_RESULT) {
+                        System.out.println(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
+                    } else {
+                        loaded.add(pr);
                     }
                 }
             }
@@ -355,6 +350,13 @@ public class JabRef {
         }
     }
 
+    /**
+     *
+     * @param name Name of the bib-file to open
+     * @param ignoreAutosave true if autosave version of the file should be ignored
+     * @return ParserResult which never is null
+     */
+
     public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
         // String in OpenDatabaseAction.java
         LOGGER.info("Opening: " + name);
@@ -384,7 +386,7 @@ public class JabRef {
             if (!FileBasedLock.waitForFileLock(file, 10)) {
                 System.out.println(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
-                return ParserResult.FILE_LOCKED;
+                return ParserResult.NULL_RESULT;
             }
 
             Charset encoding = Globals.prefs.getDefaultEncoding();
