@@ -91,7 +91,6 @@ import net.sf.jabref.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -184,7 +183,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this
      * class.
      */
+    @SuppressWarnings("unused")
     private FindUnlinkedFilesDialog() {
+        //intended
     }
 
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
@@ -238,8 +239,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
             try {
                 String[] dim = store.split(";");
                 dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
-            } catch (NumberFormatException ignored) {
-                LOGGER.debug("RestoreSizeDialog Ecxception ", ignored);
+            } catch (NumberFormatException ignoredEx) {
+                LOGGER.debug("RestoreSizeDialog Exception ", ignoredEx);
             }
         }
         if (dimension != null) {
@@ -495,6 +496,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
         if (Files.notExists(directory)) {
             directory = Paths.get(System.getProperty("user.dir"));
         }
+        if (!Files.isDirectory(directory)) {
+            directory = directory.getParent();
+        }
+
         //this addtional statement is needed because for the lamdba the variable must be effetively final
         Path dir = directory;
 
