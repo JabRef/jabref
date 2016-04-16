@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.integrity;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
@@ -10,7 +11,11 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +60,7 @@ public class IntegrityCheck {
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new AbbreviationChecker("journal").check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
+        result.addAll(new HashChecker().check(entry));
 
         return result;
     }
@@ -115,7 +121,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("file");
+            Optional<String> value = entry.getFieldOptional(Globals.FILE_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -129,7 +135,7 @@ public class IntegrityCheck {
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
-                                    "file"));
+                                    Globals.FILE_FIELD));
                 }
             }
 
@@ -317,6 +323,34 @@ public class IntegrityCheck {
             }
 
             return Collections.emptyList();
+        }
+    }
+
+    private static class HashChecker implements Checker {
+
+        // Detect # if it doesn't have a \ in front of it or if it starts the string
+        private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
+
+
+        /**
+         * Checks, if there is an even number of unescaped #
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (String fieldName : entry.getFieldNames()) {
+                String fieldValue = entry.getField(fieldName);
+                Matcher hashMatcher = UNESCAPED_HASH.matcher(fieldValue);
+                int hashCount = 0;
+                while (hashMatcher.find()) {
+                    hashCount++;
+                }
+                if ((hashCount % 2) == 1) {
+                    results.add(
+                            new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry, fieldName));
+                }
+            }
+            return results;
         }
     }
 
