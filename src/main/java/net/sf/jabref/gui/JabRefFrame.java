@@ -697,7 +697,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void preferences() {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
-            prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
+            prefsDialog = new PreferencesDialog(JabRefFrame.this);
             prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();

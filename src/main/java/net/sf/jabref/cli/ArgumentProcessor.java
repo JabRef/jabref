@@ -154,7 +154,7 @@ public class ArgumentProcessor {
                 BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
 
                 //export database
-                if (newBase.hasEntries()) { // TODO: double-check that newBase is never null and remove check
+                if (newBase.hasEntries()) {
                     String formatName;
 
                     //read in the export format, take default format if no format entered

@@ -1,6 +1,6 @@
 package net.sf.jabref;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 /**
  * JabRef MainClass

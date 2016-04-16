@@ -67,7 +67,8 @@ public class PreferencesDialog extends JDialog {
 
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
-    public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
+
+    public PreferencesDialog(JabRefFrame parent) {
         super(parent, Localization.lang("JabRef preferences"), false);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;

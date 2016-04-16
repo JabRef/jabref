@@ -366,7 +366,7 @@ public class JabRef {
             ParserResult pr = new ParserResult(null, null, null);
             pr.setFile(file);
             pr.setInvalid(true);
-            System.err.println(Localization.lang("Error") + ": " + Localization.lang("File not found"));
+            LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
 
         }
@@ -385,26 +385,18 @@ public class JabRef {
             }
 
             if (!FileBasedLock.waitForFileLock(file, 10)) {
-                System.out.println(Localization.lang("Error opening file") + " '" + name + "'. "
+                LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
                 return ParserResult.NULL_RESULT;
             }
 
             Charset encoding = Globals.prefs.getDefaultEncoding();
             ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-            if (pr == null) { // TODO: double-check that pr is never null here and remove code
-                pr = new ParserResult(null, null, null);
-                pr.setFile(file);
-                pr.setInvalid(true);
-                return pr;
-
-            }
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 for (String aWarn : pr.warnings()) {
                     LOGGER.warn(aWarn);
                 }
-
             }
             return pr;
         } catch (Throwable ex) {
