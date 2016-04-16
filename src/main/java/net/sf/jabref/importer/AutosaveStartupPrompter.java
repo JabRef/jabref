@@ -75,7 +75,7 @@ public class AutosaveStartupPrompter implements Runnable {
             ParserResult pr = null;
             while (!done) {
                 pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-                if ((pr != null) && !pr.isInvalid()) {
+                if ((pr != null) && !pr.isInvalid()) { // TODO: double-check that pr is never null here and remove check
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(file);

@@ -146,7 +146,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(jabRef), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
         } else {
             Globals.REMOTE_LISTENER.stop();
         }
