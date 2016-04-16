@@ -84,38 +84,12 @@ public class ArgumentProcessor {
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
-            String value = cli.getPreferencesReset();
-            if ("all".equals(value.trim())) {
-                try {
-                    System.out.println(Localization.lang("Setting all preferences to default values."));
-                    Globals.prefs.clear();
-                } catch (BackingStoreException e) {
-                    System.err.println(Localization.lang("Unable to clear preferences."));
-                    LOGGER.error("Unable to clear preferences", e);
-                }
-            } else {
-                String[] keys = value.split(",");
-                for (String key : keys) {
-                    if (Globals.prefs.hasKey(key.trim())) {
-                        System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
-                        Globals.prefs.clear(key.trim());
-                    } else {
-                        System.out.println(Localization.lang("Unknown preference key '%0'", key.trim()));
-                    }
-                }
-            }
-
+            resetPreferences(cli.getPreferencesReset());
         }
 
         // Check if we should import preferences from a file:
         if (cli.isPreferencesImport()) {
-            try {
-                Globals.prefs.importPreferences(cli.getPreferencesImport());
-                CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-                ExportFormats.initAllExports();
-            } catch (JabRefException ex) {
-                LOGGER.error("Cannot import preferences", ex);
-            }
+            importPreferences();
         }
 
         // List to put imported/loaded database(s) in.
@@ -126,7 +100,7 @@ public class ArgumentProcessor {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // bib files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
-                boolean bibExtension = aLeftOver.toLowerCase().endsWith("bib");
+                boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
                     pr = JabRef.openBibFile(aLeftOver, false);
@@ -170,7 +144,7 @@ public class ArgumentProcessor {
             if (!loaded.isEmpty()) {
                 String[] data = cli.getExportMatches().split(",");
                 String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-                //? stands for a blank
+                //$ stands for a blank
                 ParserResult pr = loaded.get(loaded.size() - 1);
                 BibDatabase dataBase = pr.getDatabase();
 
@@ -231,70 +205,7 @@ public class ArgumentProcessor {
 
         if (cli.isFileExport()) {
             if (!loaded.isEmpty()) {
-                String[] data = cli.getFileExport().split(",");
-
-                if (data.length == 1) {
-                    // This signals that the latest import should be stored in BibTeX
-                    // format to the given file.
-                    if (!loaded.isEmpty()) {
-                        ParserResult pr = loaded.get(loaded.size() - 1);
-                        if (!pr.isInvalid()) {
-                            try {
-                                System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
-                                        Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                                SaveSession session = databaseWriter.saveDatabase(
-                                        new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
-
-                                // Show just a warning message if encoding didn't work for all characters:
-                                if (!session.getWriter().couldEncodeAll()) {
-                                    System.err.println(Localization.lang("Warning") + ": "
-                                            + Localization.lang(
-                                                    "The chosen encoding '%0' could not encode the following characters:",
-                                                    session.getEncoding().displayName())
-                                            + " " + session.getWriter().getProblemCharacters());
-                                }
-                                session.commit(new File(data[0]));
-                            } catch (SaveException ex) {
-                                System.err.println(
-                                        Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                            }
-                        }
-                    } else {
-                        System.err.println(Localization.lang("The output option depends on a valid import option."));
-                    }
-                } else if (data.length == 2) {
-                    // This signals that the latest import should be stored in the given
-                    // format to the given file.
-                    ParserResult pr = loaded.get(loaded.size() - 1);
-
-                    // Set the global variable for this database's file directory before exporting,
-                    // so formatters can resolve linked files correctly.
-                    // (This is an ugly hack!)
-                    File theFile = pr.getFile();
-                    if (!theFile.isAbsolute()) {
-                        theFile = theFile.getAbsoluteFile();
-                    }
-                    BibDatabaseContext databaseContext = pr.getDatabaseContext();
-                    databaseContext.setDatabaseFile(theFile);
-                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
-                    System.out.println(Localization.lang("Exporting") + ": " + data[0]);
-                    IExportFormat format = ExportFormats.getExportFormat(data[1]);
-                    if (format == null) {
-                        System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
-                    } else {
-                        // We have an ExportFormat instance:
-                        try {
-                            format.performExport(pr.getDatabaseContext(), data[0], pr.getEncoding(), null);
-                        } catch (Exception ex) {
-                            System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                                    + ex.getMessage());
-                        }
-                    }
-
-                }
+                exportFile(loaded, cli.getFileExport().split(","));
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid import option."));
             }
@@ -311,54 +222,10 @@ public class ArgumentProcessor {
         }
 
         if (!cli.isBlank() && cli.isAuxImport()) {
-            boolean usageMsg = false;
+            boolean usageMsg;
 
             if (!loaded.isEmpty()) {
-                String[] data = cli.getAuxImport().split(",");
-
-                if (data.length == 2) {
-                    ParserResult pr = loaded.get(0);
-                    AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
-                    BibDatabase newBase = acl.perform();
-
-                    boolean notSavedMsg = false;
-
-                    // write an output, if something could be resolved
-                    if ((newBase != null) && newBase.hasEntries()) {
-                        String subName = StringUtil.getCorrectFileName(data[1], "bib");
-
-                        try {
-                            System.out.println(Localization.lang("Saving") + ": " + subName);
-                            SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                            Defaults defaults = new Defaults(BibDatabaseMode
-                                    .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                            SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
-                                    prefs);
-
-                            // Show just a warning message if encoding didn't work for all characters:
-                            if (!session.getWriter().couldEncodeAll()) {
-                                System.err.println(Localization.lang("Warning") + ": "
-                                        + Localization.lang(
-                                                "The chosen encoding '%0' could not encode the following characters:",
-                                                session.getEncoding().displayName())
-                                        + " " + session.getWriter().getProblemCharacters());
-                            }
-                            session.commit(new File(subName));
-                        } catch (SaveException ex) {
-                            System.err.println(
-                                    Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                        }
-
-                        notSavedMsg = true;
-                    }
-
-                    if (!notSavedMsg) {
-                        System.out.println(Localization.lang("no database generated"));
-                    }
-                } else {
-                    usageMsg = true;
-                }
+                usageMsg = generateAux(loaded, cli.getAuxImport().split(","));
             } else {
                 usageMsg = true;
             }
@@ -371,6 +238,150 @@ public class ArgumentProcessor {
         }
 
         return Optional.of(loaded);
+    }
+
+    private boolean generateAux(List<ParserResult> loaded, String[] data) {
+        if (data.length == 2) {
+            ParserResult pr = loaded.get(0);
+            AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
+            BibDatabase newBase = acl.perform();
+
+            boolean notSavedMsg = false;
+
+            // write an output, if something could be resolved
+            if ((newBase != null) && newBase.hasEntries()) {
+                String subName = StringUtil.getCorrectFileName(data[1], "bib");
+
+                try {
+                    System.out.println(Localization.lang("Saving") + ": " + subName);
+                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                    BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                    Defaults defaults = new Defaults(BibDatabaseMode
+                            .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
+                            prefs);
+
+                    // Show just a warning message if encoding didn't work for all characters:
+                    if (!session.getWriter().couldEncodeAll()) {
+                        System.err.println(Localization.lang("Warning") + ": "
+                                + Localization.lang(
+                                        "The chosen encoding '%0' could not encode the following characters:",
+                                        session.getEncoding().displayName())
+                                + " " + session.getWriter().getProblemCharacters());
+                    }
+                    session.commit(new File(subName));
+                } catch (SaveException ex) {
+                    System.err.println(
+                            Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                }
+
+                notSavedMsg = true;
+            }
+
+            if (!notSavedMsg) {
+                System.out.println(Localization.lang("no database generated"));
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private void exportFile(List<ParserResult> loaded, String[] data) {
+        if (data.length == 1) {
+            // This signals that the latest import should be stored in BibTeX
+            // format to the given file.
+            if (!loaded.isEmpty()) {
+                ParserResult pr = loaded.get(loaded.size() - 1);
+                if (!pr.isInvalid()) {
+                    try {
+                        System.out.println(Localization.lang("Saving") + ": " + data[0]);
+                        SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
+                        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
+                                Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                        SaveSession session = databaseWriter.saveDatabase(
+                                new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
+
+                        // Show just a warning message if encoding didn't work for all characters:
+                        if (!session.getWriter().couldEncodeAll()) {
+                            System.err.println(Localization.lang("Warning") + ": "
+                                    + Localization.lang(
+                                            "The chosen encoding '%0' could not encode the following characters:",
+                                            session.getEncoding().displayName())
+                                    + " " + session.getWriter().getProblemCharacters());
+                        }
+                        session.commit(new File(data[0]));
+                    } catch (SaveException ex) {
+                        System.err.println(
+                                Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                    }
+                }
+            } else {
+                System.err.println(Localization.lang("The output option depends on a valid import option."));
+            }
+        } else if (data.length == 2) {
+            // This signals that the latest import should be stored in the given
+            // format to the given file.
+            ParserResult pr = loaded.get(loaded.size() - 1);
+
+            // Set the global variable for this database's file directory before exporting,
+            // so formatters can resolve linked files correctly.
+            // (This is an ugly hack!)
+            File theFile = pr.getFile();
+            if (!theFile.isAbsolute()) {
+                theFile = theFile.getAbsoluteFile();
+            }
+            BibDatabaseContext databaseContext = pr.getDatabaseContext();
+            databaseContext.setDatabaseFile(theFile);
+            Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
+            System.out.println(Localization.lang("Exporting") + ": " + data[0]);
+            IExportFormat format = ExportFormats.getExportFormat(data[1]);
+            if (format == null) {
+                System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
+            } else {
+                // We have an ExportFormat instance:
+                try {
+                    format.performExport(pr.getDatabaseContext(), data[0], pr.getEncoding(), null);
+                } catch (Exception ex) {
+                    System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
+                            + ex.getMessage());
+                }
+            }
+
+        }
+    }
+
+    private void importPreferences() {
+        try {
+            Globals.prefs.importPreferences(cli.getPreferencesImport());
+            CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
+            ExportFormats.initAllExports();
+        } catch (JabRefException ex) {
+            LOGGER.error("Cannot import preferences", ex);
+        }
+    }
+
+    private void resetPreferences(String value) {
+        if ("all".equals(value.trim())) {
+            try {
+                System.out.println(Localization.lang("Setting all preferences to default values."));
+                Globals.prefs.clear();
+            } catch (BackingStoreException e) {
+                System.err.println(Localization.lang("Unable to clear preferences."));
+                LOGGER.error("Unable to clear preferences", e);
+            }
+        } else {
+            String[] keys = value.split(",");
+            for (String key : keys) {
+                if (Globals.prefs.hasKey(key.trim())) {
+                    System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
+                    Globals.prefs.clear(key.trim());
+                } else {
+                    System.out.println(Localization.lang("Unknown preference key '%0'", key.trim()));
+                }
+            }
+        }
     }
 
     private void automaticallySetFileLinks(List<ParserResult> loaded) {

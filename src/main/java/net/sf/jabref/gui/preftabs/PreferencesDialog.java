@@ -99,7 +99,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new NameFormatterTab());
         tabs.add(new ImportSettingsTab());
         tabs.add(new XmpPrefsTab());
-        tabs.add(new AdvancedTab(prefs, jabRef));
+        tabs.add(new AdvancedTab(prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));

@@ -18,7 +18,6 @@ package net.sf.jabref.gui.preftabs;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -41,12 +40,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
-    private final JabRef jabRef;
     private final RemotePreferences remotePreferences;
 
 
-    public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
-        this.jabRef = jabRef;
+    public AdvancedTab(JabRefPreferences prefs) {
         preferences = prefs;
         remotePreferences = new RemotePreferences(preferences);
 
