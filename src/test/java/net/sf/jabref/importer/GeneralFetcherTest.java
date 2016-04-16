@@ -1,8 +1,8 @@
 package net.sf.jabref.importer;
 
-import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.JabRefMain;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.importer.fetcher.ACMPortalFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
@@ -57,8 +57,8 @@ public class GeneralFetcherTest {
      */
     @Before
     public void setUp() {
-        JabRefMain.main(new String[0]);
-        GeneralFetcherTest.jrf = JabRef.mainFrame;
+        JabRef.main(new String[0]);
+        GeneralFetcherTest.jrf = JabRefGUI.mainFrame;
         GeneralFetcherTest.spm = GeneralFetcherTest.jrf.getSidePaneManager();
         GeneralFetcherTest.acmpf = new ACMPortalFetcher();
         ArrayList<EntryFetcher> al = new ArrayList<>();

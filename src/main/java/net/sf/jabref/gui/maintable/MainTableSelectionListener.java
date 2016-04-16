@@ -355,7 +355,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(JabRef.mainFrame, panel);
+        RightClickMenu rightClickMenu = new RightClickMenu(JabRefGUI.mainFrame, panel);
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 

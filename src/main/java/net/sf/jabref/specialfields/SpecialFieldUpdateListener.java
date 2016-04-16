@@ -21,9 +21,9 @@ import java.beans.VetoableChangeListener;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.JabRef;
 
 /**
  * Listener triggering
@@ -47,11 +47,11 @@ public class SpecialFieldUpdateListener implements VetoableChangeListener {
             NamedCompound compound = new NamedCompound("SpecialFieldSync");
             if ("keywords".equals(fieldName)) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
-                SwingUtilities.invokeLater(() -> JabRef.mainFrame.getCurrentBasePanel().updateEntryEditorIfShowing());
+                SwingUtilities.invokeLater(() -> JabRefGUI.mainFrame.getCurrentBasePanel().updateEntryEditorIfShowing());
             } else {
                 if (SpecialFieldsUtils.isSpecialField(fieldName)) {
                     SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, compound);
-                    SwingUtilities.invokeLater(() -> JabRef.mainFrame.getCurrentBasePanel().updateEntryEditorIfShowing());
+                    SwingUtilities.invokeLater(() -> JabRefGUI.mainFrame.getCurrentBasePanel().updateEntryEditorIfShowing());
                 }
             }
             // we do NOT pass the named component to the undo manager since we do not want to have undo capabilities

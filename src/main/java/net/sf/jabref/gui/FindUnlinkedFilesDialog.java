@@ -80,8 +80,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.importer.EntryFromFileCreator;
@@ -996,7 +996,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
                                 JabRefDesktop.openExternalViewer(
-                                        JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext(),
+                                        JabRefGUI.mainFrame.getCurrentBasePanel().getBibDatabaseContext(),
                                         fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);

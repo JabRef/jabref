@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui.menus.help;
 
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
@@ -47,7 +47,7 @@ public class DonateAction extends AbstractAction {
             JabRefDesktop.openBrowser(DONATION_LINK);
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
-            JabRef.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
+            JabRefGUI.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
         }
     }
 }

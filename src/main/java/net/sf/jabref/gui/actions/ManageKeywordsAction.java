@@ -45,7 +45,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
@@ -208,7 +208,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter<String> autoComp = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRefGUI.mainFrame.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);

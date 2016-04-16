@@ -26,7 +26,6 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.JabRefPreferences;
@@ -74,7 +73,7 @@ public class AutosaveStartupPrompter implements Runnable {
             boolean done = false;
             ParserResult pr;
             do {
-                pr = JabRef.openBibFile(fileToLoad.getPath(), true);
+                pr = AutosaveAwareDatabaseLoader.openBibFile(fileToLoad.getPath(), true);
                 if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();

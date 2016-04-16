@@ -16,7 +16,7 @@
 package net.sf.jabref.gui.help;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -81,7 +81,7 @@ public class HelpAction extends MnemonicAwareAction {
             JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + urlPart);
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
-            JabRef.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
+            JabRefGUI.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
         }
     }
 }

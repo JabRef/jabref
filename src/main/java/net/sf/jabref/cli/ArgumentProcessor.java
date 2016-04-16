@@ -12,8 +12,8 @@ import java.util.prefs.BackingStoreException;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefException;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.BibDatabaseWriter;
@@ -22,6 +22,7 @@ import net.sf.jabref.exporter.IExportFormat;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
+import net.sf.jabref.importer.AutosaveAwareDatabaseLoader;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ImportInspectionCommandLine;
 import net.sf.jabref.importer.ParserResult;
@@ -45,17 +46,22 @@ import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
 
+    public enum Mode {
+        INITIAL_START,
+        REMOTE_START
+    };
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     private final JabRefCLI cli;
 
     private final Optional<List<ParserResult>> parserResults;
 
-    private final boolean initialStartup;
+    private final Mode startupMode;
 
-    public ArgumentProcessor(String[] args, boolean initialStartup) {
+
+    public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
-        this.initialStartup = initialStartup;
+        this.startupMode = startupMode;
         parserResults = processArguments();
     }
 
@@ -73,11 +79,11 @@ public class ArgumentProcessor {
             JabRefLogger.setDebug();
         }
 
-        if (initialStartup && cli.isShowVersion()) {
+        if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
 
-        if (initialStartup && cli.isHelp()) {
+        if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             cli.printUsage();
             return Optional.empty();
         }
@@ -103,7 +109,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
-                    pr = JabRef.openBibFile(aLeftOver, false);
+                    pr = AutosaveAwareDatabaseLoader.openBibFile(aLeftOver, false);
                 }
 
                 if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
@@ -113,7 +119,7 @@ public class ArgumentProcessor {
                     // listener, we will instead import it into the current database.
                     // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
-                    if (initialStartup) {
+                    if (startupMode == Mode.INITIAL_START) {
                         toImport.add(aLeftOver);
                     } else {
                         loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.NULL_RESULT));
@@ -334,7 +340,7 @@ public class ArgumentProcessor {
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
             databaseContext.setDatabaseFile(theFile);
-            Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
+            Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory();
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             IExportFormat format = ExportFormats.getExportFormat(data[1]);
             if (format == null) {
@@ -488,10 +494,10 @@ public class ArgumentProcessor {
                 try {
                     List<BibEntry> entries;
                     if (OS.WINDOWS) {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRef.mainFrame);
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRefGUI.mainFrame);
                     } else {
                         entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
-                                data[0].replace("~", System.getProperty("user.home")), JabRef.mainFrame);
+                                data[0].replace("~", System.getProperty("user.home")), JabRefGUI.mainFrame);
                     }
                     return Optional.of(new ParserResult(entries));
                 } catch (IllegalArgumentException ex) {

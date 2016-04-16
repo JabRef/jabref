@@ -96,7 +96,7 @@ public class DuplicateSearch implements Runnable {
                             askAboutExact = true;
                         }
 
-                        DuplicateCallBack cb = new DuplicateCallBack(JabRef.mainFrame, be[0], be[1],
+                        DuplicateCallBack cb = new DuplicateCallBack(JabRefGUI.mainFrame, be[0], be[1],
                                 askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH);
                         ((CallBack) Spin.over(cb)).update();
 
