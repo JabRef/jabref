@@ -28,7 +28,13 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import net.sf.jabref.*;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
@@ -65,15 +71,53 @@ import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Dialog to allow the selection of entries as part of an Import.
@@ -619,10 +663,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // See if we should remove any old entries for duplicate resolving:
             if (!entriesToDelete.isEmpty()) {
-                for (BibEntry entry : entriesToDelete) {
-                    ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
-                    panel.getDatabase().removeEntry(entry);
-                }
+                removeEntriesToDelete(ce);
             }
 
             // If "Generate keys" is checked, generate keys unless it's already
@@ -636,100 +677,116 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             final List<BibEntry> selected = getSelectedEntries();
 
             if (!selected.isEmpty()) {
-
-                if (newDatabase) {
-                    // Create a new BasePanel for the entries:
-                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
-                }
-
-                boolean groupingCanceled = false;
-
-                // Set owner/timestamp if options are enabled:
-                UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
-
-                // Mark entries if we should
-                if (EntryMarker.shouldMarkEntries()) {
-                    for (BibEntry entry : selected) {
-                        EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                    }
-                }
-                // Check if we should unmark entries before adding the new ones:
-                if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                    for (BibEntry entry : panel.getDatabase().getEntries()) {
-                        EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
-                    }
-                }
-
-                for (BibEntry entry : selected) {
-                    // entry.clone();
-
-                    // Remove settings to group/search hit status:
-                    entry.setSearchHit(false);
-                    entry.setGroupHit(false);
-
-                    // If this entry should be added to any groups, do it now:
-                    Set<GroupTreeNode> groups = groupAdditions.get(entry);
-                    if (!groupingCanceled && (groups != null)) {
-                        if (entry.getCiteKey() == null) {
-                            // The entry has no key, so it can't be added to the
-                            // group.
-                            // The best course of action is probably to ask the
-                            // user if a key should be generated
-                            // immediately.
-                            int answer = JOptionPane
-                                    .showConfirmDialog(
-                                            ImportInspectionDialog.this,
-                                            Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                                            Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
-                            if (answer == JOptionPane.YES_OPTION) {
-                                generateKeys();
-                            } else {
-                                groupingCanceled = true;
-                            }
-                        }
-
-                        // If the key existed, or exists now, go ahead:
-                        if (entry.getCiteKey() != null) {
-                            for (GroupTreeNode node : groups) {
-                                if (node.supportsAddingEntries()) {
-                                    // Add the entry:
-
-                                    Optional<EntriesGroupChange> undo = node.getGroup().add(
-                                            Collections.singletonList(entry));
-                                    if (undo.isPresent()) {
-                                        ce.addEdit(UndoableChangeEntriesOfGroup
-                                                .getUndoableEdit(new GroupTreeNodeViewModel(node), undo.get()));
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    entry.setId(IdGenerator.next());
-                    panel.getDatabase().insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
-
-                }
-
-                ce.end();
-                panel.undoManager.addEdit(ce);
+                addSelectedEntries(ce, selected);
             }
 
             dispose();
-            SwingUtilities.invokeLater(() -> {
-                if (newDatabase) {
-                    frame.addTab(panel, true);
-                }
-                panel.markBaseChanged();
+            SwingUtilities.invokeLater(() -> updateGUI(selected.size()));
+        }
 
-                if (selected.isEmpty()) {
-                    frame.output(Localization.lang("No entries imported."));
-                } else {
-                    frame.output(Localization.lang("Number of entries successfully imported") + ": " + selected.size());
+        private void updateGUI(int entryCount) {
+            if (newDatabase) {
+                frame.addTab(panel, true);
+            }
+            panel.markBaseChanged();
+
+            if (entryCount == 0) {
+                frame.output(Localization.lang("No entries imported."));
+            } else {
+                frame.output(Localization.lang("Number of entries successfully imported") + ": " + entryCount);
+            }
+        }
+
+        private void removeEntriesToDelete(NamedCompound ce) {
+            for (BibEntry entry : entriesToDelete) {
+                ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+                panel.getDatabase().removeEntry(entry);
+            }
+        }
+
+        private void addSelectedEntries(NamedCompound ce, final List<BibEntry> selected) {
+            if (newDatabase) {
+                // Create a new BasePanel for the entries:
+                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
+            }
+
+            boolean groupingCanceled = false;
+
+            // Set owner/timestamp if options are enabled:
+            UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+
+            // Mark entries if we should
+            if (EntryMarker.shouldMarkEntries()) {
+                for (BibEntry entry : selected) {
+                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                 }
-            });
+            }
+            // Check if we should unmark entries before adding the new ones:
+            if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
+                for (BibEntry entry : panel.getDatabase().getEntries()) {
+                    EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
+                }
+            }
+
+            for (BibEntry entry : selected) {
+                // Remove settings to group/search hit status:
+                entry.setSearchHit(false);
+                entry.setGroupHit(false);
+
+                // If this entry should be added to any groups, do it now:
+                Set<GroupTreeNode> groups = groupAdditions.get(entry);
+                if (!groupingCanceled && (groups != null)) {
+                    groupingCanceled = addToGroups(ce, entry, groups);
+                }
+
+
+                entry.setId(IdGenerator.next());
+                panel.getDatabase().insertEntry(entry);
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+
+            }
+
+            ce.end();
+            panel.undoManager.addEdit(ce);
+        }
+
+        private boolean addToGroups(NamedCompound ce, BibEntry entry, Set<GroupTreeNode> groups) {
+            boolean groupingCanceled = false;
+            if (entry.getCiteKey() == null) {
+                // The entry has no key, so it can't be added to the
+                // group.
+                // The best course of action is probably to ask the
+                // user if a key should be generated
+                // immediately.
+                int answer = JOptionPane
+                        .showConfirmDialog(
+                                ImportInspectionDialog.this,
+                                Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.YES_OPTION) {
+                    generateKeys();
+                } else {
+                    groupingCanceled = true;
+                }
+            }
+
+            // If the key existed, or exists now, go ahead:
+            if (entry.getCiteKey() != null) {
+                for (GroupTreeNode node : groups) {
+                    if (node.supportsAddingEntries()) {
+                        // Add the entry:
+
+                        Optional<EntriesGroupChange> undo = node.getGroup().add(Collections.singletonList(entry));
+                        if (undo.isPresent()) {
+                            ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                                    undo.get()));
+                        }
+                    }
+                }
+            }
+            return groupingCanceled;
         }
 
         /**
