@@ -59,6 +59,11 @@ public class JabRefGUI {
     private final List<ParserResult> loaded;
     private final boolean isBlank;
 
+    private final List<File> postponed = new ArrayList<>();
+    private final List<ParserResult> failed = new ArrayList<>();
+    private final List<ParserResult> toOpenTab = new ArrayList<>();
+
+
     public JabRefGUI(List<ParserResult> loaded, boolean isBlank) {
         this.loaded = loaded;
         this.isBlank = isBlank;
@@ -90,27 +95,7 @@ public class JabRefGUI {
         // If the option is enabled, open the last edited databases, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
                 && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
-            // How to handle errors in the databases to open?
-            List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
-            lastEdLoop: for (String name : names) {
-                File fileToOpen = new File(name);
-
-                for (ParserResult pr : loaded) {
-                    if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
-                        continue lastEdLoop;
-                    }
-                }
-
-                if (fileToOpen.exists()) {
-                    ParserResult pr = AutosaveAwareDatabaseLoader.openBibFile(name, false);
-
-                    if (pr == ParserResult.NULL_RESULT) {
-                        LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
-                    } else {
-                        loaded.add(pr);
-                    }
-                }
-            }
+            openLastEditedDatabase();
         }
 
         GUIGlobals.init();
@@ -122,9 +107,6 @@ public class JabRefGUI {
 
         // Add all loaded databases to the frame:
         boolean first = true;
-        List<File> postponed = new ArrayList<>();
-        List<ParserResult> failed = new ArrayList<>();
-        List<ParserResult> toOpenTab = new ArrayList<>();
         if (!loaded.isEmpty()) {
             for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
                 ParserResult pr = i.next();
@@ -217,6 +199,30 @@ public class JabRefGUI {
 
         if (!loaded.isEmpty()) {
             new FocusRequester(JabRefGUI.mainFrame.getCurrentBasePanel().mainTable);
+        }
+    }
+
+    private void openLastEditedDatabase() {
+        // How to handle errors in the databases to open?
+        List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
+        lastEdLoop: for (String name : names) {
+            File fileToOpen = new File(name);
+
+            for (ParserResult pr : loaded) {
+                if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+                    continue lastEdLoop;
+                }
+            }
+
+            if (fileToOpen.exists()) {
+                ParserResult pr = AutosaveAwareDatabaseLoader.openBibFile(name, false);
+
+                if (pr == ParserResult.NULL_RESULT) {
+                    LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
+                } else {
+                    loaded.add(pr);
+                }
+            }
         }
     }
 

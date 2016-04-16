@@ -49,7 +49,9 @@ public class ArgumentProcessor {
     public enum Mode {
         INITIAL_START,
         REMOTE_START
-    };
+    }
+
+
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     private final JabRefCLI cli;
@@ -100,47 +102,7 @@ public class ArgumentProcessor {
 
         // List to put imported/loaded database(s) in.
         List<ParserResult> loaded = new ArrayList<>();
-        List<String> toImport = new ArrayList<>();
-        if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
-            for (String aLeftOver : cli.getLeftOver()) {
-                // Leftover arguments that have a "bib" extension are interpreted as
-                // bib files to open. Other files, and files that could not be opened
-                // as bib, we try to import instead.
-                boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = null;
-                if (bibExtension) {
-                    pr = AutosaveAwareDatabaseLoader.openBibFile(aLeftOver, false);
-                }
-
-                if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
-                    // We will try to import this file. Normally we
-                    // will import it into a new tab, but if this import has
-                    // been initiated by another instance through the remote
-                    // listener, we will instead import it into the current database.
-                    // This will enable easy integration with web browsers that can
-                    // open a reference file in JabRef.
-                    if (startupMode == Mode.INITIAL_START) {
-                        toImport.add(aLeftOver);
-                    } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.NULL_RESULT));
-                    }
-                } else {
-                    loaded.add(pr);
-                }
-            }
-        }
-
-        if (!cli.isBlank() && cli.isFileImport()) {
-            toImport.add(cli.getFileImport());
-        }
-
-        for (String filenameString : toImport) {
-            importFile(filenameString).ifPresent(loaded::add);
-        }
-
-        if (!cli.isBlank() && cli.isImportToOpenBase()) {
-            importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
-        }
+        importAndOpenFiles(loaded);
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
             fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
@@ -228,22 +190,70 @@ public class ArgumentProcessor {
         }
 
         if (!cli.isBlank() && cli.isAuxImport()) {
-            boolean usageMsg;
-
-            if (!loaded.isEmpty()) {
-                usageMsg = generateAux(loaded, cli.getAuxImport().split(","));
-            } else {
-                usageMsg = true;
-            }
-
-            if (usageMsg) {
-                System.out.println(Localization.lang("no base-BibTeX-file specified") + "!");
-                System.out.println(Localization.lang("usage") + " :");
-                System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
-            }
+            doAuxImport(loaded);
         }
 
         return Optional.of(loaded);
+    }
+
+    private void doAuxImport(List<ParserResult> loaded) {
+        boolean usageMsg;
+
+        if (!loaded.isEmpty()) {
+            usageMsg = generateAux(loaded, cli.getAuxImport().split(","));
+        } else {
+            usageMsg = true;
+        }
+
+        if (usageMsg) {
+            System.out.println(Localization.lang("no base-BibTeX-file specified") + "!");
+            System.out.println(Localization.lang("usage") + " :");
+            System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
+        }
+    }
+
+    private void importAndOpenFiles(List<ParserResult> loaded) {
+        List<String> toImport = new ArrayList<>();
+        if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
+            for (String aLeftOver : cli.getLeftOver()) {
+                // Leftover arguments that have a "bib" extension are interpreted as
+                // bib files to open. Other files, and files that could not be opened
+                // as bib, we try to import instead.
+                boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
+                ParserResult pr = null;
+                if (bibExtension) {
+                    pr = AutosaveAwareDatabaseLoader.openBibFile(aLeftOver, false);
+                }
+
+                if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
+                    // We will try to import this file. Normally we
+                    // will import it into a new tab, but if this import has
+                    // been initiated by another instance through the remote
+                    // listener, we will instead import it into the current database.
+                    // This will enable easy integration with web browsers that can
+                    // open a reference file in JabRef.
+                    if (startupMode == Mode.INITIAL_START) {
+                        toImport.add(aLeftOver);
+                    } else {
+                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.NULL_RESULT));
+                    }
+                } else {
+                    loaded.add(pr);
+                }
+            }
+        }
+
+        if (!cli.isBlank() && cli.isFileImport()) {
+            toImport.add(cli.getFileImport());
+        }
+
+        for (String filenameString : toImport) {
+            importFile(filenameString).ifPresent(loaded::add);
+        }
+
+        if (!cli.isBlank() && cli.isImportToOpenBase()) {
+            importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
+        }
     }
 
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
