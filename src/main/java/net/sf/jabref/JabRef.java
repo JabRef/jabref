@@ -103,7 +103,7 @@ public class JabRef {
                 if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
-                    System.out.println(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     JabRefExecutorService.INSTANCE.shutdownEverything();
                     return;
                 }
@@ -116,14 +116,19 @@ public class JabRef {
         // The preferences return the system newline character sequence as default
         Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
+        // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, true);
 
+        // See if we should shut down now
         if ((!(argumentProcessor.hasParserResults())) || argumentProcessor.shouldShutDown()) {
             JabRefExecutorService.INSTANCE.shutdownEverything();
             return;
         }
 
-        SwingUtilities.invokeLater(() -> openWindow(argumentProcessor));
+        // If not, start GUI
+        SwingUtilities
+                .invokeLater(() -> openWindow(argumentProcessor.getParserResults().orElse(Collections.emptyList()),
+                        argumentProcessor.isBlank()));
     }
 
 
@@ -190,7 +195,7 @@ public class JabRef {
         }
     }
 
-    private void openWindow(ArgumentProcessor argumentProcessor) {
+    private void openWindow(List<ParserResult> loaded, boolean isBlank) {
         // Perform checks and changes for users with a preference set from an older JabRef version.
         PreferencesMigrations.replaceAbstractField();
         PreferencesMigrations.upgradeSortOrder();
@@ -212,12 +217,8 @@ public class JabRef {
         // Look & Feel. This MUST be the first thing to do before loading any Swing-specific code!
         setLookAndFeel();
 
-        if (!argumentProcessor.hasParserResults()) {
-            return; // Should never happen as openWindow will never be called then
-        }
-        List<ParserResult> loaded = argumentProcessor.getParserResults().get();
         // If the option is enabled, open the last edited databases, if any.
-        if (!argumentProcessor.isBlank() && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
+        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
                 && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
             // How to handle errors in the databases to open?
             List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
@@ -235,7 +236,7 @@ public class JabRef {
                     ParserResult pr = JabRef.openBibFile(name, false);
 
                     if (pr == ParserResult.NULL_RESULT) {
-                        System.out.println(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
+                        LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
                     } else {
                         loaded.add(pr);
                     }
