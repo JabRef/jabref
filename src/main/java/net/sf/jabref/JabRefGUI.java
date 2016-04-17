@@ -37,7 +37,6 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.importer.AutosaveAwareDatabaseLoader;
 import net.sf.jabref.importer.AutosaveStartupPrompter;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
@@ -215,7 +214,7 @@ public class JabRefGUI {
             }
 
             if (fileToOpen.exists()) {
-                ParserResult pr = AutosaveAwareDatabaseLoader.openBibFile(name, false);
+                ParserResult pr = OpenDatabaseAction.openBibFile(name, false);
 
                 if (pr == ParserResult.NULL_RESULT) {
                     LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");

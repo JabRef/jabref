@@ -17,8 +17,6 @@
 package net.sf.jabref;
 
 import java.net.Authenticator;
-import java.util.Collections;
-
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.bibtex.InternalBibtexFields;
@@ -41,12 +39,14 @@ import org.apache.commons.logging.LogFactory;
  * JabRef MainClass
  */
 public class JabRef {
+
+    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
+
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> start(args));
     }
 
-
-    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
 
 
     private static void start(String[] args) {
@@ -101,14 +101,14 @@ public class JabRef {
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
 
         // See if we should shut down now
-        if ((!(argumentProcessor.hasParserResults())) || argumentProcessor.shouldShutDown()) {
+        if (argumentProcessor.shouldShutDown()) {
             JabRefExecutorService.INSTANCE.shutdownEverything();
             return;
         }
 
         // If not, start GUI
         SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults().orElse(Collections.emptyList()),
+                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
                         argumentProcessor.isBlank()));
     }
 

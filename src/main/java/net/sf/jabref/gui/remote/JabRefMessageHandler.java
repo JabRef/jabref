@@ -32,7 +32,7 @@ public class JabRefMessageHandler implements MessageHandler {
             throw new IllegalStateException("Could not start JabRef with arguments " + message);
         }
 
-        List<ParserResult> loaded = argumentProcessor.getParserResults().get();
+        List<ParserResult> loaded = argumentProcessor.getParserResults();
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.get(i);
             JabRefGUI.mainFrame.addParserResult(pr, i == 0);

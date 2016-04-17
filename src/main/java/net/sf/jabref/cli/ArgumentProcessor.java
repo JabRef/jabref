@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -22,9 +23,9 @@ import net.sf.jabref.exporter.IExportFormat;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.importer.AutosaveAwareDatabaseLoader;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ImportInspectionCommandLine;
+import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetchers;
@@ -56,10 +57,11 @@ public class ArgumentProcessor {
 
     private final JabRefCLI cli;
 
-    private final Optional<List<ParserResult>> parserResults;
+    private final List<ParserResult> parserResults;
 
     private final Mode startupMode;
 
+    private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
@@ -67,15 +69,15 @@ public class ArgumentProcessor {
         parserResults = processArguments();
     }
 
-    public Optional<List<ParserResult>> getParserResults() {
+    public List<ParserResult> getParserResults() {
         return parserResults;
     }
 
     public boolean hasParserResults() {
-        return parserResults.isPresent();
+        return !parserResults.isEmpty();
     }
 
-    private Optional<List<ParserResult>> processArguments() {
+    private List<ParserResult> processArguments() {
 
         if (!cli.isBlank() && cli.isDebugLogging()) {
             JabRefLogger.setDebug();
@@ -87,7 +89,8 @@ public class ArgumentProcessor {
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             cli.printUsage();
-            return Optional.empty();
+            noGUINeeded = true;
+            return Collections.emptyList();
         }
 
         // Check if we should reset all preferences to default values:
@@ -101,8 +104,7 @@ public class ArgumentProcessor {
         }
 
         // List to put imported/loaded database(s) in.
-        List<ParserResult> loaded = new ArrayList<>();
-        importAndOpenFiles(loaded);
+        List<ParserResult> loaded = importAndOpenFiles();
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
             fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
@@ -137,7 +139,8 @@ public class ArgumentProcessor {
                     default:
                         System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                 .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                        return Optional.empty();
+                        noGUINeeded = true;
+                        return Collections.emptyList();
                     }
 
                     //export new database
@@ -193,7 +196,7 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        return Optional.of(loaded);
+        return loaded;
     }
 
     private void doAuxImport(List<ParserResult> loaded) {
@@ -212,7 +215,8 @@ public class ArgumentProcessor {
         }
     }
 
-    private void importAndOpenFiles(List<ParserResult> loaded) {
+    private List<ParserResult> importAndOpenFiles() {
+        List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
         if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
@@ -222,7 +226,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
-                    pr = AutosaveAwareDatabaseLoader.openBibFile(aLeftOver, false);
+                    pr = OpenDatabaseAction.openBibFile(aLeftOver, false);
                 }
 
                 if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
@@ -254,6 +258,8 @@ public class ArgumentProcessor {
         if (!cli.isBlank() && cli.isImportToOpenBase()) {
             importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
         }
+
+        return loaded;
     }
 
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
@@ -542,7 +548,7 @@ public class ArgumentProcessor {
     }
 
     public boolean shouldShutDown() {
-        return cli.isDisableGui() || cli.isShowVersion();
+        return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
     }
 
 }
