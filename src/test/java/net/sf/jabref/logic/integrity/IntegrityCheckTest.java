@@ -143,6 +143,15 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("pages", "7+,41--43,73"));
     }
 
+    @Test
+    public void testBibStringChecks() {
+        assertCorrect(createContext("title", "Not a single hash mark"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "#einstein# and #newton#"));
+        assertWrong(createContext("month", "#jan"));
+        assertWrong(createContext("author", "#einstein# #amp; #newton#"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);

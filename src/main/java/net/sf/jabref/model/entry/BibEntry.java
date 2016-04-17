@@ -597,4 +597,9 @@ public class BibEntry {
     public Collection<String> getFieldValues() {
         return fields.values();
     }
+
+    public Map<String, String> getFieldMap() {
+        // TODO Auto-generated method stub
+        return fields;
+    }
 }
