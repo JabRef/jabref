@@ -17,18 +17,25 @@ dependencies:
 
 test:
   override:
-    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace || exit 0
-  post:
-    # if you change something here, please also adapt deployment->release->commands
-    - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
+    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace
 
 deployment:
   release:
     # we only do a simple check for SemVer and do not use a sophisticated check as presented at https://github.com/sindresorhus/semver-regex/blob/master/index.js
-    tag: /v[0-9]+(\.[0-9]+)*(-.+)?/
-    commands:
+   tag: /v[0-9]+(\.[0-9]+)*(-.+)?/
+   commands:
       # we have to do a clean build as changing gradle's "project.version" does not lead to a rebuild of resources (mirroring project.version)
-      - ./gradlew -Pinstall4jDir="install4j6" clean release --stacktrace || exit 0
+      - ./gradlew -Pinstall4jDir="install4j6" clean release --stacktrace
+      # upload at all circumstances
+      - scripts/upload-to-builds.jabref.org.sh
+  development:
+     # match all branches; this is executed, if "release" is not matched - see https://circleci.com/docs/configuration/
+    branch: /.*/
+    commands:
+      # if upload fails, it is accepted; CircleCI provides deep links to the binaries as fallback
+      - timeout 580 scripts/upload-to-builds.jabref.org.sh || exit 0
+
+
 
 general:
   artifacts:
