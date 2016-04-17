@@ -3,9 +3,6 @@ jdk:
   - oraclejdk8
 sudo: false
 
-before_install:
-  - chmod +x gradlew
-
 # skip installation as this is also done during the script step
 install: true
 
