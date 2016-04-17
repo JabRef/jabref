@@ -15,34 +15,52 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.*;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import javax.swing.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-
 import difflib.Delta;
 import difflib.DiffUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Oscar Gustafsson
@@ -66,16 +84,29 @@ public class MergeEntries {
             Localization.lang("Right entry")};
     private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
             Localization.lang("Show diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show diff") + " - " + Localization.lang("character")};
+            Localization.lang("Show diff") + " - " + Localization.lang("character"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
+
+
+    enum DiffStyle {
+        LATEXDIFF,
+        SYMMETRIC
+    }
+
 
     private static final String ADDITION_START = "<span class=add>";
     private static final String REMOVAL_START = "<span class=del>";
+    private static final String CHANGE_ADDITION_START = "<span class=cadd>";
+    private static final String CHANGE_REMOVAL_START = "<span class=cdel>";
     private static final String TAG_END = "</span>";
     private static final String HTML_START = "<html><body>";
     private static final String HTML_END = "</body></html>";
     private static final String BODY_STYLE = "body{font:sans-serif}";
     private static final String ADDITION_STYLE = ".add{color:blue;text-decoration:underline}";
     private static final String REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
+    private static final String CHANGE_ADDITION_STYLE = ".cadd{color:green;text-decoration:underline}";
+    private static final String CHANGE_REMOVAL_STYLE = ".cdel{color:green;text-decoration:line-through;}";
 
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
@@ -353,6 +384,16 @@ public class MergeEntries {
             case 2: // Latexdiff style - character
                 rightString = generateDiffHighlighting(leftString, rightString, "");
                 break;
+            case 3: // Symmetric style - word
+                String tmpLeftString = generateSymmetricHighlighting(rightString, leftString, " ");
+                rightString = generateSymmetricHighlighting(leftString, rightString, " ");
+                leftString = tmpLeftString;
+                break;
+            case 4: // Symmetric style - word
+                tmpLeftString = generateSymmetricHighlighting(rightString, leftString, "");
+                rightString = generateSymmetricHighlighting(leftString, rightString, "");
+                leftString = tmpLeftString;
+                break;
             default: // Shouldn't happen
                 break;
             }
@@ -374,6 +415,8 @@ public class MergeEntries {
         sheet.addRule(BODY_STYLE);
         sheet.addRule(ADDITION_STYLE);
         sheet.addRule(REMOVAL_STYLE);
+        sheet.addRule(CHANGE_ADDITION_STYLE);
+        sheet.addRule(CHANGE_REMOVAL_STYLE);
         pane.setEditable(false);
         return pane;
     }
@@ -416,6 +459,43 @@ public class MergeEntries {
                 }
             }
             return String.join(separator, stringList);
+        }
+        return modifiedString;
+    }
+
+    private String generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
+        if ((baseString != null) && (modifiedString != null)) {
+            List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
+            List<Delta<String>> deltaList = new ArrayList<>(DiffUtils
+                    .diff(stringList, new ArrayList<>(Arrays.asList(modifiedString.split(separator)))).getDeltas());
+            Collections.reverse(deltaList);
+            for (Delta<String> delta : deltaList) {
+                int startPos = delta.getOriginal().getPosition();
+                List<String> lines = delta.getOriginal().getLines();
+                int offset = 0;
+                switch (delta.getType()) {
+                case CHANGE:
+                    for (String line : lines) {
+                        stringList.set(startPos + offset, (offset == 0 ? CHANGE_REMOVAL_START : "") + line);
+                        offset++;
+                    }
+                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END
+                            + CHANGE_ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
+                    break;
+                case DELETE:
+                    for (offset = 0; offset <= (lines.size() - 1); offset++) {
+                        stringList.set(startPos + offset, "");
+                    }
+                    break;
+                case INSERT:
+                    stringList.add(delta.getOriginal().getPosition(),
+                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
+                    break;
+                default:
+                    break;
+                }
+            }
+            return HTML_START + String.join("", stringList) + HTML_END;
         }
         return modifiedString;
     }

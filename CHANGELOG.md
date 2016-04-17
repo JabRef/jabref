@@ -17,6 +17,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Main table now accepts pasted DOIs and tries to retrieve the entry
 - Added support for several Biblatex-fields through drop-down lists with valid alternatives
 - Added integrity checker for an odd number of unescaped '#'
+- Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 
 ### Fixed
 
@@ -48,8 +49,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - OpenOffice/LibreOffice style files are now always read and written with the same default encoding as for the database (found in the preferences)
 - The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
 - The mass edit function "Set/clear/rename fields" is now in the Edit menu
-- The merge entries dialog now show all text and colored differences between the fields
-- Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 - Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
 - Add "Move linked files to default file directory" as cleanup procedure
