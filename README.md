@@ -1,4 +1,4 @@
-# JabRef Version 3.3
+# JabRef Development Version
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
@@ -7,6 +7,10 @@
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/327430c894e04086a5bfef618fa44f36)](https://www.codacy.com/app/simonharrer/jabref)
+
+This version is a development version. Features may not work as expected.
+
+Branches of JabRef development are listed at https://github.com/JabRef/jabref/wiki/Branches.
 
 Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
