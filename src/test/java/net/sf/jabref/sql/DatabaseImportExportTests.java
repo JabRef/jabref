@@ -8,7 +8,6 @@ import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.groups.structure.AllEntriesGroup;
 import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.groups.structure.KeywordGroup;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -16,6 +15,7 @@ import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.sql.importer.DBImporterResult;
 import net.sf.jabref.sql.importer.DatabaseImporter;
 import net.sf.jabref.support.DevEnvironment;
+
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
