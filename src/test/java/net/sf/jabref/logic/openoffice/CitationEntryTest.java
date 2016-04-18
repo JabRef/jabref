@@ -1,10 +1,13 @@
 package net.sf.jabref.logic.openoffice;
 
-import static org.junit.Assert.*;
-
 import java.util.Optional;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CitationEntryTest {
 

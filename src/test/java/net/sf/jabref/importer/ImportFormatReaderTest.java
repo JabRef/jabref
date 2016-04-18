@@ -1,19 +1,20 @@
 package net.sf.jabref.importer;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class ImportFormatReaderTest {

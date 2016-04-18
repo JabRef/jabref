@@ -1,11 +1,11 @@
 package net.sf.jabref.logic.io;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class MimeTypeDetector {
     private static final Log LOGGER = LogFactory.getLog(MimeTypeDetector.class);

@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui.groups;
 
+import java.util.List;
+import java.util.Objects;
+
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author jzieren

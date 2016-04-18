@@ -17,8 +17,8 @@ package net.sf.jabref.logic.layout.format;
 
 import java.util.List;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.layout.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.LayoutFormatter;
 
 public class RisKeywords implements LayoutFormatter {
 

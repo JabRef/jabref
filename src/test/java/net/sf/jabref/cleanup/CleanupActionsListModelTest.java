@@ -1,5 +1,13 @@
 package net.sf.jabref.cleanup;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.cleanup.CleanupActionsListModel;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -8,15 +16,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;

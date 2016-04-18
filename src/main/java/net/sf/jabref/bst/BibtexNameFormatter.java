@@ -18,8 +18,8 @@ package net.sf.jabref.bst;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
 
 /**
  * From Bibtex:

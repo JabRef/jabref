@@ -22,11 +22,11 @@ import java.net.URL;
 
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.net.URLDownload;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class performs the somewhat weird action of extracting a file from within the running JabRef jar,

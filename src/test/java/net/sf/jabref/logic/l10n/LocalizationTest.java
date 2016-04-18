@@ -1,9 +1,12 @@
 package net.sf.jabref.logic.l10n;
 
-import net.sf.jabref.JabRefPreferences;
-import org.junit.*;
-
 import java.util.Locale;
+
+import net.sf.jabref.JabRefPreferences;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

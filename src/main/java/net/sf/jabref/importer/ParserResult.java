@@ -17,12 +17,11 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.nio.charset.Charset;
-
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;

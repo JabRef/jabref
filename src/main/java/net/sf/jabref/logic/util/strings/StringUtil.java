@@ -15,13 +15,17 @@
  */
 package net.sf.jabref.logic.util.strings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.CharMatcher;
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.Author;
+
+import com.google.common.base.CharMatcher;
 
 public class StringUtil {
 

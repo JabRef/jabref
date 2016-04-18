@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.database.BibDatabase;
 
 public class ContentAutoCompleters extends AutoCompleters {
 

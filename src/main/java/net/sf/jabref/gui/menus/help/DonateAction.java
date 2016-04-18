@@ -15,18 +15,19 @@
 */
 package net.sf.jabref.gui.menus.help;
 
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 public class DonateAction extends AbstractAction {
 

@@ -22,10 +22,6 @@ import java.util.Map;
 
 import javax.swing.JLabel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
@@ -38,6 +34,10 @@ import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.

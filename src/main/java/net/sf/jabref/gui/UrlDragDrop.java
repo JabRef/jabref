@@ -46,6 +46,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.gui.util.comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.Comparator;
 import java.util.List;
+
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Comparator that handles icon columns.

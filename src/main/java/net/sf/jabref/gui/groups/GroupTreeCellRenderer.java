@@ -15,9 +15,13 @@
 */
 package net.sf.jabref.gui.groups;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.logic.util.strings.StringUtil;

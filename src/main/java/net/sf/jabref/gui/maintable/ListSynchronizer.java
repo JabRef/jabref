@@ -15,10 +15,11 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import ca.odell.glazedlists.EventList;
 import net.sf.jabref.model.database.DatabaseChangeEvent;
 import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.model.entry.BibEntry;
+
+import ca.odell.glazedlists.EventList;
 
 public class ListSynchronizer implements DatabaseChangeListener {
 

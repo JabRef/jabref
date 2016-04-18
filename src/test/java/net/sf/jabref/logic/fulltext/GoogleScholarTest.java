@@ -1,12 +1,16 @@
 package net.sf.jabref.logic.fulltext;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.support.DevEnvironment;
-import org.junit.*;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.support.DevEnvironment;
+
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
 
 public class GoogleScholarTest {
 

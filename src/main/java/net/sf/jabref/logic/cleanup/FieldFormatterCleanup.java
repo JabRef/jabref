@@ -14,14 +14,14 @@
 
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats a given entry field with the specified formatter.

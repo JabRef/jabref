@@ -16,11 +16,12 @@
 package net.sf.jabref.specialfields;
 
 import java.util.List;
-import net.sf.jabref.model.entry.BibEntry;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class SpecialFieldsUtils {
 

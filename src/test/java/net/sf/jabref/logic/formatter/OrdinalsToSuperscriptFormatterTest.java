@@ -3,10 +3,10 @@ package net.sf.jabref.logic.formatter;
 
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}

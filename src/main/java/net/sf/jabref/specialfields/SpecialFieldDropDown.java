@@ -24,12 +24,12 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.util.OS;
+
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
 
 public class SpecialFieldDropDown {
 

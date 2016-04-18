@@ -1,5 +1,9 @@
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.List;
+
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
@@ -10,10 +14,6 @@ import net.sf.jabref.testutils.TestUtils;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.List;
 
 public class EntryEditorTest {
 

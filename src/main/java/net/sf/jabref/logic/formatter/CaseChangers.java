@@ -17,9 +17,15 @@
 */
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.logic.formatter.casechanger.*;
+import java.util.Arrays;
+import java.util.List;
 
-import java.util.*;
+import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 
 /**
  * Class with static methods for changing the case of strings and arrays of strings.

@@ -14,13 +14,13 @@
 
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.FieldFormatterCleanups;
 
 public class CleanupPreset {
 

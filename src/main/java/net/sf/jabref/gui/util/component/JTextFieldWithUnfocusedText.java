@@ -1,9 +1,15 @@
 package net.sf.jabref.gui.util.component;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 /**
  * A text field which displays a predefined text (e.g. "Search") if it has not the focus and no text is entered.

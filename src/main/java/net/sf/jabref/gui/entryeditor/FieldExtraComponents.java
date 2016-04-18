@@ -25,7 +25,12 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;

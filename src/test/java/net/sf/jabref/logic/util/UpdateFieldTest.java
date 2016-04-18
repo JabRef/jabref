@@ -1,15 +1,18 @@
 package net.sf.jabref.logic.util;
 
-import static org.junit.Assert.*;
-
 import java.util.Optional;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class UpdateFieldTest {

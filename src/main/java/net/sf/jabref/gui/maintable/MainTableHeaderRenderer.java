@@ -15,9 +15,12 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import javax.swing.*;
+import java.awt.Component;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 
 public class MainTableHeaderRenderer implements TableCellRenderer {
 

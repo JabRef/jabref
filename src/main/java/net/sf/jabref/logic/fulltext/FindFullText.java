@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.io.MimeTypeDetector;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -15,9 +15,11 @@
 */
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibEntry;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import java.util.*;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

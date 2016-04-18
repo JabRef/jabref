@@ -1,20 +1,21 @@
 package net.sf.jabref.logic.layout;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.model.entry.BibEntry;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Optional;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
