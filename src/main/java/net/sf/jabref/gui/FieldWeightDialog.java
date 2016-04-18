@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.*;
@@ -65,7 +66,7 @@ public class FieldWeightDialog extends JDialog {
         builder.appendSeparator(Localization.lang("Field sizes"));
 
         // We use this list to build an alphabetical list of field names:
-        TreeSet<String> fields = new TreeSet<>();
+        Set<String> fields = new TreeSet<>();
         // We use this map to remember which slider represents which field name:
         sliders.clear();
         for (int i = 0, len = InternalBibtexFields.numberOfPublicFields(); i < len; i++)

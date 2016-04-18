@@ -35,7 +35,7 @@ public class FormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        ArrayList<FieldChange> changes = new ArrayList<>();
+        List<FieldChange> changes = new ArrayList<>();
         for (String field : entry.getFieldNames()) {
             String oldValue = entry.getField(field);
 

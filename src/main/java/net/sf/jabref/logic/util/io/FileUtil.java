@@ -169,7 +169,7 @@ public class FileUtil {
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectory();
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<>();
+        List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
                 al.add(dir);
@@ -297,7 +297,7 @@ public class FileUtil {
     }
 
     public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
+        Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);

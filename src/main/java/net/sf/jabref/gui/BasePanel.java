@@ -656,7 +656,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                HashMap<BibEntry, Object> oldvals = new HashMap<>();
+                Map<BibEntry, Object> oldvals = new HashMap<>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
                 if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -1755,8 +1755,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Closes the entry editor or preview panel if it is showing the given entry.
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if ((mode == BasePanelMode.SHOWING_EDITOR && currentEditor.getEntry() == entry) ||
-                (mode == BasePanelMode.SHOWING_PREVIEW && currentPreview.getEntry() == entry)) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry)) ||
+                ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
             hideBottomComponent();
         }
     }

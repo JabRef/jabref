@@ -355,7 +355,7 @@ public class BibDatabaseWriter {
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
         // First, make a Map of all entries:
-        HashMap<String, BibtexString> remaining = new HashMap<>();
+        Map<String, BibtexString> remaining = new HashMap<>();
         int maxKeyLength = 0;
         for (BibtexString string : strings) {
             remaining.put(string.getName(), string);

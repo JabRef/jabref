@@ -2,6 +2,7 @@ package net.sf.jabref.gui.cleanup;
 
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -115,7 +116,7 @@ public class CleanupPresetPanel {
 
     public CleanupPreset getCleanupPreset() {
 
-        EnumSet<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
+        Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
         if (cleanUpSuperscripts.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);

@@ -15,6 +15,7 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.logic.FieldChange;
@@ -28,8 +29,8 @@ public class UnicodeCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        ArrayList<FieldChange> changes = new ArrayList<>();
-        final String[] fields = {"title", "author", "abstract"};
+        List<FieldChange> changes = new ArrayList<>();
+        final List<String> fields = Arrays.asList("title", "author", "abstract");
         final UnicodeToLatexFormatter unicodeConverter = new UnicodeToLatexFormatter();
         for (String field : fields) {
             if (!entry.hasField(field)) {

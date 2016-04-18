@@ -74,7 +74,7 @@ public class BibEntryWriter {
 
         writeKeyField(entry, out);
 
-        HashSet<String> written = new HashSet<>();
+        Set<String> written = new HashSet<>();
         written.add(BibEntry.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
@@ -99,7 +99,7 @@ public class BibEntryWriter {
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<>();
+        Set<String> remainingFields = new TreeSet<>();
         for (String key : entry.getFieldNames()) {
             boolean writeIt = write ? InternalBibtexFields.isWriteableField(key) :
                     InternalBibtexFields.isDisplayableField(key);

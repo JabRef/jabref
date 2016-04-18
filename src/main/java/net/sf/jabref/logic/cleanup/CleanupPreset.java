@@ -47,7 +47,7 @@ public class CleanupPreset {
 
     public static CleanupPreset loadFromPreferences(JabRefPreferences preferences) {
 
-        EnumSet<CleanupStep> activeJobs = EnumSet.noneOf(CleanupStep.class);
+        Set<CleanupStep> activeJobs = EnumSet.noneOf(CleanupStep.class);
 
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS)) {
             activeJobs.add(CleanupStep.CLEAN_UP_SUPERSCRIPTS);

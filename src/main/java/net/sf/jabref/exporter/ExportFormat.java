@@ -240,7 +240,7 @@ public class ExportFormat implements IExportFormat {
                     LOGGER.warn(missingFormatters);
                 }
             }
-            HashMap<String, Layout> layouts = new HashMap<>();
+            Map<String, Layout> layouts = new HashMap<>();
             Layout layout;
 
             ExportFormats.entryNumber = 0;
@@ -310,7 +310,7 @@ public class ExportFormat implements IExportFormat {
      * @param lfFileName The layout filename.
      */
     private static Map<String, String> readFormatterFile(String lfFileName) {
-        HashMap<String, String> formatters = new HashMap<>();
+        Map<String, String> formatters = new HashMap<>();
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {

@@ -275,7 +275,7 @@ public class ExportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<FileFilter> filters = new TreeSet<>();
+        Set<FileFilter> filters = new TreeSet<>();
         for (Map.Entry<String, IExportFormat> e : ExportFormats.EXPORT_FORMATS.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();
