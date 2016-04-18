@@ -18,9 +18,6 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
