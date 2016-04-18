@@ -15,12 +15,11 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Changed
 - Main table now accepts pasted DOIs and tries to retrieve the entry
+- Added support for several Biblatex-fields through drop-down lists with valid alternatives
 
 ### Fixed
 
 ### Removed
-
-
 
 
 

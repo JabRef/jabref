@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -521,6 +522,13 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
             return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         } else if (fieldExtras.contains(FieldProperties.GENDER)) {
             return FieldExtraComponents.getGenderExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.EDITOR_TYPE)) {
+            return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.PAGINATION)) {
+            return FieldExtraComponents.getPaginationExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.TYPE)) {
+            return FieldExtraComponents.getTypeExtraComponent(editor, this,
+                    "patent".equals(entry.getType().toLowerCase(Locale.ENGLISH)));
         }
         return Optional.empty();
     }

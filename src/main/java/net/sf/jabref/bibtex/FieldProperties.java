@@ -18,7 +18,10 @@ public enum FieldProperties {
     GENDER,
     LANGUAGE,
     LANG_ID,
-    DOI;
+    DOI,
+    EDITOR_TYPE,
+    PAGINATION,
+    TYPE;
 
     public static final EnumSet<FieldProperties> ALL_OPTS = EnumSet
             .allOf(FieldProperties.class);
