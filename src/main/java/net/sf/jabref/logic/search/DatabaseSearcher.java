@@ -39,6 +39,10 @@ public class DatabaseSearcher {
         this.database = Objects.requireNonNull(database);
     }
 
+    /**
+     *
+     * @return BibDatabase, never null
+     */
     public BibDatabase getDatabaseFromMatches() {
         LOGGER.debug("Search term: " + query);
 

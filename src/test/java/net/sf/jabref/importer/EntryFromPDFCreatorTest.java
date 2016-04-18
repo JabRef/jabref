@@ -16,7 +16,7 @@
 package net.sf.jabref.importer;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.model.entry.BibEntry;
@@ -41,7 +41,7 @@ public class EntryFromPDFCreatorTest {
         // Needed to initialize ExternalFileTypes
         entryCreator = new EntryFromPDFCreator();
         // Needed for PdfImporter - still not enough
-        JabRef.mainFrame = mock(JabRefFrame.class);
+        JabRefGUI.setMainFrame(mock(JabRefFrame.class));
     }
 
     @Test

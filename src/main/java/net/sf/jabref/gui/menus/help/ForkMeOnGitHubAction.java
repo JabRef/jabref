@@ -24,7 +24,7 @@ import javax.swing.Action;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -47,7 +47,7 @@ public class ForkMeOnGitHubAction extends AbstractAction {
             JabRefDesktop.openBrowser("https://github.com/JabRef/jabref");
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
-            JabRef.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser.") + " "
+            JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser.") + " "
                     + Localization.lang("Please open http://github.com/JabRef/jabref manually."));
         }
     }

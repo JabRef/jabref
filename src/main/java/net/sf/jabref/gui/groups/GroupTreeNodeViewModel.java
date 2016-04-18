@@ -33,7 +33,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
@@ -201,7 +201,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                BasePanel currentBasePanel = JabRef.mainFrame.getCurrentBasePanel();
+                BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
                 if(currentBasePanel != null) {
                     for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
                         if (group.contains(entry)) {
@@ -259,7 +259,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
@@ -333,7 +333,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         // Remember undo information
         if (changesRemove.isPresent()) {
             AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove.get());
-            if (changesAdd.isPresent() && undoRemove != null) {
+            if (changesAdd.isPresent() && (undoRemove != null)) {
                 // we removed and added entries
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
             }

@@ -67,7 +67,8 @@ public class PreferencesDialog extends JDialog {
 
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
-    public PreferencesDialog(JabRefFrame parent, JabRef jabRef) {
+
+    public PreferencesDialog(JabRefFrame parent) {
         super(parent, Localization.lang("JabRef preferences"), false);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
@@ -99,7 +100,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new NameFormatterTab());
         tabs.add(new ImportSettingsTab());
         tabs.add(new XmpPrefsTab());
-        tabs.add(new AdvancedTab(prefs, jabRef));
+        tabs.add(new AdvancedTab(prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));

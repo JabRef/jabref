@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -80,7 +80,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences,
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
 
-        String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         loader.addStyle(filename);
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
@@ -99,7 +99,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
-        String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
         loader = new StyleLoader(preferences,
@@ -118,7 +118,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
-        String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
 
@@ -140,7 +140,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
-        String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
 
@@ -165,7 +165,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
         int beforeAdding = loader.getStyles().size();
-        String filename = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         loader.addStyle(filename);
         loader.addStyle(filename);

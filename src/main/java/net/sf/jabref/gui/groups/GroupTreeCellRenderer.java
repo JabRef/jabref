@@ -40,7 +40,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
             int row, boolean tmpHasFocus) {
         // show as selected
-        selected = (highlight1Cell != null && highlight1Cell.equals(value)) || sel;
+        selected = ((highlight1Cell != null) && highlight1Cell.equals(value)) || sel;
         Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, tmpHasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!

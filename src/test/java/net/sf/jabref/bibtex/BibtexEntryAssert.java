@@ -101,7 +101,7 @@ public class BibtexEntryAssert {
             result = parser.parse();
         }
         Assert.assertNotNull(result);
-        Assert.assertNotEquals(ParserResult.INVALID_FORMAT, result);
+        Assert.assertFalse(result.isNullResult());
         Assert.assertEquals(1, result.getDatabase().getEntryCount());
         BibEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
         assertEquals(shouldBeEntry, entry);

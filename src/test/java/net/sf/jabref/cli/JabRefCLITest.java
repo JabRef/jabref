@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.cli;
 
 import org.junit.Assert;
 import org.junit.Test;

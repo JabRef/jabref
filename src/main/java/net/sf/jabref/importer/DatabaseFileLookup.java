@@ -19,10 +19,10 @@ import java.io.File;
 import java.util.*;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -47,7 +47,7 @@ class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabase database) {
         Objects.requireNonNull(database);
-        possibleFilePaths = Optional.ofNullable(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory()).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getFileDirectory()).orElse(new ArrayList<>());
 
         for (BibEntry entry : database.getEntries()) {
             fileCache.addAll(parseFileField(entry));

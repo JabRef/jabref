@@ -19,7 +19,7 @@ import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -152,7 +152,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.repository = Objects.requireNonNull(repository);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(JabRef.class.getResource(resourcePath).openStream());
+        initialize(JabRefMain.class.getResource(resourcePath).openStream());
         fromResource = true;
         path = resourcePath;
     }

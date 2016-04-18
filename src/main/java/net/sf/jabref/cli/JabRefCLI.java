@@ -1,8 +1,15 @@
-package net.sf.jabref;
+package net.sf.jabref.cli;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
-import org.apache.commons.cli.*;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,6 +20,21 @@ public class JabRefCLI {
     private String[] leftOver;
     private final CommandLine cl;
 
+
+    public JabRefCLI(String[] args) {
+
+        Options options = getOptions();
+
+        try {
+            this.cl = new DefaultParser().parse(options, args);
+            this.leftOver = cl.getArgs();
+        } catch (ParseException e) {
+            LOGGER.warn("Problem parsing arguments", e);
+
+            this.printUsage();
+            throw new RuntimeException();
+        }
+    }
 
     public boolean isHelp() {
         return cl.hasOption("help");
@@ -32,21 +54,6 @@ public class JabRefCLI {
 
     public boolean isDisableGui() {
         return cl.hasOption("nogui");
-    }
-
-    public JabRefCLI(String[] args) {
-
-        Options options = getOptions();
-
-        try {
-            this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = cl.getArgs();
-        } catch (ParseException e) {
-            LOGGER.warn("Problem parsing arguments", e);
-
-            this.printUsage();
-            throw new RuntimeException();
-        }
     }
 
     public boolean isPreferencesExport() {

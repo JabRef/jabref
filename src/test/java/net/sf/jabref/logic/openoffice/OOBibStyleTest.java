@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
@@ -59,7 +59,7 @@ public class OOBibStyleTest {
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
 
-        File defFile = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile();
 
         OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),

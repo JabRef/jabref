@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -94,7 +94,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
-    private final JabRef jabRef;
 
     private PositionWindow pw;
 
@@ -501,6 +500,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
+    public JabRefFrame() {
+        init();
+        updateEnabledState();
+
+    }
+
     private List<NewEntryAction> getNewEntryActions() {
         // only Bibtex
         List<NewEntryAction> actions = new ArrayList<>();
@@ -513,13 +518,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
         return actions;
-    }
-
-    public JabRefFrame(JabRef jabRef) {
-        this.jabRef = jabRef;
-        init();
-        updateEnabledState();
-
     }
 
     private JPopupMenu tabPopupMenu() {
@@ -697,7 +695,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void preferences() {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
-            prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
+            prefsDialog = new PreferencesDialog(JabRefFrame.this);
             prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();
