@@ -23,6 +23,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
+import net.sf.jabref.sql.DatabaseType;
 
 /**
  * MySQLExport contributed by Lee Patton.
@@ -37,23 +38,23 @@ public class MySQLExport extends ExportFormat {
      * First method called when user starts the export.
      *
      * @param databaseContext The bibtex database from which to export.
-     * @param file The filename to which the export should be writtten.
-     * @param encodingToUse The encoding to use.
-     * @param entries The entries to export.
+     * @param file            The filename to which the export should be writtten.
+     * @param encodingToUse   The encoding to use.
+     * @param entries         The entries to export.
      * @throws java.lang.Exception If something goes wrong, feel free to throw an exception. The error message is shown
-     *             to the user.
+     *                             to the user.
      */
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encodingToUse, List<BibEntry> entries)
-                    throws Exception {
+                              final Charset encodingToUse, List<BibEntry> entries)
+            throws Exception {
+
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exist
-            new DBExporterAndImporterFactory().getExporter("MYSQL").exportDatabaseAsFile(databaseContext, entries, file,
+            new DBExporterAndImporterFactory().getExporter(DatabaseType.MYSQL).exportDatabaseAsFile(databaseContext, entries, file,
                     encodingToUse);
         }
-
     }
 
 }

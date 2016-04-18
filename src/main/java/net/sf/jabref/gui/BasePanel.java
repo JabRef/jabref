@@ -143,7 +143,7 @@ import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
 import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.sql.exporter.DBExporter;
+import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -541,29 +541,29 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // run second, on a different thread:
             @Override
             public void run() {
-
-                if (connectedToDB) {
-
-                    final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                    try {
-                        frame.output(Localization.lang("Attempting SQL export..."));
-                        final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                        final DBExporter exporter = factory.getExporter(dbs.getServerType());
-                        exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
-                        dbs.isConfigValid(true);
-                    } catch (Exception ex) {
-                        final String preamble = Localization
-                                .lang("Could not export to SQL database for the following reason:");
-                        errorMessage = SQLUtil.getExceptionMessage(ex);
-                        LOGGER.info("Could not export to SQL database", ex);
-                        dbs.isConfigValid(false);
-                        JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                                Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-                    }
-
-                    bibDatabaseContext.getMetaData().setDBStrings(dbs);
+                if (!connectedToDB) {
+                    return;
                 }
+
+                final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
+
+                try {
+                    frame.output(Localization.lang("Attempting SQL export..."));
+                    final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
+                    final DatabaseExporter exporter = factory.getExporter(dbs.getDbPreferences().getServerType());
+                    exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
+                    dbs.isConfigValid(true);
+                } catch (Exception ex) {
+                    final String preamble = Localization
+                            .lang("Could not export to SQL database for the following reason:");
+                    errorMessage = SQLUtil.getExceptionMessage(ex);
+                    LOGGER.info("Could not export to SQL database", ex);
+                    dbs.isConfigValid(false);
+                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
+                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
+                }
+
+                bibDatabaseContext.getMetaData().setDBStrings(dbs);
             }
 
             // run third, on EDT:
@@ -574,7 +574,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (errorMessage.isEmpty()) {
                     if (connectedToDB) {
                         final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-                        frame.output(Localization.lang("%0 export successful", dbs.getServerType()));
+                        frame.output(Localization.lang("%0 export successful", dbs.getDbPreferences().getServerType().getFormattedName()));
                     }
                 } else { // show an error dialog if an error occurred
                     final String preamble = Localization
@@ -628,7 +628,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // First check if any entries have keys set already. If so, possibly remove
                 // them from consideration, or warn about overwriting keys.
                 // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
-                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
+                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext(); ) {
                     bes = i.next();
                     if (bes.getCiteKey() != null) {
                         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -2334,7 +2334,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         private final BibEntry entry;
         private final BasePanel basePanel;
-
 
         public SearchAndOpenFile(final BibEntry entry, final BasePanel basePanel) {
             this.entry = entry;

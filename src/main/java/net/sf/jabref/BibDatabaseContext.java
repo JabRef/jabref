@@ -28,6 +28,10 @@ public class BibDatabaseContext {
         this(new BibDatabase(), defaults);
     }
 
+    public BibDatabaseContext(BibDatabase database) {
+        this(database, new Defaults());
+    }
+
     public BibDatabaseContext(BibDatabase database, Defaults defaults) {
         this(database, new MetaData(), defaults);
     }

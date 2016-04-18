@@ -9,18 +9,23 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 
-public class DBImporterExporter {
+public class DatabaseUtil {
 
-    public void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, BibDatabaseContext databaseContext)
+    public static void removeDB(DBImportExportDialog dialogo, String dbName, Connection conn, BibDatabaseContext databaseContext)
             throws SQLException {
         if (dialogo.removeAction) {
             if ((dialogo.selectedInt <= 0) && dialogo.isExporter()) {
                 JOptionPane.showMessageDialog(dialogo.getDiag(), "Please select a DB to be removed", "SQL Export",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                removeAGivenDB(conn, getDatabaseIDByName(databaseContext, conn, dbName));
+                removeDB(dbName, conn, databaseContext);
             }
         }
+    }
+
+    public static void removeDB(String dbName, Connection conn, BibDatabaseContext databaseContext)
+            throws SQLException {
+        removeAGivenDB(conn, getDatabaseIDByName(databaseContext, conn, dbName));
     }
 
     /**
@@ -33,12 +38,11 @@ public class DBImporterExporter {
      * @return The ID of database row of the jabref database being exported
      * @throws SQLException
      */
-    protected int getDatabaseIDByName(BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
-
+    public static int getDatabaseIDByName(BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
         if (out instanceof Connection) {
-            try (Statement response = (Statement) SQLUtil.processQueryWithResults(out,
-                    "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';");
-                    ResultSet rs = response.getResultSet()) {
+            String query = "SELECT database_id FROM jabref_database WHERE database_name='" + dbName + "';";
+            try (Statement statement = (Statement) ((Connection) out).createStatement();
+                 ResultSet rs = statement.executeQuery(query)) {
                 if (rs.next()) {
                     return rs.getInt("database_id");
                 } else {
@@ -46,15 +50,14 @@ public class DBImporterExporter {
                     return getDatabaseIDByName(databaseContext, out, dbName);
                 }
             }
-        }
-        // in case of text export there will be only 1 bib exported
-        else {
+        } else {
+            // in case of text export there will be only 1 bib exported
             insertJabRefDatabase(databaseContext, out, dbName);
             return 1;
         }
     }
 
-    private void removeAGivenDB(Object out, final int database_id) throws SQLException {
+    private static void removeAGivenDB(Object out, final int database_id) throws SQLException {
         removeAllRecordsForAGivenDB(out, database_id);
         SQLUtil.processQuery(out, "DELETE FROM jabref_database WHERE database_id='" + database_id + "';");
     }
@@ -66,7 +69,7 @@ public class DBImporterExporter {
      * @param database_id Id of the database being exported.
      * @throws SQLException
      */
-    protected void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
+    public static void removeAllRecordsForAGivenDB(Object out, final int database_id) throws SQLException {
         SQLUtil.processQuery(out, "DELETE FROM entries WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM groups WHERE database_id='" + database_id + "';");
         SQLUtil.processQuery(out, "DELETE FROM strings WHERE database_id='" + database_id + "';");
@@ -80,7 +83,7 @@ public class DBImporterExporter {
      *
      * @throws SQLException
      */
-    private void insertJabRefDatabase(final BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
+    private static void insertJabRefDatabase(final BibDatabaseContext databaseContext, Object out, String dbName) throws SQLException {
         String path;
         if (databaseContext.getDatabaseFile() == null) {
             path = dbName;

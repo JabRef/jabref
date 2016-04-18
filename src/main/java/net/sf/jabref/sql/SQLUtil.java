@@ -21,12 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.sf.jabref.bibtex.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.bibtex.InternalBibtexFields;
 
 /**
  * @author pattonlk
@@ -39,7 +41,7 @@ import net.sf.jabref.bibtex.InternalBibtexFields;
 
 final public class SQLUtil {
 
-    private static final List<String> RESERVED_DB_WORDS = new ArrayList<>(Collections.singletonList("key"));
+    private static final List<String> RESERVED_DB_WORDS = Collections.singletonList("key");
 
     private static List<String> allFields;
 
@@ -176,47 +178,44 @@ final public class SQLUtil {
      * @return a ResultSet with the query result returned from the DB
      * @throws SQLException
      */
-    public static Statement queryAllFromTable(Connection conn, String tableName) throws SQLException {
-        String query = "SELECT * FROM " + tableName + ';';
-        return (Statement) SQLUtil.processQueryWithResults(conn, query);
+    public static String queryAllFromTable(String tableName) throws SQLException {
+        return "SELECT * FROM " + tableName + ';';
     }
 
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out The output (PrintStream or Connection) object to which the DML should be sent
+     * @param out The output object to which the DML should be sent
      * @param dml The DML statements to be processed
      */
     public static void processQuery(Object out, String dml) throws SQLException {
-        if (out instanceof PrintStream) {
-            PrintStream fout = (PrintStream) out;
-            fout.println(dml);
-        }
-        if (out instanceof Connection) {
-            Connection conn = (Connection) out;
-            SQLUtil.executeQuery(conn, dml);
+        if(out instanceof Connection) {
+            processQuery((Connection) out, dml);
+        } else if(out instanceof PrintStream) {
+            processQuery((PrintStream) out, dml);
+        } else {
+            LOGGER.error("Cannot process the query " + dml + " on the given output");
         }
     }
 
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out   The output (PrintStream or Connection) object to which the DML should be sent
-     * @param query The DML statements to be processed
-     * @return the result of the statement
+     * @param out The output Connection object to which the DML should be sent
+     * @param dml The DML statements to be processed
      */
-    public static AutoCloseable processQueryWithResults(Object out, String query) throws SQLException {
-        if (out instanceof PrintStream) {// TODO: how to handle the PrintStream
-            // case?
-            PrintStream fout = (PrintStream) out;
-            fout.println(query);
-            return fout;
-        }
-        if (out instanceof Connection) {
-            Connection conn = (Connection) out;
-            return SQLUtil.executeQueryWithResults(conn, query);
-        }
-        return null;
+    public static void processQuery(Connection out, String dml) throws SQLException {
+        SQLUtil.executeQuery(out, dml);
+    }
+
+    /**
+     * Utility method for processing DML with proper output
+     *
+     * @param out The output PrintStream to which the DML should be sent
+     * @param dml The DML statements to be processed
+     */
+    public static void processQuery(PrintStream out, String dml) throws SQLException {
+        out.println(dml);
     }
 
     /**
@@ -226,10 +225,9 @@ final public class SQLUtil {
      * @return The JDBC url corresponding to the input DBStrings
      */
     public static String createJDBCurl(DBStrings dbStrings, boolean withDBName) {
-        String url;
-        url = "jdbc:" + dbStrings.getServerType().toLowerCase() + "://" + dbStrings.getServerHostname()
-                + (withDBName ? '/' + dbStrings.getDatabase() : "") + dbStrings.getDbParameters();
-        return url;
+        DBStringsPreferences preferences = dbStrings.getDbPreferences();
+        return "jdbc:" + preferences.getServerType().getFormattedName().toLowerCase() + "://" + preferences.getServerHostname()
+                + (withDBName ? '/' + preferences.getDatabase() : "") + dbStrings.getDbParameters();
     }
 
     /**
@@ -242,11 +240,9 @@ final public class SQLUtil {
      * @throws SQLException
      */
     public static String processQueryWithSingleResult(Connection conn, String query) throws SQLException {
-        try (Statement sm = SQLUtil.executeQueryWithResults(conn, query); ResultSet rs = sm.getResultSet()) {
+        try (Statement sm = conn.createStatement(); ResultSet rs = sm.executeQuery(query)) {
             rs.next();
-            String result = rs.getString(1);
-            rs.getStatement().close();
-            return result;
+            return rs.getString(1);
         }
     }
 
@@ -263,32 +259,6 @@ final public class SQLUtil {
             if (warn != null) {
                 LOGGER.warn(warn);
             }
-        }
-    }
-
-    /**
-     * Utility method for executing DML
-     *
-     * @param conn The DML Connection object that will execute the SQL
-     * @param qry  The DML statements to be executed
-     */
-    private static Statement executeQueryWithResults(Connection conn, String qry) throws SQLException {
-        Statement stmnt = null;
-        try {
-            stmnt = conn.createStatement();
-            stmnt.executeQuery(qry);
-            SQLWarning warn = stmnt.getWarnings();
-            if (warn != null) {
-                LOGGER.warn(warn);
-            }
-            return stmnt;
-        } catch (SQLException rethrow) {
-            // in case of exception, try to close the statement to avoid a resource leak...
-            if (stmnt != null) {
-                stmnt.close();
-            }
-            //... and rethrow the exception
-            throw rethrow;
         }
     }
 
