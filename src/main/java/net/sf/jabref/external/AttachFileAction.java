@@ -36,7 +36,7 @@ public class AttachFileAction implements BaseAction {
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> model.setContent(oldVal));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(model::setContent);
             model.addEntry(model.getRowCount(), flEntry);
             String newVal = model.getStringRepresentation();
 

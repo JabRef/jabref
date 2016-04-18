@@ -170,23 +170,19 @@ public class DownloadExternalFile {
         editor = new FileListEntryEditor(frame, entry, true, false, databaseContext);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
-        editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
-
-            @Override
-            public boolean confirmClose(FileListEntry entry) {
-                File f = directory == null ? new File(entry.link) : expandFilename(directory, entry.link);
-                if (f.isDirectory()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
-                            Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                if (f.exists()) {
-                    return JOptionPane.showConfirmDialog(frame,
-                            Localization.lang("'%0' exists. Overwrite file?", f.getName()),
-                            Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
-                } else {
-                    return true;
-                }
+        editor.setExternalConfirm(closeEntry -> {
+            File f = directory == null ? new File(closeEntry.link) : expandFilename(directory, closeEntry.link);
+            if (f.isDirectory()) {
+                JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
+                        Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (f.exists()) {
+                return JOptionPane.showConfirmDialog(frame,
+                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
+            } else {
+                return true;
             }
         });
         if (dontShowDialog) {
@@ -327,7 +323,7 @@ public class DownloadExternalFile {
                 // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') > 0) {
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
                     return "";
                 } else {
                     return suffix; // return the first one we found, anyway.
@@ -335,7 +331,7 @@ public class DownloadExternalFile {
             } else {
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (link.substring(index + 1).indexOf('/') > 0) {
+                if (link.substring(index + 1).indexOf('/') >= 1) {
                     return "";
                 } else {
                     return link.substring(index + 1);

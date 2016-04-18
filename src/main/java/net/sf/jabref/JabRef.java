@@ -341,7 +341,7 @@ public class JabRef {
                     }
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(theFile);
-                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory().toArray(new String[0]);
+                    Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory();
                     System.out.println(Localization.lang("Exporting") + ": " + data[0]);
                     IExportFormat format = ExportFormats.getExportFormat(data[1]);
                     if (format == null) {
@@ -531,7 +531,7 @@ public class JabRef {
             } else {
                 lookFeel = Globals.prefs.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
             }
-            
+
             // FIXME: Open JDK problem
             if (UIManager.getCrossPlatformLookAndFeelClassName().equals(lookFeel) && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
