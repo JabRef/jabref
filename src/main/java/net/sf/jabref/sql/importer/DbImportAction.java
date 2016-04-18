@@ -15,21 +15,6 @@
  */
 package net.sf.jabref.sql.importer;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.sql.*;
-import net.sf.jabref.util.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,20 +27,22 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.DatabaseUtil;
 import net.sf.jabref.sql.SQLUtil;
+import net.sf.jabref.util.Util;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:09:08 PM To change this template use File | Settings

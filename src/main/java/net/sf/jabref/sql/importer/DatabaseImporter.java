@@ -16,9 +16,29 @@
 
 package net.sf.jabref.sql.importer;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
 import net.sf.jabref.MetaData;
 import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.*;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.groups.structure.SearchGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
@@ -30,15 +50,9 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.Database;
 import net.sf.jabref.sql.SQLUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author ifsteinm.
@@ -100,15 +114,14 @@ public class DatabaseImporter {
         try (Connection conn = this.connectToDB(dbs)) {
 
             Iterator<String> itLista = listOfDBs.iterator();
-            StringBuffer jabrefDBsb = new StringBuffer();
-            jabrefDBsb.append('(');
+            StringJoiner stringJoiner = new StringJoiner(",", "(", ")");
+
             while (itLista.hasNext()) {
-                jabrefDBsb.append('\'').append(itLista.next()).append("',");
+                stringJoiner.add("'" + itLista.next() + "'");
             }
-            jabrefDBsb.deleteCharAt(jabrefDBsb.length() - 1).append(')');
 
             String query = SQLUtil.queryAllFromTable(
-                    "jabref_database WHERE database_name IN " + jabrefDBsb.toString());
+                    "jabref_database WHERE database_name IN " + stringJoiner.toString());
             try (Statement statement = conn.createStatement();
                  ResultSet rsDatabase = statement.executeQuery(query)) {
                 while (rsDatabase.next()) {
@@ -201,25 +214,30 @@ public class DatabaseImporter {
             while (rsGroups.next()) {
                 AbstractGroup group = null;
                 String typeId = findGroupTypeName(rsGroups.getString("group_types_id"), conn);
-                if (typeId.equals(AllEntriesGroup.ID)) {
-                    // register the id of the root node:
-                    groups.put(rsGroups.getString("groups_id"), rootNode);
-                } else if (typeId.equals(ExplicitGroup.ID)) {
-                    group = new ExplicitGroup(rsGroups.getString("label"),
-                            GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
-                } else if (typeId.equals(KeywordGroup.ID)) {
-                    LOGGER.debug("Keyw: " + rsGroups.getBoolean("case_sensitive"));
-                    group = new KeywordGroup(rsGroups.getString("label"),
-                            StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
-                            StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
-                            rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                            GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
-                } else if (typeId.equals(SearchGroup.ID)) {
-                    LOGGER.debug("Search: " + rsGroups.getBoolean("case_sensitive"));
-                    group = new SearchGroup(rsGroups.getString("label"),
-                            StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
-                            rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                            GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                switch (typeId) {
+                    case AllEntriesGroup.ID:
+                        // register the id of the root node:
+                        groups.put(rsGroups.getString("groups_id"), rootNode);
+                        break;
+                    case ExplicitGroup.ID:
+                        group = new ExplicitGroup(rsGroups.getString("label"),
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                        break;
+                    case KeywordGroup.ID:
+                        LOGGER.debug("Keyw: " + rsGroups.getBoolean("case_sensitive"));
+                        group = new KeywordGroup(rsGroups.getString("label"),
+                                StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
+                                StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
+                                rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                        break;
+                    case SearchGroup.ID:
+                        LOGGER.debug("Search: " + rsGroups.getBoolean("case_sensitive"));
+                        group = new SearchGroup(rsGroups.getString("label"),
+                                StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
+                                rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                        break;
                 }
 
                 if (group != null) {

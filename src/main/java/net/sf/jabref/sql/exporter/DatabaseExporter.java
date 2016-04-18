@@ -15,25 +15,6 @@
  */
 package net.sf.jabref.sql.exporter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.BibDatabaseWriter;
-import net.sf.jabref.exporter.SavePreferences;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.*;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.sql.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,7 +24,42 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.SavePreferences;
+import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.groups.structure.AbstractGroup;
+import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.groups.structure.ExplicitGroup;
+import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.groups.structure.SearchGroup;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.sql.DBImportExportDialog;
+import net.sf.jabref.sql.DBStrings;
+import net.sf.jabref.sql.Database;
+import net.sf.jabref.sql.DatabaseUtil;
+import net.sf.jabref.sql.SQLUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author igorsteinmacher.

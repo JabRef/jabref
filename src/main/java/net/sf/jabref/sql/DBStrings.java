@@ -17,10 +17,6 @@ package net.sf.jabref.sql;
 
 import net.sf.jabref.Globals;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author pattonlk
  */

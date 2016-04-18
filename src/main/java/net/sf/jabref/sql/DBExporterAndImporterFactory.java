@@ -15,12 +15,12 @@
  */
 package net.sf.jabref.sql;
 
+import java.util.Objects;
+
 import net.sf.jabref.sql.database.MySQL;
 import net.sf.jabref.sql.database.PostgreSQL;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.sql.importer.DatabaseImporter;
-
-import java.util.Objects;
 
 public class DBExporterAndImporterFactory {
 

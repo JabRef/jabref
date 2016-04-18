@@ -21,12 +21,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import net.sf.jabref.bibtex.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.bibtex.InternalBibtexFields;
 
 /**
  * @author pattonlk

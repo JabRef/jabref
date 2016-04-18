@@ -15,16 +15,16 @@
  */
 package net.sf.jabref.sql;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.sql.exporter.DatabaseExporter;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
+
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.actions.BaseAction;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:05:13 PM To

@@ -15,20 +15,38 @@
  */
 package net.sf.jabref.sql;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog box for collecting database connection strings from the user

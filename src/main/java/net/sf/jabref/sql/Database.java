@@ -1,7 +1,6 @@
 package net.sf.jabref.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public interface Database {
