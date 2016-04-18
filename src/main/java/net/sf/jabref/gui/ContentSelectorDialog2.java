@@ -44,10 +44,10 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,7 +114,7 @@ class ContentSelectorDialog2 extends JDialog {
         setupFieldSelector();
         setupWordSelector();
         setupActions();
-        Util.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
+        KeyBinder.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
         int fieldInd = fieldListModel.indexOf(currentField);
         if (fieldInd >= 0) {
             fieldList.setSelectedIndex(fieldInd);

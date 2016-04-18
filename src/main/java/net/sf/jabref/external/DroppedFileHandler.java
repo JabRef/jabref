@@ -38,7 +38,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.util.Util;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -347,7 +346,7 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = Util.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
+        String targetName = FileUtil.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 

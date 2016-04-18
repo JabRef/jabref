@@ -17,10 +17,10 @@ package net.sf.jabref.gui;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,7 +92,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         cancel.setAction(cancelAction);
         cancel.setText(Localization.lang("Cancel"));
 
-        Util.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
+        KeyBinder.bindCloseDialogKeyToCancelAction(this.getRootPane(), cancelAction);
     }
 
     @Override

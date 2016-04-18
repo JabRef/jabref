@@ -18,7 +18,6 @@ package net.sf.jabref.gui.keyboard;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -75,7 +74,7 @@ public class KeyBindingsDialog extends JDialog {
         //setTop();
         activateListeners();
 
-        Util.bindCloseDialogKeyToCancelAction(getRootPane(), cancel.getAction());
+        KeyBinder.bindCloseDialogKeyToCancelAction(getRootPane(), cancel.getAction());
 
         addWindowListener(new WindowAdapter() {
 

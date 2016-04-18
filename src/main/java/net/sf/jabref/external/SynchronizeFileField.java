@@ -36,7 +36,6 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 /**
  * This action goes through all selected entries in the BasePanel, and attempts to autoset the
@@ -111,7 +110,7 @@ public class SynchronizeFileField extends AbstractWorker {
             Collection<BibEntry> entries = new ArrayList<>(sel);
 
             // Start the automatically setting process:
-            Runnable r = Util.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext(), null, null);
+            Runnable r = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext(), null, null);
             JabRefExecutorService.INSTANCE.executeAndWait(r);
         }
         progress += sel.size() * weightAutoSet;

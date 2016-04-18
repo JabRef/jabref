@@ -43,7 +43,6 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
@@ -142,8 +141,8 @@ public class PdfImporter {
         }
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
-        boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
-        int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE);
+        int globalChoice = Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
 
         List<BibEntry> res = new ArrayList<>();

@@ -49,6 +49,7 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.external.AutoSetLinks;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -416,27 +417,24 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, databaseContext, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                auto.setEnabled(true);
+        JabRefExecutorService.INSTANCE
+                .execute(AutoSetLinks.autoSetLinks(entries, null, null, tableModel, databaseContext, e -> {
+                    auto.setEnabled(true);
 
-                if (e.getID() > 0) {
-                    entryEditor.updateField(FileListEditor.this);
-                    adjustColumnWidth();
-                    frame.output(Localization.lang("Finished automatically setting external links."));
-                } else {
-                    frame.output(Localization.lang("Finished automatically setting external links.")
-                            + " " + Localization.lang("No files found."));
+                    if (e.getID() > 0) {
+                        entryEditor.updateField(FileListEditor.this);
+                        adjustColumnWidth();
+                        frame.output(Localization.lang("Finished automatically setting external links."));
+                    } else {
+                        frame.output(Localization.lang("Finished automatically setting external links.") + " "
+                                + Localization.lang("No files found."));
 
-                    // auto download file as no file found before
-                    frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
-                }
-                // reset
-                auto.setEnabled(true);
-            }
-        }, dialog));
-
+                        // auto download file as no file found before
+                        frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+                    }
+                    // reset
+                    auto.setEnabled(true);
+                } , dialog));
     }
 
     /**
