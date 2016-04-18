@@ -45,8 +45,8 @@ public class DuplicateResolverDialog extends JDialog {
     enum DuplicateResolverResult {
         NOT_CHOSEN,
         KEEP_BOTH,
-        KEEP_UPPER,
-        KEEP_LOWER,
+        KEEP_LEFT,
+        KEEP_RIGHT,
         AUTOREMOVE_EXACT,
         KEEP_MERGE,
         BREAK
@@ -117,8 +117,8 @@ public class DuplicateResolverDialog extends JDialog {
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
 
-        first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_UPPER));
-        second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LOWER));
+        first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LEFT));
+        second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_RIGHT));
         both.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_BOTH));
         merge.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_MERGE));
         if (removeExact != null) {

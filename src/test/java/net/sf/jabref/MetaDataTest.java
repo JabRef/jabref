@@ -1,6 +1,5 @@
 package net.sf.jabref;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +29,7 @@ public class MetaDataTest {
     }
 
     @Test
-    public void serializeSingleSaveAction() throws IOException {
+    public void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);

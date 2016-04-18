@@ -14,7 +14,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.BibDatabaseWriter;
-import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -38,7 +37,7 @@ public class Benchmarks {
     BibDatabase database = new BibDatabase();
 
     @Setup
-    public void init() throws IOException, SaveException {
+    public void init() throws IOException {
         Globals.prefs = JabRefPreferences.getInstance();
 
         Random randomizer = new Random();

@@ -1034,7 +1034,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     diag.setLocationRelativeTo(ImportInspectionDialog.this);
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
-                    if (diag.getSelected() == DuplicateResolverResult.KEEP_UPPER) {
+                    if (diag.getSelected() == DuplicateResolverResult.KEEP_LEFT) {
                         // Remove old entry. Or... add it to a list of entries
                         // to be deleted. We only delete
                         // it after Ok is clicked.
@@ -1050,7 +1050,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             entries.getReadWriteLock().writeLock().unlock();
                         }
 
-                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_LOWER) {
+                    } else if (diag.getSelected() == DuplicateResolverResult.KEEP_RIGHT) {
                         // Remove the entry from the import inspection dialog.
                         entries.getReadWriteLock().writeLock().lock();
                         try {
@@ -1096,10 +1096,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     diag.setVisible(true);
                     ImportInspectionDialog.this.toFront();
                     DuplicateResolverResult answer = diag.getSelected();
-                    if (answer == DuplicateResolverResult.KEEP_UPPER) {
+                    if (answer == DuplicateResolverResult.KEEP_LEFT) {
                         entries.remove(other.get());
                         first.setGroupHit(false);
-                    } else if (answer == DuplicateResolverResult.KEEP_LOWER) {
+                    } else if (answer == DuplicateResolverResult.KEEP_RIGHT) {
                         entries.remove(first);
                     } else if (answer == DuplicateResolverResult.KEEP_BOTH) {
                         first.setGroupHit(false);
