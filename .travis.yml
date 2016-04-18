@@ -7,8 +7,8 @@ services:
   - postgresql
   - mysql
 
-before_install:
-  - chmod +x gradlew
+# skip installation as this is also done during the script step
+install: true
 
 # allow gui testing on travis
 before_script:
@@ -18,7 +18,12 @@ before_script:
   - psql -c 'create database jabref;' -U postgres
 
 script:
-  - ./gradlew test integrationTest --info
+  - ./gradlew check integrationTest
+
+after_script:
+  # enable codecov report
+  - ./gradlew jacocoTestReport
+  - bash <(curl -s https://codecov.io/bash)
 
 # cache gradle dependencies
 cache:

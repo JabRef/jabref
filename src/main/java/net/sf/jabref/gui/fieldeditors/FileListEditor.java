@@ -17,6 +17,7 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,22 +44,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
+import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.*;
-import net.sf.jabref.external.*;
-
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.external.MoveFileAction;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.entry.EntryUtil;
+
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -227,6 +238,19 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 }
             }
         });
+        adjustColumnWidth();
+    }
+
+    public void adjustColumnWidth() {
+        for (int column = 0; column < this.getColumnCount(); column++) {
+            int width = 0;
+            for (int row = 0; row < this.getRowCount(); row++) {
+                TableCellRenderer renderer = this.getCellRenderer(row, column);
+                Component comp = this.prepareRenderer(renderer, row, column);
+                width = Math.max(comp.getPreferredSize().width, width);
+            }
+            this.columnModel.getColumn(column).setPreferredWidth(width);
+        }
     }
 
     private void openSelectedFile() {
@@ -319,6 +343,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             tableModel.addEntry(row, entry);
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
     private void addEntry() {
@@ -338,6 +363,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
     private void moveEntry(int i) {
@@ -357,6 +383,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         tableModel.addEntry(toIdx, entry);
         entryEditor.updateField(this);
         setRowSelectionInterval(toIdx, toIdx);
+        adjustColumnWidth();
     }
 
     /**
@@ -377,6 +404,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             tableModel.fireTableDataChanged();
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
         return editor.okPressed();
     }
 
@@ -395,6 +423,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
+                    adjustColumnWidth();
                     frame.output(Localization.lang("Finished automatically setting external links."));
                 } else {
                     frame.output(Localization.lang("Finished automatically setting external links.")
@@ -445,6 +474,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void downloadComplete(FileListEntry file) {
         tableModel.addEntry(tableModel.getRowCount(), file);
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
 

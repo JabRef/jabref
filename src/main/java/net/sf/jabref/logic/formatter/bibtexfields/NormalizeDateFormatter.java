@@ -46,6 +46,11 @@ public class NormalizeDateFormatter implements Formatter {
         return Localization.lang("Normalizes the date to ISO date format.");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "29.11.2003";
+    }
+
     /*
      * Try to parse the following formats
      *  "M/y" (covers 9/15, 9/2015, and 09/2015)

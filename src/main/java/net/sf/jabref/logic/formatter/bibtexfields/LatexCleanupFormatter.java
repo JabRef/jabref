@@ -40,4 +40,9 @@ public class LatexCleanupFormatter implements Formatter {
         return Localization.lang("Cleans up LaTeX code.");
     }
 
+    @Override
+    public String getExampleInput() {
+        return "{VLSI} {DSP}";
+    }
+
 }

@@ -33,4 +33,10 @@ public class SentenceCaseFormatter implements Formatter {
         return Localization.lang(
                 "Capitalize the first word, changes other words to lower case.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "i have {Aa} DREAM";
+    }
+
 }

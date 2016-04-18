@@ -7,59 +7,61 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class HtmlToLatexFormatterTest {
 
-    private HtmlToLatexFormatter htmlToLatexFormatter;
+    private final HtmlToLatexFormatter formatter = new HtmlToLatexFormatter();
 
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        htmlToLatexFormatter = new HtmlToLatexFormatter();
     }
 
     @Test
     public void formatWithoutHtmlCharactersReturnsSameString() {
-        assertEquals("abc", htmlToLatexFormatter.format("abc"));
+        assertEquals("abc", formatter.format("abc"));
     }
 
     @Test
     public void formatMultipleHtmlCharacters() {
-        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", htmlToLatexFormatter.format("&aring;&auml;&ouml;"));
+        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("&aring;&auml;&ouml;"));
     }
 
     @Test
     public void formatCombinedAccent() {
-        assertEquals("{\\'{\\i}}", htmlToLatexFormatter.format("i&#x301;"));
+        assertEquals("{\\'{\\i}}", formatter.format("i&#x301;"));
     }
 
     @Test
     public void testBasic() {
-        assertEquals("aaa", htmlToLatexFormatter.format("aaa"));
-    }
-
-    @Test
-    public void testHTMLEmpty() {
-        assertEquals("", htmlToLatexFormatter.format(""));
+        assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
     public void testHTML() {
-        assertEquals("{\\\"{a}}", htmlToLatexFormatter.format("&auml;"));
-        assertEquals("{\\\"{a}}", htmlToLatexFormatter.format("&#228;"));
-        assertEquals("{\\\"{a}}", htmlToLatexFormatter.format("&#xe4;"));
-        assertEquals("{$\\Epsilon$}", htmlToLatexFormatter.format("&Epsilon;"));
+        assertEquals("{\\\"{a}}", formatter.format("&auml;"));
+        assertEquals("{\\\"{a}}", formatter.format("&#228;"));
+        assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
+        assertEquals("{$\\Epsilon$}", formatter.format("&Epsilon;"));
     }
 
     @Test
     public void testHTMLRemoveTags() {
-        assertEquals("aaa", htmlToLatexFormatter.format("<b>aaa</b>"));
+        assertEquals("aaa", formatter.format("<b>aaa</b>"));
     }
 
     @Test
     public void testHTMLCombiningAccents() {
-        assertEquals("{\\\"{a}}", htmlToLatexFormatter.format("a&#776;"));
-        assertEquals("{\\\"{a}}", htmlToLatexFormatter.format("a&#x308;"));
-        assertEquals("{\\\"{a}}b", htmlToLatexFormatter.format("a&#776;b"));
-        assertEquals("{\\\"{a}}b", htmlToLatexFormatter.format("a&#x308;b"));
+        assertEquals("{\\\"{a}}", formatter.format("a&#776;"));
+        assertEquals("{\\\"{a}}", formatter.format("a&#x308;"));
+        assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));
+        assertEquals("{\\\"{a}}b", formatter.format("a&#x308;b"));
+    }
+
+    @Test
+    public void formatExample() {
+        assertEquals("JabRef", formatter.format(formatter.getExampleInput()));
     }
 }

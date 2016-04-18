@@ -497,7 +497,7 @@ public class BibEntry {
             return null;
         }
 
-        String year = YearUtil.toFourDigitYear(getField("year"));
+        String year = getField("year");
 
         if (hasField("month")) {
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));

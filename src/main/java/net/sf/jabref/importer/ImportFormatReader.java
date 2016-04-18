@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import net.sf.jabref.importer.fileformat.*;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
@@ -45,7 +46,7 @@ public class ImportFormatReader {
 
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter());
-        formats.add(new BibteXMLImporter());
+        formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
@@ -153,9 +154,7 @@ public class ImportFormatReader {
             sb.append("  ");
             sb.append(imFo.getFormatName());
 
-            for (int j = 0; j < pad; j++) {
-                sb.append(' ');
-            }
+            sb.append(StringUtil.repeatSpaces(pad));
 
             sb.append(" : ");
             sb.append(imFo.getCLIId());

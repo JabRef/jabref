@@ -124,38 +124,29 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
             final Process p = Runtime.getRuntime().exec(com);
 
-            Runnable errorListener = new Runnable() {
-
-                @Override
-                public void run() {
-                    try (InputStream out = p.getErrorStream()) {
-                        //                    try {
-                        //                    	if (out.available() <= 0)
-                        //                    		out = p.getInputStream();
-                        //                    } catch (Exception e) {
-                        //                    }
-                        int c;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            while ((c = out.read()) != -1) {
-                                sb.append((char) c);
-                            }
-                        } catch (IOException e) {
-                            LOGGER.warn("Could not read from stderr.", e);
-                        }
-                        // Error stream has been closed. See if there were any errors:
-                        if (!sb.toString().trim().isEmpty()) {
-                            LOGGER.warn("Push to Emacs error: " + sb);
-                            couldNotConnect = true;
+            JabRefExecutorService.INSTANCE.executeAndWait(() -> {
+                try (InputStream out = p.getErrorStream()) {
+                    int c;
+                    StringBuilder sb = new StringBuilder();
+                    try {
+                        while ((c = out.read()) != -1) {
+                            sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        LOGGER.warn("File problem.", e);
+                        LOGGER.warn("Could not read from stderr.", e);
                     }
+                    // Error stream has been closed. See if there were any errors:
+                    if (!sb.toString().trim().isEmpty()) {
+                        LOGGER.warn("Push to Emacs error: " + sb);
+                        couldNotConnect = true;
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn("File problem.", e);
                 }
-            };
-            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+            });
         } catch (IOException excep) {
             couldNotCall = true;
+            LOGGER.warn("Problem pushing to Emacs.", excep);
         }
     }
 

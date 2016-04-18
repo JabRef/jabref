@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
 import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.Author;
 
 public class StringUtil {
 
@@ -641,7 +642,7 @@ public class StringUtil {
                 }
                 for (int j = 1; j < names.length; j++) {
                     if (j == 1) {
-                        sb.append(StringUtil.expandAll(names[j]));
+                        sb.append(Author.addDotIfAbbreviation(names[j]));
                     } else {
                         sb.append(names[j]);
                     }
@@ -653,7 +654,7 @@ public class StringUtil {
             } else {
                 String[] names = authors[i].split(" ");
                 if (names.length > 0) {
-                    sb.append(StringUtil.expandAll(names[0]));
+                    sb.append(Author.addDotIfAbbreviation(names[0]));
                 }
                 for (int j = 1; j < names.length; j++) {
                     sb.append(' ');
@@ -668,48 +669,32 @@ public class StringUtil {
         return sb.toString().trim();
     }
 
-    private static String expandAll(String s) {
-        // Avoid arrayindexoutof.... :
-        if (s.isEmpty()) {
-            return s;
+    /**
+     * Return a String with n spaces
+     *
+     * @param n Number of spaces
+     * @return String with n spaces
+     */
+    public static String repeatSpaces(int n) {
+        return repeat(n, ' ');
+    }
+
+    /**
+     * Return a String with n copies of the char c
+     *
+     * @param n Number of copies
+     * @param c char to copy
+     * @return String with n copies of c
+     */
+    public static String repeat(int n, char c) {
+        StringBuilder resultSB = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+            resultSB.append(c);
         }
-        // If only one character (uppercase letter), add a dot and return immediately:
-        if ((s.length() == 1) && Character.isLetter(s.charAt(0)) &&
-                Character.isUpperCase(s.charAt(0))) {
-            return s + ".";
-        }
-        StringBuilder sb = new StringBuilder();
-        char c = s.charAt(0);
-        char d = 0;
-        for (int i = 1; i < s.length(); i++) {
-            d = s.charAt(i);
-            if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                    Character.isLetter(d) && Character.isUpperCase(d)) {
-                // AA -> A. A.
-                sb.append(c);
-                sb.append(". ");
-            } else if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                    ('-' == d)) {
-                // A-A -> A.-A.
-                sb.append(c);
-                sb.append(".");
-            } else if ((c == '.') && Character.isLetter(d)
-                    && Character.isUpperCase(d)) {
-                // A.A. -> A. A.
-                sb.append(". ");
-            } else {
-                sb.append(c);
-            }
-            c = d;
-        }
-        if (Character.isLetter(c) && Character.isUpperCase(c) &&
-                Character.isLetter(d) && Character.isUpperCase(d)) {
-            sb.append(c);
-            sb.append(". ");
-        } else {
-            sb.append(c);
-        }
-        return sb.toString().trim();
+
+        return resultSB.toString();
+
     }
 
 }

@@ -74,6 +74,9 @@ public class InternalBibtexFields {
     public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList("author", "editor", "editora",
             "editorb", "editorc", "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
             "bookauthor", "holder", "shortauthor", "shorteditor", "sortname");
+    public static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList("editortype", "editoratype",
+            "editorbtype", "editorctype");
+    public static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList("pagination", "bookpagination");
 
     // singleton instance
     private static final InternalBibtexFields RUNTIME = new InternalBibtexFields();
@@ -118,7 +121,9 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("school", true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("series", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField("title", true, 400));
-        add(new BibtexSingleField("type", true, BibtexSingleField.SMALL_W));
+        dummy = new BibtexSingleField("type", true, BibtexSingleField.SMALL_W);
+        dummy.getExtras().add(FieldProperties.TYPE);
+        add(dummy);
         add(new BibtexSingleField("language", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField("volume", true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField("year", true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
@@ -264,6 +269,26 @@ public class InternalBibtexFields {
                 field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
             }
             field.getExtras().add(FieldProperties.PERSON_NAMES);
+            add(field);
+        }
+
+        // Set all fields which should contain editor types
+        for (String fieldText : BIBLATEX_EDITOR_TYPE_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.EDITOR_TYPE);
+            add(field);
+        }
+
+        // Set all fields which are pagination fields
+        for (String fieldText : BIBLATEX_PAGINATION_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.PAGINATION);
             add(field);
         }
 

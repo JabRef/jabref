@@ -92,6 +92,11 @@ Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache 2.0
 
+Id:      org.bouncycastle:bcprov-jdk15on
+Project: The Legion of the Bouncy Castle
+URL:     https://www.bouncycastle.org/
+License: MIT
+
 Id:      org.jsoup:jsoup
 Project: jsoup
 URL:     https://github.com/jhy/jsoup/

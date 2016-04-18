@@ -53,8 +53,6 @@ class StringDialog extends JDialog {
     private final StringTable table;
     private final HelpAction helpAction;
 
-    private final PositionWindow pw;
-
     private final SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
     // The action concerned with closing the window.
@@ -142,25 +140,9 @@ class StringDialog extends JDialog {
         } else {
             setTitle(STRINGS_TITLE + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
         }
-        pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
     }
 
 

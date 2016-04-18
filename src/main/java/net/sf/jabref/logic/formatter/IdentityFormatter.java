@@ -31,6 +31,11 @@ public class IdentityFormatter implements Formatter {
     }
 
     @Override
+    public String getExampleInput() {
+        return "JabRef";
+    }
+
+    @Override
     public int hashCode() {
         return defaultHashCode();
     }

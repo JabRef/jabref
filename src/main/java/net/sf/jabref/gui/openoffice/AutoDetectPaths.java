@@ -145,13 +145,13 @@ public class AutoDetectPaths extends AbstractWorker {
         } else {
             // Linux:
             String usrRoot = "/usr/lib";
-            File inUsr = fileSearch.findFileInDir(new File(usrRoot), OpenOfficePreferences.LINUX_EXECUTABLE);
+            Optional<File> inUsr = fileSearch.findFileInDir(new File(usrRoot), OpenOfficePreferences.LINUX_EXECUTABLE);
             if (fileSearchCanceled) {
                 return false;
             }
-            if (inUsr == null) {
+            if (!inUsr.isPresent()) {
                 inUsr = fileSearch.findFileInDir(new File("/usr/lib64"), OpenOfficePreferences.LINUX_EXECUTABLE);
-                if (inUsr != null) {
+                if (inUsr.isPresent()) {
                     usrRoot = "/usr/lib64";
                 }
             }
@@ -159,18 +159,18 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCanceled) {
                 return false;
             }
-            File inOpt = fileSearch.findFileInDir(new File("/opt"), OpenOfficePreferences.LINUX_EXECUTABLE);
+            Optional<File> inOpt = fileSearch.findFileInDir(new File("/opt"), OpenOfficePreferences.LINUX_EXECUTABLE);
             if (fileSearchCanceled) {
                 return false;
             }
-            if ((inUsr != null) && (inOpt == null)) {
-                return setupPreferencesForOO(usrRoot, inUsr, OpenOfficePreferences.LINUX_EXECUTABLE);
-            } else if (inOpt != null) {
-                if (inUsr == null) {
-                    return setupPreferencesForOO("/opt", inOpt, OpenOfficePreferences.LINUX_EXECUTABLE);
+            if ((inUsr.isPresent()) && (!inOpt.isPresent())) {
+                return setupPreferencesForOO(usrRoot, inUsr.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
+            } else if (inOpt.isPresent()) {
+                if (!inUsr.isPresent()) {
+                    return setupPreferencesForOO("/opt", inOpt.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
                 } else { // Found both
-                    JRadioButton optRB = new JRadioButton(inOpt.getPath(), true);
-                    JRadioButton usrRB = new JRadioButton(inUsr.getPath(), false);
+                    JRadioButton optRB = new JRadioButton(inOpt.get().getPath(), true);
+                    JRadioButton usrRB = new JRadioButton(inUsr.get().getPath(), false);
                     ButtonGroup bg = new ButtonGroup();
                     bg.add(optRB);
                     bg.add(usrRB);
@@ -189,9 +189,9 @@ public class AutoDetectPaths extends AbstractWorker {
                         return false;
                     }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt, OpenOfficePreferences.LINUX_EXECUTABLE);
+                        return setupPreferencesForOO("/opt", inOpt.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
                     } else {
-                        return setupPreferencesForOO(usrRoot, inUsr, OpenOfficePreferences.LINUX_EXECUTABLE);
+                        return setupPreferencesForOO(usrRoot, inUsr.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
                     }
                 }
             }
@@ -205,15 +205,15 @@ public class AutoDetectPaths extends AbstractWorker {
 
     private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
         preferences.setExecutablePath(new File(inUsr, sofficeName).getPath());
-        File jurt = fileSearch.findFileInDir(rootDir, "jurt.jar");
+        Optional<File> jurt = fileSearch.findFileInDir(rootDir, "jurt.jar");
         if (fileSearchCanceled) {
             return false;
         }
-        if (jurt == null) {
-            return false;
-        } else {
-            preferences.setJarsPath(jurt.getPath());
+        if (jurt.isPresent()) {
+            preferences.setJarsPath(jurt.get().getPath());
             return true;
+        } else {
+            return false;
         }
     }
 

@@ -177,7 +177,7 @@ public class PushToApplicationButton implements ActionListener {
     }
 
 
-    static class BooleanHolder {
+    private static class BooleanHolder {
 
         public boolean value;
 

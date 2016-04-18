@@ -10,8 +10,11 @@ import java.util.List;
 
 import org.junit.Assert;
 
+import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CanonicalBibtexEntry;
 
@@ -102,6 +105,25 @@ public class BibtexEntryAssert {
         Assert.assertEquals(1, result.getDatabase().getEntryCount());
         BibEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
         assertEquals(shouldBeEntry, entry);
+    }
+
+    /**
+     * Compares two InputStreams. For each InputStream a list will be created. Afterwards the list will be compared.
+     * @param importer The fileformat you want to compare with Bibtex.
+     * @param shouldBeIs A BibtexImporter InputStream.
+     * @param actualEntries Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
+     * @throws IOException
+     */
+    public static void assertEquals(ImportFormat importer, InputStream shouldBeIs, InputStream actualEntries)
+            throws IOException {
+        BibtexImporter bibImporter = new BibtexImporter();
+
+        List<BibEntry> importEntries = importer.importEntries(actualEntries, new OutputPrinterToNull());
+        List<BibEntry> bibEntries = bibImporter.importEntries(shouldBeIs, new OutputPrinterToNull());
+        Assert.assertFalse(importEntries.isEmpty());
+        Assert.assertFalse(bibEntries.isEmpty());
+
+        BibtexEntryAssert.assertEquals(importEntries, bibEntries);
     }
 
     /**

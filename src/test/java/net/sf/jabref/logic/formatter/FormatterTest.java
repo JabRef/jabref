@@ -71,29 +71,39 @@ public class FormatterTest {
         assertFalse(formatter.getDescription().isEmpty());
     }
 
+    @Test
+    public void getExampleInputAlwaysNonEmpty() {
+        assertFalse(formatter.getExampleInput().isEmpty());
+    }
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
+        // all classes implementing {@link net.sf.jabref.logic.formatter.Formatter}
+        // sorted alphabetically
+        // Alternative: Use reflection - https://github.com/ronmamo/reflections
+        // @formatter:off
         return Arrays.asList(
-                new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new CapitalizeFormatter()},
-                new Object[]{new UpperCaseFormatter()},
-                new Object[]{new NormalizeMonthFormatter()},
-                new Object[]{new LatexCleanupFormatter()},
+                new Object[]{new ClearFormatter()},
+                new Object[]{new HtmlToLatexFormatter()},
                 new Object[]{new IdentityFormatter()},
-                new Object[]{new SentenceCaseFormatter()},
+                new Object[]{new LatexCleanupFormatter()},
+                new Object[]{new LatexToUnicodeFormatter()},
+                new Object[]{new LowerCaseFormatter()},
                 new Object[]{new MinifyNameListFormatter()},
                 new Object[]{new NormalizeDateFormatter()},
-                new Object[]{new TitleCaseFormatter()},
-                new Object[]{new ProtectTermsFormatter()},
+                new Object[]{new NormalizeMonthFormatter()},
+                new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new NormalizePagesFormatter()},
-                new Object[]{new LowerCaseFormatter()},
-                new Object[]{new HtmlToLatexFormatter()},
-                new Object[]{new LatexToUnicodeFormatter()},
-                new Object[]{new UnicodeToLatexFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new UnitsToLatexFormatter()},
+                new Object[]{new ProtectTermsFormatter()},
                 new Object[]{new RemoveBracesFormatter()},
-                new Object[]{new ClearFormatter()}
+                new Object[]{new SentenceCaseFormatter()},
+                new Object[]{new TitleCaseFormatter()},
+                new Object[]{new UnicodeToLatexFormatter()},
+                new Object[]{new UnitsToLatexFormatter()},
+                new Object[]{new UpperCaseFormatter()}
         );
+        // @formatter:on
     }
 }

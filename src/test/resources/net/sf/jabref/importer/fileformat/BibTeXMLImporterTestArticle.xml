@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry bibtex:id="Mustermann2016">
+  <bibtex:article>
+    <bibtex:author>Max Mustermann</bibtex:author>
+    <bibtex:title>Java tricks</bibtex:title>
+    <bibtex:journal>Java Journal</bibtex:journal>
+    <bibtex:year>2016</bibtex:year>
+    <bibtex:month>February</bibtex:month>
+    <bibtex:pages>2</bibtex:pages>
+    <bibtex:keywords>java</bibtex:keywords>
+  </bibtex:article>
+</bibtex:entry>
+</bibtex:file>

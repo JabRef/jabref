@@ -71,18 +71,18 @@ public class FileLink implements ParamLayoutFormatter {
             return "";
         }
 
-        String[] dirs;
+        List<String> dirs;
         // We need to resolve the file directory from the database's metadata,
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
         if (Globals.prefs.fileDirForDatabase == null) {
-            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
+            dirs = Arrays.asList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         } else {
             dirs = Globals.prefs.fileDirForDatabase;
         }
 
-        Optional<File> f = FileUtil.expandFilename(link, Arrays.asList(dirs));
+        Optional<File> f = FileUtil.expandFilename(link, dirs);
 
         /*
          * Stumbled over this while investigating

@@ -1,23 +1,15 @@
-package net.sf.jabref.logic.formatter;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
+ */
 public class NormalizePagesFormatterTest {
-    private NormalizePagesFormatter formatter;
 
-    @Before
-    public void setUp() {
-        formatter = new NormalizePagesFormatter();
-    }
-
-    @After
-    public void tearDown() {
-        formatter = null;
-    }
+    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
 
     @Test
     public void formatSinglePageResultsInNoChange() {
@@ -50,11 +42,6 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
-    public void formatPageNumbersEmptyFields() {
-        expectCorrect("", "");
-    }
-
-    @Test
     public void formatPageNumbersRemoveUnexpectedLiterals() {
         expectCorrect("{1}-{2}", "1--2");
     }
@@ -62,6 +49,11 @@ public class NormalizePagesFormatterTest {
     @Test
     public void formatPageNumbersRegexNotMatching() {
         expectCorrect("12", "12");
+    }
+
+    @Test
+    public void formatExample() {
+        expectCorrect(formatter.getExampleInput(), "1--2");
     }
 
     private void expectCorrect(String input, String expected) {

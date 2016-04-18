@@ -417,7 +417,7 @@ public class JabRefPreferences {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public String[] fileDirForDatabase;
+    public List<String> fileDirForDatabase;
 
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.

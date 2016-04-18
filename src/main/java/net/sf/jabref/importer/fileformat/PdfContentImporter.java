@@ -4,6 +4,8 @@ import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
+import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -184,12 +187,7 @@ public class PdfContentImporter extends ImportFormat {
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
 
-        try (PDDocument document = PDDocument.load(in)) {
-            if (document.isEncrypted()) {
-                LOGGER.info("Encrypted documents are not supported");
-                return result;
-            }
-
+        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(in)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
@@ -481,6 +479,9 @@ public class PdfContentImporter extends ImportFormat {
             }
 
             result.add(entry);
+        } catch (EncryptedPdfsNotSupportedException e) {
+            LOGGER.info("Decryption not supported");
+            return Collections.EMPTY_LIST;
         }
         return result;
     }

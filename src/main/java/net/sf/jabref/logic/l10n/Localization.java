@@ -1,10 +1,14 @@
 package net.sf.jabref.logic.l10n;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
@@ -23,7 +27,15 @@ public class Localization {
             return;
         }
 
-        Locale locale = new Locale(knownLanguage.get());
+        String[] languageParts = knownLanguage.get().split("_");
+        Locale locale;
+        if (languageParts.length == 1) {
+            locale = new Locale(languageParts[0]);
+        } else if (languageParts.length == 2) {
+            locale = new Locale(languageParts[0], languageParts[1]);
+        } else {
+            locale = Locale.ENGLISH;
+        }
 
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);

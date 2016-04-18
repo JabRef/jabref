@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -54,10 +54,10 @@ public class RegExpFileSearch {
      * @param regExp The expression deciding which names are acceptable.
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
-    public static Map<BibEntry, java.util.List<File>> findFilesForSet(Collection<BibEntry> entries,
+    public static Map<BibEntry, List<File>> findFilesForSet(Collection<BibEntry> entries,
             Collection<String> extensions, List<File> directories, String regExp) {
 
-        Map<BibEntry, java.util.List<File>> res = new HashMap<>();
+        Map<BibEntry, List<File>> res = new HashMap<>();
         for (BibEntry entry : entries) {
             res.put(entry, RegExpFileSearch.findFiles(entry, extensions, directories, regExp));
         }
@@ -83,7 +83,7 @@ public class RegExpFileSearch {
 
     /**
      * Searches the given directory and filename pattern for a file for the
-     * bibtex entry.
+     * BibTeX entry.
      *
      * Used to fix:
      *
@@ -99,7 +99,7 @@ public class RegExpFileSearch {
      * <ul>
      * <li>* Any subDir</li>
      * <li>** Any subDir (recursive)</li>
-     * <li>[key] Key from bibtex file and database</li>
+     * <li>[key] Key from BibTeX file and database</li>
      * <li>.* Anything else is taken to be a Regular expression.</li>
      * </ul>
      *
@@ -121,7 +121,7 @@ public class RegExpFileSearch {
      */
     private static List<File> findFile(BibEntry entry, Collection<File> dirs, String file,
             String extensionRegExp) {
-        ArrayList<File> res = new ArrayList<>();
+        List<File> res = new ArrayList<>();
         for (File directory : dirs) {
             res.addAll(RegExpFileSearch.findFile(entry, directory.getPath(), file, extensionRegExp));
         }
