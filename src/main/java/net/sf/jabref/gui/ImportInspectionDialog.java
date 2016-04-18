@@ -34,10 +34,11 @@ import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.UndoableChangeAssignment;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.help.HelpAction;
@@ -68,7 +69,6 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-import javax.swing.undo.AbstractUndoableEdit;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -500,7 +500,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private void insertNodes(JMenu menu, GroupTreeNode node) {
         final AbstractAction action = getAction(node);
 
-        if (node.getChildCount() == 0) {
+        if (node.getNumberOfChildren() == 0) {
             menu.add(action);
             if (action.isEnabled()) {
                 menu.setEnabled(true);
@@ -510,18 +510,18 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         JMenu submenu;
         if (node.getGroup() instanceof AllEntriesGroup) {
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(menu, child);
             }
         } else {
-            submenu = new JMenu('[' + node.getGroup().getName() + ']');
+            submenu = new JMenu('[' + node.getName() + ']');
             // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled
             submenu.setEnabled(action.isEnabled());
             submenu.add(action);
             submenu.add(new JPopupMenu.Separator());
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(submenu, child);
             }
             menu.add(submenu);
             if (submenu.isEnabled()) {
@@ -532,8 +532,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private AbstractAction getAction(GroupTreeNode node) {
         AbstractAction action = new AddToGroupAction(node);
-        AbstractGroup group = node.getGroup();
-        action.setEnabled(group.supportsAdd());
+        action.setEnabled(node.supportsAddingEntries());
         return action;
     }
 
@@ -548,7 +547,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         private final GroupTreeNode node;
 
         public AddToGroupAction(GroupTreeNode node) {
-            super(node.getGroup().getName());
+            super(node.getName());
             this.node = node;
         }
 
@@ -694,14 +693,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         // If the key existed, or exists now, go ahead:
                         if (entry.getCiteKey() != null) {
                             for (GroupTreeNode node : groups) {
-                                if (node.getGroup().supportsAdd()) {
+                                if (node.supportsAddingEntries()) {
                                     // Add the entry:
-                                    AbstractUndoableEdit undo = node.getGroup().add(Collections.singletonList(entry));
-                                    if (undo instanceof UndoableChangeAssignment) {
-                                        ((UndoableChangeAssignment) undo).setEditedNode(node);
-                                    }
-                                    ce.addEdit(undo);
 
+                                    Optional<EntriesGroupChange> undo = node.getGroup().add(
+                                            Collections.singletonList(entry));
+                                    if (undo.isPresent()) {
+                                        ce.addEdit(UndoableChangeEntriesOfGroup
+                                                .getUndoableEdit(new GroupTreeNodeViewModel(node), undo.get()));
+                                    }
                                 }
                             }
                         }

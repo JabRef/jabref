@@ -32,7 +32,7 @@ import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.importer.OpenDatabaseAction;

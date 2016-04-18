@@ -1,8 +1,5 @@
 package net.sf.jabref.exporter;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -14,27 +11,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.google.common.base.Charsets;
-
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.EntryTypes;
@@ -45,6 +36,14 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+
+import com.google.common.base.Charsets;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class BibDatabaseWriterTest {
 
@@ -197,7 +196,7 @@ public class BibDatabaseWriterTest {
     @Test
     public void writeGroups() throws IOException {
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING));
         metaData.setGroups(groupRoot);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -218,7 +217,7 @@ public class BibDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addChild(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);

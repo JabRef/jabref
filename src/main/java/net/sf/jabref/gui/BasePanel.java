@@ -74,14 +74,15 @@ import net.sf.jabref.external.FindFullTextAction;
 import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
-import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.groups.GroupAddRemoveDialog;
+import net.sf.jabref.gui.groups.GroupSelector;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
@@ -1268,7 +1269,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
                     for (final TreePath tree : selection) {
-                        ((GroupTreeNode) tree.getLastPathComponent()).addToGroup(entries);
+                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
                     }
                 }
                 SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
@@ -1418,7 +1419,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
                 final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
+                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path.getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {

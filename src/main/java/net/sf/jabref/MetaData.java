@@ -15,15 +15,25 @@
 */
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
 
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -31,6 +41,9 @@ import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class MetaData implements Iterable<String> {
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
@@ -390,7 +403,7 @@ public class MetaData implements Iterable<String> {
 
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
+        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
 
             // write version first
             serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
@@ -398,10 +411,9 @@ public class MetaData implements Iterable<String> {
             // now write actual groups
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
-            while (tok.hasMoreTokens()) {
-                stringBuilder.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
+
+            for(String groupNode : groupsRoot.getTreeAsString()) {
+                stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
                 stringBuilder.append(Globals.NEWLINE);
             }

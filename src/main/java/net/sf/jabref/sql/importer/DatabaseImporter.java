@@ -32,13 +32,13 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
-import net.sf.jabref.groups.structure.SearchGroup;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.groups.SearchGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
@@ -255,7 +255,7 @@ public class DatabaseImporter {
                     if (parent == null) {
                         // TODO: missing parent
                     } else {
-                        parent.add(groupTreeNodeStringEntry.getKey());
+                        groupTreeNodeStringEntry.getKey().moveTo(parent);
                     }
                 }
 

@@ -1,11 +1,5 @@
 package net.sf.jabref.importer.fileformat;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -17,29 +11,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
+
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the BibtexParser
@@ -1426,13 +1426,13 @@ public class BibtexParserTest {
         GroupTreeNode root = result.getMetaData().getGroups();
 
         assertEquals(new AllEntriesGroup(), root.getGroup());
-        assertEquals(2, root.getChildCount());
+        assertEquals(2, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
-                ((GroupTreeNode) root.getChildAt(0)).getGroup());
+                root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
-                ((GroupTreeNode) root.getChildAt(1)).getGroup());
+                root.getChildren().get(1).getGroup());
     }
 
     @Test

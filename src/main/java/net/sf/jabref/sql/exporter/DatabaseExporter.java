@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,14 +35,14 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SavePreferences;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
-import net.sf.jabref.groups.structure.SearchGroup;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.groups.SearchGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
@@ -193,8 +192,8 @@ public class DatabaseExporter {
                 resultSet.next();
                 myID = resultSet.getInt("groups_id");
 
-                for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
-                    currentID = populateEntryGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+                for (GroupTreeNode child : cursor.getChildren()) {
+                    currentID = populateEntryGroupsTable(child, myID, currentID, out, database_id);
                 }
                 //Unfortunatley, AutoCloseable throws only Exception
             } catch (Exception e) {
@@ -318,9 +317,9 @@ public class DatabaseExporter {
                 int myID = currentID;
                 rs.next();
                 myID = rs.getInt("groups_id");
-                for (Enumeration<GroupTreeNode> e = cursor.children(); e.hasMoreElements(); ) {
+                for (GroupTreeNode child : cursor.getChildren()) {
                     ++currentID;
-                    currentID = populateGroupsTable(e.nextElement(), myID, currentID, out, database_id);
+                    currentID = populateGroupsTable(child, myID, currentID, out, database_id);
                 }
                 //Unfortunatley, AutoCloseable throws only Exception
             } catch (Exception e) {

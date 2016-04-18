@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -28,11 +27,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -177,29 +176,11 @@ public class AppendDatabaseAction implements BaseAction {
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
+
                 // for explicit groups, the entries copied to the mother fromDatabase have to
                 // be "reassigned", i.e. the old reference is removed and the reference
                 // to the new fromDatabase is added.
-                GroupTreeNode node;
-                ExplicitGroup group;
-                BibEntry entry;
-
-                for (Enumeration<GroupTreeNode> e = newGroups
-                        .preorderEnumeration(); e.hasMoreElements(); ) {
-                    node = e.nextElement();
-                    if (!(node.getGroup() instanceof ExplicitGroup)) {
-                        continue;
-                    }
-                    group = (ExplicitGroup) node.getGroup();
-                    for (int i = 0; i < originalEntries.size(); ++i) {
-                        entry = originalEntries.get(i);
-                        if (group.contains(entry)) {
-                            group.removeEntry(entry);
-                            group.addEntry(appendedEntries.get(i));
-                        }
-                    }
-                }
-                frame.getGroupSelector().revalidateGroups();
+                newGroups.replaceEntriesInExplicitGroup(originalEntries, appendedEntries);
             }
         }
 
@@ -215,5 +196,4 @@ public class AppendDatabaseAction implements BaseAction {
         panel.undoManager.addEdit(ce);
         panel.markBaseChanged();
     }
-
 }

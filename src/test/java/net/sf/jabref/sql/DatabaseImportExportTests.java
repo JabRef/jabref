@@ -1,13 +1,21 @@
 package net.sf.jabref.sql;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.util.Collections;
+import java.util.List;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -19,14 +27,6 @@ import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -173,7 +173,7 @@ public class DatabaseImportExportTests {
 
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
         KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING);
-        root.add(new GroupTreeNode(group));
+        root.addSubgroup(group);
         databaseContext.getMetaData().setGroups(root);
         return databaseContext;
     }

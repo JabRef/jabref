@@ -19,10 +19,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.UndoableModifySubtree;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.gui.groups.UndoableModifySubtree;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -43,8 +44,8 @@ class GroupChange extends Change {
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups();
         final UndoableModifySubtree undo = new UndoableModifySubtree(
-                panel.getGroupSelector(), panel.getBibDatabaseContext().getMetaData().getGroups(),
-                root, Localization.lang("Modified groups"));
+                new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups()),
+                new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible
@@ -52,8 +53,8 @@ class GroupChange extends Change {
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(changedGroups.getGroup());
-            for (int i = 0; i < changedGroups.getChildCount(); ++i) {
-                root.add(((GroupTreeNode) changedGroups.getChildAt(i)).deepCopy());
+            for (GroupTreeNode child : changedGroups.getChildren()) {
+                child.copySubtree().moveTo(root);
             }
             // the group tree is now appled to a different BibDatabase than it was created
             // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
@@ -61,18 +62,15 @@ class GroupChange extends Change {
             root.refreshGroupsForNewDatabase(panel.getDatabase());
         }
 
-        if (panel.getGroupSelector().getGroupTreeRoot() == root) {
-            panel.getGroupSelector().revalidateGroups();
-        }
         undoEdit.addEdit(undo);
 
         // Update tmp database:
         tmpGroupRoot.removeAllChildren();
         if (changedGroups != null) {
-            GroupTreeNode copied = changedGroups.deepCopy();
+            GroupTreeNode copied = changedGroups.copySubtree();
             tmpGroupRoot.setGroup(copied.getGroup());
-            for (int i = 0; i < copied.getChildCount(); ++i) {
-                tmpGroupRoot.add(((GroupTreeNode) copied.getChildAt(i)).deepCopy());
+            for (GroupTreeNode child : copied.getChildren()) {
+                child.copySubtree().moveTo(tmpGroupRoot);
             }
         }
         tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
