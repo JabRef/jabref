@@ -54,17 +54,15 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final GroupTreeNodeViewModel m_groupsRoot;
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final GroupSelector gs;
 
 
     /**
      * @param groupsRoot The original set of groups, which is required as undo information when all groups are cleared.
      */
-    public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel, GroupSelector groupSelector,
+    public AutoGroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
             GroupTreeNodeViewModel groupsRoot, String defaultField, String defaultRemove, String defaultDeliminator) {
         super(jabrefFrame, Localization.lang("Automatically create groups"), true);
         frame = jabrefFrame;
-        gs = groupSelector;
         panel = basePanel;
         m_groupsRoot = groupsRoot;
         field.setText(defaultField);
@@ -110,7 +108,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 autoGroupsRoot.moveTo(m_groupsRoot.getNode());
                 NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
-                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot,
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot,
                         new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
                 ce.addEdit(undo);
 

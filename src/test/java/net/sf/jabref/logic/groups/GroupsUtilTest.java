@@ -20,12 +20,12 @@ import net.sf.jabref.model.database.BibDatabase;
 public class GroupsUtilTest {
 
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         Globals.prefs = null;
     }
 

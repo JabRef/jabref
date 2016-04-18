@@ -40,7 +40,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      * REMOVE_NODE_AND_CHILDREN)
      */
     private final int m_editType;
-    private final GroupSelector m_groupSelector;
     /** Adding of a single node (group). */
     public static final int ADD_NODE = 0;
     /** Removal of a single node. Children, if any, are kept. */
@@ -64,9 +63,8 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
      *            then call this constructor. When removing, you first have to
      *            call this constructor, then remove the node.
      */
-    public UndoableAddOrRemoveGroup(GroupSelector gs, GroupTreeNodeViewModel groupsRoot,
+    public UndoableAddOrRemoveGroup(GroupTreeNodeViewModel groupsRoot,
             GroupTreeNodeViewModel editedNode, int editType) {
-        m_groupSelector = gs;
         m_groupsRootHandle = groupsRoot;
         m_editType = editType;
         m_subtreeRootChildCount = editedNode.getChildCount();
