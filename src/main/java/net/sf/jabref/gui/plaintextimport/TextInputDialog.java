@@ -569,7 +569,7 @@ public class TextInputDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+            String data = new ClipBoardManager().getClipboardContents();
             int selStart = textPane.getSelectionStart();
             int selEnd = textPane.getSelectionEnd();
             if ((selEnd - selStart) > 0) {

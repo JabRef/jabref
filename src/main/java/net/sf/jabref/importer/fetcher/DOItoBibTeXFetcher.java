@@ -42,7 +42,6 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();

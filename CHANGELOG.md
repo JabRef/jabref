@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Main table now accepts pasted DOIs and tries to retrieve the entry
 
 ### Fixed
 

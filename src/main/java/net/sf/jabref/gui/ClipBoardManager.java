@@ -21,9 +21,6 @@
 
 package net.sf.jabref.gui;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -32,12 +29,23 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ClipBoardManager implements ClipboardOwner {
-
     private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
-    public static final ClipBoardManager CLIPBOARD = new ClipBoardManager();
+    private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
 
     /**
      * Empty implementation of the ClipboardOwner interface.
@@ -53,8 +61,7 @@ public class ClipBoardManager implements ClipboardOwner {
      */
     public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, this);
+        CLIPBOARD.setContents(stringSelection, this);
     }
 
     /**
@@ -65,9 +72,8 @@ public class ClipBoardManager implements ClipboardOwner {
      */
     public String getClipboardContents() {
         String result = "";
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         //odd: the Object param of getContents is not currently used
-        Transferable contents = clipboard.getContents(null);
+        Transferable contents = CLIPBOARD.getContents(null);
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
@@ -75,6 +81,49 @@ public class ClipBoardManager implements ClipboardOwner {
                 //highly unlikely since we are using a standard DataFlavor
                 LOGGER.info("problem with getting clipboard contents", e);
             }
+        }
+        return result;
+    }
+
+    public List<BibEntry> extractBibEntriesFromClipboard() {
+        // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
+        Transferable content = CLIPBOARD.getContents(null);
+
+        List<BibEntry> result = new ArrayList<>();
+        if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
+            // We have determined that the clipboard data is a set of entries.
+            try {
+                result = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+            } catch (UnsupportedFlavorException | ClassCastException ex) {
+                LOGGER.warn("Could not paste this type", ex);
+            } catch (IOException ex) {
+                LOGGER.warn("Could not paste", ex);
+            }
+        } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                String data = (String) content.getTransferData(DataFlavor.stringFlavor);
+                // fetch from doi
+                if (DOI.build(data).isPresent()) {
+                    LOGGER.info("Found DOI in clipboard");
+                    BibEntry entry = new DOItoBibTeXFetcher().getEntryFromDOI(new DOI(data).getDOI(), null);
+                    if (entry != null) {
+                        result.add(entry);
+                    }
+                } else {
+                    // parse bibtex string
+                    BibtexParser bp = new BibtexParser(new StringReader(data));
+                    BibDatabase db = bp.parse().getDatabase();
+                    LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
+                    if (db.hasEntries()) {
+                        result = db.getEntries();
+                    }
+                }
+            } catch (UnsupportedFlavorException ex) {
+                LOGGER.warn("Could not parse this type", ex);
+            } catch (IOException ex) {
+                LOGGER.warn("Data is no longer available in the requested flavor", ex);
+            }
+
         }
         return result;
     }

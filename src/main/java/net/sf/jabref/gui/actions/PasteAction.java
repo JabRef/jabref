@@ -24,7 +24,7 @@ public class PasteAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+        String data = new ClipBoardManager().getClipboardContents();
 
         if (data.isEmpty()) {
             return;
