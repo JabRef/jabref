@@ -157,122 +157,12 @@ class LayoutEntry {
             return value;
         case LayoutHelper.IS_FIELD_START:
         case LayoutHelper.IS_GROUP_START:
-            String field;
-            if (type == LayoutHelper.IS_GROUP_START) {
-                field = BibDatabase.getResolvedField(text, bibtex, database);
-            } else if (text.matches(".*(;|(\\&+)).*")) {
-                // split the strings along &, && or ; for AND formatter
-                String[] parts = text.split("\\s*(;|(\\&+))\\s*");
-                field = null;
-                for (String part : parts) {
-                    field = BibDatabase.getResolvedField(part, bibtex, database);
-                    if (field == null) {
-                        break;
-                    }
-
-                }
-            } else {
-                // split the strings along |, ||  for OR formatter
-                String[] parts = text.split("\\s*(\\|+)\\s*");
-                field = null;
-                for (String part : parts) {
-                    field = BibDatabase.getResolvedField(part, bibtex, database);
-                    if (field != null) {
-                        break;
-                    }
-                }
-            }
-
-            if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
-                    && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
-                return null;
-            } else {
-                if (type == LayoutHelper.IS_GROUP_START) {
-                    LayoutHelper.setCurrentGroup(field);
-                }
-                StringBuilder sb = new StringBuilder(100);
-                String fieldText;
-                boolean previousSkipped = false;
-
-                for (int i = 0; i < layoutEntries.size(); i++) {
-                    fieldText = layoutEntries.get(i).doLayout(bibtex, database);
-
-                    if (fieldText == null) {
-                        if ((i + 1) < layoutEntries.size()) {
-                            if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
-                                i++;
-                                previousSkipped = true;
-                                continue;
-                            }
-                        }
-                    } else {
-
-                        // if previous was skipped --> remove leading line
-                        // breaks
-                        if (previousSkipped) {
-                            int eol = 0;
-
-                            while ((eol < fieldText.length())
-                                    && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
-                                eol++;
-                            }
-
-                            if (eol < fieldText.length()) {
-                                sb.append(fieldText.substring(eol));
-                            }
-                        } else {
-                            /*
-                             * if fieldText is not null and the bibtexentry is marked
-                             * as a searchhit, try to highlight the searched words
-                             *
-                            */
-                            if (bibtex.isSearchHit()) {
-                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
-                            } else {
-                                sb.append(fieldText);
-                            }
-
-                        }
-                    }
-
-                    previousSkipped = false;
-                }
-
-                return sb.toString();
-            }
+            return handleFieldOrGroupStart(bibtex, database, highlightPattern);
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
         case LayoutHelper.IS_OPTION_FIELD:
-            String fieldEntry;
-
-            if ("bibtextype".equals(text)) {
-                fieldEntry = bibtex.getType();
-            } else {
-                // changed section begin - arudert
-                // resolve field (recognized by leading backslash) or text
-                String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
-                        database) : BibDatabase.getText(text, database);
-                // changed section end - arudert
-                if (fieldText == null) {
-                    fieldEntry = "";
-                } else {
-                    fieldEntry = fieldText;
-                }
-            }
-
-            if (option != null) {
-                for (LayoutFormatter anOption : option) {
-                    fieldEntry = anOption.format(fieldEntry);
-                }
-            }
-
-            // If a post formatter has been set, call it:
-            if (postFormatter != null) {
-                fieldEntry = postFormatter.format(fieldEntry);
-            }
-
-            return fieldEntry;
+            return handleOptionField(bibtex, database);
         case LayoutHelper.IS_ENCODING_NAME:
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
@@ -280,6 +170,124 @@ class LayoutEntry {
             return BibDatabase.getResolvedField("encoding", bibtex, database);
         default:
             return "";
+        }
+    }
+
+    private String handleOptionField(BibEntry bibtex, BibDatabase database) {
+        String fieldEntry;
+
+        if ("bibtextype".equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else {
+            // changed section begin - arudert
+            // resolve field (recognized by leading backslash) or text
+            String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
+                    database) : BibDatabase.getText(text, database);
+            // changed section end - arudert
+            if (fieldText == null) {
+                fieldEntry = "";
+            } else {
+                fieldEntry = fieldText;
+            }
+        }
+
+        if (option != null) {
+            for (LayoutFormatter anOption : option) {
+                fieldEntry = anOption.format(fieldEntry);
+            }
+        }
+
+        // If a post formatter has been set, call it:
+        if (postFormatter != null) {
+            fieldEntry = postFormatter.format(fieldEntry);
+        }
+
+        return fieldEntry;
+    }
+
+    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+        String field;
+        if (type == LayoutHelper.IS_GROUP_START) {
+            field = BibDatabase.getResolvedField(text, bibtex, database);
+        } else if (text.matches(".*(;|(\\&+)).*")) {
+            // split the strings along &, && or ; for AND formatter
+            String[] parts = text.split("\\s*(;|(\\&+))\\s*");
+            field = null;
+            for (String part : parts) {
+                field = BibDatabase.getResolvedField(part, bibtex, database);
+                if (field == null) {
+                    break;
+                }
+
+            }
+        } else {
+            // split the strings along |, ||  for OR formatter
+            String[] parts = text.split("\\s*(\\|+)\\s*");
+            field = null;
+            for (String part : parts) {
+                field = BibDatabase.getResolvedField(part, bibtex, database);
+                if (field != null) {
+                    break;
+                }
+            }
+        }
+
+        if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
+                && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
+            return null;
+        } else {
+            if (type == LayoutHelper.IS_GROUP_START) {
+                LayoutHelper.setCurrentGroup(field);
+            }
+            StringBuilder sb = new StringBuilder(100);
+            String fieldText;
+            boolean previousSkipped = false;
+
+            for (int i = 0; i < layoutEntries.size(); i++) {
+                fieldText = layoutEntries.get(i).doLayout(bibtex, database);
+
+                if (fieldText == null) {
+                    if ((i + 1) < layoutEntries.size()) {
+                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
+                            i++;
+                            previousSkipped = true;
+                            continue;
+                        }
+                    }
+                } else {
+
+                    // if previous was skipped --> remove leading line
+                    // breaks
+                    if (previousSkipped) {
+                        int eol = 0;
+
+                        while ((eol < fieldText.length())
+                                && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
+                            eol++;
+                        }
+
+                        if (eol < fieldText.length()) {
+                            sb.append(fieldText.substring(eol));
+                        }
+                    } else {
+                        /*
+                         * if fieldText is not null and the bibtexentry is marked
+                         * as a searchhit, try to highlight the searched words
+                         *
+                        */
+                        if (bibtex.isSearchHit()) {
+                            sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
+                        } else {
+                            sb.append(fieldText);
+                        }
+
+                    }
+                }
+
+                previousSkipped = false;
+            }
+
+            return sb.toString();
         }
     }
 
@@ -360,7 +368,7 @@ class LayoutEntry {
     }
 
     private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
-        
+
         switch (name) {
         case "HTMLToLatexFormatter": // For backward compatibility
         case "HtmlToLatex":

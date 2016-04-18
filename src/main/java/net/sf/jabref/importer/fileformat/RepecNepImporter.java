@@ -477,10 +477,13 @@ public class RepecNepImporter extends ImportFormat {
             }
             message += e.getMessage();
             LOGGER.error(message, e);
-            if (!(e instanceof IOException)) {
-                e = new IOException(message);
+            IOException toThrow;
+            if (e instanceof IOException) {
+                toThrow = (IOException) e;
+            } else {
+                toThrow = new IOException(message);
             }
-            throw (IOException) e;
+            throw toThrow;
         }
 
         return bibitems;

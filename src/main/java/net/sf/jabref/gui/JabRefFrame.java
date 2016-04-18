@@ -1558,11 +1558,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public BasePanel addTab(BibDatabaseContext databaseContext, Charset encoding, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
+        Charset usedEncoding;
         if (encoding == null) {
-            encoding = Globals.prefs.getDefaultEncoding();
+            usedEncoding = Globals.prefs.getDefaultEncoding();
+        } else {
+            usedEncoding = encoding;
         }
 
-        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext, encoding);
+        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext, usedEncoding);
         addTab(bp, raisePanel);
         return bp;
     }
