@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Main table now accepts pasted DOIs and tries to retrieve the entry
 
 ### Fixed
 
@@ -85,7 +86,6 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#672](https://github.com/JabRef/jabref/issues/672): FileList now distributes its space dependent on the width of its columns
 - Added missing German translations
 - Swedish is added as a language option (still not a complete translation)
-- Main table now accepts pasted DOIs and tries to retrieve the entry
 
 ### Fixed
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
