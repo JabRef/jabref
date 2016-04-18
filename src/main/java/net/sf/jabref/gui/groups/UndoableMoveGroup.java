@@ -37,10 +37,9 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     private final int oldChildIndex;
 
 
-    public UndoableMoveGroup(GroupSelector groupSelector, MoveGroupChange moveChange) {
-        Objects.requireNonNull(groupSelector);
+    public UndoableMoveGroup(GroupTreeNodeViewModel root, MoveGroupChange moveChange) {
+        this.root = Objects.requireNonNull(root);
         Objects.requireNonNull(moveChange);
-        root = groupSelector.getGroupTreeRoot();
         pathToOldParent = moveChange.getOldParent().getIndexedPathFromRoot();
         pathToNewParent = moveChange.getNewParent().getIndexedPathFromRoot();
         oldChildIndex = moveChange.getOldChildIndex();

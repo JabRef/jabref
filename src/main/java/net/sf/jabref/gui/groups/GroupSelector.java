@@ -1268,7 +1268,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * @param node The node that has been moved.
      */
     public void concludeMoveGroup(MoveGroupChange moveChange, GroupTreeNodeViewModel node) {
-        panel.undoManager.addEdit(new UndoableMoveGroup(this, moveChange));
+        panel.undoManager.addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
         panel.markBaseChanged();
         frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }

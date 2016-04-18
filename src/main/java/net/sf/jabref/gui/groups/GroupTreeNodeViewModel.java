@@ -142,7 +142,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     @Override
     public Enumeration children() {
         Iterable<GroupTreeNode> children = node.getChildren();
-        return new Enumeration<Object>() {
+        return new Enumeration<GroupTreeNodeViewModel>() {
 
             @Override
             public boolean hasMoreElements() {
@@ -150,7 +150,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             }
 
             @Override
-            public Object nextElement() {
+            public GroupTreeNodeViewModel nextElement() {
                 return new GroupTreeNodeViewModel(children.iterator().next());
             }
         };
