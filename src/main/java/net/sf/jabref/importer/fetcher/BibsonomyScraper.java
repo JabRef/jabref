@@ -15,17 +15,16 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.net.URLDownload;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,14 +47,14 @@ class BibsonomyScraper {
     public static Optional<BibEntry> getEntry(String entryUrl) {
         try {
             // Replace special characters by corresponding sequences:
-            entryUrl = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
+            String cleanURL = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
                     .replace("&", "%26").replace("=", "%3D");
 
-            URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + entryUrl + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
+            URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(bibtex));
             ParserResult pr = bp.parse();
-            if ((pr != null) && (pr.getDatabase().getEntryCount() > 0)) {
+            if ((pr != null) && pr.getDatabase().hasEntries()) {
                 return Optional.of(pr.getDatabase().getEntries().iterator().next());
             } else {
                 return Optional.empty();

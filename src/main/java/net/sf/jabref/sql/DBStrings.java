@@ -15,37 +15,24 @@
 */
 package net.sf.jabref.sql;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 
 /**
- *
  * @author pattonlk
  */
 public class DBStrings {
 
-    private String serverType;
-    private String serverHostname;
-    private String database;
-    private String username;
+    private DBStringsPreferences dbPreferences;
     private String password;
     private String dbParameters = "";
-
-    private List<String> serverTypes;
     private boolean isInitialized;
     private boolean configValid;
 
-
-    /** Creates a new instance of DBStrings */
+    /**
+     * Creates a new instance of DBStrings
+     */
     public DBStrings() {
-        this.serverTypes = Collections.emptyList();
-        this.setServerHostname(null);
-        this.setDatabase(null);
-        this.setUsername(null);
+        this.dbPreferences = new DBStringsPreferences(null, null, null, null);
         this.setPassword(null);
         this.isInitialized(false);
         this.isConfigValid(false);
@@ -55,57 +42,17 @@ public class DBStrings {
      * Initializes the variables needed with defaults
      */
     public void initialize() {
-        this.serverTypes = Arrays.asList("MySQL", "PostgreSQL");
-        setServerType(Globals.prefs.get(JabRefPreferences.DB_CONNECT_SERVER_TYPE));
-        setServerHostname(Globals.prefs.get(JabRefPreferences.DB_CONNECT_HOSTNAME));
-        setDatabase(Globals.prefs.get(JabRefPreferences.DB_CONNECT_DATABASE));
-        setUsername(Globals.prefs.get(JabRefPreferences.DB_CONNECT_USERNAME));
+        this.dbPreferences = DBStringsPreferences.loadFromPreferences(Globals.prefs);
         setPassword("");
         isInitialized(true);
-    }
-
-    public void setServerType(String serverType) {
-        this.serverType = serverType;
-    }
-
-    public void setServerHostname(String serverHostname) {
-        this.serverHostname = serverHostname;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getServerType() {
-        return serverType;
-    }
-
-    public String getServerHostname() {
-        return serverHostname;
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public List<String> getServerTypes() {
-        return serverTypes;
     }
 
     public boolean isInitialized() {
@@ -126,6 +73,7 @@ public class DBStrings {
 
     /**
      * Returns the database parameters set
+     *
      * @return dbParameters: The concatenated parameters
      */
     public String getDbParameters() {
@@ -136,22 +84,18 @@ public class DBStrings {
      * Add server specific database parameter(s) <br>
      * Multiple parameters must be concatenated in the format <br>
      * {@code ?Parameter1=value&parameter2=value2}
+     *
      * @param dbParameter The concatendated parameter
      */
     public void setDbParameters(String dbParameters) {
         this.dbParameters = dbParameters;
     }
 
-
-    /**
-     * Store these db strings into JabRef preferences.
-     */
-    public void storeToPreferences() {
-        Globals.prefs.put(JabRefPreferences.DB_CONNECT_SERVER_TYPE, getServerType());
-        Globals.prefs.put(JabRefPreferences.DB_CONNECT_HOSTNAME, getServerHostname());
-        Globals.prefs.put(JabRefPreferences.DB_CONNECT_DATABASE, getDatabase());
-        Globals.prefs.put(JabRefPreferences.DB_CONNECT_USERNAME, getUsername());
+    public DBStringsPreferences getDbPreferences() {
+        return dbPreferences;
     }
 
-
+    public void setDbPreferences(DBStringsPreferences dbPreferences) {
+        this.dbPreferences = dbPreferences;
+    }
 }

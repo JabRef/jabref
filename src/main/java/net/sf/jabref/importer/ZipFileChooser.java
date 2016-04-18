@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 JabRef contributors.
+/* Copyright (C) 2015-2016 JabRef contributors.
  Copyright (C) 2005 Andreas Rudert
 
  All programs in this directory and
@@ -28,9 +28,6 @@ package net.sf.jabref.importer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.HeadlessException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,7 +53,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -67,99 +63,21 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class ZipFileChooser extends JDialog {
 
-    /** table of Zip entries */
-    private final JTable table;
-    /** this */
-    private final ZipFileChooser zipFileChooser;
-    /** import customization dialog, owner of this dialog */
-    private final ImportCustomizationDialog importCustomizationDialog;
-
     private static final Log LOGGER = LogFactory.getLog(ZipFileChooser.class);
 
-
-    /*
-     *  (non-Javadoc)
-     * @see java.awt.Component#getSize()
-     */
-    @Override
-    public Dimension getSize() {
-        return new Dimension(400, 300);
-    }
-
-    /**
-     * Entries that can be selected with this dialog.
-     *
-     * @param zipFile  Zip-File
-     * @return  entries that can be selected
-     */
-    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
-        List<ZipEntry> entries = new ArrayList<>();
-        Enumeration<? extends ZipEntry> e = zipFile.entries();
-        for (ZipEntry entry : Collections.list(e)) {
-            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
-                entries.add(entry);
-            }
-        }
-        return entries.toArray(new ZipEntry[entries.size()]);
-    }
 
     /**
      * New Zip file chooser.
      *
      * @param owner  Owner of the file chooser
      * @param zipFile  Zip-Fle to choose from, must be readable
-     * @throws HeadlessException
      */
-    public ZipFileChooser(ImportCustomizationDialog owner, ZipFile zipFile) throws HeadlessException {
-        super(owner, Localization.lang("Select file from ZIP-archive"), false);
+    public ZipFileChooser(ImportCustomizationDialog importCustomizationDialog, ZipFile zipFile) {
+        super(importCustomizationDialog, Localization.lang("Select file from ZIP-archive"), false);
 
-        this.importCustomizationDialog = owner;
-        this.zipFileChooser = this;
-
-        // cancel: no entry is selected
-        JButton cancelButton = new JButton(Localization.lang("Cancel"));
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
-        // ok: get selected class and check if it is instantiable as an importer
-        JButton okButton = new JButton(Localization.lang("OK"));
-        okButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                if (row == -1) {
-                    JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Please select an importer."));
-                } else {
-                    ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
-                    ZipEntry tempZipEntry = model.getZipEntry(row);
-                    CustomImporter importer = new CustomImporter();
-                    importer.setBasePath(model.getZipFile().getName());
-                    String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.'))
-                            .replace("/", ".");
-                    importer.setClassName(className);
-                    try {
-                        ImportFormat importFormat = importer.getInstance();
-                        importer.setName(importFormat.getFormatName());
-                        importer.setCliId(importFormat.getCLIId());
-                        importCustomizationDialog.addOrReplaceImporter(importer);
-                        dispose();
-                    } catch (IOException | ClassNotFoundException | InstantiationException |
-                            IllegalAccessException exc) {
-                        LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
-                        JOptionPane.showMessageDialog(zipFileChooser, Localization.lang("Could not instantiate %0 %1", importer.getName() + ":\n", exc.getMessage()));
-                    }
-                }
-            }
-        });
 
         ZipFileChooserTableModel tableModel = new ZipFileChooserTableModel(zipFile, getSelectableZipEntries(zipFile));
-        table = new JTable(tableModel);
+        JTable table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(200);
         cm.getColumn(1).setPreferredWidth(150);
@@ -171,6 +89,38 @@ class ZipFileChooser extends JDialog {
         if (table.getRowCount() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
+
+        // cancel: no entry is selected
+        JButton cancelButton = new JButton(Localization.lang("Cancel"));
+        cancelButton.addActionListener(e -> dispose());
+        // ok: get selected class and check if it is instantiable as an importer
+        JButton okButton = new JButton(Localization.lang("OK"));
+        okButton.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, Localization.lang("Please select an importer."));
+            } else {
+                ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
+                ZipEntry tempZipEntry = model.getZipEntry(row);
+                CustomImporter importer = new CustomImporter();
+                importer.setBasePath(model.getZipFile().getName());
+                String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.'))
+                        .replace("/", ".");
+                importer.setClassName(className);
+                try {
+                    ImportFormat importFormat = importer.getInstance();
+                    importer.setName(importFormat.getFormatName());
+                    importer.setCliId(importFormat.getCLIId());
+                    importCustomizationDialog.addOrReplaceImporter(importer);
+                    dispose();
+                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
+                    LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
+                    JOptionPane.showMessageDialog(this, Localization.lang("Could not instantiate %0 %1",
+                            importer.getName() + ":\n", exc.getMessage()));
+                }
+            }
+        });
+
 
         // Key bindings:
         JPanel mainPanel = new JPanel();
@@ -190,8 +140,34 @@ class ZipFileChooser extends JDialog {
         getContentPane().add(optionsPanel, BorderLayout.SOUTH);
         this.setSize(getSize());
         pack();
-        PositionWindow.placeDialog(this, owner);
+        this.setLocationRelativeTo(importCustomizationDialog);
         new FocusRequester(table);
+    }
+
+    /**
+     * Entries that can be selected with this dialog.
+     *
+     * @param zipFile  Zip-File
+     * @return  entries that can be selected
+     */
+    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
+        List<ZipEntry> entries = new ArrayList<>();
+        Enumeration<? extends ZipEntry> e = zipFile.entries();
+        for (ZipEntry entry : Collections.list(e)) {
+            if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+                entries.add(entry);
+            }
+        }
+        return entries.toArray(new ZipEntry[entries.size()]);
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see java.awt.Component#getSize()
+     */
+    @Override
+    public Dimension getSize() {
+        return new Dimension(400, 300);
     }
 
 

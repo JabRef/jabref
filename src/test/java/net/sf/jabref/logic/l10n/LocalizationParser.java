@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.l10n;
 
-import com.google.common.base.Charsets;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +35,23 @@ public class LocalizationParser {
         return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
     }
 
+    public static List<String> findObsolete(LocalizationBundle type) throws IOException {
+        List<LocalizationEntry> entries = findLocalizationEntriesInJavaFiles(type);
+
+        List<String> keysInJavaFiles = entries.stream().map(LocalizationEntry::getKey).distinct().sorted()
+                .collect(Collectors.toList());
+
+        List<String> englishKeys;
+        if (type == LocalizationBundle.LANG) {
+            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
+        } else {
+            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
+        }
+        englishKeys.removeAll(keysInJavaFiles);
+
+        return englishKeys;
+    }
+
     private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
@@ -56,8 +73,9 @@ public class LocalizationParser {
 
     public static Properties getProperties(String path) {
         Properties properties = new Properties();
-        try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path)) {
-            properties.load(is);
+        try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(path);
+                InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            properties.load(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +90,7 @@ public class LocalizationParser {
         List<LocalizationEntry> result = new LinkedList<>();
 
         try {
-            List<String> lines = Files.readAllLines(path, Charsets.UTF_8);
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
             String content = String.join("\n", lines);
 
             List<String> keys = JavaLocalizationEntryParser.getLanguageKeysInString(content, type);
@@ -130,7 +148,7 @@ public class LocalizationParser {
                 StringBuilder b = new StringBuilder();
                 int quotations = 0;
                 for (char c : parsedContentsOfLangMethod.toCharArray()) {
-                    if (c == '"' && quotations > 0) {
+                    if ((c == '"') && (quotations > 0)) {
                         quotations--;
                     } else if (c == '"') {
                         quotations++;

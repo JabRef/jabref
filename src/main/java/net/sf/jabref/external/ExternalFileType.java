@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.external;
 
+import java.util.Objects;
 import javax.swing.*;
 
 import net.sf.jabref.gui.IconTheme;
@@ -56,7 +57,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @param val arguments.
      */
     public static ExternalFileType buildFromArgs(String[] val) {
-        if ((val == null) || (val.length < 4) || val.length > 5) {
+        if ((val == null) || (val.length < 4) || (val.length > 5)) {
             throw new IllegalArgumentException("Cannot construct ExternalFileType without four elements in String[] argument.");
         }
         String name = val[0];
@@ -78,10 +79,15 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
             iconName = val[4];
         }
 
-        if ("new".equals(iconName)) {
-            icon = IconTheme.JabRefIcon.FILE.getSmallIcon();
-        } else {
-            icon = IconTheme.getImage(iconName);
+        // set icon to default first
+        icon = IconTheme.JabRefIcon.FILE.getSmallIcon();
+
+        // check whether there is another icon defined for this file type
+        for(ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
+            if(fileType.getName().equals(name)) {
+                icon = fileType.icon;
+                break;
+            }
         }
 
         return new ExternalFileType(name, extension, mimeType, openWith, iconName, icon);
@@ -108,6 +114,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public String getExtension() {
+        if (extension == null) {
+            return "";
+        }
         return extension;
     }
 
@@ -116,6 +125,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public String getMimeType() {
+        if (mimeType == null) {
+            return "";
+        }
         return mimeType;
     }
 
@@ -133,7 +145,10 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return extension;
     }
 
-    public String getOpenWith() {
+    public String getOpenWithApplication() {
+        if (openWith == null) {
+            return "";
+        }
         return openWith;
     }
 
@@ -194,7 +209,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, extension, mimeType, openWith, iconName);
     }
 
     /**
@@ -206,17 +221,15 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      */
     @Override
     public boolean equals(Object object) {
-        if (object == null) {
-            return false;
+        if (this == object) {
+            return true;
         }
-        if (!(object instanceof ExternalFileType)) {
-            return false;
+
+        if (object instanceof ExternalFileType) {
+            ExternalFileType other = (ExternalFileType) object;
+            return Objects.equals(name, other.name) && Objects.equals(extension, other.extension) &&
+                    Objects.equals(mimeType, other.mimeType) && Objects.equals(openWith, other.openWith) && Objects.equals(iconName,  other.iconName);
         }
-        ExternalFileType other = (ExternalFileType) object;
-        return (name == null ? other.name == null : name.equals(other.name))
-                && (extension == null ? other.extension == null : extension.equals(other.extension))
-                && (mimeType == null ? other.mimeType == null : mimeType.equals(other.mimeType))
-                && (openWith == null ? other.openWith == null : openWith.equals(other.openWith))
-                && (iconName == null ? other.iconName == null : iconName.equals(other.iconName));
+        return false;
     }
 }

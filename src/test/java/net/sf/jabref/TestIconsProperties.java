@@ -13,6 +13,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TestIconsProperties {
@@ -28,7 +29,8 @@ public class TestIconsProperties {
         try (Reader reader = Files.newBufferedReader(Paths.get(iconsPropertiesPath))) {
             properties.load(reader);
         }
-        assertTrue("There must be loaded properties after loading " + iconsPropertiesPath, !properties.entrySet().isEmpty());
+        assertFalse("There must be loaded properties after loading " + iconsPropertiesPath,
+                properties.entrySet().isEmpty());
 
         // check that each key references an existing file
         for(Map.Entry<Object, Object> entry : properties.entrySet()) {

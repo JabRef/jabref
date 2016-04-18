@@ -19,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +30,6 @@ import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -122,18 +120,18 @@ public class WriteXMPAction extends AbstractWorker {
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
-            FileUtil.expandFilename(pdf, dirs).ifPresent(f -> files.add(f));
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory("pdf");
+            FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
             // Then check the "file" field:
-            dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            dirs = panel.getBibDatabaseContext().getFileDirectory();
             if (entry.hasField(Globals.FILE_FIELD)) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(entry.getField(Globals.FILE_FIELD));
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.type != null) && "pdf".equals(flEntry.type.getName().toLowerCase())) {
-                        FileUtil.expandFilename(flEntry.link, dirs).ifPresent(f -> files.add(f));
+                    if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
+                        FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
                     }
                 }
             }
@@ -145,25 +143,22 @@ public class WriteXMPAction extends AbstractWorker {
                 optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
             } else {
                 for (File file : files) {
-                    if (!file.exists()) {
-                        skipped++;
-                        optDiag.getProgressArea()
-                                .append("  " + Localization.lang("Skipped - PDF does not exist")
-                                + ":\n");
-                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
-
-                    } else {
+                    if (file.exists()) {
                         try {
                             XMPUtil.writeXMP(file, entry, database);
                             optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {
                             optDiag.getProgressArea().append(
-                                    "  " + Localization.lang("Error while writing") + " '"
-                                    + file.getPath() + "':\n");
+                                    "  " + Localization.lang("Error while writing") + " '" + file.getPath() + "':\n");
                             optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             errors++;
                         }
+                    } else {
+                        skipped++;
+                        optDiag.getProgressArea()
+                                .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
                     }
                 }
             }
@@ -206,13 +201,7 @@ public class WriteXMPAction extends AbstractWorker {
             super(parent, Localization.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
-            okButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    dispose();
-                }
-            });
+            okButton.addActionListener(e -> dispose());
 
             AbstractAction cancel = new AbstractAction() {
                 @Override
@@ -273,7 +262,7 @@ public class WriteXMPAction extends AbstractWorker {
         public void open() {
             progressArea.setText("");
             canceled = false;
-            PositionWindow.placeDialog(optDiag, panel.frame());
+            optDiag.setLocationRelativeTo(panel.frame());
 
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);

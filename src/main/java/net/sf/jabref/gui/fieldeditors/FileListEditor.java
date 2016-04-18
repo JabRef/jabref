@@ -17,6 +17,7 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,22 +44,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
+import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.*;
-import net.sf.jabref.external.*;
-
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.external.MoveFileAction;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.model.entry.EntryUtil;
+
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,7 +83,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final FieldNameLabel label;
     private FileListEntryEditor editor;
     private final JabRefFrame frame;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private final String fieldName;
     private final EntryEditor entryEditor;
     private final JPanel panel;
@@ -80,10 +91,10 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final JButton auto;
     private final JPopupMenu menu = new JPopupMenu();
 
-    public FileListEditor(JabRefFrame frame, MetaData metaData, String fieldName, String content,
+    public FileListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
                           EntryEditor entryEditor) {
         this.frame = frame;
-        this.metaData = metaData;
+        this.databaseContext = databaseContext;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
         label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
@@ -107,49 +118,15 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
         down.setMargin(new Insets(0, 0, 0, 0));
-        add.addActionListener(new ActionListener() {
+        add.addActionListener(e -> addEntry());
+        remove.addActionListener(e -> removeEntries());
+        up.addActionListener(e -> moveEntry(-1));
+        down.addActionListener(e -> moveEntry(1));
+        auto.addActionListener(e -> autoSetLinks());
+        download.addActionListener(e -> downloadFile());
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addEntry();
-            }
-        });
-        remove.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeEntries();
-            }
-        });
-        up.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(-1);
-            }
-        });
-        down.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                moveEntry(1);
-            }
-        });
-        auto.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoSetLinks();
-            }
-        });
-        download.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                downloadFile();
-            }
-        });
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout
+        FormBuilder builder = FormBuilder.create()
+                .layout(new FormLayout
                 ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
@@ -213,28 +190,18 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
         menu.add(openLink);
-        openLink.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openSelectedFile();
-            }
-        });
+        openLink.addActionListener(e -> openSelectedFile());
 
         JMenuItem openFolder = new JMenuItem(Localization.lang("Open folder"));
         menu.add(openFolder);
-        openFolder.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = getSelectedRow();
-                if (row >= 0) {
-                    FileListEntry entry = tableModel.getEntry(row);
-                    try {
-                        JabRefDesktop.openFolderAndSelectFile(entry.link);
-                    } catch (IOException ex) {
-                        LOGGER.debug("Cannot open folder", ex);
-                    }
+        openFolder.addActionListener(e -> {
+            int row = getSelectedRow();
+            if (row >= 0) {
+                FileListEntry entry = tableModel.getEntry(row);
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(entry.link);
+                } catch (IOException ex) {
+                    LOGGER.debug("Cannot open folder", ex);
                 }
             }
         });
@@ -243,24 +210,20 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         menu.add(rename);
         rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
 
-        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move to file directory"));
+        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
 
         JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
         menu.add(deleteFile);
-        deleteFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = getSelectedRow();
-                // no selection
-                if (row == -1) {
-                    return;
-                }
+        deleteFile.addActionListener(e -> {
+            int row = getSelectedRow();
+            // no selection
+            if (row != -1) {
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(metaData, entry.link);
+                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link);
 
                 // transactional delete and unlink
                 try {
@@ -275,6 +238,19 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 }
             }
         });
+        adjustColumnWidth();
+    }
+
+    public void adjustColumnWidth() {
+        for (int column = 0; column < this.getColumnCount(); column++) {
+            int width = 0;
+            for (int row = 0; row < this.getRowCount(); row++) {
+                TableCellRenderer renderer = this.getCellRenderer(row, column);
+                Component comp = this.prepareRenderer(renderer, row, column);
+                width = Math.max(comp.getPreferredSize().width, width);
+            }
+            this.columnModel.getColumn(column).setPreferredWidth(width);
+        }
     }
 
     private void openSelectedFile() {
@@ -282,9 +258,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row >= 0) {
             FileListEntry entry = tableModel.getEntry(row);
             try {
-                ExternalFileType type = ExternalFileTypes.getInstance()
-                        .getExternalFileTypeByName(entry.type.getName());
-                JabRefDesktop.openExternalFileAnyFormat(metaData, entry.link, type == null ? entry.type : type);
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
+                        .getExternalFileTypeByName(entry.type.get().getName());
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.link, type.isPresent() ? type : entry.type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -339,17 +315,17 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void append(String text) {
-
+        // Do nothing
     }
 
     @Override
     public void updateFont() {
-
+        // Do nothing
     }
 
     @Override
     public void paste(String textToInsert) {
-
+        // Do nothing
     }
 
     @Override
@@ -362,15 +338,16 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (row == -1) {
             row = 0;
         }
-        FileListEntry entry = new FileListEntry("", initialLink, null);
+        FileListEntry entry = new FileListEntry("", initialLink);
         if (editListEntry(entry, true)) {
             tableModel.addEntry(row, entry);
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
     private void addEntry() {
-        List<String> defaultDirectory = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> defaultDirectory = databaseContext.getFileDirectory();
         if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
             addEntry("");
         } else {
@@ -386,6 +363,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
     private void moveEntry(int i) {
@@ -405,6 +383,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         tableModel.addEntry(toIdx, entry);
         entryEditor.updateField(this);
         setRowSelectionInterval(toIdx, toIdx);
+        adjustColumnWidth();
     }
 
     /**
@@ -416,7 +395,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      */
     private boolean editListEntry(FileListEntry entry, boolean openBrowse) {
         if (editor == null) {
-            editor = new FileListEntryEditor(frame, entry, false, true, metaData);
+            editor = new FileListEntryEditor(frame, entry, false, true, databaseContext);
         } else {
             editor.setEntry(entry);
         }
@@ -425,6 +404,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             tableModel.fireTableDataChanged();
         }
         entryEditor.updateField(this);
+        adjustColumnWidth();
         return editor.okPressed();
     }
 
@@ -436,16 +416,17 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, metaData, new ActionListener() {
+        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, databaseContext, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 auto.setEnabled(true);
 
                 if (e.getID() > 0) {
                     entryEditor.updateField(FileListEditor.this);
-                    frame.output(Localization.lang("Finished autosetting external links."));
+                    adjustColumnWidth();
+                    frame.output(Localization.lang("Finished automatically setting external links."));
                 } else {
-                    frame.output(Localization.lang("Finished autosetting external links.")
+                    frame.output(Localization.lang("Finished automatically setting external links.")
                             + " " + Localization.lang("No files found."));
 
                     // auto download file as no file found before
@@ -469,13 +450,13 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.OK_OPTION) {
-                ActionListener l = entryEditor.generateKeyAction;
+                ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
                 bibtexKey = entryEditor.getEntry().getCiteKey();
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey);
         try {
             def.download(this);
         } catch (IOException ex) {
@@ -493,6 +474,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void downloadComplete(FileListEntry file) {
         tableModel.addEntry(tableModel.getRowCount(), file);
         entryEditor.updateField(this);
+        adjustColumnWidth();
     }
 
 
@@ -536,33 +518,41 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void undo() {
+        // Do nothing
     }
 
     @Override
     public void redo() {
+        // Do nothing
     }
 
     @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
+        // Do nothing
     }
 
     @Override
     public void clearAutoCompleteSuggestion() {
+        // Do nothing
     }
 
     @Override
     public void setActiveBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void setValidBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void setInvalidBackgroundColor() {
+        // Do nothing
     }
 
     @Override
     public void updateFontColor() {
+        // Do nothing
     }
 }

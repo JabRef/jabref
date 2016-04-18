@@ -3,12 +3,10 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -16,12 +14,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-
 public class PdfXmpImporterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
     private PdfXmpImporter importer;
+
 
     @Before
     public void setUp() {
@@ -30,21 +26,19 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testGetFormatName() throws Exception {
+    public void testGetFormatName() {
         assertEquals("XMP-annotated PDF", importer.getFormatName());
     }
 
-    @Test
+    @Test(expected = EncryptedPdfsNotSupportedException.class)
     public void importEncryptedFileThrowsException() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("src/test/resources/encrypted.pdf")) {
-            thrown.expect(IOException.class);
-            thrown.expectMessage("Stream closed");
+        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
             importer.importEntries(is, new OutputPrinterToNull());
         }
     }
 
     @Test
-    public void testImportEntries() throws Exception {
+    public void testImportEntries() throws IOException {
         try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
             List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
 
@@ -59,14 +53,14 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws Exception {
+    public void testIsRecognizedFormat() throws IOException {
         try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
             assertTrue(importer.isRecognizedFormat(is));
         }
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws Exception {
+    public void testIsRecognizedFormatReject() throws IOException {
         List<String> list = Arrays.asList("IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "empty.pdf");
 
@@ -78,7 +72,7 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testGetCommandLineId() throws Exception {
+    public void testGetCommandLineId() {
         assertEquals("xmp", importer.getCommandLineId());
     }
 }

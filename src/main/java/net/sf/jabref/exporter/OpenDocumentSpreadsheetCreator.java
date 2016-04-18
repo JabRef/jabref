@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.exporter;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.l10n.Localization;
 
 import javax.xml.transform.OutputKeys;
@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +33,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -49,13 +51,17 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super(Localization.lang("OpenDocument Spreadsheet"), "ods", null, null, ".ods");
+        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods");
     }
 
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
-            final Charset encoding, Set<String> keySet) throws Exception {
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), database, keySet);
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
+            final Charset encoding, List<BibEntry> entries) throws Exception {
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
+        if (!entries.isEmpty()) { // Only export if entries exists
+            OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheet(new File(file), databaseContext.getDatabase(), entries);
+        }
     }
 
     private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
@@ -93,12 +99,12 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, Set<String> keySet)
+    private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, List<BibEntry> entries)
             throws Exception {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);
-        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, keySet);
+        OpenDocumentSpreadsheetCreator.exportOpenDocumentSpreadsheetXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
         try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
@@ -110,8 +116,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, Set<String> keySet) {
-        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, keySet);
+    private static void exportOpenDocumentSpreadsheetXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
+        OpenDocumentRepresentation od = new OpenDocumentRepresentation(database, entries);
 
         try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
 

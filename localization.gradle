@@ -26,7 +26,7 @@ task checkTranslationsSummary(type: JavaExec) {
     args "-c"
 }
 
-task compareTranslationsWithEnglishTranslation(type: JavaExec) {
+task showMissingTranslationKeys(type: JavaExec) {
     description "Prints differences between the English translation and translations in other languages."
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
@@ -34,7 +34,7 @@ task compareTranslationsWithEnglishTranslation(type: JavaExec) {
     args "-t"
 }
 
-task compareAndUpdateTranslationsWithEnglishTranslation(type: JavaExec) {
+task generateMissingTranslationKeys(type: JavaExec) {
     description "Prints differences between the English translation and translations in other languages, and updates translations if possible."
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath

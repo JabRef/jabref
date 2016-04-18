@@ -16,44 +16,35 @@ package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class CleanupWorker {
 
-    private final CleanupPreset preset;
-    private final List<String> paths;
-    private final BibDatabase database;
+    private final BibDatabaseContext databaseContext;
+    private final JournalAbbreviationRepository repository;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(CleanupPreset preset) {
-        this(preset, Collections.emptyList());
-    }
-
-    public CleanupWorker(CleanupPreset preset, List<String> paths) {
-        this(preset, paths, null);
-    }
-
-    public CleanupWorker(CleanupPreset preset, List<String> paths, BibDatabase database) {
-        this.preset = Objects.requireNonNull(preset);
-        this.paths = Objects.requireNonNull(paths);
-        this.database = database;
+    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationRepository repository) {
+        this.databaseContext = databaseContext;
+        this.repository = repository;
     }
 
     public int getUnsuccessfulRenames() {
         return unsuccessfulRenames;
     }
 
-    public List<FieldChange> cleanup(BibEntry entry) {
+    public List<FieldChange> cleanup(CleanupPreset preset, BibEntry entry) {
+        Objects.requireNonNull(preset);
         Objects.requireNonNull(entry);
 
-        List<CleanupJob> jobs = determineCleanupActions();
+        List<CleanupJob> jobs = determineCleanupActions(preset);
 
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
@@ -63,49 +54,32 @@ public class CleanupWorker {
         return changes;
     }
 
-    private List<CleanupJob> determineCleanupActions() {
+    private List<CleanupJob> determineCleanupActions(CleanupPreset preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
             jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));
         }
         if (preset.isCleanUpSuperscripts()) {
-            jobs.add(new FormatterCleanup(BibtexFieldFormatters.SUPERSCRIPTS));
+            jobs.add(new FormatterCleanup(BibtexFieldFormatters.ORDINALS_TO_LATEX_SUPERSCRIPT));
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
         }
-        if (preset.isCleanUpMonth()) {
-            jobs.add(FieldFormatterCleanup.MONTH);
-        }
-        if (preset.isCleanUpPageNumbers()) {
-            jobs.add(FieldFormatterCleanup.PAGE_NUMBERS);
-        }
-        if (preset.isCleanUpDate()) {
-            jobs.add(FieldFormatterCleanup.DATES);
-        }
         if (preset.isFixFileLinks()) {
             jobs.add(new FileLinksCleanup());
         }
+        if (preset.isMovePDF()) {
+            jobs.add(new MoveFilesCleanup(databaseContext));
+        }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(paths));
+            jobs.add(new RelativePathsCleanup(databaseContext));
         }
         if (preset.isRenamePDF()) {
-            RenamePdfCleanup cleaner = new RenamePdfCleanup(paths, preset.isRenamePdfOnlyRelativePaths(), database);
+            RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
+                    repository);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
-        }
-        if (preset.isConvertHTMLToLatex()) {
-            jobs.add(FieldFormatterCleanup.TITLE_HTML);
-        }
-        if (preset.isConvertUnits()) {
-            jobs.add(FieldFormatterCleanup.TITLE_UNITS);
-        }
-        if (preset.isConvertCase()) {
-            jobs.add(FieldFormatterCleanup.TITLE_CASE);
-        }
-        if (preset.isConvertLaTeX()) {
-            jobs.add(FieldFormatterCleanup.TITLE_LATEX);
         }
         if (preset.isConvertUnicodeToLatex()) {
             jobs.add(new UnicodeCleanup());
@@ -113,6 +87,11 @@ public class CleanupWorker {
         if (preset.isConvertToBiblatex()) {
             jobs.add(new BiblatexCleanup());
         }
+
+        if(preset.getFormatterCleanups().isEnabled()) {
+            jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
+        }
+
         return jobs;
     }
 }

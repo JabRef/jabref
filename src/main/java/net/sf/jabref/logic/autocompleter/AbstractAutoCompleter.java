@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -32,12 +33,6 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     private static final int SHORTEST_WORD_TO_ADD = 4;
     private final AutoCompletePreferences preferences;
 
-
-    public AbstractAutoCompleter(AutoCompletePreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
-    }
-
-
     /**
      * Stores the strings as is.
      */
@@ -51,7 +46,12 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
     /**
      * Stores for a lowercase string the possible expanded strings.
      */
-    private final Map<String, TreeSet<String>> possibleStringsForSearchString = new HashMap<>();
+    private final Map<String, Set<String>> possibleStringsForSearchString = new HashMap<>();
+
+
+    public AbstractAutoCompleter(AutoCompletePreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
 
     /**
      * {@inheritDoc}
@@ -75,7 +75,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
 
             // As subset only contains lower case strings,
             // we have to to determine possible strings for each hit
-            ArrayList<String> result = new ArrayList<>();
+            List<String> result = new ArrayList<>();
             for (String s : subset) {
                 result.addAll(possibleStringsForSearchString.get(s));
             }
@@ -123,7 +123,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         // second, add a mapping from the lower cased word to the real word
         String lowerCase = word.toLowerCase();
         indexCaseInsensitive.add(lowerCase);
-        TreeSet<String> set = possibleStringsForSearchString.get(lowerCase);
+        Set<String> set = possibleStringsForSearchString.get(lowerCase);
         if (set == null) {
             set = new TreeSet<>();
         }

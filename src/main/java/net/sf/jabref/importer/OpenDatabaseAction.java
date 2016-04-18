@@ -38,6 +38,7 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -106,17 +107,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         private final BasePanel basePanel;
         private final boolean raisePanel;
-        private final File file;
 
-        OpenItSwingHelper(BasePanel basePanel, File file, boolean raisePanel) {
+        OpenItSwingHelper(BasePanel basePanel, boolean raisePanel) {
             this.basePanel = basePanel;
             this.raisePanel = raisePanel;
-            this.file = file;
         }
 
         @Override
         public void run() {
-            frame.addTab(basePanel, file, raisePanel);
+            frame.addTab(basePanel, raisePanel);
 
         }
     }
@@ -173,13 +172,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (File theFile : theFiles) {
-                        openTheFile(theFile, raisePanel);
-                    }
+            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+                for (File theFile : theFiles) {
+                    openTheFile(theFile, raisePanel);
                 }
             });
             for (File theFile : theFiles) {
@@ -271,8 +266,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                     String message = "<html>" + errorMessage + "<p>"
                             + (tryingAutosave ? Localization.lang(
-                            "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                            file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
+                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
+                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
                             + "</html>";
                     JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
                             JOptionPane.ERROR_MESSAGE);
@@ -342,7 +337,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
 
         // file is set to null inside the EventDispatcherThread
-        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, file, raisePanel));
+        SwingUtilities.invokeLater(new OpenItSwingHelper(basePanel, raisePanel));
 
         frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
                 + database.getEntryCount() + " " + Localization.lang("entries") + ".");
@@ -380,10 +375,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             result.setFile(fileToOpen);
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                NamedCompound compound = new NamedCompound("SpecialFieldSync");
                 for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 }
-                LOGGER.info("Synchronized special fields based on keywords");
+                LOGGER.debug("Synchronized special fields based on keywords");
             }
 
             if (!result.getMetaData().isGroupTreeValid()) {
@@ -436,15 +432,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (line.startsWith(Globals.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(Globals.encPrefix)) {
+                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(Globals.encPrefix.length(), atSymbolIndex);
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(Globals.encPrefix.length());
+                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));

@@ -58,7 +58,6 @@ import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -74,11 +73,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private JDialog diag;
 
-    // keyword to add
-    private JTextField keyword;
 
     private DefaultListModel<String> keywordListModel;
-    private JList<String> keywordList;
 
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
@@ -94,10 +90,11 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private void createDialog() {
-        keyword = new JTextField();
+        // keyword to add
+        JTextField keyword = new JTextField();
 
         keywordListModel = new DefaultListModel<>();
-        keywordList = new JList<>(keywordListModel);
+        JList<String> keywordList = new JList<>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -110,18 +107,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         keywordList.setVisibleRowCount(10);
 
-        intersectKeywords = new JRadioButton("Display keywords appearing in ALL entries");
-        mergeKeywords = new JRadioButton("Display keywords appearing in ANY entry");
+        intersectKeywords = new JRadioButton(Localization.lang("Display keywords appearing in ALL entries"));
+        mergeKeywords = new JRadioButton(Localization.lang("Display keywords appearing in ANY entry"));
         ButtonGroup group = new ButtonGroup();
         group.add(intersectKeywords);
         group.add(mergeKeywords);
-        ActionListener stateChanged = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                fillKeyWordList();
-            }
-        };
+        ActionListener stateChanged = e -> fillKeyWordList();
         intersectKeywords.addActionListener(stateChanged);
         mergeKeywords.addActionListener(stateChanged);
         intersectKeywords.setSelected(true);
@@ -145,16 +136,12 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelled = false;
-                diag.dispose();
-            }
+        ok.addActionListener(e -> {
+            cancelled = false;
+            diag.dispose();
         });
 
-        AbstractAction cancelAction = new AbstractAction() {
+        Action cancelAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cancelled = true;
@@ -163,22 +150,15 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         };
         cancel.addActionListener(cancelAction);
 
-        final ActionListener addActionListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                String text = keyword.getText().trim();
-                if (text.isEmpty()) {
-                    // no text to add, do nothing
-                    return;
-                }
+        final ActionListener addActionListener = arg0 -> {
+            String text = keyword.getText().trim();
+            if (!text.isEmpty()) {
                 if (keywordListModel.isEmpty()) {
                     keywordListModel.addElement(text);
                 } else {
                     int idx = 0;
                     String element = keywordListModel.getElementAt(idx);
-                    while ((idx < keywordListModel.size()) &&
-                            (element.compareTo(text) < 0)) {
+                    while ((idx < keywordListModel.size()) && (element.compareTo(text) < 0)) {
                         idx++;
                     }
                     if (idx == keywordListModel.size()) {
@@ -194,21 +174,20 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 keyword.requestFocusInWindow();
             }
         };
+
         add.addActionListener(addActionListener);
 
-        final ActionListener removeActionListenter = new ActionListener() {
+        final ActionListener removeActionListenter = arg0 -> {
+            // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
+            List<String> values = keywordList.getSelectedValuesList();
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-                List<String> values = keywordList.getSelectedValuesList();
-
-                for (String val : values) {
-                    keywordListModel.removeElement(val);
-                }
+            for (String val : values) {
+                keywordListModel.removeElement(val);
             }
         };
+
         remove.addActionListener(removeActionListenter);
+
         keywordList.addKeyListener(new KeyListener() {
 
             @Override
@@ -229,7 +208,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        AutoCompleter<String> autoComp = JabRef.jrf.getCurrentBasePanel().getAutoCompleters().get("keywords");
+        AutoCompleter<String> autoComp = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("keywords");
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -284,7 +263,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         fillKeyWordList();
 
         diag.pack();
-        PositionWindow.placeDialog(diag, frame);
+        diag.setLocationRelativeTo(frame);
         diag.setVisible(true);
         if (cancelled) {
             return;
@@ -313,56 +292,54 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            if (!keywordsToAdd.isEmpty()) {
-                // we need to check whether a special field is added
-                // for each field:
-                //   check if something is added
-                //   if yes, add all keywords of that special fields to the keywords to be removed
+        if (SpecialFieldsUtils.keywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
+            // we need to check whether a special field is added
+            // for each field:
+            //   check if something is added
+            //   if yes, add all keywords of that special fields to the keywords to be removed
 
-                Set<String> clone;
+            Set<String> clone;
 
-                // Priority
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Priority.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
-                }
+            // Priority
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Priority.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
+            }
 
-                // Quality
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Quality.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
-                }
+            // Quality
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Quality.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
+            }
 
-                // Rank
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Rank.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
-                }
+            // Rank
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Rank.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
+            }
 
-                // Relevance
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Relevance.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
-                }
+            // Relevance
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Relevance.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
+            }
 
-                // Read status
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(ReadStatus.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
-                }
+            // Read status
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(ReadStatus.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
+            }
 
-                // Printed
-                clone = createClone(keywordsToAdd);
-                clone.retainAll(Printed.getInstance().getKeyWords());
-                if (!clone.isEmpty()) {
-                    keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
-                }
+            // Printed
+            clone = createClone(keywordsToAdd);
+            clone.retainAll(Printed.getInstance().getKeyWords());
+            if (!clone.isEmpty()) {
+                keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
             }
         }
 

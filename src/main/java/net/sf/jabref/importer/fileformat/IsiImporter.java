@@ -83,26 +83,26 @@ public class IsiImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        String str;
-        int i = 0;
-        while (((str = in.readLine()) != null) && (i < 50)) {
+            String str;
+            int i = 0;
+            while (((str = in.readLine()) != null) && (i < 50)) {
 
-            /**
-             * The following line gives false positives for RIS files, so it
-             * should not be uncommented. The hypen is a characteristic of the
-             * RIS format.
-             *
-             * str = str.replace(" - ", "")
-             */
-            if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
-                return true;
+                /**
+                 * The following line gives false positives for RIS files, so it
+                 * should not be uncommented. The hypen is a characteristic of the
+                 * RIS format.
+                 *
+                 * str = str.replace(" - ", "")
+                 */
+                if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
+                    return true;
+                }
+
+                i++;
             }
-
-            i++;
         }
-
         return false;
     }
 
@@ -149,7 +149,7 @@ public class IsiImporter extends ImportFormat {
 
                 String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
-                    s = CaseChangers.TITLE.format(s);
+                    s = CaseChangers.TO_TITLE_CASE.format(s);
                     map.put(aSubsup, s);
                 }
             }
@@ -166,42 +166,42 @@ public class IsiImporter extends ImportFormat {
             throw new IOException("No stream given.");
         }
 
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
+            // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
+            String str;
 
-        // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
-        // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
-        String str;
+            while ((str = in.readLine()) != null) {
+                if (str.length() < 3) {
+                    continue;
+                }
 
-        while ((str = in.readLine()) != null) {
-            if (str.length() < 3) {
-                continue;
-            }
-
-            // begining of a new item
-            if ("PT ".equals(str.substring(0, 3))) {
-                sb.append("::").append(str);
-            } else {
-                String beg = str.substring(0, 3).trim();
-
-                // I could have used the fieldPattern regular expression instead
-                // however this seems to be
-                // quick and dirty and it works!
-                if (beg.length() == 2) {
-                    sb.append(" ## "); // mark the begining of each field
-                    sb.append(str);
+                // beginning of a new item
+                if ("PT ".equals(str.substring(0, 3))) {
+                    sb.append("::").append(str);
                 } else {
-                    sb.append("EOLEOL"); // mark the end of each line
-                    sb.append(str.trim()); // remove the initial spaces
+                    String beg = str.substring(0, 3).trim();
+
+                    // I could have used the fieldPattern regular expression instead
+                    // however this seems to be
+                    // quick and dirty and it works!
+                    if (beg.length() == 2) {
+                        sb.append(" ## "); // mark the beginning of each field
+                        sb.append(str);
+                    } else {
+                        sb.append("EOLEOL"); // mark the end of each line
+                        sb.append(str.trim()); // remove the initial spaces
+                    }
                 }
             }
         }
 
         String[] entries = sb.toString().split("::");
 
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
 
         // skip the first entry as it is either empty or has document header
         for (String entry : entries) {
@@ -256,7 +256,7 @@ public class IsiImporter extends ImportFormat {
                 } else if ("TI".equals(beg)) {
                     hm.put("title", value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put("journal", value.replaceAll("EOLEOL", " "));
+                    hm.put("journal", value.replace("EOLEOL", " "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
                     value = value.replace("EOLEOL", " ");
@@ -306,8 +306,7 @@ public class IsiImporter extends ImportFormat {
                     Type = value;
                     if ("Review".equals(Type)) {
                         Type = "article"; // set "Review" in Note/Comment?
-                    } else if (Type.startsWith("Article") || Type.startsWith("Journal")
-                            || "article".equals(PT)) {
+                    } else if (Type.startsWith("Article") || Type.startsWith("Journal") || "article".equals(PT)) {
                         Type = "article";
                     } else {
                         Type = "misc";
@@ -316,8 +315,7 @@ public class IsiImporter extends ImportFormat {
                     hm.put("CitedReferences", value.replace("EOLEOL", " ; ").trim());
                 } else {
                     // Preserve all other entries except
-                    if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg)
-                            || "FN".equals(beg)) {
+                    if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
                         continue;
                     }
                     hm.put(beg.toLowerCase(), value);
@@ -357,7 +355,6 @@ public class IsiImporter extends ImportFormat {
 
             bibitems.add(b);
         }
-
         return bibitems;
     }
 

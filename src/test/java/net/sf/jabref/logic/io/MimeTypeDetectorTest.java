@@ -1,11 +1,34 @@
 package net.sf.jabref.logic.io;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Ignore;
 
-import static org.junit.Assert.*;
+import java.net.URISyntaxException;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MimeTypeDetectorTest {
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule();
+
+    @Test
+    public void handlePermanentRedirections() {
+        String redirectedUrl = "http://localhost:8080/redirection";
+
+        stubFor(get(urlEqualTo("/redirection"))
+                .willReturn(
+                        aResponse()
+                                .withStatus(301)
+                                .withHeader("Location", "http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(redirectedUrl));
+    }
+
     @Test
     public void beFalseForInvalidUrl() {
         String invalidUrl = "thisisnourl";
@@ -24,18 +47,22 @@ public class MimeTypeDetectorTest {
         assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
     }
 
-    @Ignore
     @Test
-    public void acceptPDFMimeTypeVariations() {
-        // application/pdf;charset=ISO-8859-1
-        String pdfUrl = "http://drum.lib.umd.edu/bitstream/1903/19/2/CS-TR-3368.pdf";
-        assertTrue(MimeTypeDetector.isPdfContentType(pdfUrl));
+    public void beTrueForLocalPdfUri() throws URISyntaxException {
+        String localPath = MimeTypeDetectorTest.class.getResource("empty.pdf").toURI().toASCIIString();
+        assertTrue(MimeTypeDetector.isPdfContentType(localPath));
     }
 
-    @Ignore
     @Test
-    public void useGetRequestIfHeadRequestHasNoContentType() {
-        String pdfUrl = "http://iopscience.iop.org/article/10.1088/1749-4699/8/1/014010/pdf";
-        assertEquals("application/pdf", MimeTypeDetector.getMimeType(pdfUrl));
+    public void beTrueForPDFMimeTypeVariations() {
+        String mimeTypeVariation = "http://localhost:8080/mimevariation";
+
+        stubFor(get(urlEqualTo("/mimevariation"))
+                .willReturn(
+                        aResponse().withHeader("Content-Type", "application/pdf;charset=ISO-8859-1")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(mimeTypeVariation));
     }
 }

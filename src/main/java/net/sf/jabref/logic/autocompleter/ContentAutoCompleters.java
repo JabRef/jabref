@@ -47,9 +47,7 @@ public class ContentAutoCompleters extends AutoCompleters {
             if (metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey()) != null) {
                 List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
                 if (items != null) {
-                    for (String item : items) {
-                        ac.addItemToIndex(item);
-                    }
+                    items.forEach(ac::addItemToIndex);
                 }
             }
         }

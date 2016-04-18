@@ -8,7 +8,12 @@ import net.sf.jabref.JabRefPreferences;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import java.io.FileReader;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -25,11 +30,12 @@ public class DatabaseFileLookupTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws FileNotFoundException, IOException {
         Globals.prefs = JabRefPreferences.getInstance();
 
-        try (FileReader fr = new FileReader(ImportDataTest.UNLINKED_FILES_TEST_BIB)) {
-            ParserResult result = BibtexParser.parse(fr);
+        try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+            ParserResult result = BibtexParser.parse(reader);
             database = result.getDatabase();
             entries = database.getEntries();
 
@@ -42,7 +48,7 @@ public class DatabaseFileLookupTest {
      * Tests the prerequisites of this test-class itself.
      */
     @Test
-    public void testTestDatabase() throws Exception {
+    public void testTestDatabase() {
         Assert.assertEquals(2, database.getEntryCount());
         Assert.assertEquals(2, entries.size());
         Assert.assertNotNull(entry1);

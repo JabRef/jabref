@@ -35,7 +35,6 @@ import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.DuplicateCheck;
@@ -76,7 +75,7 @@ public class ChangeScanner implements Runnable {
     public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
         this.panel = bp;
         this.frame = frame;
-        this.inMem = bp.database();
+        this.inMem = bp.getDatabase();
         this.mdInMem = bp.getBibDatabaseContext().getMetaData();
         this.f = file;
     }
@@ -84,7 +83,6 @@ public class ChangeScanner implements Runnable {
     @Override
     public void run() {
         try {
-            //long startTime = System.currentTimeMillis();
 
             // Parse the temporary file.
             File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
@@ -130,18 +128,14 @@ public class ChangeScanner implements Runnable {
 
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                    PositionWindow.placeDialog(dial, frame);
-                    dial.setVisible(true); // dial.show(); -> deprecated since 1.5
-                    fup.scanResultsResolved(dial.isOkPressed());
-                    if (dial.isOkPressed()) {
-                        // Overwrite the temp database:
-                        storeTempDatabase();
-                    }
+            SwingUtilities.invokeLater((Runnable) () -> {
+                ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
+                dial.setLocationRelativeTo(frame);
+                dial.setVisible(true);
+                fup.scanResultsResolved(dial.isOkPressed());
+                if (dial.isOkPressed()) {
+                    // Overwrite the temp database:
+                    storeTempDatabase();
                 }
             });
 
@@ -153,30 +147,25 @@ public class ChangeScanner implements Runnable {
     }
 
     private void storeTempDatabase() {
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
-                        .withMakeBackup(false)
+        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            try {
+                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
                         .withEncoding(panel.getEncoding());
 
-                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-                    SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
-                    ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
-                } catch (SaveException ex) {
-                    LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
-                }
-
+                Defaults defaults = new Defaults(BibDatabaseMode
+                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
+                ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
+            } catch (SaveException ex) {
+                LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }
         });
     }
 
     private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
         MetaDataChange mdc = new MetaDataChange(inMem1, inTemp1);
-        ArrayList<String> handledOnDisk = new ArrayList<>();
+        List<String> handledOnDisk = new ArrayList<>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
         for (String key : inTemp1) {
@@ -217,8 +206,8 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet<String> used = new HashSet<>(disk.getEntryCount());
-        HashSet<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
+        Set<String> used = new HashSet<>(disk.getEntryCount());
+        Set<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -295,25 +284,9 @@ public class ChangeScanner implements Runnable {
                     EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
                             disk.getEntryAt(bestMatchI));
                     changes.add(ec);
-
-                    // Create an undo edit to represent this change:
-                    //NamedCompound ce = new NamedCompound("Modified entry");
-                    //ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(bestMatchI), panel));
-                    //ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    //ce.end();
-                    //changes.add(ce);
-
-                    //System.out.println("Possible match for entry:");
-                    //System.out.println("----------------------------------------------");
-
                 } else {
                     EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
                     changes.add(ec);
-                    /*NamedCompound ce = new NamedCompound("Removed entry");
-                    ce.addEdit(new UndoableInsertEntry(inMem, tmp.getEntryAt(piv1), panel));
-                    ce.end();
-                    changes.add(ce);*/
-
                 }
 
             }
@@ -338,13 +311,8 @@ public class ChangeScanner implements Runnable {
                         EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
                         changes.add(ec);
                     }
-                    /*NamedCompound ce = new NamedCompound("Added entry");
-                    ce.addEdit(new UndoableRemoveEntry(inMem, disk.getEntryAt(i), panel));
-                    ce.end();
-                    changes.add(ce);*/
                 }
             }
-            //System.out.println("Suspected new entries in file: "+(disk.getEntryCount()-used.size()));
         }
     }
 
@@ -389,15 +357,13 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanStrings(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
-        int nTmp = onTmp.getStringCount();
-        int nDisk = onDisk.getStringCount();
-        if ((nTmp == 0) && (nDisk == 0)) {
+        if (onTmp.hasNoStrings() && onDisk.hasNoStrings()) {
             return;
         }
 
-        HashSet<Object> used = new HashSet<>();
-        HashSet<Object> usedInMem = new HashSet<>();
-        HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
+        Set<Object> used = new HashSet<>();
+        Set<Object> usedInMem = new HashSet<>();
+        Set<String> notMatched = new HashSet<>(onTmp.getStringCount());
 
         // First try to match by string names.
         mainLoop:
@@ -526,8 +492,9 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    public interface DisplayResultCallback {
 
+    @FunctionalInterface
+    public interface DisplayResultCallback {
         void scanResultsResolved(boolean resolved);
     }
 }

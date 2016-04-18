@@ -20,13 +20,16 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
-
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 
 /**
@@ -36,13 +39,15 @@ public class TransferableFileLinkSelection implements Transferable {
 
     private final List<File> fileList = new ArrayList<>();
 
+    private static final Log LOGGER = LogFactory.getLog(TransferableFileLinkSelection.class);
+
 
     public TransferableFileLinkSelection(BasePanel panel, List<BibEntry> selection) {
         FileListTableModel tm = new FileListTableModel();
-        selection.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(file -> tm.setContent(file));
+        selection.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
             FileUtil.expandFilename(tm.getEntry(0).link, dirs).ifPresent(fileList::add);
         }
 
@@ -55,7 +60,8 @@ public class TransferableFileLinkSelection implements Transferable {
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-        System.out.println("Query: " + dataFlavor.getHumanPresentableName() + " , " +
+        LOGGER.debug("Query: " + dataFlavor.getHumanPresentableName() + " , "
+                +
                 dataFlavor.getDefaultRepresentationClass() + " , " + dataFlavor.getMimeType());
         return dataFlavor.equals(DataFlavor.javaFileListFlavor)
                 || dataFlavor.equals(DataFlavor.stringFlavor);

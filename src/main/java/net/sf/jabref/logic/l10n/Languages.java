@@ -21,8 +21,9 @@ public class Languages {
         LANGUAGES.put("Japanese", "ja");
         LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
-        LANGUAGES.put("Brazilian Portugese", "pt_BR");
+        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
         LANGUAGES.put("Russian", "ru");
+        LANGUAGES.put("Svenska", "sv");
         LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Vietnamese", "vi");
         LANGUAGES.put("Simplified Chinese", "zh");

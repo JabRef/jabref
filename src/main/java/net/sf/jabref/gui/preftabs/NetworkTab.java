@@ -41,7 +41,6 @@ public class NetworkTab extends JPanel implements PrefsTab {
     private final JCheckBox useAuthenticationCheckBox;
     private final JTextField usernameTextField;
     private final JPasswordField passwordTextField;
-    private final JLabel passwordWarningLabel;
     private final JabRefPreferences preferences;
     private ProxyPreferences oldProxyPreferences;
 
@@ -64,7 +63,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         usernameTextField.setEnabled(false);
         passwordTextField = new JPasswordField();
         passwordTextField.setEnabled(false);
-        passwordWarningLabel = new JLabel(Localization.lang("Attention: Password is stored in plain text!"));
+        JLabel passwordWarningLabel = new JLabel(Localization.lang("Attention: Password is stored in plain text!"));
         passwordWarningLabel.setEnabled(false);
         passwordWarningLabel.setForeground(Color.RED);
 
@@ -92,7 +91,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
         builder.addSeparator(Localization.lang("Network")).xyw(1, 1, 6);
         builder.add(useProxyCheckBox).xyw(2, 3, 5);
-        builder.add(Localization.lang("Host") + ':').xy(2, 5);
+        builder.add(Localization.lang("Hostname") + ':').xy(2, 5);
         builder.add(hostnameTextField).xyw(4, 5, 3);
         builder.add(Localization.lang("Port") + ':').xy(2, 7);
         builder.add(portTextField).xyw(4, 7, 3);
@@ -140,7 +139,8 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-        boolean validSetting, validAuthenticationSetting = false;
+        boolean validSetting;
+        boolean validAuthenticationSetting = false;
         if (useProxyCheckBox.isSelected()) {
             String host = hostnameTextField.getText();
             String port = portTextField.getText();

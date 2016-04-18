@@ -53,12 +53,13 @@ class StringDialog extends JDialog {
     private final StringTable table;
     private final HelpAction helpAction;
 
-    private final PositionWindow pw;
-
     private final SaveDatabaseAction saveAction = new SaveDatabaseAction(this);
 
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
+
+    public static final String STRINGS_TITLE = Localization.lang("Strings for database");
+
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
         super(frame);
@@ -97,7 +98,7 @@ class StringDialog extends JDialog {
 
         StringTableModel stm = new StringTableModel(this, base);
         table = new StringTable(stm);
-        if (base.getStringCount() > 0) {
+        if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
 
@@ -135,29 +136,13 @@ class StringDialog extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.stringsTitle + ": " + GUIGlobals.untitledTitle);
+            setTitle(STRINGS_TITLE + ": " + GUIGlobals.UNTITLED_TITLE);
         } else {
-            setTitle(GUIGlobals.stringsTitle + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
+            setTitle(STRINGS_TITLE + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
         }
-        pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
     }
 
 
@@ -287,7 +272,7 @@ class StringDialog extends JDialog {
 
         @Override
         public String getColumnName(int col) {
-            return col == 0 ? Localization.lang("Name") :
+            return col == 0 ? Localization.lang("Label") :
                 Localization.lang("Content");
         }
 
@@ -424,9 +409,8 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = Localization.lang("Really delete the selected") + ' '
-                        + (sel.length > 1 ? sel.length + " " + Localization.lang("entries")
-                        : Localization.lang("entry")) + '?';
+                String msg = (sel.length > 1 ? Localization.lang("Really delete the selected %0 entries?",
+                        Integer.toString(sel.length)) : Localization.lang("Really delete the selected entry?"));
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.YES_OPTION) {
@@ -445,7 +429,7 @@ class StringDialog extends JDialog {
                     panel.undoManager.addEdit(ce);
 
                     refreshTable();
-                    if (base.getStringCount() > 0) {
+                    if (!base.hasNoStrings()) {
                         table.setRowSelectionInterval(0, 0);
                     }
                 }
@@ -462,11 +446,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.UNDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.UNDO);
         }
     }
 
@@ -479,11 +459,7 @@ class StringDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                panel.runCommand(Actions.REDO);
-            } catch (Throwable ignored) {
-                // Ignore
-            }
+            panel.runCommand(Actions.REDO);
         }
     }
 }

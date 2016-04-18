@@ -15,30 +15,53 @@
 */
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
 
+import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class MetaData implements Iterable<String> {
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    public static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    static final String DATABASE_TYPE = "DATABASE_TYPE";
-    public static final String GROUPSVERSION = "groupsversion";
-    public static final String GROUPSTREE = "groupstree";
-    public static final String GROUPS = "groups";
+    private static final String DATABASE_TYPE = "databaseType";
+    private static final String GROUPSVERSION = "groupsversion";
+    private static final String GROUPSTREE = "groupstree";
+    private static final String GROUPS = "groups";
+    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
-    private File file; // The File where this base gets saved.
+
     private boolean groupTreeValid = true;
 
     private AbstractLabelPattern labelPattern;
@@ -53,6 +76,7 @@ public class MetaData implements Iterable<String> {
      * it has been passed.
      */
     public MetaData(Map<String, String> inData, BibDatabase db) {
+        Objects.requireNonNull(inData);
         boolean groupsTreePresent = false;
         List<String> flatGroupsData = null;
         List<String> treeGroupsData = null;
@@ -60,33 +84,31 @@ public class MetaData implements Iterable<String> {
         // thus this value defaults to 0.
         int groupsVersionOnDisk = 0;
 
-        if (inData != null) {
-            for (Map.Entry<String, String> entry : inData.entrySet()) {
-                StringReader data = new StringReader(entry.getValue());
-                String unit;
-                List<String> orderedData = new ArrayList<>();
-                // We must allow for ; and \ in escape sequences.
-                try {
-                    while ((unit = getNextUnit(data)) != null) {
-                        orderedData.add(unit);
-                    }
-                } catch (IOException ex) {
-                    System.err.println("Weird error while parsing meta data.");
+        for (Map.Entry<String, String> entry : inData.entrySet()) {
+            StringReader data = new StringReader(entry.getValue());
+            String unit;
+            List<String> orderedData = new ArrayList<>();
+            // We must allow for ; and \ in escape sequences.
+            try {
+                while ((unit = getNextUnit(data)) != null) {
+                    orderedData.add(unit);
                 }
-                if (GROUPSVERSION.equals(entry.getKey())) {
-                    if (!orderedData.isEmpty()) {
-                        groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
-                    }
-                } else if (GROUPSTREE.equals(entry.getKey())) {
-                    groupsTreePresent = true;
-                    treeGroupsData = orderedData; // save for later user
-                    // actual import operation is handled later because "groupsversion"
-                    // tag might not yet have been read
-                } else if (GROUPS.equals(entry.getKey())) {
-                    flatGroupsData = orderedData;
-                } else {
-                    putData(entry.getKey(), orderedData);
+            } catch (IOException ex) {
+                LOGGER.error("Weird error while parsing meta data.", ex);
+            }
+            if (GROUPSVERSION.equals(entry.getKey())) {
+                if (!orderedData.isEmpty()) {
+                    groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
                 }
+            } else if (GROUPSTREE.equals(entry.getKey())) {
+                groupsTreePresent = true;
+                treeGroupsData = orderedData; // save for later user
+                // actual import operation is handled later because "groupsversion"
+                // tag might not yet have been read
+            } else if (GROUPS.equals(entry.getKey())) {
+                flatGroupsData = orderedData;
+            } else {
+                putData(entry.getKey(), orderedData);
             }
         }
 
@@ -109,6 +131,15 @@ public class MetaData implements Iterable<String> {
      * The MetaData object can be constructed with no data in it.
      */
     public MetaData() {
+        // No data
+    }
+
+    public Optional<SaveOrderConfig> getSaveOrderConfig() {
+        List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
+        if(storedSaveOrderConfig != null) {
+            return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
+        }
+        return Optional.empty();
     }
 
     /**
@@ -161,82 +192,11 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
-     * Look up the directory set up for the given field type for this database.
-     * If no directory is set up, return that defined in global preferences.
-     * There can be up to three directory definitions for these files:
-     * the database's metadata can specify a general directory and/or a user-specific directory
-     * or the preferences can specify one.
-     *
-     * The settings are prioritized in the following order and the first defined setting is used:
-     * 1. metadata user-specific directory
-     * 2. metadata general directory
-     * 3. preferences directory
-     * 4. bib file directory
-     *
-     * @param fieldName The field type
-     * @return The default directory for this field type.
-     */
-    public List<String> getFileDirectory(String fieldName) {
-        List<String> fileDirs = new ArrayList<>();
-
-        // 1. metadata user-specific directory
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
-        List<String> metaData = getData(key);
-        if (metaData == null) {
-            key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR); // FILE_DIR_FOR_DB
-            metaData = getData(key);
-        }
-
-        // 2. metadata general directory
-        if ((metaData != null) && !metaData.isEmpty()) {
-            String dir;
-            dir = metaData.get(0);
-            // If this directory is relative, we try to interpret it as relative to
-            // the file path of this bib file:
-            if (!new File(dir).isAbsolute() && (file != null)) {
-                String relDir;
-                if (".".equals(dir)) {
-                    // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = file.getParent();
-                } else {
-                    relDir = file.getParent() + File.separator + dir;
-                }
-                // If this directory actually exists, it is very likely that the
-                // user wants us to use it:
-                if (new File(relDir).exists()) {
-                    dir = relDir;
-                }
-            }
-            fileDirs.add(dir);
-        } else {
-            // 3. preferences directory?
-            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
-            if (dir != null) {
-                fileDirs.add(dir);
-            }
-        }
-
-        // 4. bib file directory
-        if (getFile() != null) {
-            String parentDir = getFile().getParent();
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
-                fileDirs.add(0, parentDir);
-            } else {
-                fileDirs.add(parentDir);
-            }
-        }
-
-        return fileDirs;
-    }
-
-    /**
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
      * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
-     * @return true if parsing was successful, false otherwise
      */
     private void putGroups(List<String> orderedData, BibDatabase db, int version) {
         try {
@@ -245,7 +205,7 @@ public class MetaData implements Iterable<String> {
             groupTreeValid = true;
         } catch (Exception e) {
             // we cannot really do anything about this here
-            System.err.println(e);
+            LOGGER.error("Problem parsing groups from MetaData", e);
             groupTreeValid = false;
         }
     }
@@ -286,14 +246,6 @@ public class MetaData implements Iterable<String> {
             return res.toString();
         }
         return null;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
     }
 
     public DBStrings getDBStrings() {
@@ -340,7 +292,7 @@ public class MetaData implements Iterable<String> {
      * @param labelPattern the key patterns to update to. <br />
      *                     A reference to this object is stored internally and is returned at getLabelPattern();
      */
-    public void setLabelPattern(DatabaseLabelPattern labelPattern) {
+    public void setLabelPattern(AbstractLabelPattern labelPattern) {
         // remove all keypatterns from metadata
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
@@ -373,4 +325,135 @@ public class MetaData implements Iterable<String> {
         this.labelPattern = labelPattern;
     }
 
+    public FieldFormatterCleanups getSaveActions() {
+        if (this.getData(SAVE_ACTIONS) == null) {
+            return new FieldFormatterCleanups(false, new ArrayList<>());
+        } else {
+            boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
+            String formatterString = this.getData(SAVE_ACTIONS).get(1);
+            return new FieldFormatterCleanups(enablementStatus, formatterString);
+        }
+    }
+
+    public Optional<BibDatabaseMode> getMode() {
+        List<String> data = getData(MetaData.DATABASE_TYPE);
+        if ((data == null) || data.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase(Locale.ENGLISH)));
+    }
+
+    public boolean isProtected() {
+        List<String> data = getData(Globals.PROTECTED_FLAG_META);
+        if ((data == null) || data.isEmpty()) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(data.get(0));
+        }
+    }
+
+    public List<String> getContentSelectors(String fieldName) {
+        return getData(Globals.SELECTOR_META_PREFIX + fieldName);
+    }
+
+    public Optional<String> getDefaultFileDirectory() {
+        List<String> fileDirectory = getData(FILE_DIRECTORY);
+        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(fileDirectory.get(0).trim());
+        }
+    }
+
+    public Optional<String> getUserFileDirectory(String user) {
+        List<String> fileDirectory = getData(FILE_DIRECTORY + '-' + user);
+        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(fileDirectory.get(0).trim());
+        }
+    }
+
+    /**
+     * Writes all data in the format <key, serialized data>.
+     */
+    public Map<String, String> serialize() {
+
+        Map<String, String> serializedMetaData = new TreeMap<>();
+
+        // first write all meta data except groups
+        for (Map.Entry<String, List<String>> metaItem : metaData.entrySet()) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String dataItem : metaItem.getValue()) {
+                stringBuilder.append(StringUtil.quote(dataItem, ";", '\\')).append(";");
+
+                //in case of save actions, add an additional newline after the enabled flag
+                if (metaItem.getKey().equals(SAVE_ACTIONS) && "enabled".equals(dataItem)) {
+                    stringBuilder.append(Globals.NEWLINE);
+                }
+            }
+
+            String serializedItem = stringBuilder.toString();
+            // Only add non-empty values
+            if (!serializedItem.isEmpty() && !";".equals(serializedItem)) {
+                serializedMetaData.put(metaItem.getKey(), serializedItem);
+            }
+        }
+
+        // write groups if present. skip this if only the root node exists
+        // (which is always the AllEntriesGroup).
+        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
+
+            // write version first
+            serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
+
+            // now write actual groups
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(Globals.NEWLINE);
+
+            for(String groupNode : groupsRoot.getTreeAsString()) {
+                stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
+                stringBuilder.append(";");
+                stringBuilder.append(Globals.NEWLINE);
+            }
+            serializedMetaData.put(MetaData.GROUPSTREE, stringBuilder.toString());
+        }
+
+        return serializedMetaData;
+    }
+
+    public void setSaveActions(FieldFormatterCleanups saveActions) {
+        List<String> actionsSerialized = saveActions.convertToString();
+        putData(SAVE_ACTIONS, actionsSerialized);
+    }
+
+    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
+        List<String> serialized = saveOrderConfig.getConfigurationList();
+        putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+    }
+
+    public void setMode(BibDatabaseMode mode) {
+        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
+    }
+
+    public void markAsProtected() {
+        putData(Globals.PROTECTED_FLAG_META, Collections.singletonList("true"));
+    }
+
+    public void setContentSelectors(String fieldName, List<String> contentSelectors) {
+        putData(Globals.SELECTOR_META_PREFIX + fieldName, contentSelectors);
+    }
+
+    public void setDefaultFileDirectory(String path) {
+        putData(FILE_DIRECTORY, Collections.singletonList(path));
+    }
+
+    public void clearDefaultFileDirectory() {
+        remove(FILE_DIRECTORY);
+    }
+
+    public void setUserFileDirectory(String user, String path) {
+        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path));
+    }
 }

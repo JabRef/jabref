@@ -15,21 +15,6 @@
  */
 package net.sf.jabref.gui.groups;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.undo.CountingUndoManager;
-import net.sf.jabref.logic.groups.*;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.UndoManager;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -39,6 +24,30 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.UndoManager;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.undo.CountingUndoManager;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.groups.MoveGroupChange;
+import net.sf.jabref.logic.groups.SearchGroup;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
@@ -192,7 +201,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                BasePanel currentBasePanel = JabRef.jrf.getCurrentBasePanel();
+                BasePanel currentBasePanel = JabRef.mainFrame.getCurrentBasePanel();
                 if(currentBasePanel != null) {
                     for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
                         if (group.contains(entry)) {

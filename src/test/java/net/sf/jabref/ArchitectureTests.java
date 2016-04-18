@@ -1,12 +1,12 @@
 package net.sf.jabref;
 
-import com.google.common.base.Charsets;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,21 +56,23 @@ public class ArchitectureTests {
 
     @Test
     public void testLogicIndependentOfSwingAndGui() throws IOException {
-        assertIndependenceOfPackages(firstPackage, secondPackage);
+        assertIndependenceOfPackages();
     }
 
-    private void assertIndependenceOfPackages(String firstPackage, String secondPackage) throws IOException {
+    private void assertIndependenceOfPackages() throws IOException {
         List<Path> files = Files.walk(Paths.get("src"))
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
-                        return Files.readAllLines(p, Charsets.UTF_8).stream().filter(s -> s.startsWith("package " + firstPackage)).findAny().isPresent();
+                return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
+                        .filter(s -> s.startsWith("package " + firstPackage)).findAny().isPresent();
                     } catch (IOException e) {
                         return false;
                     }
                 }).filter(p -> {
                     try {
-                        return Files.readAllLines(p, Charsets.UTF_8).stream().filter(s -> s.startsWith("import " + secondPackage)).findAny().isPresent();
+                return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
+                        .filter(s -> s.startsWith("import " + secondPackage)).findAny().isPresent();
                     } catch (IOException e) {
                         return false;
                     }

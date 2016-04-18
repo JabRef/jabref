@@ -31,12 +31,12 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.exporter.layout.format.RemoveBrackets;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.exporter.layout.LayoutFormatter;
-import net.sf.jabref.exporter.layout.format.XMLChars;
+import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.format.RemoveBrackets;
+import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -908,20 +908,36 @@ class MSBibEntry {
 
     private EntryType mapMSBibToBibtexType(String msbib) {
         EntryType bibtex;
-        if ("Book".equals(msbib)) {
+        switch (msbib) {
+        case "Book":
             bibtex = BibtexEntryTypes.BOOK;
-        } else if ("BookSection".equals(msbib)) {
+            break;
+        case "BookSection":
             bibtex = BibtexEntryTypes.INBOOK;
-        } else if ("JournalArticle".equals(msbib) || "ArticleInAPeriodical".equals(msbib)) {
+            break;
+        case "JournalArticle":
+        case "ArticleInAPeriodical":
             bibtex = BibtexEntryTypes.ARTICLE;
-        } else if ("ConferenceProceedings".equals(msbib)) {
+            break;
+        case "ConferenceProceedings":
             bibtex = BibtexEntryTypes.CONFERENCE;
-        } else if ("Report".equals(msbib)) {
+            break;
+        case "Report":
             bibtex = BibtexEntryTypes.TECHREPORT;
-        } else if ("InternetSite".equals(msbib) || "DocumentFromInternetSite".equals(msbib) || "ElectronicSource".equals(msbib) || "Art".equals(msbib) || "SoundRecording".equals(msbib) || "Performance".equals(msbib) || "Film".equals(msbib) || "Interview".equals(msbib) || "Patent".equals(msbib) || "Case".equals(msbib)) {
+            break;
+        case "InternetSite":
+        case "DocumentFromInternetSite":
+        case "ElectronicSource":
+        case "Art":
+        case "SoundRecording":
+        case "Performance":
+        case "Film":
+        case "Interview":
+        case "Patent":
+        case "Case":
+        default:
             bibtex = BibtexEntryTypes.MISC;
-        } else {
-            bibtex = BibtexEntryTypes.MISC;
+            break;
         }
 
         return bibtex;
@@ -938,7 +954,7 @@ class MSBibEntry {
 
         // Todo: add check for BibTexEntry types
 
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
 
         if (tag != null) {
             hm.put(BibEntry.KEY_FIELD, tag);

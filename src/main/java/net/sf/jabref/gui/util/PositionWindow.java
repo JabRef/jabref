@@ -21,6 +21,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import net.sf.jabref.Globals;
 
@@ -39,6 +41,22 @@ public class PositionWindow {
         this.sizeXKey = sizeXKey;
         this.sizeYKey = sizeYKey;
         this.window = window;
+        // Set up a ComponentListener that saves the last size and position of the dialog
+        window.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Save dialog position
+                storeWindowPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                // Save dialog position
+                storeWindowPosition();
+            }
+        });
+
     }
 
 
@@ -105,13 +123,4 @@ public class PositionWindow {
         Globals.prefs.putInt(sizeYKey, d.height);
     }
 
-    /**
-     * This method sets the location of a Dialog such that it is centered with regard to another window, but not outside
-     * the screen on the left and the top.
-     */
-    public static void placeDialog(java.awt.Dialog diag, java.awt.Container win) {
-        if (diag != null) {
-            diag.setLocationRelativeTo(win);
-        }
-    }
 }

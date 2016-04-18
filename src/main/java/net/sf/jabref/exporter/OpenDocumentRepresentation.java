@@ -16,19 +16,16 @@
 package net.sf.jabref.exporter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.exporter.layout.format.GetOpenOfficeType;
-import net.sf.jabref.exporter.layout.format.RemoveBrackets;
-import net.sf.jabref.exporter.layout.format.RemoveWhitespace;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.layout.format.GetOpenOfficeType;
+import net.sf.jabref.logic.layout.format.RemoveBrackets;
+import net.sf.jabref.logic.layout.format.RemoveWhitespace;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -45,13 +42,13 @@ import org.w3c.dom.Text;
  */
 class OpenDocumentRepresentation {
 
-    private final Collection<BibEntry> entries;
+    private final List<BibEntry> entries;
     private final BibDatabase database;
 
     private static final Log LOGGER = LogFactory.getLog(OpenDocumentRepresentation.class);
 
 
-    public OpenDocumentRepresentation(BibDatabase database, Set<String> keySet) {
+    public OpenDocumentRepresentation(BibDatabase database, List<BibEntry> entries) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
@@ -61,17 +58,15 @@ class OpenDocumentRepresentation {
         // Use glazed lists to get a sorted view of the entries:
         List<BibEntry> entryList = new ArrayList<>();
 
-        // Set up a list of all entries, if keySet==null, or the entries whose
-        // ids are in keySet, otherwise:
-        if (keySet == null) {
+        // Set up a list of all entries, if entries==null, or the entries in the given list
+        if (entries == null) {
             entryList.addAll(database.getEntries());
         } else {
-            for (String key : keySet) {
-                entryList.add(database.getEntryById(key));
-            }
+            entryList.addAll(entries);
         }
+
         Collections.sort(entryList, new FieldComparatorStack<>(comparators));
-        entries = entryList;
+        this.entries = entryList;
     }
 
     public Document getDOMrepresentation() {

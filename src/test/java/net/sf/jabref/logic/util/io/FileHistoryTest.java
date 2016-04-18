@@ -12,11 +12,11 @@ import net.sf.jabref.JabRefPreferences;
 
 public class FileHistoryTest {
 
-    JabRefPreferences prefs;
-    List<String> oldFileNames;
+    private JabRefPreferences prefs;
+    private List<String> oldFileNames;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         prefs = JabRefPreferences.getInstance();
         oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_FILES);
     }
@@ -25,11 +25,6 @@ public class FileHistoryTest {
     public void restore() {
         prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
     }
-    @Test
-    public void testConstructor() {
-        new FileHistory(prefs);
-    }
-
 
     @Test
     public void testFileHistory() {

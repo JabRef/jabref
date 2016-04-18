@@ -49,12 +49,6 @@ public class IEEETranEntryTypes {
 
     };
 
-    public static final String[] IEEETRANBSTCTL_YES_NO_FIELDS = {"ctluse_article_number", "ctluse_paper", "ctluse_url",
-            "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names"};
-
-    public static final String[] IEEETRANBSTCTL_NUMERIC_FIELDS = {"ctlmax_names_forced_etal", "ctlnames_show_etal",
-            "ctlalt_stretch_factor"};
-
     /**
      * The periodical entry type is used for journals and magazines.
      * <p>

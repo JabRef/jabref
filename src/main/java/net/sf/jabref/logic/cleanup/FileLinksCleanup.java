@@ -22,6 +22,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
  * Fixes the format of the file field. For example, if the file link is empty but the description wrongly contains the path.
@@ -35,7 +36,7 @@ public class FileLinksCleanup implements CleanupJob {
             return new ArrayList<>();
         }
 
-        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
+        List<ParsedFileField> fileList = FileField.parse(oldValue.get());
 
         // Parsing automatically moves a single description to link, so we just need to write the fileList back again
         String newValue = FileField.getStringRepresentation(fileList);

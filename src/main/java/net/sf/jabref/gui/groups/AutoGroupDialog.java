@@ -33,8 +33,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.*;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.util.PositionWindow;
-
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -111,7 +109,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 }
 
                 autoGroupsRoot.moveTo(m_groupsRoot.getNode());
-                NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate groups"));
+                NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
                 UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(gs, m_groupsRoot,
                         new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
                 ce.addEdit(undo);
@@ -178,7 +176,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
         updateComponents();
         pack();
-        PositionWindow.placeDialog(this, frame);
+        setLocationRelativeTo(frame);
     }
 
     @Override

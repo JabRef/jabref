@@ -4,12 +4,14 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
 
-    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate"), "ctrl alt A"),
+    ABBREVIATE(
+            "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G"),
-    AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically link files"), "alt F"),
+    AUTOMATICALLY_LINK_FILES(
+            "Automatically link files", Localization.lang("Automatically set file links"), "alt F"),
     BACK("Back", Localization.lang("Back"), "alt LEFT"),
-    BACK_HELP_DIALOG("Back, help dialog", Localization.lang("Back, help dialog"), "LEFT"),
-    CLEANUP("Cleanup", Localization.lang("Cleanup"), "ctrl shift F7"),
+    CLEANUP(
+            "Cleanup", Localization.lang("Cleanup entries"), "ctrl shift F7"),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE"),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W"),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE"),
@@ -37,7 +39,6 @@ public enum KeyBinding {
     FIND_UNLINKED_FILES("Find unlinked files", Localization.lang("Find unlinked files"), "shift F7"),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "ctrl shift E"),
     FORWARD("Forward", Localization.lang("Forward"), "alt RIGHT"),
-    FORWARD_HELP_DIALOG("Forward, help dialog", Localization.lang("Forward, help dialog"), "RIGHT"),
     HELP("Help", Localization.lang("Help"), "F1"),
     HIDE_SHOW_TOOLBAR("Hide/show toolbar", Localization.lang("Hide/show toolbar"), "ctrl alt T"),
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I"),
@@ -47,7 +48,6 @@ public enum KeyBinding {
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl shift A"),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl shift B"),
     NEW_ENTRY("New entry", Localization.lang("New entry"), "ctrl N"),
-    NEW_FILE_LINK("New file link", Localization.lang("New file link"), "ctrl N"),
     NEW_FROM_PLAIN_TEXT("New from plain text", Localization.lang("New from plain text"), "ctrl shift N"),
     NEW_INBOOK("New inbook", Localization.lang("New inbook"), "ctrl shift I"),
     NEW_MASTERSTHESIS("New mastersthesis", Localization.lang("New mastersthesis"), "ctrl shift M"),
@@ -55,6 +55,7 @@ public enum KeyBinding {
     NEW_PROCEEDINGS("New proceedings", Localization.lang("New proceedings"), "ctrl shift P"),
     NEW_UNPUBLISHED("New unpublished", Localization.lang("New unpublished"), "ctrl shift U"),
     NEXT_TAB("Next tab", Localization.lang("Next tab"), "ctrl PAGE_DOWN"),
+    OPEN_CONSOLE("Open terminal here", Localization.lang("Open terminal here"), "ctrl shift J"),
     OPEN_DATABASE("Open database", Localization.lang("Open database"), "ctrl O"),
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4"),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O"),
@@ -66,12 +67,14 @@ public enum KeyBinding {
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl L"),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl Q"),
     REDO("Redo", Localization.lang("Redo"), "ctrl Y"),
-    REFRESH_OO("Refresh OO", Localization.lang("Refresh OO"), "ctrl alt O"),
+    REFRESH_OO(
+            "Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O"),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl R"),
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D"),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S"),
     SAVE_DATABASE("Save database", Localization.lang("Save database"), "ctrl S"),
-    SAVE_DATABASE_AS("Save database as ...", Localization.lang("Save database as ..."), "ctrl shift S"),
+    SAVE_DATABASE_AS(
+            "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N"),

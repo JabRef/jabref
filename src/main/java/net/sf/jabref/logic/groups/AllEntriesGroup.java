@@ -18,6 +18,9 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -29,7 +32,7 @@ public class AllEntriesGroup extends AbstractGroup {
     public static final String ID = "AllEntriesGroup:";
 
     public AllEntriesGroup() {
-        super(Localization.lang("All Entries"), GroupHierarchyType.INDEPENDENT);
+        super(Localization.lang("All entries"), GroupHierarchyType.INDEPENDENT);
     }
 
     public static AbstractGroup fromString(String s, int version) throws Exception {

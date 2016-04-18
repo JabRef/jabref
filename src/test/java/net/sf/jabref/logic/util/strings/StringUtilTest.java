@@ -1,22 +1,31 @@
 package net.sf.jabref.logic.util.strings;
 
-import static org.junit.Assert.*;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.FileField;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class StringUtilTest {
+
+    private static final String[][] STRING_ARRAY_1 = {{"a", "b"}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_1 = "a:b;c:d";
+    private static final String[][] STRING_ARRAY_2_WITH_NULL = {{"a", null}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2_WITH_NULL = "a:" + null + ";c:d";
+    private static final String[][] STRING_ARRAY_2 = {{"a", ""}, {"c", "d"}};
+    private static final String ENCODED_STRING_ARRAY_2 = "a:;c:d";
+    private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
+    private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
+
+
     @BeforeClass
     public static void loadPreferences() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Test
-    public void testUnifyLineBreaks() throws Exception {
+    public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
         assertEquals(Globals.NEWLINE, result);
@@ -136,31 +145,22 @@ public class StringUtilTest {
     }
 
 
-    private static final String[][] stringArray1 = {{"a", "b"}, {"c", "d"}};
-    private static final String encStringArray1 = "a:b;c:d";
-    private static final String[][] stringArray2null = {{"a", null}, {"c", "d"}};
-    private static final String encStringArray2 = "a:;c:d";
-    private static final String[][] stringArray2 = {{"a", ""}, {"c", "d"}};
-    private static final String encStringArray2null = "a:" + null + ";c:d";
-    private static final String[][] stringArray3 = {{"a", ":b"}, {"c;", "d"}};
-    private static final String encStringArray3 = "a:\\:b;c\\;:d";
-
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals(encStringArray1, FileField.encodeStringArray(stringArray1));
-        assertEquals(encStringArray2, FileField.encodeStringArray(stringArray2));
-        assertEquals(encStringArray2null, FileField.encodeStringArray(stringArray2null));
-        assertEquals(encStringArray3, FileField.encodeStringArray(stringArray3));
+        assertEquals(ENCODED_STRING_ARRAY_1, FileField.encodeStringArray(STRING_ARRAY_1));
+        assertEquals(ENCODED_STRING_ARRAY_2, FileField.encodeStringArray(STRING_ARRAY_2));
+        assertEquals(ENCODED_STRING_ARRAY_2_WITH_NULL, FileField.encodeStringArray(STRING_ARRAY_2_WITH_NULL));
+        assertEquals(ENCODED_STRING_ARRAY_3, FileField.encodeStringArray(STRING_ARRAY_3));
     }
 
     @Test
     public void testDecodeStringDoubleArray() {
-        assertArrayEquals(stringArray1, StringUtil.decodeStringDoubleArray(encStringArray1));
-        assertArrayEquals(stringArray2, StringUtil.decodeStringDoubleArray(encStringArray2));
+        assertArrayEquals(STRING_ARRAY_1, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_1));
+        assertArrayEquals(STRING_ARRAY_2, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_2));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(stringArray3, StringUtil.decodeStringDoubleArray(encStringArray3));
+        assertArrayEquals(STRING_ARRAY_3, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_3));
     }
 
     @Test
@@ -175,9 +175,13 @@ public class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets(null));
         assertTrue(StringUtil.isInCurlyBrackets("{}"));
         assertTrue(StringUtil.isInCurlyBrackets("{a}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{a{a}}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{{\\AA}sa {\\AA}Stor{\\aa}}"));
         assertFalse(StringUtil.isInCurlyBrackets("{"));
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
+        assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+
     }
 
     @Test
@@ -274,4 +278,64 @@ public class StringUtilTest {
         assertEquals("", StringUtil.limitStringLength(null, 10));
     }
 
+    @Test
+    public void testReplaceSpecialCharacters() {
+        assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
+        assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
+    }
+
+    @Test
+    public void testExpandAuthorInitialsAddDot() {
+        assertEquals("O.", StringUtil.expandAuthorInitials("O"));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO."));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
+        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
+        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
+        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("AO Moore"));
+        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
+        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
+        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
+        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O, Jr."));
+        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
+        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
+        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O and O Moore"));
+        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
+                StringUtil.expandAuthorInitials("Moore, O and O Moore and Moore, OO"));
+    }
+
+    @Test
+    public void testExpandAuthorInitialsDoNotAddDot() {
+        assertEquals("O.", StringUtil.expandAuthorInitials("O."));
+        assertEquals("A. O.", StringUtil.expandAuthorInitials("A. O."));
+        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A.-O."));
+        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O. Moore"));
+        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("A. O. Moore"));
+        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
+        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
+        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
+        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O., Jr."));
+        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
+        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
+        assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
+        assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
+        assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
+        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O. and O. Moore"));
+        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
+                StringUtil.expandAuthorInitials("Moore, O. and O. Moore and Moore, O. O."));
+    }
+
+    @Test
+    public void testRepeatSpaces() {
+        assertEquals("", StringUtil.repeatSpaces(0));
+        assertEquals(" ", StringUtil.repeatSpaces(1));
+        assertEquals("       ", StringUtil.repeatSpaces(7));
+    }
+
+    @Test
+    public void testRepeat() {
+        assertEquals("", StringUtil.repeat(0, 'a'));
+        assertEquals("a", StringUtil.repeat(1, 'a'));
+        assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    }
 }

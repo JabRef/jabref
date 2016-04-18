@@ -22,7 +22,7 @@ public class OvidImporterTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         importer = new OvidImporter();
     }
@@ -136,7 +136,7 @@ public class OvidImporterTest {
     }
 
     @Test
-    public void testImportSingleEntries() throws Exception {
+    public void testImportSingleEntries() throws IOException {
 
         for (int n = 3; n <= 7; n++) {
             try (InputStream is = OvidImporter.class.getResourceAsStream("OvidImporterTest" + n + ".txt");

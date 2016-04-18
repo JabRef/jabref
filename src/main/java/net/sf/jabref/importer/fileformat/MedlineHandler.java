@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,18 +21,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.importer.HTMLConverter;
-import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-class MedlineHandler extends DefaultHandler
-{
+class MedlineHandler extends DefaultHandler {
 
-    private static final HTMLConverter HTML_CONVERTER = new HTMLConverter();
+    private static final UnicodeToLatexFormatter UNICODE_CONVERTER = new UnicodeToLatexFormatter();
     private final List<BibEntry> bibitems = new ArrayList<>();
     private boolean inTitle;
     private boolean inYear;
@@ -76,7 +75,7 @@ class MedlineHandler extends DefaultHandler
     private String initials = "";
     private String number = "";
     private String page = "";
-    private String MedlineDate = "";
+    private String medlineDate = "";
     private final String series = "";
     private final String editor = "";
     private final String booktitle = "";
@@ -101,14 +100,8 @@ class MedlineHandler extends DefaultHandler
         return bibitems;
     }
 
-    public MedlineHandler() {
-        super();
-
-    }
-
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) {
-        //		public void startElement(String localName, Attributes atts) {
         // Get the number of attribute
         if ("PubmedArticle".equals(localName)) {
             // Do nothing
@@ -213,10 +206,10 @@ class MedlineHandler extends DefaultHandler
         if ("PubmedArticle".equals(localName)) {
             //bibitems.add( new Bibitem(null, makeBibtexString(), Globals.nextKey(),"-1" )	 );
             // check if year ="" then give medline date instead
-            if ("".equals(year) && !"".equals(MedlineDate)) {
+            if ("".equals(year) && !"".equals(medlineDate)) {
                     // multi-year date format
                     //System.out.println(MedlineDate);
-                    year = MedlineDate.substring(0, 4);
+                    year = medlineDate.substring(0, 4);
                     //Matcher m = Pattern.compile("\\b[0-9]{4}\\b").matcher(MedlineDate);
                     //if(m.matches())
                     //year = m.group();
@@ -235,12 +228,13 @@ class MedlineHandler extends DefaultHandler
 
             BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
-                b.setField("author", MedlineHandler.HTML_CONVERTER.formatUnicode(ImportFormatReader.expandAuthorInitials(author)));
+                b.setField("author",
+                        MedlineHandler.UNICODE_CONVERTER.format(StringUtil.expandAuthorInitials(author)));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
             if (!"".equals(title)) {
-                b.setField("title", MedlineHandler.HTML_CONVERTER.formatUnicode(title));
+                b.setField("title", MedlineHandler.UNICODE_CONVERTER.format(title));
             }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
             if (!"".equals(journal)) {
@@ -328,7 +322,7 @@ class MedlineHandler extends DefaultHandler
             page = "";
             String medlineID = "";
             String url = "";
-            MedlineDate = "";
+            medlineDate = "";
             descriptors.clear();
         }
 
@@ -516,7 +510,7 @@ class MedlineHandler extends DefaultHandler
             abstractText += new String(data, start, length);
         }
         else if (inMedlineDate) {
-            MedlineDate += new String(data, start, length);
+            medlineDate += new String(data, start, length);
         }
         else if (inDoi) {
             doi = new String(data, start, length);

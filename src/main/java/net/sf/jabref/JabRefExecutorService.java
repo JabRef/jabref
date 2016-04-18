@@ -17,10 +17,17 @@ package net.sf.jabref;
 
 import java.util.concurrent.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
  */
 public class JabRefExecutorService implements Executor {
+
+    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
@@ -60,7 +67,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                e.printStackTrace();
+                LOGGER.error("Problem executing command", e);
             }
         }
     }

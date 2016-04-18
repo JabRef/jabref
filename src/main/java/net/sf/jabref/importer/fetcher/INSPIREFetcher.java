@@ -21,7 +21,6 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,7 +73,6 @@ public class INSPIREFetcher implements EntryFetcher {
         StringBuilder sb = new StringBuilder(87).append("http://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/search?ln=en&ln=en&p=find+").append(identifier)
                 .append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
-        //sb.append("&FORMAT=WWWBRIEFBIBTEX&SEQUENCE=");
         LOGGER.debug("Inspire URL: " + sb + "\n");
         return sb.toString();
     }
@@ -132,24 +130,13 @@ public class INSPIREFetcher implements EntryFetcher {
         return null;
     }
 
-    // public void addSpiresURL(BibEntry entry) {
-    // String url = "http://"+spiresHost+"/spires/find/hep/www?texkey+";
-    // url = url+entry.getCiteKey();
-    // entry.setField("url", url);
-    // }
-    //
-    // public void addSpiresURLtoDatabase(BibDatabase db) {
-    // Iterator<BibEntry> iter = db.getEntries().iterator();
-    // while (iter.hasNext())
-    // addSpiresURL(iter.next());
-    // }
 
     /*
      * @see net.sf.jabref.imports.fetcher.EntryFetcher
      */
     @Override
     public String getHelpPage() {
-        return "Spires";
+        return "INSPIRE";
     }
 
     @Override
@@ -160,7 +147,7 @@ public class INSPIREFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Fetch INSPIRE");
+        return "INSPIRE";
     }
 
     @Override
@@ -174,28 +161,20 @@ public class INSPIREFetcher implements EntryFetcher {
     @Override
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
         try {
-            frame.setStatus("Fetching entries from Inspire");
+            frame.setStatus(Localization.lang("Fetching entries from Inspire"));
             /* query the archive and load the results into the BibEntry */
             BibDatabase bd = importInspireEntries(query, frame);
 
-            /* addSpiresURLtoDatabase(bd); */
-
-            frame.setStatus("Adding fetched entries");
+            frame.setStatus(Localization.lang("Adding fetched entries"));
             /* add the entry to the inspection dialog */
-            if (bd != null) {
-                if (bd.getEntryCount() > 0) {
-                    for (BibEntry entry : bd.getEntries()) {
-                        dialog.addEntry(entry);
-                    }
-                }
-            } else {
+            if (bd == null) {
                 LOGGER.warn("Error while fetching from Inspire");
+            } else {
+                bd.getEntries().forEach(dialog::addEntry);
             }
-            /* update the dialogs progress bar */
-            // dialog.setProgress(i + 1, keys.length);
             /* inform the inspection dialog, that we're done */
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from Inspire:") + " " + e.getMessage());
+            frame.showMessage(Localization.lang("Error while fetching from %0", "Inspire") + ": " + e.getMessage());
             LOGGER.warn("Error while fetching from Inspire", e);
         }
         return true;

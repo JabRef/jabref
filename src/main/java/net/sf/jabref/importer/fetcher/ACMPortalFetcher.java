@@ -19,12 +19,12 @@ package net.sf.jabref.importer.fetcher;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -41,11 +41,12 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,9 +54,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
-    private final HTMLConverter htmlConverter = new HTMLConverter();
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;
 
     private static final String START_URL = "http://portal.acm.org/";
@@ -66,6 +67,14 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final String BIBTEX_URL = "exportformats.cfm?id=";
     private static final String BIBTEX_URL_END = "&expformat=bibtex";
     private static final String ABSTRACT_URL = "tab_abstract.cfm?id=";
+
+    private static final String NEXT_ENTRY_PATTERN = "<div class=\"numbering\">";
+    private static final String AUTHOR_MARKER = "<div class=\"authors\">";
+    private static final String SOURCE_MARKER = "<div class=\"source\">";
+    private static final String END_ENTRY_PATTERN = "<br clear=\"all\" />";
+
+    private static final String RESULTS_FOUND_PATTERN = "<div id=\"resfound\">";
+    private static final String PAGE_RANGE_PATTERN = "<div class=\"pagerange\">";
 
     private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
     private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
@@ -130,27 +139,26 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             String page = dl.downloadToString();
 
-            String resultsFound = "<div id=\"resfound\">";
-            int hits = getNumberOfHits(page, resultsFound, ACMPortalFetcher.HITS_PATTERN);
+            int hits = getNumberOfHits(page, RESULTS_FOUND_PATTERN, ACMPortalFetcher.HITS_PATTERN);
 
-            int index = page.indexOf(resultsFound);
+            int index = page.indexOf(RESULTS_FOUND_PATTERN);
             if (index >= 0) {
-                page = page.substring(index + resultsFound.length());
+                page = page.substring(index + RESULTS_FOUND_PATTERN.length());
             }
 
             if (hits == 0) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         terms),
-                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             } else if (hits > 20) {
                 status.showMessage(
                         Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                                 String.valueOf(hits), String.valueOf(PER_PAGE)),
-                        Localization.lang("Search ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
             }
 
-            hits = getNumberOfHits(page, "<div class=\"pagerange\">", ACMPortalFetcher.MAX_HITS_PATTERN);
+            hits = getNumberOfHits(page, PAGE_RANGE_PATTERN, ACMPortalFetcher.MAX_HITS_PATTERN);
             parse(page, Math.min(hits, PER_PAGE), previews);
             for (Map.Entry<String, JLabel> entry : previews.entrySet()) {
                 preview.addEntry(entry.getKey(), entry.getValue());
@@ -161,11 +169,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Problem with ACM fetcher URL", e);
         } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to ACM Portal failed"),
-                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Could not connect to %0", "ACM Portal"),
+                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
+            LOGGER.warn("Problem with ACM connection", e);
         } catch (IOException e) {
             status.showMessage(e.getMessage(),
-                    Localization.lang("Search ACM Portal"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM Portal", e);
         }
         return false;
@@ -178,32 +187,29 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (!shouldContinue) {
                 break;
             }
-            boolean sel = selentry.getValue();
-            if (sel) {
-                BibEntry entry = downloadEntryBibTeX(selentry.getKey(), fetchAbstract);
-                if (entry != null) {
+            if (selentry.getValue()) {
+                downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry ->  {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
                     entry.getFieldOptional("title").ifPresent(title -> {
-                        title = title.replaceAll("\\\\&", "&").replaceAll("\\\\#", "#");
+                        title = title.replace("\\&", "&").replace("\\#", "#");
                         title = convertHTMLChars(title);
 
                         // Unit formatting
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                            title = unitFormatter.format(title);
+                            title = unitsToLatexFormatter.format(title);
                         }
 
                         // Case keeping
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                            title = caseKeeper.format(title);
+                            title = protectTermsFormatter.format(title);
                         }
                         entry.setField("title", title);
                     });
 
-                    entry.getFieldOptional("abstract").ifPresent(abstr -> {
-                        entry.setField("abstract", convertHTMLChars(abstr));
-                    });
+                    entry.getFieldOptional("abstract")
+                            .ifPresent(abstr -> entry.setField("abstract", convertHTMLChars(abstr)));
                     inspector.addEntry(entry);
-                }
+                });
             }
         }
     }
@@ -257,9 +263,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private boolean getNextEntryURL(String allText, int entryNumber,
             Map<String, JLabel> entries) {
-        String toFind = "<div class=\"numbering\">";
-        int index = allText.indexOf(toFind, piv);
-        int endIndex = allText.indexOf("<br clear=\"all\" />", index);
+        int index = allText.indexOf(NEXT_ENTRY_PATTERN, piv);
+        int endIndex = allText.indexOf(END_ENTRY_PATTERN, index);
         piv = endIndex;
 
         if (index >= 0) {
@@ -274,10 +279,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     StringBuilder sb = new StringBuilder();
 
                     // Find authors:
-                    String authMarker = "<div class=\"authors\">";
-                    int authStart = text.indexOf(authMarker);
+                    int authStart = text.indexOf(AUTHOR_MARKER);
                     if (authStart >= 0) {
-                        int authEnd = text.indexOf("</div>", authStart + authMarker.length());
+                        int authEnd = text.indexOf("</div>", authStart + AUTHOR_MARKER.length());
                         if (authEnd >= 0) {
                             sb.append("<p>").append(text.substring(authStart, authEnd)).append("</p>");
                         }
@@ -289,10 +293,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         sb.append("<p>").append(titM.group(1)).append("</p>");
                     }
 
-                    String sourceMarker = "<div class=\"source\">";
-                    int sourceStart = text.indexOf(sourceMarker);
+                    int sourceStart = text.indexOf(SOURCE_MARKER);
                     if (sourceStart >= 0) {
-                        int sourceEnd = text.indexOf("</div>", sourceStart + sourceMarker.length());
+                        int sourceEnd = text.indexOf("</div>", sourceStart + SOURCE_MARKER.length());
                         if (sourceEnd >= 0) {
                             String sourceText = text.substring(sourceStart, sourceEnd);
                             // Find source:
@@ -319,7 +322,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return false;
     }
 
-    private static BibEntry downloadEntryBibTeX(String id, boolean downloadAbstract) {
+    private static Optional<BibEntry> downloadEntryBibTeX(String id, boolean downloadAbstract) {
         try {
             URL url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END);
             URLConnection connection = url.openConnection();
@@ -328,13 +331,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
             Collection<BibEntry> items = null;
             try (BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")))) {
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                 items = BibtexParser.parse(in).getDatabase().getEntries();
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
             }
             if ((items == null) || items.isEmpty()) {
-                return null;
+                return Optional.empty();
             }
             BibEntry entry = items.iterator().next();
             Thread.sleep(ACMPortalFetcher.WAIT_TIME);//wait between requests or you will be blocked by ACM
@@ -353,20 +356,18 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 Thread.sleep(ACMPortalFetcher.WAIT_TIME);//wait between requests or you will be blocked by ACM
             }
 
-            return entry;
+            return Optional.of(entry);
         } catch (NoSuchElementException e) {
             LOGGER.info("Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
                     e);
-            return null;
         } catch (MalformedURLException e) {
             LOGGER.info("Malformed URL.", e);
-            return null;
         } catch (IOException e) {
             LOGGER.info("Cannot connect.", e);
-            return null;
         } catch (InterruptedException ignored) {
-            return null;
+            // Ignored
         }
+        return Optional.empty();
     }
 
     /**
@@ -376,7 +377,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      */
     private String convertHTMLChars(String text) {
 
-        return htmlConverter.format(text);
+        return htmlToLatexFormatter.format(text);
     }
 
     /**
@@ -393,7 +394,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     String number = m.group(1);
                     number = number.replace(",", ""); // Remove , as in 1,234
                     return Integer.parseInt(number);
-                } catch (IllegalStateException | NumberFormatException ex) {
+                } catch (NumberFormatException ex) {
                     throw new IOException("Cannot parse number of hits");
                 }
             } else {

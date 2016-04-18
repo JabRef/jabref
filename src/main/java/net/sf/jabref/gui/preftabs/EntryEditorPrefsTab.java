@@ -66,18 +66,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final AutoCompletePreferences autoCompletePreferences;
     private final JabRefFrame frame;
 
-
-    private void setAutoCompleteElementsEnabled(boolean enabled) {
-        autoCompFields.setEnabled(enabled);
-        autoCompLF.setEnabled(enabled);
-        autoCompFF.setEnabled(enabled);
-        autoCompBoth.setEnabled(enabled);
-        firstNameModeAbbr.setEnabled(enabled);
-        firstNameModeFull.setEnabled(enabled);
-        firstNameModeBoth.setEnabled(enabled);
-        shortestToComplete.setEnabled(enabled);
-    }
-
     public EntryEditorPrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = new AutoCompletePreferences(prefs);
@@ -176,6 +164,17 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         add(pan, BorderLayout.CENTER);
     }
 
+    private void setAutoCompleteElementsEnabled(boolean enabled) {
+        autoCompFields.setEnabled(enabled);
+        autoCompLF.setEnabled(enabled);
+        autoCompFF.setEnabled(enabled);
+        autoCompBoth.setEnabled(enabled);
+        firstNameModeAbbr.setEnabled(enabled);
+        firstNameModeFull.setEnabled(enabled);
+        firstNameModeBoth.setEnabled(enabled);
+        shortestToComplete.setEnabled(enabled);
+    }
+
     @Override
     public void setValues() {
         autoOpenForm.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM));
@@ -207,6 +206,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             break;
         default:
             firstNameModeBoth.setSelected(true);
+            break;
         }
         // one field less than the option is enough. If one filed changes, another one also changes.
         oldAutoCompFModeAbbr = firstNameModeAbbr.isSelected();
@@ -278,9 +278,8 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
                 (oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected()) ||
                 (oldAutoCompFModeFull != firstNameModeFull.isSelected())) {
-            for (int j = 0; j < frame.getTabbedPane().getTabCount(); j++) {
-                BasePanel bp = (BasePanel) frame.getTabbedPane().getComponentAt(j);
-                bp.entryEditors.clear();
+            for (BasePanel panel : frame.getBasePanelList()) {
+                panel.entryEditors.clear();
             }
         }
     }

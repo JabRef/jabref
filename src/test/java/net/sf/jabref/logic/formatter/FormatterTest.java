@@ -2,10 +2,10 @@ package net.sf.jabref.logic.formatter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.HTMLConverter;
 import net.sf.jabref.logic.formatter.bibtexfields.*;
 import net.sf.jabref.logic.formatter.casechanger.*;
-import net.sf.jabref.logic.formatter.minifier.AuthorsMinifier;
+import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +18,13 @@ import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class FormatterTest {
+
+    public Formatter formatter;
+
+
+    public FormatterTest(Formatter formatter) {
+        this.formatter = formatter;
+    }
 
     @BeforeClass
     public static void setUp() {
@@ -59,33 +66,44 @@ public class FormatterTest {
         assertNotNull(formatter.format("string"));
     }
 
-    public Formatter formatter;
+    @Test
+    public void getDescriptionAlwaysNonEmpty() {
+        assertFalse(formatter.getDescription().isEmpty());
+    }
 
-    public FormatterTest(Formatter formatter) {
-        this.formatter = formatter;
+    @Test
+    public void getExampleInputAlwaysNonEmpty() {
+        assertFalse(formatter.getExampleInput().isEmpty());
     }
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
+        // all classes implementing {@link net.sf.jabref.logic.formatter.Formatter}
+        // sorted alphabetically
+        // Alternative: Use reflection - https://github.com/ronmamo/reflections
+        // @formatter:off
         return Arrays.asList(
-                new Object[]{new AuthorsFormatter()},
-                new Object[]{new UpperEachFirstCaseChanger()},
-                new Object[]{new UpperCaseChanger()},
-                new Object[]{new MonthFormatter()},
-                new Object[]{new LatexFormatter()},
+                new Object[]{new CapitalizeFormatter()},
+                new Object[]{new ClearFormatter()},
+                new Object[]{new HtmlToLatexFormatter()},
                 new Object[]{new IdentityFormatter()},
-                new Object[]{new UpperFirstCaseChanger()},
-                new Object[]{new AuthorsMinifier()},
-                new Object[]{new DateFormatter()},
-                new Object[]{new TitleCaseChanger()},
-                new Object[]{new CaseKeeper()},
-                new Object[]{new PageNumbersFormatter()},
-                new Object[]{new LowerCaseChanger()},
-                new Object[]{new TrimFormatter()},
-                new Object[]{new HTMLConverter()},
-                new Object[]{new SuperscriptFormatter()},
-                new Object[]{new UnitFormatter()},
-                new Object[]{new RemoveBracesFormatter()}
+                new Object[]{new LatexCleanupFormatter()},
+                new Object[]{new LatexToUnicodeFormatter()},
+                new Object[]{new LowerCaseFormatter()},
+                new Object[]{new MinifyNameListFormatter()},
+                new Object[]{new NormalizeDateFormatter()},
+                new Object[]{new NormalizeMonthFormatter()},
+                new Object[]{new NormalizeNamesFormatter()},
+                new Object[]{new NormalizePagesFormatter()},
+                new Object[]{new OrdinalsToSuperscriptFormatter()},
+                new Object[]{new ProtectTermsFormatter()},
+                new Object[]{new RemoveBracesFormatter()},
+                new Object[]{new SentenceCaseFormatter()},
+                new Object[]{new TitleCaseFormatter()},
+                new Object[]{new UnicodeToLatexFormatter()},
+                new Object[]{new UnitsToLatexFormatter()},
+                new Object[]{new UpperCaseFormatter()}
         );
+        // @formatter:on
     }
 }

@@ -21,13 +21,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -69,11 +70,12 @@ public class EndnoteImporter extends ImportFormat {
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
 
         // Our strategy is to look for the "%A *" line.
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        while ((str = in.readLine()) != null) {
-            if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
-                return true;
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (A_PATTERN.matcher(str).matches() || E_PATTERN.matcher(str).matches()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -85,30 +87,30 @@ public class EndnoteImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        String str;
-        boolean first = true;
-        while ((str = in.readLine()) != null) {
-            str = str.trim();
-            // if(str.equals("")) continue;
-            if (str.indexOf("%0") == 0) {
-                if (first) {
-                    first = false;
+            String str;
+            boolean first = true;
+            while ((str = in.readLine()) != null) {
+                str = str.trim();
+                if (str.indexOf("%0") == 0) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(ENDOFRECORD);
+                    }
+                    sb.append(str);
                 } else {
-                    sb.append(ENDOFRECORD);
+                    sb.append(str);
                 }
-                sb.append(str);
-            } else {
-                sb.append(str);
+                sb.append('\n');
             }
-            sb.append('\n');
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
         String author;
         String type;
         String editor;
@@ -122,7 +124,6 @@ public class EndnoteImporter extends ImportFormat {
 
             boolean isEditedBook = false;
             String[] fields = entry.trim().substring(1).split("\n%");
-            //String lastPrefix = "";
             for (String field : fields) {
 
                 if (field.length() < 3) {
@@ -178,8 +179,7 @@ public class EndnoteImporter extends ImportFormat {
                         type = "article";
                     } else if (val.indexOf("Thesis") == 0) {
                         type = "phdthesis";
-                    }
-                    else {
+                    } else {
                         type = "misc"; //
                     }
                 } else if ("7".equals(prefix)) {
@@ -202,10 +202,9 @@ public class EndnoteImporter extends ImportFormat {
                     if ("article".equals(type)) {
                         hm.put("journal", val);
                     } else if ("book".equals(type) || "inbook".equals(type)) {
-                        hm.put(
-                                "series", val);
+                        hm.put("series", val);
                     } else {
-                        /* if (Type.equals("inproceedings")) */
+                        /* type = inproceedings */
                         hm.put("booktitle", val);
                     }
                 } else if ("I".equals(prefix)) {
@@ -243,7 +242,6 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("X".equals(prefix)) {
                     hm.put("abstract", val);
                 } else if ("9".equals(prefix)) {
-                    //Util.pr(val);
                     if (val.indexOf("Ph.D.") == 0) {
                         type = "phdthesis";
                     }
@@ -251,8 +249,7 @@ public class EndnoteImporter extends ImportFormat {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, Util
-                            .checkLegalKey(val));
+                    hm.put(BibEntry.KEY_FIELD, LabelPatternUtil.checkLegalKey(val));
                 }
             }
 
@@ -278,12 +275,12 @@ public class EndnoteImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
             // create one here
             b.setField(hm);
-            //if (hm.isEmpty())
             if (!b.getFieldNames().isEmpty()) {
                 bibitems.add(b);
             }
 
         }
+
         return bibitems;
 
     }
@@ -300,15 +297,15 @@ public class EndnoteImporter extends ImportFormat {
     private static String fixAuthor(String s) {
         int index = s.indexOf(" and ");
         if (index >= 0) {
-            return AuthorList.fixAuthor_lastNameFirst(s);
+            return AuthorList.fixAuthorLastNameFirst(s);
         }
         // Look for the comma at the end:
         index = s.lastIndexOf(',');
         if (index == (s.length() - 1)) {
             String mod = s.substring(0, s.length() - 1).replace(", ", " and ");
-            return AuthorList.fixAuthor_lastNameFirst(mod);
+            return AuthorList.fixAuthorLastNameFirst(mod);
         } else {
-            return AuthorList.fixAuthor_lastNameFirst(s);
+            return AuthorList.fixAuthorLastNameFirst(s);
         }
     }
 

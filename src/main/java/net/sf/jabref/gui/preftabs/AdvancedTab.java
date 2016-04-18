@@ -15,41 +15,28 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
-import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.logic.util.OS;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Optional;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences preferences;
-    private final JCheckBox useDefault;
     private final JCheckBox useRemoteServer;
     private final JCheckBox useIEEEAbrv;
-    private final JComboBox<String> className;
     private final JTextField remoteServerPort;
-    private String oldLnf = "";
-    private boolean oldUseDef;
 
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
@@ -61,30 +48,11 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
         this.jabRef = jabRef;
         preferences = prefs;
-        this.remotePreferences = new RemotePreferences(preferences);
+        remotePreferences = new RemotePreferences(preferences);
 
-        useDefault = new JCheckBox(Localization.lang("Use other look and feel"));
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         remoteServerPort = new JTextField();
-        String[] possibleLookAndFeels = {UIManager.getSystemLookAndFeelClassName(),
-                UIManager.getCrossPlatformLookAndFeelClassName(), "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
-                "com.jgoodies.looks.windows.WindowsLookAndFeel"};
-        // Only list L&F which are available
-        List<String> lookAndFeels = new ArrayList<>();
-        for (String lf : possibleLookAndFeels) {
-            try {
-                // Try to find L&F, throws exception if not successful
-                Class.forName(lf);
-                lookAndFeels.add(lf);
-            } catch (ClassNotFoundException ignored) {
-                // Ignored
-            }
-        }
-        className = new JComboBox<>(lookAndFeels.toArray(new String[lookAndFeels.size()]));
-        className.setEditable(true);
-        final JComboBox<String> clName = className;
-        useDefault.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
         useConvertToEquation = new JCheckBox(Localization.lang("Prefer converting subscripts and superscripts to equations rather than text"));
         useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
@@ -95,35 +63,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
-        if (!OS.OS_X) {
-            builder.appendSeparator(Localization.lang("Look and feel"));
-            JLabel lab = new JLabel(
-                    Localization.lang("Default look and feel") + ": " + UIManager.getSystemLookAndFeelClassName());
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            builder.append(useDefault);
-            builder.nextLine();
-            builder.append(pan);
-            JPanel pan2 = new JPanel();
-            lab = new JLabel(Localization.lang("Class name") + ':');
-            pan2.add(lab);
-            pan2.add(className);
-            builder.append(pan2);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(Localization
-                    .lang("Note that you must specify the fully qualified class name for the look and feel,"));
-            builder.append(lab);
-            builder.nextLine();
-            builder.append(pan);
-            lab = new JLabel(
-                    Localization.lang("and the class must be available in your classpath next time you start JabRef."));
-            builder.append(lab);
-            builder.nextLine();
-        }
         builder.appendSeparator(Localization.lang("Remote operation"));
         builder.nextLine();
         builder.append(new JPanel());
@@ -144,7 +83,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         // IEEE
         builder.nextLine();
-        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplorer"));
+        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplore"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);
@@ -170,11 +109,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        oldUseDef = preferences.getBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL);
-        oldLnf = preferences.get(JabRefPreferences.WIN_LOOK_AND_FEEL);
-        useDefault.setSelected(!oldUseDef);
-        className.setSelectedItem(oldLnf);
-        className.setEnabled(!oldUseDef);
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
         remoteServerPort.setText(String.valueOf(remotePreferences.getPort()));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
@@ -185,27 +119,18 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !useDefault.isSelected());
-        preferences.put(JabRefPreferences.WIN_LOOK_AND_FEEL, className.getSelectedItem().toString());
-
         if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
             Globals.journalAbbreviationLoader.update(preferences);
         }
         storeRemoteSettings();
 
-        if ((useDefault.isSelected() == oldUseDef) || !oldLnf.equals(className.getSelectedItem().toString())) {
-            JOptionPane.showMessageDialog(null,
-                    Localization.lang("You have changed the look and feel setting.").concat(" ")
-                            .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                    Localization.lang("Changed look and feel settings"), JOptionPane.WARNING_MESSAGE);
-        }
         preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperOnSearch.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterOnSearch.isSelected());
     }
 
-    public void storeRemoteSettings() {
+    private void storeRemoteSettings() {
         getPortAsInt().ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
                 remotePreferences.setPort(newPort);
@@ -221,13 +146,13 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
         if (remotePreferences.useRemoteServer()) {
-            Globals.remoteListener.openAndStart(new JabRefMessageHandler(jabRef), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(jabRef), remotePreferences.getPort());
         } else {
-            Globals.remoteListener.stop();
+            Globals.REMOTE_LISTENER.stop();
         }
     }
 
-    public Optional<Integer> getPortAsInt() {
+    private Optional<Integer> getPortAsInt() {
         try {
             return Optional.of(Integer.parseInt(remoteServerPort.getText()));
         } catch (NumberFormatException ex) {
@@ -237,11 +162,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-
         try {
             int portNumber = Integer.parseInt(remoteServerPort.getText());
             if (RemoteUtil.isUserPort(portNumber)) {
-                return true; // Ok, the number was legal.
+                return true;
             } else {
                 throw new NumberFormatException();
             }
@@ -252,7 +176,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
                     Localization.lang("Remote server port"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
-
     }
 
     @Override

@@ -18,10 +18,9 @@ package net.sf.jabref.logic.xmp;
 import java.io.IOException;
 import java.util.*;
 
-import javax.xml.transform.TransformerException;
-
 import net.sf.jabref.*;
-
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.database.BibDatabase;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -89,9 +88,9 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param value
      */
     public void setPersonList(String field, String value) {
-        AuthorList list = AuthorList.getAuthorList(value);
+        AuthorList list = AuthorList.parse(value);
 
-        for (AuthorList.Author author : list.getAuthorList()) {
+        for (Author author : list.getAuthors()) {
             addSequenceValue(field, author.getFirstLast(false));
         }
     }
@@ -290,7 +289,7 @@ public class XMPSchemaBibtex extends XMPSchema {
             if (value == null) {
                 value = "";
             }
-            if ("author".equals(field) || "editor".equals(field)) {
+            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);

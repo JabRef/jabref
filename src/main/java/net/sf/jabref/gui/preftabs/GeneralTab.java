@@ -20,9 +20,6 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
@@ -86,16 +83,10 @@ class GeneralTab extends JPanel implements PrefsTab {
         defSort = new JCheckBox(Localization.lang("Sort automatically"));
         ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
+        updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
                 + Localization.lang("Date format") + ':');
-        useTimeStamp.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                updateTimeStamp.setEnabled(useTimeStamp.isSelected());
-            }
-        });
-        updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
+        useTimeStamp.addChangeListener(e -> updateTimeStamp.setEnabled(useTimeStamp.isSelected()));
         overwriteOwner = new JCheckBox(Localization.lang("Overwrite"));
         overwriteTimeStamp = new JCheckBox(Localization.lang("Overwrite"));
         overwriteOwner.setToolTipText(Localization.lang("If a pasted or imported entry already has "

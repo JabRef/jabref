@@ -16,9 +16,11 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class RepecNepImporterTest {
 
-    RepecNepImporter testImporter;
+    private RepecNepImporter testImporter;
+
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new RepecNepImporter();
     }
@@ -79,7 +81,6 @@ public class RepecNepImporterTest {
             BibtexEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
-
 
     @Test
     public final void testGetFormatName() {

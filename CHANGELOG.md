@@ -10,10 +10,48 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 to [sourceforge bugs](https://sourceforge.net/p/jabref/bugs/) by using `bug NUM`, and
 to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by using `feature request NUM`.
 
+
 ## [Unreleased]
 
 ### Changed
+- Main table now accepts pasted DOIs and tries to retrieve the entry
+- Added support for several Biblatex-fields through drop-down lists with valid alternatives
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [3.3] - 2016-04-17
+
+### Changed
+- Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
+- Add possibility to lookup DOI from BibTeX entry contents inside the DOI field
+- PDFs can be automatically fetched from IEEE (given that you have access without logging in)
+- The OpenOffice/LibreOffice style file handling is changed to have only a single list of available style and you need to add your custom styles again
+- OpenOffice/LibreOffice style files are now always read and written with the same default encoding as for the database (found in the preferences)
+- The user journal abbreviation list is now always read and written with the same default encoding as for the database (found in the preferences)
+- The mass edit function "Set/clear/rename fields" is now in the Edit menu
+- Implemented [#455](https://github.com/JabRef/jabref/issues/455): Add button in preference dialog to reset preferences
+- Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
+- Add "Move linked files to default file directory" as cleanup procedure
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
+- All fields in a bib entry are written without any leading and trailing whitespace 
 - Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
 - Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
@@ -21,60 +59,83 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
 - Improved layout for OSX: Toolbar buttons and search field
-- Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
 - BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
+- Add dialog to show all preferences in their raw form plus some filtering
 - Added Ordinal formatter (1 -> 1st etc)
-
 - [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
+- [#454](https://github.com/JabRef/jabref/issues/454) Add a tab that shows all remaining entry fields that are not displayed in any other tab
+- The LaTeX to Unicode/HTML functionality is much improved by covering many more cases
+- Ability to convert from LaTeX to Unicode in right-click field menu
+- Regex-based search is know only applied entirely and not split up to different regexes on whitespaces
+- [#492](https://github.com/JabRef/jabref/issues/492): If no text is marked, the whole field is copied. Preview of pasted text in tool tip
+- Integrity check now also checks broken file links, abbreviations in `journal` and `booktitle`, and incorrect use of proceedings with page numbers
+- PdfContentImporter does not write the content of the first page into the review field any more
+- Implemented [#462](https://github.com/JabRef/jabref/issues/462): Add new action to open console where opened database file is located. New button, menu entry and shortcut (CTRL+SHIFT+J) for this action have also been added.
+- [#957](https://github.com/JabRef/jabref/issues/957) Improved usability of Export save order selection in Preferences and Database Properties
+- [#958](https://github.com/JabRef/jabref/issues/958) Adjusted size and changed layout of database dialog
+- [#1023](https://github.com/JabRef/jabref/issues/492) ArXiv fetcher now also fetches based on eprint id
+- Moved "Get BibTeX data from DOI" from main table context menu to DOI field in entry editor
+- Added open buttons to DOI and URL field
+- Move Look & Feel settings from advanced to appearance tab in preferences
+- JabRef installer now automatically determines the user rights and installs to home directory/program dir when user is restricted/admin
+- Move PDF file directory configuration from external tab to file tab in preferences
+- Implemented [#672](https://github.com/JabRef/jabref/issues/672): FileList now distributes its space dependent on the width of its columns
+- Added missing German translations
+- Swedish is added as a language option (still not a complete translation)
 
 ### Fixed
+- Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
+- Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
+- Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup
+- Fixed [#845](https://github.com/JabRef/jabref/issues/845): Add checkboxes for highlighting in groups menu, fixes other toggle highlighting as well for all toggle buttons
+- Fixed [#890](https://github.com/JabRef/jabref/issues/890): No NPE when renaming file
+- Fixed [#466](https://github.com/JabRef/jabref/issues/466): Rename PDF cleanup now also changes case of file name
 - Fixed [#621](https://github.com/JabRef/jabref/issues/621) and [#669](https://github.com/JabRef/jabref/issues/669): Encoding and preamble now end with newline.
 - Make BibTex parser more robust against missing newlines
 - Fix bug that prevented the import of BibTex entries having only a key as content
 - Fixed [#666](https://github.com/JabRef/jabref/issues/666): MS Office 2007 export is working again
-- Fixed [#670](https://github.com/JabRef/jabref/issues/670): Expressions using enclosed quotes (keywords="one two") did not work.
+- Fixed [#670](https://github.com/JabRef/jabref/issues/670): Expressions using enclosed quotes (`keywords="one two"`) did not work.
 - Fixed [#667](https://github.com/JabRef/jabref/issues/667): URL field is not sanitized anymore upon opening in browser.
 - Fixed [#687](https://github.com/JabRef/jabref/issues/687): Fixed NPE when closing JabRef with new unsaved database.
 - Fixed [#680](https://github.com/JabRef/jabref/issues/680): Synchronize Files key binding works again.
-- Fixed [#212](https://github.com/JabRef/jabref/issues/212): Added command line option -g for autogenerating bibtex keys
-- Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option -asfl for autosetting file links
+- Fixed [#212](https://github.com/JabRef/jabref/issues/212): Added command line option `-g` for autogenerating bibtex keys
+- Fixed [#213](https://github.com/JabRef/jabref/issues/212): Added command line option `-asfl` for autosetting file links
 - Fixed [#671](https://github.com/JabRef/jabref/issues/671): Remember working directory of last import
 - IEEEXplore fetcher replaces keyword separator with the preferred
-- Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behaviour under OSX
-- Merge from DOI now honors removed fields
-- Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to .sql File
+- Fixed [#710](https://github.com/JabRef/jabref/issues/710): Fixed quit behavior under OSX
+- "Merge from DOI" now honors removed fields
+- Fixed [#778](https://github.com/JabRef/jabref/issues/778): Fixed NPE when exporting to `.sql` File
+- Fixed [#824](https://github.com/JabRef/jabref/issues/824): MimeTypeDetector can now also handle local file links
 - Fixed [#803](https://github.com/JabRef/jabref/issues/803): Fixed dynamically group, free-form search
 - Fixed [#743](https://github.com/JabRef/jabref/issues/743): Logger not configured when JAR is started
-- Fixed [#822](https://github.com/JabRef/jabref/issues/822):OSX - Exception when adding the icon to the dock
-
+- Fixed [#822](https://github.com/JabRef/jabref/issues/822): OSX - Exception when adding the icon to the dock
+- Fixed [#609](https://github.com/JabRef/jabref/issues/609): Sort Arrows are shown in the main table if table is sorted
 - Fixed [#685](https://github.com/JabRef/jabref/issues/685): Fixed MySQL exporting for more than one entry
+- Fixed [#815](https://github.com/JabRef/jabref/issues/815): Curly Braces no longer ignored in OpenOffice/LibreOffice citation
+- Fixed [#855](https://github.com/JabRef/jabref/issues/856): Fixed OpenOffice Manual connect - Clicking on browse does now work correctly
+- Fixed [#649](https://github.com/JabRef/jabref/issues/649): Key bindings are now working in the preview panel
+- Fixed [#410](https://github.com/JabRef/jabref/issues/410): Find unlinked files no longer freezes when extracting entry from PDF content
+- Fixed [#936](https://github.com/JabRef/jabref/issues/936): Preview panel is now updated when an entry is cut/deleted
+- Fixed [#1001](https://github.com/JabRef/jabref/issues/1001): No NPE when exporting a complete database
+- Fixed [#991](https://github.com/JabRef/jabref/issues/991): Entry is now correctly removed from the BibDatabase
+- Fixed [#1062](https://github.com/JabRef/jabref/issues/1062): Merge entry with DOI information now also applies changes to entry type
+- Fixed [#535](https://github.com/JabRef/jabref/issues/535): Add merge action to right click menu
+- Fixed [#1115](https://github.com/JabRef/jabref/issues/1115): Wrong warning message when importing duplicate entries
+- Fixed [#935](https://github.com/JabRef/jabref/issues/935): PDFs, which are readable, but carry a protection for editing, are treated by the XMP parser and the importer generating a BibTeX entry based on the content.
+- Fixed: Showing the preview panel with a single-click at startup
 
 ### Removed
-- Fixed [#627](https://github.com/JabRef/jabref/issues/627): The pdf field is removed from the export formats, use the file field
-- Removed configuration option to use database file directory as base directory for attached files and make it default instead.
-- Removed save session functionality as it just saved the last opened tabs which is done by default
-- Removed CLI option -l to load a session
 - Removed JabRef offline help files which are replaced by the new online documentation at https://github.com/JabRef/help.jabref.org
+- Fixed [#627](https://github.com/JabRef/jabref/issues/627): The `pdf` field is removed from the export formats, use the `file` field
+- Removed configuration option to use database file directory as base directory for attached files and make it default instead
+- Removed save session functionality as it just saved the last opened tabs which is done by default
+- Removed CLI option `-l` to load a session
 - Removed PDF preview functionality
 - Removed Sixpackimporter it is not used in the wild anymore
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Removed double click listener from `doi` and `url` fields
 
 
 ## [3.2] - 2016-01-10
@@ -268,7 +329,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v3.2...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.3...HEAD
+[3.3]: https://github.com/JabRef/jabref/compare/v3.2...v3.3
 [3.2]: https://github.com/JabRef/jabref/compare/v3.1...v3.2
 [3.1]: https://github.com/JabRef/jabref/compare/v3.0...v3.1
 [3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0

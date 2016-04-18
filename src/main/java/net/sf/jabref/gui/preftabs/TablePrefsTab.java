@@ -16,11 +16,11 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -30,13 +30,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.InternalBibtexFields;
+
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -114,34 +112,22 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         secSort.insertItemAt(Localization.lang("<select>"), 0);
         terSort.insertItemAt(Localization.lang("<select>"), 0);
 
-        priSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (priSort.getSelectedIndex() > 0) {
-                    priField.setText(priSort.getSelectedItem().toString());
-                    priSort.setSelectedIndex(0);
-                }
+        priSort.addActionListener(e -> {
+            if (priSort.getSelectedIndex() > 0) {
+                priField.setText(priSort.getSelectedItem().toString());
+                priSort.setSelectedIndex(0);
             }
         });
-        secSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (secSort.getSelectedIndex() > 0) {
-                    secField.setText(secSort.getSelectedItem().toString());
-                    secSort.setSelectedIndex(0);
-                }
+        secSort.addActionListener(e -> {
+            if (secSort.getSelectedIndex() > 0) {
+                secField.setText(secSort.getSelectedItem().toString());
+                secSort.setSelectedIndex(0);
             }
         });
-        terSort.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (terSort.getSelectedIndex() > 0) {
-                    terField.setText(terSort.getSelectedItem().toString());
-                    terSort.setSelectedIndex(0);
-                }
+        terSort.addActionListener(e -> {
+            if (terSort.getSelectedIndex() > 0) {
+                terField.setText(terSort.getSelectedItem().toString());
+                terSort.setSelectedIndex(0);
             }
         });
 
@@ -226,14 +212,10 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(pan, BorderLayout.CENTER);
 
-        namesNatbib.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent changeEvent) {
-                abbrNames.setEnabled(!namesNatbib.isSelected());
-                lastNamesOnly.setEnabled(!namesNatbib.isSelected());
-                noAbbrNames.setEnabled(!namesNatbib.isSelected());
-            }
+        namesNatbib.addChangeListener(e -> {
+            abbrNames.setEnabled(!namesNatbib.isSelected());
+            lastNamesOnly.setEnabled(!namesNatbib.isSelected());
+            noAbbrNames.setEnabled(!namesNatbib.isSelected());
         });
     }
 
@@ -315,9 +297,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         if (newVal.isEmpty()) {
             newVal = null;
         }
-        if (((newVal != null) && (oldVal == null))
-                || ((newVal == null) && (oldVal != null))
-                || ((newVal != null) && !newVal.equals(oldVal))) {
+        if (!Objects.equals(oldVal, newVal)) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
             InternalBibtexFields.setNumericFieldsFromPrefs();
         }

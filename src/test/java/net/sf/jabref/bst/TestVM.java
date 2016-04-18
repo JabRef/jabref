@@ -108,16 +108,16 @@ public class TestVM {
 
     @Test
     public void testVMExecuteSimple() throws RecognitionException {
+        VM vm = new VM("INTEGERS { variable.a } " + "FUNCTION {init.state.consts}{ #5 'variable.a := } "
+                + "EXECUTE {init.state.consts}");
 
-        {
-            VM vm = new VM("INTEGERS { variable.a } "
-                    + "FUNCTION {init.state.consts}{ #5 'variable.a := } "
-                    + "EXECUTE {init.state.consts}");
+        List<BibEntry> v = new ArrayList<>();
+        vm.run(v);
+        Assert.assertEquals(Integer.valueOf(5), vm.getIntegers().get("variable.a"));
+    }
 
-            List<BibEntry> v = new ArrayList<>();
-            vm.run(v);
-            Assert.assertEquals(Integer.valueOf(5), vm.getIntegers().get("variable.a"));
-        }
+    @Test
+    public void testVMExecuteSimple2() throws RecognitionException {
         VM vm = new VM("FUNCTION {a}{ #5 #5 = " + "#1 #2 = " + "#3 #4 < " + "#4 #3 < "
                 + "#4 #4 < " + "#3 #4 > " + "#4 #3 > " + "#4 #4 > " + "\"H\" \"H\" = "
                 + "\"H\" \"Ha\" = } " + "EXECUTE {a}");
@@ -163,15 +163,19 @@ public class TestVM {
 
     @Test
     public void testVMArithmetic() throws RecognitionException {
-        {
-            VM vm = new VM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
 
-            List<BibEntry> v = new ArrayList<>();
-            vm.run(v);
-            Assert.assertEquals(3, vm.getStack().pop());
-            Assert.assertEquals(2, vm.getStack().pop());
-            Assert.assertEquals(0, vm.getStack().size());
-        }
+        VM vm = new VM("FUNCTION {test} { " + "#1 #1 + #5 #2 - }" + "EXECUTE {test}");
+
+        List<BibEntry> v = new ArrayList<>();
+        vm.run(v);
+        Assert.assertEquals(3, vm.getStack().pop());
+        Assert.assertEquals(2, vm.getStack().pop());
+        Assert.assertEquals(0, vm.getStack().size());
+
+    }
+
+    @Test
+    public void testVMArithmetic2() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { " + "#1 \"HELLO\" + #5 #2 - }" + "EXECUTE {test}");
 
         List<BibEntry> v = new ArrayList<>();
@@ -186,15 +190,16 @@ public class TestVM {
 
     @Test
     public void testNumNames() throws RecognitionException {
-        {
-            VM vm = new VM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }"
-                    + "EXECUTE {test}");
+        VM vm = new VM("FUNCTION {test} { \"Johnny Foo and Mary Bar\" num.names$ }" + "EXECUTE {test}");
 
-            List<BibEntry> v = new ArrayList<>();
-            vm.run(v);
-            Assert.assertEquals(2, vm.getStack().pop());
-            Assert.assertEquals(0, vm.getStack().size());
-        }
+        List<BibEntry> v = new ArrayList<>();
+        vm.run(v);
+        Assert.assertEquals(2, vm.getStack().pop());
+        Assert.assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    public void testNumNames2() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { \"Johnny Foo { and } Mary Bar\" num.names$ }"
                 + "EXECUTE {test}");
 
@@ -355,14 +360,16 @@ public class TestVM {
 
     @Test
     public void testVMChrToInt() throws RecognitionException {
-        {
-            VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
+        VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ }" + "EXECUTE {test}");
 
-            List<BibEntry> v = new ArrayList<>();
-            vm.run(v);
-            Assert.assertEquals(72, vm.getStack().pop());
-            Assert.assertEquals(0, vm.getStack().size());
-        }
+        List<BibEntry> v = new ArrayList<>();
+        vm.run(v);
+        Assert.assertEquals(72, vm.getStack().pop());
+        Assert.assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    public void testVMChrToIntIntToChr() throws RecognitionException {
         VM vm = new VM("FUNCTION {test} { \"H\" chr.to.int$ int.to.chr$ }" + "EXECUTE {test}");
 
         List<BibEntry> v = new ArrayList<>();
@@ -504,27 +511,27 @@ public class TestVM {
     }
 
     @Test
-    public void testFormatName() throws RecognitionException, IOException {
-        {
-            VM vm = new VM(
-                    "FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
-                            + "EXECUTE {format}"
-                    );
+    public void testFormatName() throws RecognitionException {
+        VM vm = new VM(
+                "FUNCTION {format}{ \"Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\" #1 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
+                        + "EXECUTE {format}");
 
-            List<BibEntry> v = new ArrayList<>();
-            vm.run(v);
-            Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
-            Assert.assertEquals(0, vm.getStack().size());
-        }
-        VM vm = new VM("ENTRY  { author }  { }  { label } "
-                + "FUNCTION {presort} { cite$ 'sort.key$ := } " + "ITERATE { presort } " + "READ "
-                + "SORT " + "FUNCTION {format}{ author #2 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }"
-                + "ITERATE {format}");
+        List<BibEntry> v = new ArrayList<>();
+        vm.run(v);
+        Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
+        Assert.assertEquals(0, vm.getStack().size());
+    }
+
+    @Test
+    public void testFormatName2() throws RecognitionException, IOException {
+        VM vm = new VM("ENTRY  { author }  { }  { label } " + "FUNCTION {presort} { cite$ 'sort.key$ := } "
+                + "ITERATE { presort } " + "READ " + "SORT "
+                + "FUNCTION {format}{ author #2 \"{vv~}{ll}{, jj}{, f}?\" format.name$ }" + "ITERATE {format}");
 
         List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
-        v
-                .add(TestVM.bibtexString2BibtexEntry("@book{test, author=\"Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\"}"));
+        v.add(TestVM.bibtexString2BibtexEntry(
+                "@book{test, author=\"Jonathan Meyer and Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin\"}"));
         vm.run(v);
         Assert.assertEquals("de~la Vall{\\'e}e~Poussin, C.~L. X.~J?", vm.getStack().pop());
         Assert.assertEquals("Annabi, H?", vm.getStack().pop());

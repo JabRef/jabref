@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.formatter;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.util.Objects;
 
 /**
@@ -9,12 +11,12 @@ public class IdentityFormatter implements Formatter {
 
     @Override
     public String getName() {
-        return "IdentityFormatter";
+        return Localization.lang("Identity");
     }
 
     @Override
     public String getKey() {
-        return getName();
+        return "identity";
     }
 
     @Override
@@ -22,4 +24,25 @@ public class IdentityFormatter implements Formatter {
         Objects.requireNonNull(value);
         return value;
     }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Does nothing.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "JabRef";
+    }
+
+    @Override
+    public int hashCode() {
+        return defaultHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return defaultEquals(obj);
+    }
+
 }

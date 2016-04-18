@@ -71,16 +71,16 @@ public class MedlinePlainImporter extends ImportFormat {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        String str;
-        while ((str = in.readLine()) != null) {
-            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
-                    || PMCR_PATTERN.matcher(str).find()) {
-                return true;
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
+                        || PMCR_PATTERN.matcher(str).find()) {
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
@@ -90,13 +90,14 @@ public class MedlinePlainImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-        String str;
-        while ((str = in.readLine()) != null) {
-            sb.append(str);
-            sb.append('\n');
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+            String str;
+            while ((str = in.readLine()) != null) {
+                sb.append(str);
+                sb.append('\n');
+            }
         }
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("\\n\\n");
@@ -111,7 +112,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            Map<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -252,11 +253,11 @@ public class MedlinePlainImporter extends ImportFormat {
             }
             // fix authors
             if (!author.isEmpty()) {
-                author = AuthorList.fixAuthor_lastNameFirst(author);
+                author = AuthorList.fixAuthorLastNameFirst(author);
                 hm.put("author", author);
             }
             if (!editor.isEmpty()) {
-                editor = AuthorList.fixAuthor_lastNameFirst(editor);
+                editor = AuthorList.fixAuthorLastNameFirst(editor);
                 hm.put("editor", editor);
             }
             if (!comment.isEmpty()) {
@@ -266,7 +267,7 @@ public class MedlinePlainImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 // content can never be null so only check if content is empty

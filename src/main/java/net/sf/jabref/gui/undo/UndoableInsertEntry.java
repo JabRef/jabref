@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,9 +18,11 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -34,6 +36,7 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
     private final BibEntry entry;
     private final BasePanel panel;
 
+    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
 
     public UndoableInsertEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {
@@ -60,19 +63,15 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
         try {
             base.removeEntry(entry);
             // If the entry has an editor currently open, we must close it.
-            panel.ensureNotShowing(entry);
+            panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Problem to undo `insert entry`", ex);
         }
     }
 
     @Override
     public void redo() {
         super.redo();
-
-        // Redo the change
-        String id = IdGenerator.next();
-        entry.setId(id);
         base.insertEntry(entry);
     }
 

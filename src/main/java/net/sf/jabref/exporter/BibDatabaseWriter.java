@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +39,6 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class BibDatabaseWriter {
@@ -81,13 +81,15 @@ public class BibDatabaseWriter {
      * (such as the exportDatabase call), we do not wish to use the
      * global preference of saving in standard order.
      */
-    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, Set<String> keySet,
+    public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort,
             SavePreferences preferences) {
+        Objects.requireNonNull(bibDatabaseContext);
+        Objects.requireNonNull(entriesToSort);
 
         //if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             List<BibEntry> result = new LinkedList<>();
-            result.addAll(bibDatabaseContext.getDatabase().getEntries());
+            result.addAll(entriesToSort);
             return result;
         }
 
@@ -96,12 +98,8 @@ public class BibDatabaseWriter {
         FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
 
         List<BibEntry> sorted = new ArrayList<>();
-        if (keySet == null) {
-            keySet = bibDatabaseContext.getDatabase().getKeySet();
-        }
-        for (String id : keySet) {
-            sorted.add(bibDatabaseContext.getDatabase().getEntryById(id));
-        }
+        sorted.addAll(entriesToSort);
+
         Collections.sort(sorted, comparatorStack);
 
         return sorted;
@@ -119,10 +117,7 @@ public class BibDatabaseWriter {
         }
 
         if(preferences.getTakeMetadataSaveOrderInAccount()) {
-            List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
-            if(storedSaveOrderConfig != null) {
-                return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
-            }
+            return metaData.getSaveOrderConfig();
         }
 
         return Optional.ofNullable(preferences.getSaveOrder());
@@ -134,11 +129,12 @@ public class BibDatabaseWriter {
      * let the user save only the results of a search. False and false means all
      * entries are saved.
      */
-    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences) throws SaveException {
+    public SaveSession saveDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences)
+            throws SaveException {
         return savePartOfDatabase(bibDatabaseContext, bibDatabaseContext.getDatabase().getEntries(), preferences);
     }
 
-    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
+    public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries,
             SavePreferences preferences) throws SaveException {
 
         SaveSession session;
@@ -151,7 +147,8 @@ public class BibDatabaseWriter {
         exceptionCause = null;
         // Get our data stream. This stream writes only to a temporary file until committed.
         try (VerifyingWriter writer = session.getWriter()) {
-            writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
+            List<FieldChange> saveActionChanges = writePartOfDatabase(writer, bibDatabaseContext, entries, preferences);
+            session.addFieldChanges(saveActionChanges);
         } catch (IOException ex) {
             LOGGER.error("Could not write file", ex);
             session.cancel();
@@ -162,8 +159,8 @@ public class BibDatabaseWriter {
 
     }
 
-    public void writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext, Collection<BibEntry> entries,
-            SavePreferences preferences) throws IOException {
+    public List<FieldChange> writePartOfDatabase(Writer writer, BibDatabaseContext bibDatabaseContext,
+            List<BibEntry> entries, SavePreferences preferences) throws IOException {
         Objects.requireNonNull(writer);
 
         // Map to collect entry type definitions that we must save along with entries using them.
@@ -181,9 +178,8 @@ public class BibDatabaseWriter {
         writeStrings(writer, bibDatabaseContext.getDatabase(), preferences.isReformatFile());
 
         // Write database entries.
-        List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext,
-                entries.stream().map(BibEntry::getId).collect(Collectors.toSet()), preferences);
-        sortedEntries = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+        List<BibEntry> sortedEntries = BibDatabaseWriter.getSortedEntries(bibDatabaseContext, entries, preferences);
+        List<FieldChange> saveActionChanges = BibDatabaseWriter.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
         for (BibEntry entry : sortedEntries) {
             exceptionCause = entry;
@@ -212,6 +208,8 @@ public class BibDatabaseWriter {
 
         //finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(writer, bibDatabaseContext.getDatabase());
+
+        return saveActionChanges;
     }
 
     /**
@@ -219,27 +217,25 @@ public class BibDatabaseWriter {
      * supplied input array bes.
      */
     public SaveSession savePartOfDatabase(BibDatabaseContext bibDatabaseContext, SavePreferences preferences,
-            Collection<BibEntry> entries) throws SaveException {
+            List<BibEntry> entries) throws SaveException {
 
         return savePartOfDatabase(bibDatabaseContext, entries, preferences);
     }
 
-    private static List<BibEntry> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
-        if (metaData.getData(SaveActions.META_KEY) == null) {
-            // save actions defined -> apply for every entry
-            List<BibEntry> result = new ArrayList<>(toChange.size());
+    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+        List<FieldChange> changes = new ArrayList<>();
 
-            SaveActions saveActions = new SaveActions(metaData);
+        if (metaData.getData(MetaData.SAVE_ACTIONS) != null) {
+            // save actions defined -> apply for every entry
+            FieldFormatterCleanups saveActions = metaData.getSaveActions();
 
             for (BibEntry entry : toChange) {
-                result.add(saveActions.applySaveActions(entry));
+                changes.addAll(saveActions.applySaveActions(entry));
             }
 
-            return result;
-        } else {
-            // no save actions defined -> do nothing
-            return toChange;
         }
+
+        return changes;
     }
 
     /**
@@ -248,11 +244,12 @@ public class BibDatabaseWriter {
      * @param encoding String the name of the encoding, which is part of the file header.
      */
     private void writeBibFileHeader(Writer out, Charset encoding) throws IOException {
-        if(encoding == null)
+        if(encoding == null) {
             return;
+        }
 
         out.write("% ");
-        out.write(Globals.encPrefix + encoding);
+        out.write(Globals.ENCODING_PREFIX + encoding);
         out.write(Globals.NEWLINE);
     }
 
@@ -272,45 +269,18 @@ public class BibDatabaseWriter {
             return;
         }
 
-        // first write all meta data except groups
-        for (String key : metaData) {
+        Map<String, String> serializedMetaData = metaData.serialize();
+
+        for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(key).append(":");
-            for (String metaItem : metaData.getData(key)) {
-                stringBuilder.append(StringUtil.quote(metaItem, ";", '\\')).append(";");
-            }
+            stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(metaItem.getKey()).append(":");
+            stringBuilder.append(metaItem.getValue());
             stringBuilder.append("}");
             stringBuilder.append(Globals.NEWLINE);
 
             out.write(stringBuilder.toString());
-        }
-        // write groups if present. skip this if only the root node exists
-        // (which is always the AllEntriesGroup).
-        GroupTreeNode groupsRoot = metaData.getGroups();
-        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
-            StringBuilder sb = new StringBuilder();
-            // write version first
-            sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSVERSION).append(":");
-            sb.append(VersionHandling.CURRENT_VERSION).append(";");
-            sb.append("}");
-            sb.append(Globals.NEWLINE);
-
-            // now write actual groups
-            sb.append(Globals.NEWLINE);
-            sb.append(COMMENT_PREFIX).append("{").append(MetaData.META_FLAG).append(MetaData.GROUPSTREE).append(":");
-            sb.append(Globals.NEWLINE);
-
-            for(String groupNode : groupsRoot.getTreeAsString()) {
-                sb.append(StringUtil.quote(groupNode, ";", '\\'));
-                sb.append(";");
-                sb.append(Globals.NEWLINE);
-            }
-            sb.append("}");
-            sb.append(Globals.NEWLINE);
-            out.write(sb.toString());
         }
     }
 
@@ -355,13 +325,7 @@ public class BibDatabaseWriter {
             }
         }
 
-        StringBuilder suffixSB = new StringBuilder();
-        for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffixSB.append(' ');
-        }
-        String suffix = suffixSB.toString();
-
-        fw.write(STRING_PREFIX + "{" + bs.getName() + suffix + " = ");
+        fw.write(STRING_PREFIX + "{" + bs.getName() + StringUtil.repeatSpaces(maxKeyLength - bs.getName().length()) + " = ");
         if (bs.getContent().isEmpty()) {
             fw.write("{}");
         } else {
@@ -392,7 +356,7 @@ public class BibDatabaseWriter {
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
         // First, make a Map of all entries:
-        HashMap<String, BibtexString> remaining = new HashMap<>();
+        Map<String, BibtexString> remaining = new HashMap<>();
         int maxKeyLength = 0;
         for (BibtexString string : strings) {
             remaining.put(string.getName(), string);

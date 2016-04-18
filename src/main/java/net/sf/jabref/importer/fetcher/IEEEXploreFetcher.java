@@ -18,7 +18,6 @@ package net.sf.jabref.importer.fetcher;
 import java.awt.BorderLayout;
 
 import java.io.IOException;
-//import java.lang.reflect.Array;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -26,8 +25,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +37,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -45,8 +47,8 @@ import org.json.JSONObject;
 import net.sf.jabref.*;
 import net.sf.jabref.importer.*;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
@@ -65,10 +67,20 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern PROCEEDINGS_PATTERN = Pattern.compile("(.*?)\\.?\\s?Proceedings\\s?(.*)");
     private static final Pattern MONTH_PATTERN = Pattern.compile("(\\d*+)\\s*([a-z]*+)-*(\\d*+)\\s*([a-z]*+)");
 
+    private static final Pattern PREPROCESSING_PATTERN = Pattern.compile("(?<!&)(#[x]*[0]*\\p{XDigit}+;)");
 
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
-    private final HTMLConverter htmlConverter = new HTMLConverter();
+    private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
+    private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
+    private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
+    private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
+    private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
+    private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
+    private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
+    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
+
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
@@ -154,7 +166,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error occured parsing BibTeX returned from IEEEXplore"),
+                status.showMessage(Localization.lang("Error while fetching from %0", "IEEEXplore"),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -170,16 +182,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-        } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
+        } catch (ConnectException | UnknownHostException e) {
+            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
-        } catch (UnknownHostException e) {
-            status.showMessage(Localization.lang("Connection to IEEEXplore failed"), DIALOG_TITLE,
-                    JOptionPane.ERROR_MESSAGE);
-        } catch (IOException e) {
-            status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
-        } catch (JSONException e) {
+        } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
         }
@@ -214,7 +220,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private String createBibtexQueryURL(JSONObject searchResultsJson) {
 
         //buffer to use for building the URL for fetching the bibtex data from IEEEXplore
-        StringBuffer bibtexQueryURLStringBuf = new StringBuffer(45);
+        StringBuilder bibtexQueryURLStringBuf = new StringBuilder();
         bibtexQueryURLStringBuf.append(URL_BIBTEX_START);
 
         //loop over each record and create a comma-separate list of article numbers which will be used to download the raw Bibtex
@@ -246,17 +252,16 @@ public class IEEEXploreFetcher implements EntryFetcher {
         //for some reason, the escaped HTML characters in the titles are in the format "#xNNNN" (they are missing the ampersand)
         //add the ampersands back in before passing to the HTML formatter so they can be properly converted
         //TODO: Maybe edit the HTMLconverter to also recognize escaped characters even when the & is missing?
-        //Pattern escapedPattern = Pattern.compile("(?<!&)#([x]*)([0]*)(\\p{XDigit}+);");
-        bibtexPage = bibtexPage.replaceAll("(?<!&)(#[x]*[0]*\\p{XDigit}+;)", "&$1");
+        String result = PREPROCESSING_PATTERN.matcher(bibtexPage).replaceAll("&$1");
 
         //Also, percent signs are not escaped by the IEEEXplore Bibtex output nor, it would appear, the subsequent processing in JabRef
         //TODO: Maybe find a better spot for this if it applies more universally
-        bibtexPage = bibtexPage.replaceAll("(?<!\\\\)%", "\\\\%");
+        result = result.replaceAll("(?<!\\\\)%", "\\\\%");
 
         //Format the bibtexResults using the HTML formatter (clears up numerical and text escaped characters and remaining HTML tags)
-        bibtexPage = htmlConverter.format(bibtexPage);
+        result = htmlToLatexFormatter.format(result);
 
-        return bibtexPage;
+        return result;
     }
 
     private BibEntry cleanup(BibEntry entry) {
@@ -277,15 +282,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = title.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
-                title = title.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
-                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
-                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
             } else {
-                title = title.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
-                title = title.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
-                title = title.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
-                title = title.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
             }
 
             // Replace \infin with \infty
@@ -293,12 +298,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             // Unit formatting
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                title = unitFormatter.format(title);
+                title = unitsToLatexFormatter.format(title);
             }
 
             // Automatic case keeping
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                title = caseKeeper.format(title);
+                title = protectTermsFormatter.format(title);
             }
             // Write back
             entry.setField("title", title);
@@ -311,10 +316,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //reorder the "Jr." "Sr." etc to the correct ordering
             String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
-            for (int n = 0; n < authorSplit.length; n++) {
-                authorSplit[n] = authorSplit[n].replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2");
+            List<String> authorResult = new ArrayList<>();
+            for (String authorSplitPart : authorSplit) {
+                authorResult.add(authorSplitPart.replaceAll("(.+?),(.+?),(.+)", "$1,$3,$2"));
             }
-            author = String.join(" and ", authorSplit);
+            author = String.join(" and ", authorResult);
 
             author = author.replace(".", ". ").replace("  ", " ").replace(". -", ".-").replace("; ", " and ")
                     .replace(" ,", ",").replace("  ", " ");
@@ -330,32 +336,31 @@ public class IEEEXploreFetcher implements EntryFetcher {
             month = month.toLowerCase();
 
             Matcher mm = MONTH_PATTERN.matcher(month);
-            String date = month;
+            StringBuilder date = new StringBuilder(month);
             if (mm.find()) {
                 if (mm.group(3).isEmpty()) {
-                    if (!mm.group(2).isEmpty()) {
-                        date = "#" + mm.group(2).substring(0, 3) + "#";
-                        if (!mm.group(1).isEmpty()) {
-                            date += " " + mm.group(1) + ",";
-                        }
+                    if (mm.group(2).isEmpty()) {
+                        date = new StringBuilder().append(mm.group(1)).append(',');
                     } else {
-                        date = mm.group(1) + ",";
+                        date = new StringBuilder().append('#').append(mm.group(2).substring(0, 3)).append('#');
+                        if (!mm.group(1).isEmpty()) {
+                            date.append(' ').append(mm.group(1)).append(',');
+                        }
                     }
                 } else if (mm.group(2).isEmpty()) {
-                    if (!mm.group(4).isEmpty()) {
-                        date = "#" + mm.group(4).substring(0, 3) + "# " + mm.group(1) + "--" + mm.group(3) + ",";
+                    if (mm.group(4).isEmpty()) {
+                        date.append(',');
                     } else {
-                        date += ",";
+                        date = new StringBuilder().append('#').append(mm.group(4).substring(0, 3)).append('#')
+                                .append(mm.group(1)).append("--").append(mm.group(3)).append(',');
                     }
                 } else {
-                    date = "#" + mm.group(2).substring(0, 3) + "# " + mm.group(1) + "--#" + mm.group(4).substring(0, 3)
-                            + "# " + mm.group(3) + ",";
+                    date = new StringBuilder().append('#').append(mm.group(2).substring(0, 3)).append('#')
+                            .append(mm.group(1)).append("--#").append(mm.group(4).substring(0, 3)).append('#')
+                            .append(mm.group(3)).append(',');
                 }
             }
-            //date = date.trim();
-            //if (!date.isEmpty()) {
-            entry.setField("month", date);
-            //}
+            entry.setField("month", date.toString());
         }
 
         // clean up pages
@@ -366,7 +371,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
                     entry.setField("pages", pageNumbers[0]);
                 } else {
-                    entry.setField("pages", pages.replaceAll("-", "--"));
+                    entry.setField("pages", pages.replace("-", "--"));
                 }
             }
         }
@@ -448,7 +453,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (m2.find()) {
                     String prefix = m2.group(2);
                     String postfix = m2.group(1).replaceAll("\\.$", "");
-                    if (!prefix.matches(abrvPattern)) {
+                    if (prefix.matches(abrvPattern)) {
+                        fullName = postfix.trim() + " " + prefix.trim();
+                    } else {
                         String abrv = "";
 
                         String[] parts = postfix.split("\\. ", 2);
@@ -463,8 +470,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
                         }
                         fullName = prefix.trim() + " " + postfix.trim() + " " + abrv;
 
-                    } else {
-                        fullName = postfix.trim() + " " + prefix.trim();
                     }
 
                 }
@@ -496,15 +501,15 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\$\\^\\{$1\\}\\$");
-                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\$_\\{$1\\}\\$");
-                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\$\\^\\{$1\\}\\$");
-                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\_\\{$1\\}\\$");
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
             } else {
-                abstr = abstr.replaceAll("/sup ([^/]+)/", "\\\\textsuperscript\\{$1\\}");
-                abstr = abstr.replaceAll("/sub ([^/]+)/", "\\\\textsubscript\\{$1\\}");
-                abstr = abstr.replaceAll("\\(sup\\)([^(]+)\\(/sup\\)", "\\\\textsuperscript\\{$1\\}");
-                abstr = abstr.replaceAll("\\(sub\\)([^(]+)\\(/sub\\)", "\\\\textsubscript\\{$1\\}");
+                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             }
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");

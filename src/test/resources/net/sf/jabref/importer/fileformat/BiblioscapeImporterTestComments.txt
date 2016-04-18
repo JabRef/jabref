@@ -1,0 +1,38 @@
+--AU-- Sa, M. CM.; Kascheres, A.
+--TI-- Electronically Mediated Selectivity 
+--ST-- Journal of Organic Chemistry
+--YP-- 1996
+--VL-- 61
+--NB-- 11
+--PS-- 3749
+--PE-- 3752
+--TW-- Article
+--QT-- Chemistry.
+--IS-- 0022-3263
+--AB-- [References: 11]
+--AD-- Reprint available from: Kascheres A UNIV ESTADUAL CAMPINAS INST QUIM CP 6154 BR-13083970 SAO PAULO BRAZIL UNIV ESTADUAL CAMPINAS INST QUIM BR-13083970 SAO PAULO BRAZIL
+--SB-- Just for testing
+--SA-- Me
+--NT-- This is a test note
+--PB-- Uni Stuttgart
+--TA-- Oliver
+--TT-- My own world
+--ED-- Ultra
+--QT-- Noone
+--QA-- Dani
+--CO-- Germany
+--AT-- ftp://www.google.de/
+--UR-- https://www.google.de/
+--C1-- Custom1
+--C2-- Custom2
+--C3-- Custom3
+--C4-- Custom4
+--C5-- Custom5
+--C6-- Custom6
+--DE-- What?
+--CA-- Testing, Example
+--TH-- Bib
+--SH-- One
+--SE-- Too much
+--RT-- Journal Article
+------

@@ -13,7 +13,7 @@ import java.net.Socket;
 public class RemoteTest {
 
     @Test
-    public void testGoodCase() throws Exception {
+    public void testGoodCase() {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
@@ -30,7 +30,7 @@ public class RemoteTest {
     }
 
     @Test
-    public void testGoodCaseWithAllLifecycleMethods() throws Exception {
+    public void testGoodCaseWithAllLifecycleMethods() {
         final int port = 34567;
         final String message = "MYMESSAGE";
 

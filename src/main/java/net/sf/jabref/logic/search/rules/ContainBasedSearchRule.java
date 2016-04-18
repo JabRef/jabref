@@ -15,10 +15,11 @@
 */
 package net.sf.jabref.logic.search.rules;
 
+import java.util.Iterator;
 import java.util.List;
 
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.exporter.layout.format.RemoveLatexCommands;
 
 /**
  * Search rule for contain-based search.
@@ -50,35 +51,28 @@ public class ContainBasedSearchRule implements SearchRule {
             searchString = searchString.toLowerCase();
         }
 
-        List<String> words = new SentenceAnalyzer(searchString).getWords();
+        List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
-        // We need match for all words:
-        boolean[] matchFound = new boolean[words.size()];
+        for (String fieldContent : bibEntry.getFieldValues()) {
+            String formattedFieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
+            if (!caseSensitive) {
+                formattedFieldContent = formattedFieldContent.toLowerCase();
+            }
 
-        for (String field : bibEntry.getFieldNames()) {
-            if (bibEntry.hasField(field)) {
-                String fieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
-                if (!caseSensitive) {
-                    fieldContent = fieldContent.toLowerCase();
-                }
-
-                int index = 0;
-                // Check if we have a match for each of the query words, ignoring
-                // those words for which we already have a match:
-                for (String word : words) {
-                    matchFound[index] = matchFound[index] || fieldContent.contains(word);
-
-                    index++;
+            Iterator<String> unmatchedWordsIterator = unmatchedWords.iterator();
+            while (unmatchedWordsIterator.hasNext()) {
+                String word = unmatchedWordsIterator.next();
+                if(formattedFieldContent.contains(word)) {
+                    unmatchedWordsIterator.remove();
                 }
             }
 
-        }
-        for (boolean aMatchFound : matchFound) {
-            if (!aMatchFound) {
-                return false; // Didn't match all words.
+            if(unmatchedWords.isEmpty()) {
+                return true;
             }
         }
-        return true; // Matched all words.
+
+        return false; // Didn't match all words.
     }
 
 }

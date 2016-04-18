@@ -17,9 +17,7 @@ package net.sf.jabref.exporter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +32,6 @@ import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
@@ -52,35 +48,38 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class ExportCustomizationDialog extends JDialog {
 
-    private final JabRefFrame frame;
+    public ExportCustomizationDialog(final JabRefFrame frame) {
 
-    private final JTable table;
+        super(frame, Localization.lang("Manage custom exports"), false);
+        DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
+                Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
+        JTable table = new JTable(tableModel);
+        TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_2_WIDTH);
+        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 150));
+        if (table.getRowCount() > 0) {
+            table.setRowSelectionInterval(0, 0);
+        }
 
 
-    public ExportCustomizationDialog(final JabRefFrame frame_) throws HeadlessException {
-
-        super(frame_, Localization.lang("Manage custom exports"), false);
-        frame = frame_;
         JButton addExport = new JButton(Localization.lang("Add new"));
-        addExport.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CustomExportDialog ecd = new CustomExportDialog(frame);
-                ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
-                if (ecd.okPressed()) {
-                    List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
-                    Globals.prefs.customExports.addFormat(newFormat);
-                    Globals.prefs.customExports.store();
-                }
+        addExport.addActionListener(e -> {
+            CustomExportDialog ecd = new CustomExportDialog(frame);
+            ecd.setVisible(true);
+            if (ecd.okPressed()) {
+                List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
+                Globals.prefs.customExports.addFormat(newFormat);
+                Globals.prefs.customExports.store();
             }
         });
 
         JButton modify = new JButton(Localization.lang("Modify"));
-        modify.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        modify.addActionListener(e -> {
                 int row = table.getSelectedRow();
                 if (row == -1) {
                     return;
@@ -96,14 +95,10 @@ public class ExportCustomizationDialog extends JDialog {
                     table.repaint();
                     Globals.prefs.customExports.store();
                 }
-            }
         });
 
         JButton remove = new JButton(Localization.lang("Remove"));
-        remove.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        remove.addActionListener(e -> {
                 int[] rows = table.getSelectedRows();
                 if (rows.length == 0) {
                     return;
@@ -116,10 +111,9 @@ public class ExportCustomizationDialog extends JDialog {
                     Globals.prefs.customExports.remove(list);
                 }
                 Globals.prefs.customExports.store();
-            }
         });
 
-        AbstractAction closeAction = new AbstractAction() {
+        Action closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -132,33 +126,12 @@ public class ExportCustomizationDialog extends JDialog {
 
         JButton help = new HelpAction(HelpFiles.exportCustomizationHelp).getHelpButton();
 
-        DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
-                Globals.prefs.customExports.getSortedList(),
-                new ExportTableFormat());
-        table = new JTable(tableModel);
-        TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_2_WIDTH);
-        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setPreferredScrollableViewportSize(
-                new Dimension(500, 150));
-        if (table.getRowCount() > 0) {
-            table.setRowSelectionInterval(0, 0);
-        }
-
         // Key bindings:
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
         InputMap im = main.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", closeAction);
-        //am = table.getActionMap();
-        //im = table.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        //im.put(Globals.getKeyPrefs().getKey()KeyBinds.CLOSE_DIALOG), "close");
-        //am.put("close", closeAction);
         main.setLayout(new BorderLayout());
         main.add(sp, BorderLayout.CENTER);
         JPanel buttons = new JPanel();
@@ -176,7 +149,7 @@ public class ExportCustomizationDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(buttons, BorderLayout.SOUTH);
         pack();
-        PositionWindow.placeDialog(this, frame);
+        setLocationRelativeTo(frame);
         new FocusRequester(table);
     }
 
@@ -201,10 +174,8 @@ public class ExportCustomizationDialog extends JDialog {
             case 1:
                 return Localization.lang("Main layout file");
             default:
-                return Localization.lang("File extension");
+                return Localization.lang("Extension");
             }
         }
-
     }
-
 }

@@ -4,134 +4,67 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.preftabs.NameFormatterTab;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.importer.ParserResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
 public class UtilTest {
 
-    @Test
-    public void testCheckLegalKey() {
-        // Enforce legal keys
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", true));
-        Assert.assertEquals("SPECIALCHARS", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", true));
-
-        // Do not enforce legal keys
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA", false));
-        Assert.assertEquals("SPECIALCHARS#~^", net.sf.jabref.util.Util.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r", false));
-
-        // Check null input
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null));
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, true));
-        Assert.assertNull(net.sf.jabref.util.Util.checkLegalKey(null, false));
-
-        // Use preferences setting
-        Assert.assertEquals("AAAA", net.sf.jabref.util.Util.checkLegalKey("AA AA"));
-        Assert.assertEquals("", net.sf.jabref.util.Util.checkLegalKey("\n\t\r"));
-    }
-
-    @Test
-    @Ignore
-    public void testReplaceSpecialCharacters() {
-        Assert.assertEquals("Hallo Arger", net.sf.jabref.util.Util.replaceSpecialCharacters("Hallo Arger"));
-        // Shouldn't German ï¿½ be resolved to Ae
-        Assert.assertEquals("AeaeaAAA", net.sf.jabref.util.Util.replaceSpecialCharacters("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"));
-    }
-
-
-
-
-    BibDatabase database;
-    BibEntry entry;
+    private BibDatabase database;
+    private BibEntry entry;
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         // Required by BibtexParser -> FieldContentParser
         Globals.prefs = JabRefPreferences.getInstance();
 
         StringReader reader = new StringReader(
-                "@ARTICLE{HipKro03," + "\n" +
-                        "  author = {Eric von Hippel and Georg von Krogh}," + "\n" +
-                        "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science}," + "\n" +
-                        "  journal = {Organization Science}," + "\n" +
-                        "  year = {2003}," + "\n" +
-                        "  volume = {14}," + "\n" +
-                        "  pages = {209--223}," + "\n" +
-                        "  number = {2}," + "\n" +
-                        "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA}," + "\n" +
-                        "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n" +
-                        "  issn = {1526-5455}," + "\n" +
-                        "  publisher = {INFORMS}" + "\n" +
-                        "}"
-                );
+                "@ARTICLE{HipKro03," + "\n" + "  author = {Eric von Hippel and Georg von Krogh}," + "\n"
+                        + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},"
+                        + "\n" + "  journal = {Organization Science}," + "\n" + "  year = {2003}," + "\n"
+                        + "  volume = {14}," + "\n" + "  pages = {209--223}," + "\n" + "  number = {2}," + "\n"
+                        + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},"
+                        + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
+                        + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
 
         BibtexParser parser = new BibtexParser(reader);
         ParserResult result = null;
-        try {
-            result = parser.parse();
-        } catch (Exception e) {
-            Assert.fail();
-        }
+
+        result = parser.parse();
+
         database = result.getDatabase();
-        entry = database.getEntriesByKey("HipKro03")[0];
+        entry = database.getEntryByKey("HipKro03");
 
         Assert.assertNotNull(database);
         Assert.assertNotNull(entry);
     }
 
     @Test
-    public void testParseMethodCalls() {
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("bla").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla").get(0))[0]);
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("bla,").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla,").get(0))[0]);
-
-        Assert.assertEquals(1, net.sf.jabref.util.Util.parseMethodsCalls("_bla.bla.blub,").size());
-        Assert.assertEquals("_bla.bla.blub", (net.sf.jabref.util.Util.parseMethodsCalls("_bla.bla.blub,").get(0))[0]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla,foo").get(1))[0]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[0]);
-        Assert.assertEquals("test", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0))[1]);
-        Assert.assertEquals("fark", (net.sf.jabref.util.Util.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1))[1]);
-
-        Assert.assertEquals(2, net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").size());
-        Assert.assertEquals("bla", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[0]);
-        Assert.assertEquals("foo", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[0]);
-        Assert.assertEquals("test", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(0))[1]);
-        Assert.assertEquals("fark", (net.sf.jabref.util.Util.parseMethodsCalls("bla(test),foo(fark)").get(1))[1]);
-    }
-
-    @Test
     @Ignore
     public void testFieldAndFormat() {
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh", net.sf.jabref.util.Util.getFieldAndFormat("[author]", entry, database));
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+                net.sf.jabref.util.Util.getFieldAndFormat("[author]", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh", net.sf.jabref.util.Util.getFieldAndFormat("author", entry, database));
+        Assert.assertEquals("Eric von Hippel and Georg von Krogh",
+                net.sf.jabref.util.Util.getFieldAndFormat("author", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[unknownkey]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[unknownkey]", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[:]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[:]", entry, database));
 
-        Assert.assertEquals(null, net.sf.jabref.util.Util.getFieldAndFormat("[:lower]", entry, database));
+        Assert.assertEquals("", net.sf.jabref.util.Util.getFieldAndFormat("[:lower]", entry, database));
 
-        Assert.assertEquals("eric von hippel and georg von krogh", net.sf.jabref.util.Util.getFieldAndFormat("[author:lower]", entry, database));
+        Assert.assertEquals("eric von hippel and georg von krogh",
+                net.sf.jabref.util.Util.getFieldAndFormat("[author:lower]", entry, database));
 
         Assert.assertEquals("HipKro03", net.sf.jabref.util.Util.getFieldAndFormat("[bibtexkey]", entry, database));
 
@@ -142,9 +75,9 @@ public class UtilTest {
     @Ignore
     public void testUserFieldAndFormat() {
 
-        List<String> names = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATER_KEY);
+        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
 
-        List<String> formats = Globals.prefs.getStringList(NameFormatterTab.NAME_FORMATTER_VALUE);
+        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
 
         try {
 
@@ -154,14 +87,15 @@ public class UtilTest {
             n.add("testMe123454321");
             f.add("*@*@test");
 
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, n);
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, f);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, n);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, f);
 
-            Assert.assertEquals("testtest", net.sf.jabref.util.Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
+            Assert.assertEquals("testtest",
+                    net.sf.jabref.util.Util.getFieldAndFormat("[author:testMe123454321]", entry, database));
 
         } finally {
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringList(NameFormatterTab.NAME_FORMATTER_VALUE, formats);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
+            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
         }
     }
 
@@ -181,9 +115,10 @@ public class UtilTest {
         Assert.assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
                 net.sf.jabref.util.Util.expandBrackets("[author] are two famous authors.", entry, database));
 
-        Assert.assertEquals("Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry, database));
+        Assert.assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                net.sf.jabref.util.Util.expandBrackets("[author] have published [title] in [journal].", entry,
+                        database));
     }
-
 
 }

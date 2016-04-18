@@ -28,7 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,20 +59,20 @@ class ResolveDuplicateLabelDialog {
 
         FormBuilder b = FormBuilder.create().layout(new FormLayout(
                 "left:pref, 4dlu, fill:pref", "p"));
-        b.add(new JLabel(Localization.lang("Duplicate key") + ": " + key)).xyw(1, 1, 3);
+        b.add(new JLabel(Localization.lang("Duplicate BibTeX key") + ": " + key)).xyw(1, 1, 3);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         boolean first = true;
         int row = 3;
         for (BibEntry entry : entries) {
-            JCheckBox cb = new JCheckBox(Localization.lang("Generate key"), !first);
+            JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             //JPanel pan = new JPanel();
             //pan.setLayout(new BorderLayout());
             //pan.add(cb, BorderLayout.NORTH);
             //cb.add(new JPanel(), BorderLayout.CENTER);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel pp = new PreviewPanel(null, entry, null, new MetaData(), ResolveDuplicateLabelDialog.LAYOUT);
+            PreviewPanel pp = new PreviewPanel(null, entry, null, ResolveDuplicateLabelDialog.LAYOUT);
             pp.setPreferredSize(new Dimension(800, 90));
             //pp.setBorder(BorderFactory.createEtchedBorder());
             b.add(new JScrollPane(pp)).xy(3, row);
@@ -96,21 +95,11 @@ class ResolveDuplicateLabelDialog {
 
         diag.pack();
 
-        ok.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        ok.addActionListener(e -> {
                 okPressed = true;
                 diag.dispose();
-            }
         });
-        cancel.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                diag.dispose();
-            }
-        });
 
         AbstractAction closeAction = new AbstractAction() {
 
@@ -119,6 +108,9 @@ class ResolveDuplicateLabelDialog {
                 diag.dispose();
             }
         };
+
+        cancel.addActionListener(closeAction);
+
         ActionMap am = b.getPanel().getActionMap();
         InputMap im = b.getPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");

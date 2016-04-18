@@ -19,9 +19,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
-import net.sf.jabref.logic.fetcher.FindFullText;
+import net.sf.jabref.logic.fulltext.FindFullText;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -67,29 +66,28 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            List<String> dirs = basePanel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = basePanel.getBibDatabaseContext().getFileDirectory();
             if (dirs.isEmpty()) {
-                // FIXME: Localization
-                JOptionPane.showMessageDialog(basePanel.frame(), "Main file directory not set! Preferences -> External programs", "Directory not found", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(basePanel.frame(),
+                        Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                + " -> " + Localization.lang("External programs"),
+                        Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             String bibtexKey = entry.getCiteKey();
             // TODO: this needs its own thread as it blocks the UI!
-            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.getBibDatabaseContext().getMetaData(), bibtexKey);
+            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.getBibDatabaseContext(), bibtexKey);
             try {
-                def.download(result.get(), new DownloadExternalFile.DownloadCallback() {
-                    @Override
-                    public void downloadComplete(FileListEntry file) {
-                        FileListTableModel tm = new FileListTableModel();
-                        String oldValue = entry.getField(Globals.FILE_FIELD);
-                        tm.setContent(oldValue);
-                        tm.addEntry(tm.getRowCount(), file);
-                        String newValue = tm.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                        entry.setField(Globals.FILE_FIELD, newValue);
-                        basePanel.undoManager.addEdit(edit);
-                        basePanel.markBaseChanged();
-                    }
+                def.download(result.get(), file -> {
+                    FileListTableModel tm = new FileListTableModel();
+                    String oldValue = entry.getField(Globals.FILE_FIELD);
+                    tm.setContent(oldValue);
+                    tm.addEntry(tm.getRowCount(), file);
+                    String newValue = tm.getStringRepresentation();
+                    UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
+                    entry.setField(Globals.FILE_FIELD, newValue);
+                    basePanel.undoManager.addEdit(edit);
+                    basePanel.markBaseChanged();
                 });
             } catch (IOException e) {
                 LOGGER.warn("Problem downloading file", e);
@@ -97,7 +95,7 @@ public class FindFullTextAction extends AbstractWorker {
             basePanel.output(Localization.lang("Finished downloading full text document"));
         }
         else {
-            String message = Localization.lang("Full text article download failed");
+            String message = Localization.lang("Full text document download failed");
             basePanel.output(message);
             JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
         }

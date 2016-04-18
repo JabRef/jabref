@@ -15,37 +15,60 @@
 */
 package net.sf.jabref.gui.groups;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.*;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.fieldeditors.TextField;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.logic.groups.*;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.undo.AbstractUndoableEdit;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.event.CaretListener;
+import javax.swing.undo.AbstractUndoableEdit;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FieldContentSelector;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.fieldeditors.TextField;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.groups.SearchGroup;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.util.Util;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector
@@ -245,7 +268,7 @@ class GroupDialog extends JDialog {
         setResizable(false);
         updateComponents();
         setLayoutForSelectedGroup();
-        PositionWindow.placeDialog(this, jabrefFrame);
+        setLocationRelativeTo(jabrefFrame);
 
         // add listeners
         ItemListener radioButtonItemListener = e -> {
@@ -452,7 +475,7 @@ class GroupDialog extends JDialog {
             return;
         }
         List<BibEntry> list = new ArrayList<>();
-        for (BibEntry entry : m_basePanel.database().getEntries()) {
+        for (BibEntry entry : m_basePanel.getDatabase().getEntries()) {
             if (m_editedGroup.contains(entry)) {
                 list.add(entry);
             }

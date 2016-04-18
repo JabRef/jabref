@@ -16,14 +16,13 @@
 package net.sf.jabref.gui.journals;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.List;
-
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Converts journal full names to either iso or medline abbreviations for all selected entries.
@@ -42,7 +41,7 @@ public class AbbreviateAction extends AbstractWorker {
 
     @Override
     public void init() {
-        panel.output("Abbreviating...");
+        panel.output(Localization.lang("Abbreviating..."));
     }
 
     @Override
@@ -55,13 +54,13 @@ public class AbbreviateAction extends AbstractWorker {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 Globals.journalAbbreviationLoader.getRepository(), iso);
 
-        NamedCompound ce = new NamedCompound("Abbreviate journal names");
+        NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
-            if (undoableAbbreviator.abbreviate(panel.database(), entry, "journal", ce)) {
+            if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, "journal", ce)) {
                 count++;
             }
-            if (undoableAbbreviator.abbreviate(panel.database(), entry, "journaltitle", ce)) {
+            if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, "journaltitle", ce)) {
                 count++;
             }
         }

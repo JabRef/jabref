@@ -17,6 +17,8 @@ package net.sf.jabref.model;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -141,11 +144,11 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        if ("author".equals(field) || "editor".equals(field)) {
+        if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthor_lastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
-            String auth2 = AuthorList.fixAuthor_lastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
+            String auth1 = AuthorList.fixAuthorLastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
+            String auth2 = AuthorList.fixAuthorLastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
             double similarity = DuplicateCheck.correlateByWords(auth1, auth2);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -184,7 +187,7 @@ public class DuplicateCheck {
     }
 
     public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
-        HashSet<String> allFields = new HashSet<>();
+        Set<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
 
@@ -251,7 +254,9 @@ public class DuplicateCheck {
      * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
      */
     private static double similarity(String s1, String s2) {
-        String longer = s1, shorter = s2;
+        String longer = s1;
+        String shorter = s2;
+
         if (s1.length() < s2.length()) { // longer should always have greater length
             longer = s2;
             shorter = s1;
@@ -271,32 +276,31 @@ public class DuplicateCheck {
     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
     */
     private static int editDistance(String s1, String s2) {
-        s1 = s1.toLowerCase();
-        s2 = s2.toLowerCase();
+        String s1LowerCase = s1.toLowerCase();
+        String s2LowerCase = s2.toLowerCase();
 
-        int[] costs = new int[s2.length() + 1];
-        for (int i = 0; i <= s1.length(); i++) {
+        int[] costs = new int[s2LowerCase.length() + 1];
+        for (int i = 0; i <= s1LowerCase.length(); i++) {
             int lastValue = i;
-            for (int j = 0; j <= s2.length(); j++) {
+            for (int j = 0; j <= s2LowerCase.length(); j++) {
                 if (i == 0) {
                     costs[j] = j;
-                } else {
-                    if (j > 0) {
-                        int newValue = costs[j - 1];
-                        if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
-                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                        }
-                        costs[j - 1] = lastValue;
-                        lastValue = newValue;
+                } else if (j > 0) {
+                    int newValue = costs[j - 1];
+                    if (s1LowerCase.charAt(i - 1) != s2LowerCase.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
                     }
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+
                 }
             }
             if (i > 0) {
-                costs[s2.length()] = lastValue;
+                costs[s2LowerCase.length()] = lastValue;
             }
         }
-        LOGGER.debug("String 1: " + s1 + " String 2: " + s2 + " Distance: " + costs[s2.length()]);
-        return costs[s2.length()];
+        LOGGER.debug("String 1: " + s1LowerCase + " String 2: " + s2LowerCase + " Distance: " + costs[s2LowerCase.length()]);
+        return costs[s2LowerCase.length()];
     }
 
 

@@ -24,7 +24,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Role of an importer for JabRef.
- * 
+ *
  * <p>Importers are sorted according to following criteria
  * <ol><li>
  *   custom importers come first, then importers shipped with JabRef
@@ -65,9 +65,11 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * JabRef cycles through all available import formats. No error messages or feedback
      * is displayed from individual import formats in this case.
      *
-     * If importing in a specified format, and null or an empty list is returned, JabRef reports
+     * If importing in a specified format, and an empty list is returned, JabRef reports
      * that no entries were found. If an IOException is thrown, JabRef displays the exception's
      * message in unmodified form.
+     *
+     * This method should never return null. Return an empty list instead.
      *
      * TODO the return type should be changed to "ParseResult" as the parser could use a different encoding than the default encoding
      */
@@ -75,16 +77,16 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Name of this import format.
-     * 
+     *
      * <p>The name must be unique.</p>
-     * 
+     *
      * @return format name, must be unique and not <code>null</code>
      */
     public abstract String getFormatName();
 
     /**
      * Extensions that this importer can read.
-     * 
+     *
      * @return comma separated list of extensions or <code>null</code> for the default
      */
     public String getExtensions() {
@@ -93,7 +95,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Short, one token ID to identify the format from the command line.
-     * 
+     *
      * @return command line ID
      */
     public String getCLIId() {
@@ -110,14 +112,14 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Description  of the ImportFormat.
-     * 
+     *
      * <p>Implementors of ImportFormats should override this. Ideally, it should specify
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import
      * </li><li>
      *   by what criteria it {@link #isRecognizedFormat(InputStream) recognizes} an import format
      * </li></ul>
-     * 
+     *
      * @return description of the import format
      */
     public String getDescription() {
@@ -126,10 +128,10 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Sets if this is a custom importer.
-     * 
+     *
      * <p>For custom importers added dynamically to JabRef, this will be
      * set automatically by JabRef.</p>
-     * 
+     *
      * @param isCustomImporter if this is a custom importer
      */
     public final void setIsCustomImporter(boolean isCustomImporter) {
@@ -138,9 +140,9 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Wether this importer is a custom importer.
-     * 
+     *
      * <p>Custom importers will have precedence over built-in importers.</p>
-     * 
+     *
      * @return  wether this is a custom importer
      */
     public final boolean isCustomImporter() {
@@ -162,10 +164,15 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     @Override
     public boolean equals(Object o) {
-        return o != null
-                && o instanceof ImportFormat
-                && ((ImportFormat) o).isCustomImporter() == isCustomImporter()
-                && ((ImportFormat) o).getFormatName().equals(getFormatName());
+        if (this == o) {
+            return true;
+        }
+
+        if (o instanceof ImportFormat) {
+            ImportFormat format = (ImportFormat) o;
+            return (format.isCustomImporter() == isCustomImporter()) && format.getFormatName().equals(getFormatName());
+        }
+        return false;
     }
 
     /*

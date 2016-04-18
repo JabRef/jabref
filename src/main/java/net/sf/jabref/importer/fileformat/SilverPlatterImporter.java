@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -60,22 +61,22 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public boolean isRecognizedFormat(InputStream stream) throws IOException {
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
+        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
 
-        // This format is very similar to Inspec, so we have a two-fold strategy:
-        // If we see the flag signalling that it is an inspec file, return false.
-        // This flag should appear above the first entry and prevent us from
-        // accepting the Inspec format. Then we look for the title entry.
-        String str;
-        while ((str = in.readLine()) != null) {
+            // This format is very similar to Inspec, so we have a two-fold strategy:
+            // If we see the flag signaling that it is an Inspec file, return false.
+            // This flag should appear above the first entry and prevent us from
+            // accepting the Inspec format. Then we look for the title entry.
+            String str;
+            while ((str = in.readLine()) != null) {
 
-            if (START_PATTERN.matcher(str).find())
-            {
-                return false; // This is an inspec file, so return false.
-            }
+                if (START_PATTERN.matcher(str).find()) {
+                    return false; // This is an Inspec file, so return false.
+                }
 
-            if ((str.length() >= 5) && "TI:  ".equals(str.substring(0, 5))) {
-                return true;
+                if ((str.length() >= 5) && "TI:  ".equals(str.substring(0, 5))) {
+                    return true;
+                }
             }
         }
         return false;
@@ -87,7 +88,7 @@ public class SilverPlatterImporter extends ImportFormat {
      */
     @Override
     public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        ArrayList<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibitems = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
             boolean isChapter = false;
             String str;
@@ -101,19 +102,17 @@ public class SilverPlatterImporter extends ImportFormat {
             }
             String[] entries = sb.toString().split("__::__");
             String type = "";
-            HashMap<String, String> h = new HashMap<>();
+            Map<String, String> h = new HashMap<>();
             for (String entry : entries) {
                 if (entry.trim().length() < 6) {
                     continue;
                 }
-                //System.out.println("'"+entries[i]+"'");
                 h.clear();
                 String[] fields = entry.split("__NEWFIELD__");
                 for (String field : fields) {
                     if (field.length() < 6) {
                         continue;
                     }
-                    //System.out.println(">"+fields[j]+"<");
                     String f3 = field.substring(0, 2);
                     String frest = field.substring(5);
                     if ("TI".equals(f3)) {
@@ -123,10 +122,10 @@ public class SilverPlatterImporter extends ImportFormat {
                             String ed = frest.trim();
                             ed = ed.substring(0, ed.length() - 4);
                             h.put("editor",
-                                    AuthorList.fixAuthor_lastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
+                                    AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                         } else {
-                            h.put("author", AuthorList
-                                    .fixAuthor_lastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                            h.put("author",
+                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                         }
                     } else if ("AB".equals(f3)) {
                         h.put("abstract", frest);
@@ -145,10 +144,13 @@ public class SilverPlatterImporter extends ImportFormat {
                                 h.put("year", yr);
                                 frest = frest.substring(m);
                                 m = frest.indexOf(':');
+                                int issueIndex = frest.indexOf('(');
+                                int endIssueIndex = frest.indexOf(')');
                                 if (m >= 0) {
                                     String pg = frest.substring(m + 1).trim();
                                     h.put("pages", pg);
-                                    h.put("volume", frest.substring(1, m));
+                                    h.put("volume", frest.substring(1, issueIndex).trim());
+                                    h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
                                 }
                             }
                         }
@@ -199,15 +201,9 @@ public class SilverPlatterImporter extends ImportFormat {
                     if (titleO != null) {
                         String title = ((String) titleO).trim();
                         int inPos = title.indexOf("\" in ");
-                        int pgPos = title.lastIndexOf(' ');
                         if (inPos > 1) {
-                            h.put("title", title.substring(1, inPos));
+                            h.put("title", title.substring(0, inPos));
                         }
-                        if (pgPos > inPos) {
-                            h.put("pages", title.substring(pgPos)
-.replace("-", "--"));
-                        }
-
                     }
 
                 }

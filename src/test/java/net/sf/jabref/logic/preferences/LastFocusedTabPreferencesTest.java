@@ -26,7 +26,7 @@ public class LastFocusedTabPreferencesTest {
     }
 
     @Test
-    public void testLastFocusedTab() throws Exception {
+    public void testLastFocusedTab() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
         File whatever = new File("whatever");
         prefs.setLastFocusedTab(whatever);
@@ -34,7 +34,7 @@ public class LastFocusedTabPreferencesTest {
     }
 
     @Test
-    public void testLastFocusedTabNull() throws Exception {
+    public void testLastFocusedTabNull() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
         File whatever = new File("whatever");
         prefs.setLastFocusedTab(whatever);

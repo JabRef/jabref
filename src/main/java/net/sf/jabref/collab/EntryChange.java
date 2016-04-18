@@ -17,6 +17,7 @@ package net.sf.jabref.collab;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.JComponent;
@@ -58,7 +59,7 @@ class EntryChange extends Change {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
                 + " Modifications agree: " + modificationsAgree);
 
-        TreeSet<String> allFields = new TreeSet<>();
+        Set<String> allFields = new TreeSet<>();
         allFields.addAll(memEntry.getFieldNames());
         allFields.addAll(tmpEntry.getFieldNames());
         allFields.addAll(diskEntry.getFieldNames());
@@ -150,9 +151,17 @@ class EntryChange extends Change {
 
         @Override
         public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-            entry.setField(field, onDisk);
+            if (onDisk == null) {
+                entry.clearField(field);
+            } else {
+                entry.setField(field, onDisk);
+            }
             undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
-            tmpEntry.setField(field, onDisk);
+            if (onDisk == null) {
+                tmpEntry.clearField(field);
+            } else {
+                tmpEntry.setField(field, onDisk);
+            }
             return true;
         }
 

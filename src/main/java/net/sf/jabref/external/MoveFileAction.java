@@ -20,6 +20,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.util.Util;
@@ -31,6 +32,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
@@ -42,7 +44,7 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final boolean toFileDir;
 
-    private final String MOVE_RENAME = Localization.lang("Move/Rename file");
+    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     private static final Log LOGGER = LogFactory.getLog(MoveFileAction.class);
 
@@ -63,14 +65,14 @@ public class MoveFileAction extends AbstractAction {
         FileListEntry flEntry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
         String ln = flEntry.link;
-        boolean httpLink = ln.toLowerCase().startsWith("http");
+        boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
 
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -90,8 +92,8 @@ public class MoveFileAction extends AbstractAction {
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
             String extension = null;
-            if (flEntry.type != null) {
-                extension = "." + flEntry.type.getExtension();
+            if (flEntry.type.isPresent()) {
+                extension = "." + flEntry.type.get().getExtension();
             }
 
             File newFile = null;
@@ -102,8 +104,9 @@ public class MoveFileAction extends AbstractAction {
                 if (toFileDir) {
                     // Determine which name to suggest:
                     String suggName = Util
-                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry())
-                            .concat(flEntry.type == null ? "" : "." + flEntry.type.getExtension());
+                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
+                                    Globals.journalAbbreviationLoader.getRepository())
+                            .concat(flEntry.type.isPresent() ? "." + flEntry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
                             Globals.prefs.getBoolean(JabRefPreferences.RENAME_ON_MOVE_FILE_TO_FILE_DIR));

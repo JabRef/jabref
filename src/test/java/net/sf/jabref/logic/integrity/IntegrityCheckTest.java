@@ -1,105 +1,182 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.model.entry.IdGenerator;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import net.sf.jabref.*;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.*;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class IntegrityCheckTest {
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @BeforeClass
+    public static void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
+
     @Test
     public void testUrlChecks() {
-        assertCorrect("http://www.google.com", IntegrityCheck.URL_CHECKER);
-        assertCorrect("https://www.google.com", IntegrityCheck.URL_CHECKER);
-        assertCorrect("file://c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
-        assertWrong("www.google.com", IntegrityCheck.URL_CHECKER);
-        assertWrong("google.com", IntegrityCheck.URL_CHECKER);
-        assertWrong("c:/asdf/asdf", IntegrityCheck.URL_CHECKER);
+        assertCorrect(createContext("url", "http://www.google.com"));
+        assertCorrect(createContext("url", "file://c:/asdf/asdf"));
+
+        assertWrong(createContext("url", "www.google.com"));
+        assertWrong(createContext("url", "google.com"));
+        assertWrong(createContext("url", "c:/asdf/asdf"));
     }
 
     @Test
     public void testYearChecks() {
-        assertCorrect("2014", IntegrityCheck.YEAR_CHECKER);
-        assertCorrect("1986", IntegrityCheck.YEAR_CHECKER);
-        assertWrong("abc", IntegrityCheck.YEAR_CHECKER);
-        assertWrong("86", IntegrityCheck.YEAR_CHECKER);
-        assertWrong("204", IntegrityCheck.YEAR_CHECKER);
+        assertCorrect(createContext("year", "2014"));
+        assertCorrect(createContext("year", "1986"));
+        assertWrong(createContext("year", "abc"));
+        assertWrong(createContext("year", "86"));
+        assertWrong(createContext("year", "204"));
     }
 
     @Test
-    public void testBraketChecks() {
-        assertCorrect("x", IntegrityCheck.BRACKET_CHECKER);
-        assertCorrect("{x}", IntegrityCheck.BRACKET_CHECKER);
-        assertCorrect("{x}x{}x{{}}", IntegrityCheck.BRACKET_CHECKER);
-        assertWrong("{x}x{}}x{{}}", IntegrityCheck.BRACKET_CHECKER);
-        assertWrong("}", IntegrityCheck.BRACKET_CHECKER);
-        assertWrong("{", IntegrityCheck.BRACKET_CHECKER);
-    }
-
-    @Test
-    public void regexTest() {
-        assertEquals("N,NN", Pattern.compile("[^, ]+").matcher("Knuth, Donald E. ".trim()).replaceAll("N").replaceAll("\\s+", ""));
+    public void testBracketChecks() {
+        assertCorrect(createContext("title", "x"));
+        assertCorrect(createContext("title", "{x}"));
+        assertCorrect(createContext("title", "{x}x{}x{{}}"));
+        assertWrong(createContext("title", "{x}x{}}x{{}}"));
+        assertWrong(createContext("title", "}"));
+        assertWrong(createContext("title", "{"));
     }
 
     @Test
     public void testAuthorNameChecks() {
-        assertCorrect("", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertCorrect("Knuth", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertCorrect("   Knuth, Donald E. ", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertCorrect("Knuth, Donald E. and Kurt Cobain and A. Einstein", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertCorrect("Donald E. Knuth and Kurt Cobain and A. Einstein", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertWrong(", and Kurt Cobain and A. Einstein", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertWrong("Donald E. Knuth and Kurt Cobain and ,", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertWrong("and Kurt Cobain and A. Einstein", IntegrityCheck.AUTHOR_NAME_CHECKER);
-        assertWrong("Donald E. Knuth and Kurt Cobain and", IntegrityCheck.AUTHOR_NAME_CHECKER);
+        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
+            assertCorrect(createContext(field, ""));
+            assertCorrect(createContext(field, "Knuth"));
+            assertCorrect(createContext(field, "   Knuth, Donald E. "));
+            assertCorrect(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"));
+            assertCorrect(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"));
+            assertWrong(createContext(field, ", and Kurt Cobain and A. Einstein"));
+            assertWrong(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"));
+            assertWrong(createContext(field, "and Kurt Cobain and A. Einstein"));
+            assertWrong(createContext(field, "Donald E. Knuth and Kurt Cobain and"));
+        }
     }
 
     @Test
     public void testTitleChecks() {
-        assertCorrect("This is a title", IntegrityCheck.TITLE_CHECKER);
-        assertWrong("This is a Title", IntegrityCheck.TITLE_CHECKER);
-        assertCorrect("This is a {T}itle", IntegrityCheck.TITLE_CHECKER);
-        assertCorrect("{This is a Title}", IntegrityCheck.TITLE_CHECKER);
-        assertCorrect("This is a {Title}", IntegrityCheck.TITLE_CHECKER);
-        assertCorrect("{C}urrent {C}hronicle", IntegrityCheck.TITLE_CHECKER);
-        assertCorrect("{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}", IntegrityCheck.TITLE_CHECKER);
+        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+
+        assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a {T}itle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testAbbreviationChecks() {
+        for (String field : Arrays.asList("booktitle", "journal")) {
+            assertCorrect(createContext(field, "Proceedings of the"));
+            assertWrong(createContext(field, "Proc. of the"));
+        }
+    }
+
+    @Test
+    public void testFileChecks() {
+        MetaData metaData = Mockito.mock(MetaData.class);
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
+        Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
+
+        assertCorrect(createContext("file", ":build.gradle:gradle", metaData));
+        assertCorrect(createContext("file", "description:build.gradle:gradle", metaData));
+        assertWrong(createContext("file", ":asflakjfwofja:PDF", metaData));
+    }
+
+    @Test
+    public void fileCheckFindsFilesRelativeToBibFile() throws IOException {
+        File bibFile = testFolder.newFile("lit.bib");
+        testFolder.newFile("file.pdf");
+
+        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        databaseContext.setDatabaseFile(bibFile);
+
+        assertCorrect(databaseContext);
+    }
+
+    @Test
+    public void testTypeChecks() {
+        assertCorrect(createContext("pages", "11--15", "inproceedings"));
+        assertWrong(createContext("pages", "11--15", "proceedings"));
     }
 
     @Test
     public void testPageNumbersChecks() {
-        assertCorrect("1--2", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("12", IntegrityCheck.PAGES_CHECKER);
-        assertWrong("1-2", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("1,2,3", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("43+", IntegrityCheck.PAGES_CHECKER);
-        assertWrong("1 2", IntegrityCheck.PAGES_CHECKER);
-        assertWrong("{1}-{2}", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("7,41,73--97", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("7,41--42,73", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("7--11,41--43,73", IntegrityCheck.PAGES_CHECKER);
-        assertCorrect("7+,41--43,73", IntegrityCheck.PAGES_CHECKER);
+        assertCorrect(createContext("pages", "1--2"));
+        assertCorrect(createContext("pages", "12"));
+        assertWrong(createContext("pages", "1-2"));
+        assertCorrect(createContext("pages", "1,2,3"));
+        assertCorrect(createContext("pages", "43+"));
+        assertWrong(createContext("pages", "1 2"));
+        assertWrong(createContext("pages", "{1}-{2}"));
+        assertCorrect(createContext("pages", "7,41,73--97"));
+        assertCorrect(createContext("pages", "7,41--42,73"));
+        assertCorrect(createContext("pages", "7--11,41--43,73"));
+        assertCorrect(createContext("pages", "7+,41--43,73"));
     }
 
-    private void assertWrong(String value, IntegrityCheck.Checker yearChecker) {
-        List<IntegrityMessage> messages = new LinkedList<>();
-        BibEntry entry = new BibEntry(IdGenerator.next());
-        entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages);
+    private BibDatabaseContext createContext(String field, String value, String type) {
+        BibEntry entry = new BibEntry();
+        entry.setField(field, value);
+        entry.setType(type);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        return new BibDatabaseContext(bibDatabase, new Defaults());
+    }
+
+    public BibDatabaseContext createContext(String field, String value, MetaData metaData) {
+        BibEntry entry = new BibEntry();
+        entry.setField(field, value);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
+    }
+
+    public BibDatabaseContext createContext(String field, String value) {
+        return createContext(field, value, new MetaData());
+    }
+
+    private void assertWrong(BibDatabaseContext context) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
-    private void assertCorrect(String value, IntegrityCheck.Checker yearChecker) {
-        List<IntegrityMessage> messages = new LinkedList<>();
-        BibEntry entry = new BibEntry(IdGenerator.next());
-        entry.setField(BibEntry.KEY_FIELD, "key");
-        yearChecker.check(value, "field", entry, messages);
+    private void assertCorrect(BibDatabaseContext context) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
+    }
+
+    private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
+        context.setMode(mode);
+        return context;
     }
 
 }

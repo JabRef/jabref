@@ -15,14 +15,13 @@
  */
 package net.sf.jabref.logic.util.strings;
 
-import net.sf.jabref.Globals;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
+import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.Author;
 
 public class StringUtil {
 
@@ -31,6 +30,7 @@ public class StringUtil {
 
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
+    public static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
@@ -44,11 +44,11 @@ public class StringUtil {
         if ((toShave == null) || (toShave.isEmpty())) {
             return "";
         }
-        toShave = toShave.trim();
-        if (isInCurlyBrackets(toShave) || isInCitationMarks(toShave)) {
-            return toShave.substring(1, toShave.length() - 1);
+        String shaved = toShave.trim();
+        if (isInCurlyBrackets(shaved) || isInCitationMarks(shaved)) {
+            return shaved.substring(1, shaved.length() - 1);
         }
-        return toShave;
+        return shaved;
     }
 
     /**
@@ -71,14 +71,14 @@ public class StringUtil {
             return "";
         }
 
-        from = Math.max(from, 0);
-        to = Math.min(strings.length, to);
+        int updatedFrom = Math.max(from, 0);
+        int updatedTo = Math.min(strings.length, to);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = from; i < (to - 1); i++) {
+        for (int i = updatedFrom; i < (updatedTo - 1); i++) {
             stringBuilder.append(strings[i]).append(separator);
         }
-        return stringBuilder.append(strings[to - 1]).toString();
+        return stringBuilder.append(strings[updatedTo - 1]).toString();
     }
 
     /**
@@ -103,13 +103,14 @@ public class StringUtil {
             return "";
         }
 
+
         if (orgName.toLowerCase().endsWith("." + defaultExtension.toLowerCase())) {
             return orgName;
         }
 
         int hiddenChar = orgName.indexOf('.', 1); // hidden files Linux/Unix (?)
         if (hiddenChar < 1) {
-            orgName = orgName + "." + defaultExtension;
+            return orgName + "." + defaultExtension;
         }
 
         return orgName;
@@ -119,18 +120,18 @@ public class StringUtil {
      * Creates a substring from a text
      *
      * @param text
-     * @param index
+     * @param startIndex
      * @param terminateOnEndBraceOnly
      * @return
      */
-    public static String getPart(String text, int index, boolean terminateOnEndBraceOnly) {
+    public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
         int count = 0;
 
         StringBuilder part = new StringBuilder();
 
         // advance to first char and skip whitespace
-        index++;
+        int index = startIndex + 1;
         while ((index < text.length()) && Character.isWhitespace(text.charAt(index))) {
             index++;
         }
@@ -351,16 +352,6 @@ public class StringUtil {
         }
 
         return buf.toString();
-
-        /*
-         * if (s.isEmpty()) return s; // Protect against ArrayIndexOutOf....
-         * StringBuffer buf = new StringBuffer();
-         *
-         * Matcher mcr = titleCapitalPattern.matcher(s.substring(1)); while
-         * (mcr.find()) { String replaceStr = mcr.group();
-         * mcr.appendReplacement(buf, "{" + replaceStr + "}"); }
-         * mcr.appendTail(buf); return s.substring(0, 1) + buf.toString();
-         */
     }
 
     /**
@@ -373,11 +364,12 @@ public class StringUtil {
      * @return A new String with braces removed.
      */
     public static String removeBracesAroundCapitals(String s) {
+        String current = s;
         String previous = s;
-        while ((s = removeSingleBracesAroundCapitals(s)).length() < previous.length()) {
-            previous = s;
+        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
+            previous = current;
         }
-        return s;
+        return current;
     }
 
     /**
@@ -417,12 +409,35 @@ public class StringUtil {
         return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
     }
 
+    /**
+     * Checks if the given String has exactly one pair of surrounding curly braces <br>
+     * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     * @param toCheck The string to check
+     * @return True, if the check was succesful. False otherwise.
+     */
     public static boolean isInCurlyBrackets(String toCheck) {
+        int count = 0;
+        int brackets = 0;
         if ((toCheck == null) || toCheck.isEmpty()) {
-            return false; // In case of null or empty string
+            return false;
         } else {
-            return (toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}');
+            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
+                for (char c : toCheck.toCharArray()) {
+                    if (c == '{') {
+                        if (brackets == 0) {
+                            count++;
+                        }
+                        brackets++;
+                    } else if (c == '}') {
+                        brackets--;
+                    }
+                }
+
+                return count == 1;
+            }
+            return false;
         }
+
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
@@ -473,6 +488,36 @@ public class StringUtil {
     }
 
     /**
+     * Optimized method for converting a String into an Integer
+     *
+     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     *
+     * @param str the String holding an Integer value
+     * @return the int value of str or null if not possible
+     */
+    public static Integer intValueOfWithNull(String str) {
+        int idx = 0;
+        int end;
+        boolean sign = false;
+        char ch;
+
+        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+            return null;
+        }
+
+        int ival = 0;
+        for (;; ival *= 10) {
+            ival += '0' - ch;
+            if (++idx == end) {
+                return sign ? ival : -ival;
+            }
+            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
+                return null;
+            }
+        }
+    }
+
+    /**
      * This method ensures that the output String has only
      * valid XML unicode characters as specified by the
      * XML 1.0 standard. For reference, please see
@@ -507,12 +552,11 @@ public class StringUtil {
      * @param  delimstr  Delimiter string
      * @return list      {@link java.util.List} of <tt>String</tt>
      */
-    public static List<String> tokenizeToList(String buf, String delimstr)
-    {
+    public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
-        buf = buf + '\n';
+        String buffer = buf + '\n';
 
-        StringTokenizer st = new StringTokenizer(buf, delimstr);
+        StringTokenizer st = new StringTokenizer(buffer, delimstr);
 
         while (st.hasMoreTokens()) {
             list.add(st.nextToken());
@@ -565,4 +609,92 @@ public class StringUtil {
 
         return s.substring(0, maxLength - 3) + "...";
     }
+
+    /**
+     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
+     */
+    public static String replaceSpecialCharacters(String s) {
+        String result = s;
+        for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
+            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
+     *
+     * @param name
+     * @return The name after expanding initials.
+     */
+    public static String expandAuthorInitials(String name) {
+        String[] authors = name.split(" and ");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < authors.length; i++) {
+            if (authors[i].contains(", ")) {
+                String[] names = authors[i].split(", ");
+                if (names.length > 0) {
+                    sb.append(names[0]);
+                    if (names.length > 1) {
+                        sb.append(", ");
+                    }
+                }
+                for (int j = 1; j < names.length; j++) {
+                    if (j == 1) {
+                        sb.append(Author.addDotIfAbbreviation(names[j]));
+                    } else {
+                        sb.append(names[j]);
+                    }
+                    if (j < (names.length - 1)) {
+                        sb.append(", ");
+                    }
+                }
+
+            } else {
+                String[] names = authors[i].split(" ");
+                if (names.length > 0) {
+                    sb.append(Author.addDotIfAbbreviation(names[0]));
+                }
+                for (int j = 1; j < names.length; j++) {
+                    sb.append(' ');
+                    sb.append(names[j]);
+                }
+            }
+            if (i < (authors.length - 1)) {
+                sb.append(" and ");
+            }
+        }
+
+        return sb.toString().trim();
+    }
+
+    /**
+     * Return a String with n spaces
+     *
+     * @param n Number of spaces
+     * @return String with n spaces
+     */
+    public static String repeatSpaces(int n) {
+        return repeat(n, ' ');
+    }
+
+    /**
+     * Return a String with n copies of the char c
+     *
+     * @param n Number of copies
+     * @param c char to copy
+     * @return String with n copies of c
+     */
+    public static String repeat(int n, char c) {
+        StringBuilder resultSB = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+            resultSB.append(c);
+        }
+
+        return resultSB.toString();
+
+    }
+
 }

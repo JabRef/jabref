@@ -5,68 +5,12 @@ import java.util.stream.Collectors;
 
 public class FileField {
 
-    private static final FileField.ParsedFileField NULL_OBJECT = new FileField.ParsedFileField("", "", "");
-
-    public static class ParsedFileField {
-
-        public final String description;
-        public final String link;
-        public final String fileType;
-
-        public ParsedFileField(String description, String link, String fileType) {
-            this.description = Objects.requireNonNull(description);
-            this.link = Objects.requireNonNull(link);
-            this.fileType = Objects.requireNonNull(fileType);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if ((o == null) || (this.getClass() != o.getClass())) {
-                return false;
-            }
-
-            FileField.ParsedFileField that = (FileField.ParsedFileField) o;
-
-            if (!this.description.equals(that.description)) {
-                return false;
-            }
-            if (!this.link.equals(that.link)) {
-                return false;
-            }
-            return this.fileType.equals(that.fileType);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = this.description.hashCode();
-            result = (31 * result) + this.link.hashCode();
-            result = (31 * result) + this.fileType.hashCode();
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "ParsedFileField{" +
-                    "description='" + description + '\'' +
-                    ", link='" + link + '\'' +
-                    ", fileType='" + fileType + '\'' +
-                    '}';
-        }
-
-        public boolean isEmpty() {
-            return NULL_OBJECT.equals(this);
-        }
-    }
-
-    public static List<FileField.ParsedFileField> parse(String value) {
+    public static List<ParsedFileField> parse(String value) {
         if ((value == null) || value.trim().isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<FileField.ParsedFileField> files = new ArrayList<>();
+        List<ParsedFileField> files = new ArrayList<>();
         List<String> entry = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inXmlChar = false;
@@ -113,17 +57,17 @@ public class FileField {
         return files;
     }
 
-    private static FileField.ParsedFileField convert(List<String> entry) {
+    private static ParsedFileField convert(List<String> entry) {
         // ensure list has at least 3 fields
         while (entry.size() < 3) {
             entry.add("");
         }
-        FileField.ParsedFileField field = new FileField.ParsedFileField(entry.get(0), entry.get(1), entry.get(2));
+        ParsedFileField field = new ParsedFileField(entry.get(0), entry.get(1), entry.get(2));
         // link is only mandatory field
-        if(field.description.isEmpty() && field.link.isEmpty() && !field.fileType.isEmpty()) {
-            field = new ParsedFileField("", field.fileType, "");
-        } else if(!field.description.isEmpty() && field.link.isEmpty() && field.fileType.isEmpty()) {
-            field = new ParsedFileField("", field.description, "");
+        if(field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
+            field = new ParsedFileField("", field.getFileType(), "");
+        } else if(!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
+            field = new ParsedFileField("", field.getDescription(), "");
         }
         entry.clear();
         return field;
@@ -133,7 +77,7 @@ public class FileField {
         String[][] array = new String[fields.size()][];
         int i = 0;
         for (ParsedFileField entry : fields) {
-            array[i] = new String[] {entry.description, entry.link, entry.fileType};
+            array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
             i++;
         }
         return encodeStringArray(array);
@@ -150,7 +94,7 @@ public class FileField {
      * @return The encoded String.
      */
     public static String encodeStringArray(String[][] values) {
-        return Arrays.asList(values).stream().map(entry -> encodeStringArray(entry)).collect(Collectors.joining(";"));
+        return Arrays.asList(values).stream().map(FileField::encodeStringArray).collect(Collectors.joining(";"));
     }
 
     /**
@@ -160,7 +104,7 @@ public class FileField {
      * @return The encoded String.
      */
     private static String encodeStringArray(String[] entry) {
-        return Arrays.asList(entry).stream().map(string -> quote(string)).collect(Collectors.joining(":"));
+        return Arrays.asList(entry).stream().map(FileField::quote).collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {

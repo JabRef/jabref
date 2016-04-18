@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +35,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScienceDirectFetcher implements EntryFetcher {
+
+    private static final String SCIENCE_DIRECT = "ScienceDirect";
 
     private static final Log LOGGER = LogFactory.getLog(ScienceDirectFetcher.class);
 
@@ -52,7 +53,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getHelpPage() {
-        return "ScienceDirect";
+        return SCIENCE_DIRECT;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return Localization.menuTitle("Search ScienceDirect");
+        return SCIENCE_DIRECT;
     }
 
     @Override
@@ -82,7 +83,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
             if (citations.isEmpty()) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         query),
-                        Localization.lang("Search ScienceDirect"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", SCIENCE_DIRECT), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
 
@@ -91,7 +92,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibsonomyScraper.getEntry(cit).ifPresent(entry -> dialog.addEntry(entry));
+                BibsonomyScraper.getEntry(cit).ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }
 
@@ -99,7 +100,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
-            status.showMessage(Localization.lang("Error while fetching from ScienceDirect") + ": " + e.getMessage());
+            status.showMessage(
+                    Localization.lang("Error while fetching from %0", SCIENCE_DIRECT) + ": " + e.getMessage());
         }
         return false;
     }
@@ -113,20 +115,16 @@ public class ScienceDirectFetcher implements EntryFetcher {
      */
     private static List<String> getCitations(String query) throws IOException {
         String urlQuery;
-        ArrayList<String> ids = new ArrayList<>();
-        try {
-            urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name());
-            int count = 1;
-            String nextPage;
-            while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
-                    && (count < ScienceDirectFetcher.MAX_PAGES_TO_LOAD)) {
-                urlQuery = nextPage;
-                count++;
-            }
-            return ids;
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        List<String> ids = new ArrayList<>();
+        urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name());
+        int count = 1;
+        String nextPage;
+        while (((nextPage = getCitationsFromUrl(urlQuery, ids)) != null)
+                && (count < ScienceDirectFetcher.MAX_PAGES_TO_LOAD)) {
+            urlQuery = nextPage;
+            count++;
         }
+        return ids;
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {

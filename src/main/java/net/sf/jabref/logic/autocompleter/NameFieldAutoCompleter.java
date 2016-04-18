@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -92,41 +93,9 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
         for (String fieldName : fieldNames) {
             if (entry.hasField(fieldName)) {
                 String fieldValue = entry.getField(fieldName);
-                AuthorList authorList = AuthorList.getAuthorList(fieldValue);
-                for (int j = 0; j < authorList.size(); j++) {
-                    AuthorList.Author author = authorList.getAuthor(j);
-                    if (lastNameOnlyAndSeparationBySpace) {
-                        addItemToIndex(author.getLastOnly());
-                    } else {
-                        if (autoCompLF) {
-                            switch (autoCompFirstnameMode) {
-                            case ONLY_ABBREVIATED:
-                                    addItemToIndex(author.getLastFirst(true));
-                                    break;
-                            case ONLY_FULL:
-                                    addItemToIndex(author.getLastFirst(false));
-                                    break;
-                            case BOTH:
-                            default:
-                                addItemToIndex(author.getLastFirst(true));
-                                addItemToIndex(author.getLastFirst(false));
-                            }
-                        }
-                        if (autoCompFF) {
-                            switch (autoCompFirstnameMode) {
-                            case ONLY_ABBREVIATED:
-                                addItemToIndex(author.getFirstLast(true));
-                                break;
-                            case ONLY_FULL:
-                                addItemToIndex(author.getFirstLast(false));
-                                break;
-                            case BOTH:
-                            default:
-                                    addItemToIndex(author.getFirstLast(true));
-                                    addItemToIndex(author.getFirstLast(false));
-                            }
-                        }
-                    }
+                AuthorList authorList = AuthorList.parse(fieldValue);
+                for (Author author : authorList.getAuthors()) {
+                    handleAuthor(author);
                 }
             }
         }
@@ -139,14 +108,55 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
      * @return String without prefix
      */
     private String determinePrefixAndReturnRemainder(String str, String delimiter) {
-        int index = str.toLowerCase().lastIndexOf(delimiter);
+        String result = str;
+        int index = result.toLowerCase().lastIndexOf(delimiter);
         if (index >= 0) {
-            prefix = str.substring(0, index + delimiter.length());
-            str = str.substring(index + delimiter.length());
+            prefix = result.substring(0, index + delimiter.length());
+            result = result.substring(index + delimiter.length());
         } else {
             prefix = "";
         }
-        return str;
+        return result;
+    }
+
+    private void handleAuthor(Author author) {
+        if (lastNameOnlyAndSeparationBySpace) {
+            addItemToIndex(author.getLastOnly());
+        } else {
+            if (autoCompLF) {
+                switch (autoCompFirstnameMode) {
+                case ONLY_ABBREVIATED:
+                    addItemToIndex(author.getLastFirst(true));
+                    break;
+                case ONLY_FULL:
+                    addItemToIndex(author.getLastFirst(false));
+                    break;
+                case BOTH:
+                    addItemToIndex(author.getLastFirst(true));
+                    addItemToIndex(author.getLastFirst(false));
+                    break;
+                default:
+                    break;
+                }
+            }
+            if (autoCompFF) {
+                switch (autoCompFirstnameMode) {
+                case ONLY_ABBREVIATED:
+                    addItemToIndex(author.getFirstLast(true));
+                    break;
+                case ONLY_FULL:
+                    addItemToIndex(author.getFirstLast(false));
+                    break;
+                case BOTH:
+                    addItemToIndex(author.getFirstLast(true));
+                    addItemToIndex(author.getFirstLast(false));
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
     }
 
     @Override
@@ -155,14 +165,15 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
             return new ArrayList<>();
         }
 
+        String result;
         // Normally, one would implement that using
         // class inheritance. But this seemed overengineered
         if (this.lastNameOnlyAndSeparationBySpace) {
-            toComplete = determinePrefixAndReturnRemainder(toComplete, " ");
+            result = determinePrefixAndReturnRemainder(toComplete, " ");
         } else {
-            toComplete = determinePrefixAndReturnRemainder(toComplete, " and ");
+            result = determinePrefixAndReturnRemainder(toComplete, " and ");
         }
-        return super.complete(toComplete);
+        return super.complete(result);
     }
 
     @Override

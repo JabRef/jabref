@@ -21,10 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Insets;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Enumeration;
 import net.sf.jabref.gui.BasePanel;
@@ -34,7 +30,6 @@ import net.sf.jabref.logic.l10n.Localization;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
-    private BibDatabase secondary;
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
     private final JCheckBox cb = new JCheckBox(Localization.lang("Accept change"));
@@ -47,11 +42,13 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
             BibDatabase secondary, final DefaultMutableTreeNode root) {
         super(owner, Localization.lang("External changes"), true);
-        this.secondary = secondary;
+        BibDatabase localSecondary;
 
         // Just to be sure, put in an empty secondary base if none is given:
         if (secondary == null) {
-            this.secondary = new BibDatabase();
+            localSecondary = new BibDatabase();
+        } else {
+            localSecondary = secondary;
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
@@ -78,51 +75,39 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         getContentPane().add(pane, BorderLayout.CENTER);
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-        cb.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (selected != null) {
-                    selected.setAccepted(cb.isSelected());
-                }
+        cb.addChangeListener(e -> {
+            if (selected != null) {
+                selected.setAccepted(cb.isSelected());
             }
         });
-        cancel.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-        ok.addActionListener(new ActionListener() {
+        cancel.addActionListener(e -> dispose());
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        ok.addActionListener(e -> {
 
-                // Perform all accepted changes:
-                // Store all edits in an Undoable object:
-                NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-                Enumeration<Change> enumer = root.children();
-                boolean anyDisabled = false;
-                for (Change c : Collections.list(enumer)) {
-                    boolean allAccepted = false;
-                    if (c.isAcceptable() && c.isAccepted()) {
-                        allAccepted = c.makeChange(panel, ChangeDisplayDialog.this.secondary, ce);
-                    }
-
-                    if (!allAccepted) {
-                        anyDisabled = true;
-                    }
+            // Perform all accepted changes:
+            // Store all edits in an Undoable object:
+            NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
+            Enumeration<Change> enumer = root.children();
+            boolean anyDisabled = false;
+            for (Change c : Collections.list(enumer)) {
+                boolean allAccepted = false;
+                if (c.isAcceptable() && c.isAccepted()) {
+                    allAccepted = c.makeChange(panel, localSecondary, ce);
                 }
-                ce.end();
-                panel.undoManager.addEdit(ce);
-                if (anyDisabled) {
-                    panel.markBaseChanged();
+
+                if (!allAccepted) {
+                    anyDisabled = true;
                 }
-                panel.setUpdatedExternally(false);
-                dispose();
-                okPressed = true;
             }
+            ce.end();
+            panel.undoManager.addEdit(ce);
+            if (anyDisabled) {
+                panel.markBaseChanged();
+            }
+            panel.setUpdatedExternally(false);
+            dispose();
+            okPressed = true;
         });
 
         pack();

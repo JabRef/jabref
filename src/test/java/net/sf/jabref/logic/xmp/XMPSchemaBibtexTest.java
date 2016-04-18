@@ -26,7 +26,7 @@ import java.util.Map;
 public class XMPSchemaBibtexTest {
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 

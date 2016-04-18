@@ -15,8 +15,7 @@ public class GroupsUtil {
     public static Set<String> findDeliminatedWordsInField(BibDatabase db, String field, String deliminator) {
         Set<String> res = new TreeSet<>();
 
-        for (String s : db.getKeySet()) {
-            BibEntry be = db.getEntryById(s);
+        for (BibEntry be : db.getEntries()) {
             if (be.hasField(field)) {
                 String fieldValue = be.getField(field).trim();
                 StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
@@ -39,8 +38,7 @@ public class GroupsUtil {
      */
     public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
         Set<String> res = new TreeSet<>();
-        for (String s : db.getKeySet()) {
-            BibEntry be = db.getEntryById(s);
+        for (BibEntry be : db.getEntries()) {
             be.getFieldOptional(field).ifPresent(o -> {
                 StringTokenizer tok = new StringTokenizer(o.toString(), remove, false);
                 while (tok.hasMoreTokens()) {
@@ -60,13 +58,12 @@ public class GroupsUtil {
      */
     public static Set<String> findAuthorLastNames(BibDatabase db, List<String> fields) {
         Set<String> res = new TreeSet<>();
-        for (String s : db.getKeySet()) {
-            BibEntry be = db.getEntryById(s);
+        for (BibEntry be : db.getEntries()) {
             for (String field : fields) {
                 String val = be.getField(field);
                 if ((val != null) && !val.isEmpty()) {
-                    AuthorList al = AuthorList.getAuthorList(val);
-                    res.addAll(al.getAuthorList().stream().map(author -> author.getLast())
+                    AuthorList al = AuthorList.parse(val);
+                    res.addAll(al.getAuthors().stream().map(author -> author.getLast())
                             .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
                             .collect(Collectors.toList()));
                 }

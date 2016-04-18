@@ -16,16 +16,15 @@
 package net.sf.jabref.specialfields;
 
 import java.util.List;
-
-import net.sf.jabref.util.Util;
-
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.util.UpdateField;
 
 public class SpecialFieldsUtils {
 
+    private static final String KEYWORDS_FIELD = "keywords";
     public static final String FIELDNAME_PRIORITY = "priority";
     public static final String FIELDNAME_RANKING = "ranking";
     public static final String FIELDNAME_RELEVANCE = "relevance";
@@ -77,7 +76,8 @@ public class SpecialFieldsUtils {
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
     public static void updateField(SpecialField e, String value, BibEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
-        Util.updateField(be, e.getFieldName(), value, ce, nullFieldIfValueIsTheSame);
+        UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
+                .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
         SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
@@ -111,13 +111,11 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
-        String oldValue = be.getField("keywords");
+        String oldValue = be.getField(KEYWORDS_FIELD);
         be.putKeywords(keywordList);
-        String updatedValue = be.getField("keywords");
-        if ((oldValue == null) || !oldValue.equals(updatedValue)) {
-            if (ce != null) {
-                ce.addEdit(new UndoableFieldChange(be, "keywords", oldValue, updatedValue));
-            }
+        String updatedValue = be.getField(KEYWORDS_FIELD);
+        if (((oldValue == null) || !oldValue.equals(updatedValue)) && (ce != null)) {
+            ce.addEdit(new UndoableFieldChange(be, KEYWORDS_FIELD, oldValue, updatedValue));
         }
 
     }
@@ -146,7 +144,8 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        Util.updateNonDisplayableField(be, c.getFieldName(), newValue, nc);
+        UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue)
+                .ifPresent(fieldChange -> nc.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
     /**
@@ -155,11 +154,11 @@ public class SpecialFieldsUtils {
      * @param ce indicates the undo named compound. May be null
      */
     public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
-        if (!be.hasField("keywords")) {
+        if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
         List<String> keywordList = net.sf.jabref.model.entry.EntryUtil
-                .getSeparatedKeywords(be.getField("keywords"));
+                .getSeparatedKeywords(be.getField(KEYWORDS_FIELD));
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);

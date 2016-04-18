@@ -45,7 +45,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.InternalBibtexFields;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -56,13 +55,15 @@ import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
-import net.sf.jabref.gui.util.IconComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -77,7 +78,6 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with
@@ -90,12 +90,12 @@ public class SearchResultsDialog {
     private final JabRefFrame frame;
 
     private JDialog diag;
-    private final String[] fields = new String[] {
+    private static final String[] FIELDS = new String[] {
             "author", "title", "year", "journal"
     };
-    private final static int FILE_COL = 0;
-    private final static int URL_COL = 1;
-    private final static int PAD = 2;
+    private static final int FILE_COL = 0;
+    private static final int URL_COL = 1;
+    private static final int PAD = 2;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -123,7 +123,7 @@ public class SearchResultsDialog {
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
                 .get(JabRefPreferences.PREVIEW_1);
-        preview = new PreviewPanel(null, new MetaData(), layoutFile);
+        preview = new PreviewPanel(null, null, layoutFile);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -240,10 +240,10 @@ public class SearchResultsDialog {
 
         }
         // Remaining columns:
-        for (int i = PAD; i < (PAD + fields.length); i++) {
+        for (int i = PAD; i < (PAD + FIELDS.length); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            comparators.add(new FieldComparator(fields[i - PAD]));
+            comparators.add(new FieldComparator(FIELDS[i - PAD]));
         }
 
         sortedEntries.getReadWriteLock().writeLock().lock();
@@ -264,8 +264,8 @@ public class SearchResultsDialog {
             cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
-        for (int i = 0; i < fields.length; i++) {
-            int width = InternalBibtexFields.getFieldLength(fields[i]);
+        for (int i = 0; i < FIELDS.length; i++) {
+            int width = InternalBibtexFields.getFieldLength(FIELDS[i]);
             cm.getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -349,18 +349,19 @@ public class SearchResultsDialog {
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                p.getBibDatabaseContext().getMetaData(), fl.type)).actionPerformed(null);
+                                p.getBibDatabaseContext(), fl.type)).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
                     entry.getFieldOptional("url").ifPresent(link -> { try {
-                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext().getMetaData(), link, "url");
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, "url");
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
                     });
                     break;
-
+                default:
+                    break;
                 }
             }
         }
@@ -390,9 +391,8 @@ public class SearchResultsDialog {
                     if ((description == null) || (description.trim().isEmpty())) {
                         description = flEntry.link;
                     }
-                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description,
-                            flEntry.link, flEntry.type.getIcon(), p.getBibDatabaseContext().getMetaData(),
-                            flEntry.type));
+                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.link,
+                            flEntry.type.get().getIcon(), p.getBibDatabaseContext(), flEntry.type));
                     count++;
                 }
 
@@ -416,18 +416,12 @@ public class SearchResultsDialog {
                 BibEntry entry = listEvent.getSourceList().get(0);
                 // Find out which BasePanel the selected entry belongs to:
                 BasePanel p = entryHome.get(entry);
-                // Update the preview's metadata reference:
-                preview.setMetaData(p.getBibDatabaseContext().getMetaData());
+                // Update the preview's database context:
+                preview.setDatabaseContext(p.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        preview.scrollRectToVisible(toRect);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
         }
     }
@@ -440,13 +434,13 @@ public class SearchResultsDialog {
 
         @Override
         public int getColumnCount() {
-            return PAD + fields.length;
+            return PAD + FIELDS.length;
         }
 
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return EntryUtil.capitalizeFirst(fields[column - PAD]);
+                return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else {
                 return "";
             }
@@ -462,7 +456,11 @@ public class SearchResultsDialog {
                         tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            fileLabel.setIcon(tmpModel.getEntry(0).type.getIcon());
+                            if (tmpModel.getEntry(0).type.isPresent()) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).type.get().getIcon());
+                            } else {
+                                fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
+                            }
                         }
                         return fileLabel;
                     } else {
@@ -480,8 +478,8 @@ public class SearchResultsDialog {
                 }
             }
             else {
-                String field = fields[column - PAD];
-                if ("author".equals(field) || "editor".equals(field)) {
+                String field = FIELDS[column - PAD];
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {

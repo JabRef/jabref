@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 public class LocalizationKeyParamsTest {
 
     @Test
-    public void testReplacePlaceholders() throws Exception {
+    public void testReplacePlaceholders() {
         assertEquals("BibLaTeX mode", new LocalizationKeyParams("BibLaTeX mode").replacePlaceholders());
         assertEquals("BibLaTeX mode", new LocalizationKeyParams("%0 mode", "BibLaTeX").replacePlaceholders());
         assertEquals("C:\\bla mode", new LocalizationKeyParams("%0 mode", "C:\\bla").replacePlaceholders());

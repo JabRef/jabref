@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
@@ -50,16 +49,15 @@ public class ExportToClipboardAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
-    private final BibDatabase database;
 
     /**
      * written by run() and read by update()
      */
     private String message;
 
-    public ExportToClipboardAction(JabRefFrame frame, BibDatabase database) {
+
+    public ExportToClipboardAction(JabRefFrame frame) {
         this.frame = Objects.requireNonNull(frame);
-        this.database = Objects.requireNonNull(database);
     }
 
     @Override
@@ -69,7 +67,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().isEmpty()) {
-            message = Localization.lang("No entries selected.");
+            message = Localization.lang("This operation requires one or more entries to be selected.");
             getCallBack().update();
             return;
         }
@@ -100,10 +98,8 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-        // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory();
 
         File tmp = null;
         try {
@@ -111,15 +107,10 @@ public class ExportToClipboardAction extends AbstractWorker {
             // file, and read the contents afterwards:
             tmp = File.createTempFile("jabrefCb", ".tmp");
             tmp.deleteOnExit();
-            List<BibEntry> bes = panel.getSelectedEntries();
-            Set<String> entries = new HashSet<>(bes.size());
-            for (BibEntry be : bes) {
-                entries.add(be.getId());
-            }
+            List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
-            format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
-                    tmp.getPath(), panel.getEncoding(), entries);
+            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {
@@ -131,21 +122,18 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            //StringSelection ss = new StringSelection(sw.toString());
             RtfSelection rs = new RtfSelection(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
-            message = Localization.lang("Entries exported to clipboard") + ": " + bes.size();
+            message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
             LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
-            if (tmp != null) {
-                if (!tmp.delete()) {
-                    LOGGER.info("Cannot delete temporary clipboard file");
-                }
+            if ((tmp != null) && !tmp.delete()) {
+                LOGGER.info("Cannot delete temporary clipboard file");
             }
         }
     }

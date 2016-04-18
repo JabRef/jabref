@@ -88,12 +88,13 @@ public class VersionHandling {
          * @throws Exception
          *             When a group could not be recreated
          */
-        private static GroupTreeNode fromString(String s, BibDatabase db,
+        private static GroupTreeNode fromString(String str, BibDatabase db,
                 int version) throws Exception {
             GroupTreeNode root = null;
             GroupTreeNode newNode;
             int i;
             String g;
+            String s = str;
             while (!s.isEmpty()) {
                 if (s.startsWith("(")) {
                     String subtree = Version0_1.getSubtree(s);
@@ -147,6 +148,8 @@ public class VersionHandling {
                         return s.substring(1, i);
                     }
                     break;
+                default:
+                    break;
                 }
                 ++i;
             }
@@ -154,14 +157,14 @@ public class VersionHandling {
         }
 
         /**
-         * Returns the index of the first occurence of c, skipping quoted
+         * Returns the index of the first occurrence of c, skipping quoted
          * special characters (escape character: '\\').
          *
          * @param s
          *            The String to search in.
          * @param c
          *            The character to search
-         * @return The index of the first unescaped occurence of c in s, or -1
+         * @return The index of the first unescaped occurrence of c in s, or -1
          *         if not found.
          */
         private static int indexOfUnquoted(String s, char c) {
@@ -201,8 +204,7 @@ public class VersionHandling {
                 }
 
                 spaceIndex = s.indexOf(' ');
-                if (spaceIndex <= 0)
-                 {
+                if (spaceIndex <= 0) {
                     throw new Exception("bad format");
                 }
                 level = Integer.parseInt(s.substring(0, spaceIndex));

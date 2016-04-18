@@ -26,6 +26,8 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.*;
+import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
+import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
@@ -38,7 +40,7 @@ import spin.Spin;
 public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
-    private BibEntry[] bes;
+    private List<BibEntry> bes;
     private final List<BibEntry[]> duplicates = new ArrayList<>();
 
 
@@ -50,13 +52,10 @@ public class DuplicateSearch implements Runnable {
     public void run() {
 
         panel.output(Localization.lang("Searching for duplicates..."));
-        Object[] keys = panel.getDatabase().getKeySet().toArray();
-        if (keys.length < 2) {
+
+        bes = panel.getDatabase().getEntries();
+        if (bes.size() < 2) {
             return;
-        }
-        bes = new BibEntry[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            bes[i] = panel.getDatabase().getEntryById((String) keys[i]);
         }
 
         SearcherRunnable st = new SearcherRunnable();
@@ -97,26 +96,25 @@ public class DuplicateSearch implements Runnable {
                             askAboutExact = true;
                         }
 
-                        DuplicateCallBack cb = new DuplicateCallBack(JabRef.jrf, be[0], be[1],
-                                askAboutExact ? DuplicateResolverDialog.DUPLICATE_SEARCH_WITH_EXACT :
-                                        DuplicateResolverDialog.DUPLICATE_SEARCH);
+                        DuplicateCallBack cb = new DuplicateCallBack(JabRef.mainFrame, be[0], be[1],
+                                askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH);
                         ((CallBack) Spin.over(cb)).update();
 
                         duplicateCounter++;
-                        int answer = cb.getSelected();
-                        if ((answer == DuplicateResolverDialog.KEEP_UPPER)
-                                || (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT)) {
+                        DuplicateResolverResult answer = cb.getSelected();
+                        if ((answer == DuplicateResolverResult.KEEP_UPPER)
+                                || (answer == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
                             toRemove.add(be[1]);
-                            if (answer == DuplicateResolverDialog.AUTOREMOVE_EXACT) {
+                            if (answer == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                                 autoRemoveExactDuplicates = true; // Remember choice
                             }
-                        } else if (answer == DuplicateResolverDialog.KEEP_LOWER) {
+                        } else if (answer == DuplicateResolverResult.KEEP_LOWER) {
                             toRemove.add(be[0]);
-                        } else if (answer == DuplicateResolverDialog.BREAK) {
+                        } else if (answer == DuplicateResolverResult.BREAK) {
                             st.setFinished(); // thread killing
                             current = Integer.MAX_VALUE;
                             duplicateCounter--; // correct counter
-                        } else if (answer == DuplicateResolverDialog.KEEP_MERGE) {
+                        } else if (answer == DuplicateResolverResult.KEEP_MERGE) {
                             toRemove.add(be[0]);
                             toRemove.add(be[1]);
                             toAdd.add(cb.getMergedEntry());
@@ -150,9 +148,10 @@ public class DuplicateSearch implements Runnable {
                     panel.markBaseChanged();
                 }
 
-                panel.output(Localization.lang("Duplicate pairs found") + ": " + duplicates.size()
-                        + ' ' + Localization.lang("pairs processed") + ": " + dupliC);
-
+                synchronized (duplicates) {
+                    panel.output(Localization.lang("Duplicates found") + ": " + duplicates.size() + ' '
+                            + Localization.lang("pairs processed") + ": " + dupliC);
+                }
                 ce.end();
                 panel.undoManager.addEdit(ce);
 
@@ -169,14 +168,16 @@ public class DuplicateSearch implements Runnable {
 
         @Override
         public void run() {
-            for (int i = 0; (i < (bes.length - 1)) && !finished; i++) {
-                for (int j = i + 1; (j < bes.length) && !finished; j++) {
-                    boolean eq = DuplicateCheck.isDuplicate(bes[i], bes[j], panel.getBibDatabaseContext().getMode());
+            for (int i = 0; (i < (bes.size() - 1)) && !finished; i++) {
+                for (int j = i + 1; (j < bes.size()) && !finished; j++) {
+                    BibEntry first = bes.get(i);
+                    BibEntry second = bes.get(j);
+                    boolean eq = DuplicateCheck.isDuplicate(first, second, panel.getBibDatabaseContext().getMode());
 
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {
                         synchronized (duplicates) {
-                            duplicates.add(new BibEntry[]{bes[i], bes[j]});
+                            duplicates.add(new BibEntry[]{first, second});
                             duplicates.notifyAll(); // send wake up all
                         }
                     }
@@ -202,16 +203,15 @@ public class DuplicateSearch implements Runnable {
 
     static class DuplicateCallBack implements CallBack {
 
-        private int reply = -1;
+        private DuplicateResolverResult reply = DuplicateResolverResult.NOT_CHOSEN;
         private final JabRefFrame frame;
         private final BibEntry one;
         private final BibEntry two;
-        private final int dialogType;
+        private final DuplicateResolverType dialogType;
         private BibEntry merged;
 
 
-        public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two,
-                                 int dialogType) {
+        public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType dialogType) {
 
             this.frame = frame;
             this.one = one;
@@ -219,7 +219,7 @@ public class DuplicateSearch implements Runnable {
             this.dialogType = dialogType;
         }
 
-        public int getSelected() {
+        public DuplicateResolverResult getSelected() {
             return reply;
         }
 

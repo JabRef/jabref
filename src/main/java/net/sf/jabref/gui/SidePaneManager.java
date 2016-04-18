@@ -26,9 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,20 +57,8 @@ public class SidePaneManager {
          * side pane components, we get rid of the annoying latency when
          * switching tabs:
          */
-        frame.tabbedPane.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        setActiveBasePanel((BasePanel) SidePaneManager.this.frame.tabbedPane
-                                .getSelectedComponent());
-                    }
-                });
-            }
-        });
+        frame.getTabbedPane().addChangeListener(event -> SwingUtilities.invokeLater(
+                () -> setActiveBasePanel(SidePaneManager.this.frame.getCurrentBasePanel())));
         sidep = new SidePane();
         sidep.setVisible(false);
     }
@@ -83,7 +68,7 @@ public class SidePaneManager {
     }
 
     public synchronized boolean hasComponent(String name) {
-        return components.get(name) != null;
+        return components.containsKey(name);
     }
 
     public synchronized boolean isComponentVisible(String name) {
@@ -103,7 +88,7 @@ public class SidePaneManager {
         }
     }
 
-    public void show(String name) {
+    public synchronized void show(String name) {
         Object o = components.get(name);
         if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
@@ -112,7 +97,7 @@ public class SidePaneManager {
         }
     }
 
-    public void hide(String name) {
+    public synchronized void hide(String name) {
         Object o = components.get(name);
         if (o == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
@@ -264,7 +249,8 @@ public class SidePaneManager {
      *
      * @param panel
      */
-    private void setActiveBasePanel(BasePanel panel) {
+
+    private synchronized void setActiveBasePanel(BasePanel panel) {
         for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
             stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
         }
@@ -274,7 +260,7 @@ public class SidePaneManager {
         sidep.setComponents(visible);
         if (visible.isEmpty()) {
             if (sidep.isVisible()) {
-                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.contentPane.getDividerLocation());
+                Globals.prefs.putInt(JabRefPreferences.SIDE_PANE_WIDTH, frame.getSplitPane().getDividerLocation());
             }
             sidep.setVisible(false);
         } else {
@@ -283,9 +269,9 @@ public class SidePaneManager {
             if (!wasVisible) {
                 int width = Globals.prefs.getInt(JabRefPreferences.SIDE_PANE_WIDTH);
                 if (width > 0) {
-                    frame.contentPane.setDividerLocation(width);
+                    frame.getSplitPane().setDividerLocation(width);
                 } else {
-                    frame.contentPane.setDividerLocation(getPanel().getPreferredSize().width);
+                    frame.getSplitPane().setDividerLocation(getPanel().getPreferredSize().width);
                 }
             }
         }

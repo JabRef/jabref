@@ -31,7 +31,7 @@ public class FieldNameLabel extends JLabel {
         super(name, SwingConstants.LEFT);
         setVerticalAlignment(SwingConstants.TOP);
         //setFont(GUIGlobals.fieldNameFont);
-        setForeground(GUIGlobals.entryEditorLabelColor);
+        setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         //  setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
         //setBorder(BorderFactory.createEtchedBorder());
         setBorder(BorderFactory.createEmptyBorder());

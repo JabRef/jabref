@@ -15,11 +15,13 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.gui.InternalBibtexFields;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is
@@ -57,7 +59,7 @@ public class EntryComparator implements Comparator<BibEntry> {
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
 
-        if (e1 == e2) {
+        if (Objects.equals(e1, e2)) {
             return 0;
         }
 
@@ -75,7 +77,7 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if ("author".equals(sortField) || "editor".equals(sortField)) {
+        if (InternalBibtexFields.getFieldExtras(sortField).contains(FieldProperties.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
             }
@@ -106,7 +108,7 @@ public class EntryComparator implements Comparator<BibEntry> {
         if ((f1 != null) && (f2 == null)) {
             return -1;
         }
-        if ((f1 == null) && (f2 != null)) {
+        if (f1 == null) { // f2 != null here automatically
             return 1;
         }
 

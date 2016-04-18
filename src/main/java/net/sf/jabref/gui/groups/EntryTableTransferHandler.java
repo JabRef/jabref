@@ -148,7 +148,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             }
         } catch (IOException ioe) {
             LOGGER.error("Failed to read dropped data", ioe);
-        } catch (UnsupportedFlavorException ufe) {
+        } catch (UnsupportedFlavorException | ClassCastException ufe) {
             LOGGER.error("Drop type error", ufe);
         }
 
@@ -253,7 +253,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      */
     public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
-        String[] lines = s.replaceAll("\r", "").split("\n");
+        String[] lines = s.replace("\r", "").split("\n");
         List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
@@ -325,9 +325,10 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             @Override
             public void run() {
-                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow).importPdfFiles(fileNames, frame);
-                if (importRes.noPdfFiles.length > 0) {
-                    loadOrImportFiles(importRes.noPdfFiles, dropRow);
+                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow)
+                        .importPdfFiles(fileNames);
+                if (!importRes.getNoPdfFiles().isEmpty()) {
+                    loadOrImportFiles(importRes.getNoPdfFiles(), dropRow);
                 }
             }
         });
@@ -342,7 +343,7 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @param fileNames The names of the files to open.
      * @param dropRow success status for the operation
      */
-    private void loadOrImportFiles(String[] fileNames, int dropRow) {
+    private void loadOrImportFiles(List<String> fileNames, int dropRow) {
 
         OpenDatabaseAction openAction = new OpenDatabaseAction(frame, false);
         List<String> notBibFiles = new ArrayList<>();
@@ -350,7 +351,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
             Optional<String> extension = FileUtil.getFileExtension(fileName);
-            ExternalFileType fileType;
+            Optional<ExternalFileType> fileType;
 
             if (extension.isPresent() && "bib".equals(extension.get())) {
                 // we assume that it is a BibTeX file.
@@ -366,13 +367,13 @@ public class EntryTableTransferHandler extends TransferHandler {
              *
              * TODO we should offer an option to highlight the row the user is on too.
              */
-            if ((fileType != null) && (dropRow >= 0)) {
+            if ((fileType.isPresent()) && (dropRow >= 0)) {
 
                 /*
                  * TODO: make this an instance variable?
                  */
                 DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                dfh.handleDroppedfile(fileName, fileType, entryTable, dropRow);
+                dfh.handleDroppedfile(fileName, fileType.get(), entryTable, dropRow);
 
                 continue;
             }

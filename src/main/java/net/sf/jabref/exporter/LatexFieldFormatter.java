@@ -15,14 +15,15 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.InternalBibtexFields;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
@@ -84,17 +85,18 @@ public class LatexFieldFormatter {
             return valueDelimiterStartOfValue + String.valueOf(valueDelimiterEndOfValue);
         }
 
+        String result = content;
         boolean shouldWrapWithBraces = Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName);
         if (shouldWrapWithBraces) {
-            content = StringUtil.putBracesAroundCapitals(content);
+            result = StringUtil.putBracesAroundCapitals(result);
         }
 
         // normalize newlines
-        boolean shouldNormalizeNewlines = !content.contains(Globals.NEWLINE) && content.contains("\n");
+        boolean shouldNormalizeNewlines = !result.contains(Globals.NEWLINE) && result.contains("\n");
         if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            content = content.replace("\n", Globals.NEWLINE);
+            result = result.replace("\n", Globals.NEWLINE);
         }
 
         // If the field is non-standard, we will just append braces,
@@ -102,10 +104,12 @@ public class LatexFieldFormatter {
         boolean resolveStrings = shouldResolveStrings(fieldName);
 
         if (!resolveStrings) {
-            return formatWithoutResolvingStrings(content, fieldName);
+            return formatWithoutResolvingStrings(result, fieldName);
         }
 
-        return formatAndResolveStrings(content, fieldName);
+        // Trim whitespace
+        result = result.trim();
+        return formatAndResolveStrings(result, fieldName);
     }
 
     private String formatAndResolveStrings(String content, String fieldName) {
@@ -168,7 +172,7 @@ public class LatexFieldFormatter {
             }
         }
 
-        return parser.format(stringBuilder.toString(), fieldName);
+        return parser.format(stringBuilder, fieldName);
     }
 
     private boolean shouldResolveStrings(String fieldName) {

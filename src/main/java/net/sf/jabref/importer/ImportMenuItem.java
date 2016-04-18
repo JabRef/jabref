@@ -29,15 +29,15 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.*;
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.util.Util;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality
@@ -123,11 +123,12 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // Unknown format:
                         frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
-                        imports.add(Globals.importFormatReader.importUnknownFormat(filename));
+                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
                     } else {
+                        frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
                         ParserResult pr = new ParserResult(
-                                Globals.importFormatReader.importFromFile(importer,
+                                Globals.IMPORT_FORMAT_READER.importFromFile(importer,
                                         filename, frame));
 
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer
@@ -181,17 +182,17 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
             } else {
                 if (openInNew) {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
-                            Globals.prefs.getDefaultEncoding(), true);
+                    frame.addTab(bibtexResult.getDatabaseContext(), Globals.prefs.getDefaultEncoding(), true);
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
+                            openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
-                    PositionWindow.placeDialog(diag, frame);
+                    diag.setLocationRelativeTo(frame);
                     diag.setVisible(true);
                     diag.toFront();
                 }
@@ -215,7 +216,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 ParserResult pr = importResult.parserResult;
 
                 anythingUseful = anythingUseful
-                        || (pr.getDatabase().getEntryCount() > 0) || (pr.getDatabase().getStringCount() > 0);
+                        || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
@@ -244,11 +245,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
-                Util.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP),
-                        !openInNew && Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)); // set timestamp and owner
+                UpdateField.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP)); // set timestamp and owner
 
+                boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {
+                    if (markEntries) {
+                        EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
+                    }
                     database.insertEntry(entry);
                 }
             }

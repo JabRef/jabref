@@ -15,28 +15,19 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.List;
-
 import javax.swing.*;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.l10n.Localization;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.*;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.PositionWindow;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.ColumnSpec;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * @author Oscar
@@ -47,13 +38,6 @@ public class MergeEntriesDialog extends JDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
-    private BibEntry one;
-    private BibEntry two;
-    private NamedCompound ce;
-    private MergeEntries mergeEntries;
-
-    private PositionWindow pw;
-
 
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
     private static final String MARGIN = "5px";
@@ -84,16 +68,15 @@ public class MergeEntriesDialog extends JDialog {
         }
 
         // Store the two entries
-        one = selected.get(0);
-        two = selected.get(1);
+        BibEntry one = selected.get(0);
+        BibEntry two = selected.get(1);
 
-        mergeEntries = new MergeEntries(one, two, panel.getBibDatabaseContext().getMode());
+        MergeEntries mergeEntries = new MergeEntries(one, two, panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(MERGE_ENTRIES);
+        NamedCompound ce = new NamedCompound(MERGE_ENTRIES);
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
-        // layout.setColumnGroups(new int[][] {{3, 11}});
         this.setLayout(layout);
 
         this.add(mergeEntries.getMergeEntryPanel(), cc.xy(1, 1));
@@ -104,22 +87,27 @@ public class MergeEntriesDialog extends JDialog {
         bb.addGlue();
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.setActionCommand("cancel");
-        cancel.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(e.getActionCommand());
-            }
+        cancel.addActionListener(e -> {
+            panel.output(Localization.lang("Cancelled merging entries"));
+            dispose();
         });
 
         JButton replaceentries = new JButton(MERGE_ENTRIES);
         replaceentries.setActionCommand("replace");
-        replaceentries.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buttonPressed(e.getActionCommand());
-            }
+        replaceentries.addActionListener(e -> {
+            // Create a new entry and add it to the undo stack
+            // Remove the other two entries and add them to the undo stack (which is not working...)
+            BibEntry mergedEntry = mergeEntries.getMergeEntry();
+            panel.insertEntry(mergedEntry);
+            ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), mergedEntry, panel));
+            ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), one, panel));
+            panel.getDatabase().removeEntry(one);
+            ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
+            panel.getDatabase().removeEntry(two);
+            ce.end();
+            panel.undoManager.addEdit(ce);
+            panel.output(Localization.lang("Merged entries"));
+            dispose();
         });
 
         bb.addButton(new JButton[] {replaceentries, cancel});
@@ -131,53 +119,13 @@ public class MergeEntriesDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        this.addComponentListener(new ComponentAdapter() {
 
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
-
-        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X, JabRefPreferences.MERGEENTRIES_POS_Y,
-                JabRefPreferences.MERGEENTRIES_SIZE_X, JabRefPreferences.MERGEENTRIES_SIZE_Y);
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+                JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
+                JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
 
         // Show what we've got
         setVisible(true);
-    }
-
-    /**
-     * Act on button pressed
-     *
-     * @param button Button pressed
-     */
-    private void buttonPressed(String button) {
-        BibEntry mergedEntry = mergeEntries.getMergeEntry();
-        if ("cancel".equals(button)) {
-            // Cancelled, throw it away
-            panel.output(Localization.lang("Cancelled merging entries"));
-        } else if ("replace".equals(button)) {
-            // Create a new entry and add it to the undo stack
-            // Remove the other two entries and add them to the undo stack (which is not working...)
-            panel.insertEntry(mergedEntry);
-            ce.addEdit(new UndoableInsertEntry(panel.database(), mergedEntry, panel));
-            ce.addEdit(new UndoableRemoveEntry(panel.database(), one, panel));
-            panel.database().removeEntry(one);
-            ce.addEdit(new UndoableRemoveEntry(panel.database(), two, panel));
-            panel.database().removeEntry(two);
-            ce.end();
-            panel.undoManager.addEdit(ce);
-            panel.output(Localization.lang("Merged entries"));
-        }
-        dispose();
     }
 }

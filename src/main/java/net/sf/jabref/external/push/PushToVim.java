@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
+    private static final Log LOGGER = LogFactory.getLog(PushToVim.class);
 
     private final JTextField vimServer = new JTextField(30);
 
@@ -96,33 +96,29 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
             final Process p = Runtime.getRuntime().exec(com);
 
-            Runnable errorListener = new Runnable() {
-
-                @Override
-                public void run() {
-                    try (InputStream out = p.getErrorStream()) {
-                        int c;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            while ((c = out.read()) != -1) {
-                                sb.append((char) c);
-                            }
-                        } catch (IOException e) {
-                            LOGGER.warn("Could not read from stderr.", e);
-                        }
-                        // Error stream has been closed. See if there were any errors:
-                        if (!sb.toString().trim().isEmpty()) {
-                            LOGGER.warn("Push to Vim error: " + sb);
-                            couldNotConnect = true;
+            JabRefExecutorService.INSTANCE.executeAndWait(() -> {
+                try (InputStream out = p.getErrorStream()) {
+                    int c;
+                    StringBuilder sb = new StringBuilder();
+                    try {
+                        while ((c = out.read()) != -1) {
+                            sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        LOGGER.warn("File problem.", e);
+                        LOGGER.warn("Could not read from stderr.", e);
                     }
+                    // Error stream has been closed. See if there were any errors:
+                    if (!sb.toString().trim().isEmpty()) {
+                        LOGGER.warn("Push to Vim error: " + sb);
+                        couldNotConnect = true;
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn("File problem.", e);
                 }
-            };
-            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+            });
         } catch (IOException excep) {
             couldNotCall = true;
+            LOGGER.warn("Problem pushing to Vim.", excep);
         }
 
     }

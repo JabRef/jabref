@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -38,26 +39,17 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 22, 2006
- * Time: 12:06:09 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ImportFormats {
-
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
-
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
-        SortedSet<ImportFormat> importers = Globals.importFormatReader.getImportFormats();
+        SortedSet<ImportFormat> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
 
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<ImportFileFilter> filters = new TreeSet<>();
+        Set<ImportFileFilter> filters = new TreeSet<>();
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);

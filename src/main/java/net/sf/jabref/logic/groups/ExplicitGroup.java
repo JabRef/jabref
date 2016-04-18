@@ -15,13 +15,17 @@
  */
 package net.sf.jabref.logic.groups;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.util.*;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.
@@ -72,10 +76,9 @@ public class ExplicitGroup extends AbstractGroup {
      * Called only when created fromString
      */
     private void addEntries(QuotedStringTokenizer tok, BibDatabase db) {
-        BibEntry[] entries;
         while (tok.hasMoreTokens()) {
-            entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
-            Collections.addAll(this.entries, entries);
+            List<BibEntry> entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
+            this.entries.addAll(entries);
         }
     }
 

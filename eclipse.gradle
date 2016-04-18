@@ -19,6 +19,11 @@ tasks.cleanEclipse.doLast {
     delete("${project.projectDir}/.settings/org.eclipse.jdt.ui.prefs")
 }
 
+// Currently, the eclipse task is not intelligent enough to replace generated lines:
+// It just adds the lines.
+// To avoid broken configurations, the existing configuration is deleted completely.
+tasks.eclipse.dependsOn(cleanEclipse)
+
 tasks.eclipse.doFirst {
     File jdt_core_prefs = file("${project.projectDir}/.settings/org.eclipse.jdt.core.prefs")
     // existence check doesn't work as gradle generates the file on its own
@@ -476,6 +481,10 @@ tasks.eclipse.doFirst {
             editor_save_participant_org.eclipse.jdt.ui.postsavelistener.cleanup=true
             formatter_profile=_JabRef
             formatter_settings_version=12
+            org.eclipse.jdt.ui.ignorelowercasenames=true
+            org.eclipse.jdt.ui.importorder=java;javax;net.sf.jabref;org.jabref;;\\#;
+            org.eclipse.jdt.ui.ondemandthreshold=99
+            org.eclipse.jdt.ui.staticondemandthreshold=99
             sp_cleanup.add_default_serial_version_id=true
             sp_cleanup.add_generated_serial_version_id=false
             sp_cleanup.add_missing_annotations=true

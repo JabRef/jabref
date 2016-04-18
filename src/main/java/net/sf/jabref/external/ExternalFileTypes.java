@@ -3,6 +3,7 @@ package net.sf.jabref.external;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,7 +41,7 @@ public final class ExternalFileTypes {
         updateExternalFileTypes();
     }
 
-    public List<ExternalFileType> getDefaultExternalFileTypes() {
+    public static List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<>();
         list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", "pdfSmall",
                 IconTheme.JabRefIcon.PDF_FILE.getSmallIcon()));
@@ -113,29 +114,14 @@ public final class ExternalFileTypes {
      * @param name The file type name.
      * @return The ExternalFileType registered, or null if none.
      */
-    public ExternalFileType getExternalFileTypeByName(String name) {
+    public Optional<ExternalFileType> getExternalFileTypeByName(String name) {
         for (ExternalFileType type : externalFileTypes) {
             if (type.getName().equals(name)) {
-                return type;
+                return Optional.of(type);
             }
         }
         // Return an instance that signifies an unknown file type:
-        return new UnknownExternalFileType(name);
-    }
-
-    /**
-     * Check if there is an external file type registered with this name.
-     *
-     * @param name The file type name.
-     * @return true if there is an ExternalFileType with this name, false if not.
-     */
-    public Boolean isExternalFileTypeName(String name) {
-        for (ExternalFileType type : externalFileTypes) {
-            if (type.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
+        return Optional.of(new UnknownExternalFileType(name));
     }
 
     /**
@@ -144,13 +130,28 @@ public final class ExternalFileTypes {
      * @param extension The file extension.
      * @return The ExternalFileType registered, or null if none.
      */
-    public ExternalFileType getExternalFileTypeByExt(String extension) {
+    public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
-                return type;
+            if (type.getExtension().equalsIgnoreCase(extension)) {
+                return Optional.of(type);
             }
         }
-        return null;
+        return Optional.empty();
+    }
+
+    /**
+     * Returns true if there is an external file type registered for this extension.
+     *
+     * @param extension The file extension.
+     * @return true if an ExternalFileType with the extension exists, false otherwise
+     */
+    public boolean isExternalFileTypeByExt(String extension) {
+        for (ExternalFileType type : externalFileTypes) {
+            if (type.getExtension().equalsIgnoreCase(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -161,11 +162,11 @@ public final class ExternalFileTypes {
      */
     public String getExternalFileTypeNameByExt(String extension) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && type.getExtension().equalsIgnoreCase(extension)) {
+            if (type.getExtension().equalsIgnoreCase(extension)) {
                 return type.getName();
             }
         }
-        return null;
+        return "";
     }
 
     /**
@@ -174,17 +175,17 @@ public final class ExternalFileTypes {
      * @param filename The name of the file whose type to look up.
      * @return The ExternalFileType registered, or null if none.
      */
-    public ExternalFileType getExternalFileTypeForName(String filename) {
+    public Optional<ExternalFileType> getExternalFileTypeForName(String filename) {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getExtension() != null) && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
+            if (!type.getExtension().isEmpty() && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
                     && (type.getExtension().length() > longestFound)) {
                 longestFound = type.getExtension().length();
                 foundType = type;
             }
         }
-        return foundType;
+        return Optional.ofNullable(foundType);
     }
 
     /**
@@ -194,36 +195,16 @@ public final class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type is
      *         guaranteed to be returned.
      */
-    public ExternalFileType getExternalFileTypeByMimeType(String mimeType) {
+    public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
-                return type;
+            if (type.getMimeType().equalsIgnoreCase(mimeType)) {
+                return Optional.of(type);
             }
         }
-        if ("text/html".equals(mimeType)) {
-            return HTML_FALLBACK_TYPE;
+        if ("text/html".equalsIgnoreCase(mimeType)) {
+            return Optional.of(HTML_FALLBACK_TYPE);
         } else {
-            return null;
-        }
-    }
-
-    /**
-     * Look up the external file type name registered for this MIME type, if any.
-     *
-     * @param mimeType The MIME type.
-     * @return The name of the ExternalFileType registered, or null if none. For the mime type "text/html", a valid file type name is
-     *         guaranteed to be returned.
-     */
-    public String getExternalFileTypeNameByMimeType(String mimeType) {
-        for (ExternalFileType type : externalFileTypes) {
-            if ((type.getMimeType() != null) && type.getMimeType().equals(mimeType)) {
-                return type.getName();
-            }
-        }
-        if ("text/html".equals(mimeType)) {
-            return HTML_FALLBACK_TYPE.getName();
-        } else {
-            return null;
+            return Optional.empty();
         }
     }
 

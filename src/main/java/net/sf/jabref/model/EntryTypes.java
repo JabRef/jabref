@@ -51,10 +51,6 @@ public class EntryTypes {
             return Optional.ofNullable(STANDARD_TYPES.get(name.toLowerCase()));
         }
 
-        public void addOrModifyCustomEntryType(CustomEntryType type) {
-            addOrModifyEntryType(type);
-        }
-
         private void addOrModifyEntryType(EntryType type) {
             ALL_TYPES.put(type.getName().toLowerCase(), type);
         }
@@ -79,7 +75,7 @@ public class EntryTypes {
             if (!ALL_TYPES.get(toLowerCase).equals(STANDARD_TYPES.get(toLowerCase))) {
                 ALL_TYPES.remove(toLowerCase);
 
-                if (STANDARD_TYPES.get(toLowerCase) != null) {
+                if (STANDARD_TYPES.containsKey(toLowerCase)) {
                     // In this case the user has removed a customized version
                     // of a standard type. We reinstate the standard type.
                     addOrModifyEntryType(STANDARD_TYPES.get(toLowerCase));
@@ -98,7 +94,6 @@ public class EntryTypes {
      */
     public static Optional<EntryType> getType(String name, BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getType(name) : BIBTEX.getType(name);
-
     }
 
     /**
@@ -146,6 +141,18 @@ public class EntryTypes {
             BIBLATEX.removeType(name);
         } else {
             BIBTEX.removeType(name);
+        }
+    }
+
+    public static void removeAllCustomEntryTypes() {
+        for(BibDatabaseMode type : BibDatabaseMode.values()) {
+            for(String typeName : new HashSet<>(getAllTypes(type))) {
+                getType(typeName, type).ifPresent(entryType -> {
+                    if (entryType instanceof CustomEntryType) {
+                        removeType(typeName, type);
+                    }
+                });
+            }
         }
     }
 }

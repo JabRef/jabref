@@ -29,9 +29,9 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.util.Util;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
@@ -61,8 +61,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     }
 
     @Override
-    protected void addField(String s) {
-        s = s.trim();
+    protected void addField(String str) {
+        String s = str.trim();
         if (forceLowerCase) {
             s = s.toLowerCase();
         }
@@ -70,7 +70,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             return;
         }
 
-        String testString = Util.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s);
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Entry type names are not allowed to contain white space or the following "
@@ -121,7 +121,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
         if (EntryTypes.getStandardType(typeName, mode).isPresent()) {
             Optional<EntryType> entryType = EntryTypes.getType(typeName, mode);
-            if (isChanged || (entryType.isPresent() && entryType.get() instanceof CustomEntryType)) {
+            if (isChanged || (entryType.isPresent() && (entryType.get() instanceof CustomEntryType))) {
                 def.setEnabled(true);
             } else {
                 def.setEnabled(false);

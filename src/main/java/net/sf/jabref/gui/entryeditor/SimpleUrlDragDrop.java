@@ -55,6 +55,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragEnter(DropTargetDragEvent dtde) {
+        // Ignored
     }
 
     /*
@@ -64,6 +65,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
+        // Ignored
     }
 
     /*
@@ -73,6 +75,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dropActionChanged(DropTargetDragEvent dtde) {
+        // Ignored
     }
 
     /*
@@ -82,6 +85,7 @@ class SimpleUrlDragDrop implements DropTargetListener {
      */
     @Override
     public void dragExit(DropTargetEvent dte) {
+        // Ignored
     }
 
     /*

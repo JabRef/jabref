@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 public class MatcherSetsTest {
 
     @Test
-    public void testBuildAnd() throws Exception {
+    public void testBuildAnd() {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.AND);
         assertTrue(matcherSet.isMatch(new BibEntry()));
 
@@ -23,7 +23,7 @@ public class MatcherSetsTest {
     }
 
     @Test
-    public void testBuildOr() throws Exception {
+    public void testBuildOr() {
         MatcherSet matcherSet = MatcherSets.build(MatcherSets.MatcherType.OR);
         assertFalse(matcherSet.isMatch(new BibEntry()));
 

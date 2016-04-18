@@ -15,15 +15,14 @@
 */
 package net.sf.jabref.logic.util.io;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 
 import net.sf.jabref.model.entry.FileField;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,8 +34,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class FileUtil {
-    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
-
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
@@ -82,9 +79,7 @@ public class FileUtil {
             stackList.add(stack);
         }
 
-        String[] arr = new String[paths.size()];
-        Arrays.fill(arr, "");
-        List<String> pathSubstrings = Arrays.asList(arr);
+        List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
         // compute shortest folder substrings
         while (!stackList.stream().allMatch(Vector::isEmpty)) {
@@ -93,10 +88,8 @@ public class FileUtil {
 
                 if (tempString.isEmpty() && !stackList.get(i).isEmpty()) {
                     pathSubstrings.set(i, stackList.get(i).pop());
-                } else {
-                    if (!stackList.get(i).isEmpty()) {
-                        pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
-                    }
+                } else if (!stackList.get(i).isEmpty()) {
+                    pathSubstrings.set(i, stackList.get(i).pop() + File.separator + tempString);
                 }
             }
 
@@ -166,17 +159,17 @@ public class FileUtil {
      * <li>the directory of the bib file</li>
      * </ul>
      *
-     * @param metaData The MetaData for the database this file belongs to.
+     * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final MetaData metaData, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = metaData.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        List<String> fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = databaseContext.getFileDirectory();
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<>();
+        List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
                 al.add(dir);
@@ -215,11 +208,13 @@ public class FileUtil {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * null if the file does not exist.
      */
-    public static Optional<File> expandFilename(String name, String dir) {
+    private static Optional<File> expandFilename(String filename, String dir) {
 
-        if ((name == null) || name.isEmpty()) {
+        if ((filename == null) || filename.isEmpty()) {
             return Optional.empty();
         }
+
+        String name = filename;
 
         File file = new File(name);
         if (file.exists() || (dir == null)) {
@@ -273,11 +268,12 @@ public class FileUtil {
         return fileName;
     }
 
-    private static File shortenFileName(File fileName, String dir) {
-        if ((fileName == null) || !fileName.isAbsolute() || (dir == null)) {
+    private static File shortenFileName(File fileName, String directory) {
+        if ((fileName == null) || !fileName.isAbsolute() || (directory == null)) {
             return fileName;
         }
 
+        String dir = directory;
         String longName;
         if (OS.WINDOWS) {
             // case-insensitive matching on Windows
@@ -301,7 +297,7 @@ public class FileUtil {
     }
 
     public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
+        Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
@@ -320,13 +316,9 @@ public class FileUtil {
             // First, look for exact matches:
             for (BibEntry entry : entries) {
                 String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty()) {
-                    if (dot > 0) {
-                        if (name.substring(0, dot).equals(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
-                    }
+                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                    result.get(entry).add(file);
+                    continue nextFile;
                 }
             }
             // If we get here, we didn't find any exact matches. If non-exact
@@ -334,11 +326,9 @@ public class FileUtil {
             if (!exactOnly) {
                 for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty()) {
-                        if (name.startsWith(citeKey)) {
-                            result.get(entry).add(file);
-                            continue nextFile;
-                        }
+                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                        result.get(entry).add(file);
+                        continue nextFile;
                     }
                 }
             }
@@ -361,9 +351,9 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (FileField.ParsedFileField file : fileList) {
-                expandFilename(file.link, fileDirs).ifPresent(f -> result.add(f));
+            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
+            for (ParsedFileField file : fileList) {
+                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
             }
         }
 

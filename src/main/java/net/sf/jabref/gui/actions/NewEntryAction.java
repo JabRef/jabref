@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.actions;
 
 import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -23,7 +22,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         // This action leads to a dialog asking for entry type.
         super(IconTheme.JabRefIcon.ADD_ENTRY.getIcon());
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, Localization.menuTitle("New entry"));
+        putValue(Action.NAME, Localization.menuTitle("New entry") + "...");
         putValue(Action.ACCELERATOR_KEY, key);
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX entry"));
     }
@@ -48,7 +47,7 @@ public class NewEntryAction extends MnemonicAwareAction {
         String thisType = type;
         if (thisType == null) {
             EntryTypeDialog etd = new EntryTypeDialog(jabRefFrame);
-            PositionWindow.placeDialog(etd, jabRefFrame);
+            etd.setLocationRelativeTo(jabRefFrame);
             etd.setVisible(true);
             EntryType tp = etd.getChoice();
             if (tp == null) {
@@ -57,9 +56,10 @@ public class NewEntryAction extends MnemonicAwareAction {
             thisType = tp.getName();
         }
 
-        if (jabRefFrame.tabbedPane.getTabCount() > 0) {
-            ((BasePanel) jabRefFrame.tabbedPane.getSelectedComponent())
-                    .newEntry(EntryTypes.getType(thisType, jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getMode()).get());
+        if (jabRefFrame.getBasePanelCount() > 0) {
+            jabRefFrame.getCurrentBasePanel().newEntry(
+                    EntryTypes.getType(thisType, jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getMode())
+                            .get());
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }

@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.gui.worker;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -71,7 +70,7 @@ public class SendAsEMailAction extends AbstractWorker {
             return;
         }
         if (panel.getSelectedEntries().isEmpty()) {
-            message = Localization.lang("No entries selected.");
+            message = Localization.lang("This operation requires one or more entries to be selected.");
             return;
         }
 
@@ -89,14 +88,14 @@ public class SendAsEMailAction extends AbstractWorker {
             }
         }
 
-        ArrayList<String> attachments = new ArrayList<>();
+        List<String> attachments = new ArrayList<>();
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = FileUtil.getListOfLinkedFiles(bes,
-                frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD));
+                frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory());
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

@@ -16,9 +16,16 @@
 
 package net.sf.jabref.sql;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -33,17 +40,11 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * @author ifsteinm
@@ -146,7 +147,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
         b.addButton(cancelButton);
         b.addRelatedGap();
-        JButton removeButton = new JButton(Localization.lang("Remove Selected"));
+        JButton removeButton = new JButton(Localization.lang("Remove selected"));
         b.addButton(removeButton);
 
         b.addGlue();
@@ -156,44 +157,26 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         diag.setLocationRelativeTo(frame);
         table.addMouseListener(this);
 
-        importButton.addActionListener(new ActionListener() {
+        importButton.addActionListener(e -> importAction());
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                importAction();
-            }
+        exportButton.addActionListener(e -> exportAction());
+
+        cancelButton.addActionListener(e -> {
+            moreThanOne = false;
+            hasDBSelected = false;
+            diag.dispose();
         });
 
-        exportButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                exportAction();
-            }
-        });
-
-        cancelButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                moreThanOne = false;
-                hasDBSelected = false;
+        removeButton.addActionListener(e -> {
+            moreThanOne = false;
+            hasDBSelected = true;
+            selectedInt = table.getSelectedRow();
+            selectedDB = (String) table.getValueAt(selectedInt, 0);
+            int areYouSure = JOptionPane.showConfirmDialog(diag,
+                    Localization.lang("Are you sure you want to remove the already existent SQL DBs?"));
+            if (areYouSure == JOptionPane.YES_OPTION) {
+                removeAction = true;
                 diag.dispose();
-            }
-        });
-        removeButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                moreThanOne = false;
-                hasDBSelected = true;
-                selectedInt = table.getSelectedRow();
-                selectedDB = (String) table.getValueAt(selectedInt, 0);
-                int areYouSure = JOptionPane.showConfirmDialog(diag, "Are you sure you want to remove the already\nexistent SQL DBs?");
-                if (areYouSure == JOptionPane.YES_OPTION) {
-                    removeAction = true;
-                    diag.dispose();
-                }
             }
         });
         diag.setModal(true);

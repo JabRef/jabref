@@ -15,13 +15,15 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.swing.BorderFactory;
@@ -36,39 +38,38 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.groups.GroupMatcher;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibtexSingleField;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.groups.EntryTableTransferHandler;
+import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
-import net.sf.jabref.gui.util.FirstColumnComparator;
-import net.sf.jabref.gui.util.IconComparator;
-import net.sf.jabref.gui.util.IsMarkedComparator;
-import net.sf.jabref.gui.util.RankingFieldComparator;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
+import net.sf.jabref.gui.util.comparator.FirstColumnComparator;
+import net.sf.jabref.gui.util.comparator.IconComparator;
+import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
+import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.TypedBibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.groups.EntryTableTransferHandler;
-import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The central table which displays the bibtex entries.
@@ -79,35 +80,33 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
  *
  */
 public class MainTable extends JTable {
+
+
+
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
-    private final SortedList<BibEntry> sortedForMarking;
-    private final SortedList<BibEntry> sortedForTable;
-    private final SortedList<BibEntry> sortedForSearch;
-    private final SortedList<BibEntry> sortedForGrouping;
+
     private final boolean tableColorCodes;
-    private boolean isFloatSearchActive;
-    private boolean isFloatGroupingActive;
     private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
     private final TableComparatorChooser<BibEntry> comparatorChooser;
     private final JScrollPane pane;
-    private Comparator<BibEntry> searchComparator;
-    private Comparator<BibEntry> groupComparator;
-    private final Comparator<BibEntry> markingComparator = new IsMarkedComparator();
-    private Matcher<BibEntry> searchMatcher;
-    private Matcher<BibEntry> groupMatcher;
 
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
+    private final MainTableDataModel model;
 
-    // Constants used to define how a cell should be rendered.
-    private static final int REQUIRED = 1;
-    private static final int OPTIONAL = 2;
-    private static final int OTHER = 3;
-    private static final int BOOLEAN = 4;
+    public MainTableDataModel getTableModel() {
+        return model;
+    }
 
+    // Enum used to define how a cell should be rendered.
+    private enum CellRendererMode {
+        REQUIRED,
+        OPTIONAL,
+        OTHER
+    }
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
@@ -129,37 +128,24 @@ public class MainTable extends JTable {
     }
 
 
-    public MainTable(MainTableFormat tableFormat, EventList<BibEntry> list, JabRefFrame frame,
+    public MainTable(MainTableFormat tableFormat, MainTableDataModel model, JabRefFrame frame,
             BasePanel panel) {
         super();
+        this.model = model;
 
         addFocusListener(Globals.focusListener);
         setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
         this.panel = panel;
-        // This SortedList has a Comparator controlled by the TableComparatorChooser
-        // we are going to install, which responds to user sorting selections:
-        sortedForTable = new SortedList<>(list, null);
-        // This SortedList applies afterwards, and floats marked entries:
-        sortedForMarking = new SortedList<>(sortedForTable, null);
-        // This SortedList applies afterwards, and can float search hits:
-        sortedForSearch = new SortedList<>(sortedForMarking, null);
-        // This SortedList applies afterwards, and can float grouping hits:
-        sortedForGrouping = new SortedList<>(sortedForSearch, null);
 
-        searchMatcher = null;
-        groupMatcher = null;
-        searchComparator = null;
-        groupComparator = null;
 
-        DefaultEventTableModel<BibEntry> tableModel = (DefaultEventTableModel<BibEntry>) GlazedListsSwing
-                .eventTableModelWithThreadProxyList(sortedForGrouping, tableFormat);
-        setModel(tableModel);
+        setModel(GlazedListsSwing
+                .eventTableModelWithThreadProxyList(model.getTableRows(), tableFormat));
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
         localSelectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedForGrouping);
+                .eventSelectionModelWithThreadProxyList(model.getTableRows());
         setSelectionModel(localSelectionModel);
         pane = new JScrollPane(this);
         pane.setBorder(BorderFactory.createEmptyBorder());
@@ -174,10 +160,13 @@ public class MainTable extends JTable {
 
         this.setTableHeader(new PreventDraggingJTableHeader(this, tableFormat));
 
-        comparatorChooser = this.createTableComparatorChooser(this, sortedForTable,
+        comparatorChooser = this.createTableComparatorChooser(this, model.getSortedForUserDefinedTableColumnSorting(),
                 TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener = new PersistenceTableColumnListener(this);
+
+        // set table header render AFTER creation of comparatorChooser (this enables sort arrow rendering)
+        this.getTableHeader().setDefaultRenderer(new MainTableHeaderRenderer(this.getTableHeader().getDefaultRenderer()));
 
         // TODO: Figure out, whether this call is needed.
         getSelected();
@@ -189,101 +178,8 @@ public class MainTable extends JTable {
         pane.setTransferHandler(xfer);
 
         setupComparatorChooser();
-        refreshSorting();
+        model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         setWidths();
-
-    }
-
-    public void refreshSorting() {
-        sortedForMarking.getReadWriteLock().writeLock().lock();
-        try {
-            if (Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES)) {
-                sortedForMarking.setComparator(markingComparator);
-            } else {
-                sortedForMarking.setComparator(null);
-            }
-        } finally {
-            sortedForMarking.getReadWriteLock().writeLock().unlock();
-        }
-
-        sortedForSearch.getReadWriteLock().writeLock().lock();
-        try {
-            sortedForSearch.setComparator(searchComparator);
-        } finally {
-            sortedForSearch.getReadWriteLock().writeLock().unlock();
-        }
-
-        sortedForGrouping.getReadWriteLock().writeLock().lock();
-        try {
-            sortedForGrouping.setComparator(groupComparator);
-        } finally {
-            sortedForGrouping.getReadWriteLock().writeLock().unlock();
-        }
-    }
-
-    /**
-     * Adds a sorting rule that floats hits to the top, and causes non-hits to be grayed out:
-     */
-    public void showFloatSearch() {
-        if(!isFloatSearchActive) {
-            isFloatSearchActive = true;
-
-            searchMatcher = SearchMatcher.INSTANCE;
-            searchComparator = new HitOrMissComparator(searchMatcher);
-            refreshSorting();
-
-            scrollTo(0);
-        }
-    }
-
-    /**
-     * Removes sorting by search results, and graying out of non-hits.
-     */
-    public void stopShowingFloatSearch() {
-        if(isFloatSearchActive) {
-            isFloatSearchActive = false;
-
-            searchMatcher = null;
-            searchComparator = null;
-            refreshSorting();
-        }
-    }
-
-    public boolean isFloatSearchActive() {
-        return isFloatSearchActive;
-    }
-
-    /**
-     * Adds a sorting rule that floats group hits to the top, and causes non-hits to be grayed out:
-     */
-    public void showFloatGrouping() {
-        isFloatGroupingActive = true;
-
-        groupMatcher = GroupMatcher.INSTANCE;
-        groupComparator = new HitOrMissComparator(groupMatcher);
-        refreshSorting();
-    }
-
-    /**
-     * Removes sorting by group, and graying out of non-hits.
-     */
-    public void stopShowingFloatGrouping() {
-        if(isFloatGroupingActive) {
-            isFloatGroupingActive = false;
-
-            groupMatcher = null;
-            groupComparator = null;
-            refreshSorting();
-        }
-    }
-
-    public boolean isFloatGroupingActive() {
-        return isFloatGroupingActive;
-    }
-
-
-    public EventList<BibEntry> getTableRows() {
-        return sortedForGrouping;
     }
 
     public void addSelectionListener(ListEventListener<BibEntry> listener) {
@@ -320,12 +216,12 @@ public class MainTable extends JTable {
         int score = -3;
         DefaultTableCellRenderer renderer = MainTable.defRenderer;
 
-        int status = getCellStatus(row, column);
+        CellRendererMode status = getCellStatus(row, column);
 
-        if (!isFloatSearchActive || matches(row, searchMatcher)) {
+        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
             score++;
         }
-        if (!isFloatGroupingActive || matches(row, groupMatcher)) {
+        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
             score += 2;
         }
 
@@ -365,14 +261,11 @@ public class MainTable extends JTable {
                 renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
-        }
-        else if (tableColorCodes) {
-            if (status == MainTable.REQUIRED) {
+        } else if (tableColorCodes) {
+            if (status == CellRendererMode.REQUIRED) {
                 renderer = MainTable.reqRenderer;
-            } else if (status == MainTable.OPTIONAL) {
+            } else if (status == CellRendererMode.OPTIONAL) {
                 renderer = MainTable.optRenderer;
-            } else if (status == MainTable.BOOLEAN) {
-                renderer = (DefaultTableCellRenderer) getDefaultRenderer(Boolean.class);
             }
         }
 
@@ -413,7 +306,7 @@ public class MainTable extends JTable {
                             cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
                         } catch (NumberFormatException e) {
                             LOGGER.info("Exception while setting column widths. Choosing default.", e);
-                            cm.getColumn(i).setPreferredWidth(GUIGlobals.DEFAULT_FIELD_LENGTH);
+                            cm.getColumn(i).setPreferredWidth(BibtexSingleField.DEFAULT_FIELD_LENGTH);
                         }
                         break;
                     }
@@ -423,7 +316,7 @@ public class MainTable extends JTable {
     }
 
     public BibEntry getEntryAt(int row) {
-        return sortedForGrouping.get(row);
+        return model.getTableRows().get(row);
     }
 
     /**
@@ -500,7 +393,7 @@ public class MainTable extends JTable {
                 Globals.prefs.getBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING)
         }; // descending
 
-        sortedForTable.getReadWriteLock().writeLock().lock();
+        model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().lock();
         try {
             for (int i = 0; i < sortFields.length; i++) {
                 int index = -1;
@@ -522,61 +415,54 @@ public class MainTable extends JTable {
                 }
             }
         } finally {
-            sortedForTable.getReadWriteLock().writeLock().unlock();
+            model.getSortedForUserDefinedTableColumnSorting().getReadWriteLock().writeLock().unlock();
         }
 
         // Add action listener so we can remember the sort order:
-        comparatorChooser.addSortActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                // Get the information about the current sort order:
-                List<String> fields = getCurrentSortFields();
-                List<Boolean> order = getCurrentSortOrder();
-                // Update preferences:
-                int count = Math.min(fields.size(), order.size());
-                if (count >= 1) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
-                }
-                if (count >= 2) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
-                }
-                if (count >= 3) {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
-                }
-                else {
-                    Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
-                    Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
-                }
+        comparatorChooser.addSortActionListener(e -> {
+            // Get the information about the current sort order:
+            List<String> fields = getCurrentSortFields();
+            List<Boolean> order = getCurrentSortOrder();
+            // Update preferences:
+            int count = Math.min(fields.size(), order.size());
+            if (count >= 1) {
+                Globals.prefs.put(JabRefPreferences.TABLE_PRIMARY_SORT_FIELD, fields.get(0));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_PRIMARY_SORT_DESCENDING, order.get(0));
             }
-
+            if (count >= 2) {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, fields.get(1));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, order.get(1));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_SECONDARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_SECONDARY_SORT_DESCENDING, false);
+            }
+            if (count >= 3) {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, fields.get(2));
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, order.get(2));
+            } else {
+                Globals.prefs.put(JabRefPreferences.TABLE_TERTIARY_SORT_FIELD, "");
+                Globals.prefs.putBoolean(JabRefPreferences.TABLE_TERTIARY_SORT_DESCENDING, false);
+            }
         });
 
     }
 
-    private int getCellStatus(int row, int col) {
+    private CellRendererMode getCellStatus(int row, int col) {
         try {
-            BibEntry be = sortedForGrouping.get(row);
+            BibEntry be = getEntryAt(row);
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
             if(type.isPresent()) {
                 String columnName = getColumnName(col).toLowerCase();
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
-                    return MainTable.REQUIRED;
+                    return CellRendererMode.REQUIRED;
                 }
                 if (type.get().getOptionalFields().contains(columnName)) {
-                    return MainTable.OPTIONAL;
+                    return CellRendererMode.OPTIONAL;
                 }
             }
-            return MainTable.OTHER;
+            return CellRendererMode.OTHER;
         } catch (NullPointerException ex) {
-            return MainTable.OTHER;
+            return CellRendererMode.OTHER;
         }
     }
 
@@ -600,16 +486,8 @@ public class MainTable extends JTable {
         localSelectionModel.setSelectionInterval(row, row);
     }
 
-    /**
-     * Adds the given row to the selection
-     * @param row the row to add to the selection
-     */
-    public void addSelection(int row) {
-        this.localSelectionModel.addSelectionInterval(row, row);
-    }
-
     public int findEntry(BibEntry entry) {
-        return sortedForGrouping.indexOf(entry);
+        return model.getTableRows().indexOf(entry);
     }
 
     /**
@@ -625,13 +503,13 @@ public class MainTable extends JTable {
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
-        return m.matches(sortedForGrouping.get(row));
+        return m.matches(getBibEntry(row));
     }
 
     private boolean isComplete(int row) {
         try {
-            BibEntry entry = sortedForGrouping.get(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.database()), panel.getBibDatabaseContext().getMode());
+            BibEntry entry = getBibEntry(row);
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.getDatabase()), panel.getBibDatabaseContext().getMode());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
@@ -640,11 +518,15 @@ public class MainTable extends JTable {
 
     private int isMarked(int row) {
         try {
-            BibEntry be = sortedForGrouping.get(row);
+            BibEntry be = getBibEntry(row);
             return EntryMarker.isMarked(be);
         } catch (NullPointerException ex) {
             return 0;
         }
+    }
+
+    private BibEntry getBibEntry(int row) {
+        return model.getTableRows().get(row);
     }
 
     public void scrollTo(int y) {
@@ -652,18 +534,24 @@ public class MainTable extends JTable {
         scb.setValue(y * scb.getUnitIncrement(1));
     }
 
+    public void showFloatSearch() {
+        this.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
+
+        scrollTo(0);
+    }
+
     /**
      * updateFont
      */
     public void updateFont() {
-        setFont(GUIGlobals.CURRENTFONT);
-        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.CURRENTFONT.getSize());
+        setFont(GUIGlobals.currentFont);
+        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.currentFont.getSize());
     }
 
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !isFloatSearchActive)) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
 
@@ -748,13 +636,7 @@ public class MainTable extends JTable {
 
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
-        final TableComparatorChooser<BibEntry> result = TableComparatorChooser.install(table, list, sortingStrategy);
-        result.addSortActionListener(e -> {
-            // We need to reset the stack of sorted list each time sorting order
-            // changes, or the sorting breaks down:
-            refreshSorting();
-        });
-        return result;
+        return TableComparatorChooser.install(table, list, sortingStrategy);
     }
 
     /**
@@ -788,17 +670,6 @@ public class MainTable extends JTable {
 
     public PersistenceTableColumnListener getTableColumnListener() {
         return tableColumnListener;
-    }
-
-    /**
-     * Returns the List of entries sorted by a user-selected term. This is the
-     * sorting before marking, search etc. applies.
-     *
-     * Note: The returned List must not be modified from the outside
-     * @return The sorted list of entries.
-     */
-    public SortedList<BibEntry> getSortedForTable() {
-        return sortedForTable;
     }
 
     public MainTableColumn getMainTableColumn(int modelIndex) {

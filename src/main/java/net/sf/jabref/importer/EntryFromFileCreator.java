@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -40,9 +41,9 @@ import net.sf.jabref.gui.FileListTableModel;
  * @version 25.11.2008 | 23:39:03
  *
  */
-public abstract class EntryFromFileCreator implements java.io.FileFilter {
+public abstract class EntryFromFileCreator implements FileFilter {
 
-    final ExternalFileType externalFileType;
+    protected final ExternalFileType externalFileType;
 
     private static final int MIN_PATH_TOKEN_LENGTH = 4;
 
@@ -96,14 +97,14 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
      * @param addPathTokensAsKeywords
      * @return
      */
-    public BibEntry createEntry(File f, boolean addPathTokensAsKeywords) {
+    public Optional<BibEntry> createEntry(File f, boolean addPathTokensAsKeywords) {
         if ((f == null) || !f.exists()) {
-            return null;
+            return Optional.empty();
         }
         Optional<BibEntry> newEntry = createBibtexEntry(f);
 
         if (!(newEntry.isPresent())) {
-            return null;
+            return newEntry;
         }
 
         if (addPathTokensAsKeywords) {
@@ -115,7 +116,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
 
         addFileInfo(newEntry.get(), f);
-        return newEntry.get();
+        return newEntry;
     }
 
     /** Returns the ExternalFileType that is imported here */
@@ -151,10 +152,10 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
     }
 
     private void addFileInfo(BibEntry entry, File file) {
-        ExternalFileType fileType = ExternalFileTypes.getInstance()
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        List<String> possibleFilePaths = JabRef.jrf.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> possibleFilePaths = JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
@@ -164,7 +165,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
     }
 
-    void appendToField(BibEntry entry, String field, String value) {
+    protected void appendToField(BibEntry entry, String field, String value) {
         if ((value == null) || value.isEmpty()) {
             return;
         }
@@ -180,7 +181,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
-    void addEntrysToEntry(BibEntry entry, List<BibEntry> entrys) {
+    protected void addEntrysToEntry(BibEntry entry, List<BibEntry> entrys) {
         if (entrys != null) {
             for (BibEntry e : entrys) {
                 addEntryDataToEntry(entry, e);
@@ -188,7 +189,7 @@ public abstract class EntryFromFileCreator implements java.io.FileFilter {
         }
     }
 
-    void addEntryDataToEntry(BibEntry entry, BibEntry e) {
+    protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
             appendToField(entry, field, e.getField(field));
         }

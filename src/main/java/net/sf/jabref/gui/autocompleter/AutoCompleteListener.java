@@ -155,6 +155,19 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         LOGGER.debug("ToSetIn: '" + toSetIn + "'");
     }
 
+    private boolean atEndOfWord(JTextComponent textField) {
+        int nextCharPosition = textField.getCaretPosition();
+
+        // position not at the end of input
+        if(nextCharPosition < textField.getText().length()) {
+            char nextChar = textField.getText().charAt(nextCharPosition);
+            if (!Character.isWhitespace(nextChar)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * If user cancels autocompletion by a) entering another letter than the completed word (and there is no other auto
      * completion) b) space the casing of the letters has to be kept
@@ -267,6 +280,11 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             return;
         }
 
+        // don't do auto completion inside words
+        if (!atEndOfWord((JTextComponent) e.getSource())) {
+            return;
+        }
+
         if ((e.getModifiers() | InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             if (Character.isLetter(ch) || Character.isDigit(ch)
@@ -291,28 +309,22 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                     if (!toSetIn.isEmpty()) {
                         int cp = comp.getCaretPosition();
                         //comp.setCaretPosition(cp+1-toSetIn.);
-                        //System.out.println(cp-toSetIn.length()+" - "+cp);
                         comp.select((cp + 1) - toSetIn.length(), cp);
                         lastBeginning = lastBeginning + ch;
 
                         e.consume();
                         lastCaretPosition = comp.getCaretPosition();
 
-                        //System.out.println("Added char: '"+toSetIn+"'");
-                        //System.out.println("LastBeginning: '"+lastBeginning+"'");
-
                         lastCompletions = findCompletions(lastBeginning);
                         lastShownCompletion = 0;
                         for (int i = 0; i < lastCompletions.size(); i++) {
                             String lastCompletion = lastCompletions.get(i);
-                            //System.out.println("Completion["+i+"] = "+lastCompletion);
                             if (lastCompletion.endsWith(toSetIn)) {
                                 lastShownCompletion = i;
                                 break;
                             }
 
                         }
-                        //System.out.println("Index now: "+lastShownCompletion);
                         if (toSetIn.length() < 2) {
                             // User typed the last character of the autocompleted word
                             // We have to replace the automcompletion word by the typed word.

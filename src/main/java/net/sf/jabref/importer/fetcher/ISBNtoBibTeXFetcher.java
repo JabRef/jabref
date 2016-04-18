@@ -20,10 +20,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.swing.JPanel;
+
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
@@ -31,8 +36,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitFormatter;
-import net.sf.jabref.logic.formatter.casechanger.CaseKeeper;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -41,9 +45,11 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
+    private static final Log LOGGER = LogFactory.getLog(ISBNtoBibTeXFetcher.class);
+
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?isbn=%s";
-    private final CaseKeeper caseKeeper = new CaseKeeper();
-    private final UnitFormatter unitFormatter = new UnitFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
 
     @Override
@@ -59,7 +65,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             // this should never happen
             status.setStatus(Localization.lang("Error"));
-            e.printStackTrace();
+            LOGGER.warn("Shouldn't happen...", e);
             return false;
         }
 
@@ -70,7 +76,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.warn("Bad URL when fetching ISBN info", e);
             return false;
         }
 
@@ -87,12 +93,12 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                 if (title != null) {
                     // Unit formatting
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                        title = unitFormatter.format(title);
+                        title = unitsToLatexFormatter.format(title);
                     }
 
                     // Case keeping
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                        title = caseKeeper.format(title);
+                        title = protectTermsFormatter.format(title);
                     }
                     entry.setField("title", title);
                 }
@@ -103,15 +109,18 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
-            status.showMessage(Localization.lang("No entry found for IBSN %0 at www.ebook.de", query));
+            status.showMessage(Localization.lang("No entry found for ISBN %0 at www.ebook.de", query));
+            LOGGER.debug("No ISBN info found", e);
             return false;
-        } catch (java.net.UnknownHostException e) {
+        } catch (UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host
             // It is more likely that we don't have an internet connection
             status.showMessage(Localization.lang("No_Internet_Connection."));
+            LOGGER.debug("No internet connection", e);
             return false;
         } catch (Exception e) {
             status.showMessage(e.toString());
+            LOGGER.warn("Problem getting info for ISBN", e);
             return false;
         }
 
@@ -120,6 +129,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     @Override
     public String getTitle() {
         return "ISBN to BibTeX";
+
     }
 
     @Override
