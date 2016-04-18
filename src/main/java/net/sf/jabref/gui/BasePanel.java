@@ -52,9 +52,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import ca.odell.glazedlists.event.ListEventListener;
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HighlightMatchingGroupPreferences;
@@ -147,6 +144,10 @@ import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
 import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.sql.exporter.DBExporter;
+
+import ca.odell.glazedlists.event.ListEventListener;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
