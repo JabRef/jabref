@@ -17,7 +17,6 @@ package net.sf.jabref.gui.keyboard;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.util.KeyBinder;
 import net.sf.jabref.logic.l10n.Localization;
 
 import java.awt.BorderLayout;

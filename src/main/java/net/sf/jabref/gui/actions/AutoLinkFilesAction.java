@@ -7,14 +7,15 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.external.AutoSetLinks;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This Action may only be used in a menu or button.

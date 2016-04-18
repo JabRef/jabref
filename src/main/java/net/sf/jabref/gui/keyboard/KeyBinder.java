@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.util;
+package net.sf.jabref.gui.keyboard;
 
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 import javax.swing.JRootPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.keyboard.KeyBinding;
 
 public class KeyBinder {
 

@@ -23,6 +23,7 @@ import net.sf.jabref.exporter.IExportFormat;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
+import net.sf.jabref.external.AutoSetLinks;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ImportInspectionCommandLine;
 import net.sf.jabref.importer.OpenDatabaseAction;
@@ -40,8 +41,6 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
