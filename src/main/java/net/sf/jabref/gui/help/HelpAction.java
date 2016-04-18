@@ -81,7 +81,7 @@ public class HelpAction extends MnemonicAwareAction {
             JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + urlPart);
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
-            JabRefGUI.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
+            JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser."));
         }
     }
 }

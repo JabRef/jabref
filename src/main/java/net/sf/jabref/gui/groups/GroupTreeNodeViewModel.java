@@ -201,7 +201,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
             } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
                 int hits = 0;
-                BasePanel currentBasePanel = JabRefGUI.mainFrame.getCurrentBasePanel();
+                BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
                 if(currentBasePanel != null) {
                     for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
                         if (group.contains(entry)) {

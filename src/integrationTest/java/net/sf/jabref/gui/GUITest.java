@@ -1,6 +1,6 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
@@ -24,7 +24,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
     protected void onSetUp() {
         awtExceptionHandler = new AWTExceptionHandler();
         awtExceptionHandler.installExceptionDetectionInEDT();
-        application(JabRef.class).start();
+        application(JabRefMain.class).start();
 
         robot().waitForIdle();
 

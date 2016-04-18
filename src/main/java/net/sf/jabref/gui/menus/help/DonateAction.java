@@ -47,7 +47,7 @@ public class DonateAction extends AbstractAction {
             JabRefDesktop.openBrowser(DONATION_LINK);
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
-            JabRefGUI.mainFrame.getCurrentBasePanel().output(Localization.lang("Could not open browser."));
+            JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser."));
         }
     }
 }

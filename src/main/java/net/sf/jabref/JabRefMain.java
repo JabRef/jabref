@@ -38,9 +38,9 @@ import org.apache.commons.logging.LogFactory;
 /**
  * JabRef MainClass
  */
-public class JabRef {
+public class JabRefMain {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRef.class);
+    private static final Log LOGGER = LogFactory.getLog(JabRefMain.class);
 
 
     public static void main(String[] args) {

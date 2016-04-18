@@ -258,9 +258,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     result = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
-                    result = ParserResult.NULL_RESULT;
+                    result = ParserResult.getNullResult();
                 }
-                if (result == ParserResult.NULL_RESULT) {
+                if (result.isNullResult()) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
@@ -456,13 +456,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     }
 
     /**
+     * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
     *
     * @param name Name of the bib-file to open
     * @param ignoreAutosave true if autosave version of the file should be ignored
     * @return ParserResult which never is null
     */
 
-    public static ParserResult openBibFile(String name, boolean ignoreAutosave) {
+    public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave) {
         // String in OpenDatabaseAction.java
         LOGGER.info("Opening: " + name);
         File file = new File(name);
@@ -491,7 +492,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             if (!FileBasedLock.waitForFileLock(file, 10)) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
-                return ParserResult.NULL_RESULT;
+                return ParserResult.getNullResult();
             }
 
             Charset encoding = Globals.prefs.getDefaultEncoding();

@@ -1,7 +1,7 @@
 package net.sf.jabref.testutils;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 
 /**
  * UtilsClass for UnitTests.
@@ -21,15 +21,15 @@ public class TestUtils {
      */
     public static void initJabRef() {
         String[] args = {"-p", " ", TestUtils.PATH_TO_TEST_BIBTEX};
-        JabRef.main(args);
+        JabRefMain.main(args);
     }
 
     /**
      * Closes the current instance of JabRef.
      */
     public static void closeJabRef() {
-        if (JabRefGUI.mainFrame != null) {
-            JabRefGUI.mainFrame.dispose();
+        if (JabRefGUI.getMainFrame() != null) {
+            JabRefGUI.getMainFrame().dispose();
         }
     }
 

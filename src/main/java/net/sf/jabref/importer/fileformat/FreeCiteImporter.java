@@ -214,7 +214,7 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRefGUI.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRefGUI.mainFrame.getCurrentBasePanel().getDatabase(), e);
+                    LabelPatternUtil.makeLabel(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e);
 
                     res.add(e);
                 }

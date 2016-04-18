@@ -35,7 +35,7 @@ public class JabRefMessageHandler implements MessageHandler {
         List<ParserResult> loaded = argumentProcessor.getParserResults();
         for (int i = 0; i < loaded.size(); i++) {
             ParserResult pr = loaded.get(i);
-            JabRefGUI.mainFrame.addParserResult(pr, i == 0);
+            JabRefGUI.getMainFrame().addParserResult(pr, i == 0);
         }
     }
 }

@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +49,7 @@ public class ResourceExtractor implements Worker {
 
     /** Creates a new instance of ResourceExtractor */
     public ResourceExtractor(final Component parent, final String filename, File destination) {
-        resource = JabRef.class.getResource(filename);
+        resource = JabRefMain.class.getResource(filename);
         //System.out.println(filename+"\n"+resource);
         this.parent = parent;
         this.destination = destination;

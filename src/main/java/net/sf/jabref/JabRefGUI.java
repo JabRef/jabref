@@ -53,7 +53,7 @@ public class JabRefGUI {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
-    public static JabRefFrame mainFrame;
+    private static JabRefFrame mainFrame;
 
     private final List<ParserResult> loaded;
     private final boolean isBlank;
@@ -123,7 +123,7 @@ public class JabRefGUI {
                         // add them to the list
                         toOpenTab.add(pr);
                     } else {
-                        JabRefGUI.mainFrame.addParserResult(pr, first);
+                        JabRefGUI.getMainFrame().addParserResult(pr, first);
                         first = false;
                     }
                 } else {
@@ -135,40 +135,40 @@ public class JabRefGUI {
 
         // finally add things to the currently opened tab
         for (ParserResult pr : toOpenTab) {
-            JabRefGUI.mainFrame.addParserResult(pr, first);
+            JabRefGUI.getMainFrame().addParserResult(pr, first);
             first = false;
         }
 
         // Start auto save timer:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
-            Globals.startAutoSaveManager(JabRefGUI.mainFrame);
+            Globals.startAutoSaveManager(JabRefGUI.getMainFrame());
         }
 
         // If we are set to remember the window location, we also remember the maximised
         // state. This needs to be set after the window has been made visible, so we
         // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        JabRefGUI.mainFrame.setVisible(true);
+        JabRefGUI.getMainFrame().setVisible(true);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         for (ParserResult pr : failed) {
             String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName()) + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
-            JOptionPane.showMessageDialog(JabRefGUI.mainFrame, message, Localization.lang("Error opening file"),
+            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
             int i = 0;
             for (ParserResult pr : loaded) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.mainFrame, i++);
+                ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
             }
         }
 
@@ -181,9 +181,9 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loaded, but not to getBasePanelCount()
 
-        for (int i = 0; (i < loaded.size()) && (i < JabRefGUI.mainFrame.getBasePanelCount()); i++) {
+        for (int i = 0; (i < loaded.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
             ParserResult pr = loaded.get(i);
-            BasePanel panel = JabRefGUI.mainFrame.getBasePanelAt(i);
+            BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
 
@@ -192,12 +192,12 @@ public class JabRefGUI {
         // If any database loading was postponed due to an autosave, schedule them
         // for handing now:
         if (!postponed.isEmpty()) {
-            AutosaveStartupPrompter asp = new AutosaveStartupPrompter(JabRefGUI.mainFrame, postponed);
+            AutosaveStartupPrompter asp = new AutosaveStartupPrompter(JabRefGUI.getMainFrame(), postponed);
             SwingUtilities.invokeLater(asp);
         }
 
         if (!loaded.isEmpty()) {
-            new FocusRequester(JabRefGUI.mainFrame.getCurrentBasePanel().mainTable);
+            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable);
         }
     }
 
@@ -214,9 +214,9 @@ public class JabRefGUI {
             }
 
             if (fileToOpen.exists()) {
-                ParserResult pr = OpenDatabaseAction.openBibFile(name, false);
+                ParserResult pr = OpenDatabaseAction.loadDatabaseOrAutoSave(name, false);
 
-                if (pr == ParserResult.NULL_RESULT) {
+                if (pr.isNullResult()) {
                     LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
                 } else {
                     loaded.add(pr);
@@ -263,7 +263,7 @@ public class JabRefGUI {
                     // also set system l&f as default
                     Globals.prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, systemLookFeel);
                     // notify the user
-                    JOptionPane.showMessageDialog(JabRefGUI.mainFrame,
+                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
                             Localization
                                     .lang("Unable to find the requested Look & Feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
@@ -288,6 +288,15 @@ public class JabRefGUI {
                 }
             }
         }
+    }
+
+    public static JabRefFrame getMainFrame() {
+        return mainFrame;
+    }
+
+    // Only used for testing, other than that do NOT set the mainFrame...
+    public static void setMainFrame(JabRefFrame mainFrame) {
+        JabRefGUI.mainFrame = mainFrame;
     }
 
 }

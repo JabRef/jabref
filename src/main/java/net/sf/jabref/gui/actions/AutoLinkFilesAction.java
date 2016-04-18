@@ -32,26 +32,26 @@ public class AutoLinkFilesAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
-        List<BibEntry> entries = JabRefGUI.mainFrame.getCurrentBasePanel().getSelectedEntries();
+        List<BibEntry> entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
         if (entries.isEmpty()) {
-            JabRefGUI.mainFrame.getCurrentBasePanel()
+            JabRefGUI.getMainFrame().getCurrentBasePanel()
                     .output(Localization.lang("This operation requires one or more entries to be selected."));
             return;
         }
-        JDialog diag = new JDialog(JabRefGUI.mainFrame, true);
+        JDialog diag = new JDialog(JabRefGUI.getMainFrame(), true);
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
         Runnable runnable = Util.autoSetLinks(entries, nc, null, null,
-                JabRefGUI.mainFrame.getCurrentBasePanel().getBibDatabaseContext(), e -> {
+                JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), e -> {
                     if (e.getID() > 0) {
                         // entry has been updated in Util.autoSetLinks, only treat nc and status message
                         if (nc.hasEdits()) {
                             nc.end();
-                            JabRefGUI.mainFrame.getCurrentBasePanel().undoManager.addEdit(nc);
-                            JabRefGUI.mainFrame.getCurrentBasePanel().markBaseChanged();
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().undoManager.addEdit(nc);
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
                         }
-                        JabRefGUI.mainFrame.output(Localization.lang("Finished automatically setting external links."));
+                        JabRefGUI.getMainFrame().output(Localization.lang("Finished automatically setting external links."));
                     } else {
-                        JabRefGUI.mainFrame.output(Localization.lang("Finished automatically setting external links.") + " "
+                        JabRefGUI.getMainFrame().output(Localization.lang("Finished automatically setting external links.") + " "
                                 + Localization.lang("No files found."));
                     }
                 } , diag);

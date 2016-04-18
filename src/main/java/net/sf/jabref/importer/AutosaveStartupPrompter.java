@@ -73,7 +73,7 @@ public class AutosaveStartupPrompter implements Runnable {
             boolean done = false;
             ParserResult pr;
             do {
-                pr = OpenDatabaseAction.openBibFile(fileToLoad.getPath(), true);
+                pr = OpenDatabaseAction.loadDatabaseOrAutoSave(fileToLoad.getPath(), true);
                 if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();

@@ -446,7 +446,7 @@ public class JabRefPreferences {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(JabRef.class);
+        prefs = Preferences.userNodeForPackage(JabRefMain.class);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));

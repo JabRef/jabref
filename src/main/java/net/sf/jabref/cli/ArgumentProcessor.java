@@ -112,54 +112,8 @@ public class ArgumentProcessor {
 
         if (cli.isExportMatches()) {
             if (!loaded.isEmpty()) {
-                String[] data = cli.getExportMatches().split(",");
-                String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-                //$ stands for a blank
-                ParserResult pr = loaded.get(loaded.size() - 1);
-                BibDatabase dataBase = pr.getDatabase();
-
-                SearchQuery query = new SearchQuery(searchTerm,
-                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
-                        Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-                BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
-
-                //export database
-                if (newBase.hasEntries()) {
-                    String formatName;
-
-                    //read in the export format, take default format if no format entered
-                    switch (data.length) {
-                    case 3:
-                        formatName = data[2];
-                        break;
-                    case 2:
-                        //default ExportFormat: HTML table (with Abstract & BibTeX)
-                        formatName = "tablerefsabsbib";
-                        break;
-                    default:
-                        System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                                .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                        noGUINeeded = true;
-                        return Collections.emptyList();
-                    }
-
-                    //export new database
-                    IExportFormat format = ExportFormats.getExportFormat(formatName);
-                    if (format == null) {
-                        System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
-                    } else {
-                        // We have an ExportFormat instance:
-                        try {
-                            System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                            BibDatabaseContext databaseContext = new BibDatabaseContext(newBase, pr.getMetaData());
-                            format.performExport(databaseContext, data[1], pr.getEncoding(), newBase.getEntries());
-                        } catch (Exception ex) {
-                            System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                                    + ex.getMessage());
-                        }
-                    }
-                } else {
-                    System.err.println(Localization.lang("No search matches."));
+                if (!exportMatches(loaded)) {
+                    return Collections.emptyList();
                 }
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid input option."));
@@ -199,6 +153,59 @@ public class ArgumentProcessor {
         return loaded;
     }
 
+    private boolean exportMatches(List<ParserResult> loaded) {
+        String[] data = cli.getExportMatches().split(",");
+        String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
+        //$ stands for a blank
+        ParserResult pr = loaded.get(loaded.size() - 1);
+        BibDatabase dataBase = pr.getDatabase();
+
+        SearchQuery query = new SearchQuery(searchTerm,
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
+                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+        BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
+
+        //export database
+        if (newBase.hasEntries()) {
+            String formatName;
+
+            //read in the export format, take default format if no format entered
+            switch (data.length) {
+            case 3:
+                formatName = data[2];
+                break;
+            case 2:
+                //default ExportFormat: HTML table (with Abstract & BibTeX)
+                formatName = "tablerefsabsbib";
+                break;
+            default:
+                System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                        .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                noGUINeeded = true;
+                return false;
+            }
+
+            //export new database
+            IExportFormat format = ExportFormats.getExportFormat(formatName);
+            if (format == null) {
+                System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
+            } else {
+                // We have an ExportFormat instance:
+                try {
+                    System.out.println(Localization.lang("Exporting") + ": " + data[1]);
+                    BibDatabaseContext databaseContext = new BibDatabaseContext(newBase, pr.getMetaData());
+                    format.performExport(databaseContext, data[1], pr.getEncoding(), newBase.getEntries());
+                } catch (Exception ex) {
+                    System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
+                            + ex.getMessage());
+                }
+            }
+        } else {
+            System.err.println(Localization.lang("No search matches."));
+        }
+        return true;
+    }
+
     private void doAuxImport(List<ParserResult> loaded) {
         boolean usageMsg;
 
@@ -226,10 +233,10 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
-                    pr = OpenDatabaseAction.openBibFile(aLeftOver, false);
+                    pr = OpenDatabaseAction.loadDatabaseOrAutoSave(aLeftOver, false);
                 }
 
-                if (!bibExtension || (pr == ParserResult.NULL_RESULT)) {
+                if (!bibExtension || (pr.isNullResult())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -239,7 +246,7 @@ public class ArgumentProcessor {
                     if (startupMode == Mode.INITIAL_START) {
                         toImport.add(aLeftOver);
                     } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.NULL_RESULT));
+                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.getNullResult()));
                     }
                 } else {
                     loaded.add(pr);
@@ -510,10 +517,10 @@ public class ArgumentProcessor {
                 try {
                     List<BibEntry> entries;
                     if (OS.WINDOWS) {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRefGUI.mainFrame);
+                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRefGUI.getMainFrame());
                     } else {
                         entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
-                                data[0].replace("~", System.getProperty("user.home")), JabRefGUI.mainFrame);
+                                data[0].replace("~", System.getProperty("user.home")), JabRefGUI.getMainFrame());
                     }
                     return Optional.of(new ParserResult(entries));
                 } catch (IllegalArgumentException ex) {

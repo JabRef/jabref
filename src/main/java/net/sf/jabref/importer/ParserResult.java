@@ -32,7 +32,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
-    public static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
+
+    private static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
     private final BibDatabase base;
     private MetaData metaData;
     private final Map<String, EntryType> entryTypes;
@@ -188,5 +189,14 @@ public class ParserResult {
 
     public BibDatabaseContext getDatabaseContext() {
         return new BibDatabaseContext(base, metaData, file);
+    }
+
+    public boolean isNullResult() {
+        // TODO Auto-generated method stub
+        return this == NULL_RESULT;
+    }
+
+    public static ParserResult getNullResult() {
+        return NULL_RESULT;
     }
 }
