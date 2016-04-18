@@ -82,8 +82,8 @@ public class FieldExtraComponents {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
         if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
-                    storeFieldAction, false, ", ");
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
+                    ", ");
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
         }
@@ -100,7 +100,7 @@ public class FieldExtraComponents {
                 if (s != null) {
                     editor.setText(s);
                     storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                    panel.undoManager.addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
+                    panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
                 }
             }
         });
@@ -332,7 +332,7 @@ public class FieldExtraComponents {
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
+        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
                 storeFieldAction, false,
                 InternalBibtexFields.getFieldExtras(editor.getFieldName())
                         .contains(FieldProperties.PERSON_NAMES) ? " and " : ", ");

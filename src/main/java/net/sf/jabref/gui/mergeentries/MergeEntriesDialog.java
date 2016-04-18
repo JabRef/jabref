@@ -113,7 +113,7 @@ public class MergeEntriesDialog extends JDialog {
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
             panel.getDatabase().removeEntry(two);
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
             dispose();
         });

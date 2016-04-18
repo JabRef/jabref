@@ -631,8 +631,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             final HashMap<String, Integer> map = new HashMap<>();
 
             // first element (#) not inside tableRows
-            for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
-                String name = panel.mainTable.getColumnName(i);
+            for (int i = 1; i < panel.getMainTable().getColumnCount(); i++) {
+                String name = panel.getMainTable().getColumnName(i);
                 if ((name != null) && !name.isEmpty()) {
                     map.put(name.toLowerCase(), i);
                 }
@@ -664,11 +664,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             if (panel == null) {
                 return;
             }
-            TableColumnModel colMod = panel.mainTable.getColumnModel();
+            TableColumnModel colMod = panel.getMainTable().getColumnModel();
             colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
                 try {
-                    String name = panel.mainTable.getColumnName(i).toLowerCase();
+                    String name = panel.getMainTable().getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
                     if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);

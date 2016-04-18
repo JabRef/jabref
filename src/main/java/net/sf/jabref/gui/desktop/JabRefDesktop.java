@@ -233,7 +233,7 @@ public class JabRefDesktop {
                 String newValue = tModel.getStringRepresentation();
                 UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
-                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
                 return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);

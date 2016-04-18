@@ -196,7 +196,7 @@ public class JabRefGUI {
         }
 
         if (!loaded.isEmpty()) {
-            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable);
+            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable());
         }
     }
 

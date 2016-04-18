@@ -63,8 +63,8 @@ class ContentSelectorDialog2 extends JDialog {
     private final JPanel fieldNamePan = new JPanel();
     private final JPanel wordEditPan = new JPanel();
 
-    private final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
-    private final String FIELD_FIRST_LINE = Localization.lang("<field name>");
+    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
+    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
     private String currentField;
     private final JabRefFrame frame;
@@ -96,14 +96,13 @@ class ContentSelectorDialog2 extends JDialog {
      * @param frame the JabRef Frame
      * @param panel the currently selected BasePanel
      * @param modal should this dialog be modal?
-     * @param metaData The metadata of the current database
      * @param fieldName the field this selector is initialized for. May be null.
      */
-    public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
+    public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal,
             String fieldName) {
         super(owner, Localization.lang("Setup selectors"));
         this.setModal(modal);
-        this.metaData = metaData;
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;
         this.panel = panel;
         this.currentField = fieldName;
@@ -294,7 +293,7 @@ class ContentSelectorDialog2 extends JDialog {
             }
         }
 
-        // System.out.println("TODO: remove metadata for removed selector field.");
+        // TODO: remove metadata for removed selector field.
         panel.markNonUndoableBaseChanged();
 
         // Update all selectors in the current BasePanel.

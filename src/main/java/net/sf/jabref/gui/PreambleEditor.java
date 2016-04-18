@@ -175,7 +175,7 @@ class PreambleEditor extends JDialog {
             }
 
             if (set) {
-                panel.undoManager.addEdit(new UndoablePreambleChange
+                panel.getUndoManager().addEdit(new UndoablePreambleChange
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {

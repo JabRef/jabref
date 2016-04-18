@@ -245,6 +245,8 @@ public class DatabaseImporter {
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
                                 GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
                         break;
+                    default:
+                        break;
                     }
                 } catch (ParseException e) {
                     LOGGER.error(e);

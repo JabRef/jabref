@@ -64,7 +64,7 @@ public class UnabbreviateAction extends AbstractWorker {
         }
         if (count > 0) {
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
             message = Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
         } else {

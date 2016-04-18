@@ -111,7 +111,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                 ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
             }
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
         panel.output(Localization.lang("Finished resolving duplicate BibTeX keys. %0 entries modified.",

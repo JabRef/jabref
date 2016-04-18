@@ -192,7 +192,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         ce.end();
-        panel.undoManager.addEdit(ce);
+        panel.getUndoManager().addEdit(ce);
         panel.markBaseChanged();
     }
 }

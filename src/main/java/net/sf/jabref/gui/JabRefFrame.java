@@ -629,14 +629,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-            Globals.focusListener.setFocused(bp.mainTable);
+            Globals.focusListener.setFocused(bp.getMainTable());
             setWindowTitle();
             editModeAction.initName();
             // Update search autocompleter with information for the correct database:
             bp.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
             bp.setBackAndForwardEnabledState();
-            new FocusRequester(bp.mainTable);
+            new FocusRequester(bp.getMainTable());
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
@@ -1735,7 +1735,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void removeCachedEntryEditors() {
         for (int j = 0; j < tabbedPane.getTabCount(); j++) {
             BasePanel bp = (BasePanel) tabbedPane.getComponentAt(j);
-            bp.entryEditors.clear();
+            bp.getEntryEditors().clear();
         }
     }
 

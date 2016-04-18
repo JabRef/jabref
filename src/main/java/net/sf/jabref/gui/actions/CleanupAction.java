@@ -111,7 +111,7 @@ public class CleanupAction extends AbstractWorker {
             ce.end();
             if (ce.hasEdits()) {
                 modifiedEntriesCount++;
-                panel.undoManager.addEdit(ce);
+                panel.getUndoManager().addEdit(ce);
             }
         }
     }

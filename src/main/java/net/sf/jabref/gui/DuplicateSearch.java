@@ -156,7 +156,7 @@ public class DuplicateSearch implements Runnable {
                             + Localization.lang("pairs processed") + ": " + dupliC);
                 }
                 ce.end();
-                panel.undoManager.addEdit(ce);
+                panel.getUndoManager().addEdit(ce);
 
             }
 

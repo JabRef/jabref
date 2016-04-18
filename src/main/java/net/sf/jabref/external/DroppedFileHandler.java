@@ -137,7 +137,7 @@ public class DroppedFileHandler {
 
         if (tryXmpImport(fileName, fileType, edits)) {
             edits.end();
-            panel.undoManager.addEdit(edits);
+            panel.getUndoManager().addEdit(edits);
             return;
         }
 
@@ -171,7 +171,7 @@ public class DroppedFileHandler {
             panel.updateEntryEditorIfShowing();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
 
     }
 
@@ -220,7 +220,7 @@ public class DroppedFileHandler {
             panel.markBaseChanged();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
     }
 
     // Done by MrDlib
@@ -444,7 +444,7 @@ public class DroppedFileHandler {
         entry.setField(Globals.FILE_FIELD, newValue);
 
         if (edits == null) {
-            panel.undoManager.addEdit(edit);
+            panel.getUndoManager().addEdit(edit);
         } else {
             edits.addEdit(edit);
         }

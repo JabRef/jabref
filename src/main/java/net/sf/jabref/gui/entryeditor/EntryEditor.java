@@ -571,12 +571,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // - ILC (16/02/2010) -
                 //////////////////////////////////////////////////////////
                 SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
+                    final int row = panel.getMainTable().findEntry(entry);
                     if (row >= 0) {
-                        if (panel.mainTable.getSelectedRowCount() == 0) {
-                            panel.mainTable.setRowSelectionInterval(row, row);
+                        if (panel.getMainTable().getSelectedRowCount() == 0) {
+                            panel.getMainTable().setRowSelectionInterval(row, row);
                         }
-                        panel.mainTable.ensureVisible(row);
+                        panel.getMainTable().ensureVisible(row);
                     }
                 });
             } catch (IOException ex) {
@@ -687,8 +687,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private void scrollTo(int row) {
         movingToDifferentEntry = true;
-        panel.mainTable.setRowSelectionInterval(row, row);
-        panel.mainTable.ensureVisible(row);
+        panel.getMainTable().setRowSelectionInterval(row, row);
+        panel.getMainTable().ensureVisible(row);
     }
 
     /**
@@ -833,7 +833,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 return true;
             }
 
-            panel.undoManager.addEdit(compound);
+            panel.getUndoManager().addEdit(compound);
 
             if (duplicateWarning) {
                 warnDuplicateBibtexkey();
@@ -853,9 +853,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             panel.markBaseChanged();
 
             SwingUtilities.invokeLater(() -> {
-                final int row = panel.mainTable.findEntry(entry);
+                final int row = panel.getMainTable().findEntry(entry);
                 if (row >= 0) {
-                    panel.mainTable.ensureVisible(row);
+                    panel.getMainTable().ensureVisible(row);
                 }
             });
 
@@ -1046,7 +1046,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             panel.entryEditorClosing(EntryEditor.this);
             panel.getDatabase().removeEntry(entry);
             panel.markBaseChanged();
-            panel.undoManager.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+            panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             panel.output(Localization.lang("Deleted entry"));
         }
     }
@@ -1126,9 +1126,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     ce.addEdit(undoableKeyChange);
                     TimeStamp.doUpdateTimeStamp(entry)
                             .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-                    panel.undoManager.addEdit(ce);
+                    panel.getUndoManager().addEdit(ce);
                 } else {
-                    panel.undoManager.addEdit(undoableKeyChange);
+                    panel.getUndoManager().addEdit(undoableKeyChange);
                 }
 
                 textField.setValidBackgroundColor();
@@ -1194,9 +1194,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                             TimeStamp.doUpdateTimeStamp(entry)
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
 
-                            panel.undoManager.addEdit(ce);
+                            panel.getUndoManager().addEdit(ce);
                         } else {
-                            panel.undoManager.addEdit(undoableFieldChange);
+                            panel.getUndoManager().addEdit(undoableFieldChange);
                         }
                         updateSource();
                         panel.markBaseChanged();
@@ -1223,9 +1223,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Should only be done if this editor is currently showing:
             if (!movingAway && isShowing()) {
                 SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
+                    final int row = panel.getMainTable().findEntry(entry);
                     if (row >= 0) {
-                        panel.mainTable.ensureVisible(row);
+                        panel.getMainTable().ensureVisible(row);
                     }
                 });
             }
@@ -1270,7 +1270,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            int thisRow = panel.mainTable.findEntry(entry);
+            int thisRow = panel.getMainTable().findEntry(entry);
             int newRow;
 
             if ((thisRow + 1) < panel.getDatabase().getEntryCount()) {
@@ -1283,7 +1283,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             scrollTo(newRow);
-            panel.mainTable.setRowSelectionInterval(newRow, newRow);
+            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
 
         }
     }
@@ -1297,7 +1297,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int thisRow = panel.mainTable.findEntry(entry);
+            int thisRow = panel.getMainTable().findEntry(entry);
             int newRow;
 
             if ((thisRow - 1) >= 0) {
@@ -1311,7 +1311,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             scrollTo(newRow);
-            panel.mainTable.setRowSelectionInterval(newRow, newRow);
+            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
 
         }
     }
@@ -1362,7 +1362,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
 
             // Store undo information:
-            panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
+            panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
 
             // here we update the field
             String bibtexKeyData = entry.getCiteKey();

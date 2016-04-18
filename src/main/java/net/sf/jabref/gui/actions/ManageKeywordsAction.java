@@ -304,7 +304,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         NamedCompound ce = updateKeywords(bp.getSelectedEntries(), keywordsToAdd, keywordsToRemove);
-        bp.undoManager.addEdit(ce);
+        bp.getUndoManager().addEdit(ce);
         bp.markBaseChanged();
     }
 

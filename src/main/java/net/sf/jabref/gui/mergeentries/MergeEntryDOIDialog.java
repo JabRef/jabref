@@ -183,7 +183,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
             if (edited) {
                 ce.end();
-                panel.undoManager.addEdit(ce);
+                panel.getUndoManager().addEdit(ce);
                 panel.output(Localization.lang("Updated entry with info from DOI"));
                 panel.updateEntryEditorIfShowing();
                 panel.markBaseChanged();
