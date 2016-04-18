@@ -17,6 +17,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Main table now accepts pasted DOIs and tries to retrieve the entry
 - Added support for several Biblatex-fields through drop-down lists with valid alternatives
 - Added integrity checker for an odd number of unescaped '#'
+- Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 
 ### Fixed
 
