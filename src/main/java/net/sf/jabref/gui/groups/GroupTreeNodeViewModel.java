@@ -142,7 +142,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     @Override
     public Enumeration children() {
         Iterable<GroupTreeNode> children = node.getChildren();
-        return new Enumeration() {
+        return new Enumeration<Object>() {
 
             @Override
             public boolean hasMoreElements() {
@@ -347,11 +347,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return getNode().getGroup() instanceof AllEntriesGroup;
     }
 
-    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager, GroupSelector groupSelector) {
+    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
         GroupTreeNode newNode = new GroupTreeNode(newGroup);
         this.getNode().addChild(newNode);
 
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupSelector, this,
+        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
                 new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
         undoManager.addEdit(undo);
     }

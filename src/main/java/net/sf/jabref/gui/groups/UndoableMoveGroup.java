@@ -30,7 +30,6 @@ import java.util.Objects;
  */
 class UndoableMoveGroup extends AbstractUndoableEdit {
 
-    private final GroupSelector groupSelector;
     private final GroupTreeNodeViewModel root;
     private final List<Integer> pathToNewParent;
     private final int newChildIndex;
@@ -39,8 +38,7 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
 
 
     public UndoableMoveGroup(GroupSelector groupSelector, MoveGroupChange moveChange) {
-        this.groupSelector = Objects.requireNonNull(groupSelector);
-
+        Objects.requireNonNull(groupSelector);
         Objects.requireNonNull(moveChange);
         root = groupSelector.getGroupTreeRoot();
         pathToOldParent = moveChange.getOldParent().getIndexedPathFromRoot();
