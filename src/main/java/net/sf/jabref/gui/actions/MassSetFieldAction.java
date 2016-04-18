@@ -56,7 +56,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     private JComboBox<String> field;
     private JTextField text;
     private JTextField renameTo;
-    private boolean cancelled = true;
+    private boolean canceled = true;
     private JCheckBox overwrite;
 
 
@@ -148,7 +148,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
                     return; // Do not close the dialog.
                 }
             }
-            cancelled = false;
+            canceled = false;
             diag.dispose();
         });
 
@@ -156,7 +156,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                cancelled = true;
+                canceled = true;
                 diag.dispose();
             }
         };
@@ -193,13 +193,13 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (diag == null) {
             createDialog();
         }
-        cancelled = true;
+        canceled = true;
         prepareDialog(!entries.isEmpty());
         if (diag != null) {
             diag.setLocationRelativeTo(frame);
             diag.setVisible(true);
         }
-        if (cancelled) {
+        if (canceled) {
             return;
         }
 

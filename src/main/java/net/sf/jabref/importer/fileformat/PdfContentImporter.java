@@ -481,7 +481,7 @@ public class PdfContentImporter extends ImportFormat {
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
             LOGGER.info("Decryption not supported");
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return result;
     }

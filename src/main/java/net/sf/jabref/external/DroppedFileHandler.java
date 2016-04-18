@@ -241,7 +241,7 @@ public class DroppedFileHandler {
                         + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
-                Localization.lang("XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
+                Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (reply == JOptionPane.CANCEL_OPTION) {

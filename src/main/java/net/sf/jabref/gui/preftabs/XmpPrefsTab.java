@@ -135,7 +135,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         tablePanel.add(toolbar, BorderLayout.EAST);
 
         // Build Prefs Tabs
-        builder.appendSeparator(Localization.lang("XMP Export Privacy Settings"));
+        builder.appendSeparator(Localization.lang("XMP export privacy settings"));
         builder.nextLine();
 
         builder.append(pan);
@@ -269,6 +269,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Localization.lang("XMP metadata");
+        return Localization.lang("XMP-metadata");
     }
 }

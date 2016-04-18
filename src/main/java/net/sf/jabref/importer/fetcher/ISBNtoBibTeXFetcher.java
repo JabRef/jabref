@@ -115,7 +115,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         } catch (UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host
             // It is more likely that we don't have an internet connection
-            status.showMessage(Localization.lang("No_Internet_Connection."));
+            status.showMessage(Localization.lang("No_internet_connection."));
             LOGGER.debug("No internet connection", e);
             return false;
         } catch (Exception e) {

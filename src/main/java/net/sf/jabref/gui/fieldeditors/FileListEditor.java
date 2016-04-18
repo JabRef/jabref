@@ -392,7 +392,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      *
      * @param entry      The entry to edit.
      * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
-     * @return true if the edit was accepted, false if it was cancelled.
+     * @return true if the edit was accepted, false if it was canceled.
      */
     private boolean editListEntry(FileListEntry entry, boolean openBrowse) {
         if (editor == null) {
@@ -464,7 +464,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     /**
      * This is the callback method that the DownloadExternalFile class uses to report the result
-     * of a download operation. This call may never come, if the user cancelled the operation.
+     * of a download operation. This call may never come, if the user canceled the operation.
      *
      * @param file The FileListEntry linking to the resulting local file.
      */

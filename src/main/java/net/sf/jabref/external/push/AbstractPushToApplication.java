@@ -145,7 +145,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * Function to initialize parameters. Currently it is expected that commandPathPreferenceKey is set to the path of
      * the application.
      */
-    abstract protected void initParameters();
+    protected abstract void initParameters();
 
     /**
      * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings

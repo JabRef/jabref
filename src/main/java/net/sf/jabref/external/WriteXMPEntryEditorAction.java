@@ -54,7 +54,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
-        panel.output(Localization.lang("Writing XMP metadata..."));
+        panel.output(Localization.lang("Writing XMP-metadata..."));
         panel.frame().setProgressBarIndeterminate(true);
         panel.frame().setProgressBarVisible(true);
         BibEntry entry = editor.getEntry();

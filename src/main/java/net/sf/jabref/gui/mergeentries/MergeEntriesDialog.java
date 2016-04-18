@@ -88,7 +88,7 @@ public class MergeEntriesDialog extends JDialog {
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.setActionCommand("cancel");
         cancel.addActionListener(e -> {
-            panel.output(Localization.lang("Cancelled merging entries"));
+            panel.output(Localization.lang("Canceled merging entries"));
             dispose();
         });
 

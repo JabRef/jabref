@@ -602,7 +602,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             List<BibEntry> entries;
             int numSelected;
-            boolean cancelled;
+            boolean canceled;
 
 
             // Run first, in EDT:
@@ -647,7 +647,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
                             if (answer == JOptionPane.NO_OPTION) {
                                 // Ok, break off the operation.
-                                cancelled = true;
+                                canceled = true;
                                 return;
                             }
                             // No need to check more entries, because the user has already confirmed
@@ -686,7 +686,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void update() {
                 database.setFollowCrossrefs(true);
-                if (cancelled) {
+                if (canceled) {
                     frame.unblock();
                     return;
                 }
@@ -856,19 +856,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     item.openLink();
                 }));
 
-        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                        bibDatabaseContext.getFileDirectory());
-                for (final File f : files) {
-                    try {
-                        JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
-                    } catch (IOException e) {
-                        LOGGER.info("Could not open folder", e);
-                    }
+        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
+            final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
+                    bibDatabaseContext.getFileDirectory());
+            for (final File f : files) {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
                 }
-            });
-        });
+            }
+        }));
 
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
@@ -1207,7 +1205,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             etd.setVisible(true);
             actualType = etd.getChoice();
         }
-        if (actualType != null) { // Only if the dialog was not cancelled.
+        if (actualType != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {
@@ -2034,7 +2032,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     }
                     if (entry == null) {
-                        output(Localization.lang("No url defined") + '.');
+                        output(Localization.lang("No URL defined") + '.');
                     } else {
                         try {
                             JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
@@ -2355,7 +2353,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.getBibDatabaseContext().getFileDirectory().size() > 0) {
+            if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));

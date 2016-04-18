@@ -11,6 +11,7 @@ import java.util.Optional;
  * Implementing classes should specialize on specific article sites.
  * See e.g. @link{http://libguides.mit.edu/apis}.
  */
+@FunctionalInterface
 public interface FullTextFinder {
     /**
      * Tries to find a fulltext URL for a given BibTex entry.

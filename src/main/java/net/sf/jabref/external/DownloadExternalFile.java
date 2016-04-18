@@ -47,7 +47,7 @@ import java.util.Optional;
  * method on the callback FileListEditor, which then needs to take care of linking to the file.
  * The local filename is passed as an argument to the downloadCompleted() method.
  * <p/>
- * If the download is cancelled, or failed, the user is informed. The callback is never called.
+ * If the download is canceled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
@@ -227,7 +227,7 @@ public class DownloadExternalFile {
                 LOGGER.info("Cannot delete temporary file");
             }
         } else {
-            // Cancelled. Just delete the temp file:
+            // Canceled. Just delete the temp file:
             if (downloadFinished && !tmp.delete()) {
                 LOGGER.info("Cannot delete temporary file");
             }

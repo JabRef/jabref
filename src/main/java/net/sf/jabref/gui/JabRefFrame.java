@@ -810,8 +810,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             //getCurrentBasePanel().runCommand("save");
                             SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
                             saveAction.runCommand();
-                            if (saveAction.isCancelled() || !saveAction.isSuccess()) {
-                                // The action was either cancelled or unsuccessful.
+                            if (saveAction.isCanceled() || !saveAction.isSuccess()) {
+                                // The action was either canceled or unsuccessful.
                                 // Break!
                                 output(Localization.lang("Unable to save database"));
                                 close = false;
@@ -836,8 +836,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (getBasePanelAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
                     WaitForSaveOperation w = new WaitForSaveOperation(this);
-                    w.show(); // This method won't return until cancelled or the save operation is done.
-                    if (w.cancelled()) {
+                    w.show(); // This method won't return until canceled or the save operation is done.
+                    if (w.canceled()) {
                         return false; // The user clicked cancel.
                     }
                 }

@@ -141,8 +141,8 @@ public class MergeEntryDOIDialog extends JDialog {
         BibEntry mergedEntry = mergeEntries.getMergeEntry();
 
         if ("cancel".equals(button)) {
-            // Cancelled, throw it away
-            panel.output(Localization.lang("Cancelled merging entries"));
+            // Canceled, throw it away
+            panel.output(Localization.lang("Canceled merging entries"));
         } else if ("done".equals(button)) {
             // Updated the original entry with the new fields
             Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());

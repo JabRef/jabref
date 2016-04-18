@@ -95,7 +95,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners(); // no infos on file system
         parser.addErrorListener(ThrowingErrorListener.INSTANCE);
-        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancellationException on parse errors
+        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
         tree = parser.start();
         this.query = query;
     }

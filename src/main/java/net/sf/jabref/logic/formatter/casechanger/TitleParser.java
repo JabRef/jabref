@@ -62,14 +62,14 @@ public final class TitleParser {
         boolean[] isProtected = new boolean[title.length()];
         char[] chars = title.toCharArray();
 
-        int brakets = 0;
+        int brackets = 0;
         for (int i = 0; i < title.length(); i++) {
             if (chars[i] == '{') {
-                brakets++;
+                brackets++;
             } else if (chars[i] == '}') {
-                brakets--;
+                brackets--;
             } else {
-                isProtected[i] = brakets > 0;
+                isProtected[i] = brackets > 0;
             }
         }
 

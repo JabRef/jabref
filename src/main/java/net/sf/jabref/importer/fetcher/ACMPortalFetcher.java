@@ -149,13 +149,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (hits == 0) {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'",
                         terms),
-                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             } else if (hits > 20) {
                 status.showMessage(
                         Localization.lang("%0 entries found. To reduce server load, only %1 will be downloaded.",
                                 String.valueOf(hits), String.valueOf(PER_PAGE)),
-                        Localization.lang("Search %0", "ACM Portal"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
             }
 
             hits = getNumberOfHits(page, PAGE_RANGE_PATTERN, ACMPortalFetcher.MAX_HITS_PATTERN);
@@ -169,12 +169,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Problem with ACM fetcher URL", e);
         } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", "ACM Portal"),
-                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
+            status.showMessage(Localization.lang("Could not connect to %0", getTitle()),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM connection", e);
         } catch (IOException e) {
             status.showMessage(e.getMessage(),
-                    Localization.lang("Search %0", "ACM Portal"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem with ACM Portal", e);
         }
         return false;
@@ -415,7 +415,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
 
-    // This method is called by the dialog when the user has cancelled or
+    // This method is called by the dialog when the user has canceled or
     //signaled a stop. It is expected that any long-running fetch operations
     //will stop after this method is called.
     @Override

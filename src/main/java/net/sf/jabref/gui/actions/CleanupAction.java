@@ -45,7 +45,7 @@ public class CleanupAction extends AbstractWorker {
      */
     private int unsuccessfulRenames;
 
-    private boolean cancelled;
+    private boolean canceled;
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
     private final CleanupPresetPanel presetPanel;
@@ -61,12 +61,12 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void init() {
-        cancelled = false;
+        canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
             JOptionPane.showMessageDialog(frame, Localization.lang("First select entries to clean up."),
                     Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
-            cancelled = true;
+            canceled = true;
             return;
         }
         frame.block();
@@ -76,12 +76,12 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled) {
+        if (canceled) {
             return;
         }
         int choice = showDialog();
         if (choice != JOptionPane.OK_OPTION) {
-            cancelled = true;
+            canceled = true;
             return;
         }
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
@@ -97,7 +97,7 @@ public class CleanupAction extends AbstractWorker {
                 Globals.prefs.putBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, false);
             }
             if (answer == JOptionPane.NO_OPTION) {
-                cancelled = true;
+                canceled = true;
                 return;
             }
         }
@@ -118,7 +118,7 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void update() {
-        if (cancelled) {
+        if (canceled) {
             frame.unblock();
             return;
         }

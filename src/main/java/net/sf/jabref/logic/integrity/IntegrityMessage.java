@@ -31,4 +31,8 @@ public class IntegrityMessage implements Cloneable {
         return fieldName;
     }
 
+    @Override
+    public Object clone() {
+        return new IntegrityMessage(message, entry, fieldName);
+    }
 }

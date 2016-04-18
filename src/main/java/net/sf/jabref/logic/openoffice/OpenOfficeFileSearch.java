@@ -22,7 +22,7 @@ import java.util.Optional;
 
 public class OpenOfficeFileSearch {
 
-    private boolean fileSearchCancelled;
+    private boolean fileSearchCanceled;
 
 
     /**
@@ -85,17 +85,17 @@ public class OpenOfficeFileSearch {
     }
 
     public void resetFileSearch() {
-        fileSearchCancelled = false;
+        fileSearchCanceled = false;
     }
 
     public void cancelFileSearch() {
-        fileSearchCancelled = true;
+        fileSearchCanceled = true;
     }
 
     public List<File> findFileInDirs(List<File> dirList, String filename) {
         List<File> sofficeFiles = new ArrayList<>();
         for (File dir : dirList) {
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 break;
             }
             findFileInDir(dir, filename).ifPresent(sofficeFiles::add);
@@ -109,7 +109,7 @@ public class OpenOfficeFileSearch {
     * @return The directory where the file was first found, or null if not found.
     */
     public Optional<File> findFileInDir(File startDir, String filename) {
-        if (fileSearchCancelled) {
+        if (fileSearchCanceled) {
             return Optional.empty();
         }
         File[] files = startDir.listFiles();
@@ -118,7 +118,7 @@ public class OpenOfficeFileSearch {
         }
         Optional<File> result = Optional.empty();
         for (File file : files) {
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 return Optional.empty();
             }
             if (file.isDirectory()) {

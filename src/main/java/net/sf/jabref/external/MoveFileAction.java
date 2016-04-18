@@ -139,7 +139,7 @@ public class MoveFileAction extends AbstractAction {
                     chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
                 }
                 if (chosenFile == null) {
-                    return; // cancelled
+                    return; // canceled
                 }
                 newFile = new File(chosenFile);
                 // Check if the file already exists:

@@ -484,10 +484,10 @@ public class OpenOfficePanel extends AbstractWorker {
         ButtonBarBuilder bb = new ButtonBarBuilder();
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        ActionListener tfListener = (e -> {
+        ActionListener tfListener = e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
-        });
+        };
 
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
@@ -528,7 +528,7 @@ public class OpenOfficePanel extends AbstractWorker {
         if (addPageInfo) {
             AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
             acd.showDialog();
-            if (acd.cancelled()) {
+            if (acd.canceled()) {
                 return;
             }
             if (!acd.getPageInfo().isEmpty()) {

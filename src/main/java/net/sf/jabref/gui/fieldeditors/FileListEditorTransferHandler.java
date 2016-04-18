@@ -114,14 +114,13 @@ class FileListEditorTransferHandler extends TransferHandler {
                 for (File file : files) {
                     // Find the file's extension, if any:
                     String name = file.getAbsolutePath();
-                    FileUtil.getFileExtension(name).ifPresent(extension -> {
-                        ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension).ifPresent(fileType -> {
-                            if (droppedFileHandler == null) {
-                                droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
-                            }
-                            droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
-                        });
-                    });
+                    FileUtil.getFileExtension(name).ifPresent(extension -> ExternalFileTypes.getInstance()
+                            .getExternalFileTypeByExt(extension).ifPresent(fileType -> {
+                                if (droppedFileHandler == null) {
+                                    droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
+                                }
+                                droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
+                            }));
                 }
             });
             if (!files.isEmpty()) {

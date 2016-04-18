@@ -275,7 +275,7 @@ public class PdfImporter {
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 
-        if (type != null) { // Only if the dialog was not cancelled.
+        if (type != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, type.getName());
             try {
