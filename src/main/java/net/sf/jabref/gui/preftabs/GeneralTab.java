@@ -15,21 +15,33 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 

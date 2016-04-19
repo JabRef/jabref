@@ -1,12 +1,12 @@
 package net.sf.jabref.gui.desktop.os;
 
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypes;
 
 public class OSX implements NativeDesktop {
 

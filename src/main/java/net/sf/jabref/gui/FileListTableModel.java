@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.gui;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;

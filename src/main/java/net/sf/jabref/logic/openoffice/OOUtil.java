@@ -15,11 +15,12 @@
 */
 package net.sf.jabref.logic.openoffice;
 
-import java.util.Set;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -33,8 +34,6 @@ import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.uno.UnoRuntime;
-
-import net.sf.jabref.logic.layout.Layout;
 
 /**
  * Utility methods for processing OO Writer documents.

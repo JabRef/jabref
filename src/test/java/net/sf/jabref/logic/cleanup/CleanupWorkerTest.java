@@ -6,10 +6,18 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -17,8 +25,13 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import org.junit.*;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import static org.mockito.Mockito.mock;
 
 public class CleanupWorkerTest {

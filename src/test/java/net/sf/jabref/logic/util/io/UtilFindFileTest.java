@@ -1,17 +1,18 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.FileBasedTestCase;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import net.sf.jabref.FileBasedTestCase;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * Testing Util.findFile for finding files based on regular expressions.

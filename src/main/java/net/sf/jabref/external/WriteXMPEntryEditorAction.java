@@ -20,11 +20,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;

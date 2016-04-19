@@ -24,7 +24,9 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.JOptionPane;
+
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;

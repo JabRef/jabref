@@ -8,14 +8,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class CleanupPresetPanel {
 

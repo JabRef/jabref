@@ -28,16 +28,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ImportFormats {
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);

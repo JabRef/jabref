@@ -19,10 +19,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import net.sf.jabref.*;
-
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;

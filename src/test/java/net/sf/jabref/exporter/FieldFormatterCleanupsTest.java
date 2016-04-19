@@ -1,5 +1,10 @@
 package net.sf.jabref.exporter;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -9,14 +14,10 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 

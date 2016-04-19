@@ -19,18 +19,31 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

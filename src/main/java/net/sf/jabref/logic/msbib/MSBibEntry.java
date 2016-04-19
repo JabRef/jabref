@@ -27,20 +27,24 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;

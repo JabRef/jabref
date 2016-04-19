@@ -21,6 +21,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -28,12 +29,13 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import com.jgoodies.forms.layout.Sizes;
-import com.jgoodies.looks.Options;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.layout.Sizes;
+import com.jgoodies.looks.Options;
 
 /**
  * A combo-box and a manage button that will add selected strings to an

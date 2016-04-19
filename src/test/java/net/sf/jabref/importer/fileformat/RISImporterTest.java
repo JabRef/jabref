@@ -1,9 +1,10 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
-
 import java.io.IOException;
 import java.io.InputStream;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;

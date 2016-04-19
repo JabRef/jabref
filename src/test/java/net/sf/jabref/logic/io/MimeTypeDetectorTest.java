@@ -1,12 +1,15 @@
 package net.sf.jabref.logic.io;
 
+import java.net.URISyntaxException;
+
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

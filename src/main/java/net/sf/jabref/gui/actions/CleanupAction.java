@@ -17,7 +17,8 @@ package net.sf.jabref.gui.actions;
 
 import java.util.List;
 import java.util.Objects;
-import javax.swing.*;
+
+import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;

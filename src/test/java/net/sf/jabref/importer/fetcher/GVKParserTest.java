@@ -8,15 +8,15 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xml.sax.SAXException;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
 
 public class GVKParserTest {
 

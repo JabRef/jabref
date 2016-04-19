@@ -1,13 +1,14 @@
 package net.sf.jabref.logic.groups;
 
-import net.sf.jabref.logic.search.matchers.AndMatcher;
-import net.sf.jabref.logic.search.matchers.OrMatcher;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.logic.search.matchers.AndMatcher;
+import net.sf.jabref.logic.search.matchers.OrMatcher;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class GroupTreeNodeTest {
 

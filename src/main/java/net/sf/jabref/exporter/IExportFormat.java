@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.filechooser.FileFilter;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.entry.BibEntry;
 
 public interface IExportFormat {
 

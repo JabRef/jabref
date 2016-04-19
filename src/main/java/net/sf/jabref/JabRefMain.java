@@ -17,6 +17,7 @@
 package net.sf.jabref;
 
 import java.net.Authenticator;
+
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.bibtex.InternalBibtexFields;

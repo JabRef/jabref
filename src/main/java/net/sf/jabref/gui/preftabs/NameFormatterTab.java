@@ -15,24 +15,35 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.format.NameFormatter;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.NameFormatter;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 

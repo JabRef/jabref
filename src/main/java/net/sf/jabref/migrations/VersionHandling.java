@@ -17,13 +17,13 @@ package net.sf.jabref.migrations;
 
 import java.util.List;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabase;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to

@@ -15,13 +15,15 @@
 */
 package net.sf.jabref.logic.groups;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.matchers.MatcherSets;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.

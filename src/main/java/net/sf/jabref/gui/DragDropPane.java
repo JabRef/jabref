@@ -16,12 +16,20 @@
 
 package net.sf.jabref.gui;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 /**
  * Extends the JTabbedPane class to support Drag&Drop of Tabs.

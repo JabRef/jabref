@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.junit.Assert;
 import org.junit.Test;
 

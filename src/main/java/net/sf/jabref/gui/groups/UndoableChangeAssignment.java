@@ -22,10 +22,10 @@ import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * @author jzieren

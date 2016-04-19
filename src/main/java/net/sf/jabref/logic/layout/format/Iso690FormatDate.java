@@ -23,7 +23,7 @@
 
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.logic.layout.*;
+import net.sf.jabref.logic.layout.LayoutFormatter;
 
 /**
  *

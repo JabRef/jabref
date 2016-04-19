@@ -49,8 +49,6 @@ modified slightly by nizar batada for JabRef
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -65,6 +63,7 @@ import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -79,6 +78,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * A font chooser widget.

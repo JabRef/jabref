@@ -15,12 +15,18 @@
 */
 package net.sf.jabref;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
 
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef

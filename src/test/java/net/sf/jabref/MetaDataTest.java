@@ -1,15 +1,16 @@
 package net.sf.jabref;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+
+import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

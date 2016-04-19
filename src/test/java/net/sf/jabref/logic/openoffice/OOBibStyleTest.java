@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.openoffice;
 
-import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,10 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
@@ -28,6 +23,14 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class OOBibStyleTest {

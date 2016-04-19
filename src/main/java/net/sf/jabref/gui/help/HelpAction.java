@@ -15,6 +15,15 @@
 */
 package net.sf.jabref.gui.help;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.KeyStroke;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
@@ -22,13 +31,9 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help

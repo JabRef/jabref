@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import javax.swing.*;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.Enumeration;
+
+import javax.swing.JTable;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 /**
  * Related to <code>MainTable</code> class. <br/>

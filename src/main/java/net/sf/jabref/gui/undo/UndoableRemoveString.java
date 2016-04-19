@@ -17,14 +17,14 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class UndoableRemoveString extends AbstractUndoableEdit {
 

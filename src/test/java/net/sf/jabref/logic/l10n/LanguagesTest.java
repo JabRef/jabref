@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.Test;
-
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class LanguagesTest {
 

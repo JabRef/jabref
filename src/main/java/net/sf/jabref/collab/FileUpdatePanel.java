@@ -20,9 +20,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.SidePaneComponent;
+import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener,

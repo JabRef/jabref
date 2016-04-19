@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.logic.search.rules.describer;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
 

@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Search rule for regex-based search.

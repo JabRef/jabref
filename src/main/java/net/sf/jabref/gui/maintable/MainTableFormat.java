@@ -19,15 +19,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.gui.*;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import javax.swing.JLabel;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import ca.odell.glazedlists.gui.TableFormat;
 
-import javax.swing.JLabel;
+import ca.odell.glazedlists.gui.TableFormat;
 
 /**
  * Class defining the contents and column headers of the main table.

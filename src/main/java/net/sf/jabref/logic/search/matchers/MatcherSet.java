@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.logic.search.matchers;
 
-import net.sf.jabref.logic.search.SearchMatcher;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
+
+import net.sf.jabref.logic.search.SearchMatcher;
 
 public abstract class MatcherSet implements SearchMatcher {
 

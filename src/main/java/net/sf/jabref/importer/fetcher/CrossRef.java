@@ -1,17 +1,18 @@
 package net.sf.jabref.importer.fetcher;
 
+import java.util.Objects;
+import java.util.Optional;
+
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.BibEntry;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A class for fetching DOIs from CrossRef

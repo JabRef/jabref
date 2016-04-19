@@ -1,9 +1,14 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
 
 public class SearchQueryHighlightObservable {
 

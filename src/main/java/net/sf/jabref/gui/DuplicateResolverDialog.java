@@ -15,14 +15,18 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
 
-import net.sf.jabref.model.entry.BibEntry;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 // created by : ?
 //

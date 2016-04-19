@@ -15,15 +15,16 @@
 */
 package net.sf.jabref.logic.search.rules.describer;
 
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.search.SearchBaseVisitor;
-import net.sf.jabref.search.SearchParser;
-import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.search.SearchBaseVisitor;
+import net.sf.jabref.search.SearchParser;
+
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
 

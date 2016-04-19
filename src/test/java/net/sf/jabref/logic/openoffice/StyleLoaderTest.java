@@ -1,8 +1,5 @@
 package net.sf.jabref.logic.openoffice;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
@@ -10,15 +7,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class StyleLoaderTest {
 

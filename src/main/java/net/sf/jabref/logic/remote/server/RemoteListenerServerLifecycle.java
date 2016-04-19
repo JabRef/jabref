@@ -1,11 +1,12 @@
 package net.sf.jabref.logic.remote.server;
 
-import net.sf.jabref.JabRefExecutorService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.net.BindException;
+
+import net.sf.jabref.JabRefExecutorService;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Manages the RemoteListenerServerThread through typical life cycle methods.

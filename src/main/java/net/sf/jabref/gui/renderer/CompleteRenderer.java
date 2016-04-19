@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.renderer;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class CompleteRenderer extends GeneralRenderer {
 

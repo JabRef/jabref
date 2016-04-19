@@ -1,13 +1,13 @@
 package net.sf.jabref.logic.layout.format;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.layout.ParamLayoutFormatter;
+import static org.junit.Assert.assertEquals;
 
 
 public class FileLinkTest {

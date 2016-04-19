@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.layout.format;
 
-import static org.junit.Assert.*;
-
 import net.sf.jabref.Globals;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class RisKeywordsTest {

@@ -15,14 +15,6 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,7 +23,22 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for export formats based on templates.

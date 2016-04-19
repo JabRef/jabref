@@ -6,6 +6,7 @@ import java.util.Collections;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.OutputPrinterToNull;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

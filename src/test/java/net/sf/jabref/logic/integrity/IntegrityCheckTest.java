@@ -2,9 +2,16 @@ package net.sf.jabref.logic.integrity;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -15,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 

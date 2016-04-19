@@ -1,10 +1,20 @@
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.logic.formatter.bibtexfields.*;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-
 import java.util.Arrays;
 import java.util.List;
+
+import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 
 public class BibtexFieldFormatters {
     public static final NormalizePagesFormatter NORMALIZE_PAGES = new NormalizePagesFormatter();

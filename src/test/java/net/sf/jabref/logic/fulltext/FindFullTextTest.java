@@ -1,17 +1,18 @@
 package net.sf.jabref.logic.fulltext;
 
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class FindFullTextTest {
     private BibEntry entry;

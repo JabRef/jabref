@@ -29,8 +29,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.antlr.runtime.ANTLRFileStream;

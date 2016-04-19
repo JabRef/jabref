@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -41,18 +42,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinder;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 class ContentSelectorDialog2 extends JDialog {
 

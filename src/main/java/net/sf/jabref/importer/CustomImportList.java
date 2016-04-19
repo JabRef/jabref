@@ -30,11 +30,11 @@ package net.sf.jabref.importer;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Collection of user defined custom import formats.

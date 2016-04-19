@@ -1,6 +1,7 @@
 package net.sf.jabref.testutils;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
 
 /**
  * Provides helper methods for making testing of GUIs easier.

@@ -2,7 +2,7 @@ package net.sf.jabref.logic.groups;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AllEntriesGroupTest {
 

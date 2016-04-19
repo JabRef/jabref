@@ -1,5 +1,11 @@
 package net.sf.jabref.importer.fileformat;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.model.entry.BibEntry;
@@ -10,12 +16,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Test for OAI2-Handler and Fetcher.

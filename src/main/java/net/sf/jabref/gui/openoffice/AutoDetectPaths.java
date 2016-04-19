@@ -15,21 +15,34 @@
 */
 package net.sf.jabref.gui.openoffice;
 
-import net.sf.jabref.gui.worker.AbstractWorker;
-
-import javax.swing.*;
-
+import java.awt.BorderLayout;
 import java.io.File;
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+
+import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OpenOfficeFileSearch;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.util.OS;
+
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Tools for automatically detecting jar and executable paths to OpenOffice and/or LibreOffice.

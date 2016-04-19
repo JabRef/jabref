@@ -16,7 +16,9 @@
 package net.sf.jabref.external;
 
 import java.util.Objects;
-import javax.swing.*;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
 

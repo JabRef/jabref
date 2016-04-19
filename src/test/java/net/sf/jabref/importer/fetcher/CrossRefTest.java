@@ -1,11 +1,12 @@
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.Test;
-
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class CrossRefTest {
     @Test

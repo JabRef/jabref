@@ -15,9 +15,11 @@
 */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.gui.IconTheme;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 
-import javax.swing.*;
+import net.sf.jabref.gui.IconTheme;
 
 /**
  * This class extends {@link AbstractAction} with the ability to set

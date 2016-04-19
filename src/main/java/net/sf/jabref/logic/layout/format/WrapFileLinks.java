@@ -15,19 +15,23 @@
  */
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.FileField;
-
-import java.util.*;
-
-import net.sf.jabref.model.entry.ParsedFileField;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This formatter iterates over all file links, or all file links of a specified

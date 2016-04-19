@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.CookieHandler;
@@ -37,22 +36,24 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import net.sf.jabref.*;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 

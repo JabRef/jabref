@@ -17,7 +17,11 @@
 */
 package net.sf.jabref.logic.labelpattern;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A small table, where an entry type is associated with a label pattern (an
