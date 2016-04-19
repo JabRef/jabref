@@ -160,6 +160,16 @@ public class IntegrityCheckTest {
         assertWrong(createContext("author", "#einstein# #amp; #newton#"));
     }
 
+    @Test
+    public void testHTMLCharacterChecks() {
+        assertCorrect(createContext("title", "Not a single {HTML} character"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
+        assertWrong(createContext("author", "Lenhard, J&#227;rg"));
+        assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
