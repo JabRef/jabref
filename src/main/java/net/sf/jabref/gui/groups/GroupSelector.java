@@ -825,6 +825,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     @Override
+    public int getRescalingWeight() {
+        return 1;
+    }
+
+    @Override
     public void componentClosing() {
         if (panel != null) {// panel may be null if no file is open any more
             panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
