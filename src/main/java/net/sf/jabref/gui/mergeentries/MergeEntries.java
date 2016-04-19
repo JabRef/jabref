@@ -523,12 +523,10 @@ public class MergeEntries {
             return;
         }
         // Check if the type has changed
-        if (!identicalTypes) {
-            if (typeRadioButtons.get(0).isSelected()) {
-                mergedEntry.setType(leftEntry.getType());
-            } else {
-                mergedEntry.setType(rightEntry.getType());
-            }
+        if (!identicalTypes && typeRadioButtons.get(0).isSelected()) {
+            mergedEntry.setType(leftEntry.getType());
+        } else {
+            mergedEntry.setType(rightEntry.getType());
         }
 
         // Check the potentially different fields
