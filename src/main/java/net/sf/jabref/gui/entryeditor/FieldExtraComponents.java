@@ -190,7 +190,9 @@ public class FieldExtraComponents {
                 Optional<DOI> doi = CrossRef.findDOI(entryEditor.getEntry());
                 if (doi.isPresent()) {
                     JTextComponent field = (JTextComponent) fieldEditor.getTextComponent();
+                    // set new data
                     field.setText(doi.get().getDOI());
+                    entryEditor.updateField(fieldEditor);
                 } else {
                     panel.frame().setStatus(Localization.lang("No DOI found"));
                 }
