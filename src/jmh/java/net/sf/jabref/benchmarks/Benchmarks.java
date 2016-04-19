@@ -22,7 +22,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
@@ -40,8 +39,8 @@ public class Benchmarks {
 
     private String bibtexString;
     private final BibDatabase database = new BibDatabase();
-    private final List<String> latexConversionStrings = new ArrayList<>();
-    private final List<String> htmlConversionStrings = new ArrayList<>();
+    private String latexConversionString;
+    private String htmlConversionString;
 
     @Setup
     public void init() throws IOException, SaveException {
@@ -66,27 +65,9 @@ public class Benchmarks {
                 new SavePreferences());
         bibtexString = stringWriter.toString();
 
-        List<String> latexSymbols = new ArrayList<>(HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.values());
-        int symbolcount = latexSymbols.size();
-        StringBuilder sb = new StringBuilder();
-        sb.append("{A} \\textbf{bold} ");
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append(" {\\it italic} {");
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append(latexSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append("} abc");
-        latexConversionStrings.add(sb.toString());
+        latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
 
-        List<String> htmlSymbols = new ArrayList<>(HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet());
-        symbolcount = htmlSymbols.size();
-        sb = new StringBuilder();
-        sb.append("A <b>bold</b> ");
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append(" <it>italic</it> ");
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append(htmlSymbols.get(Math.abs(randomizer.nextInt() % symbolcount)));
-        sb.append("&#8211; abc");
-        htmlConversionStrings.add(sb.toString());
+        htmlConversionString = "<b>&Ouml;sterreich</b> &#8211; &amp; characters &#x2aa2; <i>italic</i>";
     }
 
     @Benchmark
@@ -122,33 +103,21 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public List<String> latexToUnicodeConversion() {
-        List<String> result = new ArrayList<>(1000);
+    public String latexToUnicodeConversion() {
         LatexToUnicodeFormatter f = new LatexToUnicodeFormatter();
-        for (String s : latexConversionStrings) {
-            result.add(f.format(s));
-        }
-        return result;
+        return f.format(latexConversionString);
     }
 
     @Benchmark
-    public List<String> latexToHTMLConversion() {
-        List<String> result = new ArrayList<>(1000);
+    public String latexToHTMLConversion() {
         HTMLChars f = new HTMLChars();
-        for (String s : latexConversionStrings) {
-            result.add(f.format(s));
-        }
-        return result;
+        return f.format(latexConversionString);
     }
 
     @Benchmark
-    public List<String> htmlToLatexConversion() {
-        List<String> result = new ArrayList<>(1000);
+    public String htmlToLatexConversion() {
         HtmlToLatexFormatter f = new HtmlToLatexFormatter();
-        for (String s : htmlConversionStrings) {
-            result.add(f.format(s));
-        }
-        return result;
+        return f.format(htmlConversionString);
     }
 
     public static void main(String[] args) throws IOException, RunnerException {

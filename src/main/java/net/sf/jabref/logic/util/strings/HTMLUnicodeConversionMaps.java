@@ -211,38 +211,38 @@ public class HTMLUnicodeConversionMaps {
 
             /* Greek */
             {"913", "Alpha", "{{$\\Alpha$}}"}, // greek capital letter alpha, U+0391
-            {"914", "Beta", "{$\\Beta$}"}, // greek capital letter beta, U+0392
-            {"915", "Gamma", "{$\\Gamma$}"}, // greek capital letter gamma,
+            {"914", "Beta", "{{$\\Beta$}}"}, // greek capital letter beta, U+0392
+            {"915", "Gamma", "{{$\\Gamma$}}"}, // greek capital letter gamma,
             //                                   U+0393 ISOgrk3
-            {"916", "Delta", "{$\\Delta$}"}, // greek capital letter delta,
+            {"916", "Delta", "{{$\\Delta$}}"}, // greek capital letter delta,
             //                                   U+0394 ISOgrk3
-            {"917", "Epsilon", "{$\\Epsilon$}"}, // greek capital letter epsilon, U+0395
-            {"918", "Zeta", "{$\\Zeta$}"}, // greek capital letter zeta, U+0396
-            {"919", "Eta", "{$\\Eta$}"}, // greek capital letter eta, U+0397
-            {"920", "Theta", "{$\\Theta$}"}, // greek capital letter theta,
+            {"917", "Epsilon", "{{$\\Epsilon$}}"}, // greek capital letter epsilon, U+0395
+            {"918", "Zeta", "{{$\\Zeta$}}"}, // greek capital letter zeta, U+0396
+            {"919", "Eta", "{{$\\Eta$}}"}, // greek capital letter eta, U+0397
+            {"920", "Theta", "{{$\\Theta$}}"}, // greek capital letter theta,
             //                                   U+0398 ISOgrk3
-            {"921", "Iota", "{$\\Iota$}"}, // greek capital letter iota, U+0399
-            {"922", "Kappa", "{$\\Kappa$}"}, // greek capital letter kappa, U+039A
-            {"923", "Lambda", "{$\\Lambda$}"}, // greek capital letter lambda,
+            {"921", "Iota", "{{$\\Iota$}}"}, // greek capital letter iota, U+0399
+            {"922", "Kappa", "{{$\\Kappa$}}"}, // greek capital letter kappa, U+039A
+            {"923", "Lambda", "{{$\\Lambda$}}"}, // greek capital letter lambda,
             //                                   U+039B ISOgrk3
-            {"924", "Mu", "{$\\Mu$}"}, // greek capital letter mu, U+039C
-            {"925", "Nu", "{$\\Nu$}"}, // greek capital letter nu, U+039D
-            {"926", "Xi", "{$\\Xi$}"}, // greek capital letter xi, U+039E ISOgrk3
-            {"927", "Omicron", "{$\\Omicron$}"}, // greek capital letter omicron, U+039F
-            {"928", "Pi", "{$\\Pi$}"}, // greek capital letter pi, U+03A0 ISOgrk3
-            {"929", "Rho", "{$\\Rho$}"}, // greek capital letter rho, U+03A1
+            {"924", "Mu", "{{$\\Mu$}}"}, // greek capital letter mu, U+039C
+            {"925", "Nu", "{{$\\Nu$}}"}, // greek capital letter nu, U+039D
+            {"926", "Xi", "{{$\\Xi$}}"}, // greek capital letter xi, U+039E ISOgrk3
+            {"927", "Omicron", "{{$\\Omicron$}}"}, // greek capital letter omicron, U+039F
+            {"928", "Pi", "{{$\\Pi$}}"}, // greek capital letter pi, U+03A0 ISOgrk3
+            {"929", "Rho", "{{$\\Rho$}}"}, // greek capital letter rho, U+03A1
             /* there is no Sigmaf, and no U+03A2 character either */
-            {"931", "Sigma", "{$\\Sigma$}"}, // greek capital letter sigma,
+            {"931", "Sigma", "{{$\\Sigma$}}"}, // greek capital letter sigma,
             //                                   U+03A3 ISOgrk3
-            {"932", "Tau", "{$\\Tau$}"}, // greek capital letter tau, U+03A4
-            {"933", "Upsilon", "{$\\Upsilon$}"}, // greek capital letter upsilon,
+            {"932", "Tau", "{{$\\Tau$}}"}, // greek capital letter tau, U+03A4
+            {"933", "Upsilon", "{{$\\Upsilon$}}"}, // greek capital letter upsilon,
             //                                   U+03A5 ISOgrk3
-            {"934", "Phi", "{$\\Phi$}"}, // greek capital letter phi,
+            {"934", "Phi", "{{$\\Phi$}}"}, // greek capital letter phi,
             //                                   U+03A6 ISOgrk3
-            {"935", "Chi", "{$\\Chi$}"}, // greek capital letter chi, U+03A7
-            {"936", "Psi", "{$\\Psi$}"}, // greek capital letter psi,
+            {"935", "Chi", "{{$\\Chi$}}"}, // greek capital letter chi, U+03A7
+            {"936", "Psi", "{{$\\Psi$}}"}, // greek capital letter psi,
             //                                   U+03A8 ISOgrk3
-            {"937", "Omega", "{$\\Omega$}"}, // greek capital letter omega,
+            {"937", "Omega", "{{$\\Omega$}}"}, // greek capital letter omega,
             //                                   U+03A9 ISOgrk3
 
             {"945", "alpha", "$\\alpha$"}, // greek small letter alpha,
@@ -286,7 +286,7 @@ public class HTMLUnicodeConversionMaps {
             {"", "thetav", "$\\vartheta$"}, // greek small letter theta symbol,
             {"", "vartheta", "$\\vartheta$"}, // greek small letter theta symbol,
             //                                   U+03D1 NEW
-            {"978", "upsih", "{$\\Upsilon$}"}, // greek upsilon with hook symbol,
+            {"978", "upsih", "{{$\\Upsilon$}}"}, // greek upsilon with hook symbol,
             //                                   U+03D2 NEW
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
 
@@ -306,9 +306,9 @@ public class HTMLUnicodeConversionMaps {
             /* Letterlike Symbols */
             {"8472", "weierp", "$\\wp$"}, // script capital P = power set
             //                                    = Weierstrass p, U+2118 ISOamso
-            {"8465", "image", "{$\\Im$}"}, // blackletter capital I = imaginary part,
+            {"8465", "image", "{{$\\Im$}}"}, // blackletter capital I = imaginary part,
             //                                    U+2111 ISOamso
-            {"8476", "real", "{$\\Re$}"}, // blackletter capital R = real part symbol,
+            {"8476", "real", "{{$\\Re$}}"}, // blackletter capital R = real part symbol,
             //                                    U+211C ISOamso
             {"8482", "trade", "{\\texttrademark}"}, // trade mark sign, U+2122 ISOnum
             {"8501", "alefsym", "$\\aleph$"}, // alef symbol = first transfinite cardinal,
@@ -323,18 +323,18 @@ public class HTMLUnicodeConversionMaps {
             {"8596", "harr", "$\\leftrightarrow$"}, // left right arrow, U+2194 ISOamsa
             {"8629", "crarr", "$\\dlsh$"}, // downwards arrow with corner leftwards
             //                                    = carriage return, U+21B5 NEW - require mathabx
-            {"8656", "lArr", "{$\\Leftarrow$}"}, // leftwards double arrow, U+21D0 ISOtech
+            {"8656", "lArr", "{{$\\Leftarrow$}}"}, // leftwards double arrow, U+21D0 ISOtech
             /*  ISO 10646 does not say that lArr is the same as the 'is implied by' arrow
              but also does not have any other character for that function. So ? lArr can
              be used for 'is implied by' as ISOtech suggests */
-            {"8657", "uArr", "{$\\Uparrow$}"}, // upwards double arrow, U+21D1 ISOamsa
-            {"8658", "rArr", "{$\\Rightarrow$}"}, // rightwards double arrow,
+            {"8657", "uArr", "{{$\\Uparrow$}}"}, // upwards double arrow, U+21D1 ISOamsa
+            {"8658", "rArr", "{{$\\Rightarrow$}}"}, // rightwards double arrow,
             //                                     U+21D2 ISOtech
             /*   ISO 10646 does not say this is the 'implies' character but does not have
              another character with this function so ?
              rArr can be used for 'implies' as ISOtech suggests */
-            {"8659", "dArr", "{$\\Downarrow$}"}, // downwards double arrow, U+21D3 ISOamsa
-            {"8660", "hArr", "{$\\Leftrightarrow$}"}, // left right double arrow,
+            {"8659", "dArr", "{{$\\Downarrow$}}"}, // downwards double arrow, U+21D3 ISOamsa
+            {"8660", "hArr", "{{$\\Leftrightarrow$}}"}, // left right double arrow,
             //                                     U+21D4 ISOamsa
 
             /* Mathematical Operators */
@@ -575,10 +575,10 @@ public class HTMLUnicodeConversionMaps {
             {"729", "dot", "{\\\\.{}}"}, // Dot above
             {"730", "ring", "{\\r{}}"}, // Ring above
             {"731", "ogon", "{\\k{}}"}, // Ogonek
-            {"733", "dblac", "{\\H{}}"}, // Double acute
+            {"733", "dblac", "{{\\H{}}}"}, // Double acute
             {"949", "epsi", "$\\epsilon$"}, // Epsilon - double check
             {"1013", "epsiv", "$\\varepsilonup$"}, // lunate epsilon, requires txfonts
-            {"1055", "", "{\\cyrchar\\CYRP}"}, // Cyrillic capital Pe
+            {"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
             {"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
             // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
             // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
@@ -593,17 +593,17 @@ public class HTMLUnicodeConversionMaps {
             {"8244", "", "{\\prime\\prime\\prime}"}, // triple prime
             {"8251", "", "{\\textreferencemark}"}, {"8253", "", "{\\textinterrobang}"},
             {"8450", "complexes", "$\\mathbb{C}$"}, // double struck capital C -- requires e.g. amsfonts
-            {"8451", "", "$\\deg${C}"}, // Degree Celsius
-            {"8459", "Hscr", "$\\mathcal{H}$"}, // script capital H -- possibly use \mathscr
-            {"8460", "Hfr", "$\\mathbb{H}$"}, // black letter capital H -- requires e.g. amsfonts
-            {"8466", "Lscr", "$\\mathcal{L}$"}, // script capital L -- possibly use \mathscr
+            {"8451", "", "$\\deg${{C}}"}, // Degree Celsius
+            {"8459", "Hscr", "{{$\\mathcal{H}}}$"}, // script capital H -- possibly use \mathscr
+            {"8460", "Hfr", "{{$\\mathbb{H}$}}"}, // black letter capital H -- requires e.g. amsfonts
+            {"8466", "Lscr", "{{$\\mathcal{L}$}}"}, // script capital L -- possibly use \mathscr
             {"8467", "ell", "{\\ell}"}, // script small l
-            {"8469", "naturals", "$\\mathbb{N}$"}, // double struck capital N -- requires e.g. amsfonts
-            {"8474", "Qopf", "$\\mathbb{Q}$"}, // double struck capital Q -- requires e.g. amsfonts
-            {"8477", "reals", "$\\mathbb{R}$"}, // double struck capital R -- requires e.g. amsfonts
-            {"8486", "", "${\\Omega}$"}, // Omega
+            {"8469", "naturals", "{{$\\mathbb{N}$}}"}, // double struck capital N -- requires e.g. amsfonts
+            {"8474", "Qopf", "{{$\\mathbb{Q}$}}"}, // double struck capital Q -- requires e.g. amsfonts
+            {"8477", "reals", "{{$\\mathbb{R}$}}"}, // double struck capital R -- requires e.g. amsfonts
+            {"8486", "", "${{\\Omega}}$"}, // Omega
             {"8491", "angst", "{{\\AA}}"}, // Angstrom
-            {"8496", "Escr", "$\\mathcal{E}$"}, // script capital E
+            {"8496", "Escr", "{{$\\mathcal{E}$}}"}, // script capital E
             {"8531", "frac13", "$\\sfrac{1}{3}$"}, // Vulgar fraction one third
             {"8532", "frac23", "$\\sfrac{2}{3}$"}, // Vulgar fraction two thirds
             {"8533", "frac15", "$\\sfrac{1}{5}$"}, // Vulgar fraction one fifth
