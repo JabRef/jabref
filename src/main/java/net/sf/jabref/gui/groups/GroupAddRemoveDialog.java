@@ -148,7 +148,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         // walk through the children:
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {
-            for (Enumeration e = node.children(); e.hasMoreElements();) {
+            for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
                 TreeNode n = (TreeNode) e.nextElement();
                 TreePath path = parent.pathByAddingChild(n);
                 expandAll(tree, path, expand);
