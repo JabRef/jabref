@@ -82,7 +82,7 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
             FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
