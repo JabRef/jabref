@@ -55,7 +55,6 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox keyEmptyWarningDialog;
     private final JCheckBox enforceLegalKeys;
     private final JCheckBox confirmDelete;
-    private final JCheckBox allowEditing;
     private final JCheckBox memoryStick;
     private final JCheckBox inspectionWarnDupli;
     private final JCheckBox useTimeStamp;
@@ -89,7 +88,6 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         biblatexMode = new JComboBox<>(BibDatabaseMode.values());
         biblatexMode.setRenderer(new DefaultBibModeRenderer());
-        allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         defSort = new JCheckBox(Localization.lang("Sort automatically"));
@@ -190,7 +188,6 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        allowEditing.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_TABLE_EDITING));
         defSort.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
         ctrlClick.setSelected(prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
@@ -250,7 +247,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
-        prefs.putBoolean(JabRefPreferences.ALLOW_TABLE_EDITING, allowEditing.isSelected());
         prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
