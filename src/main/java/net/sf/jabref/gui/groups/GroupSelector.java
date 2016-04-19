@@ -282,40 +282,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 }
             }
         });
-        JButton expand = new JButton(IconTheme.JabRefIcon.ADD_ROW.getSmallIcon());
-        expand.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) + 1;
-                groupsTree.setVisibleRowCount(i);
-                groupsTree.revalidate();
-                groupsTree.repaint();
-                GroupSelector.this.revalidate();
-                GroupSelector.this.repaint();
-                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-                LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: "
-                        + GroupSelector.this.getPreferredSize().getHeight());
-            }
-        });
-        JButton reduce = new JButton(IconTheme.JabRefIcon.REMOVE_ROW.getSmallIcon());
-        reduce.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
-                if (i < 1) {
-                    i = 1;
-                }
-                groupsTree.setVisibleRowCount(i);
-                groupsTree.revalidate();
-                groupsTree.repaint();
-                GroupSelector.this.revalidate();
-                // _panel.sidePaneManager.revalidate();
-                GroupSelector.this.repaint();
-                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-            }
-        });
 
         editModeCb.addActionListener(e -> setEditMode(editModeCb.getState()));
 
@@ -335,14 +301,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         autoGroup.setMinimumSize(butDim);
         openset.setPreferredSize(butDim);
         openset.setMinimumSize(butDim);
-        expand.setPreferredSize(butDim);
-        expand.setMinimumSize(butDim);
-        reduce.setPreferredSize(butDim);
-        reduce.setMinimumSize(butDim);
         Insets butIns = new Insets(0, 0, 0, 0);
         helpButton.setMargin(butIns);
-        reduce.setMargin(butIns);
-        expand.setMargin(butIns);
         openset.setMargin(butIns);
         newButton.addActionListener(e -> {
             GroupDialog gd = new GroupDialog(frame, panel, null);
@@ -381,8 +341,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
         select.setToolTipText(Localization.lang("Select entries in group selection"));
-        expand.setToolTipText(Localization.lang("Show one more row"));
-        reduce.setToolTipText(Localization.lang("Show one less rows"));
         editModeCb.setToolTipText(Localization.lang("Click group to toggle membership of selected entries"));
         ButtonGroup bgr = new ButtonGroup();
         bgr.add(andCb);
@@ -445,16 +403,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         con.fill = GridBagConstraints.HORIZONTAL;
         gb.setConstraints(openset, con);
         pan.add(openset);
-
-        con.gridwidth = 1;
-        con.gridx = 4;
-        con.gridy = 0;
-        gb.setConstraints(expand, con);
-        pan.add(expand);
-
-        con.gridx = 5;
-        gb.setConstraints(reduce, con);
-        pan.add(reduce);
 
         con.gridwidth = 6;
         con.gridy = 1;
@@ -834,6 +782,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     @Override
     public void componentOpening() {
         valueChanged(null);
+    }
+
+    @Override
+    public int getRescalingWeight() {
+        return 1;
     }
 
     @Override

@@ -72,15 +72,20 @@ public class SidePane extends JPanel {
     public void setComponents(Collection<SidePaneComponent> comps) {
         mainPanel.removeAll();
 
-        constraint.weighty = 0;
-        for (Component c : comps) {
+        int totalWeights = 0;
+        for (SidePaneComponent c : comps) {
+            constraint.weighty = c.getRescalingWeight();
+            totalWeights += c.getRescalingWeight();
             gridBagLayout.setConstraints(c, constraint);
             mainPanel.add(c);
         }
-        constraint.weighty = 1;
-        Component bx = Box.createVerticalGlue();
-        gridBagLayout.setConstraints(bx, constraint);
-        mainPanel.add(bx);
+        if(totalWeights <= 0) {
+            // Fill vertical space so that components start at top
+            constraint.weighty = 1;
+            Component bx = Box.createVerticalGlue();
+            gridBagLayout.setConstraints(bx, constraint);
+            mainPanel.add(bx);
+        }
 
         revalidate();
         repaint();
