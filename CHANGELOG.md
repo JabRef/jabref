@@ -21,6 +21,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#1233](https://github.com/JabRef/jabref/issues/1233): Group side pane now takes up all the remaining space
 
 ### Fixed
+- Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 
 ### Removed
 
