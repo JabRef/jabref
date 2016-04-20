@@ -19,8 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -39,7 +37,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
@@ -202,15 +199,14 @@ public class DatabasePropertiesDialog extends JDialog {
         defaultSaveOrderConfig = new SaveOrderConfig();
         defaultSaveOrderConfig.setSaveInOriginalOrder();
 
-        List<String> storedSaveOrderConfig = metaData.getData(MetaData.SAVE_ORDER_CONFIG);
+        Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
-        if (storedSaveOrderConfig == null) {
+        if (!storedSaveOrderConfig.isPresent()) {
             saveInOriginalOrder.setSelected(true);
             oldSaveOrderConfig = null;
             selected = false;
         } else {
-            SaveOrderConfig saveOrderConfig;
-            saveOrderConfig = new SaveOrderConfig(storedSaveOrderConfig);
+            SaveOrderConfig saveOrderConfig = storedSaveOrderConfig.get();
             oldSaveOrderConfig = saveOrderConfig;
             if (saveOrderConfig.saveInOriginalOrder) {
                 saveInOriginalOrder.setSelected(true);
@@ -230,35 +226,11 @@ public class DatabasePropertiesDialog extends JDialog {
             fileDir.setText("");
         }
 
-        List<String> fileDI = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL)); // File dir setting
-        List<String> fileDIL = metaData.getData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_IND_LEGACY)); // Legacy file dir setting for backward comp.
-        if (fileDI == null) {
-            oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting as originally empty if reading from legacy setting
-            if (fileDIL == null) {
-                fileDirIndv.setText("");
-            } else {
-                // Insert path from legacy setting if possible
-                // Better be a little careful about how many entries the Vector has:
-                if (!(fileDIL.isEmpty())) {
-                    fileDirIndv.setText((fileDIL.get(0)).trim());
-                }
-            }
-        } else {
-            // Better be a little careful about how many entries the Vector has:
-            if (!(fileDI.isEmpty())) {
-                fileDirIndv.setText((fileDI.get(0)).trim());
-            }
-            oldFileIndvVal = fileDirIndv.getText(); // Record individual file dir setting normally if reading from ordinary setting
-        }
+        String fileDI = metaData.getUserFileDirectory(Globals.prefs.getUser()).orElse(""); // File dir setting
+        fileDirIndv.setText(fileDI);
+        oldFileIndvVal = fileDirIndv.getText();
 
-        List<String> prot = metaData.getData(Globals.PROTECTED_FLAG_META);
-        if (prot == null) {
-            protect.setSelected(false);
-        } else {
-            if (!(prot.isEmpty())) {
-                protect.setSelected(Boolean.parseBoolean(prot.get(0)));
-            }
-        }
+        protect.setSelected(metaData.isProtected());
 
         // Store original values to see if they get changed:
         oldFileVal = fileDir.getText();
@@ -281,17 +253,17 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.setDefaultFileDirectory(text);
         }
         // Repeat for individual file dir - reuse 'text' and 'dir' vars
-        text = fileDirIndv.getText().trim();
+        text = fileDirIndv.getText();
         if (text.isEmpty()) {
-            metaData.remove(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL));
+            metaData.clearUserFileDirectory(Globals.prefs.getUser());
         } else {
-            metaData.putData(Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL), Arrays.asList(text));
+            metaData.setUserFileDirectory(Globals.prefs.getUser(), text);
         }
 
         if (protect.isSelected()) {
-            metaData.putData(Globals.PROTECTED_FLAG_META, Arrays.asList("true"));
+            metaData.markAsProtected();
         } else {
-            metaData.remove(Globals.PROTECTED_FLAG_META);
+            metaData.markAsNotProtected();
         }
 
         SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
@@ -310,18 +282,17 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if (saveOrderConfigChanged) {
-            List<String> serialized = newSaveOrderConfig.getConfigurationList();
             if (newSaveOrderConfig.equals(defaultSaveOrderConfig)) {
-                metaData.remove(MetaData.SAVE_ORDER_CONFIG);
+                metaData.clearSaveOrderConfig();
             } else {
-                metaData.putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+                metaData.setSaveOrderConfig(newSaveOrderConfig);
             }
         }
 
         boolean saveActionsChanged = fieldFormatterCleanupsPanel.hasChanged();
         if (saveActionsChanged) {
             if (fieldFormatterCleanupsPanel.isDefaultSaveActions()) {
-                metaData.remove(MetaData.SAVE_ACTIONS);
+                metaData.clearSaveActions();
             } else {
                 fieldFormatterCleanupsPanel.storeSettings(metaData);
             }

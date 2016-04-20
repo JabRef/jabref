@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -119,15 +118,11 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     return;
                 } else { // User indicated to store anyway.
-                       // See if the database has the protected flag set:
-                    List<String> pd = panel.getBibDatabaseContext().getMetaData().getData(Globals.PROTECTED_FLAG_META);
-                    boolean databaseProtectionFlag = (pd != null) && Boolean.parseBoolean(pd.get(0));
-                    if (databaseProtectionFlag) {
+                    if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),
                                 Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
                         canceled = true;
-                    }
-                    else {
+                    } else {
                         panel.setUpdatedExternally(false);
                         panel.getSidePaneManager().hide("fileUpdate");
                     }

@@ -192,7 +192,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         if (importSelectorWords) {
             for (String s : meta) {
-                if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+                if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
                     panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
                 }
             }
