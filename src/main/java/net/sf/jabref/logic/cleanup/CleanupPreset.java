@@ -49,9 +49,6 @@ public class CleanupPreset {
 
         Set<CleanupStep> activeJobs = EnumSet.noneOf(CleanupStep.class);
 
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS)) {
-            activeJobs.add(CleanupStep.CLEAN_UP_SUPERSCRIPTS);
-        }
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
             activeJobs.add(CleanupStep.CLEAN_UP_DOI);
         }
@@ -70,9 +67,6 @@ public class CleanupPreset {
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS)) {
             activeJobs.add(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
-        if (preferences.getBoolean(JabRefPreferences.CLEANUP_UNICODE)) {
-            activeJobs.add(CleanupStep.CONVERT_UNICODE_TO_LATEX);
-        }
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX)) {
             activeJobs.add(CleanupStep.CONVERT_TO_BIBLATEX);
         }
@@ -88,10 +82,6 @@ public class CleanupPreset {
 
     public boolean isCleanUpUpgradeExternalLinks() {
         return isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
-    }
-
-    public boolean isCleanUpSuperscripts() {
-        return isActive(CleanupStep.CLEAN_UP_SUPERSCRIPTS);
     }
 
     public boolean isCleanUpDOI() {
@@ -114,10 +104,6 @@ public class CleanupPreset {
         return isActive(CleanupStep.RENAME_PDF) || isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
     }
 
-    public boolean isConvertUnicodeToLatex() {
-        return isActive(CleanupStep.CONVERT_UNICODE_TO_LATEX);
-    }
-
     public boolean isConvertToBiblatex() {
         return isActive(CleanupStep.CONVERT_TO_BIBLATEX);
     }
@@ -127,8 +113,6 @@ public class CleanupPreset {
     }
 
     public void storeInPreferences(JabRefPreferences preferences) {
-
-        preferences.putBoolean(JabRefPreferences.CLEANUP_SUPERSCRIPTS, isActive(CleanupStep.CLEAN_UP_SUPERSCRIPTS));
         preferences.putBoolean(JabRefPreferences.CLEANUP_DOI, isActive(CleanupStep.CLEAN_UP_DOI));
         preferences.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, isActive(CleanupStep.MOVE_PDF));
         preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, isActive(CleanupStep.MAKE_PATHS_RELATIVE));
@@ -137,7 +121,6 @@ public class CleanupPreset {
                 isActive(CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
         preferences.putBoolean(JabRefPreferences.CLEANUP_UPGRADE_EXTERNAL_LINKS,
                 isActive(CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        preferences.putBoolean(JabRefPreferences.CLEANUP_UNICODE, isActive(CleanupStep.CONVERT_UNICODE_TO_LATEX));
         preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
         preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
 
@@ -154,10 +137,6 @@ public class CleanupPreset {
 
     public enum CleanupStep {
         /**
-         * Converts the text in 1st, 2nd, ... to real superscripts by wrapping in \textsuperscript{st}, ...
-         */
-        CLEAN_UP_SUPERSCRIPTS,
-        /**
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
          */
         CLEAN_UP_DOI,
@@ -168,10 +147,6 @@ public class CleanupPreset {
          * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
          */
         CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-        /**
-         * Converts Unicode characters to LaTeX code
-         */
-        CONVERT_UNICODE_TO_LATEX,
         /**
          * Converts to BibLatex format
          */
