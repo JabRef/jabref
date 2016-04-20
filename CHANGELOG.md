@@ -22,6 +22,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Added integrity check detecting HTML-encoded characters
 
 ### Fixed
+- Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 
 ### Removed
 
