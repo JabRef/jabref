@@ -67,9 +67,4 @@ public class ImportInspectionCommandLine implements ImportInspector {
         }
         return Collections.emptyList();
     }
-
-    @Override
-    public void toFront() {
-        // Nothing
-    }
 }

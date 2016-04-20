@@ -218,7 +218,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      *
      * @param frame
      * @param panel
-     * @param fields
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
         this.frame = frame;
