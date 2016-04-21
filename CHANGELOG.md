@@ -20,6 +20,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 - Implemented [#1233](https://github.com/JabRef/jabref/issues/1233): Group side pane now takes up all the remaining space
 - Added integrity check detecting HTML-encoded characters
+- Integrity check table can be sorted by clicking on column headings
 
 ### Fixed
 - Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI

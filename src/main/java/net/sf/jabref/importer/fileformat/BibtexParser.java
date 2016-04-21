@@ -698,7 +698,7 @@ public class BibtexParser {
                         }
 
                         // Finished, now reverse newKey and remove whitespaces:
-                        parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key.",
+                        parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key.",
                                 String.valueOf(line)));
                         key = newKey.reverse();
                     }
@@ -706,12 +706,12 @@ public class BibtexParser {
                 break;
 
             case ',':
-                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
+                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (contains whitespaces).",
                         String.valueOf(line)));
                 break;
 
             case '\n':
-                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
+                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (comma missing).",
                         String.valueOf(line)));
                 break;
 

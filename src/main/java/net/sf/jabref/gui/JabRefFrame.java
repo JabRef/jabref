@@ -58,13 +58,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.MenuElement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -88,6 +85,7 @@ import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
+import net.sf.jabref.gui.actions.IntegrityCheckAction;
 import net.sf.jabref.gui.actions.ManageKeywordsAction;
 import net.sf.jabref.gui.actions.MassSetFieldAction;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -123,8 +121,6 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.integrity.IntegrityCheck;
-import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
@@ -173,59 +169,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PositionWindow pw;
 
-    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity") + ELLIPSES) {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            IntegrityCheck check = new IntegrityCheck(getCurrentBasePanel().getBibDatabaseContext());
-            List<IntegrityMessage> messages = check.checkBibtexDatabase();
-
-            if (messages.isEmpty()) {
-                JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
-            } else {
-                // prepare data model
-                Object[][] model = new Object[messages.size()][3];
-                int i = 0;
-                for (IntegrityMessage message : messages) {
-                    model[i][0] = message.getEntry().getCiteKey();
-                    model[i][1] = message.getFieldName();
-                    model[i][2] = message.getMessage();
-                    i++;
-                }
-
-                // construct view
-                JTable table = new JTable(
-                        model,
-                        new Object[] {"key", "field", "message"}
-                );
-
-                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                ListSelectionModel selectionModel = table.getSelectionModel();
-
-                selectionModel.addListSelectionListener(event -> {
-                    if (!event.getValueIsAdjusting()) {
-                        String citeKey = (String) model[table.getSelectedRow()][0];
-                        String fieldName = (String) model[table.getSelectedRow()][1];
-                        getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
-                    }
-                });
-
-                table.getColumnModel().getColumn(0).setPreferredWidth(80);
-                table.getColumnModel().getColumn(1).setPreferredWidth(30);
-                table.getColumnModel().getColumn(2).setPreferredWidth(250);
-                table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-                JScrollPane scrollPane = new JScrollPane(table);
-                String title = Localization.lang("%0 problem(s) found", String.valueOf(messages.size()));
-                JDialog dialog = new JDialog(JabRefFrame.this, title, false);
-                dialog.add(scrollPane);
-                dialog.setSize(600, 500);
-
-                // show view
-                dialog.setVisible(true);
-            }
-        }
-    };
-
+    private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
     private final ToolBar tlb = new ToolBar();
 
