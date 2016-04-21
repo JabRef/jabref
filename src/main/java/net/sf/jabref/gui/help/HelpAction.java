@@ -49,7 +49,7 @@ public class HelpAction extends MnemonicAwareAction {
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
-    public HelpAction(String title, String tooltip, String urlPart, Icon icon) {
+    private HelpAction(String title, String tooltip, String urlPart, Icon icon) {
         super(icon);
         this.urlPart = urlPart;
         putValue(Action.NAME, title);

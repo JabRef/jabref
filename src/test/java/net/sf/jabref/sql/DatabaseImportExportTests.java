@@ -1,9 +1,5 @@
 package net.sf.jabref.sql;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +50,21 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToMySQLSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
+        DatabaseType databaseType = DatabaseType.MYSQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("mysql", "localhost", "root", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToMySQLSingleEntrySingleGroup() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
@@ -84,6 +95,21 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToPostgresSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
+        DatabaseType databaseType = DatabaseType.POSTGRESQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("postgresql", "localhost", "postgres", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToPostgresSingleEntrySingleGroup() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
@@ -98,7 +124,8 @@ public class DatabaseImportExportTests {
         testDatabaseExport(databaseContext, databaseType, databaseName, strings);
     }
 
-    private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings) throws Exception {
+    private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings)
+            throws Exception {
         DatabaseExporter db = new DBExporterAndImporterFactory().getExporter(databaseType);
         try (Connection connection = db.connectToDB(strings)) {
             db.createTables(connection);
@@ -124,43 +151,23 @@ public class DatabaseImportExportTests {
         }
     }
 
-    @Test
-    public void testExportToFileSingleEntry() throws Exception {
-        BibDatabaseContext databaseContext = createContextWithSingleEntry();
-        for (DatabaseType databaseType : DatabaseType.values()) {
-            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry.sql", databaseType);
-        }
-    }
-
-    @Test
-    public void testExportToFileSingleEntrySingleGroup() throws Exception {
-        BibDatabaseContext databaseContext = createContextWithSingleEntrySingleGroup();
-        for (DatabaseType databaseType : DatabaseType.values()) {
-            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group.sql", databaseType);
-        }
-    }
-
-    private void testExportToFile(BibDatabaseContext databaseContext, String path, DatabaseType databaseType) throws Exception {
-        DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
-
-        Path tempFile = Files.createTempFile("jabref", "database-export" + databaseType.getFormattedName());
-        exporter.exportDatabaseAsFile(databaseContext,
-                databaseContext.getDatabase().getEntries(),
-                tempFile.toAbsolutePath().toString(),
-                StandardCharsets.UTF_8);
-
-        Path expectSqlFile = Paths.get(path);
-        assertEquals(
-                String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
-                String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
-        );
-    }
-
     private BibDatabaseContext createContextWithSingleEntry() {
         BibEntry entry = new BibEntry("id1");
         entry.setCiteKey("einstein");
         entry.setType("article");
         entry.setField("author", "Albert Einstein");
+        entry.setField("title", "Die grundlage der allgemeinen relativitätstheorie}");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        return databaseContext;
+    }
+
+    private BibDatabaseContext createContextWithSingleEntryUsingQuoteSymbol() {
+        BibEntry entry = new BibEntry("id1");
+        entry.setCiteKey("einstein");
+        entry.setType("article");
+        entry.setField("author", "Albert L{\\'{u}}cia Einstein");
         entry.setField("title", "Die grundlage der allgemeinen relativitätstheorie}");
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);

@@ -151,7 +151,7 @@ public class LocalizationConsistencyTest {
             System.out.println(
                     "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys found in properties file which should be removed");
+            fail("Obsolete keys " + obsoleteKeys + " found in properties file which should be removed");
         }
     }
 
@@ -168,7 +168,7 @@ public class LocalizationConsistencyTest {
             System.out.println(
                     "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys found in menu properties file which should be removed");
+            fail("Obsolete keys " + obsoleteKeys + " found in menu properties file which should be removed");
         }
     }
 

@@ -15,7 +15,6 @@
  */
 package net.sf.jabref.sql;
 
-import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +45,6 @@ final public class SQLUtil {
     private static List<String> allFields;
 
     private static final Log LOGGER = LogFactory.getLog(SQLUtil.class);
-
 
     private SQLUtil() {
     }
@@ -185,37 +183,11 @@ final public class SQLUtil {
     /**
      * Utility method for processing DML with proper output
      *
-     * @param out The output object to which the DML should be sent
-     * @param dml The DML statements to be processed
-     */
-    public static void processQuery(Object out, String dml) throws SQLException {
-        if(out instanceof Connection) {
-            processQuery((Connection) out, dml);
-        } else if(out instanceof PrintStream) {
-            processQuery((PrintStream) out, dml);
-        } else {
-            LOGGER.error("Cannot process the query " + dml + " on the given output");
-        }
-    }
-
-    /**
-     * Utility method for processing DML with proper output
-     *
      * @param out The output Connection object to which the DML should be sent
      * @param dml The DML statements to be processed
      */
     public static void processQuery(Connection out, String dml) throws SQLException {
         SQLUtil.executeQuery(out, dml);
-    }
-
-    /**
-     * Utility method for processing DML with proper output
-     *
-     * @param out The output PrintStream to which the DML should be sent
-     * @param dml The DML statements to be processed
-     */
-    public static void processQuery(PrintStream out, String dml) throws SQLException {
-        out.println(dml);
     }
 
     /**

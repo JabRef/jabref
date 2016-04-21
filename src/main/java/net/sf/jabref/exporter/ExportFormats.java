@@ -91,8 +91,6 @@ public class ExportFormats {
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
         ExportFormats.putFormat(new MSBibExportFormat());
-        ExportFormats.putFormat(new MySQLExport());
-        ExportFormats.putFormat(new PostgreSQLExport());
         ExportFormats.putFormat(new ModsExportFormat());
 
         // Now add custom export formats
