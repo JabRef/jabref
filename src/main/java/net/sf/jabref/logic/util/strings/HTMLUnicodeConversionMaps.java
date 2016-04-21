@@ -551,6 +551,8 @@ public class HTMLUnicodeConversionMaps {
             {"339", "", "{{\\oe}}"}, // oe-ligature
             {"348", "Scirc", "{{\\^{S}}}"}, // upper case S with circumflex
             {"349", "scirc", "{\\^{s}}"}, // lower case s with circumflex
+            {"350", "Scedil", "{{\\c{S}}}"}, // upper case S with cedilla
+            {"351", "scedil", "{\\c{s}}"}, // lower case s with cedilla
             {"370", "Uogon", "{{\\k{U}}}"}, // capital U with ogonek
             {"371", "uogon", "{\\k{u}}"}, // small u with ogonek
             {"381", "Zcaron", "{{\\v{Z}}}"}, // capital Z with caron
