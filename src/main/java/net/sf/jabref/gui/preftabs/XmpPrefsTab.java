@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -36,7 +37,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
@@ -52,6 +52,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
 
+    private final JabRefPreferences prefs;
     private boolean tableChanged;
 
     private int rowCount;
@@ -67,7 +68,8 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     /**
      * Customization of external program paths.
      */
-    public XmpPrefsTab() {
+    public XmpPrefsTab(JabRefPreferences prefs) {
+        this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
         TableModel tableModel = new AbstractTableModel() {
@@ -258,7 +260,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         // table setup table. This needs to be done either if changes were made, or
         // if the checkbox is checked and no field values have been stored previously:
         if (tableChanged ||
-                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
+                (privacyFilterCheckBox.isSelected() && !prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {

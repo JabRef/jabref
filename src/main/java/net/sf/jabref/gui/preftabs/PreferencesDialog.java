@@ -104,9 +104,9 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new TableColumnsTab(prefs, parent));
         tabs.add(new LabelPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new PreviewPrefsTab(prefs));
-        tabs.add(new NameFormatterTab());
-        tabs.add(new ImportSettingsTab());
-        tabs.add(new XmpPrefsTab());
+        tabs.add(new NameFormatterTab(prefs));
+        tabs.add(new ImportSettingsTab(prefs));
+        tabs.add(new XmpPrefsTab(prefs));
         tabs.add(new AdvancedTab(prefs));
 
         // add all tabs
