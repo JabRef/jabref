@@ -96,13 +96,19 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = ImportFormats.createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
-                fc.showOpenDialog(frame);
-                File file = fc.getSelectedFile();
+                JFileChooser fileChooser = createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
+                int result = fileChooser.showOpenDialog(frame);
+
+                if (result != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+
+                File file = fileChooser.getSelectedFile();
                 if (file == null) {
                     return;
                 }
-                FileFilter ff = fc.getFileFilter();
+
+                FileFilter ff = fileChooser.getFileFilter();
                 ImportFormat format = null;
                 if (ff instanceof ImportFileFilter) {
                     format = ((ImportFileFilter) ff).getImportFormat();
@@ -117,8 +123,7 @@ public class ImportFormats {
                                 Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    ImportMenuItem imi = new ImportMenuItem(frame,
-                            openInNew, format);
+                    ImportMenuItem imi = new ImportMenuItem(frame, openInNew, format);
                     imi.automatedImport(Arrays.asList(file.getAbsolutePath()));
 
                     // Make sure we remember which filter was used, to set the default
