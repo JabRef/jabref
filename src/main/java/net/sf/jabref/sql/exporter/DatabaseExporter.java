@@ -301,11 +301,10 @@ public class DatabaseExporter {
             rs.next();
             myID = rs.getInt("groups_id");
             for (GroupTreeNode child : cursor.getChildren()) {
-                ++currentID;
+                currentID++;
                 currentID = populateGroupsTable(child, myID, currentID, out, database_id);
             }
-            //Unfortunatley, AutoCloseable throws only Exception
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.warn("Cannot close resource", e);
         }
 
