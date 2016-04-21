@@ -54,6 +54,21 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToMySQLSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
+        DatabaseType databaseType = DatabaseType.MYSQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("mysql", "localhost", "root", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToMySQLSingleEntrySingleGroup() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
@@ -73,6 +88,21 @@ public class DatabaseImportExportTests {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
+        DatabaseType databaseType = DatabaseType.POSTGRESQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("postgresql", "localhost", "postgres", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
+    public void testExportToPostgresSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
         DatabaseType databaseType = DatabaseType.POSTGRESQL;
 
         String databaseName = "jabref";
@@ -168,6 +198,17 @@ public class DatabaseImportExportTests {
         return databaseContext;
     }
 
+    private BibDatabaseContext createContextWithSingleEntryUsingQuoteSymbol() {
+        BibEntry entry = new BibEntry("id1");
+        entry.setCiteKey("einstein");
+        entry.setType("article");
+        entry.setField("author", "Albert L{\\'{u}}cia Einstein");
+        entry.setField("title", "Die grundlage der allgemeinen relativitätstheorie}");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        return databaseContext;
+    }
     private BibDatabaseContext createContextWithSingleEntrySingleGroup() {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
