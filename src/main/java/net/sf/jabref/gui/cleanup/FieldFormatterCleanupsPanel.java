@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.DefaultListCellRenderer;
@@ -73,8 +74,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
-        List<String> saveActionsMetaList = metaData.getData(MetaData.SAVE_ACTIONS);
-        setValues(FieldFormatterCleanups.parseFromString(saveActionsMetaList));
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
     }
 
     public void setValues(FieldFormatterCleanups formatterCleanups) {
@@ -84,7 +85,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         this.removeAll();
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
-        //The copy is necessary becaue the original List is unmodifiable
+        //The copy is necessary because the original List is unmodifiable
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions);
         buildLayout(actionsToDisplay);
 
@@ -256,11 +257,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         // if all actions have been removed, remove the save actions from the MetaData
         if (formatterCleanups.getConfiguredActions().isEmpty()) {
-            metaData.remove(MetaData.SAVE_ACTIONS);
+            metaData.clearSaveActions();
             return;
         }
 
-        metaData.putData(MetaData.SAVE_ACTIONS, formatterCleanups.convertToString());
+        metaData.setSaveActions(formatterCleanups);
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {

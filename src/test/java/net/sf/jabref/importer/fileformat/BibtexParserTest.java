@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.importer.ParserResult;
@@ -1337,10 +1336,11 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse();
 
-        List<String> saveActions = parserResult.getMetaData().getData(MetaData.SAVE_ACTIONS);
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
-        assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[lower_case]", saveActions.get(1));
+        assertTrue(saveActions.isEnabled());
+        assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
+                saveActions.getConfiguredActions());
     }
 
     @Test
@@ -1349,7 +1349,7 @@ public class BibtexParserTest {
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
         ParserResult parserResult = parser.parse();
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),

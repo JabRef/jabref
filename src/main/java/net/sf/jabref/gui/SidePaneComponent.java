@@ -109,4 +109,10 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     public Dimension getMinimumSize() {
         return getPreferredSize();
     }
+
+    /**
+     * Specifies how to distribute extra vertical space between side pane components.
+     * 0: fixed height, 1: fill the remaining space
+     */
+    public abstract int getRescalingWeight();
 }

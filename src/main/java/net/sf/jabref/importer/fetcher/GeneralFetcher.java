@@ -308,6 +308,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
     }
 
+    @Override
+    public int getRescalingWeight() {
+        return 0;
+    }
 
     private static class EntryFetcherComparator implements Comparator<EntryFetcher> {
 

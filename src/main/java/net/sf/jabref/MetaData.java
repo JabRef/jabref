@@ -46,11 +46,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MetaData implements Iterable<String> {
-    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
     public static final String META_FLAG = "jabref-meta: ";
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
-    public static final String SAVE_ACTIONS = "saveActions";
+    private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+
+    private static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     private static final String DATABASE_TYPE = "databaseType";
@@ -58,6 +59,8 @@ public class MetaData implements Iterable<String> {
     private static final String GROUPSTREE = "groupstree";
     private static final String GROUPS = "groups";
     private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    public static final String SELECTOR_META_PREFIX = "selector_";
+    private static final String PROTECTED_FLAG_META = "protectedFlag";
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
@@ -86,10 +89,10 @@ public class MetaData implements Iterable<String> {
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
-            String unit;
             List<String> orderedData = new ArrayList<>();
             // We must allow for ; and \ in escape sequences.
             try {
+                String unit;
                 while ((unit = getNextUnit(data)) != null) {
                     orderedData.add(unit);
                 }
@@ -146,11 +149,11 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "author", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "review", new Vector<>());
     }
 
     /**
@@ -272,13 +275,13 @@ public class MetaData implements Iterable<String> {
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
-            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
                 List<String> value = getData(key);
-                String type = key.substring(MetaData.PREFIX_KEYPATTERN.length());
+                String type = key.substring(PREFIX_KEYPATTERN.length());
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
-        List<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
+        List<String> defaultPattern = getData(KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
         }
@@ -297,7 +300,7 @@ public class MetaData implements Iterable<String> {
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
                 iterator.remove();
             }
         }
@@ -305,7 +308,7 @@ public class MetaData implements Iterable<String> {
         // set new value if it is not a default value
         Set<String> allKeys = labelPattern.getAllKeys();
         for (String key : allKeys) {
-            String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
+            String metaDataKey = PREFIX_KEYPATTERN + key;
             if (!labelPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(labelPattern.getValue(key).get(0));
@@ -315,28 +318,28 @@ public class MetaData implements Iterable<String> {
 
         // store default pattern
         if (labelPattern.getDefaultValue() == null) {
-            this.remove(MetaData.KEYPATTERNDEFAULT);
+            this.remove(KEYPATTERNDEFAULT);
         } else {
             List<String> data = new ArrayList<>();
             data.add(labelPattern.getDefaultValue().get(0));
-            this.putData(MetaData.KEYPATTERNDEFAULT, data);
+            this.putData(KEYPATTERNDEFAULT, data);
         }
 
         this.labelPattern = labelPattern;
     }
 
-    public FieldFormatterCleanups getSaveActions() {
+    public Optional<FieldFormatterCleanups> getSaveActions() {
         if (this.getData(SAVE_ACTIONS) == null) {
-            return new FieldFormatterCleanups(false, new ArrayList<>());
+            return Optional.empty();
         } else {
             boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
             String formatterString = this.getData(SAVE_ACTIONS).get(1);
-            return new FieldFormatterCleanups(enablementStatus, formatterString);
+            return Optional.of(new FieldFormatterCleanups(enablementStatus, formatterString));
         }
     }
 
     public Optional<BibDatabaseMode> getMode() {
-        List<String> data = getData(MetaData.DATABASE_TYPE);
+        List<String> data = getData(DATABASE_TYPE);
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
@@ -344,7 +347,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public boolean isProtected() {
-        List<String> data = getData(Globals.PROTECTED_FLAG_META);
+        List<String> data = getData(PROTECTED_FLAG_META);
         if ((data == null) || data.isEmpty()) {
             return false;
         } else {
@@ -353,7 +356,12 @@ public class MetaData implements Iterable<String> {
     }
 
     public List<String> getContentSelectors(String fieldName) {
-        return getData(Globals.SELECTOR_META_PREFIX + fieldName);
+        List<String> contentSelectors = getData(SELECTOR_META_PREFIX + fieldName);
+        if(contentSelectors == null) {
+            return Collections.emptyList();
+        } else {
+            return contentSelectors;
+        }
     }
 
     public Optional<String> getDefaultFileDirectory() {
@@ -406,7 +414,7 @@ public class MetaData implements Iterable<String> {
         if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
 
             // write version first
-            serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
+            serializedMetaData.put(GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
 
             // now write actual groups
             StringBuilder stringBuilder = new StringBuilder();
@@ -417,7 +425,7 @@ public class MetaData implements Iterable<String> {
                 stringBuilder.append(";");
                 stringBuilder.append(Globals.NEWLINE);
             }
-            serializedMetaData.put(MetaData.GROUPSTREE, stringBuilder.toString());
+            serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
         }
 
         return serializedMetaData;
@@ -430,19 +438,19 @@ public class MetaData implements Iterable<String> {
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
         List<String> serialized = saveOrderConfig.getConfigurationList();
-        putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+        putData(SAVE_ORDER_CONFIG, serialized);
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
+        putData(DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
     }
 
     public void markAsProtected() {
-        putData(Globals.PROTECTED_FLAG_META, Collections.singletonList("true"));
+        putData(PROTECTED_FLAG_META, Collections.singletonList("true"));
     }
 
     public void setContentSelectors(String fieldName, List<String> contentSelectors) {
-        putData(Globals.SELECTOR_META_PREFIX + fieldName, contentSelectors);
+        putData(SELECTOR_META_PREFIX + fieldName, contentSelectors);
     }
 
     public void setDefaultFileDirectory(String path) {
@@ -454,6 +462,26 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setUserFileDirectory(String user, String path) {
-        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path));
+        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim()));
+    }
+
+    public void clearUserFileDirectory(String user) {
+        remove(FILE_DIRECTORY + '-' + user);
+    }
+
+    public void clearContentSelectors(String fieldName) {
+        remove(SELECTOR_META_PREFIX + fieldName);
+    }
+
+    public void markAsNotProtected() {
+        remove(PROTECTED_FLAG_META);
+    }
+
+    public void clearSaveActions() {
+        remove(SAVE_ACTIONS);
+    }
+
+    public void clearSaveOrderConfig() {
+        remove(SAVE_ORDER_CONFIG);
     }
 }

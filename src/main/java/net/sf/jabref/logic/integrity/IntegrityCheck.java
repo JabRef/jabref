@@ -62,6 +62,7 @@ public class IntegrityCheck {
         result.addAll(new AbbreviationChecker("journal").check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
         result.addAll(new BibStringChecker().check(entry));
+        result.addAll(new HTMLCharacterChecker().check(entry));
 
         return result;
     }
@@ -349,6 +350,29 @@ public class IntegrityCheck {
                     results.add(
                             new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
                                     field.getKey()));
+                }
+            }
+            return results;
+        }
+    }
+
+    private static class HTMLCharacterChecker implements Checker {
+
+        // Detect any HTML encoded character,
+        private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
+
+
+        /**
+         * Checks, if there are any HTML encoded characters in the fields
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                Matcher characterMatcher = HTML_CHARACTER_PATTERN.matcher(field.getValue());
+                if (characterMatcher.find()) {
+                    results.add(new IntegrityMessage(Localization.lang("HTML encoded character found"), entry,
+                            field.getKey()));
                 }
             }
             return results;

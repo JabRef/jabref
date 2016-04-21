@@ -161,24 +161,24 @@ public class BibEntry {
      * Returns the contents of the given field, or null if it is not set.
      */
     public String getField(String name) {
-        return fields.get(normalizeFieldName(name));
+        return fields.get(toLowerCase(name));
     }
 
     /**
      * Returns the contents of the given field as an Optional.
      */
     public Optional<String> getFieldOptional(String name) {
-        return Optional.ofNullable(fields.get(normalizeFieldName(name)));
+        return Optional.ofNullable(fields.get(toLowerCase(name)));
     }
 
     /**
      * Returns true if the entry has the given field, or false if it is not set.
      */
     public boolean hasField(String name) {
-        return fields.containsKey(normalizeFieldName(name));
+        return fields.containsKey(toLowerCase(name));
     }
 
-    private String normalizeFieldName(String fieldName) {
+    private String toLowerCase(String fieldName) {
         Objects.requireNonNull(fieldName, "field name must not be null");
 
         return fieldName.toLowerCase(Locale.ENGLISH);
@@ -207,7 +207,7 @@ public class BibEntry {
      * extract the year from the 'date' field (analogously for 'month').
      */
     public String getFieldOrAlias(String name) {
-        String fieldValue = getField(normalizeFieldName(name));
+        String fieldValue = getField(toLowerCase(name));
 
         if (!Strings.isNullOrEmpty(fieldValue)) {
             return fieldValue;
@@ -330,7 +330,7 @@ public class BibEntry {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
-        String fieldName = normalizeFieldName(name);
+        String fieldName = toLowerCase(name);
 
         if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
@@ -361,7 +361,7 @@ public class BibEntry {
      * @param name The field to clear.
      */
     public void clearField(String name) {
-        String fieldName = normalizeFieldName(name);
+        String fieldName = toLowerCase(name);
 
         changed = true;
 
@@ -392,7 +392,7 @@ public class BibEntry {
         final String orSeparator = "/";
 
         for (String field : allFields) {
-            String fieldName = normalizeFieldName(field);
+            String fieldName = toLowerCase(field);
             // OR fields
             if (fieldName.contains(orSeparator)) {
                 String[] altFields = field.split(orSeparator);
@@ -411,7 +411,7 @@ public class BibEntry {
 
     private boolean atLeastOnePresent(String[] fieldsToCheck, BibDatabase database) {
         for (String field : fieldsToCheck) {
-            String fieldName = normalizeFieldName(field);
+            String fieldName = toLowerCase(field);
 
             String value = BibDatabase.getResolvedField(fieldName, this, database);
             if ((value != null) && !value.isEmpty()) {

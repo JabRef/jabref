@@ -695,6 +695,11 @@ public class OpenOfficePanel extends AbstractWorker {
         public void componentOpening() {
             preferences.setShowPanel(true);
         }
+
+        @Override
+        public int getRescalingWeight() {
+            return 0;
+        }
     }
 
 }

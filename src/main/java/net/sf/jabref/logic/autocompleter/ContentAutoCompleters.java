@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -44,12 +43,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addContentSelectorValuesToAutoCompleters(MetaData metaData) {
         for (Map.Entry<String, AutoCompleter<String>> entry : this.autoCompleters.entrySet()) {
             AutoCompleter<String> ac = entry.getValue();
-            if (metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey()) != null) {
-                List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + entry.getKey());
-                if (items != null) {
-                    items.forEach(ac::addItemToIndex);
-                }
-            }
+            metaData.getContentSelectors(entry.getKey()).forEach(ac::addItemToIndex);
         }
     }
 

@@ -83,6 +83,11 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
         manager.unregisterComponent(FileUpdatePanel.NAME);
     }
 
+    @Override
+    public int getRescalingWeight() {
+        return 0;
+    }
+
     /**
      * actionPerformed
      *

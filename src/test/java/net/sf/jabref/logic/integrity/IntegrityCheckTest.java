@@ -17,7 +17,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -25,14 +25,15 @@ import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
 
 public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -111,6 +112,7 @@ public class IntegrityCheckTest {
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
@@ -158,6 +160,16 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("author", "#einstein# and #newton#"));
         assertWrong(createContext("month", "#jan"));
         assertWrong(createContext("author", "#einstein# #amp; #newton#"));
+    }
+
+    @Test
+    public void testHTMLCharacterChecks() {
+        assertCorrect(createContext("title", "Not a single {HTML} character"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
+        assertWrong(createContext("author", "Lenhard, J&#227;rg"));
+        assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
     }
 
     private BibDatabaseContext createContext(String field, String value, String type) {

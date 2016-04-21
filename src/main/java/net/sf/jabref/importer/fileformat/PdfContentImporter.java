@@ -192,12 +192,6 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ImportInspector inspector = new ImportInspector() {
-
-                    @Override
-                    public void toFront() {
-                        // Do nothing
-                    }
-
                     @Override
                     public void setProgress(int current, int max) {
                         // Do nothing
