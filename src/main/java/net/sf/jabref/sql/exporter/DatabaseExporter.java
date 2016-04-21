@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -116,7 +117,7 @@ public class DatabaseExporter {
         for (BibEntry entry : entries) {
             try (PreparedStatement statement = connection.prepareStatement(
                     "INSERT INTO entries (jabref_eid, entry_types_id, cite_key, " + SQLUtil.getFieldStr() + ", database_id) "
-                            + "VALUES (?, (SELECT entry_types_id FROM entry_types WHERE label= ? ), ?, " + SQLUtil.getAllFields())) {
+                            + "VALUES (?, (SELECT entry_types_id FROM entry_types WHERE label= ? ), ?, " + SQLUtil.getAllFields().stream().map(s -> "?").collect(Collectors.joining(", ")) + ", ?);")) {
                 statement.setString(1, entry.getId());
                 statement.setString(2, entry.getType());
                 statement.setString(3, entry.getCiteKey());
