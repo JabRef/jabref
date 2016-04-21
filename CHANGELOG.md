@@ -20,8 +20,11 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 
 ### Fixed
+- Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database
+
 
 ### Removed
+- Removes possibility to export entries/databases to an .sql file, as the logic cannot easily use the correct escape logic
 
 
 
