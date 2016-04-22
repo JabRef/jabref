@@ -27,7 +27,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 
 ### Removed
-- Removes possibility to export entries/databases to an .sql file, as the logic cannot easily use the correct escape logic
+- Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
 
 
 
