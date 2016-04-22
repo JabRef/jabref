@@ -611,4 +611,21 @@ public class BibEntry {
         // TODO Auto-generated method stub
         return fields;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BibEntry entry = (BibEntry) o;
+        return Objects.equals(type, entry.type) && Objects.equals(fields, entry.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, fields);
+    }
 }
