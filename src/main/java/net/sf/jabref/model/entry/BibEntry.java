@@ -309,15 +309,11 @@ public class BibEntry {
     /**
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
-     * WARNING: this method does not notify change listeners, so it should *NOT*
-     * be used for entries that are being displayed in the GUI. Furthermore, it
-     * does not check values for content, so e.g. empty strings will be set as such.
      */
     public void setField(Map<String, String> fields) {
         Objects.requireNonNull(fields, "fields must not be null");
 
-        changed = true;
-        this.fields.putAll(fields);
+        fields.forEach((field, value) -> setField(field, value));
     }
 
     /**
@@ -329,6 +325,11 @@ public class BibEntry {
     public void setField(String name, String value) {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
+
+        if(value.isEmpty()) {
+            clearField(name);
+            return;
+        }
 
         String fieldName = toLowerCase(name);
 

@@ -640,13 +640,12 @@ public class BibtexParserTest {
         assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
 
-        BibEntry e = c.iterator().next();
-        assertEquals("article", e.getType());
-        assertEquals("", e.getCiteKey());
-        assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        BibEntry e = new BibEntry();
+        e.setField("author", "Ed von Test");
+        e.setType("article");
+
+        assertEquals(Collections.singletonList(e), c);
     }
 
     @Test
