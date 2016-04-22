@@ -267,7 +267,7 @@ public class DatabaseImporter {
                         GroupTreeNode node = groups.get(groupId);
                         if ((node != null) && (node.getGroup() instanceof ExplicitGroup)) {
                             ExplicitGroup expGroup = (ExplicitGroup) node.getGroup();
-                            expGroup.addEntry(entries.get(entryId));
+                            expGroup.add(entries.get(entryId));
                         }
                     }
                 }

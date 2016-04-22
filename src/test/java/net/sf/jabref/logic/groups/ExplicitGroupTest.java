@@ -27,7 +27,7 @@ public class ExplicitGroupTest {
     @Test
     public void testToStringComplex() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING);
-        group.addEntry(makeBibtexEntry());
+        group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;shields01;", group.toString());
     }
 
