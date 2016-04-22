@@ -40,7 +40,7 @@ public class ExplicitGroup extends KeywordGroup {
         super(name, "groups", name, true, false, context);
     }
 
-    public static AbstractGroup fromString(String s, int version) throws Exception {
+    public static ExplicitGroup fromString(String s, int version) throws Exception {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
@@ -79,8 +79,12 @@ public class ExplicitGroup extends KeywordGroup {
     private void addLegacyEntryKeys(QuotedStringTokenizer tok) {
         while (tok.hasMoreTokens()) {
             String key = StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR);
-            this.legacyEntryKeys.add(key);
+            addLegacyEntryKey(key);
         }
+    }
+
+    public void addLegacyEntryKey(String key) {
+        this.legacyEntryKeys.add(key);
     }
 
     @Override

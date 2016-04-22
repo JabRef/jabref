@@ -25,10 +25,10 @@ public class ExplicitGroupTest {
     }
 
     @Test
-    public void testToStringComplex() {
+    public void toStringDoesNotWriteAssignedEntries() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING);
         group.add(makeBibtexEntry());
-        assertEquals("ExplicitGroup:myExplicitGroup;2;shields01;", group.toString());
+        assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
     }
 
     public BibEntry makeBibtexEntry() {
