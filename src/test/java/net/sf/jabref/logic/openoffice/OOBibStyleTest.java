@@ -494,4 +494,26 @@ public class OOBibStyleTest {
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }
+
+
+    public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
+        String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
+        OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationRepository.class));
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta and Gamma Epsilon and Ypsilon Tau");
+        entry.setField("title", "JabRef Manual");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("von Beta, Epsilon, and Tau, 2016",
+                style.getCitationMarker(entries, entryDBMap, true, null, null));
+
+    }
+
 }

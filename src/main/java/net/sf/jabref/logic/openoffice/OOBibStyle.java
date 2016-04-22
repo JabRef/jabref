@@ -402,7 +402,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if ((value.trim().length() > 2) && QUOTED.matcher(value.trim()).matches()) {
+            if ((value.trim().length() > 1) && QUOTED.matcher(value.trim()).matches()) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;
