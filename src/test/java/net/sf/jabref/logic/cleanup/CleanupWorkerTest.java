@@ -76,7 +76,7 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupDoesNothingByDefault() throws IOException {
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         entry.setField("pdf", "aPdfFile");
         entry.setField("some", "1st");
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
@@ -231,7 +231,7 @@ public class CleanupWorkerTest {
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 

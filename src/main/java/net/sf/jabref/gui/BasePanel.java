@@ -664,7 +664,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     for (BibEntry entry : entries) {
                         bes = entry;
                         // Store the old value:
-                        oldvals.put(bes, bes.getField(BibEntry.KEY_FIELD));
+                        oldvals.put(bes, bes.getCiteKey());
                         database.setCiteKeyForEntry(bes, null);
                     }
                 }
@@ -676,7 +676,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     bes = entry;
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
-                            bes.getField(BibEntry.KEY_FIELD)));
+                            bes.getCiteKey()));
                 }
                 ce.end();
                 undoManager.addEdit(ce);

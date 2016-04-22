@@ -513,7 +513,7 @@ public class BibtexParser {
             skipWhitespace();
         }
         String key = parseKey();
-        result.setField(BibEntry.KEY_FIELD, key);
+        result.setCiteKey(key);
         skipWhitespace();
 
         while (true) {

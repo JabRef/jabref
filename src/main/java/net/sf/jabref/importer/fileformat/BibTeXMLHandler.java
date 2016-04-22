@@ -77,7 +77,7 @@ class BibTeXMLHandler extends DefaultHandler {
                     }
                 }
                 if (bibtexKey != null) {
-                    b.setField(BibEntry.KEY_FIELD, bibtexKey);
+                    b.setCiteKey(bibtexKey);
                 }
             } else if ("article".equals(local) || "inbook".equals(local) || "book".equals(local)
                     || "booklet".equals(local) || "incollection".equals(local) || "inproceedings".equals(local)

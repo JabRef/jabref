@@ -80,7 +80,7 @@ public class BibtexEntryTests {
     public void isNullCiteKeyThrowsNPE() {
         BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
 
-        e.setField(BibEntry.KEY_FIELD, null);
+        e.setCiteKey(null);
         Assert.fail();
     }
 
@@ -89,10 +89,10 @@ public class BibtexEntryTests {
         BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
         Assert.assertFalse(e.hasCiteKey());
 
-        e.setField(BibEntry.KEY_FIELD, "");
+        e.setCiteKey("");
         Assert.assertFalse(e.hasCiteKey());
 
-        e.setField(BibEntry.KEY_FIELD, "key");
+        e.setCiteKey("key");
         Assert.assertTrue(e.hasCiteKey());
 
         e.clearField(BibEntry.KEY_FIELD);
@@ -352,7 +352,7 @@ public class BibtexEntryTests {
         BibEntry be = new BibEntry();
         Assert.assertFalse(be.hasCiteKey());
         be.setField("author", "Albert Einstein");
-        be.setField(BibEntry.KEY_FIELD, "Einstein1931");
+        be.setCiteKey("Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
         Assert.assertEquals("Einstein1931", be.getCiteKey());
         Assert.assertEquals("Albert Einstein", be.getField("author"));
