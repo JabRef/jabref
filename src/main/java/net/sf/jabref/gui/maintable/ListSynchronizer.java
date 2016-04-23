@@ -15,13 +15,15 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.model.database.DatabaseChangeEvent;
-import net.sf.jabref.model.database.DatabaseChangeListener;
+import net.sf.jabref.event.AddEntryEvent;
+import net.sf.jabref.event.ChangeEntryEvent;
+import net.sf.jabref.event.RemoveEntryEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.EventList;
+import com.google.common.eventbus.Subscribe;
 
-public class ListSynchronizer implements DatabaseChangeListener {
+public class ListSynchronizer {
 
     private final EventList<BibEntry> list;
 
@@ -29,27 +31,47 @@ public class ListSynchronizer implements DatabaseChangeListener {
         this.list = list;
     }
 
-    @Override
-    public void databaseChanged(DatabaseChangeEvent e) {
-        list.getReadWriteLock().writeLock().lock();
+    @Subscribe
+    public void listen(AddEntryEvent aee) {
+        lock();
         try {
-            if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
-                list.add(e.getEntry());
-            } else if (e.getType() == DatabaseChangeEvent.ChangeType.REMOVED_ENTRY) {
-                list.remove(e.getEntry());
-            } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
-                int index = list.indexOf(e.getEntry());
-                if (index != -1) {
-                    // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
-                    // DatabaseChangeEvent.ADDED_ENTRY
-                    // thus,
-                    list.set(index, e.getEntry());
-                }
-            }
+            list.add(aee.getEntry());
         } finally {
-            list.getReadWriteLock().writeLock().unlock();
+            unlock();
         }
-
     }
 
+    @Subscribe
+    public void listen(RemoveEntryEvent ree) {
+        lock();
+        try {
+            list.remove(ree.getEntry());
+        } finally {
+            unlock();
+        }
+    }
+
+    @Subscribe
+    public void listen(ChangeEntryEvent cee) {
+        lock();
+        try {
+            int index = list.indexOf(cee.getEntry());
+            if (index != -1) {
+                // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
+                // DatabaseChangeEvent.ADDED_ENTRY
+                // thus,
+                list.set(index, cee.getEntry());
+            }
+        } finally {
+            unlock();
+        }
+    }
+
+    private void lock() {
+        list.getReadWriteLock().writeLock().lock();
+    }
+
+    private void unlock() {
+        list.getReadWriteLock().writeLock().unlock();
+    }
 }
