@@ -149,7 +149,7 @@ public class DatabaseImporter {
                         while (rsEntries.next()) {
                             String id = rsEntries.getString("entries_id");
                             BibEntry entry = new BibEntry(IdGenerator.next(), types.get(rsEntries.getString("entry_types_id")).getName());
-                            entry.setField(BibEntry.KEY_FIELD, rsEntries.getString("cite_key"));
+                            entry.setCiteKey(rsEntries.getString("cite_key"));
                             for (String col : colNames) {
                                 String value = rsEntries.getString(col);
                                 if (value != null) {

@@ -212,7 +212,7 @@ public class BibDatabase {
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
-            entry.setField(BibEntry.KEY_FIELD, key);
+            entry.setCiteKey(key);
         }
         return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }

@@ -14,7 +14,6 @@ import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.CanonicalBibtexEntry;
 
 import org.junit.Assert;
 
@@ -133,21 +132,13 @@ public class BibtexEntryAssert {
      * @param actualEntries the list with the actual entries
      */
     public static void assertEquals(List<BibEntry> shouldBeIs, List<BibEntry> actualEntries) {
-        Assert.assertNotNull(shouldBeIs);
-        Assert.assertNotNull(actualEntries);
-        Assert.assertEquals(shouldBeIs.size(), actualEntries.size());
-        for (int i = 0; i < actualEntries.size(); i++) {
-            assertEquals(shouldBeIs.get(i), actualEntries.get(i));
-        }
+        Assert.assertEquals(shouldBeIs, actualEntries);
     }
 
     /**
-     * Compares to BibTeX entries using their canonical representation
+     * Compares to BibTeX entries
      */
     public static void assertEquals(BibEntry shouldBeEntry, BibEntry entry) {
-        // use the canonical string representation to compare the entries
-        String shouldBeEntryRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(shouldBeEntry);
-        String entryRepresentation = CanonicalBibtexEntry.getCanonicalRepresentation(entry);
-        Assert.assertEquals(shouldBeEntryRepresentation, entryRepresentation);
+        Assert.assertEquals(shouldBeEntry, entry);
     }
 }

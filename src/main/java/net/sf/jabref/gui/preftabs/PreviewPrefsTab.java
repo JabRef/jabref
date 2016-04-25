@@ -189,7 +189,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
             return PreviewPrefsTab.entry;
         }
         PreviewPrefsTab.entry = new BibEntry(IdGenerator.next(), "article");
-        PreviewPrefsTab.entry.setField(BibEntry.KEY_FIELD, "conceicao1997");
+        PreviewPrefsTab.entry.setCiteKey("conceicao1997");
         PreviewPrefsTab.entry.setField("author",
                 "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
         PreviewPrefsTab.entry.setField("title",

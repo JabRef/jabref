@@ -77,7 +77,7 @@ public class RegExpFileSearchTests {
         //given
         List<BibEntry> entries = new ArrayList<>();
         BibEntry localEntry = new BibEntry("123", BibtexEntryTypes.ARTICLE.getName());
-        localEntry.setField(BibEntry.KEY_FIELD, "pdfInDatabase");
+        localEntry.setCiteKey("pdfInDatabase");
         localEntry.setField("year", "2001");
         entries.add(localEntry);
 

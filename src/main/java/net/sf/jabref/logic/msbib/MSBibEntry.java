@@ -323,7 +323,7 @@ class MSBibEntry {
         sourceType = getMSBibSourceType(bibtex);
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            tag = bibtex.getField(BibEntry.KEY_FIELD);
+            tag = bibtex.getCiteKey();
         }
 
         if (bibtex.hasField("language")) {
