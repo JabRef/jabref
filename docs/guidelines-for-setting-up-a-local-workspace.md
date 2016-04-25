@@ -23,14 +23,20 @@ Execution failed for task ':compileJava'.
 If you do not have a GitHub account, create it at https://github.com.
 
 ### Get an IDE in place
-I suggest [Eclipse](https://eclipse.org/).
-Please install [EclEmma](http://eclemma.org/) for code coverage.
+We suggest [Eclipse](https://eclipse.org/) or [IntelliJ](https://www.jetbrains.com/idea/).
 
-Other developers like and use [IntelliJ](https://www.jetbrains.com/idea/).
+#### IntelliJ
 The community edition should be enough.
 If not, a developer key for the JabRef project for the full version is available upon request.
 
-In Ubuntu Linux, you can follow one of these guidelines:
+Ensure that you configure the imports as follows:
+
+![image](https://cloud.githubusercontent.com/assets/375693/14460173/5113c518-00bc-11e6-89b8-e1f221001a7d.png)
+
+#### Eclipse
+Please install [EclEmma](http://eclemma.org/) for code coverage.
+
+In Ubuntu Linux, you can follow one of these guidelines to Install Eclipse:
 
 * [Documentation from Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse)
 * [Step-by-step from Krizna](www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/)
