@@ -23,7 +23,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Fixed
 - Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database
-
+- Fixed [#1270](https://github.com/JabRef/jabref/issues/1270): Auto save is now working again as expected (without leaving a bunch of temporary files behind)
 - Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 - Fixed [1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as "" 
 
