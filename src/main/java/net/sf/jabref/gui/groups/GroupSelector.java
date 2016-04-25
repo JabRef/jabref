@@ -114,7 +114,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             Localization.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Localization.lang("Automatically assign new entry to selected groups"));
-    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit Group Membership"),
+    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit group membership"),
             false);
     private final Border editModeBorder = BorderFactory.createTitledBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED), "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP,
@@ -335,7 +335,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
         autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
-        invCb.setToolTipText(Localization.lang("Show entries *not* in group selection"));
+        invCb.setToolTipText("<html>" + Localization.lang("Show entries <b>not</b> in group selection") + "</html>");
         showOverlappingGroups.setToolTipText(
                 Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
