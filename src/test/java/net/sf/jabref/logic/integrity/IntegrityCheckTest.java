@@ -139,6 +139,12 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testBooktitleChecks() {
+        assertCorrect(createContext("booktitle", "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", "proceedings"));
+        assertWrong(createContext("booktitle", "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", "proceedings"));
+    }
+
+    @Test
     public void testPageNumbersChecks() {
         assertCorrect(createContext("pages", "1--2"));
         assertCorrect(createContext("pages", "12"));

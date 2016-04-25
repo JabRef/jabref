@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,6 +64,7 @@ public class IntegrityCheck {
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
+        result.addAll(new BooktitleChecker().check(entry));
 
         return result;
     }
@@ -84,6 +86,24 @@ public class IntegrityCheck {
 
             if ("proceedings".equalsIgnoreCase(entry.getType())) {
                 return Collections.singletonList(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, "pages"));
+            }
+
+            return Collections.emptyList();
+        }
+    }
+
+    private static class BooktitleChecker implements Checker {
+
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            String field = "booktitle";
+            Optional<String> value = entry.getFieldOptional(field);
+            if (!value.isPresent()) {
+                return Collections.emptyList();
+            }
+
+            if (value.get().toLowerCase(Locale.ENGLISH).endsWith("conference on")) {
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("booktitle ends with 'conference on'"), entry, field));
             }
 
             return Collections.emptyList();
