@@ -326,7 +326,7 @@ public class BibEntry {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
-        if(value.isEmpty()) {
+        if (value.isEmpty()) {
             clearField(name);
             return;
         }
@@ -352,7 +352,6 @@ public class BibEntry {
             fields.put(fieldName, oldValue);
             throw new IllegalArgumentException("Change rejected: " + pve);
         }
-
     }
 
     /**
@@ -549,13 +548,11 @@ public class BibEntry {
         if (newValue == null) {
             if (oldValue != null) {
                 this.clearField("keywords");
-                changed = true;
             }
             return;
         }
         if ((oldValue == null) || !oldValue.equals(newValue)) {
             this.setField("keywords", newValue);
-            changed = true;
         }
     }
 
@@ -618,7 +615,7 @@ public class BibEntry {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         BibEntry entry = (BibEntry) o;
