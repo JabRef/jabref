@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class CopacImporterTestFiles {
 
         try (InputStream copacStream = CopacImporterTest.class.getResourceAsStream(fileName);
                 InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
-            BibtexEntryAssert.assertEquals(bibStream, copacStream, copacImporter);
+            BibEntryAssert.assertEquals(bibStream, copacStream, copacImporter);
         }
 
     }

@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -144,7 +144,7 @@ public class OvidImporterTest {
                 List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
                 Assert.assertNotNull(entries);
                 Assert.assertEquals(1, entries.size());
-                BibtexEntryAssert.assertEquals(nis, entries.get(0));
+                BibEntryAssert.assertEquals(nis, entries.get(0));
             }
         }
     }

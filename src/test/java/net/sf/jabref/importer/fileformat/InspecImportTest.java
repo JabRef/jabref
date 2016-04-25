@@ -9,7 +9,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -66,7 +66,7 @@ public class InspecImportTest {
         expectedEntry.setField("pages", "20");
         expectedEntry.setField("volume", "19");
 
-        BibtexEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
+        BibEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
                 InspecImportTest.class.getResourceAsStream("InspecImportTest2.txt"), inspecImp);
     }
 

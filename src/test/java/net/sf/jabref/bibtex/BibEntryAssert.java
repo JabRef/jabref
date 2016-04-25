@@ -17,7 +17,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 
-public class BibtexEntryAssert {
+public class BibEntryAssert {
 
     /**
      * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
@@ -33,7 +33,7 @@ public class BibtexEntryAssert {
         Assert.assertNotNull(resourceName);
         Assert.assertNotNull(entry);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
-            BibtexEntryAssert.assertEquals(shouldBeIs, entry);
+            BibEntryAssert.assertEquals(shouldBeIs, entry);
         }
     }
 
@@ -51,7 +51,7 @@ public class BibtexEntryAssert {
         Assert.assertNotNull(resourceName);
         Assert.assertNotNull(asIsEntries);
         try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {
-            BibtexEntryAssert.assertEquals(shouldBeIs, asIsEntries);
+            BibEntryAssert.assertEquals(shouldBeIs, asIsEntries);
         }
     }
 
