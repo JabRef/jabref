@@ -151,7 +151,7 @@ public class MedlinePlainImporterTest {
                             + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
                             + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
                             + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
-            BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 
@@ -162,7 +162,7 @@ public class MedlinePlainImporterTest {
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setField("keywords", "Female, Male");
-            BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 
@@ -175,7 +175,7 @@ public class MedlinePlainImporterTest {
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setType("article");
-            BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 

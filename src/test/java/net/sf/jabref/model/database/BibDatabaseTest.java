@@ -8,7 +8,6 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -75,7 +74,7 @@ public class BibDatabaseTest {
         database.insertEntry(entry);
         assertEquals(database.getEntries().size(), 1);
         assertEquals(database.getEntryCount(), 1);
-        BibtexEntryAssert.assertEquals(entry, database.getEntries().get(0));
+        assertEquals(entry, database.getEntries().get(0));
     }
 
     @Test

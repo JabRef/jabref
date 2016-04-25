@@ -29,7 +29,6 @@ import javax.xml.transform.TransformerException;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -907,7 +906,7 @@ public class XMPUtilTest {
             entry.setField("author", "Firstname Lastname");
             List<BibEntry> expected = Collections.singletonList(entry);
 
-            BibtexEntryAssert.assertEquals(expected, readEntries);
+            Assert.assertEquals(expected, readEntries);
         }
     }
 

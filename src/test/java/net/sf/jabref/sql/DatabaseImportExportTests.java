@@ -7,7 +7,6 @@ import java.util.List;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -144,7 +143,7 @@ public class DatabaseImportExportTests {
         try (Connection connection = importer.connectToDB(strings)) {
             List<DBImporterResult> results = importer.performImport(strings, Collections.singletonList(databaseName), databaseContext.getMode());
             assertEquals(1, results.size());
-            BibtexEntryAssert.assertEquals(databaseContext.getDatabase().getEntries(),
+            assertEquals(databaseContext.getDatabase().getEntries(),
                     results.get(0).getDatabaseContext().getDatabase().getEntries());
 
             assertEquals(databaseContext.getMetaData().getGroups(), results.get(0).getDatabaseContext().getMetaData().getGroups());

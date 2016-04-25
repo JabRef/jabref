@@ -62,7 +62,7 @@ public class CopacImporterTestFiles {
 
         try (InputStream copacStream = CopacImporterTest.class.getResourceAsStream(fileName);
                 InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
-            BibtexEntryAssert.assertEquals(copacImporter, bibStream, copacStream);
+            BibtexEntryAssert.assertEquals(bibStream, copacStream, copacImporter);
         }
 
     }

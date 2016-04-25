@@ -6,11 +6,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
@@ -55,90 +55,73 @@ public class BibtexEntryAssert {
         }
     }
 
-    /**
-     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry.
-     * This entry is compared to the given entry. The given entry is contained in a list to ease using of the compare method
-     *
-     * @param shouldBeInputStream the inputStream reading the entry from
-     * @param asIsEntries a list containing a single entry to compare with
-     */
-    public static void assertEquals(InputStream shouldBeInputStream, List<BibEntry> asIsEntries)
-            throws UnsupportedEncodingException, IOException {
-        Assert.assertNotNull(shouldBeInputStream);
-        Assert.assertNotNull(asIsEntries);
-        Assert.assertEquals(1, asIsEntries.size());
-        assertEquals(shouldBeInputStream, asIsEntries.get(0));
+    private static List<BibEntry> getListFromInputStream(InputStream is) throws IOException {
+        ParserResult result;
+        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+            BibtexParser parser = new BibtexParser(reader);
+            result = parser.parse();
+        }
+        Assert.assertNotNull(result);
+        Assert.assertFalse(result.isNullResult());
+        return result.getDatabase().getEntries();
     }
 
-    public static void assertEquals(List<BibEntry> expectedEntries, InputStream asIsInputStream)
+    /**
+     * Reads a bibtex database from the given InputStream. The list is compared with the given list.
+     *
+     * @param expectedInputStream the inputStream reading the entry from
+     * @param actualEntries a list containing a single entry to compare with
+     */
+    public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
             throws UnsupportedEncodingException, IOException {
-        Assert.assertNotNull(asIsInputStream);
+        Assert.assertNotNull(expectedInputStream);
+        Assert.assertNotNull(actualEntries);
+        Assert.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
+    }
+
+    public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
+            throws UnsupportedEncodingException, IOException {
+        Assert.assertNotNull(actualInputStream);
         Assert.assertNotNull(expectedEntries);
-
-        try (Reader reader = new InputStreamReader(asIsInputStream, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(reader);
-            ParserResult result = parser.parse();
-
-            assertEquals(expectedEntries, result.getDatabase().getEntries());
-        }
+        Assert.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
     }
 
     /**
      * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
      * compared to the given entry
      *
-     * @param shouldBeInputStream the inputStream reading the entry from
-     * @param entry the entry to compare with
+     * @param expected the inputStream reading the entry from
+     * @param actual the entry to compare with
      */
-    public static void assertEquals(InputStream shouldBeInputStream, BibEntry entry)
+    public static void assertEquals(InputStream expected, BibEntry actual)
             throws UnsupportedEncodingException, IOException {
-        Assert.assertNotNull(shouldBeInputStream);
-        Assert.assertNotNull(entry);
-        ParserResult result;
-        try (Reader reader = new InputStreamReader(shouldBeInputStream, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(reader);
-            result = parser.parse();
-        }
-        Assert.assertNotNull(result);
-        Assert.assertFalse(result.isNullResult());
-        Assert.assertEquals(1, result.getDatabase().getEntryCount());
-        BibEntry shouldBeEntry = result.getDatabase().getEntries().iterator().next();
-        assertEquals(shouldBeEntry, entry);
+        assertEquals(expected, Collections.singletonList(actual));
     }
 
     /**
-     * Compares two InputStreams. For each InputStream a list will be created. Afterwards the list will be compared.
-     * @param importer The fileformat you want to compare with Bibtex.
-     * @param shouldBeIs A BibtexImporter InputStream.
-     * @param actualEntries Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
+     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is filtered through importerForActualIs to convert to a list of BibEntries.
+     * @param expectedIs A BibtexImporter InputStream.
+     * @param actualIs Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
+     * @param importerForActualIs The fileformat you want to use to convert the actualIs to the list of expected BibEntries
      * @throws IOException
      */
-    public static void assertEquals(ImportFormat importer, InputStream shouldBeIs, InputStream actualEntries)
+    public static void assertEquals(InputStream expectedIs, InputStream actualIs, ImportFormat importerForActualIs)
             throws IOException {
-        BibtexImporter bibImporter = new BibtexImporter();
-
-        List<BibEntry> importEntries = importer.importEntries(actualEntries, new OutputPrinterToNull());
-        List<BibEntry> bibEntries = bibImporter.importEntries(shouldBeIs, new OutputPrinterToNull());
-        Assert.assertFalse(importEntries.isEmpty());
-        Assert.assertFalse(bibEntries.isEmpty());
-
-        BibtexEntryAssert.assertEquals(importEntries, bibEntries);
+        List<BibEntry> actualEntries = importerForActualIs.importEntries(actualIs, new OutputPrinterToNull());
+        Assert.assertEquals(getListFromInputStream(expectedIs), actualEntries);
     }
 
     /**
-     * Compares to lists of bibtex entries
-     *
-     * @param shouldBeIs the list with the expected entries
-     * @param actualEntries the list with the actual entries
+     * Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a list of BibEntries.
+     * @param expectedIs A BibtexImporter InputStream.
+     * @param actualIs Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
+     * @param importerForActualIs The fileformat you want to use to convert the actualIs to the list of expected BibEntries
+     * @throws IOException
      */
-    public static void assertEquals(List<BibEntry> shouldBeIs, List<BibEntry> actualEntries) {
-        Assert.assertEquals(shouldBeIs, actualEntries);
+    public static void assertEquals(List<BibEntry> expected, InputStream actualIs, ImportFormat importerForActualIs)
+            throws IOException {
+        List<BibEntry> actualEntries = importerForActualIs.importEntries(actualIs, new OutputPrinterToNull());
+        Assert.assertEquals(expected, actualEntries);
     }
 
-    /**
-     * Compares to BibTeX entries
-     */
-    public static void assertEquals(BibEntry shouldBeEntry, BibEntry entry) {
-        Assert.assertEquals(shouldBeEntry, entry);
-    }
 }
