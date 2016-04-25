@@ -293,7 +293,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.groupsHelp)
+        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.GROUP)
                 .getHelpButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);

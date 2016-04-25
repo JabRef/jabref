@@ -53,6 +53,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -96,7 +97,8 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private final JButton help = new HelpAction("OpenOfficeIntegration").getHelpButton();
+    private final JButton help = new HelpAction(Localization.lang("OpenOffice/LibreOffice integration"),
+            HelpFiles.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
     private SidePaneManager manager;
@@ -461,7 +463,7 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
                 InvocationTargetException e) {
             LOGGER.error("Could not add URL to system classloader", e);
-            throw new IOException("Error, could not add URL to system classloader");
+            throw new IOException("Error, could not add URL to system classloader", e);
 
         }
     }

@@ -304,7 +304,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special table columns and special fields ***/
 
-        JButton helpButton = new HelpAction(Localization.lang("Help on special fields"), HelpFiles.specialFieldsHelp).getHelpButton();
+        JButton helpButton = new HelpAction(Localization.lang("Help on special fields"),
+                HelpFiles.SPECIAL_FIELDS).getHelpButton();
 
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));

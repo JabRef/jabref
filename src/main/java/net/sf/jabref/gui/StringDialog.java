@@ -88,7 +88,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction(Localization.lang("Help"), HelpFiles.stringEditorHelp);
+        helpAction = new HelpAction(Localization.lang("Help"), HelpFiles.STRING_EDITOR);
 
         addWindowListener(new WindowAdapter() {
 
