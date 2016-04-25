@@ -288,7 +288,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
-        JButton help = new HelpAction(HelpFiles.importInspectionHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.IMPORT_INSPECTION).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -1269,6 +1269,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private void setupComparatorChooser() {
         // First column:
+
         List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
         comparators.clear();
 

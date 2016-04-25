@@ -18,6 +18,7 @@ package net.sf.jabref.importer.fetcher;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.JSONEntryParser;
@@ -124,8 +125,8 @@ public class DOAJFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "DOAJHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_DOAJ;
     }
 
     @Override

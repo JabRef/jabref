@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -35,6 +36,12 @@ import net.sf.jabref.logic.net.URLDownload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ *
+ * The current ScienceDirect fetcher implementation does no longer work
+ *
+ */
+@Deprecated
 public class ScienceDirectFetcher implements EntryFetcher {
 
     private static final String SCIENCE_DIRECT = "ScienceDirect";
@@ -53,8 +60,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
 
     @Override
-    public String getHelpPage() {
-        return SCIENCE_DIRECT;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_SCIENCEDIRECT;
     }
 
     @Override
@@ -65,7 +72,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
     @Override
     public String getTitle() {
-        return SCIENCE_DIRECT;
+        return "ScienceDirect";
     }
 
     @Override

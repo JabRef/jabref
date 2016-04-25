@@ -137,7 +137,7 @@ public class ExportCustomizationDialog extends JDialog {
         JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new HelpAction(HelpFiles.exportCustomizationHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.CUSTOM_EXPORTS).getHelpButton();
 
         // Key bindings:
         JPanel main = new JPanel();

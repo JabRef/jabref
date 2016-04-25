@@ -163,7 +163,7 @@ class ManageJournalsPanel extends JPanel {
         bb.addButton(cancel);
         bb.addUnrelatedGap();
 
-        JButton help = new HelpAction(HelpFiles.journalAbbrHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.JOURNAL_ABBREV).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

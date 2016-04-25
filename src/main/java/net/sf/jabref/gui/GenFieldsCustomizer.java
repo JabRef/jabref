@@ -67,7 +67,7 @@ public class GenFieldsCustomizer extends JDialog {
     public GenFieldsCustomizer(JabRefFrame frame) {
         super(frame, Localization.lang("Set general fields"), false);
         parentFrame = frame;
-        helpBut = new HelpAction(HelpFiles.generalFieldsHelp).getHelpButton();
+        helpBut = new HelpAction(HelpFiles.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));
     }

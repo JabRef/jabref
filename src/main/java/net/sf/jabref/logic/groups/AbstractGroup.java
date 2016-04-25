@@ -131,6 +131,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      */
     public abstract boolean contains(BibEntry entry);
 
+    @Override
     public boolean isMatch(BibEntry entry) {
         return contains(entry);
     }

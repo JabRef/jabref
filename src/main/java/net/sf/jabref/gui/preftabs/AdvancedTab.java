@@ -82,7 +82,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(HelpFiles.remoteHelp).getHelpButton());
+        p.add(new HelpAction(HelpFiles.REMOTE).getHelpButton());
         builder.append(p);
 
         // IEEE

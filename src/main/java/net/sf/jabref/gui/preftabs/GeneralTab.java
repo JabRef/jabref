@@ -144,7 +144,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(HelpFiles.ownerHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.OWNER).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -154,7 +154,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(HelpFiles.timeStampHelp).getHelpButton();
+        help = new HelpAction(HelpFiles.TIMESTAMP).getHelpButton();
         builder.append(help);
         builder.nextLine();
 

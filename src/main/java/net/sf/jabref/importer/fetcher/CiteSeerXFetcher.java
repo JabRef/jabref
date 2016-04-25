@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -87,8 +88,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "CiteSeerHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_CITESEERX;
     }
 
     @Override

@@ -63,7 +63,7 @@ public class LabelPatternPanel extends JPanel {
 
     public LabelPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.labelPatternHelp);
+        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.LABEL_PATTERN);
         buildGUI();
     }
 
