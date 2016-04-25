@@ -15,24 +15,29 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.fieldeditors.FileListEditor;
-import net.sf.jabref.gui.util.component.CheckBoxMessage;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.util.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
@@ -72,7 +77,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -103,7 +108,7 @@ public class MoveFileAction extends AbstractAction {
                 String chosenFile;
                 if (toFileDir) {
                     // Determine which name to suggest:
-                    String suggName = Util
+                    String suggName = FileUtil
                             .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
                                     Globals.journalAbbreviationLoader.getRepository())
                             .concat(flEntry.type.isPresent() ? "." + flEntry.type.get().getExtension() : "");
@@ -139,7 +144,7 @@ public class MoveFileAction extends AbstractAction {
                     chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
                 }
                 if (chosenFile == null) {
-                    return; // cancelled
+                    return; // canceled
                 }
                 newFile = new File(chosenFile);
                 // Check if the file already exists:

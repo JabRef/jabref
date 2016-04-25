@@ -23,18 +23,21 @@ package net.sf.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
-import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.BibEntry;
+
 import spin.Spin;
 
 public class DuplicateSearch implements Runnable {
@@ -96,7 +99,7 @@ public class DuplicateSearch implements Runnable {
                             askAboutExact = true;
                         }
 
-                        DuplicateCallBack cb = new DuplicateCallBack(JabRef.mainFrame, be[0], be[1],
+                        DuplicateCallBack cb = new DuplicateCallBack(JabRefGUI.getMainFrame(), be[0], be[1],
                                 askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH);
                         ((CallBack) Spin.over(cb)).update();
 

@@ -15,16 +15,19 @@
  */
 package net.sf.jabref.model;
 
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -141,7 +144,7 @@ public class DuplicateCheck {
             return EMPTY_IN_TWO;
         }
 
-        if ("author".equals(field) || "editor".equals(field)) {
+        if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
             String auth1 = AuthorList.fixAuthorLastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
@@ -184,7 +187,7 @@ public class DuplicateCheck {
     }
 
     public static double compareEntriesStrictly(BibEntry one, BibEntry two) {
-        HashSet<String> allFields = new HashSet<>();
+        Set<String> allFields = new HashSet<>();
         allFields.addAll(one.getFieldNames());
         allFields.addAll(two.getFieldNames());
 

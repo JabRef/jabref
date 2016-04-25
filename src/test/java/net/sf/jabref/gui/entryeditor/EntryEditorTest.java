@@ -1,6 +1,10 @@
 package net.sf.jabref.gui.entryeditor;
 
-import net.sf.jabref.JabRef;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.List;
+
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
@@ -11,10 +15,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.awt.event.ActionEvent;
-import java.util.Arrays;
-import java.util.List;
-
 public class EntryEditorTest {
 
     @Test
@@ -24,13 +24,13 @@ public class EntryEditorTest {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField("author", "Brigitte Laurant");
         FieldEditor authorTextField = new TextArea("author", "Hans Meiser");
-        EntryEditor editor = new EntryEditor(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), bibEntry);
+        EntryEditor editor = new EntryEditor(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
-        AutoCompleter<String> autoCompleter = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("author");
+        AutoCompleter<String> autoCompleter = JabRefGUI.getMainFrame().getCurrentBasePanel().getAutoCompleters().get("author");
 
         List<String> result = autoCompleter.complete("Hans");
         Assert.assertEquals(Arrays.asList("Hans Meiser"), result);
@@ -45,13 +45,13 @@ public class EntryEditorTest {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField("journal", "Testtext");
         FieldEditor authorTextField = new TextArea("journal", "New Testtext");
-        EntryEditor editor = new EntryEditor(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), bibEntry);
+        EntryEditor editor = new EntryEditor(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), bibEntry);
 
         // perform action ...
         editor.getStoreFieldAction().actionPerformed(new ActionEvent(authorTextField, 0, ""));
 
         // test content of stored words in autocompleter ...
-        AutoCompleter<String> autoCompleter = JabRef.mainFrame.getCurrentBasePanel().getAutoCompleters().get("journal");
+        AutoCompleter<String> autoCompleter = JabRefGUI.getMainFrame().getCurrentBasePanel().getAutoCompleters().get("journal");
 
         List<String> result = autoCompleter.complete("Ne");
         Assert.assertEquals(Arrays.asList("New Testtext"), result);

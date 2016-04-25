@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.model.database;
 
+@FunctionalInterface
 public interface DatabaseChangeListener {
 
     void databaseChanged(DatabaseChangeEvent e);

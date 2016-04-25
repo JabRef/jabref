@@ -1,13 +1,14 @@
 package net.sf.jabref.logic.preferences;
 
+import java.io.File;
+
 import net.sf.jabref.JabRefPreferences;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class LastFocusedTabPreferencesTest {
 

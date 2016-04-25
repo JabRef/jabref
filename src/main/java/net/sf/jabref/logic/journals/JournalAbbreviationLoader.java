@@ -15,17 +15,18 @@
 */
 package net.sf.jabref.logic.journals;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class JournalAbbreviationLoader {
 

@@ -16,8 +16,9 @@
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -28,7 +29,7 @@ public class Printed extends SpecialField {
 
 
     private Printed() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        List<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toggle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(),
                 Localization.lang("Toggle print status")));

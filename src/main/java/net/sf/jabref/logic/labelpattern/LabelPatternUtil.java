@@ -18,9 +18,9 @@
 package net.sf.jabref.logic.labelpattern;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +30,10 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

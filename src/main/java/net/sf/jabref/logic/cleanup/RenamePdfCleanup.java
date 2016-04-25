@@ -13,57 +13,51 @@
 */
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.util.Util;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private final List<String> paths;
-    private final BibDatabase database;
+    private final BibDatabaseContext databaseContext;
     private final Boolean onlyRelativePaths;
     private int unsuccessfulRenames;
     private final JournalAbbreviationRepository repository;
 
 
-    public RenamePdfCleanup(List<String> paths, Boolean onlyRelativePaths, BibDatabase database,
+    public RenamePdfCleanup(Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
             JournalAbbreviationRepository repository) {
-        this.paths = paths;
-        this.database = database;
+        this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.repository = repository;
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        //Extract the path
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
-        if (!oldValue.isPresent()) {
-            return new ArrayList<>();
-        }
-
-        List<FileField.ParsedFileField> fileList = FileField.parse(oldValue.get());
-        List<FileField.ParsedFileField> newFileList = new ArrayList<>();
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
+        List<ParsedFileField> fileList = typedEntry.getFiles();
+        List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
-        for (FileField.ParsedFileField flEntry : fileList) {
-            String realOldFilename = flEntry.link;
+        for (ParsedFileField flEntry : fileList) {
+            String realOldFilename = flEntry.getLink();
 
             if (onlyRelativePaths && (new File(realOldFilename).isAbsolute())) {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(Util.getLinkedFileName(database, entry, repository));
+            StringBuilder newFilename = new StringBuilder(
+                    FileUtil.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
             //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
@@ -71,7 +65,8 @@ public class RenamePdfCleanup implements CleanupJob {
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
-            Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename, paths);
+            Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
+                    databaseContext.getFileDirectory());
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 continue;
@@ -97,33 +92,34 @@ public class RenamePdfCleanup implements CleanupJob {
                 changed = true;
 
                 //Change the path for this entry
-                String description = flEntry.description;
-                String type = flEntry.fileType;
+                String description = flEntry.getDescription();
+                String type = flEntry.getFileType();
 
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
                 File parent = (new File(realOldFilename)).getParentFile();
                 String newFileEntryFileName;
-                if ((parent == null) || paths.contains(parent.getAbsolutePath())) {
+                if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
                     newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(
                             newFilename.toString());
                 }
-                newFileList.add(new FileField.ParsedFileField(description, newFileEntryFileName, type));
+                newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
             } else {
                 unsuccessfulRenames++;
             }
         }
 
         if (changed) {
-            String newValue = FileField.getStringRepresentation(newFileList);
-            assert (!oldValue.get().equals(newValue));
-            entry.setField(Globals.FILE_FIELD, newValue);
+            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
-            return Collections.singletonList(change);
+            if(change.isPresent()) {
+                return Collections.singletonList(change.get());
+            } else {
+                return Collections.emptyList();
+            }
         }
 
         return new ArrayList<>();

@@ -15,14 +15,15 @@
 */
 package net.sf.jabref.gui.fieldeditors.contextmenu;
 
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.formatter.CaseChangers;
+import java.util.Objects;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
-import java.util.Objects;
+
+import net.sf.jabref.logic.formatter.CaseChangers;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class CaseChangeMenu extends JMenu {
 

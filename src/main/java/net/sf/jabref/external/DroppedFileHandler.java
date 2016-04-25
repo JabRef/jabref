@@ -20,29 +20,36 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.util.Util;
-import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -111,8 +118,6 @@ public class DroppedFileHandler {
      *
      * @param fileName  The name of the dragged file.
      * @param fileType  The FileType associated with the file.
-     * @param localFile Indicate whether this is a local file, or a remote file copied
-     *                  to a local temporary file.
      * @param mainTable The MainTable the file was dragged to.
      * @param dropRow   The row where the file was dropped.
      */
@@ -150,7 +155,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -200,7 +205,7 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -244,7 +249,7 @@ public class DroppedFileHandler {
                         + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
-                Localization.lang("XMP metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
+                Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (reply == JOptionPane.CANCEL_OPTION) {
@@ -274,7 +279,7 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD)).toString();
+            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -311,7 +316,7 @@ public class DroppedFileHandler {
             BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -349,7 +354,7 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = Util.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
+        String targetName = FileUtil.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
@@ -400,7 +405,7 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -460,7 +465,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename,
                            NamedCompound edits) {
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -504,14 +509,13 @@ public class DroppedFileHandler {
      * the given name.
      *
      * @param fileName The name of the source file.
-     * @param fileType The FileType associated with the file.
      * @param toFile   The destination filename. An existing path-component will be removed.
      * @param edits    TODO we should be able to undo this!
      * @return
      */
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

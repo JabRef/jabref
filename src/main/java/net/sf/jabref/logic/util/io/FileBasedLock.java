@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.exporter.SaveSession;
-
 import java.io.File;
+
+import net.sf.jabref.exporter.SaveSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -15,27 +15,40 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.format.NameFormatter;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.NameFormatter;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class NameFormatterTab extends JPanel implements PrefsTab {
 
+    private final JabRefPreferences prefs;
     private boolean tableChanged;
 
     private final JTable table;
@@ -87,7 +100,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
      * Tab to create custom Name Formatters
      *
      */
-    public NameFormatterTab() {
+    public NameFormatterTab(JabRefPreferences prefs) {
+        this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
         TableModel tableModel = new AbstractTableModel() {
@@ -197,8 +211,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+        List<String> names = prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
+        List<String> formats = prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -314,8 +328,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
+            prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
+            prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
         }
     }
 

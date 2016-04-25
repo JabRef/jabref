@@ -36,7 +36,7 @@ public class DoiCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
 
-        ArrayList<FieldChange> changes = new ArrayList<>();
+        List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
         if (entry.hasField("doi")) {
@@ -55,7 +55,7 @@ public class DoiCleanup implements CleanupJob {
 
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
                 for (String field : FIELDS) {
-                    DOI.build(entry.getField((field))).ifPresent(unused -> removeFieldValue(entry, field, changes));
+                    DOI.build(entry.getField(field)).ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {

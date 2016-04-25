@@ -16,8 +16,9 @@
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -30,7 +31,7 @@ public class Priority extends SpecialField {
 
 
     private Priority() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        List<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null,
                 Localization.lang("No priority information")));
         Icon tmpicon;

@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -27,28 +28,19 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 22, 2006
- * Time: 12:06:09 PM
- * To change this template use File | Settings | File Templates.
- */
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ImportFormats {
-
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
-
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
@@ -57,7 +49,7 @@ public class ImportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_IMPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<ImportFileFilter> filters = new TreeSet<>();
+        Set<ImportFileFilter> filters = new TreeSet<>();
         for (ImportFormat format : importers) {
             ImportFileFilter filter = new ImportFileFilter(format);
             filters.add(filter);
@@ -104,13 +96,19 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = ImportFormats.createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
-                fc.showOpenDialog(frame);
-                File file = fc.getSelectedFile();
+                JFileChooser fileChooser = createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
+                int result = fileChooser.showOpenDialog(frame);
+
+                if (result != JFileChooser.APPROVE_OPTION) {
+                    return;
+                }
+
+                File file = fileChooser.getSelectedFile();
                 if (file == null) {
                     return;
                 }
-                FileFilter ff = fc.getFileFilter();
+
+                FileFilter ff = fileChooser.getFileFilter();
                 ImportFormat format = null;
                 if (ff instanceof ImportFileFilter) {
                     format = ((ImportFileFilter) ff).getImportFormat();
@@ -125,8 +123,7 @@ public class ImportFormats {
                                 Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    ImportMenuItem imi = new ImportMenuItem(frame,
-                            openInNew, format);
+                    ImportMenuItem imi = new ImportMenuItem(frame, openInNew, format);
                     imi.automatedImport(Arrays.asList(file.getAbsolutePath()));
 
                     // Make sure we remember which filter was used, to set the default

@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.journals;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class Abbreviation implements Comparable<Abbreviation> {
 
-    private final static String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
+    private static final String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
 
     private final String name;
     private final String abbreviation;
@@ -59,7 +59,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
         }
         if (o instanceof Abbreviation) {
             Abbreviation that = (Abbreviation) o;
-            return Objects.equal(name, that.name);
+            return Objects.equals(name, that.name);
         }
         return false;
     }

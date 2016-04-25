@@ -1,28 +1,30 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
-
-import com.google.common.base.Strings;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.EntryType;
+
+import com.google.common.base.Strings;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
@@ -184,23 +186,12 @@ public class PdfContentImporter extends ImportFormat {
     public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
 
-        try (PDDocument document = PDDocument.load(in)) {
-            if (document.isEncrypted()) {
-                LOGGER.info("Encrypted documents are not supported");
-                return result;
-            }
-
+        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(in)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ImportInspector inspector = new ImportInspector() {
-
-                    @Override
-                    public void toFront() {
-                        // Do nothing
-                    }
-
                     @Override
                     public void setProgress(int current, int max) {
                         // Do nothing
@@ -481,6 +472,9 @@ public class PdfContentImporter extends ImportFormat {
             }
 
             result.add(entry);
+        } catch (EncryptedPdfsNotSupportedException e) {
+            LOGGER.info("Decryption not supported");
+            return Collections.emptyList();
         }
         return result;
     }

@@ -21,22 +21,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
 import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,16 +53,15 @@ public class ExportToClipboardAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
-    private final BibDatabase database;
 
     /**
      * written by run() and read by update()
      */
     private String message;
 
-    public ExportToClipboardAction(JabRefFrame frame, BibDatabase database) {
+
+    public ExportToClipboardAction(JabRefFrame frame) {
         this.frame = Objects.requireNonNull(frame);
-        this.database = Objects.requireNonNull(database);
     }
 
     @Override
@@ -100,10 +102,8 @@ public class ExportToClipboardAction extends AbstractWorker {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-        // Also store the database's file in a global variable:
-        Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory();
 
         File tmp = null;
         try {
@@ -114,8 +114,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
-            format.performExport(database, panel.getBibDatabaseContext().getMetaData(),
-                    tmp.getPath(), panel.getEncoding(), entries);
+            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(), panel.getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {

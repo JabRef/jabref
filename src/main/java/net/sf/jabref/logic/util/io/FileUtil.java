@@ -15,23 +15,46 @@
 */
 package net.sf.jabref.logic.util.io;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.BibEntry;
-
-import net.sf.jabref.model.entry.FileField;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FileUtil {
+
+    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
+
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
@@ -157,17 +180,17 @@ public class FileUtil {
      * <li>the directory of the bib file</li>
      * </ul>
      *
-     * @param metaData The MetaData for the database this file belongs to.
+     * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final MetaData metaData, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = metaData.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
-        List<String> fileDir = metaData.getFileDirectory(Globals.FILE_FIELD);
+        List<String> fileDir = databaseContext.getFileDirectory();
         // Include the directory of the bib file:
-        ArrayList<String> al = new ArrayList<>();
+        List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
                 al.add(dir);
@@ -295,7 +318,7 @@ public class FileUtil {
     }
 
     public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
-        HashMap<BibEntry, List<File>> result = new HashMap<>();
+        Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
         Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
@@ -349,13 +372,39 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<FileField.ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (FileField.ParsedFileField file : fileList) {
-                expandFilename(file.link, fileDirs).ifPresent(result::add);
+            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
+            for (ParsedFileField file : fileList) {
+                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
             }
         }
 
         return result;
+    }
+
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database the database, where the entry is located
+     * @param entry    the entry to which the file should be linked to
+     * @param repository
+     * @return a suggested fileName
+     */
+    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
+            JournalAbbreviationRepository repository) {
+        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
+        StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+        Layout layout = null;
+        try {
+            layout = new LayoutHelper(sr, repository).getLayoutFromText();
+        } catch (IOException e) {
+            LOGGER.info("Wrong format " + e.getMessage(), e);
+        }
+        if (layout != null) {
+            targetName = layout.doLayout(entry, database);
+        }
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanFileName(targetName);
+        return targetName;
     }
 
 }

@@ -1,5 +1,13 @@
 package net.sf.jabref.exporter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -12,8 +20,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.*;
 
 public class FieldFormatterCleanups {
 

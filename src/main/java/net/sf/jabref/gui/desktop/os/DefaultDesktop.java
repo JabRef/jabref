@@ -1,11 +1,12 @@
 package net.sf.jabref.gui.desktop.os;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DefaultDesktop implements NativeDesktop {
     private static final Log LOGGER = LogFactory.getLog(NativeDesktop.class);
@@ -22,8 +23,8 @@ public class DefaultDesktop implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        Desktop.getDesktop().open(file.getParentFile());
+        File file = Paths.get(filePath).toAbsolutePath().getParent().toFile();
+        Desktop.getDesktop().open(file);
     }
 
     @Override

@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.Comparator;
+
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Compares Bibtex entries based on their 'crossref' fields. Entries including

@@ -46,9 +46,6 @@ public class Globals {
 
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
 
-    public static final String FILETYPE_PREFS_EXT = "_dir";
-    public static final String SELECTOR_META_PREFIX = "selector_";
-    public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String NONE = "_non__";
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";

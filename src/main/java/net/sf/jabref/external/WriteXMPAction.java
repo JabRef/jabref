@@ -20,22 +20,35 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -103,7 +116,7 @@ public class WriteXMPAction extends AbstractWorker {
         }
         optDiag.open();
 
-        panel.output(Localization.lang("Writing XMP metadata..."));
+        panel.output(Localization.lang("Writing XMP-metadata..."));
     }
 
     @Override
@@ -120,11 +133,11 @@ public class WriteXMPAction extends AbstractWorker {
 
             // First check the (legacy) "pdf" field:
             String pdf = entry.getField("pdf");
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory("pdf");
             FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
             // Then check the "file" field:
-            dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            dirs = panel.getBibDatabaseContext().getFileDirectory();
             if (entry.hasField(Globals.FILE_FIELD)) {
                 FileListTableModel tm = new FileListTableModel();
                 tm.setContent(entry.getField(Globals.FILE_FIELD));
@@ -198,7 +211,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent) {
-            super(parent, Localization.lang("Writing XMP metadata for selected entries..."), false);
+            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false);
             okButton.setEnabled(false);
 
             okButton.addActionListener(e -> dispose());

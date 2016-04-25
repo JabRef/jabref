@@ -34,39 +34,62 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
-import net.sf.jabref.*;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.BibtexSingleFieldProperties;
+import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.gui.actions.Actions;
-import net.sf.jabref.gui.fieldeditors.*;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
-import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
-import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.logic.util.date.TimeStamp;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
-import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryContainer;
+import net.sf.jabref.gui.FieldContentSelector;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
+import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
+import net.sf.jabref.gui.fieldeditors.TextField;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -75,6 +98,22 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import net.sf.jabref.logic.util.date.TimeStamp;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -192,6 +231,9 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         }
 
         updateAllFields();
+        if (this.fileListEditor != null){
+            this.fileListEditor.adjustColumnWidth();
+        }
     }
 
     private void setupFieldPanels() {
@@ -451,34 +493,42 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
-        final Set<BibtexSingleFieldProperties> fieldExtras = InternalBibtexFields.getFieldExtras(fieldName);
+        final Set<FieldProperties> fieldExtras = InternalBibtexFields.getFieldExtras(fieldName);
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER)) {
+                || fieldExtras.contains(FieldProperties.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(BibtexSingleFieldProperties.DATEPICKER));
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.EXTERNAL)) {
+                    fieldExtras.contains(FieldProperties.DATE));
+        } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.JOURNAL_NAMES)) {
+        } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     getStoreFieldAction());
-        } else if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + fieldName) != null) {
-            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
-                    getStoreFieldAction());
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.URL)) {
+        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
+            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
+        } else if (fieldExtras.contains(FieldProperties.URL)) {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.DOI)) {
-            return FieldExtraComponents.getDoiExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.SET_OWNER)) {
+        } else if (fieldExtras.contains(FieldProperties.DOI)) {
+            return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.YES_NO)) {
+        } else if (fieldExtras.contains(FieldProperties.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (fieldExtras.contains(BibtexSingleFieldProperties.MONTH)) {
+        } else if (fieldExtras.contains(FieldProperties.MONTH)) {
             return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+        } else if (fieldExtras.contains(FieldProperties.GENDER)) {
+            return FieldExtraComponents.getGenderExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.EDITOR_TYPE)) {
+            return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.PAGINATION)) {
+            return FieldExtraComponents.getPaginationExtraComponent(editor, this);
+        } else if (fieldExtras.contains(FieldProperties.TYPE)) {
+            return FieldExtraComponents.getTypeExtraComponent(editor, this,
+                    "patent".equals(entry.getType().toLowerCase(Locale.ENGLISH)));
         }
         return Optional.empty();
     }
@@ -577,9 +627,8 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", frame.prevTab);
 
-
-        HashSet<AWTKeyStroke> keys = new HashSet<>(textComponent
-                .getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        Set<AWTKeyStroke> keys = new HashSet<>(
+                textComponent.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         keys.clear();
         keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
         textComponent.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);

@@ -15,31 +15,27 @@
 */
 package net.sf.jabref.gui.remote;
 
-import net.sf.jabref.JabRef;
+import java.util.List;
+
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.remote.server.MessageHandler;
 
-import java.util.Optional;
-import java.util.Vector;
-
 public class JabRefMessageHandler implements MessageHandler {
-
-    private final JabRef jabRef;
-
-    public JabRefMessageHandler(JabRef jabRef) {
-        this.jabRef = jabRef;
-    }
 
     @Override
     public void handleMessage(String message) {
-        Optional<Vector<ParserResult>> loaded = jabRef.processArguments(message.split("\n"), false);
-        if (!(loaded.isPresent())) {
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(message.split("\n"),
+                ArgumentProcessor.Mode.REMOTE_START);
+        if (!(argumentProcessor.hasParserResults())) {
             throw new IllegalStateException("Could not start JabRef with arguments " + message);
         }
 
-        for (int i = 0; i < loaded.get().size(); i++) {
-            ParserResult pr = loaded.get().elementAt(i);
-            JabRef.mainFrame.addParserResult(pr, i == 0);
+        List<ParserResult> loaded = argumentProcessor.getParserResults();
+        for (int i = 0; i < loaded.size(); i++) {
+            ParserResult pr = loaded.get(i);
+            JabRefGUI.getMainFrame().addParserResult(pr, i == 0);
         }
     }
 }

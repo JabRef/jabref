@@ -15,16 +15,6 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,7 +23,22 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for export formats based on templates.
@@ -163,20 +168,19 @@ public class ExportFormat implements IExportFormat {
     /**
      * Perform the export of {@code database}.
      *
-     * @param database   The database to export from.
-     * @param metaData   The database's meta data.
+     * @param databaseContext the database to export from.
      * @param file       the file to write the resulting export to
      * @param encoding   The encoding of the database
      * @param entries    Contains all entries that should be exported.
      * @throws IOException if a problem occurred while trying to write to {@code writer}
      *                     or read from required resources.
      * @throws Exception   if any other error occurred during export.
-     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabase, MetaData, String, Charset, List)
+     * @see net.sf.jabref.exporter.IExportFormat#performExport(BibDatabaseContext, String, Charset, List)
      */
     @Override
-    public void performExport(final BibDatabase database, final MetaData metaData, final String file,
+    public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(database);
+        Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
@@ -216,7 +220,7 @@ public class ExportFormat implements IExportFormat {
             }
             // Write the header
             if (beginLayout != null) {
-                ps.write(beginLayout.doLayout(database, encoding));
+                ps.write(beginLayout.doLayout(databaseContext, encoding));
                 missingFormatters.addAll(beginLayout.getMissingFormatters());
             }
 
@@ -227,11 +231,8 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
             SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(
-                    new BibDatabaseContext(database, metaData, defaults), entries, savePrefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePrefs);
 
             // Load default layout
             Layout defLayout;
@@ -246,7 +247,7 @@ public class ExportFormat implements IExportFormat {
                     LOGGER.warn(missingFormatters);
                 }
             }
-            HashMap<String, Layout> layouts = new HashMap<>();
+            Map<String, Layout> layouts = new HashMap<>();
             Layout layout;
 
             ExportFormats.entryNumber = 0;
@@ -275,7 +276,7 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, database));
+                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
             }
 
             // Print footer
@@ -292,7 +293,7 @@ public class ExportFormat implements IExportFormat {
 
             // Write footer
             if ((endLayout != null) && (this.encoding != null)) {
-                ps.write(endLayout.doLayout(database, this.encoding));
+                ps.write(endLayout.doLayout(databaseContext, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
 
@@ -316,7 +317,7 @@ public class ExportFormat implements IExportFormat {
      * @param lfFileName The layout filename.
      */
     private static Map<String, String> readFormatterFile(String lfFileName) {
-        HashMap<String, String> formatters = new HashMap<>();
+        Map<String, String> formatters = new HashMap<>();
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {

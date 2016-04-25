@@ -15,32 +15,55 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexSingleField;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.*;
-import java.util.List;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
@@ -276,7 +299,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         listOfFileColumns = new JList<>(fileTypeNames);
         JScrollPane listOfFileColumnsScrollPane = new JScrollPane(listOfFileColumns);
         listOfFileColumns.setVisibleRowCount(3);
-        extraFileColumns = new JCheckBox(Localization.lang("Show Extra columns"));
+        extraFileColumns = new JCheckBox(Localization.lang("Show extra columns"));
         extraFileColumns.addChangeListener(arg0 -> listOfFileColumns.setEnabled(extraFileColumns.isSelected()));
 
         /*** begin: special table columns and special fields ***/

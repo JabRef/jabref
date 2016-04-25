@@ -1,15 +1,5 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.*;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,16 +7,33 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
 
 public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -61,7 +68,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : Arrays.asList("author", "editor")) {
+        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));
@@ -104,7 +111,8 @@ public class IntegrityCheckTest {
     @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
-        Mockito.when(metaData.getFileDirectory("file")).thenReturn(Collections.singletonList("."));
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
@@ -118,10 +126,10 @@ public class IntegrityCheckTest {
         File bibFile = testFolder.newFile("lit.bib");
         testFolder.newFile("file.pdf");
 
-        MetaData metaData = new MetaData();
-        metaData.setFile(bibFile);
+        BibDatabaseContext databaseContext = createContext("file", ":file.pdf:PDF");
+        databaseContext.setDatabaseFile(bibFile);
 
-        assertCorrect(createContext("file", ":file.pdf:PDF", metaData));
+        assertCorrect(databaseContext);
     }
 
     @Test
@@ -143,6 +151,25 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("pages", "7,41--42,73"));
         assertCorrect(createContext("pages", "7--11,41--43,73"));
         assertCorrect(createContext("pages", "7+,41--43,73"));
+    }
+
+    @Test
+    public void testBibStringChecks() {
+        assertCorrect(createContext("title", "Not a single hash mark"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "#einstein# and #newton#"));
+        assertWrong(createContext("month", "#jan"));
+        assertWrong(createContext("author", "#einstein# #amp; #newton#"));
+    }
+
+    @Test
+    public void testHTMLCharacterChecks() {
+        assertCorrect(createContext("title", "Not a single {HTML} character"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
+        assertWrong(createContext("author", "Lenhard, J&#227;rg"));
+        assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
     }
 
     private BibDatabaseContext createContext(String field, String value, String type) {

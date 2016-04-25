@@ -44,4 +44,10 @@ public class TitleCaseFormatter implements Formatter {
         return Localization.lang(
                 "Capitalize all words, but converts articles, prepositions, and conjunctions to lower case.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "{BPMN} conformance In open source Engines";
+    }
+
 }

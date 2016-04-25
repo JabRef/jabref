@@ -21,14 +21,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
+import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.BasicEventList;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class handles user defined custom export formats. They are initially

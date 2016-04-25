@@ -17,22 +17,22 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.nio.charset.Charset;
-
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
-    public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
-    public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
+
+    private static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
     private final BibDatabase base;
     private MetaData metaData;
     private final Map<String, EntryType> entryTypes;
@@ -186,4 +186,16 @@ public class ParserResult {
         this.errorMessage = errorMessage;
     }
 
+    public BibDatabaseContext getDatabaseContext() {
+        return new BibDatabaseContext(base, metaData, file);
+    }
+
+    public boolean isNullResult() {
+        // TODO Auto-generated method stub
+        return this == NULL_RESULT;
+    }
+
+    public static ParserResult getNullResult() {
+        return NULL_RESULT;
+    }
 }

@@ -8,7 +8,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
@@ -19,14 +23,18 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.openjdk.jmh.Main;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 @State(Scope.Thread)
 public class Benchmarks {
 
-    StringReader bibtexStringReader;
+    String bibtexString;
     BibDatabase database = new BibDatabase();
 
     @Setup
@@ -50,12 +58,13 @@ public class Benchmarks {
         databaseWriter.writePartOfDatabase(stringWriter,
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
-        String bibtexString = stringWriter.toString();
-        bibtexStringReader = new StringReader(bibtexString);
+        bibtexString = stringWriter.toString();
+
     }
 
     @Benchmark
     public ParserResult parse() throws IOException {
+        StringReader bibtexStringReader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(bibtexStringReader);
         return parser.parse();
     }

@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 public class StyleLoader {
 

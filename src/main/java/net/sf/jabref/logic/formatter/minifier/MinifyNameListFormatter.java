@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.formatter.minifier;
 
+import java.util.Objects;
+
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-
-import java.util.Objects;
 
 /**
  * Replaces three or more authors with and others
@@ -43,6 +43,11 @@ public class MinifyNameListFormatter implements Formatter {
     @Override
     public String getDescription() {
         return Localization.lang("Shortens lists of persons if there are more than 2 persons to \"et al.\".");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "Stefan Kolb and Simon Harrer and Oliver Kopp";
     }
 
     private String abbreviateAuthor(String authorField) {

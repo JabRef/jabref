@@ -15,19 +15,19 @@
  */
 package net.sf.jabref.importer.fileformat;
 
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
-
-import java.util.regex.Pattern;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -101,7 +101,7 @@ public class SilverPlatterImporter extends ImportFormat {
             }
             String[] entries = sb.toString().split("__::__");
             String type = "";
-            HashMap<String, String> h = new HashMap<>();
+            Map<String, String> h = new HashMap<>();
             for (String entry : entries) {
                 if (entry.trim().length() < 6) {
                     continue;
@@ -123,8 +123,8 @@ public class SilverPlatterImporter extends ImportFormat {
                             h.put("editor",
                                     AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                         } else {
-                            h.put("author", AuthorList
-                                    .fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
+                            h.put("author",
+                                    AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                         }
                     } else if ("AB".equals(f3)) {
                         h.put("abstract", frest);
@@ -143,10 +143,13 @@ public class SilverPlatterImporter extends ImportFormat {
                                 h.put("year", yr);
                                 frest = frest.substring(m);
                                 m = frest.indexOf(':');
+                                int issueIndex = frest.indexOf('(');
+                                int endIssueIndex = frest.indexOf(')');
                                 if (m >= 0) {
                                     String pg = frest.substring(m + 1).trim();
                                     h.put("pages", pg);
-                                    h.put("volume", frest.substring(1, m));
+                                    h.put("volume", frest.substring(1, issueIndex).trim());
+                                    h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
                                 }
                             }
                         }
@@ -197,14 +200,9 @@ public class SilverPlatterImporter extends ImportFormat {
                     if (titleO != null) {
                         String title = ((String) titleO).trim();
                         int inPos = title.indexOf("\" in ");
-                        int pgPos = title.lastIndexOf(' ');
                         if (inPos > 1) {
-                            h.put("title", title.substring(1, inPos));
+                            h.put("title", title.substring(0, inPos));
                         }
-                        if (pgPos > inPos) {
-                            h.put("pages", title.substring(pgPos).replace("-", "--"));
-                        }
-
                     }
 
                 }

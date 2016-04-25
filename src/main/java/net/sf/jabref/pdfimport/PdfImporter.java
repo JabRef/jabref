@@ -27,10 +27,6 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.model.entry.EntryType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -41,13 +37,11 @@ import net.sf.jabref.gui.EntryTypeDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
@@ -55,6 +49,11 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PdfImporter {
 
@@ -142,8 +141,8 @@ public class PdfImporter {
         }
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
-        boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
-        int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE);
+        int globalChoice = Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
 
         List<BibEntry> res = new ArrayList<>();
@@ -212,7 +211,7 @@ public class PdfImporter {
         FileListTableModel tm = new FileListTableModel();
         File toLink = new File(fileName);
         // Get a list of file directories:
-        List<String> dirsS = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        List<String> dirsS = panel.getBibDatabaseContext().getFileDirectory();
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
@@ -276,14 +275,14 @@ public class PdfImporter {
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 
-        if (type != null) { // Only if the dialog was not cancelled.
+        if (type != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, type.getName());
             try {
                 panel.getDatabase().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibEntry> list = new ArrayList<>();
+                List<BibEntry> list = new ArrayList<>();
                 list.add(be);
                 UpdateField.setAutomaticFields(list, true, true);
 

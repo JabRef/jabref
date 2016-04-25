@@ -71,6 +71,8 @@ public class BibtexString {
             if (name.length() <= 1) {
                 return OTHER;
             }
+            // TODO: Figure out what the next check actually does and replace it with something more sensible
+            // Second character is not upper case? What about non-letters?
             if (!(String.valueOf(name.charAt(1))).toUpperCase().equals(
                     String.valueOf(name.charAt(1)))) {
                 return OTHER;

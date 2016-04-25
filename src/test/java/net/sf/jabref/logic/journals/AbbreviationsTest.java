@@ -1,11 +1,12 @@
 package net.sf.jabref.logic.journals;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Test;
 
-import net.sf.jabref.JabRefPreferences;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AbbreviationsTest {
 

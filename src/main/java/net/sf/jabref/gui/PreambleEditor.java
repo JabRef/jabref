@@ -15,22 +15,35 @@
  */
 package net.sf.jabref.gui;
 
-import java.awt.event.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.actions.Actions;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabase;
 
 class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.
@@ -44,9 +57,6 @@ class PreambleEditor extends JDialog {
     private final RedoAction redoAction = new RedoAction();
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
-
-    private final PositionWindow pw;
-
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base) {
         super(baseFrame);
@@ -99,25 +109,9 @@ class PreambleEditor extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
         setTitle(Localization.lang("Edit preamble"));
 
-        pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
                 JabRefPreferences.PREAMBLE_SIZE_X, JabRefPreferences.PREAMBLE_SIZE_Y);
         pw.setWindowPosition();
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
-
     }
 
     private void setupJTextComponent(JTextComponent ta) {

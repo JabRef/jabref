@@ -23,13 +23,13 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.exporter.AutoSaveManager;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -71,13 +71,14 @@ public class AutosaveStartupPrompter implements Runnable {
                 fileToLoad = AutoSaveManager.getAutoSaveFile(file);
             }
             boolean done = false;
-            ParserResult pr = null;
-            while (!done) {
-                pr = JabRef.openBibFile(fileToLoad.getPath(), true);
-                if ((pr != null) && !pr.isInvalid()) {
+            ParserResult pr;
+            do {
+                pr = OpenDatabaseAction.loadDatabaseOrAutoSave(fileToLoad.getPath(), true);
+                if (pr.isInvalid()) {
                     loaded.add(pr);
-                    BasePanel panel = frame.addTab(pr.getDatabase(), file,
-                            pr.getMetaData(), pr.getEncoding(), first);
+                    BibDatabaseContext databaseContext = pr.getDatabaseContext();
+                    databaseContext.setDatabaseFile(file);
+                    BasePanel panel = frame.addTab(databaseContext, pr.getEncoding(), first);
                     location.put(pr, frame.getBasePanelCount() - 1);
                     if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();
@@ -93,23 +94,17 @@ public class AutosaveStartupPrompter implements Runnable {
                         tryingAutosave = false;
                         fileToLoad = file;
                     } else {
-                        String message;
-                        if (pr == null) {
-                            message = Localization.lang("Error opening file '%0'.", file.getName());
-                        } else {
-                            message = "<html>" + pr.getErrorMessage() + "<p>" +
-                                    Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
-                        }
+                        String message = "<html>" + pr.getErrorMessage() + "<p>"
+                                + Localization.lang("Error opening file '%0'.", file.getName()) + "</html>";
                         JOptionPane.showMessageDialog(frame,
                                 message, Localization.lang("Error opening file"), JOptionPane.ERROR_MESSAGE);
                         done = true;
                     }
 
                 }
-            }
+            } while (!done);
 
-            if ((pr != null) && !pr.isInvalid()
-                    && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+            if (!pr.isInvalid() && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
             }
         }

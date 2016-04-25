@@ -16,9 +16,16 @@
 
 package net.sf.jabref.sql;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -33,16 +40,11 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * @author ifsteinm
@@ -145,7 +147,7 @@ public class DBImportExportDialog implements MouseListener, KeyListener {
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
         b.addButton(cancelButton);
         b.addRelatedGap();
-        JButton removeButton = new JButton(Localization.lang("Remove Selected"));
+        JButton removeButton = new JButton(Localization.lang("Remove selected"));
         b.addButton(removeButton);
 
         b.addGlue();

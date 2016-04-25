@@ -1,19 +1,19 @@
 package net.sf.jabref.bibtex;
 
-import static org.junit.Assert.*;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
-
-import java.util.Optional;
+import static org.junit.Assert.assertEquals;
 
 public class EntryTypesTestBibLatex {
 

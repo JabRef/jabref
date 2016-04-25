@@ -3,17 +3,27 @@ jdk:
   - oraclejdk8
 sudo: false
 
-before_install:
-  - chmod +x gradlew
+services:
+  - postgresql
+  - mysql
+
+# skip installation as this is also done during the script step
+install: true
 
 # allow gui testing on travis
 before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+  - psql -c 'create database jabref;' -U postgres
 
 script:
-  - ./gradlew test integrationTest --info
+  - ./gradlew check integrationTest
+
+after_script:
+  # enable codecov report
+  - ./gradlew jacocoTestReport
+  - bash <(curl -s https://codecov.io/bash)
 
 # cache gradle dependencies
 cache:

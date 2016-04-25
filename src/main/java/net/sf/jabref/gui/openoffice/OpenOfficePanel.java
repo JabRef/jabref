@@ -28,7 +28,41 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SidePaneComponent;
+import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -36,17 +70,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.*;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -484,10 +507,10 @@ public class OpenOfficePanel extends AbstractWorker {
         ButtonBarBuilder bb = new ButtonBarBuilder();
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        ActionListener tfListener = (e -> {
+        ActionListener tfListener = e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
-        });
+        };
 
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
@@ -528,7 +551,7 @@ public class OpenOfficePanel extends AbstractWorker {
         if (addPageInfo) {
             AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
             acd.showDialog();
-            if (acd.cancelled()) {
+            if (acd.canceled()) {
                 return;
             }
             if (!acd.getPageInfo().isEmpty()) {
@@ -671,6 +694,11 @@ public class OpenOfficePanel extends AbstractWorker {
         @Override
         public void componentOpening() {
             preferences.setShowPanel(true);
+        }
+
+        @Override
+        public int getRescalingWeight() {
+            return 0;
         }
     }
 

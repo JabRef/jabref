@@ -17,33 +17,43 @@ package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sf.jabref.model.database.BibDatabaseMode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.comparator.EntryComparator;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.model.DuplicateCheck;
-import net.sf.jabref.model.database.EntrySorter;
-import net.sf.jabref.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ChangeScanner implements Runnable {
 
@@ -206,8 +216,8 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        HashSet<String> used = new HashSet<>(disk.getEntryCount());
-        HashSet<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
+        Set<String> used = new HashSet<>(disk.getEntryCount());
+        Set<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
@@ -361,9 +371,9 @@ public class ChangeScanner implements Runnable {
             return;
         }
 
-        HashSet<Object> used = new HashSet<>();
-        HashSet<Object> usedInMem = new HashSet<>();
-        HashSet<String> notMatched = new HashSet<>(onTmp.getStringCount());
+        Set<Object> used = new HashSet<>();
+        Set<Object> usedInMem = new HashSet<>();
+        Set<String> notMatched = new HashSet<>(onTmp.getStringCount());
 
         // First try to match by string names.
         mainLoop:

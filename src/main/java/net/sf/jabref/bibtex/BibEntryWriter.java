@@ -1,19 +1,24 @@
 package net.sf.jabref.bibtex;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Predicate;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.*;
-import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
-import net.sf.jabref.model.entry.TypedBibEntry;
 
 public class BibEntryWriter {
 
@@ -74,7 +79,7 @@ public class BibEntryWriter {
 
         writeKeyField(entry, out);
 
-        HashSet<String> written = new HashSet<>();
+        Set<String> written = new HashSet<>();
         written.add(BibEntry.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
@@ -99,7 +104,7 @@ public class BibEntryWriter {
             }
         }
         // Then write remaining fields in alphabetic order.
-        TreeSet<String> remainingFields = new TreeSet<>();
+        Set<String> remainingFields = new TreeSet<>();
         for (String key : entry.getFieldNames()) {
             boolean writeIt = write ? InternalBibtexFields.isWriteableField(key) :
                     InternalBibtexFields.isDisplayableField(key);
@@ -172,14 +177,6 @@ public class BibEntryWriter {
             actualField = "UNKNOWN";
         }
 
-        StringBuilder suffixSB = new StringBuilder();
-
-        for (int i = (intendation - actualField.length()); i > 0; i--) {
-            suffixSB.append(' ');
-        }
-
-        String suffix = suffixSB.toString();
-
-        return actualField.toLowerCase() + suffix + " = ";
+        return actualField.toLowerCase() + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
     }
 }

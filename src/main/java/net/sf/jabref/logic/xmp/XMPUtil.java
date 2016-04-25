@@ -15,24 +15,46 @@
  */
 package net.sf.jabref.logic.xmp;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ParserResult;
-
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,10 +67,13 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.exceptions.CryptographyException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
+import org.apache.pdfbox.pdmodel.encryption.BadSecurityHandlerException;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 import org.w3c.dom.Document;
 
 /**
@@ -120,6 +145,22 @@ public class XMPUtil {
         return result;
     }
 
+    public static PDDocument loadWithAutomaticDecryption(InputStream inputStream)
+            throws IOException, EncryptedPdfsNotSupportedException {
+        PDDocument doc = PDDocument.load(inputStream);
+        if (doc.isEncrypted()) {
+            // try the empty string as user password
+            StandardDecryptionMaterial sdm = new StandardDecryptionMaterial("");
+            try {
+                doc.openProtection(sdm);
+            } catch (BadSecurityHandlerException | CryptographyException e) {
+                LOGGER.error("Cannot handle encrypted PDF: " + e.getMessage());
+                throw new EncryptedPdfsNotSupportedException();
+            }
+        }
+        return doc;
+    }
+
     /**
      * Try to read the given BibTexEntry from the XMP-stream of the given
      * inputstream containing a PDF-file.
@@ -138,11 +179,7 @@ public class XMPUtil {
 
         List<BibEntry> result = new LinkedList<>();
 
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
-            }
-
+        try (PDDocument document = loadWithAutomaticDecryption(inputStream)) {
             Optional<XMPMetadata> meta = XMPUtil.getXMPMetadata(document);
 
             if (meta.isPresent()) {
@@ -507,13 +544,8 @@ public class XMPUtil {
      * @return The XMPMetadata object found in the file
      */
     private static Optional<XMPMetadata> readRawXMP(InputStream inputStream) throws IOException {
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException("Error: Cannot read metadata from encrypted document.");
-            }
-
+        try (PDDocument document = loadWithAutomaticDecryption(inputStream)) {
             return XMPUtil.getXMPMetadata(document);
-
         }
     }
 
@@ -1035,8 +1067,7 @@ public class XMPUtil {
 
         try (PDDocument document = PDDocument.load(file.getAbsoluteFile())) {
             if (document.isEncrypted()) {
-                throw new EncryptionNotSupportedException(
-                        "Error: Cannot add metadata to encrypted document.");
+                throw new EncryptedPdfsNotSupportedException();
             }
 
             if (writePDFInfo && (resolvedEntries.size() == 1)) {
@@ -1082,10 +1113,9 @@ public class XMPUtil {
             try {
                 document.save(file.getAbsolutePath());
             } catch (COSVisitorException e) {
-                throw new TransformerException("Could not write XMP-metadata: "
-                        + e.getLocalizedMessage());
+                LOGGER.debug("Could not write XMP metadata", e);
+                throw new TransformerException("Could not write XMP metadata: " + e.getLocalizedMessage(), e);
             }
-
         }
     }
 
@@ -1264,7 +1294,7 @@ public class XMPUtil {
         try {
             List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream);
             return !bibEntries.isEmpty();
-        } catch (EncryptionNotSupportedException ex) {
+        } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");
             return false;
         } catch (IOException e) {

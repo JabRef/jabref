@@ -1,7 +1,10 @@
 package net.sf.jabref.external;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
@@ -32,11 +35,11 @@ public class AttachFileAction implements BaseAction {
         BibEntry entry = panel.getSelectedEntries().get(0);
         FileListEntry flEntry = new FileListEntry("", "");
         FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
-                panel.getBibDatabaseContext().getMetaData());
+                panel.getBibDatabaseContext());
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(oldVal -> model.setContent(oldVal));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(model::setContent);
             model.addEntry(model.getRowCount(), flEntry);
             String newVal = model.getStringRepresentation();
 

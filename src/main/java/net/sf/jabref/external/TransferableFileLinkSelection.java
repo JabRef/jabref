@@ -15,22 +15,22 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileListTableModel;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.ArrayList;
 
 /**
  *
@@ -47,7 +47,7 @@ public class TransferableFileLinkSelection implements Transferable {
         selection.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
-            List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
             FileUtil.expandFilename(tm.getEntry(0).link, dirs).ifPresent(fileList::add);
         }
 

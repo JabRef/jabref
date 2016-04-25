@@ -1,15 +1,15 @@
 package net.sf.jabref.logic.net;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class URLDownloadTest {
 

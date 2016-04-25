@@ -1,0 +1,11 @@
+Record.*INSPEC.*
+
+TI ~ The SIS project : software reuse with a natural language approach
+AU ~ Prechelt, Lutz
+AB ~ Abstrakt
+PU ~ Karlsruhe :  Universitat Karlsruhe, Fakultat fur Informatik
+PY ~ 10000
+SO ~ 10000. 1992; 19: 20
+ID ~ key
+RT ~ Journal-Paper
+

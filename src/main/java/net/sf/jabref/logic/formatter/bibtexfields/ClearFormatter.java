@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
+
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-
-import java.util.Objects;
 
 public class ClearFormatter implements Formatter {
 
@@ -27,4 +27,10 @@ public class ClearFormatter implements Formatter {
     public String getDescription() {
         return Localization.lang("Clears the field completely.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "Obsolete text";
+    }
+
 }

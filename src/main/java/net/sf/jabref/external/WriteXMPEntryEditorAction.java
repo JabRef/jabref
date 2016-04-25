@@ -20,11 +20,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -54,7 +59,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         setEnabled(false);
-        panel.output(Localization.lang("Writing XMP metadata..."));
+        panel.output(Localization.lang("Writing XMP-metadata..."));
         panel.frame().setProgressBarIndeterminate(true);
         panel.frame().setProgressBarVisible(true);
         BibEntry entry = editor.getEntry();
@@ -64,11 +69,11 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         // First check the (legacy) "pdf" field:
         String pdf = entry.getField("pdf");
-        List<String> dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory("pdf");
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory("pdf");
         FileUtil.expandFilename(pdf, dirs).ifPresent(files::add);
 
         // Then check the "file" field:
-        dirs = panel.getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD);
+        dirs = panel.getBibDatabaseContext().getFileDirectory();
         if (entry.hasField(Globals.FILE_FIELD)) {
             FileListTableModel tm = new FileListTableModel();
             tm.setContent(entry.getField(Globals.FILE_FIELD));

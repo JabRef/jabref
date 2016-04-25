@@ -15,19 +15,20 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
 
 /*
  * A transferable object containing an array of BibEntry objects. Used

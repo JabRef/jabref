@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.importer;
 
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
 
 /**
  * PostOpenAction that checks whether there are warnings about duplicate BibTeX keys, and

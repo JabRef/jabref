@@ -1,15 +1,19 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -56,9 +60,10 @@ public class LocalizationConsistencyTest {
         /**
          * Overriding the HashTable put() so we can check for duplicates
          */
+        @Override
         public synchronized Object put(Object key, Object value) {
             // Have we seen this key before?
-            if (get(key) != null) {
+            if (containsKey(key)) {
                 duplicates.add(String.valueOf(key));
             }
 
@@ -71,7 +76,7 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void ensureNoDuplicates() throws IOException {
+    public void ensureNoDuplicates() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
             for (String lang : Languages.LANGUAGES.values()) {
                 String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
@@ -146,7 +151,7 @@ public class LocalizationConsistencyTest {
             System.out.println(
                     "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys found in properties file which should be removed");
+            fail("Obsolete keys " + obsoleteKeys + " found in properties file which should be removed");
         }
     }
 
@@ -163,7 +168,7 @@ public class LocalizationConsistencyTest {
             System.out.println(
                     "2. EXECUTE gradlew -b localization.gradle compareAndUpdateTranslationsWithEnglishTranslation TO");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys found in menu properties file which should be removed");
+            fail("Obsolete keys " + obsoleteKeys + " found in menu properties file which should be removed");
         }
     }
 

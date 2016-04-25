@@ -1,6 +1,9 @@
 package net.sf.jabref.logic.l10n;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 
 public class Languages {
 
@@ -21,7 +24,7 @@ public class Languages {
         LANGUAGES.put("Japanese", "ja");
         LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
-        LANGUAGES.put("Brazilian Portugese", "pt_BR");
+        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
         LANGUAGES.put("Russian", "ru");
         LANGUAGES.put("Svenska", "sv");
         LANGUAGES.put("Turkish", "tr");

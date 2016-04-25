@@ -28,8 +28,8 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.CaseChangers;
-import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.

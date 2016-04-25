@@ -15,9 +15,24 @@
 */
 package net.sf.jabref.gui.labelpattern;
 
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
@@ -26,12 +41,9 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -104,7 +116,18 @@ public class LabelPatternPanel extends JPanel {
         gbl.setConstraints(btnDefault, con);
         pan.add(btnDefault);
 
-        for (EntryType type : EntryTypes.getAllValues(panel.getBibDatabaseContext().getMode())) {
+        BibDatabaseMode mode;
+        // check mode of currently used DB
+        if (panel != null) {
+            mode = panel.getBibDatabaseContext().getMode();
+        } else { // use preferences value if no DB is open
+            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+                mode = BibDatabaseMode.BIBLATEX;
+            } else {
+                mode = BibDatabaseMode.BIBTEX;
+            }
+        }
+        for (EntryType type : EntryTypes.getAllValues(mode)) {
             textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
         }

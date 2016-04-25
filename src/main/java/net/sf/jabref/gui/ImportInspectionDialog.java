@@ -15,6 +15,95 @@
 */
 package net.sf.jabref.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.external.DownloadExternalFile;
+import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
+import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.renderer.GeneralRenderer;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.comparator.IconComparator;
+import net.sf.jabref.gui.util.component.CheckBoxMessage;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.DuplicateCheck;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -28,51 +117,8 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.external.DownloadExternalFile;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.UndoableChangeAssignment;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.renderer.GeneralRenderer;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.comparator.IconComparator;
-import net.sf.jabref.gui.util.component.CheckBoxMessage;
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
-import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.DuplicateCheck;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.undo.AbstractUndoableEdit;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
 
 /**
  * Dialog to allow the selection of entries as part of an Import.
@@ -94,20 +140,15 @@ import java.util.List;
  * soon as possible (it is not really critical, but good style to not contribute
  * any more results via addEntry, call entryListComplete() or dispose(), after
  * receiving this call).
- *
- * @author alver
  */
 public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
-
     private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
-
-    protected ImportInspectionDialog ths = this;
 
     private BasePanel panel;
 
     public final JabRefFrame frame;
 
-    private final MetaData metaData;
+    private final BibDatabaseContext bibDatabaseContext;
 
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
@@ -116,8 +157,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final TableComparatorChooser<BibEntry> comparatorChooser;
 
     private final DefaultEventSelectionModel<BibEntry> selectionModel;
-
-    private final String[] fields;
 
     private final JProgressBar progressBar = new JProgressBar(SwingConstants.HORIZONTAL);
 
@@ -147,10 +186,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private final PreviewPanel preview;
 
-    private boolean generatedKeys; // Set to true after keys have
-    // been
-
-    // generated.
+    private boolean generatedKeys; // Set to true after keys have been generated.
 
     private boolean defaultSelected = true;
 
@@ -159,12 +195,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
 
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
-            Globals.prefs
-            .getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
+            Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION));
 
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+
+    private static final List<String> INSPECTION_FIELDS = Arrays.asList("author", "title", "year", BibEntry.KEY_FIELD);
 
     private static final int DUPL_COL = 1;
     private static final int FILE_COL = 2;
@@ -181,17 +218,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      *
      * @param frame
      * @param panel
-     * @param fields
      */
-    public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String[] fields,
-            String undoName, boolean newDatabase) {
+    public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
         this.frame = frame;
         this.panel = panel;
-        this.metaData = (panel == null) ? new MetaData() : panel.getBibDatabaseContext().getMetaData();
-        this.fields = Arrays.copyOf(fields, fields.length);
+        this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        preview = new PreviewPanel(null, metaData, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
+        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -230,11 +265,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         popup.add(deleteListener);
         popup.addSeparator();
-        if (!newDatabase) {
-            GroupTreeNode node = metaData.getGroups();
+        if (!newDatabase && (bibDatabaseContext != null)) {
+            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
-            groupsAdd.setEnabled(false); // Will get enabled if there are
-            // groups that can be added to.
+            groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
             insertNodes(groupsAdd, node);
             popup.add(groupsAdd);
         }
@@ -510,7 +544,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private void insertNodes(JMenu menu, GroupTreeNode node) {
         final AbstractAction action = getAction(node);
 
-        if (node.getChildCount() == 0) {
+        if (node.getNumberOfChildren() == 0) {
             menu.add(action);
             if (action.isEnabled()) {
                 menu.setEnabled(true);
@@ -520,18 +554,18 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         JMenu submenu;
         if (node.getGroup() instanceof AllEntriesGroup) {
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(menu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(menu, child);
             }
         } else {
-            submenu = new JMenu('[' + node.getGroup().getName() + ']');
+            submenu = new JMenu('[' + node.getName() + ']');
             // setEnabled(true) is done above/below if at least one menu
             // entry (item or submenu) is enabled
             submenu.setEnabled(action.isEnabled());
             submenu.add(action);
             submenu.add(new JPopupMenu.Separator());
-            for (int i = 0; i < node.getChildCount(); ++i) {
-                insertNodes(submenu, (GroupTreeNode) node.getChildAt(i));
+            for (GroupTreeNode child : node.getChildren()) {
+                insertNodes(submenu, child);
             }
             menu.add(submenu);
             if (submenu.isEnabled()) {
@@ -542,8 +576,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private AbstractAction getAction(GroupTreeNode node) {
         AbstractAction action = new AddToGroupAction(node);
-        AbstractGroup group = node.getGroup();
-        action.setEnabled(group.supportsAdd());
+        action.setEnabled(node.supportsAddingEntries());
         return action;
     }
 
@@ -558,7 +591,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         private final GroupTreeNode node;
 
         public AddToGroupAction(GroupTreeNode node) {
-            super(node.getGroup().getName());
+            super(node.getName());
             this.node = node;
         }
 
@@ -609,7 +642,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     // is indicated by the entry's group hit status:
                     if (entry.isGroupHit()) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
-                                Localization.lang("There are possible duplicates (marked with a 'D' icon) that haven't been resolved. Continue?"),
+                                Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                                 Localization.lang("Disable this confirmation dialog"), false);
                         int answer = JOptionPane.showConfirmDialog(ImportInspectionDialog.this,
                                 cbm, Localization.lang("Duplicates found"), JOptionPane.YES_NO_OPTION);
@@ -630,10 +663,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // See if we should remove any old entries for duplicate resolving:
             if (!entriesToDelete.isEmpty()) {
-                for (BibEntry entry : entriesToDelete) {
-                    ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
-                    panel.getDatabase().removeEntry(entry);
-                }
+                removeEntriesToDelete(ce);
             }
 
             // If "Generate keys" is checked, generate keys unless it's already
@@ -647,99 +677,116 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             final List<BibEntry> selected = getSelectedEntries();
 
             if (!selected.isEmpty()) {
-
-                if (newDatabase) {
-                    // Create a new BasePanel for the entries:
-                    Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
-                }
-
-                boolean groupingCanceled = false;
-
-                // Set owner/timestamp if options are enabled:
-                UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
-
-                // Mark entries if we should
-                if (EntryMarker.shouldMarkEntries()) {
-                    for (BibEntry entry : selected) {
-                        EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
-                    }
-                }
-                // Check if we should unmark entries before adding the new ones:
-                if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
-                    for (BibEntry entry : panel.getDatabase().getEntries()) {
-                        EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
-                    }
-                }
-
-                for (BibEntry entry : selected) {
-                    // entry.clone();
-
-                    // Remove settings to group/search hit status:
-                    entry.setSearchHit(false);
-                    entry.setGroupHit(false);
-
-                    // If this entry should be added to any groups, do it now:
-                    Set<GroupTreeNode> groups = groupAdditions.get(entry);
-                    if (!groupingCanceled && (groups != null)) {
-                        if (entry.getCiteKey() == null) {
-                            // The entry has no key, so it can't be added to the
-                            // group.
-                            // The best course of action is probably to ask the
-                            // user if a key should be generated
-                            // immediately.
-                            int answer = JOptionPane
-                                    .showConfirmDialog(
-                                            ImportInspectionDialog.this,
-                                            Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
-                                            Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
-                            if (answer == JOptionPane.YES_OPTION) {
-                                generateKeys();
-                            } else {
-                                groupingCanceled = true;
-                            }
-                        }
-
-                        // If the key existed, or exists now, go ahead:
-                        if (entry.getCiteKey() != null) {
-                            for (GroupTreeNode node : groups) {
-                                if (node.getGroup().supportsAdd()) {
-                                    // Add the entry:
-                                    AbstractUndoableEdit undo = node.getGroup().add(Collections.singletonList(entry));
-                                    if (undo instanceof UndoableChangeAssignment) {
-                                        ((UndoableChangeAssignment) undo).setEditedNode(node);
-                                    }
-                                    ce.addEdit(undo);
-
-                                }
-                            }
-                        }
-                    }
-
-                    entry.setId(IdGenerator.next());
-                    panel.getDatabase().insertEntry(entry);
-                    ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
-
-                }
-
-                ce.end();
-                panel.undoManager.addEdit(ce);
+                addSelectedEntries(ce, selected);
             }
 
             dispose();
-            SwingUtilities.invokeLater(() -> {
-                if (newDatabase) {
-                    frame.addTab(panel, true);
-                }
-                panel.markBaseChanged();
+            SwingUtilities.invokeLater(() -> updateGUI(selected.size()));
+        }
 
-                if (selected.isEmpty()) {
-                    frame.output(Localization.lang("No entries imported."));
-                } else {
-                    frame.output(Localization.lang("Number of entries successfully imported") + ": " + selected.size());
+        private void updateGUI(int entryCount) {
+            if (newDatabase) {
+                frame.addTab(panel, true);
+            }
+            panel.markBaseChanged();
+
+            if (entryCount == 0) {
+                frame.output(Localization.lang("No entries imported."));
+            } else {
+                frame.output(Localization.lang("Number of entries successfully imported") + ": " + entryCount);
+            }
+        }
+
+        private void removeEntriesToDelete(NamedCompound ce) {
+            for (BibEntry entry : entriesToDelete) {
+                ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+                panel.getDatabase().removeEntry(entry);
+            }
+        }
+
+        private void addSelectedEntries(NamedCompound ce, final List<BibEntry> selected) {
+            if (newDatabase) {
+                // Create a new BasePanel for the entries:
+                Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
+            }
+
+            boolean groupingCanceled = false;
+
+            // Set owner/timestamp if options are enabled:
+            UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
+                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+
+            // Mark entries if we should
+            if (EntryMarker.shouldMarkEntries()) {
+                for (BibEntry entry : selected) {
+                    EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                 }
-            });
+            }
+            // Check if we should unmark entries before adding the new ones:
+            if (Globals.prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING)) {
+                for (BibEntry entry : panel.getDatabase().getEntries()) {
+                    EntryMarker.unmarkEntry(entry, true, panel.getDatabase(), ce);
+                }
+            }
+
+            for (BibEntry entry : selected) {
+                // Remove settings to group/search hit status:
+                entry.setSearchHit(false);
+                entry.setGroupHit(false);
+
+                // If this entry should be added to any groups, do it now:
+                Set<GroupTreeNode> groups = groupAdditions.get(entry);
+                if (!groupingCanceled && (groups != null)) {
+                    groupingCanceled = addToGroups(ce, entry, groups);
+                }
+
+
+                entry.setId(IdGenerator.next());
+                panel.getDatabase().insertEntry(entry);
+                ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
+
+            }
+
+            ce.end();
+            panel.undoManager.addEdit(ce);
+        }
+
+        private boolean addToGroups(NamedCompound ce, BibEntry entry, Set<GroupTreeNode> groups) {
+            boolean groupingCanceled = false;
+            if (entry.getCiteKey() == null) {
+                // The entry has no key, so it can't be added to the
+                // group.
+                // The best course of action is probably to ask the
+                // user if a key should be generated
+                // immediately.
+                int answer = JOptionPane
+                        .showConfirmDialog(
+                                ImportInspectionDialog.this,
+                                Localization.lang("Cannot add entries to group without generating keys. Generate keys now?"),
+                                Localization.lang("Add to group"), JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.YES_OPTION) {
+                    generateKeys();
+                } else {
+                    groupingCanceled = true;
+                }
+            }
+
+            // If the key existed, or exists now, go ahead:
+            if (entry.getCiteKey() != null) {
+                for (GroupTreeNode node : groups) {
+                    if (node.supportsAddingEntries()) {
+                        // Add the entry:
+
+                        Optional<EntriesGroupChange> undo = node.getGroup().add(Collections.singletonList(entry));
+                        if (undo.isPresent()) {
+                            ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
+                                    undo.get()));
+                        }
+                    }
+                }
+            }
+            return groupingCanceled;
         }
 
         /**
@@ -777,8 +824,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
         }
 
-        for (int i = 0; i < fields.length; i++) {
-            int width = InternalBibtexFields.getFieldLength(fields[i]);
+        for (int i = 0; i < INSPECTION_FIELDS.size(); i++) {
+            int width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
             glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
         }
     }
@@ -870,7 +917,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         }
                         FileListEntry fl = tableModel.getEntry(0);
                         (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                panel.getBibDatabaseContext().getMetaData(), fl.type))
+                                panel.getBibDatabaseContext(), fl.type))
                                 .actionPerformed(null);
                     }
                 } else { // Must be URL_COL
@@ -929,7 +976,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(), flEntry.type));
+                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -951,7 +998,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.getFieldOptional(fieldName).ifPresent(link -> {
                 try {
-                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link, fieldName);
+                    JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
                     LOGGER.warn("Could not open link", ex);
                 }
@@ -1114,7 +1161,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     bibtexKey = entry.getCiteKey();
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, metaData, bibtexKey);
+            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey);
             try {
                 def.download(this);
             } catch (IOException ex) {
@@ -1164,15 +1211,15 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            JabRefExecutorService.INSTANCE
-                    .execute(net.sf.jabref.util.Util.autoSetLinks(entry, localModel, metaData, e -> {
+            JabRefExecutorService.INSTANCE.execute(
+                    net.sf.jabref.external.AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
                             entries.getReadWriteLock().writeLock().lock();
                             entry.setField(Globals.FILE_FIELD, localModel.getStringRepresentation());
                             entries.getReadWriteLock().writeLock().unlock();
                             glTable.repaint();
                         }
-                    }, diag));
+                    } , diag));
 
         }
     }
@@ -1194,8 +1241,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             entry = selectionModel.getSelected().get(0);
             FileListEntry flEntry = new FileListEntry("", "");
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true,
-                    metaData);
+            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, bibDatabaseContext);
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel localModel = new FileListTableModel();
@@ -1241,10 +1287,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         }
         // Remaining columns:
-        for (int i = PAD; i < (PAD + fields.length); i++) {
+        for (int i = PAD; i < (PAD + INSPECTION_FIELDS.size()); i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
-            comparators.add(new FieldComparator(fields[i - PAD]));
+            comparators.add(new FieldComparator(INSPECTION_FIELDS.get(i - PAD)));
         }
 
         // Set initial sort columns:
@@ -1268,7 +1314,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     public interface CallBack {
 
         /**
-         * This method is called by the dialog when the user has cancelled or
+         * This method is called by the dialog when the user has canceled or
          * signaled a stop. It is expected that any long-running fetch
          * operations will stop after this method is called.
          */
@@ -1332,7 +1378,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         @Override
         public int getColumnCount() {
-            return PAD + fields.length;
+            return PAD + INSPECTION_FIELDS.size();
         }
 
         @Override
@@ -1341,7 +1387,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return EntryUtil.capitalizeFirst(fields[i - PAD]);
+                return EntryUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
             }
             return "";
         }
@@ -1377,8 +1423,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     return null;
                 }
             } else {
-                String field = fields[i - PAD];
-                if ("author".equals(field) || "editor".equals(field)) {
+                String field = INSPECTION_FIELDS.get(i - PAD);
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                     return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib)
                             .orElse("");
                 } else {

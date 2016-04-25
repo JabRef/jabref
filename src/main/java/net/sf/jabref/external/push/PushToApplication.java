@@ -15,14 +15,15 @@
 */
 package net.sf.jabref.external.push;
 
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JPanel;
+
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.MetaData;
-
-import java.util.List;
-
-import javax.swing.*;
 
 /**
  * Class that defines interaction with an external application in the form of "pushing" selected entries to it.

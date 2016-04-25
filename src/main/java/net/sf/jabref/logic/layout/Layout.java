@@ -15,18 +15,19 @@
 */
 package net.sf.jabref.logic.layout;
 
-import java.util.Optional;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Main class for formatting DOCUMENT ME!
@@ -136,12 +137,12 @@ public class Layout {
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibDatabase database, Charset encoding) {
+    public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         StringBuilder sb = new StringBuilder(100);
         String fieldText;
 
         for (LayoutEntry layoutEntry : layoutEntries) {
-            fieldText = layoutEntry.doLayout(database, encoding);
+            fieldText = layoutEntry.doLayout(databaseContext, encoding);
 
             if (fieldText == null) {
                 fieldText = "";

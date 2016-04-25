@@ -24,48 +24,60 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.UIManager;
 
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.exporter.CustomExportList;
+import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
-import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.exporter.CustomExportList;
-import net.sf.jabref.exporter.ExportComparator;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.importer.CustomImportList;
-import net.sf.jabref.logic.remote.RemotePreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
@@ -251,6 +263,7 @@ public class JabRefPreferences {
     public static final String PREVIEW_0 = "preview0";
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
+    public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -272,7 +285,6 @@ public class JabRefPreferences {
     public static final String DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP = "displayKeyWarningDialogAtStartup";
     public static final String DIALOG_WARNING_FOR_EMPTY_KEY = "dialogWarningForEmptyKey";
     public static final String DIALOG_WARNING_FOR_DUPLICATE_KEY = "dialogWarningForDuplicateKey";
-    public static final String ALLOW_TABLE_EDITING = "allowTableEditing";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -314,9 +326,6 @@ public class JabRefPreferences {
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
-    public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
-    public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
-    public static final String USER_FILE_DIR = "userFileDir";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
@@ -324,6 +333,7 @@ public class JabRefPreferences {
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
+    public static final String CLEANUP_MOVE_PDF = "CleanUpMovePDF";
     public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
     public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
@@ -351,6 +361,10 @@ public class JabRefPreferences {
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
+
+    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
+    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
+    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -417,12 +431,7 @@ public class JabRefPreferences {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public String[] fileDirForDatabase;
-
-    // Similarly to the previous variable, this is a global that can be used during
-    // the export of a database if the database filename should be output. If a database
-    // is tied to a file on disk, this variable is set to that file before export starts:
-    public File databaseFile;
+    public List<String> fileDirForDatabase;
 
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
@@ -451,7 +460,7 @@ public class JabRefPreferences {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(JabRef.class);
+        prefs = Preferences.userNodeForPackage(JabRefMain.class);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -587,6 +596,9 @@ public class JabRefPreferences {
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
+
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
+
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -700,7 +712,6 @@ public class JabRefPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(ALLOW_TABLE_EDITING, Boolean.FALSE);
         defaults.put(DIALOG_WARNING_FOR_DUPLICATE_KEY, Boolean.TRUE);
         defaults.put(DIALOG_WARNING_FOR_EMPTY_KEY, Boolean.TRUE);
         defaults.put(DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
@@ -827,11 +838,12 @@ public class JabRefPreferences {
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
-        defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
+
+        defaults.put(PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
+        defaults.put(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
-        defaults.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        defaults.put(PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
@@ -848,15 +860,14 @@ public class JabRefPreferences {
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+    }
 
-        defaults.put(USER_FILE_DIR, Globals.FILE_FIELD + Globals.DIR_SUFFIX);
+    public String getUser() {
         try {
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
-            LOGGER.info("Hostname not found.", ex);
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
+            LOGGER.debug("Hostname not found.", ex);
+            return get(DEFAULT_OWNER);
         }
     }
 
@@ -1280,6 +1291,17 @@ public class JabRefPreferences {
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_PRIOPT, number);
     }
 
+    public void purgeCustomEntryTypes() {
+        int number = 0;
+        if(getCustomEntryType(number) != null) {
+            number++;
+        }
+
+        for(int i = 0; i < number; i++) {
+            purgeCustomEntryTypes(i);
+        }
+    }
+
     /**
      * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
      *
@@ -1358,6 +1380,7 @@ public class JabRefPreferences {
 
         storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
+        storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
         storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());

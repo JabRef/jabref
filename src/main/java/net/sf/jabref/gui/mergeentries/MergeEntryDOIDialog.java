@@ -15,28 +15,29 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 
-import net.sf.jabref.gui.undo.UndoableChangeType;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.ColumnSpec;
 
 /**
  * @author Oscar
@@ -51,7 +52,6 @@ public class MergeEntryDOIDialog extends JDialog {
     private BibEntry doiEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
-    private PositionWindow pw;
 
     private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
 
@@ -125,26 +125,10 @@ public class MergeEntryDOIDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
-        pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
 
         // Show what we've got
         setVisible(true);
@@ -160,8 +144,8 @@ public class MergeEntryDOIDialog extends JDialog {
         BibEntry mergedEntry = mergeEntries.getMergeEntry();
 
         if ("cancel".equals(button)) {
-            // Cancelled, throw it away
-            panel.output(Localization.lang("Cancelled merging entries"));
+            // Canceled, throw it away
+            panel.output(Localization.lang("Canceled merging entries"));
         } else if ("done".equals(button)) {
             // Updated the original entry with the new fields
             Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());

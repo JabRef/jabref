@@ -15,20 +15,20 @@
 */
 package net.sf.jabref.exporter;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.Globals;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * characters could be saved, and if not, which characters were not encodable.
  * <p>
  * After saving is finished, the client should close the Writer. If the save should be put into effect, call commit(),
- * otherwise call cancel(). When cancelling, the temporary file is simply deleted and the target file remains unchanged.
+ * otherwise call cancel(). When canceling, the temporary file is simply deleted and the target file remains unchanged.
  * When committing, the temporary file is copied to the target file after making a backup if requested and if the target
  * file already existed, and finally the temporary file is deleted.
  * <p>

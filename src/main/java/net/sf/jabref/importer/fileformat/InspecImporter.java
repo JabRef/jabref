@@ -15,20 +15,19 @@
 */
 package net.sf.jabref.importer.fileformat;
 
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
-
-import java.util.regex.Pattern;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * INSPEC format importer.
@@ -125,14 +124,15 @@ public class InspecImporter extends ImportFormat {
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
-                            String yr = frest.substring(m - 5, m);
+                            String yr = frest.substring(m - 5, m).trim();
                             h.put("year", yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
                                 h.put("pages", pg);
-                                h.put("volume", frest.substring(1, m));
+                                String vol = frest.substring(1, m).trim();
+                                h.put("volume", vol);
                             }
                         }
                     }

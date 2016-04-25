@@ -1,15 +1,10 @@
 package net.sf.jabref.logic.groups;
 
-import static org.junit.Assert.*;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -17,15 +12,22 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class GroupsUtilTest {
 
     @Before
-    public void setup() {
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @After
-    public void teardown() {
+    public void tearDown() {
         Globals.prefs = null;
     }
 

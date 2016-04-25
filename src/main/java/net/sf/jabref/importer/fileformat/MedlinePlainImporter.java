@@ -17,19 +17,19 @@
 
 package net.sf.jabref.importer.fileformat;
 
-import java.util.regex.Pattern;
-import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -112,7 +112,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            Map<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -267,7 +267,7 @@ public class MedlinePlainImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            ArrayList<Object> toRemove = new ArrayList<>();
+            List<Object> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 // content can never be null so only check if content is empty

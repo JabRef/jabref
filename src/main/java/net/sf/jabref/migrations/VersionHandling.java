@@ -17,13 +17,13 @@ package net.sf.jabref.migrations;
 
 import java.util.List;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AbstractGroup;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabase;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
@@ -53,7 +53,7 @@ public class VersionHandling {
             field = groups.get(3 * i);
             name = groups.get((3 * i) + 1);
             regexp = groups.get((3 * i) + 2);
-            root.add(new GroupTreeNode(new KeywordGroup(name, field, regexp,
+            root.addChild(new GroupTreeNode(new KeywordGroup(name, field, regexp,
                     false, true, GroupHierarchyType.INDEPENDENT)));
         }
         return root;
@@ -119,7 +119,7 @@ public class VersionHandling {
                 if (root == null) {
                     root = newNode;
                 } else {
-                    root.add(newNode);
+                    root.addChild(newNode);
                 }
             }
             return root;
@@ -218,9 +218,9 @@ public class VersionHandling {
                 } else {
                     // insert at desired location
                     while (level <= cursor.getLevel()) {
-                        cursor = (GroupTreeNode) cursor.getParent();
+                        cursor = cursor.getParent().get();
                     }
-                    cursor.add(newNode);
+                    cursor.addChild(newNode);
                     cursor = newNode;
                 }
             }

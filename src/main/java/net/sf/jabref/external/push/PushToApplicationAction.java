@@ -23,7 +23,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -86,13 +86,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         operation.pushEntries(panel.getDatabase(), entries, getKeyString(entries), panel.getBibDatabaseContext().getMetaData());
 
         // Call the operationCompleted() method on the event dispatch thread:
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                operation.operationCompleted(panel);
-            }
-        });
+        SwingUtilities.invokeLater(() -> operation.operationCompleted(panel));
     }
 
     private static String getKeyString(List<BibEntry> bibentries) {

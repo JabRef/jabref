@@ -1,17 +1,26 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
-
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 public class IntegrityCheck {
 
@@ -38,8 +47,7 @@ public class IntegrityCheck {
             return result;
         }
 
-        result.addAll(new AuthorNameChecker("author").check(entry));
-        result.addAll(new AuthorNameChecker("editor").check(entry));
+        result.addAll(new AuthorNameChecker().check(entry));
 
         if (!bibDatabaseContext.isBiblatexMode()) {
             result.addAll(new TitleChecker().check(entry));
@@ -53,6 +61,8 @@ public class IntegrityCheck {
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new AbbreviationChecker("journal").check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
+        result.addAll(new BibStringChecker().check(entry));
+        result.addAll(new HTMLCharacterChecker().check(entry));
 
         return result;
     }
@@ -113,21 +123,21 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("file");
+            Optional<String> value = entry.getFieldOptional(Globals.FILE_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
-            List<FileField.ParsedFileField> parsedFileFields = FileField.parse(value.get()).stream()
-                    .filter(p -> !(p.link.startsWith("http://") || p.link.startsWith("https://")))
+            List<ParsedFileField> parsedFileFields = FileField.parse(value.get()).stream()
+                    .filter(p -> !(p.getLink().startsWith("http://") || p.getLink().startsWith("https://")))
                     .collect(Collectors.toList());
 
-            for (FileField.ParsedFileField p : parsedFileFields) {
-                Optional<File> file = FileUtil.expandFilename(context.getMetaData(), p.link);
+            for (ParsedFileField p : parsedFileFields) {
+                Optional<File> file = FileUtil.expandFilename(context, p.getLink());
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
-                                    "file"));
+                                    Globals.FILE_FIELD));
                 }
             }
 
@@ -154,29 +164,26 @@ public class IntegrityCheck {
 
     private static class AuthorNameChecker implements Checker {
 
-        private final String field;
-
-        private AuthorNameChecker(String field) {
-            this.field = field;
-        }
-
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
-            if (!value.isPresent()) {
-                return Collections.emptyList();
-            }
+            List<IntegrityMessage> result = new ArrayList<>();
+            for (String field : entry.getFieldNames()) {
+                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+                    Optional<String> value = entry.getFieldOptional(field);
+                    if (!value.isPresent()) {
+                        return Collections.emptyList();
+                    }
 
-            String valueTrimmedAndLowerCase = value.get().trim().toLowerCase();
-            if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should start with a name"), entry, field));
-            } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should end with a name"), entry, field));
+                    String valueTrimmedAndLowerCase = value.get().trim().toLowerCase();
+                    if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
+                        result.add(new IntegrityMessage(Localization.lang("should start with a name"), entry, field));
+                    } else if (valueTrimmedAndLowerCase.endsWith(" and") || valueTrimmedAndLowerCase.endsWith(",")) {
+                        result.add(new IntegrityMessage(Localization.lang("should end with a name"), entry, field));
+                    }
+                }
             }
-
-            return Collections.emptyList();
+            return result;
         }
-
     }
 
     private static class BracketChecker implements Checker {
@@ -201,7 +208,7 @@ public class IntegrityCheck {
                     counter++;
                 } else if (a == '}') {
                     if (counter == 0) {
-                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly braket"), entry, field));
+                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly bracket"), entry, field));
                     } else {
                         counter--;
                     }
@@ -209,7 +216,7 @@ public class IntegrityCheck {
             }
 
             if (counter > 0) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly braket"), entry, field));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly bracket"), entry, field));
             }
 
             return Collections.emptyList();
@@ -318,6 +325,57 @@ public class IntegrityCheck {
             }
 
             return Collections.emptyList();
+        }
+    }
+
+    private static class BibStringChecker implements Checker {
+
+        // Detect # if it doesn't have a \ in front of it or if it starts the string
+        private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
+
+
+        /**
+         * Checks, if there is an even number of unescaped #
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
+                int hashCount = 0;
+                while (hashMatcher.find()) {
+                    hashCount++;
+                }
+                if ((hashCount % 2) == 1) {
+                    results.add(
+                            new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
+                                    field.getKey()));
+                }
+            }
+            return results;
+        }
+    }
+
+    private static class HTMLCharacterChecker implements Checker {
+
+        // Detect any HTML encoded character,
+        private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
+
+
+        /**
+         * Checks, if there are any HTML encoded characters in the fields
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                Matcher characterMatcher = HTML_CHARACTER_PATTERN.matcher(field.getValue());
+                if (characterMatcher.find()) {
+                    results.add(new IntegrityMessage(Localization.lang("HTML encoded character found"), entry,
+                            field.getKey()));
+                }
+            }
+            return results;
         }
     }
 

@@ -15,7 +15,9 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 /**

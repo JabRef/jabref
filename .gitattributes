@@ -1,5 +1,10 @@
+# unix  line endings at unix files
 gradlew eol=lf
 *.sh eol=lf
 
+# ensure that line endings of *.java and *.properties are normalized
+*.properties text
+*.java text
+
+# ensure that CHANGELOG entries are merged instead of causing conflicts
 CHANGELOG.md merge=union
-src/main/resources/l10n/*.properties merge=union

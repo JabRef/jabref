@@ -25,39 +25,40 @@
 
 package net.sf.jabref.logic.layout.format;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
-import net.sf.jabref.logic.layout.LayoutFormatter;
+import static org.junit.Assert.assertEquals;
 
 
 public class LatexToUnicodeFormatterTest {
 
+    public final LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
     @Test
     public void testPlainFormat() {
-        assertEquals("aaa", new LatexToUnicodeFormatter().format("aaa"));
+        assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
     public void testFormatUmlaut() {
-        assertEquals("ä", new LatexToUnicodeFormatter().format("{\\\"{a}}"));
-        assertEquals("Ä", new LatexToUnicodeFormatter().format("{\\\"{A}}"));
+        assertEquals("ä", formatter.format("{\\\"{a}}"));
+        assertEquals("Ä", formatter.format("{\\\"{A}}"));
     }
 
     @Test
     public void testFormatStripLatexCommands() {
-        assertEquals("-", new LatexToUnicodeFormatter().format("\\mbox{-}"));
+        assertEquals("-", formatter.format("\\mbox{-}"));
     }
 
     @Test
     public void testEquations() {
-        LayoutFormatter layout = new LatexToUnicodeFormatter();
-
-        assertEquals("$", layout.format("\\$"));
-        assertEquals("σ", layout.format("$\\sigma$"));
-        assertEquals("A 32\u00A0mA ΣΔ-modulator",
-                layout.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals("$", formatter.format("\\$"));
+        assertEquals("σ", formatter.format("$\\sigma$"));
+        assertEquals("A 32\u00A0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
+    @Test
+    public void formatExample() {
+        assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
+    }
 }

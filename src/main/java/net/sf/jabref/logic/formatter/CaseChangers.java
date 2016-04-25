@@ -17,14 +17,20 @@
 */
 package net.sf.jabref.logic.formatter;
 
-import net.sf.jabref.logic.formatter.casechanger.*;
+import java.util.Arrays;
+import java.util.List;
 
-import java.util.*;
+import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 
 /**
  * Class with static methods for changing the case of strings and arrays of strings.
  * <p>
- * This class must detect the words in the title and whether letters are protected for case changes via enclosing them with '{' and '}' brakets.
+ * This class must detect the words in the title and whether letters are protected for case changes via enclosing them with '{' and '}' brackets.
  * Hence, for each letter to be changed, it needs to be known wether it is protected or not.
  * This can be done by starting at the letter position and moving forward and backword to see if there is a '{' and '}, respectively.
  */

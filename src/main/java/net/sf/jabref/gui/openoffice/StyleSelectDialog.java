@@ -20,8 +20,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -48,28 +46,26 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -79,10 +75,11 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
@@ -147,7 +144,7 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, new MetaData(), "");
+        preview = new PreviewPanel(null, null, "");
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 
@@ -218,22 +215,6 @@ class StyleSelectDialog {
         PositionWindow pw = new PositionWindow(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
                 JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        diag.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
     }
 
     private void setupTable() {
@@ -279,22 +260,20 @@ class StyleSelectDialog {
 
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(actionEvent -> {
-            getSelectedStyle().ifPresent(style -> {
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = style.getPath();
-                try {
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new MetaData(), link, type);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new MetaData(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    LOGGER.warn("Problem open style file editor", e);
+        edit.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+            String link = style.getPath();
+            try {
+                if (type.isPresent()) {
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+                } else {
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
+                            new UnknownExternalFileType("jstyle"));
                 }
-            });
-        });
+            } catch (IOException e) {
+                LOGGER.warn("Problem open style file editor", e);
+            }
+        }));
 
         // Add action listener to "Show" menu item, which is supposed to open the style file in a dialog:
         show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));

@@ -16,31 +16,26 @@
 
 package net.sf.jabref.sql.importer;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class DBImporterResult {
 
-    private final BibDatabase database;
-    private final MetaData metaData;
+    private final BibDatabaseContext databaseContext;
     private final String name;
 
     public DBImporterResult(final BibDatabase database, final MetaData metaData, final String name) {
-        this.database = database;
-        this.metaData = metaData;
+        this.databaseContext = new BibDatabaseContext(database, metaData);
         this.name = name;
-    }
-
-    public MetaData getMetaData() {
-        return metaData;
     }
 
     public String getName() {
         return name;
     }
 
-    public BibDatabase getDatabase() {
-        return database;
+    public BibDatabaseContext getDatabaseContext() {
+        return databaseContext;
     }
 
 }

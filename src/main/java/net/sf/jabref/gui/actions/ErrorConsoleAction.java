@@ -15,9 +15,8 @@
  */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.logic.error.StreamEavesdropper;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.Cache;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,8 +25,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
+
+import net.sf.jabref.logic.error.StreamEavesdropper;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.logging.Cache;
 
 /**
  * Such an error console can be

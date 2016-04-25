@@ -15,20 +15,36 @@
 */
 package net.sf.jabref.pdfimport;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class ImportDialog extends JDialog {
 
@@ -132,7 +148,7 @@ public class ImportDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        switch (Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
+        switch (Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
             radioButtonNoMeta.setSelected(true);
             break;
@@ -156,9 +172,9 @@ public class ImportDialog extends JDialog {
 
     private void onOK() {
         this.result = JOptionPane.OK_OPTION;
-        Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
+        Globals.prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
         if (useDefaultPDFImportStyle.isSelected()) {
-            Globals.prefs.putBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, true);
+            Globals.prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, true);
         }
         // checkBoxDoNotShowAgain handled by local variable
         dispose();

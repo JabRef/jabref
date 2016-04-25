@@ -1,15 +1,16 @@
 package net.sf.jabref.gui.actions;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.Action;
+
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 /**
  * The action concerned with opening a new database.
@@ -32,8 +33,7 @@ public class NewDatabaseAction extends MnemonicAwareAction {
         // Create a new, empty, database.
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         bibDatabaseContext.setMode(mode);
-        jabRefFrame.addTab(bibDatabaseContext.getDatabase(), null, bibDatabaseContext.getMetaData(),
-                Globals.prefs.getDefaultEncoding(), true);
+        jabRefFrame.addTab(bibDatabaseContext, Globals.prefs.getDefaultEncoding(), true);
         jabRefFrame.output(Localization.lang("New %0 database created.", mode.getFormattedName()));
     }
 }

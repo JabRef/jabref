@@ -15,29 +15,35 @@
  */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
@@ -308,7 +314,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static Map<String, String> getFormElements(String page) {
         Matcher m = GoogleScholarFetcher.INPUT_PATTERN.matcher(page);
-        HashMap<String, String> items = new HashMap<>();
+        Map<String, String> items = new HashMap<>();
         while (m.find()) {
             String name = m.group(2);
             if ((name.length() > 2) && (name.charAt(0) == '"')

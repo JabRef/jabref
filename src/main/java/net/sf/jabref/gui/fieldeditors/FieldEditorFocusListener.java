@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
-import javax.swing.*;
-
-import net.sf.jabref.gui.GUIGlobals;
-
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+
+import javax.swing.JComponent;
+
+import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * Focus listener that changes the color of the text area when it has focus.

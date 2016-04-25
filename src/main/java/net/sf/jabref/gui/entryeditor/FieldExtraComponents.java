@@ -15,8 +15,30 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
@@ -26,6 +48,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
@@ -34,20 +57,6 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Set;
 
 public class FieldExtraComponents {
 
@@ -73,7 +82,7 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
             FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
@@ -115,7 +124,7 @@ public class FieldExtraComponents {
         button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
             } catch (IOException ex) {
                 panel.output(Localization.lang("Unable to open link."));
             }
@@ -127,19 +136,22 @@ public class FieldExtraComponents {
         JTextComponent url = (JTextComponent) fieldEditor;
 
         DocumentListener documentListener = new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkUrl(documentEvent);
+                checkUrl();
             }
 
-            private void checkUrl(DocumentEvent documentEvent) {
+            private void checkUrl() {
                 if (URLUtil.isURL(url.getText())) {
                     button.setEnabled(true);
                 } else {
@@ -159,46 +171,65 @@ public class FieldExtraComponents {
      * @param panel
      * @return
      */
-    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
+    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, EntryEditor entryEditor, FieldEditor fieldEditor) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
+        // open doi link
         JButton button = new JButton(Localization.lang("Open"));
         button.setEnabled(false);
         button.addActionListener(actionEvent -> {
             try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), fieldEditor.getText(), fieldEditor.getFieldName());
+                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
             } catch (IOException ex) {
                 panel.output(Localization.lang("Unable to open link."));
             }
         });
+        // lookup doi
+        JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
+        doiButton.addActionListener(actionEvent -> {
+                Optional<DOI> doi = CrossRef.findDOI(entryEditor.getEntry());
+                if (doi.isPresent()) {
+                    entryEditor.getEntry().setField("doi", doi.get().getDOI());
+                } else {
+                    panel.frame().setStatus(Localization.lang("No DOI found"));
+                }
+        });
+        // fetch bibtex data
         JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> new MergeEntryDOIDialog(panel));
 
         controls.add(button, BorderLayout.NORTH);
+        controls.add(doiButton, BorderLayout.CENTER);
         controls.add(fetchButton, BorderLayout.SOUTH);
 
         // enable/disable button
         JTextComponent doi = (JTextComponent) fieldEditor;
 
         DocumentListener documentListener = new DocumentListener() {
+            @Override
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
+            @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
+            @Override
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkDoi(documentEvent);
+                checkDoi();
             }
 
-            private void checkDoi(DocumentEvent documentEvent) {
+            private void checkDoi() {
                 Optional<DOI> doiUrl = DOI.build(doi.getText());
                 if(doiUrl.isPresent()) {
                     button.setEnabled(true);
                     fetchButton.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                    fetchButton.setEnabled(false);
                 }
             }
         };
@@ -304,7 +335,8 @@ public class FieldExtraComponents {
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                 storeFieldAction, false,
-                "author".equals(editor.getFieldName()) || "editor".equals(editor.getFieldName()) ? " and " : ", ");
+                InternalBibtexFields.getFieldExtras(editor.getFieldName())
+                        .contains(FieldProperties.PERSON_NAMES) ? " and " : ", ");
         contentSelectors.add(ws);
         return Optional.of(ws);
     }
@@ -339,4 +371,108 @@ public class FieldExtraComponents {
 
     }
 
+    /**
+     * Return a dropdown list with the alternatives for editor type fields
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+
+    public static Optional<JComponent> getEditorTypeExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+        final String[] optionValues = {"", "editor", "compiler", "founder", "continuator", "redactor", "reviser",
+                "collaborator"};
+        final String[] optionDescriptions = {Localization.lang("Select"), Localization.lang("Editor"),
+                Localization.lang("Compiler"), Localization.lang("Founder"), Localization.lang("Continuator"),
+                Localization.lang("Redactor"), Localization.lang("Reviser"), Localization.lang("Collaborator")};
+        JComboBox<String> editorType = new JComboBox<>(optionDescriptions);
+        editorType.addActionListener(actionEvent -> {
+            fieldEditor.setText(optionValues[editorType.getSelectedIndex()]);
+            entryEditor.updateField(fieldEditor);
+        });
+        return Optional.of(editorType);
+
+    }
+
+    /**
+     * Return a dropdown list with the alternatives for pagination type fields
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+
+    public static Optional<JComponent> getPaginationExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+        final String[] optionValues = {"", "page", "column", "line", "verse", "section", "paragraph", "none"};
+        final String[] optionDescriptions = {Localization.lang("Select"), Localization.lang("Page"),
+                Localization.lang("Column"), Localization.lang("Line"), Localization.lang("Verse"),
+                Localization.lang("Section"), Localization.lang("Paragraph"), Localization.lang("None")};
+        JComboBox<String> pagination = new JComboBox<>(optionDescriptions);
+        pagination.addActionListener(actionEvent -> {
+            fieldEditor.setText(optionValues[pagination.getSelectedIndex()]);
+            entryEditor.updateField(fieldEditor);
+        });
+        return Optional.of(pagination);
+    }
+
+    /**
+     * Return a dropdown list with the alternatives for pagination type fields
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+
+    public static Optional<JComponent> getTypeExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor,
+            boolean isPatent) {
+        String[] optionValues;
+        String[] optionDescriptions;
+        if (isPatent) {
+            optionValues = new String[] {"", "patent", "patentde", "patenteu", "patentfr", "patentuk", "patentus",
+                    "patreq", "patreqde", "patreqeu", "patreqfr", "patrequk", "patrequs"};
+            optionDescriptions = new String[] {Localization.lang("Select"), Localization.lang("Patent"),
+                    Localization.lang("German patent"), Localization.lang("European patent"),
+                    Localization.lang("French patent"), Localization.lang("British patent"),
+                    Localization.lang("U.S. patent"), Localization.lang("Patent request"),
+                    Localization.lang("German patent request"), Localization.lang("European patent request"),
+                    Localization.lang("French patent request"), Localization.lang("British patent request"),
+                    Localization.lang("U.S. patent request")};
+        } else {
+            optionValues = new String[] {"", "mathesis", "phdthesis", "candthesis", "techreport", "resreport",
+                    "software", "datacd", "audiocd"};
+            optionDescriptions = new String[] {Localization.lang("Select"), Localization.lang("Master's thesis"),
+                    Localization.lang("PhD thesis"), Localization.lang("Candidate thesis"),
+                    Localization.lang("Technical report"), Localization.lang("Research report"),
+                    Localization.lang("Software"), Localization.lang("Data CD"), Localization.lang("Audio CD")};
+        }
+        JComboBox<String> type = new JComboBox<>(optionDescriptions);
+        type.addActionListener(actionEvent -> {
+            fieldEditor.setText(optionValues[type.getSelectedIndex()]);
+            entryEditor.updateField(fieldEditor);
+        });
+        return Optional.of(type);
+    }
+
+    /**
+     * Return a dropdown list with the gender alternatives for fields with GENDER
+     *
+     * @param fieldEditor
+     * @param entryEditor
+     * @return
+     */
+
+    public static Optional<JComponent> getGenderExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
+        final String[] optionValues = {"", "sf", "sm", "sp", "pf", "pm", "pn", "pp"};
+        final String[] optionDescriptions = {Localization.lang("Select"), Localization.lang("Female name"),
+                Localization.lang("Male name"),
+                Localization.lang("Neuter name"), Localization.lang("Female names"), Localization.lang("Male names"),
+                Localization.lang("Neuter names"), Localization.lang("Mixed names")};
+        JComboBox<String> gender = new JComboBox<>(optionDescriptions);
+        gender.addActionListener(actionEvent -> {
+            fieldEditor.setText(optionValues[gender.getSelectedIndex()]);
+            entryEditor.updateField(fieldEditor);
+        });
+        return Optional.of(gender);
+
+    }
 }

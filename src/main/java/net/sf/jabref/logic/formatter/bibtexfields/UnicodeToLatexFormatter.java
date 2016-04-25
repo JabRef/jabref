@@ -18,13 +18,13 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import java.util.Objects;
 import java.util.Set;
 
-import net.sf.jabref.logic.l10n.Localization;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 
@@ -81,6 +81,11 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
     @Override
     public String getDescription() {
         return Localization.lang("Converts Unicode characters to LaTeX encoding.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "Mönch";
     }
 
     @Override

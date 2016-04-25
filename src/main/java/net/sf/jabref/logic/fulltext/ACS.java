@@ -1,17 +1,18 @@
 package net.sf.jabref.logic.fulltext;
 
-import net.sf.jabref.model.entry.BibEntry;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
+import java.util.Optional;
+
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import java.net.URL;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * FullTextFinder implementation that attempts to find a PDF URL at ACS.

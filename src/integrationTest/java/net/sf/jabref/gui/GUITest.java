@@ -1,8 +1,11 @@
 package net.sf.jabref.gui;
 
+import javax.swing.JButton;
+
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.FrameFixture;
@@ -11,16 +14,12 @@ import org.assertj.swing.timing.Pause;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.swing.*;
-
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 public class GUITest extends AssertJSwingJUnitTestCase {
-
     private AWTExceptionHandler awtExceptionHandler;
-
 
     @Override
     protected void onSetUp() {

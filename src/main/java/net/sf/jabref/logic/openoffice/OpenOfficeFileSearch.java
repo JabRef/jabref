@@ -18,10 +18,11 @@ package net.sf.jabref.logic.openoffice;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class OpenOfficeFileSearch {
 
-    private boolean fileSearchCancelled;
+    private boolean fileSearchCanceled;
 
 
     /**
@@ -84,23 +85,20 @@ public class OpenOfficeFileSearch {
     }
 
     public void resetFileSearch() {
-        fileSearchCancelled = false;
+        fileSearchCanceled = false;
     }
 
     public void cancelFileSearch() {
-        fileSearchCancelled = true;
+        fileSearchCanceled = true;
     }
 
     public List<File> findFileInDirs(List<File> dirList, String filename) {
         List<File> sofficeFiles = new ArrayList<>();
         for (File dir : dirList) {
-            if (fileSearchCancelled) {
+            if (fileSearchCanceled) {
                 break;
             }
-            File sOffice = findFileInDir(dir, filename);
-            if (sOffice != null) {
-                sofficeFiles.add(sOffice);
-            }
+            findFileInDir(dir, filename).ifPresent(sofficeFiles::add);
         }
         return sofficeFiles;
     }
@@ -110,27 +108,26 @@ public class OpenOfficeFileSearch {
     * @param filename The name of the file to search for.
     * @return The directory where the file was first found, or null if not found.
     */
-    public File findFileInDir(File startDir, String filename) {
-        if (fileSearchCancelled) {
-            return null;
+    public Optional<File> findFileInDir(File startDir, String filename) {
+        if (fileSearchCanceled) {
+            return Optional.empty();
         }
         File[] files = startDir.listFiles();
         if (files == null) {
-            return null;
+            return Optional.empty();
         }
-        File result = null;
+        Optional<File> result = Optional.empty();
         for (File file : files) {
-            if (fileSearchCancelled) {
-                return null;
+            if (fileSearchCanceled) {
+                return Optional.empty();
             }
             if (file.isDirectory()) {
                 result = findFileInDir(file, filename);
-                if (result != null) {
-                    break;
+                if (result.isPresent()) {
+                    return result;
                 }
             } else if (file.getName().equals(filename)) {
-                result = startDir;
-                break;
+                return Optional.of(startDir);
             }
         }
         return result;

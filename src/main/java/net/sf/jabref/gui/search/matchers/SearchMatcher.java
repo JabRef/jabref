@@ -16,6 +16,7 @@
 package net.sf.jabref.gui.search.matchers;
 
 import net.sf.jabref.model.entry.BibEntry;
+
 import ca.odell.glazedlists.matchers.Matcher;
 
 /**

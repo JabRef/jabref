@@ -17,22 +17,23 @@ package net.sf.jabref.collab;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class EntryChange extends Change {
 
@@ -58,7 +59,7 @@ class EntryChange extends Change {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
                 + " Modifications agree: " + modificationsAgree);
 
-        TreeSet<String> allFields = new TreeSet<>();
+        Set<String> allFields = new TreeSet<>();
         allFields.addAll(memEntry.getFieldNames());
         allFields.addAll(tmpEntry.getFieldNames());
         allFields.addAll(diskEntry.getFieldNames());

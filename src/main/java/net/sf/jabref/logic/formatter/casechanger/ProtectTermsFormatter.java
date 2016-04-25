@@ -48,7 +48,12 @@ public class ProtectTermsFormatter implements Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Adds {} brackets around acronyms, month names and countries in %s to preserve their case.");
+                "Adds {} brackets around acronyms, month names and countries to preserve their case.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "In CDMA";
     }
 
     @Override

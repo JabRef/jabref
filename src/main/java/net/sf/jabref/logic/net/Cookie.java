@@ -15,9 +15,13 @@
 */
 package net.sf.jabref.logic.net;
 
-import java.net.*;
-import java.text.*;
-import java.util.*;
+import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Optional;
 
 class Cookie {
 

@@ -44,7 +44,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
     @Override
     public void actionPerformed(ActionEvent e) {
         // Make a sorted Map that compares case-insensitively:
-        TreeMap<String, BasePanel> map = new TreeMap<>(this);
+        Map<String, BasePanel> map = new TreeMap<>(this);
 
         for (BasePanel panel : frame.getBasePanelList()) {
             map.put(panel.getTabTitle(), panel);

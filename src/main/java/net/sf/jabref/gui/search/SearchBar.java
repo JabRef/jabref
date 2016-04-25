@@ -15,17 +15,34 @@
  */
 package net.sf.jabref.gui.search;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.WrapLayout;
-import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -33,16 +50,9 @@ import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * The search bar at the top of the screen allowing the user to search his database.

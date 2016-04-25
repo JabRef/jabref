@@ -15,14 +15,14 @@
  */
 package net.sf.jabref.logic.layout.format;
 
+import java.util.Map;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-
-import java.util.Map;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
@@ -208,6 +208,11 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
     @Override
     public String getDescription() {
         return Localization.lang("Converts LaTeX encoding to Unicode characters.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "M{\\\"{o}}nch";
     }
 
 }

@@ -1,14 +1,14 @@
 package net.sf.jabref.logic;
 
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryType;
 
 public class CustomEntryTypesManager {
 

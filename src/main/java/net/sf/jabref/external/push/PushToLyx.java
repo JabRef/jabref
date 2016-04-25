@@ -21,16 +21,27 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
+
+    private static final Log LOGGER = LogFactory.getLog(PushToLyx.class);
+
 
     @Override
     public String getApplicationName() {
@@ -66,7 +77,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     protected void initSettingsPanel() {
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(Path);
+        settings.add(path);
     }
 
     @Override
@@ -101,32 +112,18 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
         final File lyxpipe = lp;
 
         JabRefExecutorService.INSTANCE.executeAndWait((Runnable) () -> {
-            try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyx_out = new BufferedWriter(fw)) {
+            try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyxOut = new BufferedWriter(fw)) {
                 String citeStr;
 
                 citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
-                lyx_out.write(citeStr + "\n");
+                lyxOut.write(citeStr + "\n");
 
-                lyx_out.close();
+                lyxOut.close();
                 fw.close();
             } catch (IOException excep) {
                 couldNotCall = true;
+                LOGGER.warn("Problem pushing to LyX/Kile.", excep);
             }
         });
     }
-
-    /*class Timeout extends javax.swing.Timer
-    {
-      public Timeout(int timeout, final Thread toStop, final String message) {
-        super(timeout, new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            toStop.stop();         // !!! <- deprecated
-            // toStop.interrupt(); // better ?, interrupts wait and IO
-            //stop();
-            //output(message);
-          }
-        });
-      }
-    } */
-
 }

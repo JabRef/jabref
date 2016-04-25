@@ -15,11 +15,11 @@
 */
 package net.sf.jabref.collab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -39,8 +39,7 @@ class EntryAddChange extends Change {
         super(Localization.lang("Added entry"));
         this.diskEntry = diskEntry;
 
-        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, new MetaData(),
-                Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        PreviewPanel pp = new PreviewPanel(null, diskEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);
     }
 

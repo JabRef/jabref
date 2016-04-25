@@ -6,17 +6,17 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.model.entry.BibEntry;
 
 @RunWith(Parameterized.class)
 public class PdfContentImporterTestFiles {
@@ -34,7 +34,11 @@ public class PdfContentImporterTestFiles {
         // The test folder contains pairs of PDFs and BibTeX files. We check each pair.
         // This method returns the basenames of the available pairs
 
-        Object[][] data = new Object[][] {{"LNCS-minimal"}};
+        Object[][] data = new Object[][] {
+                // minimal PDF, not encrypted
+                {"LNCS-minimal"},
+                // minimal PDF, write-protected, thus encrypted
+                {"LNCS-minimal-protected"}};
         return Arrays.asList(data);
     }
 

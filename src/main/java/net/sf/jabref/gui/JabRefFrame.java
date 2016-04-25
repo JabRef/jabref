@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,18 +15,89 @@
 */
 package net.sf.jabref.gui;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.exporter.*;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.MenuElement;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HighlightMatchingGroupPreferences;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.AutoSaveManager;
+import net.sf.jabref.exporter.ExportCustomizationDialog;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.exporter.SaveAllAction;
+import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
-import net.sf.jabref.groups.EntryTableTransferHandler;
-import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.gui.actions.*;
+import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.actions.AutoLinkFilesAction;
+import net.sf.jabref.gui.actions.ErrorConsoleAction;
+import net.sf.jabref.gui.actions.ManageKeywordsAction;
+import net.sf.jabref.gui.actions.MassSetFieldAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.NewDatabaseAction;
+import net.sf.jabref.gui.actions.NewEntryAction;
+import net.sf.jabref.gui.actions.NewSubDatabaseAction;
+import net.sf.jabref.gui.actions.SortTabsAction;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import net.sf.jabref.gui.groups.EntryTableTransferHandler;
+import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
@@ -45,7 +116,11 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.ImportCustomizationDialog;
+import net.sf.jabref.importer.ImportFormats;
+import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
@@ -55,25 +130,24 @@ import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.specialfields.*;
+import net.sf.jabref.specialfields.Printed;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
+
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
 
 /**
  * The main window of the application.
@@ -96,7 +170,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private JTabbedPane tabbedPane; // initialized at constructor
 
     private final Insets marg = new Insets(1, 0, 2, 0);
-    private final JabRef jabRef;
 
     private PositionWindow pw;
 
@@ -503,6 +576,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
 
+    public JabRefFrame() {
+        init();
+        updateEnabledState();
+
+    }
+
     private List<NewEntryAction> getNewEntryActions() {
         // only Bibtex
         List<NewEntryAction> actions = new ArrayList<>();
@@ -515,13 +594,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
         return actions;
-    }
-
-    public JabRefFrame(JabRef jabRef) {
-        this.jabRef = jabRef;
-        init();
-        updateEnabledState();
-
     }
 
     private JPopupMenu tabPopupMenu() {
@@ -590,22 +662,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
-
-        // Set up a ComponentListener that saves the last size and position of the dialog
-        this.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                // Save dialog position
-                pw.storeWindowPosition();
-            }
-        });
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
@@ -715,7 +771,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public void preferences() {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
-            prefsDialog = new PreferencesDialog(JabRefFrame.this, jabRef);
+            prefsDialog = new PreferencesDialog(JabRefFrame.this);
             prefsDialog.setLocationRelativeTo(JabRefFrame.this);
         } else {
             prefsDialog.setValues();
@@ -830,8 +886,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             //getCurrentBasePanel().runCommand("save");
                             SaveDatabaseAction saveAction = new SaveDatabaseAction(getCurrentBasePanel());
                             saveAction.runCommand();
-                            if (saveAction.isCancelled() || !saveAction.isSuccess()) {
-                                // The action was either cancelled or unsuccessful.
+                            if (saveAction.isCanceled() || !saveAction.isSuccess()) {
+                                // The action was either canceled or unsuccessful.
                                 // Break!
                                 output(Localization.lang("Unable to save database"));
                                 close = false;
@@ -856,8 +912,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (getBasePanelAt(i).isSaving()) {
                     // There is a database still being saved, so we need to wait.
                     WaitForSaveOperation w = new WaitForSaveOperation(this);
-                    w.show(); // This method won't return until cancelled or the save operation is done.
-                    if (w.cancelled()) {
+                    w.show(); // This method won't return until canceled or the save operation is done.
+                    if (w.canceled()) {
                         return false; // The user clicked cancel.
                     }
                 }
@@ -1377,13 +1433,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+                addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
-            addTab(pr.getDatabase(), pr.getFile(), pr.getMetaData(), pr.getEncoding(), raisePanel);
+            addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
         }
     }
 
@@ -1573,17 +1629,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public BasePanel addTab(BibDatabase db, File file, MetaData metaData, Charset encoding, boolean raisePanel) {
-        // ensure that non-null parameters are really non-null
-        if (metaData == null) {
-            metaData = new MetaData();
-        }
+    public BasePanel addTab(BibDatabaseContext databaseContext, Charset encoding, boolean raisePanel) {
+        Objects.requireNonNull(databaseContext);
+
+        Charset usedEncoding;
         if (encoding == null) {
-            encoding = Globals.prefs.getDefaultEncoding();
+            usedEncoding = Globals.prefs.getDefaultEncoding();
+        } else {
+            usedEncoding = encoding;
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BasePanel bp = new BasePanel(JabRefFrame.this, new BibDatabaseContext(db, metaData, file, defaults), encoding);
+        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext, usedEncoding);
         addTab(bp, raisePanel);
         return bp;
     }
@@ -1721,7 +1777,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries, final boolean openInNew) {
         SwingUtilities.invokeLater(() -> {
             ImportInspectionDialog diag = new ImportInspectionDialog(JabRefFrame.this, panel,
-                    InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    Localization.lang("Import"), openInNew);
             diag.addEntries(entries);
             diag.entryListComplete();
             diag.setLocationRelativeTo(JabRefFrame.this);

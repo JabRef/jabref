@@ -16,17 +16,16 @@
 package net.sf.jabref.logic.layout.format;
 
 import java.io.File;
-
-import net.sf.jabref.logic.layout.ParamLayoutFormatter;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.FileField.ParsedFileField;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.ParamLayoutFormatter;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,14 +53,14 @@ public class FileLink implements ParamLayoutFormatter {
         if (fileType == null) {
             // No file type specified. Simply take the first link.
             if (!(fileList.isEmpty())) {
-                link = fileList.get(0).link;
+                link = fileList.get(0).getLink();
             }
         }
         else {
             // A file type is specified:
             for (ParsedFileField flEntry : fileList) {
-                if (flEntry.fileType.equalsIgnoreCase(fileType)) {
-                    link = flEntry.link;
+                if (flEntry.getFileType().equalsIgnoreCase(fileType)) {
+                    link = flEntry.getLink();
                     break;
                 }
             }
@@ -71,18 +70,18 @@ public class FileLink implements ParamLayoutFormatter {
             return "";
         }
 
-        String[] dirs;
+        List<String> dirs;
         // We need to resolve the file directory from the database's metadata,
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
         if (Globals.prefs.fileDirForDatabase == null) {
-            dirs = new String[] {Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)};
+            dirs = Arrays.asList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         } else {
             dirs = Globals.prefs.fileDirForDatabase;
         }
 
-        Optional<File> f = FileUtil.expandFilename(link, Arrays.asList(dirs));
+        Optional<File> f = FileUtil.expandFilename(link, dirs);
 
         /*
          * Stumbled over this while investigating

@@ -15,7 +15,15 @@
  */
 package net.sf.jabref.gui.worker;
 
-import net.sf.jabref.Globals;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -25,17 +33,9 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -89,14 +89,14 @@ public class SendAsEMailAction extends AbstractWorker {
             }
         }
 
-        ArrayList<String> attachments = new ArrayList<>();
+        List<String> attachments = new ArrayList<>();
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<File> fileList = FileUtil.getListOfLinkedFiles(bes,
-                frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getFileDirectory(Globals.FILE_FIELD));
+                frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory());
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

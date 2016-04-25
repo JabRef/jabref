@@ -1,7 +1,5 @@
 package net.sf.jabref.exporter;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -10,14 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import com.google.common.base.Charsets;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -25,32 +17,39 @@ import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.google.common.base.Charsets;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import static org.junit.Assert.assertEquals;
+
 @RunWith(Parameterized.class)
 public class ExportFormatTest {
 
     public IExportFormat exportFormat;
     public String exportFormatName;
-    public static BibDatabase database;
-    public static Charset charset;
-    public static MetaData metaData;
-    public static List<BibEntry> entries;
+    public BibDatabaseContext databaseContext;
+    public Charset charset;
+    public List<BibEntry> entries;
 
     public ExportFormatTest(IExportFormat format, String name) {
         exportFormat = format;
         exportFormatName = name;
     }
 
-
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
-        database = new BibDatabase();
+        databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         charset = Charsets.UTF_8;
-        metaData = new MetaData();
         entries = Collections.emptyList();
     }
 
@@ -58,7 +57,7 @@ public class ExportFormatTest {
     public void testExportingEmptyDatabaseYieldsEmptyFile() throws Exception {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(database, metaData, filename, charset, entries);
+        exportFormat.performExport(databaseContext, filename, charset, entries);
         try (FileInputStream stream = new FileInputStream(tmpFile);
                 InputStreamReader reader = new InputStreamReader(stream, charset)) {
             char[] buffer = new char[512];
@@ -70,14 +69,14 @@ public class ExportFormatTest {
     public void testExportingNullDatabaseThrowsNPE() throws Exception {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(null, metaData, filename, charset, entries);
+        exportFormat.performExport(null, filename, charset, entries);
     }
 
     @Test(expected = NullPointerException.class)
     public void testExportingNullEntriesThrowsNPE() throws Exception {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
-        exportFormat.performExport(database, metaData, filename, charset, null);
+        exportFormat.performExport(databaseContext, filename, charset, null);
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")

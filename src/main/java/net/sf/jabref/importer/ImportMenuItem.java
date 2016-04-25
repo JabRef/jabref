@@ -27,9 +27,15 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -126,6 +132,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // This import method never throws an IOException:
                         imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
                     } else {
+                        frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
                         ParserResult pr = new ParserResult(
                                 Globals.IMPORT_FORMAT_READER.importFromFile(importer,
@@ -182,14 +189,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
             } else {
                 if (openInNew) {
-                    frame.addTab(bibtexResult.getDatabase(), bibtexResult.getFile(), bibtexResult.getMetaData(),
-                            Globals.prefs.getDefaultEncoding(), true);
+                    frame.addTab(bibtexResult.getDatabaseContext(), Globals.prefs.getDefaultEncoding(), true);
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {
                     final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, InternalBibtexFields.DEFAULT_INSPECTION_FIELDS, Localization.lang("Import"), openInNew);
+                    ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"),
+                            openInNew);
                     diag.addEntries(bibtexResult.getDatabase().getEntries());
                     diag.entryListComplete();
                     diag.setLocationRelativeTo(frame);

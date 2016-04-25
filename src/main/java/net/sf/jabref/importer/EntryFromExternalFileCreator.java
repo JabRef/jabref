@@ -3,8 +3,8 @@ package net.sf.jabref.importer;
 import java.io.File;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.model.entry.BibEntry;
 
 /** EntryCreator for any predefined ExternalFileType.
  * This Creator accepts all files with the extension defined in the ExternalFileType.

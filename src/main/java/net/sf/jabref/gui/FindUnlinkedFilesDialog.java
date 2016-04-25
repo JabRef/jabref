@@ -36,8 +36,18 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -69,21 +79,23 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.importer.EntryFromFileCreator;
 import net.sf.jabref.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.importer.UnlinkedPDFFileFilter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.EntryType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -93,6 +105,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
+
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
     /**
@@ -101,7 +114,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
     public static final String ACTION_COMMAND = "findUnlinkedFiles";
     public static final String ACTION_MENU_TITLE = Localization.menuTitle("Find unlinked files...");
 
-    public static final String ACTION_SHORT_DESCRIPTION = Localization.lang("Searches for unlinked PDF files on the file system");
+    public static final String ACTION_SHORT_DESCRIPTION = Localization
+            .lang("Searches for unlinked PDF files on the file system");
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -110,7 +124,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private EntryFromFileCreatorManager creatorManager;
 
     private UnlinkedFilesCrawler crawler;
-    private File lastSelectedDirectory;
+    private Path lastSelectedDirectory;
 
     private TreeModel treeModel;
     /* PANELS */
@@ -163,12 +177,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
+
     /**
      * For Unit-testing only. <i>Don't remove!</i> <br>
      * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this
      * class.
      */
+    @SuppressWarnings("unused")
     private FindUnlinkedFilesDialog() {
+        //intended
     }
 
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
@@ -222,8 +239,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
             try {
                 String[] dim = store.split(";");
                 dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
-            } catch (NumberFormatException ignored) {
-                // Ignored
+            } catch (NumberFormatException ignoredEx) {
+                LOGGER.debug("RestoreSizeDialog Exception ", ignoredEx);
             }
         }
         if (dimension != null) {
@@ -238,16 +255,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void initialize() {
 
         initializeActions();
-
         initComponents();
-
         createTree();
         createFileTypesCombobox();
         createEntryTypesCombobox();
-
         initLayout();
         setupActions();
-
         pack();
     }
 
@@ -258,6 +271,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void initializeActions() {
 
         actionSelectAll = new AbstractAction(Localization.lang("Select all")) {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -268,6 +282,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionUnselectAll = new AbstractAction(Localization.lang("Unselect all")) {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -278,6 +293,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionExpandTree = new AbstractAction(Localization.lang("Expand all")) {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -286,6 +302,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         };
 
         actionCollapseTree = new AbstractAction(Localization.lang("Collapse all")) {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 CheckableTreeNode rootNode = (CheckableTreeNode) tree.getModel().getRoot();
@@ -321,10 +338,11 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * @param lastSelectedDir
      *            directory that is used as the working directory in this view.
      */
-    private void storeLastSelectedDirectory(File lastSelectedDir) {
+    private void storeLastSelectedDirectory(Path lastSelectedDir) {
         lastSelectedDirectory = lastSelectedDir;
         if (lastSelectedDirectory != null) {
-            Globals.prefs.put(FindUnlinkedFilesDialog.GLOBAL_PREFS_WORKING_DIRECTORY_KEY, lastSelectedDirectory.getAbsolutePath());
+            Globals.prefs.put(FindUnlinkedFilesDialog.GLOBAL_PREFS_WORKING_DIRECTORY_KEY,
+                    lastSelectedDirectory.toAbsolutePath().toString());
         }
     }
 
@@ -337,15 +355,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
      *
      * @return The persistently stored working directory path for this view.
      */
-    private File loadLastSelectedDirectory() {
+    private Path loadLastSelectedDirectory() {
         String workingDirectory = Globals.prefs.get(FindUnlinkedFilesDialog.GLOBAL_PREFS_WORKING_DIRECTORY_KEY);
         if (workingDirectory == null) {
             workingDirectory = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
-        lastSelectedDirectory = new File(workingDirectory);
-        if (lastSelectedDirectory.isFile()) {
-            lastSelectedDirectory = lastSelectedDirectory.getParentFile();
-        }
+        lastSelectedDirectory = Paths.get(workingDirectory);
+
         return lastSelectedDirectory;
     }
 
@@ -366,32 +382,33 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * @return The selected directory from the user, or <code>null</code>, if
      *         the user has aborted the selection.
      */
-    private File chooseDirectory() {
+    private Path chooseDirectory() {
 
         if (fileChooser == null) {
             fileChooser = new JFileChooser();
             fileChooser.setAutoscrolls(true);
             fileChooser.setDialogTitle(Localization.lang("Select directory"));
             fileChooser.setApproveButtonText(Localization.lang("Choose Directory"));
-            fileChooser.setApproveButtonToolTipText(Localization.lang("Use the selected directory to start with the search."));
+            fileChooser.setApproveButtonToolTipText(
+                    Localization.lang("Use the selected directory to start with the search."));
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
 
         String path = textfieldDirectoryPath.getText();
-        if ((path == null) || path.isEmpty()) {
-            fileChooser.setCurrentDirectory(lastSelectedDirectory);
+        if (path.isEmpty()) {
+            fileChooser.setCurrentDirectory(lastSelectedDirectory.toFile());
         } else {
-            fileChooser.setCurrentDirectory(new File(path));
+            fileChooser.setCurrentDirectory(Paths.get(path).toFile());
         }
 
         int result = fileChooser.showOpenDialog(frame);
         if (result == JFileChooser.CANCEL_OPTION) {
             return null;
         }
-        File selectedDirectory = fileChooser.getSelectedFile();
+        Path selectedDirectory = fileChooser.getSelectedFile().toPath();
         String filepath = "";
         if (selectedDirectory != null) {
-            filepath = selectedDirectory.getAbsolutePath();
+            filepath = selectedDirectory.toAbsolutePath().toString();
         }
         textfieldDirectoryPath.setText(filepath);
 
@@ -412,8 +429,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         if (enable) {
             tree.addMouseListener(treeMouseListener);
-        }
-        else {
+        } else {
             tree.removeMouseListener(treeMouseListener);
         }
         disOrEnableAllElements(FindUnlinkedFilesDialog.this, enable);
@@ -476,16 +492,21 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void startSearch() {
 
-        final File directory = new File(textfieldDirectoryPath.getText());
-
-        if (!directory.exists() || !directory.isDirectory()) {
-            textfieldDirectoryPath.setText("");
-            return;
+        Path directory = Paths.get(textfieldDirectoryPath.getText());
+        if (Files.notExists(directory)) {
+            directory = Paths.get(System.getProperty("user.dir"));
         }
+        if (!Files.isDirectory(directory)) {
+            directory = directory.getParent();
+        }
+
+        //this addtional statement is needed because for the lamdba the variable must be effetively final
+        Path dir = directory;
 
         storeLastSelectedDirectory(directory);
 
-        progressBarSearching.setMinimumSize(new Dimension(buttonScan.getSize().width, progressBarSearching.getMinimumSize().height));
+        progressBarSearching.setMinimumSize(
+                new Dimension(buttonScan.getSize().width, progressBarSearching.getMinimumSize().height));
         progressBarSearching.setVisible(true);
         progressBarSearching.setString("");
 
@@ -500,16 +521,18 @@ public class FindUnlinkedFilesDialog extends JDialog {
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
             UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(selectedFileFilter, database);
-            CheckableTreeNode rootNode = crawler.searchDirectory(directory, unlinkedPDFFileFilter, threadState, new ChangeListener() {
+            CheckableTreeNode rootNode = crawler.searchDirectory(dir.toFile(), unlinkedPDFFileFilter, threadState,
+                    new ChangeListener() {
 
-                int counter;
+                        int counter;
 
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    counter++;
-                    progressBarSearching.setString(counter + " files found");
-                }
-            });
+
+                        @Override
+                        public void stateChanged(ChangeEvent e) {
+                            counter++;
+                            progressBarSearching.setString(counter + " files found");
+                        }
+                    });
             searchFinishedHandler(rootNode);
         });
 
@@ -553,16 +576,17 @@ public class FindUnlinkedFilesDialog extends JDialog {
         progressBarImporting.setValue(0);
         progressBarImporting.setString("");
 
-        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem()).getEntryType();
+        final EntryType entryType = ((BibtexEntryTypeWrapper) comboBoxEntryTypeSelection.getSelectedItem())
+                .getEntryType();
 
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
             List<String> errors = new LinkedList<>();
-            creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(),
-                    entryType,
+            creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(), entryType,
                     checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
                         int counter;
+
 
                         @Override
                         public void stateChanged(ChangeEvent e) {
@@ -583,9 +607,11 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         if ((errors != null) && !errors.isEmpty()) {
 
-            JOptionPane.showMessageDialog(this, "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ") + errors.size() + (errors.size() > 1 ? " files" : " file") + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
-                    Localization.lang("Warning"),
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ")
+                            + errors.size() + (errors.size() > 1 ? " files" : " file")
+                            + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
+                    Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
         }
 
         progressBarImporting.setVisible(false);
@@ -631,7 +657,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
          * Stores the selected Directory.
          */
         buttonBrowse.addActionListener(e -> {
-            File selectedDirectory = chooseDirectory();
+            Path selectedDirectory = chooseDirectory();
             storeLastSelectedDirectory(selectedDirectory);
         });
 
@@ -644,9 +670,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
          * selected nodes in this dialogs tree view. <br>
          */
         ActionListener actionListenerImportEntrys = e -> startImport();
-
         buttonApply.addActionListener(actionListenerImportEntrys);
-
         buttonClose.addActionListener(e -> dispose());
     }
 
@@ -666,7 +690,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private List<File> getFileListFromNode(CheckableTreeNode node) {
         List<File> filesList = new ArrayList<>();
         Enumeration<CheckableTreeNode> children = node.depthFirstEnumeration();
-        ArrayList<CheckableTreeNode> nodesToRemove = new ArrayList<>();
+        List<CheckableTreeNode> nodesToRemove = new ArrayList<>();
         for (CheckableTreeNode child : Collections.list(children)) {
             if (child.isLeaf() && child.isSelected()) {
                 File nodeFile = ((FileNodeWrapper) child.getUserObject()).file;
@@ -676,7 +700,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 }
             }
         }
-
 
         // remove imported files from tree
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
@@ -751,12 +774,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonOptionCollapseAll.setAction(actionCollapseTree);
 
         checkboxCreateKeywords = new JCheckBox(Localization.lang("Create directory based keywords"));
-        checkboxCreateKeywords.setToolTipText(Localization.lang("Creates keywords in created entrys with directory pathnames"));
+        checkboxCreateKeywords
+                .setToolTipText(Localization.lang("Creates keywords in created entrys with directory pathnames"));
         checkboxCreateKeywords.setSelected(checkBoxWhyIsThereNoGetSelectedStupidSwing);
-        checkboxCreateKeywords.addItemListener(e -> checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing);
+        checkboxCreateKeywords.addItemListener(
+                e -> checkBoxWhyIsThereNoGetSelectedStupidSwing = !checkBoxWhyIsThereNoGetSelectedStupidSwing);
 
         textfieldDirectoryPath = new JTextField();
-        textfieldDirectoryPath.setText(lastSelectedDirectory == null ? "" : lastSelectedDirectory.getAbsolutePath());
+        textfieldDirectoryPath
+                .setText(lastSelectedDirectory == null ? "" : lastSelectedDirectory.toAbsolutePath().toString());
 
         labelDirectoryDescription = new JLabel(Localization.lang("Select a directory where the search shall start."));
         labelFileTypesDescription = new JLabel(Localization.lang("Select file type:"));
@@ -793,71 +819,76 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         GridBagLayout gbl = new GridBagLayout();
 
-        panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select directory")));
-        panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Select files")));
-        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("BibTeX entry creation")));
+        panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                Localization.lang("Select directory")));
+        panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                Localization.lang("Select files")));
+        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                Localization.lang("BibTeX entry creation")));
 
         Insets basicInsets = new Insets(6, 6, 6, 6);
         Insets smallInsets = new Insets(3, 2, 3, 1);
         Insets noInsets = new Insets(0, 0, 0, 0);
 
         // 		x, y, w, h, wx,wy,ix,iy
-        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, buttonScan, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, noInsets,
-                0, 1, 1, 1, 1, 1, 40, 10);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, labelSearchingDirectoryInfo, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, noInsets,
-                0, 2, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, progressBarSearching, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, noInsets,
-                0, 3, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, buttonScan, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.EAST, noInsets, 0, 1, 1, 1, 1, 1, 40, 10);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, labelSearchingDirectoryInfo,
+                GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, noInsets, 0, 2, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelSearchArea, progressBarSearching, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.EAST, noInsets, 0, 3, 1, 1, 0, 0, 0, 0);
 
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, labelDirectoryDescription, null, GridBagConstraints.WEST, new Insets(6, 6, 0, 6),
-                0, 0, 3, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, textfieldDirectoryPath, GridBagConstraints.HORIZONTAL, null, basicInsets,
-                0, 1, 2, 1, 1, 1, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, buttonBrowse, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, basicInsets,
-                2, 1, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, labelFileTypesDescription, GridBagConstraints.NONE, GridBagConstraints.WEST, new Insets(18, 6, 18, 3),
-                0, 3, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, comboBoxFileTypeSelection, GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST, new Insets(18, 3, 18, 6),
-                1, 3, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, panelSearchArea, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST, new Insets(18, 6, 18, 6),
-                2, 3, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, labelDirectoryDescription, null,
+                GridBagConstraints.WEST, new Insets(6, 6, 0, 6), 0, 0, 3, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, textfieldDirectoryPath, GridBagConstraints.HORIZONTAL,
+                null, basicInsets, 0, 1, 2, 1, 1, 1, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, buttonBrowse, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.EAST, basicInsets, 2, 1, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, labelFileTypesDescription, GridBagConstraints.NONE,
+                GridBagConstraints.WEST, new Insets(18, 6, 18, 3), 0, 3, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, comboBoxFileTypeSelection,
+                GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST, new Insets(18, 3, 18, 6), 1, 3, 1, 1, 1, 0, 0,
+                0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelDirectory, panelSearchArea, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.EAST, new Insets(18, 6, 18, 6), 2, 3, 1, 1, 0, 0, 0, 0);
 
-        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, labelFilesDescription, GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST, new Insets(6, 6, 0, 6),
-                0, 0, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, scrollpaneTree, GridBagConstraints.BOTH, GridBagConstraints.CENTER, basicInsets,
-                0, 1, 1, 1, 1, 1, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, panelOptions, GridBagConstraints.NONE, GridBagConstraints.NORTHEAST, basicInsets,
-                1, 1, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionSelectAll, GridBagConstraints.HORIZONTAL, GridBagConstraints.NORTH, noInsets,
-                0, 0, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionUnselectAll, GridBagConstraints.HORIZONTAL, GridBagConstraints.NORTH, noInsets,
-                0, 1, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionExpandAll, GridBagConstraints.HORIZONTAL, GridBagConstraints.NORTH, new Insets(6, 0, 0, 0),
-                0, 2, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionCollapseAll, GridBagConstraints.HORIZONTAL, GridBagConstraints.NORTH, noInsets,
-                0, 3, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, labelFilesDescription, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.WEST, new Insets(6, 6, 0, 6), 0, 0, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, scrollpaneTree, GridBagConstraints.BOTH,
+                GridBagConstraints.CENTER, basicInsets, 0, 1, 1, 1, 1, 1, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelFiles, panelOptions, GridBagConstraints.NONE,
+                GridBagConstraints.NORTHEAST, basicInsets, 1, 1, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionSelectAll, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.NORTH, noInsets, 0, 0, 1, 1, 1, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionUnselectAll, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.NORTH, noInsets, 0, 1, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionExpandAll, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.NORTH, new Insets(6, 0, 0, 0), 0, 2, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionCollapseAll, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.NORTH, noInsets, 0, 3, 1, 1, 0, 0, 0, 0);
 
-        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, labelEntryTypeDescription, GridBagConstraints.NONE, GridBagConstraints.WEST, basicInsets,
-                0, 0, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, comboBoxEntryTypeSelection, GridBagConstraints.NONE, GridBagConstraints.WEST, basicInsets,
-                1, 0, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, checkboxCreateKeywords, GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST, basicInsets,
-                0, 1, 2, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelImportArea, labelImportingInfo, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, new Insets(6, 6, 0, 6),
-                0, 1, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelImportArea, progressBarImporting, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, new Insets(0, 6, 6, 6),
-                0, 2, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelButtons, panelImportArea, GridBagConstraints.NONE, GridBagConstraints.EAST, smallInsets,
-                1, 0, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, labelEntryTypeDescription,
+                GridBagConstraints.NONE, GridBagConstraints.WEST, basicInsets, 0, 0, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, comboBoxEntryTypeSelection,
+                GridBagConstraints.NONE, GridBagConstraints.WEST, basicInsets, 1, 0, 1, 1, 1, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelEntryTypesSelection, checkboxCreateKeywords,
+                GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST, basicInsets, 0, 1, 2, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelImportArea, labelImportingInfo, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.CENTER, new Insets(6, 6, 0, 6), 0, 1, 1, 1, 1, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelImportArea, progressBarImporting, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.CENTER, new Insets(0, 6, 6, 6), 0, 2, 1, 1, 1, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, panelButtons, panelImportArea, GridBagConstraints.NONE,
+                GridBagConstraints.EAST, smallInsets, 1, 0, 1, 1, 0, 0, 0, 0);
 
-        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelDirectory, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, basicInsets,
-                0, 0, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelFiles, GridBagConstraints.BOTH, GridBagConstraints.NORTHWEST, new Insets(12, 6, 2, 2),
-                0, 1, 1, 1, 1, 1, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelEntryTypesSelection, GridBagConstraints.HORIZONTAL, GridBagConstraints.SOUTHWEST, new Insets(12, 6, 2, 2),
-                0, 2, 1, 1, 0, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelButtons, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER, new Insets(10, 6, 10, 6),
-                0, 3, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelDirectory, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.CENTER, basicInsets, 0, 0, 1, 1, 0, 0, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelFiles, GridBagConstraints.BOTH,
+                GridBagConstraints.NORTHWEST, new Insets(12, 6, 2, 2), 0, 1, 1, 1, 1, 1, 0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelEntryTypesSelection,
+                GridBagConstraints.HORIZONTAL, GridBagConstraints.SOUTHWEST, new Insets(12, 6, 2, 2), 0, 2, 1, 1, 0, 0,
+                0, 0);
+        FindUnlinkedFilesDialog.addComponent(gbl, getContentPane(), panelButtons, GridBagConstraints.HORIZONTAL,
+                GridBagConstraints.CENTER, new Insets(10, 6, 10, 6), 0, 3, 1, 1, 0, 0, 0, 0);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -908,8 +939,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
      * @param insets
      *            Insets of the component. Can be <code>null</code>.
      */
-    private static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill, Integer anchor,
-            Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY, int ipadX, int ipadY) {
+    private static void addComponent(GridBagLayout layout, Container container, Component component, Integer fill,
+            Integer anchor, Insets insets, int gridX, int gridY, int width, int height, double weightX, double weightY,
+            int ipadX, int ipadY) {
         container.setLayout(layout);
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = gridX;
@@ -963,7 +995,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         if ((userObject instanceof FileNodeWrapper) && node.isLeaf()) {
                             FileNodeWrapper fnw = (FileNodeWrapper) userObject;
                             try {
-                                JabRefDesktop.openExternalViewer(JabRef.mainFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(), fnw.file.getAbsolutePath(), "pdf");
+                                JabRefDesktop.openExternalViewer(
+                                        JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(),
+                                        fnw.file.getAbsolutePath(), "pdf");
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }
@@ -1013,7 +1047,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
                     boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
+                        cellHasFocus);
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
                     if (creator.getExternalFileType() != null) {
@@ -1032,7 +1067,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void createEntryTypesCombobox() {
 
-        Iterator<EntryType> iterator = EntryTypes.getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
+        Iterator<EntryType> iterator = EntryTypes
+                .getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
         list.add(new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
@@ -1114,10 +1150,11 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
 
         @Override
-        public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,
-                boolean hasFocus) {
+        public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded,
+                boolean leaf, int row, boolean hasFocus) {
 
-            Component nodeComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            Component nodeComponent = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
+                    hasFocus);
             CheckableTreeNode node = (CheckableTreeNode) value;
 
             FileNodeWrapper userObject = (FileNodeWrapper) node.getUserObject();
@@ -1138,11 +1175,14 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
             GridBagLayout gbl = new GridBagLayout();
             FindUnlinkedFilesDialog.addComponent(gbl, newPanel, checkbox, null, null, null, 0, 0, 1, 1, 0, 0, 0, 0);
-            FindUnlinkedFilesDialog.addComponent(gbl, newPanel, nodeComponent, GridBagConstraints.HORIZONTAL, null, new Insets(1, 2, 0, 0), 1, 0, 1, 1, 1, 0, 0, 0);
+            FindUnlinkedFilesDialog.addComponent(gbl, newPanel, nodeComponent, GridBagConstraints.HORIZONTAL, null,
+                    new Insets(1, 2, 0, 0), 1, 0, 1, 1, 1, 0, 0, 0);
 
             if (userObject.fileCount > 0) {
-                JLabel label = new JLabel("(" + userObject.fileCount + " file" + (userObject.fileCount > 1 ? "s" : "") + ")");
-                FindUnlinkedFilesDialog.addComponent(gbl, newPanel, label, null, null, new Insets(1, 2, 0, 0), 2, 0, 1, 1, 0, 0, 0, 0);
+                JLabel label = new JLabel(
+                        "(" + userObject.fileCount + " file" + (userObject.fileCount > 1 ? "s" : "") + ")");
+                FindUnlinkedFilesDialog.addComponent(gbl, newPanel, label, null, null, new Insets(1, 2, 0, 0), 2, 0, 1,
+                        1, 0, 0, 0, 0);
             }
             return newPanel;
         }

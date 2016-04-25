@@ -17,7 +17,8 @@ package net.sf.jabref.gui.help;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.*;
+import javax.swing.Action;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 

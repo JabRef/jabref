@@ -15,29 +15,10 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
@@ -48,6 +29,42 @@ import java.io.StringReader;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
@@ -65,14 +82,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * If a database is set, the preview will attempt to resolve strings in the
      * previewed entry using that database.
      */
-    private Optional<BibDatabase> database = Optional.empty();
+    private Optional<BibDatabaseContext> databaseContext = Optional.empty();
 
     private Optional<Layout> layout = Optional.empty();
-
-    /**
-     * must not be null, must always be set during constructor, but can change over time
-     */
-    private MetaData metaData;
 
     /**
      * must not be null, must always be set during constructor, but can change over time
@@ -95,23 +107,20 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
 
     /**
-     * @param database
-     *            (may be null) Optionally used to resolve strings.
+     * @param databaseContext
+     *            (may be null) Optionally used to resolve strings and for resolving pdf directories for links.
      * @param entry
      *            (may be null) If given this entry is shown otherwise you have
      *            to call setEntry to make something visible.
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
-     * @param metaData
-     *            (must be given) Used for resolving pdf directories for links.
      * @param layoutFile
      *            (must be given) Used for layout
      */
-    public PreviewPanel(BibDatabase database, BibEntry entry,
-                        BasePanel panel, MetaData metaData, String layoutFile) {
-        this(panel, metaData, layoutFile);
-        this.database = Optional.ofNullable(database);
+    public PreviewPanel(BibDatabaseContext databaseContext, BibEntry entry,
+                        BasePanel panel, String layoutFile) {
+        this(panel, databaseContext, layoutFile);
         setEntry(entry);
     }
 
@@ -120,15 +129,15 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
      * @param panel
      *            (may be null) If not given no toolbar is shown on the right
      *            hand side.
-     * @param metaData
-     *            (must be given) Used for resolving pdf directories for links.
+     * @param databaseContext
+     *            (may be null) Used for resolving pdf directories for links.
      * @param layoutFile
      *            (must be given) Used for layout
      */
-    public PreviewPanel(BasePanel panel, MetaData metaData, String layoutFile) {
+    public PreviewPanel(BasePanel panel, BibDatabaseContext databaseContext, String layoutFile) {
         super(new BorderLayout(), true);
 
-        this.metaData = Objects.requireNonNull(metaData);
+        this.databaseContext = Optional.ofNullable(databaseContext);
         this.layoutFile = Objects.requireNonNull(layoutFile);
         updateLayout();
 
@@ -228,10 +237,11 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         previewPane.setDragEnabled(true); // this has an effect only, if no custom transfer handler is registered. We keep the statement if the transfer handler is removed.
         previewPane.setContentType("text/html");
         previewPane.addHyperlinkListener(hyperlinkEvent -> {
-            if (hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            if ((hyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED) && PreviewPanel.this.databaseContext
+                    .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.metaData, address, "url");
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, "url");
                 } catch (IOException e) {
                     LOGGER.warn("Could not open external viewer", e);
                 }
@@ -240,8 +250,8 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     }
 
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
+    public void setDatabaseContext(BibDatabaseContext databaseContext) {
+        this.databaseContext = Optional.ofNullable(databaseContext);
     }
 
     public void updateLayout(String layoutFormat) {
@@ -284,9 +294,9 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
         StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
         entry.ifPresent(entry ->
-                layout.ifPresent(layout ->
-                        sb.append(layout.doLayout(entry, database.orElse(null), highlightPattern))
-                )
+                layout.ifPresent(layout -> sb.append(layout
+                        .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null),
+                                highlightPattern)))
         );
         String newValue = sb.toString();
 

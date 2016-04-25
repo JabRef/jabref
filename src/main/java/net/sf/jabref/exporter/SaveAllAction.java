@@ -19,13 +19,16 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
+
 import spin.Spin;
 
 /**

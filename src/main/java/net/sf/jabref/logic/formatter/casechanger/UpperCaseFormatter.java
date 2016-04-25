@@ -32,4 +32,10 @@ public class UpperCaseFormatter implements Formatter {
         return Localization.lang(
                 "Changes all letters to upper case.");
     }
+
+    @Override
+    public String getExampleInput() {
+        return "Kde {Amarok}";
+    }
+
 }

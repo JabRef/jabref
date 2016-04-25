@@ -1,10 +1,10 @@
 package net.sf.jabref.migrations;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 public class PreferencesMigrations {
 
@@ -69,7 +69,7 @@ public class PreferencesMigrations {
         encodingMap.put("Big5_HKSCS", "Big5-HKSCS");
         encodingMap.put("EUC_JP", "EUC-JP");
 
-        if (encodingMap.get(defaultEncoding) != null) {
+        if (encodingMap.containsKey(defaultEncoding)) {
             prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }

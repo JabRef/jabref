@@ -15,18 +15,34 @@
 */
 package net.sf.jabref.gui.maintable;
 
-import java.awt.event.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.*;
 
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-import net.sf.jabref.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BasePanelMode;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -37,6 +53,10 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,10 +93,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
         previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.getDatabase(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_0)),
-                new PreviewPanel(panel.getDatabase(), null, panel, panel.getBibDatabaseContext().getMetaData(), Globals.prefs
-                        .get(JabRefPreferences.PREVIEW_1))};
+                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
+                        Globals.prefs.get(JabRefPreferences.PREVIEW_0)),
+                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
+                        Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
 
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
         panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
@@ -299,7 +319,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
                                         flEntry.link, flEntry.type.get().getIcon(),
-                                        panel.getBibDatabaseContext().getMetaData(), flEntry.type);
+                                        panel.getBibDatabaseContext(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
                                     panel.output(Localization.lang("Unable to open link."));
@@ -307,8 +327,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                         } else {
                             try {
-                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext().getMetaData(), link,
-                                        fieldName);
+                                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
                                 LOGGER.info("Unable to open link", ex);
@@ -356,7 +375,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if ((selRow == -1) || !table.isRowSelected(table.rowAtPoint(e.getPoint()))) {
             table.setRowSelectionInterval(row, row);
         }
-        RightClickMenu rightClickMenu = new RightClickMenu(JabRef.mainFrame, panel);
+        RightClickMenu rightClickMenu = new RightClickMenu(JabRefGUI.getMainFrame(), panel);
         rightClickMenu.show(table, e.getX(), e.getY());
     }
 
@@ -394,7 +413,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             description = flEntry.link;
                         }
                         menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext().getMetaData(),
+                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext(),
                                 flEntry.type));
                         showDefaultPopup = false;
                     }
@@ -413,7 +432,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 icon = iconLabel.getIcon();
                             }
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
-                                    panel.getBibDatabaseContext().getMetaData(), field));
+                                    panel.getBibDatabaseContext(), field));
                             showDefaultPopup = false;
                         }
                     }

@@ -19,16 +19,31 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -299,17 +314,12 @@ public class BibtexParser {
      * @return the text read so far
      */
     private String dumpTextReadSoFarToString() {
-        StringBuilder entry = new StringBuilder();
-        while (!pureTextFromFile.isEmpty()) {
-            entry.append(pureTextFromFile.pollFirst());
-        }
-
-        String result = entry.toString();
-        int indexOfAt = entry.indexOf("@");
+        String result = getPureTextFromFile();
+        int indexOfAt = result.indexOf("@");
 
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
-            return purgeEOFCharacters(entry);
+            return purgeEOFCharacters(result);
         } else {
 
             //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
@@ -332,10 +342,17 @@ public class BibtexParser {
                 }
             }
 
-            result = result.substring(runningIndex + 1);
-
-            return result;
+            return result.substring(runningIndex + 1);
         }
+    }
+
+    private String getPureTextFromFile() {
+        StringBuilder entry = new StringBuilder();
+        while (!pureTextFromFile.isEmpty()) {
+            entry.append(pureTextFromFile.pollFirst());
+        }
+
+        return entry.toString();
     }
 
     /**
@@ -343,10 +360,10 @@ public class BibtexParser {
      *
      * @return a String without eof characters
      */
-    private String purgeEOFCharacters(StringBuilder input) {
+    private String purgeEOFCharacters(String input) {
 
         StringBuilder remainingText = new StringBuilder();
-        for (Character character : input.toString().toCharArray()) {
+        for (Character character : input.toCharArray()) {
             if (!(isEOFCharacter(character))) {
                 remainingText.append(character);
             }
@@ -441,7 +458,7 @@ public class BibtexParser {
         int character = pushbackReader.read();
 
         if(! isEOFCharacter(character)) {
-            pureTextFromFile.offerLast(Character.valueOf((char) character));
+            pureTextFromFile.offerLast((char) character);
         }
         if (character == '\n') {
             line++;
@@ -454,7 +471,7 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(character);
-        if(pureTextFromFile.getLast().charValue() == character) {
+        if(pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
     }
@@ -549,7 +566,7 @@ public class BibtexParser {
                 // at least one online database exports bibtex like that, making
                 // it inconvenient
                 // for users if JabRef didn't accept it.
-                if ("author".equals(key) || "editor".equals(key)) {
+                if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
                     entry.setField(key, entry.getField(key) + " and " + content);
                 } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one

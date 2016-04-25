@@ -18,7 +18,12 @@ package net.sf.jabref.exporter;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -26,15 +31,16 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * User: alver
@@ -85,8 +91,6 @@ public class ExportFormats {
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
         ExportFormats.putFormat(new MSBibExportFormat());
-        ExportFormats.putFormat(new MySQLExport());
-        ExportFormats.putFormat(new PostgreSQLExport());
         ExportFormats.putFormat(new ModsExportFormat());
 
         // Now add custom export formats
@@ -200,7 +204,7 @@ public class ExportFormats {
                         }
                     }
                     final IExportFormat format = eff.getExportFormat();
-                    List<BibEntry> entries = null;
+                    List<BibEntry> entries;
                     if (selectedOnly) {
                         // Selected entries
                         entries = frame.getCurrentBasePanel().getSelectedEntries();
@@ -212,10 +216,8 @@ public class ExportFormats {
                     // Set the global variable for this database's file directory before exporting,
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
-                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                            .getFileDirectory(Globals.FILE_FIELD).toArray(new String[0]);
-                    // Also store the database's file in a global variable:
-                    Globals.prefs.databaseFile = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+                    Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
+                            .getFileDirectory();
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -232,10 +234,8 @@ public class ExportFormats {
                         @Override
                         public void run() {
                             try {
-                                format.performExport(frame.getCurrentBasePanel().getDatabase(),
-                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                                        finFile.getPath(), frame
-                                                .getCurrentBasePanel().getEncoding(), finEntries);
+                                format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                                        finFile.getPath(), frame.getCurrentBasePanel().getEncoding(), finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {
@@ -279,7 +279,7 @@ public class ExportFormats {
         String lastUsedFormat = Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT);
         FileFilter defaultFilter = null;
         JFileChooser fc = new JFileChooser(currentDir);
-        TreeSet<FileFilter> filters = new TreeSet<>();
+        Set<FileFilter> filters = new TreeSet<>();
         for (Map.Entry<String, IExportFormat> e : ExportFormats.EXPORT_FORMATS.entrySet()) {
             String formatName = e.getKey();
             IExportFormat format = e.getValue();

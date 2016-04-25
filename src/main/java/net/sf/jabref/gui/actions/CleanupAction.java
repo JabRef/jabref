@@ -15,12 +15,17 @@
  */
 package net.sf.jabref.gui.actions;
 
+import java.util.List;
+import java.util.Objects;
+
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.CleanupPresetPanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.cleanup.CleanupPresetPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
@@ -30,10 +35,6 @@ import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Objects;
 
 public class CleanupAction extends AbstractWorker {
 
@@ -45,26 +46,25 @@ public class CleanupAction extends AbstractWorker {
      */
     private int unsuccessfulRenames;
 
-    private boolean cancelled;
+    private boolean canceled;
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
-    private final CleanupPresetPanel presetPanel;
+
 
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
         this.frame = panel.frame();
         this.preferences = Objects.requireNonNull(preferences);
-        this.presetPanel = new CleanupPresetPanel(CleanupPreset.loadFromPreferences(preferences));
     }
 
     @Override
     public void init() {
-        cancelled = false;
+        canceled = false;
         modifiedEntriesCount = 0;
         if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
             JOptionPane.showMessageDialog(frame, Localization.lang("First select entries to clean up."),
                     Localization.lang("Cleanup entry"), JOptionPane.INFORMATION_MESSAGE);
-            cancelled = true;
+            canceled = true;
             return;
         }
         frame.block();
@@ -74,12 +74,14 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (cancelled) {
+        if (canceled) {
             return;
         }
-        int choice = showDialog();
+        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
+                CleanupPreset.loadFromPreferences(preferences));
+        int choice = showDialog(presetPanel);
         if (choice != JOptionPane.OK_OPTION) {
-            cancelled = true;
+            canceled = true;
             return;
         }
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
@@ -95,7 +97,7 @@ public class CleanupAction extends AbstractWorker {
                 Globals.prefs.putBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, false);
             }
             if (answer == JOptionPane.NO_OPTION) {
-                cancelled = true;
+                canceled = true;
                 return;
             }
         }
@@ -116,7 +118,7 @@ public class CleanupAction extends AbstractWorker {
 
     @Override
     public void update() {
-        if (cancelled) {
+        if (canceled) {
             frame.unblock();
             return;
         }
@@ -145,7 +147,7 @@ public class CleanupAction extends AbstractWorker {
         frame.unblock();
     }
 
-    private int showDialog() {
+    private int showDialog(CleanupPresetPanel presetPanel) {
         String dialogTitle = Localization.lang("Cleanup entries");
 
         Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getPanel()};
@@ -159,10 +161,9 @@ public class CleanupAction extends AbstractWorker {
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
-        CleanupWorker cleaner = new CleanupWorker(preset,
-                bibDatabaseContext.getMetaData().getFileDirectory(Globals.FILE_FIELD), bibDatabaseContext.getDatabase(),
+        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext,
                 Globals.journalAbbreviationLoader.getRepository());
-        List<FieldChange> changes = cleaner.cleanup(entry);
+        List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
 

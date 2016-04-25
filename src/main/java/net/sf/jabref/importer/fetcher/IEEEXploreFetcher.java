@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.CookieHandler;
@@ -37,22 +36,24 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import net.sf.jabref.*;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -166,7 +167,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error while fetching from %0", "IEEEXplore"),
+                status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -183,7 +184,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
         } catch (ConnectException | UnknownHostException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
+            status.showMessage(Localization.lang("Could not connect to %0", getTitle()), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
@@ -205,7 +206,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     /**
-     * This method is called by the dialog when the user has cancelled the import.
+     * This method is called by the dialog when the user has canceled the import.
      */
     @Override
     public void stopFetching() {
