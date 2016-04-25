@@ -96,6 +96,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Swedish is added as a language option (still not a complete translation)
 
 ### Fixed
+- Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
 - Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup

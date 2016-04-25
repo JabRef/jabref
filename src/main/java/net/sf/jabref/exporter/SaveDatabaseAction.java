@@ -1,4 +1,5 @@
 /*  Copyright (C) 2003-2015 JabRef contributors.
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -75,58 +76,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             saveAs();
         } else {
 
-            // Check for external modifications:
-            if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
-                String[] opts = new String[] {Localization.lang("Review changes"),
-                        Localization.lang("Save"),
-                        Localization.lang("Cancel")};
-                int answer = JOptionPane.showOptionDialog(panel.frame(),
-                        Localization.lang("File has been updated externally. "
-                                + "What do you want to do?"),
-                        Localization.lang("File updated externally"),
-                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
-                        null, opts, opts[0]);
-
-                if (answer == JOptionPane.CANCEL_OPTION) {
-                    canceled = true;
-                    return;
-                } else if (answer == JOptionPane.YES_OPTION) {
-                    canceled = true;
-
-                    JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
-
-                        if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
-                            // TODO: GUI handling of the situation when the externally modified file keeps being locked.
-                            LOGGER.error("File locked, this will be trouble.");
-                        }
-
-                        ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                                panel.getBibDatabaseContext().getDatabaseFile());
-                        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
-                        if (scanner.changesFound()) {
-                            scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
-                                if (resolved) {
-                                    panel.setUpdatedExternally(false);
-                                    SwingUtilities.invokeLater(
-                                            (Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
-                                } else {
-                                    canceled = true;
-                                }
-                            });
-                        }
-                    });
-
-                    return;
-                } else { // User indicated to store anyway.
-                    if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("Database is protected. Cannot save until external changes have been reviewed."),
-                                Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
-                        canceled = true;
-                    } else {
-                        panel.setUpdatedExternally(false);
-                        panel.getSidePaneManager().hide("fileUpdate");
-                    }
-                }
+            // Check for external modifications: if true, save not performed so do not tell the user a save is underway but return instead.
+            if (checkExternalModification()) {
+                return;
             }
 
             panel.frame().output(Localization.lang("Saving database") + "...");
@@ -168,6 +120,13 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.autoGenerateKeysBeforeSaving();
 
             if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                // Check for external modifications to alleviate multiuser concurrency issue when near
+                // simultaneous saves occur to a shared database file: if true, do not perform the save
+                // rather return instead.
+                if (checkExternalModification()) {
+                    return;
+                }
+
                 // Save the database:
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getEncoding());
 
@@ -398,5 +357,70 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public boolean isCanceled() {
         return canceled;
+    }
+
+    /**
+     * Check whether or not the external database has been modified. If so need to alert the user to accept external updates prior to
+     * saving the database. This is necessary to avoid overwriting other users work when using a multiuser database file.
+     *
+     * @return true if the external database file has been modified and the user must choose to accept the changes and false if no modifications
+     * were found or there is no requested protection for the database file.
+     */
+    private boolean checkExternalModification() {
+        // Check for external modifications:
+        if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
+            String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
+                    Localization.lang("Cancel")};
+            int answer = JOptionPane.showOptionDialog(panel.frame(),
+                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                    Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
+
+            if (answer == JOptionPane.CANCEL_OPTION) {
+                canceled = true;
+                return true;
+            } else if (answer == JOptionPane.YES_OPTION) {
+                canceled = true;
+
+                JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+
+                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                        // TODO: GUI handling of the situation when the externally modified file keeps being locked.
+                        LOGGER.error("File locked, this will be trouble.");
+                    }
+
+                    ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
+                            panel.getBibDatabaseContext().getDatabaseFile());
+                    JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+                    if (scanner.changesFound()) {
+                        scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
+                            if (resolved) {
+                                panel.setUpdatedExternally(false);
+                                SwingUtilities
+                                        .invokeLater((Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                            } else {
+                                canceled = true;
+                            }
+                        });
+                    }
+                });
+
+                return true;
+            } else { // User indicated to store anyway.
+                if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
+                    JOptionPane.showMessageDialog(frame,
+                            Localization
+                                    .lang("Database is protected. Cannot save until external changes have been reviewed."),
+                            Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
+                    canceled = true;
+                } else {
+                    panel.setUpdatedExternally(false);
+                    panel.getSidePaneManager().hide("fileUpdate");
+                }
+            }
+        }
+
+        // Return false as either no external database file modifications have been found or overwrite is requested any way
+        return false;
     }
 }
