@@ -61,7 +61,7 @@ import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.event.AddEntryEvent;
-import net.sf.jabref.event.AddOrChangeEntryEvent;
+import net.sf.jabref.event.ChangeEntryEvent;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
@@ -1261,7 +1261,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Subscribe
         public void listen(AddEntryEvent aee) {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(aee.getEntry());
+                final List<BibEntry> entries = Collections.singletonList(aee.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1281,9 +1281,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(AddOrChangeEntryEvent aocee) {
-            searchAutoCompleter.addBibtexEntry(aocee.getEntry());
+        public void listen(AddEntryEvent aocee) {
+            searchAutoCompleter.addBibtexEntry(aocee.getBibEntry());
         }
+
+        @Subscribe
+        public void listen(ChangeEntryEvent aocee) {
+            searchAutoCompleter.addBibtexEntry(aocee.getBibEntry());
+        }
+
     }
 
     /**
@@ -1293,8 +1299,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class AutoCompleteListener {
 
         @Subscribe
-        public void listen(AddOrChangeEntryEvent aocee) {
-            BasePanel.this.autoCompleters.addEntry(aocee.getEntry());
+        public void listen(AddEntryEvent aocee) {
+            BasePanel.this.autoCompleters.addEntry(aocee.getBibEntry());
+        }
+
+        @Subscribe
+        public void listen(ChangeEntryEvent aocee) {
+            BasePanel.this.autoCompleters.addEntry(aocee.getBibEntry());
         }
     }
 

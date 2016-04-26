@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AddOrChangeEntryEventTest {
+public class ChangeEntryEventTest {
 
     private EventBus eventBus;
     private TestEventListener testEventListener;
@@ -20,14 +20,13 @@ public class AddOrChangeEntryEventTest {
     }
 
     @Test
-    public void testReceivingEvent() {
+    public void testEventReceivement() {
         BibEntry shouldBeBibEntry = new BibEntry();
-        shouldBeBibEntry.setId("testkey1");
-        AddOrChangeEntryEvent aocee = new AddOrChangeEntryEvent(shouldBeBibEntry);
+        shouldBeBibEntry.setId("testkey2");
+        ChangeEntryEvent aocee = new ChangeEntryEvent(shouldBeBibEntry);
         eventBus.post(aocee);
 
         Assert.assertEquals(shouldBeBibEntry.getId(), testEventListener.getBibEntry().getId());
-        Assert.assertEquals(shouldBeBibEntry.getId(), aocee.getEntry().getId());
+        Assert.assertEquals(shouldBeBibEntry.getId(), aocee.getBibEntry().getId());
     }
-
 }

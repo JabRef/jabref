@@ -1,9 +1,21 @@
 package net.sf.jabref.event;
 
-public class AddEntryEvent extends AddOrChangeEntryEvent {
+import net.sf.jabref.model.entry.BibEntry;
 
-    public AddEntryEvent(Object object) {
-        super(object);
+public class AddEntryEvent {
+
+    private BibEntry bibEntry;
+
+    public AddEntryEvent(BibEntry bibEntry) {
+        setBibEntry(bibEntry);
+    }
+
+    public void setBibEntry(BibEntry bibEntry) {
+        this.bibEntry = bibEntry;
+    }
+
+    public BibEntry getBibEntry() {
+        return this.bibEntry;
     }
 
 }

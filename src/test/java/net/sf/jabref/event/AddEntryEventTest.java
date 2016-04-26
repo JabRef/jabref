@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RemoveEntryEventTest {
+public class AddEntryEventTest {
 
     private EventBus eventBus;
     private TestEventListener testEventListener;
@@ -22,8 +22,8 @@ public class RemoveEntryEventTest {
     @Test
     public void testEventReceivement() {
         BibEntry shouldBeBibEntry = new BibEntry();
-        shouldBeBibEntry.setId("testkey3");
-        RemoveEntryEvent aocee = new RemoveEntryEvent(shouldBeBibEntry);
+        shouldBeBibEntry.setId("testkey1");
+        AddEntryEvent aocee = new AddEntryEvent(shouldBeBibEntry);
         eventBus.post(aocee);
 
         Assert.assertEquals(shouldBeBibEntry.getId(), testEventListener.getBibEntry().getId());

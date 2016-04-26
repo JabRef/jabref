@@ -98,12 +98,12 @@ public class EntrySorter {
     @Subscribe
     public void listen(AddEntryEvent aee) {
         synchronized (set) {
-            int pos = -Collections.binarySearch(set, aee.getEntry(), comp) - 1;
+            int pos = -Collections.binarySearch(set, aee.getBibEntry(), comp) - 1;
             LOGGER.debug("Insert position = " + pos);
             if (pos >= 0) {
-                set.add(pos, aee.getEntry());
+                set.add(pos, aee.getBibEntry());
             } else {
-                set.add(0, aee.getEntry());
+                set.add(0, aee.getBibEntry());
             }
         }
     }
@@ -111,7 +111,7 @@ public class EntrySorter {
     @Subscribe
     public void listen(RemoveEntryEvent ree) {
         synchronized (set) {
-            set.remove(ree.getEntry());
+            set.remove(ree.getBibEntry());
             changed = true;
         }
     }
@@ -119,11 +119,11 @@ public class EntrySorter {
     @Subscribe
     public void listen(ChangeEntryEvent cee) {
         synchronized (set) {
-            int pos = Collections.binarySearch(set, cee.getEntry(), comp);
-            int posOld = set.indexOf(cee.getEntry());
+            int pos = Collections.binarySearch(set, cee.getBibEntry(), comp);
+            int posOld = set.indexOf(cee.getBibEntry());
             if (pos < 0) {
                 set.remove(posOld);
-                set.add(-posOld - 1, cee.getEntry());
+                set.add(-posOld - 1, cee.getBibEntry());
             }
         }
     }

@@ -86,9 +86,6 @@ public class BibDatabase {
      */
     private boolean followCrossrefs = true;
 
-    /**
-     * Event bus
-     */
     private final EventBus eventBus;
 
 

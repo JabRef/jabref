@@ -35,7 +35,7 @@ public class ListSynchronizer {
     public void listen(AddEntryEvent aee) {
         lock();
         try {
-            list.add(aee.getEntry());
+            list.add(aee.getBibEntry());
         } finally {
             unlock();
         }
@@ -45,7 +45,7 @@ public class ListSynchronizer {
     public void listen(RemoveEntryEvent ree) {
         lock();
         try {
-            list.remove(ree.getEntry());
+            list.remove(ree.getBibEntry());
         } finally {
             unlock();
         }
@@ -55,12 +55,12 @@ public class ListSynchronizer {
     public void listen(ChangeEntryEvent cee) {
         lock();
         try {
-            int index = list.indexOf(cee.getEntry());
+            int index = list.indexOf(cee.getBibEntry());
             if (index != -1) {
                 // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
                 // DatabaseChangeEvent.ADDED_ENTRY
                 // thus,
-                list.set(index, cee.getEntry());
+                list.set(index, cee.getBibEntry());
             }
         } finally {
             unlock();

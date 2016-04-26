@@ -2,27 +2,20 @@ package net.sf.jabref.event;
 
 import net.sf.jabref.model.entry.BibEntry;
 
-public class RemoveEntryEvent implements Event {
+public class RemoveEntryEvent {
 
     private BibEntry bibEntry;
 
-
-    public RemoveEntryEvent(Object object) {
-        setObject(object);
+    public RemoveEntryEvent(BibEntry bibEntry) {
+        setBibEntry(bibEntry);
     }
 
-    @Override
-    public Object getObject() {
-        return bibEntry;
+    public void setBibEntry(BibEntry bibEntry) {
+        this.bibEntry = bibEntry;
     }
 
-    @Override
-    public void setObject(Object object) {
-        this.bibEntry = (BibEntry) object;
-    }
-
-    public BibEntry getEntry() {
-        return bibEntry;
+    public BibEntry getBibEntry() {
+        return this.bibEntry;
     }
 
 }
