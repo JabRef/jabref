@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<DialogPane prefHeight="600.0" prefWidth="750.0"
+	xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="net.sf.jabref.gui.help.AboutDialogViewModel">
+	<content>
+		<BorderPane>
+			<center>
+				<Accordion styleClass="info-sections"
+					BorderPane.alignment="CENTER">
+					<panes>
+						<TitledPane text="%Developers">
+							<content>
+								<Label alignment="CENTER" text="${controller.developers}"
+									wrapText="true" />
+							</content>
+						</TitledPane>
+						<TitledPane expanded="false" text="%Authors">
+							<content>
+								<ScrollPane fitToWidth="true">
+									<content>
+										<Label text="${controller.authors}" textAlignment="CENTER"
+											wrapText="true" BorderPane.alignment="CENTER" />
+									</content>
+								</ScrollPane>
+							</content>
+						</TitledPane>
+						<TitledPane expanded="false" text="%License">
+							<content>
+								<Label text="${controller.license}" wrapText="true" />
+							</content>
+						</TitledPane>
+						<TitledPane expanded="false" text="%Libraries">
+							<content>
+								<Hyperlink onAction="#openExternalLibrariesWebsite"
+									text="${controller.websiteLibraries}" />
+							</content>
+						</TitledPane>
+						<TitledPane expanded="false" text="%Contributing">
+							<content>
+								<Hyperlink onAction="#openGithub" text="${controller.websiteGithub}" />
+							</content>
+						</TitledPane>
+					</panes>
+				</Accordion>
+			</center>
+			<bottom>
+				<ButtonBar styleClass="custom-buttons"
+					BorderPane.alignment="CENTER">
+					<buttons>
+						<Button mnemonicParsing="false" onAction="#copyVersionToClipboard"
+							text="%Copy Version" />
+						<Button fx:id="closeButton" cancelButton="true"
+							defaultButton="true" layoutX="664.0" layoutY="14.0"
+							mnemonicParsing="false" onAction="#closeAboutDialog" text="%Close" />
+					</buttons>
+				</ButtonBar>
+			</bottom>
+			<top>
+				<BorderPane BorderPane.alignment="CENTER">
+					<center>
+						<ImageView fitHeight="48.0" fitWidth="48.0"
+							pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+							<image>
+								<Image url="/images/external/JabRef-icon-48.png" />
+							</image>
+						</ImageView>
+					</center>
+					<bottom>
+						<VBox styleClass="general-info" alignment="CENTER"
+							BorderPane.alignment="CENTER">
+							<children>
+								<Label text="${controller.years}" />
+								<Hyperlink alignment="CENTER" contentDisplay="CENTER"
+									onAction="#openJabrefWebsite" text="${controller.website}" />
+							</children>
+						</VBox>
+					</bottom>
+				</BorderPane>
+			</top>
+		</BorderPane>
+	</content>
+	<header>
+		<Label alignment="CENTER" contentDisplay="CENTER"
+			onMouseClicked="#copyVersionToClipboard" styleClass="about-heading"
+			text="${controller.heading}">
+			<font>
+				<Font size="18.0" />
+			</font>
+			<cursor>
+				<Cursor fx:constant="HAND" />
+			</cursor>
+		</Label>
+	</header>
+</DialogPane>

@@ -18,6 +18,10 @@ public class Localization {
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
+    
+    public static ResourceBundle getMessages() {
+        return messages;
+    }
 
     public static void setLanguage(String language) {
         Optional<String> knownLanguage = Languages.convertToKnownLocale(language);
