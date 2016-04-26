@@ -8,12 +8,14 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.event.TestEventListener;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
 
+import com.google.common.eventbus.EventBus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -186,5 +188,36 @@ public class BibDatabaseTest {
         string = new BibtexString(id, "VLSI", "Very Large Scale Integration");
         database.addString(string);
         fail();
+    }
+
+    @Test
+    public void testAddEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
+        TestEventListener tel = new TestEventListener();
+        EventBus eventBus = database.getEventBus();
+
+        eventBus.register(tel);
+        database.insertEntry(shouldBeEntry);
+
+        BibEntry isEntry = tel.getBibEntry();
+
+        assertEquals(shouldBeEntry.getId(), isEntry.getId());
+    }
+
+    @Test
+    public void testRemoveEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
+        TestEventListener tel = new TestEventListener();
+        EventBus eventBus = database.getEventBus();
+
+        eventBus.register(tel);
+        database.insertEntry(shouldBeEntry);
+        database.removeEntry(shouldBeEntry);
+
+        BibEntry isEntry = tel.getBibEntry();
+
+        assertEquals(shouldBeEntry.getId(), isEntry.getId());
     }
 }
