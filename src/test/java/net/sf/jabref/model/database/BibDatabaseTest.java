@@ -196,12 +196,9 @@ public class BibDatabaseTest {
         BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
         TestEventListener tel = new TestEventListener();
         EventBus eventBus = database.getEventBus();
-
         eventBus.register(tel);
         database.insertEntry(shouldBeEntry);
-
         BibEntry isEntry = tel.getBibEntry();
-
         assertEquals(shouldBeEntry.getId(), isEntry.getId());
     }
 
@@ -211,13 +208,10 @@ public class BibDatabaseTest {
         BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
         TestEventListener tel = new TestEventListener();
         EventBus eventBus = database.getEventBus();
-
         eventBus.register(tel);
         database.insertEntry(shouldBeEntry);
         database.removeEntry(shouldBeEntry);
-
         BibEntry isEntry = tel.getBibEntry();
-
         assertEquals(shouldBeEntry.getId(), isEntry.getId());
     }
 }

@@ -1289,7 +1289,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void listen(ChangeEntryEvent aocee) {
             searchAutoCompleter.addBibtexEntry(aocee.getBibEntry());
         }
-
     }
 
     /**

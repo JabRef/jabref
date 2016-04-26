@@ -88,7 +88,6 @@ public class BibDatabase {
 
     private final EventBus eventBus;
 
-
     /**
      * Returns the number of entries.
      */
