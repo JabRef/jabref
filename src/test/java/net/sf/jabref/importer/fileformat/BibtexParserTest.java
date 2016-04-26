@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -64,7 +63,7 @@ public class BibtexParserTest {
         expected.setType("article");
         expected.setCiteKey("test");
         expected.setField("author", "Ed von Test");
-        BibtexEntryAssert.assertEquals(Arrays.asList(expected), parsed);
+        assertEquals(Collections.singletonList(expected), parsed);
     }
 
     @Test
@@ -91,7 +90,7 @@ public class BibtexParserTest {
         expected.setCiteKey("canh05");
         expected.setField("author", "Crowston, K. and Annabi, H.");
         expected.setField("title", "Title A");
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -332,7 +331,7 @@ public class BibtexParserTest {
         secondEntry.setField("author", "Norton Bar");
         expected.add(secondEntry);
 
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -372,7 +371,7 @@ public class BibtexParserTest {
         secondEntry.setCiteKey("foo");
         expected.add(secondEntry);
 
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -1481,6 +1480,6 @@ public class BibtexParserTest {
         c.setCiteKey("c");
         expected.add(c);
 
-        BibtexEntryAssert.assertEquals(expected, result.getDatabase().getEntries());
+        assertEquals(expected, result.getDatabase().getEntries());
     }
 }

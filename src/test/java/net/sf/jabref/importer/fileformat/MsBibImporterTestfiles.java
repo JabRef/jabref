@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -57,7 +57,7 @@ public class MsBibImporterTestfiles {
         MsBibImporter testImporter = new MsBibImporter();
         try (InputStream is = MsBibImporter.class.getResourceAsStream(xmlFileName)) {
             List<BibEntry> result = testImporter.importEntries(is, new OutputPrinterToNull());
-            BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
+            BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
         }
     }
 
