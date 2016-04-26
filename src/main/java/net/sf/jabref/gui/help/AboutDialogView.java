@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,25 +15,24 @@
 */
 package net.sf.jabref.gui.help;
 
-import java.awt.event.ActionEvent;
+import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.logic.l10n.Localization;
 
-import javax.swing.Action;
-import javax.swing.Icon;
+import com.airhacks.afterburner.views.FXMLView;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Alert.AlertType;
 
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import javafx.application.Platform;
+public class AboutDialogView extends FXMLView {
 
-public class AboutAction extends MnemonicAwareAction {
-
-    public AboutAction(String title, String tooltip, Icon iconFile) {
-        super(iconFile);
-        putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
+    public AboutDialogView() {
+        super();
+        bundle = Localization.getMessages();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Platform.runLater(() -> new AboutDialogView().show());
+    public void show() {
+        FXAlert aboutDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("About JabRef"));
+        aboutDialog.setDialogPane((DialogPane) this.getView());
+        aboutDialog.show();
     }
 
 }

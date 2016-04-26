@@ -32,22 +32,31 @@ import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * JabRef MainClass
  */
-public class JabRefMain {
+public class JabRefMain extends Application {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefMain.class);
-
+    private static String[] arguments;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> start(args));
+        arguments = args;
+        launch(arguments);
     }
 
-
+    @Override
+    public void start(Stage mainStage) throws Exception {
+        Platform.setImplicitExit(false);
+        SwingUtilities.invokeLater(() -> start(arguments));
+    }
 
     private static void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();

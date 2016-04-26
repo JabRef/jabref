@@ -95,6 +95,8 @@ dependencies {
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'com.google.guava:guava:19.0'
+    
+    compile 'com.airhacks:afterburner.fx:1.6.3'
 
     compile 'commons-logging:commons-logging:1.2'
 
