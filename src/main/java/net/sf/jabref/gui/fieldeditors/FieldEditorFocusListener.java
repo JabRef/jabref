@@ -24,14 +24,8 @@ import net.sf.jabref.gui.GUIGlobals;
 
 /**
  * Focus listener that changes the color of the text area when it has focus.
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: 18.mar.2005
- * Time: 18:20:14
- * To change this template use File | Settings | File Templates.
  */
 public class FieldEditorFocusListener implements FocusListener {
-
     @Override
     public void focusGained(FocusEvent event) {
         if (event.getSource() instanceof FieldEditor) {
@@ -49,5 +43,4 @@ public class FieldEditorFocusListener implements FocusListener {
             ((JComponent) event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
         }
     }
-
 }
