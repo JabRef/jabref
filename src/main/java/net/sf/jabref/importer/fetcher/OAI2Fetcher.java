@@ -31,6 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;
@@ -232,9 +233,8 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        // there is no helppage
-        return null;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_OAI2_ARXIV;
     }
 
     @Override

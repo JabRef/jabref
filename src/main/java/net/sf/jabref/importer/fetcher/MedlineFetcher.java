@@ -125,8 +125,8 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return HelpFiles.medlineHelp;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_MEDLINE;
     }
 
     @Override

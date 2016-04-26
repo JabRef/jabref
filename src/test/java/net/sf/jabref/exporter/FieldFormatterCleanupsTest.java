@@ -37,7 +37,7 @@ public class FieldFormatterCleanupsTest {
     public void setUp() {
         entry = new BibEntry();
         entry.setType(BibtexEntryTypes.INPROCEEDINGS);
-        entry.setField(BibEntry.KEY_FIELD, "6055279");
+        entry.setCiteKey("6055279");
         entry.setField("title", "Educational session 1");
         entry.setField("booktitle", "Custom Integrated Circuits Conference (CICC), 2011 IEEE");
         entry.setField("year", "2011");

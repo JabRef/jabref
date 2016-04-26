@@ -14,7 +14,8 @@ public class MySQL implements Database {
 
     public static final String DRIVER = "com.mysql.jdbc.Driver";
 
-    private void loadDriver() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+
+    private void loadDriver() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         Class.forName(DRIVER).newInstance();
     }
 

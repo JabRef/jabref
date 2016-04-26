@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
@@ -138,8 +139,8 @@ public class INSPIREFetcher implements EntryFetcher {
      * @see net.sf.jabref.imports.fetcher.EntryFetcher
      */
     @Override
-    public String getHelpPage() {
-        return "INSPIRE";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_INSPIRE;
     }
 
     @Override

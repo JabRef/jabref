@@ -443,7 +443,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(HelpFiles.contentSelectorHelp).getHelpButton());
+        bsb.addButton(new HelpAction(HelpFiles.CONTENT_SELECTOR).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

@@ -40,32 +40,33 @@ import org.apache.commons.logging.LogFactory;
  * Dialog unless it is already visible, and shows the URL in it.
  */
 public class HelpAction extends MnemonicAwareAction {
+
     private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
+    private HelpFiles helpPage;
 
-    private String urlPart;
 
-    public HelpAction(String title, String tooltip, String urlPart, KeyStroke key) {
-        this(title, tooltip, urlPart, IconTheme.JabRefIcon.HELP.getSmallIcon());
+    public HelpAction(String title, String tooltip, HelpFiles helpPage, KeyStroke key) {
+        this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
-    public HelpAction(String title, String tooltip, String urlPart, Icon icon) {
+    private HelpAction(String title, String tooltip, HelpFiles helpPage, Icon icon) {
         super(icon);
-        this.urlPart = urlPart;
+        this.helpPage = helpPage;
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);
     }
 
-    public HelpAction(String tooltip, String urlPart) {
-        this(Localization.lang("Help"), tooltip, urlPart, IconTheme.JabRefIcon.HELP.getSmallIcon());
+    public HelpAction(String tooltip, HelpFiles helpPage) {
+        this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
-    public HelpAction(String urlPart, Icon icon) {
-        this(Localization.lang("Help"), Localization.lang("Help"), urlPart, icon);
+    public HelpAction(HelpFiles helpPage, Icon icon) {
+        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, icon);
     }
 
-    public HelpAction(String urlPart) {
-        this(Localization.lang("Help"), Localization.lang("Help"), urlPart, IconTheme.JabRefIcon.HELP.getSmallIcon());
+    public HelpAction(HelpFiles helpPage) {
+        this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
     public JButton getHelpButton() {
@@ -76,14 +77,15 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
-    public void setHelpFile(String urlPart) {
-        this.urlPart = urlPart;
+    public void setHelpFile(HelpFiles urlPart) {
+        this.helpPage = urlPart;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + urlPart);
+            JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/"
+                    + helpPage.getPageName());
         } catch (IOException ex) {
             LOGGER.warn("Could not open browser", ex);
             JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser."));

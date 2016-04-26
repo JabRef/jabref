@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.BeforeClass;
@@ -49,7 +49,7 @@ public class PdfContentImporterTestFiles {
         PdfContentImporter importer = new PdfContentImporter();
         try (InputStream is = PdfContentImporter.class.getResourceAsStream(pdfFileName)) {
             List<BibEntry> result = importer.importEntries(is, null);
-            BibtexEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
+            BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
         }
     }
 

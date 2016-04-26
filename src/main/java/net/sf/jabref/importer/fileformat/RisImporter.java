@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
@@ -207,7 +208,7 @@ public class RisImporter extends ImportFormat {
                         if (oldAb == null) {
                             hm.put("abstract", val);
                         } else {
-                            hm.put("abstract", oldAb + "\n" + val);
+                            hm.put("abstract", oldAb + Globals.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
                         hm.put("url", val);

@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -133,8 +134,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "ISBNtoBibTeXHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_ISBN_TO_BIBTEX;
     }
 
     @Override

@@ -213,7 +213,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
         displayedBibEntryType = entry.getType();
 
-        helpAction = new HelpAction(HelpFiles.entryEditorHelp, IconTheme.JabRefIcon.HELP.getIcon());
+        helpAction = new HelpAction(HelpFiles.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction();
         storeFieldAction = new StoreFieldAction();
@@ -303,7 +303,7 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
         // other fields
         List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
-        List<String> otherFields = this.entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
         otherFields.remove("bibtexkey");
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -54,7 +54,7 @@ public class RISImporterTestFiles {
         try (InputStream risStream = RISImporterTest.class.getResourceAsStream(fileName + ".ris")) {
 
             List<BibEntry> risEntries = risImporter.importEntries(risStream, new OutputPrinterToNull());
-            BibtexEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
+            BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
 
         }
     }

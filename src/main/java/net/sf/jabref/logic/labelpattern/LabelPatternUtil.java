@@ -500,7 +500,7 @@ public class LabelPatternUtil {
             if (!key.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, key);
+                    entry.setCiteKey(key);
                 } else {
                     database.setCiteKeyForEntry(entry, key);
                 }
@@ -533,7 +533,7 @@ public class LabelPatternUtil {
             if (!moddedKey.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, moddedKey);
+                    entry.setCiteKey(moddedKey);
                 } else {
                     database.setCiteKeyForEntry(entry, moddedKey);
                 }

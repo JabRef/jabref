@@ -177,7 +177,9 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"), HelpFiles.regularExpressionSearchHelp).getHelpButton());
+        builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"),
+                HelpFiles.REGEX_SEARCH)
+                .getHelpButton());
         builder.nextLine();
         builder.append(runAutoFileSearch, 3);
         builder.nextLine();
@@ -186,7 +188,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton help = new HelpAction(HelpFiles.autosaveHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.AUTOSAVE).getHelpButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());

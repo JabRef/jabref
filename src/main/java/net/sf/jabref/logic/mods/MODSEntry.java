@@ -112,7 +112,7 @@ class MODSEntry {
         }
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            id = bibtex.getField(BibEntry.KEY_FIELD);
+            id = bibtex.getCiteKey();
         }
         if (bibtex.hasField("place")) {
             if (CHARFORMAT) {

@@ -189,7 +189,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new HelpAction(HelpFiles.importCustomizationHelp).getHelpButton();
+        JButton helpButton = new HelpAction(HelpFiles.CUSTOM_IMPORTS).getHelpButton();
 
 
         // Key bindings:

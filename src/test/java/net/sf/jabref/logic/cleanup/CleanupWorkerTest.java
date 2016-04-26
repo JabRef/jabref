@@ -2,6 +2,7 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,7 +40,7 @@ public class CleanupWorkerTest {
     @Rule
     public TemporaryFolder bibFolder = new TemporaryFolder();
 
-    private CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
+    private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
     private File pdfFolder;
 
@@ -76,7 +77,7 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupDoesNothingByDefault() throws IOException {
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         entry.setField("pdf", "aPdfFile");
         entry.setField("some", "1st");
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
@@ -150,6 +151,30 @@ public class CleanupWorkerTest {
         FieldChange expectedChange = new FieldChange(entry, "doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3",
                 "10.1016/0001-8708(80)90035-3");
         Assert.assertEquals(Collections.singletonList(expectedChange), changes);
+    }
+
+    @Test
+    public void cleanupDoiFindsDoiInURLFieldAndMoveItToDOIField() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        BibEntry entry = new BibEntry();
+        entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals("10.1016/0001-8708(80)90035-3", entry.getField("doi"));
+        Assert.assertNull(entry.getField("url"));
+    }
+
+    @Test
+    public void cleanupDoiReturnsChangeWhenDoiInURLField() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        BibEntry entry = new BibEntry();
+        entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
+
+        List<FieldChange> changes = worker.cleanup(preset, entry);
+        List<FieldChange> changeList = new ArrayList<>();
+        changeList.add(new FieldChange(entry, "doi", null, "10.1016/0001-8708(80)90035-3"));
+        changeList.add(new FieldChange(entry, "url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3", null));
+        Assert.assertEquals(changeList, changes);
     }
 
     @Test
@@ -231,7 +256,7 @@ public class CleanupWorkerTest {
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 

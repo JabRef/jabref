@@ -89,7 +89,7 @@ public class DatabaseImporter {
      */
     private List<String> readColumnNames(Connection conn) throws SQLException {
         String query = database.getReadColumnNamesQuery();
-        try (Statement statement = (Statement) conn.createStatement();
+        try (Statement statement = conn.createStatement();
              ResultSet rsColumns = statement.executeQuery(query)) {
             List<String> colNames = new ArrayList<>();
             while (rsColumns.next()) {
@@ -106,10 +106,15 @@ public class DatabaseImporter {
      * @param mode
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
      * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
      * @throws Exception
      */
     public List<DBImporterResult> performImport(DBStrings dbs, List<String> listOfDBs, BibDatabaseMode mode)
-            throws Exception {
+            throws IllegalAccessException, InstantiationException, ClassNotFoundException, SQLException
+    {
         List<DBImporterResult> result = new ArrayList<>();
         try (Connection conn = this.connectToDB(dbs)) {
 
@@ -149,7 +154,7 @@ public class DatabaseImporter {
                         while (rsEntries.next()) {
                             String id = rsEntries.getString("entries_id");
                             BibEntry entry = new BibEntry(IdGenerator.next(), types.get(rsEntries.getString("entry_types_id")).getName());
-                            entry.setField(BibEntry.KEY_FIELD, rsEntries.getString("cite_key"));
+                            entry.setCiteKey(rsEntries.getString("cite_key"));
                             for (String col : colNames) {
                                 String value = rsEntries.getString(col);
                                 if (value != null) {
@@ -281,9 +286,13 @@ public class DatabaseImporter {
      *
      * @param dbstrings The DBStrings to use to make the connection
      * @return java.sql.Connection to the DB chosen
-     * @throws Exception
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
      */
-    public Connection connectToDB(DBStrings dbstrings) throws Exception {
+    public Connection connectToDB(DBStrings dbstrings)
+            throws IllegalAccessException, InstantiationException, ClassNotFoundException, SQLException {
         String url = SQLUtil.createJDBCurl(dbstrings, true);
         return database.connect(url, dbstrings.getDbPreferences().getUsername(), dbstrings.getPassword());
     }
