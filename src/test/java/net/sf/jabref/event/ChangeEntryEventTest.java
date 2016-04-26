@@ -1,6 +1,7 @@
 package net.sf.jabref.event;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.eventbus.EventBus;
 import org.junit.Assert;
@@ -22,11 +23,11 @@ public class ChangeEntryEventTest {
     @Test
     public void testEventReceivement() {
         BibEntry shouldBeBibEntry = new BibEntry();
-        shouldBeBibEntry.setId("testkey2");
+        shouldBeBibEntry.setId(IdGenerator.next());
         ChangeEntryEvent aocee = new ChangeEntryEvent(shouldBeBibEntry);
         eventBus.post(aocee);
 
-        Assert.assertEquals(shouldBeBibEntry.getId(), testEventListener.getBibEntry().getId());
-        Assert.assertEquals(shouldBeBibEntry.getId(), aocee.getBibEntry().getId());
+        Assert.assertEquals(shouldBeBibEntry, testEventListener.getBibEntry());
+        Assert.assertEquals(shouldBeBibEntry, aocee.getBibEntry());
     }
 }

@@ -199,7 +199,7 @@ public class BibDatabaseTest {
         eventBus.register(tel);
         database.insertEntry(shouldBeEntry);
         BibEntry isEntry = tel.getBibEntry();
-        assertEquals(shouldBeEntry.getId(), isEntry.getId());
+        assertEquals(shouldBeEntry, isEntry);
     }
 
     @Test
@@ -212,6 +212,6 @@ public class BibDatabaseTest {
         database.insertEntry(shouldBeEntry);
         database.removeEntry(shouldBeEntry);
         BibEntry isEntry = tel.getBibEntry();
-        assertEquals(shouldBeEntry.getId(), isEntry.getId());
+        assertEquals(shouldBeEntry, isEntry);
     }
 }
