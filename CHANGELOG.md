@@ -14,6 +14,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 ## [Unreleased]
 
 ### Changed
+- Implemented [#629](https://github.com/JabRef/jabref/issues/629): Explicit groups are now written in the "groups" field of the entry instead of at the end of the bib file
 - Main table now accepts pasted DOIs and tries to retrieve the entry
 - Added support for several Biblatex-fields through drop-down lists with valid alternatives
 - Added integrity checker for an odd number of unescaped '#'

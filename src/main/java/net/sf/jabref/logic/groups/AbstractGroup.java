@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.logic.groups;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @throws Exception If an error occured and a group could not be created, e.g.
      *                   due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
+    public static AbstractGroup fromString(String s, int version) throws Exception {
         if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s, version);
         }
@@ -71,7 +72,7 @@ public abstract class AbstractGroup implements SearchMatcher {
             return SearchGroup.fromString(s, version);
         }
         if (s.startsWith(ExplicitGroup.ID)) {
-            return ExplicitGroup.fromString(s, db, version);
+            return ExplicitGroup.fromString(s, version);
         }
         return null; // unknown group
     }
@@ -116,6 +117,10 @@ public abstract class AbstractGroup implements SearchMatcher {
      * undo this change. null is returned otherwise.
      */
     public abstract Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd);
+
+    public Optional<EntriesGroupChange> add(BibEntry entryToAdd) {
+        return add(Collections.singletonList(entryToAdd));
+    }
 
     /**
      * Removes the specified entries from this group.

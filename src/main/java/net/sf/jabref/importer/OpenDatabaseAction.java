@@ -75,13 +75,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from
-        // the bib file:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for checking for new custom entry types loaded from the bib file:
+        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for converting legacy entries in ExplicitGroup
+        POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
         // Add the action for the new external file handling system in version 2.3:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
+        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
+        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {

@@ -175,18 +175,13 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
                     newGroups.setGroup(group);
-                    appendedEntries.stream().map(group::addEntry);
+                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-
-                // for explicit groups, the entries copied to the mother fromDatabase have to
-                // be "reassigned", i.e. the old reference is removed and the reference
-                // to the new fromDatabase is added.
-                newGroups.replaceEntriesInExplicitGroup(originalEntries, appendedEntries);
             }
         }
 
