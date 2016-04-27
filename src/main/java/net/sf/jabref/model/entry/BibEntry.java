@@ -63,35 +63,90 @@ public class BibEntry {
     private String parsedSerialization;
 
     /*
-    * marks if the complete serialization, which was read from file, should be used.
-    * Is set to false, if parts of the entry change
+     * Marks whether the complete serialization, which was read from file, should be used.
+     *
+     * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
 
+
+    /**
+     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+     */
     public BibEntry() {
         this(IdGenerator.next());
     }
 
+    /**
+     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     *
+     * @param id The ID to be used
+     */
     public BibEntry(String id) {
         this(id, DEFAULT_TYPE);
     }
 
+    /**
+     * Constructs a new BibEntry with the given ID and given type
+     *
+     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
+     */
     public BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
-        changed = true;
         setType(type);
     }
 
     /**
-     * Returns an set containing the names of all fields that are
-     * set for this particular entry.
+     * Sets this entry's ID, provided the database containing it
+     * doesn't veto the change.
      *
-     * @return a set of existing field names
+     * @param id The ID to be used
      */
-    public Set<String> getFieldNames() {
-        return new TreeSet<>(fields.keySet());
+    public void setId(String id) {
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
+
+        try {
+            firePropertyChangedEvent(BibEntry.ID_FIELD, this.id, id);
+        } catch (PropertyVetoException pv) {
+            throw new IllegalStateException("Couldn't change ID: " + pv);
+        }
+
+        this.id = id;
+        changed = true;
+    }
+
+    /**
+     * Returns this entry's ID.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the cite key AKA citation key AKA BibTeX key.
+     *
+     * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
+     *
+     * @param newCiteKey The cite key to set. Must not be null, may be empty to remove it.
+     */
+    public void setCiteKey(String newCiteKey) {
+        setField(KEY_FIELD, newCiteKey);
+    }
+
+    /**
+     * Returns the cite key AKA citation key AKA BibTeX key, or null if it is not set.
+     *
+     * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
+     */
+    public String getCiteKey() {
+        return fields.get(KEY_FIELD);
+    }
+
+    public boolean hasCiteKey() {
+        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -106,7 +161,7 @@ public class BibEntry {
      */
     public void setType(String type) {
         String newType;
-        if ((type == null) || type.isEmpty()) {
+        if (Strings.isNullOrEmpty(type)) {
             newType = DEFAULT_TYPE;
         } else {
             newType = type;
@@ -134,27 +189,13 @@ public class BibEntry {
     }
 
     /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
+     * Returns an set containing the names of all fields that are
+     * set for this particular entry.
+     *
+     * @return a set of existing field names
      */
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
-        try {
-            firePropertyChangedEvent(BibEntry.ID_FIELD, this.id, id);
-        } catch (PropertyVetoException pv) {
-            throw new IllegalStateException("Couldn't change ID: " + pv);
-        }
-
-        this.id = id;
-        changed = true;
-    }
-
-    /**
-     * Returns this entry's ID.
-     */
-    public String getId() {
-        return id;
+    public Set<String> getFieldNames() {
+        return new TreeSet<>(fields.keySet());
     }
 
     /**
@@ -289,21 +330,6 @@ public class BibEntry {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the bibtex key, or null if it is not set.
-     */
-    public String getCiteKey() {
-        return fields.get(KEY_FIELD);
-    }
-
-    public void setCiteKey(String newCiteKey) {
-        setField(KEY_FIELD, newCiteKey);
-    }
-
-    public boolean hasCiteKey() {
-        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -606,7 +632,6 @@ public class BibEntry {
     }
 
     public Map<String, String> getFieldMap() {
-        // TODO Auto-generated method stub
         return fields;
     }
 
