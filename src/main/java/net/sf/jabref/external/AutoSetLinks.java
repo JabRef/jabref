@@ -131,6 +131,7 @@ public class AutoSetLinks {
                             //System.out.println("Comp: "+existingEntry.getLink());
                             if (new File(existingEntry.link).equals(f)) {
                                 alreadyHas = true;
+                                foundAny = true;
                                 break;
                             }
                         }
