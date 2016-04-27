@@ -431,7 +431,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     auto.setEnabled(true);
 
                     if (e.getID() > 0) {
-                        entryEditor.updateField(FileListEditor.this);
+                        entryEditor.updateField(this);
                         adjustColumnWidth();
                         frame.output(Localization.lang("Finished automatically setting external links."));
                     } else {
