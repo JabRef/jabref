@@ -38,7 +38,6 @@ import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.VersionHandling;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
@@ -78,7 +77,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData, BibDatabase db) {
+    public MetaData(Map<String, String> inData) {
         Objects.requireNonNull(inData);
         boolean groupsTreePresent = false;
         List<String> flatGroupsData = null;
@@ -117,7 +116,7 @@ public class MetaData implements Iterable<String> {
 
         // this possibly handles import of a previous groups version
         if (groupsTreePresent) {
-            putGroups(treeGroupsData, db, groupsVersionOnDisk);
+            putGroups(treeGroupsData, groupsVersionOnDisk);
         }
 
         if (!groupsTreePresent && (flatGroupsData != null)) {
@@ -198,13 +197,11 @@ public class MetaData implements Iterable<String> {
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param db          The BibDatabase this metadata belongs to
      * @param version     The group tree version
      */
-    private void putGroups(List<String> orderedData, BibDatabase db, int version) {
+    private void putGroups(List<String> orderedData, int version) {
         try {
-            groupsRoot = VersionHandling.importGroups(orderedData, db,
-                    version);
+            groupsRoot = VersionHandling.importGroups(orderedData, version);
             groupTreeValid = true;
         } catch (Exception e) {
             // we cannot really do anything about this here

@@ -196,7 +196,7 @@ public class BibtexParser {
         }
 
         // Instantiate meta data:
-        parserResult.setMetaData(new MetaData(meta, database));
+        parserResult.setMetaData(new MetaData(meta));
 
         parseRemainingContent();
 

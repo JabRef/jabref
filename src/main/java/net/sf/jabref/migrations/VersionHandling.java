@@ -23,7 +23,6 @@ import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabase;
 
 /**
  * Handles versioning of groups, e.g. automatic conversion from previous to
@@ -59,16 +58,14 @@ public class VersionHandling {
         return root;
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData,
-            BibDatabase db, int version) throws Exception {
+    public static GroupTreeNode importGroups(List<String> orderedData, int version) throws Exception {
         switch (version) {
         case 0:
         case 1:
-            return Version0_1.fromString(orderedData.get(0),
-                    db, version);
+            return Version0_1.fromString(orderedData.get(0), version);
         case 2:
         case 3:
-            return Version2_3.fromString(orderedData, db, version);
+            return Version2_3.fromString(orderedData, version);
         default:
             throw new IllegalArgumentException(
                     "Failed to read groups data (unsupported version: " +
@@ -88,8 +85,7 @@ public class VersionHandling {
          * @throws Exception
          *             When a group could not be recreated
          */
-        private static GroupTreeNode fromString(String str, BibDatabase db,
-                int version) throws Exception {
+        private static GroupTreeNode fromString(String str, int version) throws Exception {
             GroupTreeNode root = null;
             GroupTreeNode newNode;
             int i;
@@ -98,7 +94,7 @@ public class VersionHandling {
             while (!s.isEmpty()) {
                 if (s.startsWith("(")) {
                     String subtree = Version0_1.getSubtree(s);
-                    newNode = Version0_1.fromString(subtree, db, version);
+                    newNode = Version0_1.fromString(subtree, version);
                     // continue after this subtree by removing it
                     // and the leading/trailing braces, and
                     // the comma (that makes 3) that always trails it
@@ -113,8 +109,7 @@ public class VersionHandling {
                     } else {
                         s = "";
                     }
-                    newNode = new GroupTreeNode(AbstractGroup.fromString(StringUtil
-                            .unquote(g, '\\'), db, version));
+                    newNode = new GroupTreeNode(AbstractGroup.fromString(StringUtil.unquote(g, '\\'), version));
                 }
                 if (root == null) {
                     root = newNode;
@@ -185,8 +180,7 @@ public class VersionHandling {
 
     private static class Version2_3 {
 
-        private static GroupTreeNode fromString(List<String> data, BibDatabase db,
-                int version) throws Exception {
+        private static GroupTreeNode fromString(List<String> data, int version) throws Exception {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;
             GroupTreeNode newNode;
@@ -208,8 +202,7 @@ public class VersionHandling {
                     throw new Exception("bad format");
                 }
                 level = Integer.parseInt(s.substring(0, spaceIndex));
-                group = AbstractGroup.fromString(s.substring(spaceIndex + 1),
-                        db, version);
+                group = AbstractGroup.fromString(s.substring(spaceIndex + 1), version);
                 newNode = new GroupTreeNode(group);
                 if (cursor == null) {
                     // create new root

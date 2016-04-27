@@ -151,18 +151,6 @@ public class DatabaseExporter {
             return -1;
         }
 
-        // if this group contains entries...
-        if (cursor.getGroup() instanceof ExplicitGroup) {
-            ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
-            for (BibEntry be : grp.getEntries()) {
-                SQLUtil.processQuery(connection, "INSERT INTO entry_group (entries_id, groups_id) " + "VALUES ("
-                        + "(SELECT entries_id FROM entries WHERE jabref_eid=" + '\'' + be.getId()
-                        + "' AND database_id = " + database_id + "), "
-                        + "(SELECT groups_id FROM groups WHERE database_id=" + '\'' + database_id + "' AND parent_id="
-                        + '\'' + parentID + "' AND label=" + '\'' + grp.getName() + "')" + ");");
-            }
-        }
-
         // recurse on child nodes (depth-first traversal)
         String sql = "SELECT groups_id FROM groups WHERE label = ? AND database_id= ? AND parent_id = ? ;";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {

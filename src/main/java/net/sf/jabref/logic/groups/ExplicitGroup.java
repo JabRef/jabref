@@ -15,34 +15,32 @@
  */
 package net.sf.jabref.logic.groups;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.
  *
  * @author jzieren
  */
-public class ExplicitGroup extends AbstractGroup {
+public class ExplicitGroup extends KeywordGroup {
 
     public static final String ID = "ExplicitGroup:";
 
-    private final Set<BibEntry> entries = new HashSet<>();
+    private final List<String> legacyEntryKeys = new ArrayList<>();
 
     public ExplicitGroup(String name, GroupHierarchyType context) {
-        super(name, context);
+        super(name, "groups", name, true, false, context);
     }
 
-    public static AbstractGroup fromString(String s, BibDatabase db, int version) throws Exception {
+    public static ExplicitGroup fromString(String s, int version) throws Exception {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
@@ -57,14 +55,14 @@ public class ExplicitGroup extends AbstractGroup {
         case 1:
         case 2: {
             ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), GroupHierarchyType.INDEPENDENT);
-            newGroup.addEntries(tok, db);
+            newGroup.addLegacyEntryKeys(tok);
             return newGroup;
         }
         case 3: {
             String name = tok.nextToken();
             int context = Integer.parseInt(tok.nextToken());
             ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
-            newGroup.addEntries(tok, db);
+            newGroup.addLegacyEntryKeys(tok);
             return newGroup;
         }
         default:
@@ -73,68 +71,26 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     /**
-     * Called only when created fromString
+     * Called only when created fromString.
+     * JabRef used to store the entries of an explicit group in the serialization, e.g.
+     *  ExplicitGroup:GroupName\;0\;Key1\;Key2\;;
+     * This method exists for backwards compatibility.
      */
-    private void addEntries(QuotedStringTokenizer tok, BibDatabase db) {
+    private void addLegacyEntryKeys(QuotedStringTokenizer tok) {
         while (tok.hasMoreTokens()) {
-            List<BibEntry> entries = db.getEntriesByKey(StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR));
-            this.entries.addAll(entries);
+            String key = StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR);
+            addLegacyEntryKey(key);
         }
     }
 
-    @Override
-    public boolean supportsAdd() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsRemove() {
-        return true;
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
-        if (entriesToAdd.isEmpty()) {
-            return Optional.empty(); // nothing to do
-        }
-
-        HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        this.entries.addAll(entriesToAdd);
-
-        return Optional.of(new EntriesGroupChange(entriesBeforeEdit, this.entries));
-    }
-
-    public boolean addEntry(BibEntry entry) {
-        return entries.add(entry);
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
-        if (entriesToRemove.isEmpty()) {
-            return Optional.empty(); // nothing to do
-        }
-
-        HashSet<BibEntry> entriesBeforeEdit = new HashSet<>(this.entries);
-        for (BibEntry entry : entriesToRemove) {
-            this.entries.remove(entry);
-        }
-
-        return Optional.of(new EntriesGroupChange(entriesBeforeEdit, this.entries));
-    }
-
-    public boolean removeEntry(BibEntry entry) {
-        return entries.remove(entry);
-    }
-
-    @Override
-    public boolean contains(BibEntry entry) {
-        return entries.contains(entry);
+    public void addLegacyEntryKey(String key) {
+        this.legacyEntryKeys.add(key);
     }
 
     @Override
     public AbstractGroup deepCopy() {
         ExplicitGroup copy = new ExplicitGroup(getName(), getContext());
-        copy.entries.addAll(entries);
+        copy.legacyEntryKeys.addAll(legacyEntryKeys);
         return copy;
     }
 
@@ -144,67 +100,36 @@ public class ExplicitGroup extends AbstractGroup {
             return false;
         }
         ExplicitGroup other = (ExplicitGroup) o;
-        // compare entries assigned to both groups
-        if (entries.size() != other.entries.size()) {
-            return false; // add/remove
-        }
-        HashSet<String> keys = new HashSet<>();
-        BibEntry entry;
-        String key;
-        // compare bibtex keys for all entries that have one
-        for (BibEntry mEntry1 : entries) {
-            entry = mEntry1;
-            key = entry.getCiteKey();
-            if (key != null) {
-                keys.add(key);
-            }
-        }
-        for (BibEntry mEntry : other.entries) {
-            entry = mEntry;
-            key = entry.getCiteKey();
-            if ((key != null) && !keys.remove(key)) {
-                return false;
-            }
-        }
-        return keys.isEmpty() && other.getName().equals(getName()) && (other.getHierarchicalContext() == getHierarchicalContext());
+        return Objects.equals(getName(), other.getName()) && Objects.equals(getHierarchicalContext(),
+                other.getHierarchicalContext()) && Objects.equals(getLegacyEntryKeys(), other.getLegacyEntryKeys());
     }
 
     /**
-     * Returns a String representation of this group and its entries. Entries
-     * are referenced by their Bibtexkey. Entries that do not have a Bibtexkey
-     * are not included in the representation and will thus not be available
-     * upon recreation.
+     * Returns a String representation of this group and its entries.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
-        append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
-        String s;
-        // write entries in well-defined order for CVS compatibility
+        sb.append(ExplicitGroup.ID).append(
+                StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+                append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
+
+        // write legacy entry keys in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<>();
-        for (BibEntry mEntry : entries) {
-            s = mEntry.getCiteKey();
-            if ((s != null) && !s.isEmpty()) {
-                sortedKeys.add(s);
-            }
-        }
+        sortedKeys.addAll(legacyEntryKeys);
+
         for (String sortedKey : sortedKeys) {
-            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(AbstractGroup.SEPARATOR);
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
+                    AbstractGroup.SEPARATOR);
         }
         return sb.toString();
     }
 
     /**
-     * Remove all assignments, resulting in an empty group.
+     * Remove all stored cite keys, resulting in an empty group.
      */
-    public void clearAssignments() {
-        entries.clear();
-    }
-
-    @Override
-    public boolean isDynamic() {
-        return false;
+    public void clearLegacyEntryKeys() {
+        legacyEntryKeys.clear();
     }
 
     @Override
@@ -217,9 +142,7 @@ public class ExplicitGroup extends AbstractGroup {
                 + "Entries can be assigned to this group by selecting them "
                 + "then using either drag and drop or the context menu. "
                 + "Entries can be removed from this group by selecting them "
-                + "then using the context menu. Every entry assigned to this group "
-                + "must have a unique key. The key may be changed at any time "
-                + "as long as it remains unique.");
+                + "then using the context menu.");
     }
 
     @Override
@@ -239,33 +162,8 @@ public class ExplicitGroup extends AbstractGroup {
         return sb.toString();
     }
 
-    /**
-     * Update the group to handle the situation where the group
-     * is applied to a different BibDatabase than it was created for.
-     * This group type contains a Set of BibEntry objects, and these will not
-     * be the same objects as in the new database. We must reset the entire Set with
-     * matching entries from the new database.
-     *
-     * @param db The database to refresh for.
-     */
-    @Override
-    public void refreshForNewDatabase(BibDatabase db) {
-        Set<BibEntry> newSet = new HashSet<>();
-        for (BibEntry entry : entries) {
-            BibEntry sameEntry = db.getEntryByKey(entry.getCiteKey());
-            /*if (sameEntry == null) {
-                System.out.println("Error: could not find entry '"+entry.getCiteKey()+"'");
-            } else {
-                System.out.println("'"+entry.getCiteKey()+"' ok");
-            }*/
-            newSet.add(sameEntry);
-        }
-        entries.clear();
-        entries.addAll(newSet);
-    }
-
-    public Set<BibEntry> getEntries() {
-        return entries;
+    public List<String> getLegacyEntryKeys() {
+        return legacyEntryKeys;
     }
 
     @Override
@@ -274,13 +172,11 @@ public class ExplicitGroup extends AbstractGroup {
     }
 
     public int getNumEntries() {
-        return entries.size();
+        return legacyEntryKeys.size();
     }
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
         return super.hashCode();
     }
-
 }
