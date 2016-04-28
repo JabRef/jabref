@@ -1590,20 +1590,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int tabCount = tabbedPane.getTabCount();
         if (tabCount != previousTabCount) {
             previousTabCount = tabCount;
-            JabRefFrame.setEnabled(openDatabaseOnlyActions, tabCount > 0);
-            JabRefFrame.setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+            setEnabled(openDatabaseOnlyActions, tabCount > 0);
+            setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
         if (tabCount == 0) {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
         }
 
-        boolean saved = false;
 
         if (tabCount > 0) {
-            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+            BasePanel current = getCurrentBasePanel();
+            if(current != null) {
+                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+                setEnabled(openAndSavedDatabasesOnlyActions, saved);
+            }
         }
-        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**

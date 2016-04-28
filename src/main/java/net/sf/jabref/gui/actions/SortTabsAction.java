@@ -31,9 +31,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * in alphabetical order.
  */
 public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
-
     private final JabRefFrame frame;
-
 
     public SortTabsAction(JabRefFrame frame) {
         putValue(Action.NAME, Localization.menuTitle("Sort tabs"));
