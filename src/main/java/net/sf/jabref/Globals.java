@@ -46,7 +46,7 @@ public class Globals {
 
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
 
-    public static final String NONE = "_non__";
+
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 

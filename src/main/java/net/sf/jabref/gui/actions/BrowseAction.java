@@ -24,7 +24,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -41,15 +40,15 @@ public final class BrowseAction extends AbstractAction {
     private final String extension;
 
     public static BrowseAction buildForDir(JFrame frame, JTextField tc) {
-        return new BrowseAction(frame, tc, true, null, Globals.NONE);
+        return new BrowseAction(frame, tc, true, null, "");
     }
 
     public static BrowseAction buildForDir(JTextField tc) {
-        return new BrowseAction(null, tc, true, null, Globals.NONE);
+        return new BrowseAction(null, tc, true, null, "");
     }
 
     public static BrowseAction buildForFile(JTextField tc) {
-        return new BrowseAction(null, tc, false, null, Globals.NONE);
+        return new BrowseAction(null, tc, false, null, "");
     }
 
     public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget, String extension) {
