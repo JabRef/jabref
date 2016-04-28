@@ -241,7 +241,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         File file = bibDatabaseContext.getDatabaseFile();
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
-        this.database.getEventBus().register(new GroupTreeListener());
+        this.database.registerListener(new GroupTreeListener());
 
         if (file == null) {
             if (database.hasEntries()) {
@@ -1259,9 +1259,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class GroupTreeListener {
 
         @Subscribe
-        public void listen(AddEntryEvent aee) {
+        public void listen(AddEntryEvent addEntryEvent) {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(aee.getBibEntry());
+                final List<BibEntry> entries = Collections.singletonList(addEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1281,13 +1281,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(AddEntryEvent aocee) {
-            searchAutoCompleter.addBibtexEntry(aocee.getBibEntry());
+        public void listen(AddEntryEvent addEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(addEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangeEntryEvent aocee) {
-            searchAutoCompleter.addBibtexEntry(aocee.getBibEntry());
+        public void listen(ChangeEntryEvent changeEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(changeEntryEvent.getBibEntry());
         }
     }
 
@@ -1298,13 +1298,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class AutoCompleteListener {
 
         @Subscribe
-        public void listen(AddEntryEvent aocee) {
-            BasePanel.this.autoCompleters.addEntry(aocee.getBibEntry());
+        public void listen(AddEntryEvent addEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(addEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangeEntryEvent aocee) {
-            BasePanel.this.autoCompleters.addEntry(aocee.getBibEntry());
+        public void listen(ChangeEntryEvent changeEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(changeEntryEvent.getBibEntry());
         }
     }
 
@@ -1353,8 +1353,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void createMainTable() {
-        database.getEventBus().register(tableModel.getListSynchronizer());
-        database.getEventBus().register(SpecialFieldDatabaseChangeListener.getInstance());
+        database.registerListener(tableModel.getListSynchronizer());
+        database.registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
         tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
@@ -1517,7 +1517,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
-        this.getDatabase().getEventBus().register(new SearchAutoCompleteListener());
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
@@ -1525,7 +1525,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
                     autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
-            this.getDatabase().getEventBus().register(new AutoCompleteListener());
+            this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
             autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);

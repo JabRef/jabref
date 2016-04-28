@@ -21,9 +21,9 @@ public class SpecialFieldDatabaseChangeListener {
     }
 
     @Subscribe
-    public void listen(AddEntryEvent aee) {
+    public void listen(AddEntryEvent addEntryEvent) {
         if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            final BibEntry entry = aee.getBibEntry();
+            final BibEntry entry = addEntryEvent.getBibEntry();
             // NamedCompount code similar to SpecialFieldUpdateListener
             NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));
             SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);

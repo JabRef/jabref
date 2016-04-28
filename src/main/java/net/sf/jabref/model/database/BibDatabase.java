@@ -555,7 +555,20 @@ public class BibDatabase {
         return epilog;
     }
 
-    public EventBus getEventBus() {
-        return this.eventBus;
+    /**
+     * Registers an listener object (subscriber) to the internal event bus.
+     * All subscribers should contain at least one <code>@Subscribe</code> annotated
+     * method accepting one of the following event types:
+     *
+     *   - {@link AddEntryEvent}
+     *   - {@link ChangeEntryEvent}
+     *   - {@link RemoveEntryEvent}
+     *
+     * or another {@link EntryEvent} extending type.
+     *
+     * @param object Listener (subscriber)
+     */
+    public void registerListener(Object object) {
+        this.eventBus.register(object);
     }
 }

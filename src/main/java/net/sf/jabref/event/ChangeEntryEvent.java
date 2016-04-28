@@ -9,16 +9,10 @@ import net.sf.jabref.model.entry.BibEntry;
  * was changed.
  */
 
-public class ChangeEntryEvent {
-
-    private final BibEntry bibEntry;
+public class ChangeEntryEvent extends EntryEvent {
 
     public ChangeEntryEvent(BibEntry bibEntry) {
-        this.bibEntry = bibEntry;
-    }
-
-    public BibEntry getBibEntry() {
-        return this.bibEntry;
+        super(bibEntry);
     }
 
 }

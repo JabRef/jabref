@@ -15,7 +15,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
 
-import com.google.common.eventbus.EventBus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -193,10 +192,9 @@ public class BibDatabaseTest {
     @Test
     public void testAddEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
-        BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
+        BibEntry shouldBeEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
-        EventBus eventBus = database.getEventBus();
-        eventBus.register(tel);
+        database.registerListener(tel);
         database.insertEntry(shouldBeEntry);
         BibEntry isEntry = tel.getBibEntry();
         assertEquals(shouldBeEntry, isEntry);
@@ -205,11 +203,12 @@ public class BibDatabaseTest {
     @Test
     public void testRemoveEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
-        BibEntry shouldBeEntry = new BibEntry(IdGenerator.next());
+        BibEntry shouldBeEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
-        EventBus eventBus = database.getEventBus();
-        eventBus.register(tel);
+        database.registerListener(tel);
         database.insertEntry(shouldBeEntry);
+        tel = new TestEventListener();
+        database.registerListener(tel);
         database.removeEntry(shouldBeEntry);
         BibEntry isEntry = tel.getBibEntry();
         assertEquals(shouldBeEntry, isEntry);

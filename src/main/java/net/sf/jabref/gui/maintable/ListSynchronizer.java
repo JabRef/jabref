@@ -32,35 +32,35 @@ public class ListSynchronizer {
     }
 
     @Subscribe
-    public void listen(AddEntryEvent aee) {
+    public void listen(AddEntryEvent addEntryEvent) {
         lock();
         try {
-            list.add(aee.getBibEntry());
+            list.add(addEntryEvent.getBibEntry());
         } finally {
             unlock();
         }
     }
 
     @Subscribe
-    public void listen(RemoveEntryEvent ree) {
+    public void listen(RemoveEntryEvent removeEntryEvent) {
         lock();
         try {
-            list.remove(ree.getBibEntry());
+            list.remove(removeEntryEvent.getBibEntry());
         } finally {
             unlock();
         }
     }
 
     @Subscribe
-    public void listen(ChangeEntryEvent cee) {
+    public void listen(ChangeEntryEvent changeEntryEvent) {
         lock();
         try {
-            int index = list.indexOf(cee.getBibEntry());
+            int index = list.indexOf(changeEntryEvent.getBibEntry());
             if (index != -1) {
                 // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
                 // DatabaseChangeEvent.ADDED_ENTRY
                 // thus,
-                list.set(index, cee.getBibEntry());
+                list.set(index, changeEntryEvent.getBibEntry());
             }
         } finally {
             unlock();

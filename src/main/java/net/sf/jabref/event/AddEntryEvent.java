@@ -9,16 +9,10 @@ import net.sf.jabref.model.entry.BibEntry;
  * was added to the database.
  */
 
-public class AddEntryEvent {
-
-    private final BibEntry bibEntry;
+public class AddEntryEvent extends EntryEvent {
 
     public AddEntryEvent(BibEntry bibEntry) {
-        this.bibEntry = bibEntry;
-    }
-
-    public BibEntry getBibEntry() {
-        return this.bibEntry;
+        super(bibEntry);
     }
 
 }

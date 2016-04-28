@@ -9,16 +9,10 @@ import net.sf.jabref.model.entry.BibEntry;
  * is going to be removed from the database.
  */
 
-public class RemoveEntryEvent {
-
-    private final BibEntry bibEntry;
+public class RemoveEntryEvent extends EntryEvent {
 
     public RemoveEntryEvent(BibEntry bibEntry) {
-        this.bibEntry = bibEntry;
-    }
-
-    public BibEntry getBibEntry() {
-        return this.bibEntry;
+        super(bibEntry);
     }
 
 }
