@@ -40,7 +40,7 @@ public class ExplicitGroup extends KeywordGroup {
         super(name, "groups", name, true, false, context);
     }
 
-    public static ExplicitGroup fromString(String s, int version) throws Exception {
+    public static ExplicitGroup fromString(String s) throws Exception {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new Exception(
                     "Internal error: ExplicitGroup cannot be created from \""
@@ -48,26 +48,14 @@ public class ExplicitGroup extends KeywordGroup {
                             + "\". "
                     + "Please report this on https://github.com/JabRef/jabref/issues");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID
-                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
-        switch (version) {
-        case 0:
-        case 1:
-        case 2: {
-            ExplicitGroup newGroup = new ExplicitGroup(tok.nextToken(), GroupHierarchyType.INDEPENDENT);
-            newGroup.addLegacyEntryKeys(tok);
-            return newGroup;
-        }
-        case 3: {
-            String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
-            ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
-            newGroup.addLegacyEntryKeys(tok);
-            return newGroup;
-        }
-        default:
-            throw new UnsupportedVersionException("ExplicitGroup", version);
-        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID.length()),
+                AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+
+        String name = tok.nextToken();
+        int context = Integer.parseInt(tok.nextToken());
+        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
+        newGroup.addLegacyEntryKeys(tok);
+        return newGroup;
     }
 
     /**

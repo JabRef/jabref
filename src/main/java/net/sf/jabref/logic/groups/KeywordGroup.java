@@ -74,7 +74,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, int version) throws Exception {
+    public static AbstractGroup fromString(String s) throws Exception {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new Exception(
                     "Internal error: KeywordGroup cannot be created from \""
@@ -84,42 +84,17 @@ public class KeywordGroup extends AbstractGroup {
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
-        switch (version) {
-            case 0: {
-                String name = tok.nextToken();
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                // assume caseSensitive=false and regExp=true for old groups
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), false, true, GroupHierarchyType.INDEPENDENT);
-            }
-            case 1:
-            case 2: {
-                String name = tok.nextToken();
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        GroupHierarchyType.INDEPENDENT);
-            }
-            case 3: {
-                String name = tok.nextToken();
-                int context = Integer.parseInt(tok.nextToken());
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, GroupHierarchyType.getByNumber(context));
-            }
-            default:
-                throw new UnsupportedVersionException("KeywordGroup", version);
-        }
+
+        String name = tok.nextToken();
+        int context = Integer.parseInt(tok.nextToken());
+        String field = tok.nextToken();
+        String expression = tok.nextToken();
+        boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+        boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+        return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                GroupHierarchyType.getByNumber(context));
     }
 
     /**

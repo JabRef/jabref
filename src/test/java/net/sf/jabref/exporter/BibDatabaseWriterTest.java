@@ -206,9 +206,7 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
@@ -229,9 +227,7 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 

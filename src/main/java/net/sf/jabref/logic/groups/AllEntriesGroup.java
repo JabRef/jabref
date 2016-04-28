@@ -32,22 +32,14 @@ public class AllEntriesGroup extends AbstractGroup {
         super(Localization.lang("All entries"), GroupHierarchyType.INDEPENDENT);
     }
 
-    public static AbstractGroup fromString(String s, int version) throws Exception {
+    public static AbstractGroup fromString(String s) throws Exception {
         if (!s.startsWith(AllEntriesGroup.ID)) {
             throw new Exception(
                     "Internal error: AllEntriesGroup cannot be created from \""
                             + s + "\". "
                     + "Please report this on https://github.com/JabRef/jabref/issues");
         }
-        switch (version) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            return new AllEntriesGroup();
-        default:
-            throw new UnsupportedVersionException("AllEntriesGroup", version);
-        }
+        return new AllEntriesGroup();
     }
 
     @Override

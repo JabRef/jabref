@@ -39,6 +39,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
+- Removed support of old groups format (used prior to JabRef version 1.6)
 
 
 
