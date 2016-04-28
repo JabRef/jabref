@@ -38,33 +38,35 @@ public final class BrowseAction extends AbstractAction {
     private final JTextField comp;
     private final boolean dir;
     private final JComponent focusTarget;
+    private final String extension;
 
     public static BrowseAction buildForDir(JFrame frame, JTextField tc) {
-        return new BrowseAction(frame, tc, true, null);
+        return new BrowseAction(frame, tc, true, null, Globals.NONE);
     }
 
     public static BrowseAction buildForDir(JTextField tc) {
-        return new BrowseAction(null, tc, true, null);
+        return new BrowseAction(null, tc, true, null, Globals.NONE);
     }
 
     public static BrowseAction buildForFile(JTextField tc) {
-        return new BrowseAction(null, tc, false, null);
+        return new BrowseAction(null, tc, false, null, Globals.NONE);
     }
 
-    public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget) {
-        return new BrowseAction(null, tc, false, focusTarget);
+    public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget, String extension) {
+        return new BrowseAction(null, tc, false, focusTarget, extension);
 }
 
     public static BrowseAction buildForDir(JTextField tc, JComponent focusTarget) {
-        return new BrowseAction(null, tc, true, focusTarget);
+        return new BrowseAction(null, tc, true, focusTarget, null);
     }
 
-    private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget) {
+    private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget, String extension) {
         super(Localization.lang("Browse"));
         this.frame = frame;
         this.dir = dir;
         this.comp = tc;
         this.focusTarget = focusTarget;
+        this.extension = extension;
     }
 
     @Override
@@ -82,10 +84,10 @@ public final class BrowseAction extends AbstractAction {
 
     private String askUser() {
         if (dir) {
-            return FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE,
+            return FileDialogs.getNewDir(frame, new File(comp.getText()), extension,
                     JFileChooser.OPEN_DIALOG, false);
         } else {
-            return FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE,
+            return FileDialogs.getNewFile(frame, new File(comp.getText()), extension,
                     JFileChooser.OPEN_DIALOG, false);
         }
     }
