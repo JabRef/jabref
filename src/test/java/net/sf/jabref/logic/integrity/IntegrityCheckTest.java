@@ -172,6 +172,15 @@ public class IntegrityCheckTest {
         assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
     }
 
+    @Test
+    public void testISSNChecks() {
+        assertCorrect(createContext("issn", "0020-7217"));
+        assertCorrect(createContext("issn", "2434-561X"));
+        assertCorrect(createContext("issn", "2434-561x"));
+        assertWrong(createContext("issn", "Some other stuff"));
+        assertWrong(createContext("issn", "0020-7218"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
