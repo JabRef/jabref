@@ -216,9 +216,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         builder.add(selectFieldCombobox).xy(1, 1);
 
         List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream()
-                .map(formatter -> formatter.getKey()).collect(Collectors.toList());
+                .map(Formatter::getName).collect(Collectors.toList());
         List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream()
-                .map(formatter -> formatter.getDescription()).collect(Collectors.toList());
+                .map(Formatter::getDescription).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
         formattersCombobox.setRenderer(new DefaultListCellRenderer() {
 
@@ -287,9 +287,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
-        String selectedFormatterKey = formattersCombobox.getSelectedItem().toString();
+        String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
         for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
-            if (formatter.getKey().equals(selectedFormatterKey)) {
+            if (formatter.getName().equals(selectedFormatterName)) {
                 selectedFormatter = formatter;
                 break;
             }

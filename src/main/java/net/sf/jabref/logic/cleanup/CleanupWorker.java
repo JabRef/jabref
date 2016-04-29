@@ -21,7 +21,6 @@ import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -60,9 +59,6 @@ public class CleanupWorker {
         if (preset.isCleanUpUpgradeExternalLinks()) {
             jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));
         }
-        if (preset.isCleanUpSuperscripts()) {
-            jobs.add(new FormatterCleanup(BibtexFieldFormatters.ORDINALS_TO_LATEX_SUPERSCRIPT));
-        }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
         }
@@ -80,9 +76,6 @@ public class CleanupWorker {
                     repository);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
-        }
-        if (preset.isConvertUnicodeToLatex()) {
-            jobs.add(new UnicodeCleanup());
         }
         if (preset.isConvertToBiblatex()) {
             jobs.add(new BiblatexCleanup());

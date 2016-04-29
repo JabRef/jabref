@@ -29,6 +29,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 - Fixed [#1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
 - Fixed [#1259](https://github.com/JabRef/jabref/issues/1259): NPE when sorting tabs
+- Fixed display bug in the cleanup dialog: field formatters are now correctly displayed using their name 
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
