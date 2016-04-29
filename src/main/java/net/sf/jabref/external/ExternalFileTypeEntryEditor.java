@@ -263,7 +263,7 @@ public class ExternalFileTypeEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(null, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(null, initial, "",
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

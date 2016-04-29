@@ -70,9 +70,11 @@ public class StyleLoader {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
-            } else {
+            } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
+            } else {
+                LOGGER.error(String.format("Style with filename %s is invalid", filename));
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
@@ -89,7 +91,12 @@ public class StyleLoader {
         List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                externalStyles.add(new OOBibStyle(new File(filename), repository, encoding));
+                OOBibStyle style = new OOBibStyle(new File(filename), repository, encoding);
+                if (style.isValid()) {
+                    externalStyles.add(style);
+                } else {
+                    LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find external style file " + filename, e);

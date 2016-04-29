@@ -55,7 +55,7 @@ public class FileDialogs {
         OpenFileFilter off = null;
         if (extension == null) {
             off = new OpenFileFilter();
-        } else if (!extension.equals(Globals.NONE)) {
+        } else if (!extension.isEmpty()) {
             off = new OpenFileFilter(extension);
         }
 
@@ -98,7 +98,7 @@ public class FileDialogs {
 
         if (extension == null) {
             off = new OpenFileFilter();
-        } else if (!extension.equals(Globals.NONE)) {
+        } else if (!extension.isEmpty()) {
             off = new OpenFileFilter(extension);
         }
 

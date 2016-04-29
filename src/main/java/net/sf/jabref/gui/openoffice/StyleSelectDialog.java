@@ -110,9 +110,7 @@ class StyleSelectDialog {
     private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
 
     private boolean okPressed;
-
     private final StyleLoader loader;
-
     private final OpenOfficePreferences preferences;
 
 
@@ -127,15 +125,18 @@ class StyleSelectDialog {
     }
 
     private void init() {
-
-
         setupPopupMenu();
 
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
+            addDialog.setDirectoryPath(preferences.getCurrentStyle());
             addDialog.setVisible(true);
-            addDialog.getFileName().ifPresent(loader::addStyle);
+            addDialog.getFileName().ifPresent(fileName -> {
+                loader.addStyle(fileName);
+                preferences.setCurrentStyle(fileName);
+            });
             updateStyles();
+
         });
         addButton.setToolTipText(Localization.lang("Add style file"));
 
@@ -149,7 +150,6 @@ class StyleSelectDialog {
         preview.setEntry(prevEntry);
 
         setupTable();
-
         updateStyles();
 
         // Build dialog
@@ -172,13 +172,11 @@ class StyleSelectDialog {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                        if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                            JOptionPane.showMessageDialog(diag,
-                                    Localization
-                                            .lang("You must select a valid style file."),
-                                    Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
+                    JOptionPane.showMessageDialog(diag, Localization.lang("You must select a valid style file."),
+                            Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 okPressed = true;
                 storeSettings();
                 diag.dispose();
@@ -257,7 +255,6 @@ class StyleSelectDialog {
         popup.add(show);
         popup.add(remove);
         popup.add(reload);
-
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
         edit.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
@@ -359,6 +356,7 @@ class StyleSelectDialog {
         }
         return Optional.empty();
     }
+
     /**
      * Get the currently selected style.
      * @return the selected style, or empty if no style is selected.
@@ -425,7 +423,7 @@ class StyleSelectDialog {
     }
 
     private void tablePopup(MouseEvent e) {
-            popup.show(e.getComponent(), e.getX(), e.getY());
+        popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
     private void displayStyle(OOBibStyle style) {
@@ -497,7 +495,7 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, ".jstyle"));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();
@@ -547,5 +545,10 @@ class StyleSelectDialog {
             }
             return Optional.empty();
         }
+
+        public void setDirectoryPath(String path) {
+            this.newFile.setText(path);
+        }
+
     }
 }
