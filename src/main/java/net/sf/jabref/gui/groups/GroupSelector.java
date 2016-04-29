@@ -228,7 +228,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         showNumberOfElements.isSelected());
                 if (groupsTree != null) {
                     groupsTree.invalidate();
-                    groupsTree.validate();
                     groupsTree.repaint();
                 }
             }
