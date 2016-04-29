@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,10 +21,9 @@ public class ISSNChecker implements Checker {
         }
 
         // Check that the ISSN is on the correct form
-        List<IntegrityMessage> result = new ArrayList<>();
         String issn = entry.getField("issn").trim();
-        Matcher issn_matcher = ISSN_PATTERN.matcher(issn);
-        if (!issn_matcher.matches()) {
+        Matcher issnMatcher = ISSN_PATTERN.matcher(issn);
+        if (!issnMatcher.matches()) {
             return Collections.singletonList(
                     new IntegrityMessage(Localization.lang("incorrect format"), entry, "issn"));
         }
@@ -42,7 +40,7 @@ public class ISSNChecker implements Checker {
         if ((control == 'x') || (control == 'X')) {
             control = '9' + 1;
         }
-        if ((((sum % 11) + control) - '0') == 11) {
+        if (((((sum % 11) + control) - '0') == 11) || ((sum % 11) == 0)) {
             return Collections.emptyList();
         } else {
             return Collections

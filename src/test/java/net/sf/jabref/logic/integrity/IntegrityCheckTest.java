@@ -175,7 +175,8 @@ public class IntegrityCheckTest {
     @Test
     public void testISSNChecks() {
         assertCorrect(createContext("issn", "0020-7217"));
-        assertCorrect(createContext("issn", "2434-561X"));
+        assertCorrect(createContext("issn", "0020-7217"));
+        assertCorrect(createContext("issn", "1687-6180"));
         assertCorrect(createContext("issn", "2434-561x"));
         assertWrong(createContext("issn", "Some other stuff"));
         assertWrong(createContext("issn", "0020-7218"));
