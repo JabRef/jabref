@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -58,10 +59,10 @@ public abstract class AbstractGroup implements SearchMatcher {
      *
      * @param s The result from the group's toString() method.
      * @return New instance of the encoded group.
-     * @throws Exception If an error occured and a group could not be created, e.g.
-     *                   due to a malformed regular expression.
+     * @throws ParseException If an error occurred and a group could not be created,
+     *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s) throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s);
         }

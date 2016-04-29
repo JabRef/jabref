@@ -32,9 +32,11 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.GroupsParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -63,8 +65,6 @@ public class MetaData implements Iterable<String> {
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
 
-    private boolean groupTreeValid = true;
-
     private AbstractLabelPattern labelPattern;
 
     private DBStrings dbStrings = new DBStrings();
@@ -76,7 +76,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData) {
+    public MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
@@ -169,14 +169,12 @@ public class MetaData implements Iterable<String> {
      *
      * @param orderedData The vector of metadata strings
      */
-    private void putGroups(List<String> orderedData) {
+    private void putGroups(List<String> orderedData) throws ParseException {
         try {
             groupsRoot = GroupsParser.importGroups(orderedData);
-            groupTreeValid = true;
-        } catch (Exception e) {
-            // we cannot really do anything about this here
-            LOGGER.error("Problem parsing groups from MetaData", e);
-            groupTreeValid = false;
+        } catch (ParseException e) {
+            throw new ParseException(Localization.lang(
+                    "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
         }
     }
 
@@ -190,7 +188,6 @@ public class MetaData implements Iterable<String> {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
-        groupTreeValid = true;
     }
 
     /**
@@ -224,10 +221,6 @@ public class MetaData implements Iterable<String> {
 
     public void setDBStrings(DBStrings dbStrings) {
         this.dbStrings = dbStrings;
-    }
-
-    public boolean isGroupTreeValid() {
-        return groupTreeValid;
     }
 
     /**

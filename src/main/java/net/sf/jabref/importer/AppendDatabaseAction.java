@@ -35,6 +35,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
@@ -173,7 +174,12 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    ExplicitGroup group = null;
+                    try {
+                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    } catch (ParseException e) {
+                        LOGGER.error(e);
+                    }
                     newGroups.setGroup(group);
                     group.add(appendedEntries);
                 }

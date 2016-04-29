@@ -2,6 +2,7 @@ package net.sf.jabref.logic.groups;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -19,13 +20,13 @@ public class ExplicitGroupTest {
     }
 
     @Test
-     public void testToStringSimple() {
+     public void testToStringSimple() throws ParseException {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT);
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
-    public void toStringDoesNotWriteAssignedEntries() {
+    public void toStringDoesNotWriteAssignedEntries() throws ParseException {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING);
         group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());

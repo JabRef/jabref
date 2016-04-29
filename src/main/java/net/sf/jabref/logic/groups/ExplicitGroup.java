@@ -21,9 +21,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Select explicit bibtex entries. It is also known as static group.
@@ -36,17 +40,15 @@ public class ExplicitGroup extends KeywordGroup {
 
     private final List<String> legacyEntryKeys = new ArrayList<>();
 
-    public ExplicitGroup(String name, GroupHierarchyType context) {
+    private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
+
+    public ExplicitGroup(String name, GroupHierarchyType context) throws ParseException {
         super(name, "groups", name, true, false, context);
     }
 
-    public static ExplicitGroup fromString(String s) throws Exception {
+    public static ExplicitGroup fromString(String s) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
-            throw new Exception(
-                    "Internal error: ExplicitGroup cannot be created from \""
-                            + s
-                            + "\". "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID.length()),
                 AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
@@ -77,9 +79,16 @@ public class ExplicitGroup extends KeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(getName(), getContext());
-        copy.legacyEntryKeys.addAll(legacyEntryKeys);
-        return copy;
+        try {
+            ExplicitGroup copy = new ExplicitGroup(getName(), getContext());
+            copy.legacyEntryKeys.addAll(legacyEntryKeys);
+            return copy;
+        } catch (ParseException exception) {
+            // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
+            LOGGER.error("Internal error in ExplicitGroup.deepCopy(). "
+                    + "Please report this on https://github.com/JabRef/jabref/issues", exception);
+            return null;
+        }
     }
 
     @Override

@@ -58,12 +58,9 @@ public class SearchGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s) throws Exception {
+    public static AbstractGroup fromString(String s) {
         if (!s.startsWith(SearchGroup.ID)) {
-            throw new Exception(
-                    "Internal error: SearchGroup cannot be created from \"" + s
-                            + "\". "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID.length()),
                 AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);

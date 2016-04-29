@@ -19,12 +19,15 @@ package net.sf.jabref.logic.groups;
 
 import java.util.List;
 
+import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.l10n.Localization;
+
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
 public class GroupsParser {
 
-    public static GroupTreeNode importGroups(List<String> orderedData) throws Exception {
+    public static GroupTreeNode importGroups(List<String> orderedData) throws ParseException {
         GroupTreeNode cursor = null;
         GroupTreeNode root = null;
         for (String string : orderedData) {
@@ -36,7 +39,7 @@ public class GroupsParser {
 
             int spaceIndex = string.indexOf(' ');
             if (spaceIndex <= 0) {
-                throw new Exception("bad format");
+                throw new ParseException(Localization.lang("Expected \"%0\" to contain whitespace", string));
             }
             int level = Integer.parseInt(string.substring(0, spaceIndex));
             AbstractGroup group = AbstractGroup.fromString(string.substring(spaceIndex + 1));
