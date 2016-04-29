@@ -63,6 +63,7 @@ public class IntegrityCheck {
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
+        result.addAll(new ISSNChecker().check(entry));
 
         return result;
     }
