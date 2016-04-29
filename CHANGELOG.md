@@ -25,6 +25,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [feature request #1294](https://github.com/JabRef/jabref/issues/1294): Added possibility to filter for `*.jstyle` files in OpenOffice/LibreOffice style selection dialog. Open style selection dialog in directory of last selected file
 - Added integrity check for ISSN
 - Add LaTeX to Unicode converter as cleanup operation
+- Added an option in the about dialog to easily copy the version information of JabRef
 
 ### Fixed
 - Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database
