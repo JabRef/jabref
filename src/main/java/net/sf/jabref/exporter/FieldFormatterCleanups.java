@@ -11,9 +11,8 @@ import java.util.StringJoiner;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
-import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -33,8 +32,7 @@ public class FieldFormatterCleanups {
 
     static {
         availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(BibtexFieldFormatters.ALL);
-        availableFormatters.addAll(CaseChangers.ALL);
+        availableFormatters.addAll(Formatters.ALL);
 
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));

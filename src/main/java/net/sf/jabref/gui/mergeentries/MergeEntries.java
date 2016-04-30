@@ -48,7 +48,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.logic.formatter.CaseChangers;
+import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -243,7 +243,7 @@ public class MergeEntries {
         int row = 2;
         int maxLabelWidth = -1;
         for (String field : allFields) {
-            JLabel label = boldFontLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
+            JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
             mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
             String leftString = leftEntry.getField(field);
             String rightString = rightEntry.getField(field);
