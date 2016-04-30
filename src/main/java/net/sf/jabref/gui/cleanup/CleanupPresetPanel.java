@@ -109,6 +109,10 @@ public class CleanupPresetPanel {
 
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
+        if (cleanUpMovePDF.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
+        }
+
         if (cleanUpDOI.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         }
