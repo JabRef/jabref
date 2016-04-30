@@ -36,6 +36,11 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void ignoreWhitespaceInPageNumbersWithDoubleDash() {
+        expectCorrect("43 -- 103", "43--103");
+    }
+
+    @Test
     public void keepCorrectlyFormattedPageNumbers() {
         expectCorrect("1--2", "1--2");
     }

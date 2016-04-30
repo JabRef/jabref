@@ -64,7 +64,7 @@ public class NormalizePagesFormatter implements Formatter {
         // replace
         String newValue = matcher.replaceFirst(PAGES_REPLACE_PATTERN);
         // replacement?
-        if(!newValue.equals(cleanValue)) {
+        if(matcher.matches()) {
             // write field
             return newValue;
         }
