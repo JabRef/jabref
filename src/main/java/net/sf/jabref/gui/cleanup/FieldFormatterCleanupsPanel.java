@@ -208,6 +208,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
         fieldNames.add(BibEntry.KEY_FIELD);
+        fieldNames.add("all");
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
 
