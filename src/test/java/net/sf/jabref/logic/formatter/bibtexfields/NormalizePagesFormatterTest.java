@@ -51,6 +51,11 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void doesNotRemoveLetters() {
+        expectCorrect("R1-R50", "R1-R50");
+    }
+
+    @Test
     public void formatExample() {
         expectCorrect(formatter.getExampleInput(), "1--2");
     }

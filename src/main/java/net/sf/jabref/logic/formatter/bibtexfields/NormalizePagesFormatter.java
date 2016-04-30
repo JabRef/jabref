@@ -20,7 +20,7 @@ public class NormalizePagesFormatter implements Formatter {
 
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
 
-    private static final String REJECT_LITERALS = "[^0-9,\\-\\+]";
+    private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,]";
     private static final String PAGES_REPLACE_PATTERN = "$1--$2";
 
 
@@ -37,7 +37,7 @@ public class NormalizePagesFormatter implements Formatter {
     /**
      * Format page numbers, separated either by commas or double-hyphens.
      * Converts the range number format of the <code>pages</code> field to page_number--page_number.
-     * Removes all literals except [0-9,-+].
+     * Removes unwanted literals except letters, numbers and -+ signs.
      * Keeps the existing String if the resulting field does not match the expected Regex.
      *
      * <example>
