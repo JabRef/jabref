@@ -42,6 +42,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -91,47 +92,51 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             public void actionPerformed(ActionEvent e) {
                 dispose();
 
-                GroupTreeNode autoGroupsRoot = new GroupTreeNode(new ExplicitGroup(
-                        Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
-                Set<String> hs;
-                String fieldText = field.getText();
-                if (keywords.isSelected()) {
-                    if (nd.isSelected()) {
-                        hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
-                                deliminator.getText());
-                    } else {
-                        hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
-                                remove.getText());
+                try {
+                    GroupTreeNode autoGroupsRoot = new GroupTreeNode(
+                            new ExplicitGroup(Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
+                    Set<String> hs;
+                    String fieldText = field.getText();
+                    if (keywords.isSelected()) {
+                        if (nd.isSelected()) {
+                            hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(),
+                                    field.getText().toLowerCase().trim(), deliminator.getText());
+                        } else {
+                            hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
+                                    remove.getText());
 
+                        }
+                    } else if (authors.isSelected()) {
+                        List<String> fields = new ArrayList<>(2);
+                        fields.add("author");
+                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                        fieldText = "author";
+                    } else { // editors.isSelected() as it is a radio button group.
+                        List<String> fields = new ArrayList<>(2);
+                        fields.add("editor");
+                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                        fieldText = "editor";
                     }
-                } else if (authors.isSelected()) {
-                    List<String> fields = new ArrayList<>(2);
-                    fields.add("author");
-                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                    fieldText = "author";
-                } else { // editors.isSelected() as it is a radio button group.
-                    List<String> fields = new ArrayList<>(2);
-                    fields.add("editor");
-                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                    fieldText = "editor";
+
+                    for (String keyword : hs) {
+                        KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
+                                GroupHierarchyType.INDEPENDENT);
+                        autoGroupsRoot.addChild(new GroupTreeNode(group));
+                    }
+
+                    autoGroupsRoot.moveTo(m_groupsRoot.getNode());
+                    NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
+                    UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot, new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
+                    ce.addEdit(undo);
+
+                    panel.markBaseChanged(); // a change always occurs
+                    frame.output(Localization.lang("Created groups."));
+                    ce.end();
+                    panel.undoManager.addEdit(ce);
+                } catch (ParseException exception) {
+                    frame.showMessage(exception.getLocalizedMessage());
                 }
 
-                for (String keyword : hs) {
-                    KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
-                            GroupHierarchyType.INDEPENDENT);
-                    autoGroupsRoot.addChild(new GroupTreeNode(group));
-                }
-
-                autoGroupsRoot.moveTo(m_groupsRoot.getNode());
-                NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
-                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot,
-                        new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
-                ce.addEdit(undo);
-
-                panel.markBaseChanged(); // a change always occurs
-                frame.output(Localization.lang("Created groups."));
-                ce.end();
-                panel.undoManager.addEdit(ce);
             }
         };
         remove.addActionListener(okListener);

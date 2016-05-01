@@ -1409,7 +1409,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestGroupTree() throws IOException {
+    public void integrationTestGroupTree() throws IOException, ParseException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: groupsversion:3;}"
                 + Globals.NEWLINE +

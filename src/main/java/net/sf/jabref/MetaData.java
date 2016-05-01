@@ -32,12 +32,14 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupsParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.migrations.VersionHandling;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.sql.DBStrings;
 
@@ -54,17 +56,14 @@ public class MetaData implements Iterable<String> {
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     private static final String DATABASE_TYPE = "databaseType";
-    private static final String GROUPSVERSION = "groupsversion";
+
     private static final String GROUPSTREE = "groupstree";
-    private static final String GROUPS = "groups";
     private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
-
-    private boolean groupTreeValid = true;
 
     private AbstractLabelPattern labelPattern;
 
@@ -77,14 +76,8 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData) {
+    public MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
-        boolean groupsTreePresent = false;
-        List<String> flatGroupsData = null;
-        List<String> treeGroupsData = null;
-        // The first version (0) lacked a version specification,
-        // thus this value defaults to 0.
-        int groupsVersionOnDisk = 0;
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
@@ -98,33 +91,11 @@ public class MetaData implements Iterable<String> {
             } catch (IOException ex) {
                 LOGGER.error("Weird error while parsing meta data.", ex);
             }
-            if (GROUPSVERSION.equals(entry.getKey())) {
-                if (!orderedData.isEmpty()) {
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
-                }
-            } else if (GROUPSTREE.equals(entry.getKey())) {
-                groupsTreePresent = true;
-                treeGroupsData = orderedData; // save for later user
-                // actual import operation is handled later because "groupsversion"
-                // tag might not yet have been read
-            } else if (GROUPS.equals(entry.getKey())) {
-                flatGroupsData = orderedData;
+            if (GROUPSTREE.equals(entry.getKey())) {
+                putGroups(orderedData);
+                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not use them here
             } else {
                 putData(entry.getKey(), orderedData);
-            }
-        }
-
-        // this possibly handles import of a previous groups version
-        if (groupsTreePresent) {
-            putGroups(treeGroupsData, groupsVersionOnDisk);
-        }
-
-        if (!groupsTreePresent && (flatGroupsData != null)) {
-            try {
-                groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
-                groupTreeValid = true;
-            } catch (IllegalArgumentException ex) {
-                groupTreeValid = true;
             }
         }
     }
@@ -197,16 +168,13 @@ public class MetaData implements Iterable<String> {
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param version     The group tree version
      */
-    private void putGroups(List<String> orderedData, int version) {
+    private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = VersionHandling.importGroups(orderedData, version);
-            groupTreeValid = true;
-        } catch (Exception e) {
-            // we cannot really do anything about this here
-            LOGGER.error("Problem parsing groups from MetaData", e);
-            groupTreeValid = false;
+            groupsRoot = GroupsParser.importGroups(orderedData);
+        } catch (ParseException e) {
+            throw new ParseException(Localization.lang(
+                    "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
         }
     }
 
@@ -220,7 +188,6 @@ public class MetaData implements Iterable<String> {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
-        groupTreeValid = true;
     }
 
     /**
@@ -254,10 +221,6 @@ public class MetaData implements Iterable<String> {
 
     public void setDBStrings(DBStrings dbStrings) {
         this.dbStrings = dbStrings;
-    }
-
-    public boolean isGroupTreeValid() {
-        return groupTreeValid;
     }
 
     /**
@@ -409,11 +372,6 @@ public class MetaData implements Iterable<String> {
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
         if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
-
-            // write version first
-            serializedMetaData.put(GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
-
-            // now write actual groups
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
 

@@ -393,11 +393,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 LOGGER.debug("Synchronized special fields based on keywords");
             }
 
-            if (!result.getMetaData().isGroupTreeValid()) {
-                result.addWarning(Localization.lang(
-                        "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
-            }
-
             return result;
         }
     }
