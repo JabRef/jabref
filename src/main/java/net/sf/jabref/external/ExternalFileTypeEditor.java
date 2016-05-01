@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +59,7 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
  * Editor for external file types.
  */
 public class ExternalFileTypeEditor extends JDialog {
+
     private JFrame frame;
     private JDialog dialog;
     private List<ExternalFileType> fileTypes;
@@ -111,6 +113,7 @@ public class ExternalFileTypeEditor extends JDialog {
             dispose();
         });
         Action cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -134,9 +137,10 @@ public class ExternalFileTypeEditor extends JDialog {
             //}
         });
 
-        add.addActionListener(e ->  {
+        add.addActionListener(e -> {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new",
+                    IconTheme.JabRefIcon.FILE.getSmallIcon());
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -246,6 +250,7 @@ public class ExternalFileTypeEditor extends JDialog {
         return new EditExternalFileTypesAction(dialog);
     }
 
+
     class EditListener implements ActionListener {
 
         @Override
@@ -276,6 +281,7 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     private class FileTypeTableModel extends AbstractTableModel {
+
         @Override
         public int getColumnCount() {
             return 5;
@@ -354,6 +360,7 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
+
         private JabRefFrame frame;
         private JDialog dialog;
         private ExternalFileTypeEditor editor;

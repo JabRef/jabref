@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,7 +45,6 @@ import java.util.TimerTask;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -2366,21 +2366,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void action() throws SaveException {
 
-            String chosenFile = FileDialogs.getNewFile(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
-                    JFileChooser.SAVE_DIALOG, false);
-            if (chosenFile != null) {
+            //    String chosenFile = FileDialogs.getNewFile(frame,
+            //          new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
+            //        JFileChooser.SAVE_DIALOG, false);
+
+            Path chosenFile = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            File expFile = chosenFile.toFile();
+            /*  if (chosenFile != null) {
                 File expFile = new File(chosenFile);
                 if (!expFile.exists() || (JOptionPane.showConfirmDialog(frame,
                         Localization.lang("'%0' exists. Overwrite file?", expFile.getName()),
                         Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+                  */
                     saveDatabase(expFile, true, Globals.prefs.getDefaultEncoding(), saveType);
                     frame.getFileHistory().newFile(expFile.getPath());
                     frame.output(Localization.lang("Saved selected to '%0'.", expFile.getPath()));
                 }
             }
-        }
-    }
+
+
+
 
     private static class SearchAndOpenFile {
 

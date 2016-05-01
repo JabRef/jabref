@@ -70,7 +70,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -86,7 +85,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -113,9 +111,10 @@ import javax.swing.text.StyledDocument;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -194,7 +193,6 @@ public class TextInputDialog extends JDialog {
         if (entry.getType() != null) {
             typeStr.append(' ').append(Localization.lang("for")).append(' ').append(entry.getType());
         }
-
 
         this.setTitle(typeStr.toString());
         getContentPane().add(panel1, BorderLayout.CENTER);
@@ -284,7 +282,7 @@ public class TextInputDialog extends JDialog {
 
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("Plain text import") + "</h3><p>"
                 + Localization.lang("This is a simple copy and paste dialog. First load or paste some text into "
-                + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
+                        + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -309,15 +307,11 @@ public class TextInputDialog extends JDialog {
         inputPanel.setBorder(titledBorder1);
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
-
         JScrollPane fieldScroller = new JScrollPane(fieldList);
-        fieldScroller.setVerticalScrollBarPolicy(
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
+        fieldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // insert buttons
         insertButton.addActionListener(event -> insertTextForTag(override.isSelected()));
-
 
         // Radio buttons
         append.setToolTipText(Localization.lang("Append the selected text to BibTeX field"));
@@ -386,8 +380,6 @@ public class TextInputDialog extends JDialog {
         inputMenu.add(appendMenu);
         inputMenu.add(overrideMenu);
 
-
-
         // Toolbar
 
         toolBar.add(clearAction);
@@ -418,8 +410,7 @@ public class TextInputDialog extends JDialog {
         sourcePreview.setEditable(false);
         sourcePreview.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         JScrollPane paneScrollPane = new JScrollPane(sourcePreview);
-        paneScrollPane.setVerticalScrollBarPolicy(
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        paneScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         paneScrollPane.setPreferredSize(new Dimension(500, 255));
         paneScrollPane.setMinimumSize(new Dimension(10, 10));
 
@@ -516,7 +507,7 @@ public class TextInputDialog extends JDialog {
         text = text.replace("##NEWLINE##", OS.NEWLINE);
 
         ParserResult importerResult = fimp.importEntries(text);
-        if(importerResult.hasWarnings()) {
+        if (importerResult.hasWarnings()) {
             frame.showMessage(importerResult.getErrorMessage());
         }
         List<BibEntry> importedEntries = importerResult.getDatabase().getEntries();
@@ -542,8 +533,7 @@ public class TextInputDialog extends JDialog {
         StringWriter sw = new StringWriter(200);
         try {
             new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
-                    false).write(entry, sw,
-                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                    false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
@@ -571,9 +561,9 @@ public class TextInputDialog extends JDialog {
 
 
     private class PasteAction extends BasicAction {
+
         public PasteAction() {
-            super(Localization.lang("Paste"),
-                    Localization.lang("Paste from clipboard"),
+            super(Localization.lang("Paste"), Localization.lang("Paste from clipboard"),
                     IconTheme.JabRefIcon.PASTE.getIcon());
         }
 
@@ -595,18 +585,17 @@ public class TextInputDialog extends JDialog {
     }
 
     private class LoadAction extends BasicAction {
+
         public LoadAction() {
-            super(Localization.lang("Open"),
-                    Localization.lang("Open file"),
-                    IconTheme.JabRefIcon.OPEN.getIcon());
+            super(Localization.lang("Open"), Localization.lang("Open file"), IconTheme.JabRefIcon.OPEN.getIcon());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, Collections.emptyList(), ".txt",
-                        JFileChooser.OPEN_DIALOG, false);
-                if (chosen != null) {
+                String chosen = new NewFileDialogs(frame).withExtension(FileExtensions.TXT).getSelectedFile()
+                        .toString();
+                if (!chosen.isEmpty()) {
                     File newFile = new File(chosen);
                     document.remove(0, document.getLength());
                     EditorKit eKit = textPane.getEditorKit();
@@ -624,10 +613,9 @@ public class TextInputDialog extends JDialog {
     }
 
     private class ClearAction extends BasicAction {
+
         public ClearAction() {
-            super(Localization.lang("Clear"),
-                    Localization.lang("Clear inputarea"),
-                    IconTheme.JabRefIcon.NEW.getIcon());
+            super(Localization.lang("Clear"), Localization.lang("Clear inputarea"), IconTheme.JabRefIcon.NEW.getIcon());
         }
 
         @Override
@@ -637,7 +625,9 @@ public class TextInputDialog extends JDialog {
     }
 
     class FieldListSelectionHandler implements ListSelectionListener {
+
         private int lastIndex = -1;
+
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
@@ -665,12 +655,14 @@ public class TextInputDialog extends JDialog {
     // simple JList Renderer
     // based on : Advanced JList Programming at developers.sun.com
     private class SimpleCellRenderer extends DefaultListCellRenderer {
+
         private final Font baseFont;
         private final Font usedFont;
         private final Icon okIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_DONE.getSmallIcon();
         private final Icon needIcon = IconTheme.JabRefIcon.PLAIN_TEXT_IMPORT_TODO.getSmallIcon();
         private final Color requiredColor = Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND);
         private final Color optionalColor = Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND);
+
 
         public SimpleCellRenderer(Font normFont) {
             baseFont = normFont;
@@ -681,9 +673,7 @@ public class TextInputDialog extends JDialog {
          * reconfigure the Jlabel each time we're called.
          */
         @Override
-        public Component getListCellRendererComponent(
-                JList<?> list,
-                Object value, // value to display
+        public Component getListCellRendererComponent(JList<?> list, Object value, // value to display
                 int index, // cell index
                 boolean iss, // is the cell selected
                 boolean chf) // the list and the cell have the focus
@@ -716,6 +706,7 @@ public class TextInputDialog extends JDialog {
     }
 
     private class FieldListMouseListener extends MouseAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
@@ -728,6 +719,8 @@ public class TextInputDialog extends JDialog {
 
         private final String field;
         private final Boolean overrideField;
+
+
         public MenuTextForTagAction(String field, Boolean overrideField) {
             super(field);
             this.field = field;
@@ -744,7 +737,9 @@ public class TextInputDialog extends JDialog {
 }
 
 class PopupListener extends MouseAdapter {
+
     private final JPopupMenu popMenu;
+
 
     public PopupListener(JPopupMenu menu) {
         popMenu = menu;
@@ -768,6 +763,7 @@ class PopupListener extends MouseAdapter {
 }
 
 abstract class BasicAction extends AbstractAction {
+
     public BasicAction(String text, String description, Icon icon) {
         super(text, icon);
         putValue(Action.SHORT_DESCRIPTION, description);

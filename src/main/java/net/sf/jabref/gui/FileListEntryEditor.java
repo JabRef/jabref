@@ -23,7 +23,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,13 +36,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -89,19 +85,24 @@ public class FileListEntryEditor {
     private ConfirmCloseFileListEntryEditor externalConfirm;
 
     private FileListEntry entry;
-    private final BibDatabaseContext databaseContext;
+    //Do not make this variable final, as then the lambda action listener will fail on compiöe
+    private BibDatabaseContext databaseContext;
     private boolean okPressed;
     private boolean okDisabledExternally;
     private boolean openBrowseWhenShown;
     private boolean dontOpenBrowseUntilDisposed;
 
+    //Do not make this variable final, as then the lambda action listener will fail on compile
+    private JabRefFrame frame;
+
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
 
-    public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar,
-            boolean showOpenButton, BibDatabaseContext databaseContext) {
+    public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar, boolean showOpenButton,
+            BibDatabaseContext databaseContext) {
         this.entry = entry;
         this.databaseContext = databaseContext;
+        this.frame = frame;
 
         ActionListener okAction = e -> {
             // If OK button is disabled, ignore this event:
@@ -127,27 +128,28 @@ public class FileListEntryEditor {
             }
         });
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
+                "left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
         builder.add(Localization.lang("Link")).xy(1, 1);
         builder.add(link).xy(3, 1);
-        final BrowseListener browse = new BrowseListener(frame, link);
+        //final BrowseListener browse = new BrowseListener(frame, link); //TODO: Maybe use browse action
+
         final JButton browseBut = new JButton(Localization.lang("Browse"));
-        browseBut.addActionListener(browse);
+        browseBut.addActionListener(browsePressed);
         builder.add(browseBut).xy(5, 1);
         JButton open = new JButton(Localization.lang("Open"));
         if (showOpenButton) {
             builder.add(open).xy(7, 1);
         }
         builder.add(Localization.lang("Description")).xy(1, 3);
-        builder.add(description).xyw(3,3,3);
+        builder.add(description).xyw(3, 3, 3);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.add(Localization.lang("File type")).xy(1, 5);
         builder.add(types).xyw(3, 5, 3);
         if (showProgressBar) {
             builder.appendRows("2dlu, p");
-            builder.add(downloadLabel).xy(1,7);
-            builder.add(prog).xyw(3,7,3);
+            builder.add(downloadLabel).xy(1, 7);
+            builder.add(prog).xyw(3, 7, 3);
         }
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
@@ -167,6 +169,7 @@ public class FileListEntryEditor {
         open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -199,6 +202,8 @@ public class FileListEntryEditor {
 
         });
 
+        System.out.println("LInk field " + link.getText());
+
         diag = new JDialog(frame, Localization.lang("Save file"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -210,7 +215,8 @@ public class FileListEntryEditor {
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
-                    SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
+                    System.out.println("Window activated ");
+                    // SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
                 }
             }
 
@@ -288,8 +294,7 @@ public class FileListEntryEditor {
     private void setValues(FileListEntry entry) {
         description.setText(entry.description);
         link.setText(entry.link);
-        //if (link.getText().length() > 0)
-        //    checkExtension();
+
         Collection<ExternalFileType> list = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
@@ -345,41 +350,29 @@ public class FileListEntryEditor {
     }
 
 
-    class BrowseListener implements ActionListener {
-        private final JFrame parent;
-        private final JTextField comp;
-
-        public BrowseListener(JFrame parent, JTextField comp) {
-            this.parent = parent;
-            this.comp = comp;
+    ActionListener browsePressed = e -> {
+        String filePath = link.getText().trim();
+        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
+        String workingDir;
+        // no file set yet or found
+        if (file.isPresent()) {
+            workingDir = file.get().getPath();
+        } else {
+            workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
+        String selection = new NewFileDialogs(this.frame, workingDir).getSelectedFile().toString();
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String filePath = comp.getText().trim();
-            Optional<File> file = FileUtil.expandFilename(databaseContext, filePath);
-            File workingDir;
-            // no file set yet or found
-            if (file.isPresent()) {
-                workingDir = new File(file.get().getParent());
-            } else {
-                workingDir = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
-            }
-            String selection = FileDialogs.getNewFile(parent, workingDir, Collections.emptyList(),
-                    JFileChooser.OPEN_DIALOG, false);
-            if (selection != null) {
-                File newFile = new File(selection);
-                // Store the directory for next time:
-                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
+        if (selection != null) {
+            File newFile = new File(selection);
+            // Store the directory for next time:
+            Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());
 
-                // If the file is below the file directory, make the path relative:
-                List<String> fileDirs = databaseContext.getFileDirectory();
-                newFile = FileUtil.shortenFileName(newFile, fileDirs);
+            // If the file is below the file directory, make the path relative:
+            List<String> fileDirs = this.databaseContext.getFileDirectory();
+            newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
-                comp.setText(newFile.getPath());
-                comp.requestFocus();
-            }
+            link.setText(newFile.getPath());
+            link.requestFocus();
         }
-    }
-
+    };
 }

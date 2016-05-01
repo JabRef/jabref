@@ -22,7 +22,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,6 +53,8 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -71,6 +72,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -451,7 +453,7 @@ public class ProtectedTermsDialog {
             super(diag, Localization.lang("Add protected terms file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".terms")));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.TERMS));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

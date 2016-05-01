@@ -2,7 +2,6 @@ package net.sf.jabref.gui.protectedterms;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -14,9 +13,12 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
+
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 
@@ -48,7 +50,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
 
     private void setupDialog() {
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".terms")));
+        browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.TERMS));
 
         // Build content panel
         FormBuilder builder = FormBuilder.create();

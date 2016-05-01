@@ -21,8 +21,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.Collections;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -31,24 +32,28 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog for creating or modifying custom exports.
  */
 class CustomExportDialog extends JDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
@@ -67,15 +72,17 @@ class CustomExportDialog extends JDialog {
     public CustomExportDialog(final JabRefFrame parent) {
         super(parent, Localization.lang("Edit custom export"), true);
         ActionListener okListener = e -> {
+            Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();
+            if (layoutFileDir != null) {
+                Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, layoutFileDir.toString());
+
+            }
 
             // Check that there are no empty strings.
             if (layoutFile.getText().isEmpty() || name.getText().isEmpty() || extension.getText().isEmpty()
                     || !layoutFile.getText().endsWith(".layout")) {
-                //JOptionPane.showMessageDialog
-                //    (parent, Globals.lang("You must provide a name, a search "
-                //			  +"string and a field name for this group."),
-                //			  Globals.lang("Create group"),
-                //     JOptionPane.ERROR_MESSAGE);
+
+                LOGGER.info("One field is empty!"); //TODO: Better error message
                 return;
             }
 
@@ -84,11 +91,20 @@ class CustomExportDialog extends JDialog {
             okPressed = true;
             dispose();
         };
+
+        layoutFile.setText(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
+
         JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
         name.addActionListener(okListener);
         layoutFile.addActionListener(okListener);
         extension.addActionListener(okListener);
+
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+        cancel.addActionListener(e -> dispose());
+
+        JButton browse = new JButton(Localization.lang("Browse"));
+        browse.addActionListener(BrowseAction.buildForFile(layoutFile, FileExtensions.LAYOUT));
 
         AbstractAction cancelAction = new AbstractAction() {
 
@@ -97,26 +113,6 @@ class CustomExportDialog extends JDialog {
                 dispose();
             }
         };
-
-        JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.addActionListener(cancelAction);
-
-        JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(e -> {
-                File directory = new File(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
-                String chosenStr = FileDialogs.getNewFile(parent, directory, Collections.singletonList(".layout"),
-                        JFileChooser.OPEN_DIALOG, false);
-                if (chosenStr == null) {
-                    return;
-                }
-                File chosen = new File(chosenStr);
-
-                // Update working directory for layout files.
-                Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, chosen.getParent());
-
-                layoutFile.setText(chosen.getPath());
-        });
-
         // Key bindings:
         JPanel main = new JPanel();
         ActionMap am = main.getActionMap();
@@ -127,9 +123,8 @@ class CustomExportDialog extends JDialog {
         // Layout starts here.
         GridBagLayout gbl = new GridBagLayout();
         main.setLayout(gbl);
-        main.setBorder(BorderFactory.createTitledBorder
-                (BorderFactory.createEtchedBorder(),
-                        Localization.lang("Export properties")));
+        main.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+                Localization.lang("Export properties")));
 
         // Main panel:
         GridBagConstraints con = new GridBagConstraints();

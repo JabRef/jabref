@@ -36,9 +36,10 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.exporter.AutoSaveManager;
@@ -82,6 +83,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
+
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
@@ -96,13 +98,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-            List<String> chosenStrings = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
-                    true);
+
+            List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
+                    .getMultipleFileNames();
+
             for (String chosen : chosenStrings) {
-                if (chosen != null) {
-                    filesToOpen.add(new File(chosen));
-                }
+
+                filesToOpen.add(new File(chosen));
+
             }
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
@@ -111,6 +114,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         openFiles(filesToOpen, true);
     }
+
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -142,11 +146,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null) && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null)
+                        && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -176,7 +181,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
+            frame.output(Localization.lang("File '%0' is already open.",
+                    toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
@@ -200,12 +206,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } else if (autoSaveFound) {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
-                int answer = JOptionPane.showConfirmDialog(null,
-                        "<html>" + Localization
-                                .lang("An autosave file was found for this database. This could indicate "
-                                        + "that JabRef did not shut down cleanly last time the file was used.")
-                                + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
-                                + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                int answer = JOptionPane
+                        .showConfirmDialog(
+                                null, "<html>"
+                                        + Localization
+                                                .lang("An autosave file was found for this database. This could indicate "
+                                                        + "that JabRef did not shut down cleanly last time the file was used.")
+                                        + "<br>"
+                                        + Localization
+                                                .lang("Do you want to recover the database from the autosave file?")
+                                        + "</html>",
+                                Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -220,9 +231,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 if (FileBasedLock.hasLockFile(file.toPath())) {
                     Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
-                    if ((modificationTime.isPresent()) && (
-                            (System.currentTimeMillis() - modificationTime.get().toMillis())
-                                    > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
+                    if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
+                            - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
@@ -318,10 +328,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            JabRefExecutorService.INSTANCE.execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
+            JabRefExecutorService.INSTANCE
+                    .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        Defaults defaults = new Defaults(
+                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults));
 
         // file is set to null inside the EventDispatcherThread
@@ -340,13 +352,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Open and parse file
         ParserResult result = new BibtexImporter().importDatabase(fileToOpen.toPath(), defaultEncoding);
 
-            if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                NamedCompound compound = new NamedCompound("SpecialFieldSync");
-                for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
-                }
-                LOGGER.debug("Synchronized special fields based on keywords");
+        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            NamedCompound compound = new NamedCompound("SpecialFieldSync");
+            for (BibEntry entry : result.getDatabase().getEntries()) {
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
             }
+            LOGGER.debug("Synchronized special fields based on keywords");
+        }
 
         return result;
     }
