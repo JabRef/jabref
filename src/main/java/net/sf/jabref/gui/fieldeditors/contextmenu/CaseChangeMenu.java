@@ -21,8 +21,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class CaseChangeMenu extends JMenu {
@@ -32,7 +32,7 @@ public class CaseChangeMenu extends JMenu {
         Objects.requireNonNull(parent);
 
         // create menu items, one for each case changer
-        for (final Formatter caseChanger : CaseChangers.ALL) {
+        for (final Formatter caseChanger : Formatters.CASE_CHANGERS) {
             JMenuItem menuItem = new JMenuItem(caseChanger.getName());
             menuItem.addActionListener(e -> parent.setText(caseChanger.format(parent.getText())));
             this.add(menuItem);

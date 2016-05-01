@@ -24,6 +24,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Added missing help files
 - Implemented [feature request #1294](https://github.com/JabRef/jabref/issues/1294): Added possibility to filter for `*.jstyle` files in OpenOffice/LibreOffice style selection dialog. Open style selection dialog in directory of last selected file
 - Added integrity check for ISSN
+- Add LaTeX to Unicode converter as cleanup operation
 
 ### Fixed
 - Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database
@@ -34,6 +35,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed display bug in the cleanup dialog: field formatters are now correctly displayed using their name 
 - Fixed [#1271](https://github.com/JabRef/jabref/issues/1271): Authors with compound first names are displayed properly 
 - Fixed: Selecting invalid jstyle causes NPE and prevents opening of style selection dialog
+- Fixed: Move linked files to default directory works again
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
