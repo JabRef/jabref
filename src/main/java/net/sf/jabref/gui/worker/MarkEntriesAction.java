@@ -50,7 +50,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         this.level = level;
 
         //menuItem = new JMenuItem(Globals.menuTitle("Mark entries").replace("&",""));
-        menuItem = new JMenuItem("               ");
+        menuItem = new JMenuItem(Localization.lang("Level") + " " + level + "   ");
         menuItem.setMnemonic(String.valueOf(level + 1).charAt(0));
         menuItem.setBackground(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + this.level));
         menuItem.setOpaque(true);
