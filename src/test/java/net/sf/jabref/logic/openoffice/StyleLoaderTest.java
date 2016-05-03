@@ -85,7 +85,7 @@ public class StyleLoaderTest {
 
         String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
-        loader.addStyle(filename);
+        loader.addStyleIfValid(filename);
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
 
@@ -96,7 +96,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences,
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
         int beforeAdding = loader.getStyles().size();
-        loader.addStyle("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
+        loader.addStyleIfValid("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
         assertEquals(beforeAdding, loader.getStyles().size());
     }
 
@@ -170,8 +170,8 @@ public class StyleLoaderTest {
         int beforeAdding = loader.getStyles().size();
         String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
-        loader.addStyle(filename);
-        loader.addStyle(filename);
+        loader.addStyleIfValid(filename);
+        loader.addStyleIfValid(filename);
         assertEquals(beforeAdding + 1, loader.getStyles().size());
     }
 
@@ -179,7 +179,7 @@ public class StyleLoaderTest {
     public void testAddNullStyleThrowsNPE() {
         loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
                 mock(JournalAbbreviationRepository.class), Globals.prefs.getDefaultEncoding());
-        loader.addStyle(null);
+        loader.addStyleIfValid(null);
         fail();
     }
 

@@ -64,7 +64,12 @@ public class StyleLoader {
         return result;
     }
 
-    public void addStyle(String filename) {
+    /**
+     * Adds the given style to the list of styles
+     * @param filename The filename of the style
+     * @return True if the added style is valid, false otherwise
+     */
+    public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
@@ -73,6 +78,7 @@ public class StyleLoader {
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
+                return true;
             } else {
                 LOGGER.error(String.format("Style with filename %s is invalid", filename));
             }
@@ -82,6 +88,7 @@ public class StyleLoader {
         } catch (IOException e) {
             LOGGER.info("Problem reading external style file " + filename, e);
         }
+        return false;
 
     }
 
@@ -92,7 +99,7 @@ public class StyleLoader {
         for (String filename : lists) {
             try {
                 OOBibStyle style = new OOBibStyle(new File(filename), repository, encoding);
-                if (style.isValid()) {
+                if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
                     LOGGER.error(String.format("Style with filename %s is invalid", filename));
