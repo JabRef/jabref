@@ -19,8 +19,9 @@ public class Windows implements NativeDesktop {
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
-            //filePath as string, because it could be an URL
-            Runtime.getRuntime().exec(new String[] {"explorer.exe", filePath});
+            // quote String so explorer handles URL query strings correctly
+            String quotePath = "\"" + filePath +"\"";
+            Runtime.getRuntime().exec(new String[] {"explorer.exe", quotePath});
         }
 
     }
