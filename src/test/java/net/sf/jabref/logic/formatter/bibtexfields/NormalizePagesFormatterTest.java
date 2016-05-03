@@ -61,6 +61,11 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void replacesLongDashWithDoubleDash() {
+        expectCorrect("1 \u2014 50", "1--50");
+    }
+
+    @Test
     public void formatExample() {
         expectCorrect(formatter.getExampleInput(), "1--2");
     }
