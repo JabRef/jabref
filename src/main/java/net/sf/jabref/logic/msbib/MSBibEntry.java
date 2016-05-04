@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.msbib;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,20 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.layout.LayoutFormatter;
+
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
-import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -45,11 +33,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -72,7 +57,6 @@ import org.w3c.dom.NodeList;
  * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
  */
 class MSBibEntry {
-    private static final Log LOGGER = LogFactory.getLog(MSBibEntry.class);
 
     private String sourceType = "Misc";
     private String bibTexEntry;
@@ -165,7 +149,7 @@ class MSBibEntry {
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
     // WORD SPACE , SPACE WORD SPACE , SPACE WORD
     // tested using http://www.javaregex.com/test.html
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w+)\\s?[,]?\\s?(\\w+)\\b");
 
     // Allows 20.3-2007|||20/3-  2007 etc.
     // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
@@ -457,9 +441,7 @@ class MSBibEntry {
             productionCompany = bibtex.getField(MSBIB + "productioncompany");
         }
 
-        if (("ElectronicSource".equals(sourceType)
-                || "Art".equals(sourceType)
-                || "Misc".equals(sourceType))
+        if (("ElectronicSource".equals(sourceType) || "Art".equals(sourceType) || "Misc".equals(sourceType))
                 && (bibtex.hasField("title"))) {
             publicationTitle = bibtex.getField("title");
         }
@@ -552,21 +534,6 @@ class MSBibEntry {
             editors = getAuthors(bibtex.getField("editor"));
         }
 
-        boolean FORMATXML = false;
-        if (FORMATXML) {
-            title = format(title);
-            bibTexAbstract = format(bibTexAbstract);
-        }
-    }
-
-    private String format(String value) {
-        if (value == null) {
-            return null;
-        }
-        String result;
-        LayoutFormatter chars = new XMLChars();
-        result = chars.format(value);
-        return result;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
@@ -707,18 +674,6 @@ class MSBibEntry {
         return result;
     }
 
-    private Node getDOMrepresentation() {
-        Node result = null;
-        try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-            result = getDOMrepresentation(documentBuilder.newDocument());
-        } catch (ParserConfigurationException e) {
-            LOGGER.warn("Could not create DocumentBuilder", e);
-        }
-        return result;
-    }
-
     private void addField(Document document, Element parent, String name, String value) {
         if (value == null) {
             return;
@@ -752,7 +707,7 @@ class MSBibEntry {
         }
 
         Matcher matcher = ADDRESS_PATTERN.matcher(address);
-        if (matcher.matches() && (matcher.groupCount() > 3)) {
+        if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
@@ -768,7 +723,7 @@ class MSBibEntry {
         }
 
         Matcher matcher = DATE_PATTERN.matcher(date);
-        if (matcher.matches() && (matcher.groupCount() > 3)) {
+        if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "Month" + extra, matcher.group(1));
             addField(document, parent, "Day" + extra, matcher.group(2));
             addField(document, parent, "Year" + extra, matcher.group(3));
@@ -776,7 +731,6 @@ class MSBibEntry {
     }
 
     public Element getDOMrepresentation(Document document) {
-
 
         Element msbibEntry = document.createElement(B_COLON + "Source");
 
@@ -840,7 +794,7 @@ class MSBibEntry {
 
         addDate(document, msbibEntry, dateAccessed, "Accessed");
 
-            /* SM 2010.10 added month export */
+        /* SM 2010.10 added month export */
         addField(document, msbibEntry, "Month", month);
 
         addField(document, msbibEntry, "URL", url);
@@ -872,7 +826,7 @@ class MSBibEntry {
         addField(document, msbibEntry, BIBTEX + "Price", bibTexPrice);
         addField(document, msbibEntry, BIBTEX + "Size", bibTexSize);
 
-            /* SM: 2010.10 end intype, paper support */
+        /* SM: 2010.10 end intype, paper support */
         addField(document, msbibEntry, BIBTEX + "InType", bibTexInType);
         addField(document, msbibEntry, BIBTEX + "Paper", bibTexPaper);
 
@@ -1132,26 +1086,6 @@ class MSBibEntry {
 
         entry.setField(hm);
         return entry;
-    }
-
-    /*
-     * render as XML
-     *
-     * TODO This is untested.
-     */
-    @Override
-    public String toString() {
-        StringWriter result = new StringWriter();
-        try {
-            DOMSource source = new DOMSource(getDOMrepresentation());
-            StreamResult streamResult = new StreamResult(result);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, streamResult);
-        } catch (TransformerException e) {
-            LOGGER.warn("Could not build XML representation", e);
-        }
-        return result.toString();
     }
 
 }
