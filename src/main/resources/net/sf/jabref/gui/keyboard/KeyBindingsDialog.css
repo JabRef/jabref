@@ -1,0 +1,22 @@
+.keybinding-table {
+	-fx-table-cell-border-color: transparent;
+}
+
+.tree-table-row-cell:empty {
+    visibility: hidden;
+}
+
+.tree-table-row-cell > .tree-table-cell > .icon {
+    -fx-font-family: 'Material Design Icons';
+    -fx-font-size: 16;
+    -fx-fill: #5e5f5e;
+}
+
+.tree-table-row-cell:selected > .tree-table-cell > .icon, .tree-table-row-cell:pressed > .tree-table-cell > .icon {
+   -fx-fill: white;
+}
+
+.dialog-pane *.button-bar {
+	-fx-max-height: 0;
+	-fx-pref-height: 0;
+}

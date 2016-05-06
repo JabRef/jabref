@@ -15,6 +15,9 @@ import javax.swing.KeyStroke;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.OS;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,6 +51,51 @@ public class KeyBindingPreferences {
         }
     }
 
+    public KeyCombination getKeyCombination(KeyBinding bindName) {
+        String binding = keyBindingRepository.get(bindName.getKey());
+        return KeyCombination.valueOf(binding);
+    }
+
+    /**
+     * Check if the given keyCombination equals the given keyEvent
+     *
+     * @param combination as KeyCombination
+     * @param keyEvent as KeEvent
+     * @return true if matching, else false
+     */
+    public boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
+        KeyCode code = keyEvent.getCode();
+        if (code == KeyCode.UNDEFINED) {
+            return false;
+        }
+        // gather the pressed modifier keys
+        String modifiers = "";
+        if (keyEvent.isControlDown()) {
+            modifiers = "ctrl";
+        }
+        if (keyEvent.isShiftDown()) {
+            modifiers += " shift";
+        }
+        if (keyEvent.isAltDown()) {
+            modifiers += " alt";
+        }
+        modifiers = modifiers.trim();
+        String newShortcut = (modifiers.isEmpty()) ? code.toString() : modifiers + " " + code;
+        KeyCombination pressedCombination = KeyCombination.valueOf(newShortcut);
+        return combination.equals(pressedCombination);
+    }
+
+    /**
+     * Check if the given KeyBinding equals the given keyEvent
+     *
+     * @param binding as KeyBinding
+     * @param keyEvent as KeEvent
+     * @return true if matching, else false
+     */
+    public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
+        KeyCombination keyCombination = getKeyCombination(binding);
+        return checkKeyCombinationEquality(keyCombination, keyEvent);
+    }
 
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences, but adapted for Mac
@@ -81,7 +129,6 @@ public class KeyBindingPreferences {
             return KeyStroke.getKeyStroke(keyCode, shortcutMask + modifiers);
         }
     }
-
 
     /**
      * Stores new key bindings into Preferences, provided they actually differ from the old ones.
