@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.event.ChangeSpecialFieldEvent;
+import net.sf.jabref.event.ChangedSpecialFieldEvent;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -34,9 +34,9 @@ public class SpecialFieldUpdateListener {
     private static SpecialFieldUpdateListener INSTANCE;
 
     @Subscribe
-    public void listen(ChangeSpecialFieldEvent changeSpecialFieldEvent) {
-        final BibEntry entry = changeSpecialFieldEvent.getBibEntry();
-        final String fieldName = changeSpecialFieldEvent.getFieldName();
+    public void listen(ChangedSpecialFieldEvent changedSpecialFieldEvent) {
+        final BibEntry entry = changedSpecialFieldEvent.getBibEntry();
+        final String fieldName = changedSpecialFieldEvent.getFieldName();
         // Source editor cycles through all entries
         // if we immediately updated the fields, the entry editor would detect a subsequent change as a user change
         // and re-fire this event

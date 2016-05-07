@@ -5,13 +5,13 @@ import net.sf.jabref.model.entry.BibEntry;
 /**
  * Instances of this class are suitable for passing through the event bus.
  * A <code>BibEntry</code> object the changes were applied on is required.
- * <code>AddEntryEvent</code> should be used, when new <code>BibEntry</code>
- * was added to the database.
+ * <code>RemovedEntryEvent</code> should be used, when a <code>BibEntry</code>
+ * is going to be removed from the database.
  */
 
-public class AddEntryEvent extends EntryEvent {
+public class RemovedEntryEvent extends EntryEvent {
 
-    public AddEntryEvent(BibEntry bibEntry) {
+    public RemovedEntryEvent(BibEntry bibEntry) {
         super(bibEntry);
     }
 

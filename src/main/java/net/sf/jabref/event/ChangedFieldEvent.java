@@ -1,12 +1,12 @@
 package net.sf.jabref.event;
 
 
-public class ChangeFieldEvent {
+public class ChangedFieldEvent {
 
     private final String fieldName;
     private final String value;
 
-    public ChangeFieldEvent(String fieldName, String newValue) {
+    public ChangedFieldEvent(String fieldName, String newValue) {
         this.fieldName = fieldName;
         this.value = newValue;
     }

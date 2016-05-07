@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.event.ChangeFieldEvent;
+import net.sf.jabref.event.ChangedFieldEvent;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.google.common.base.Strings;
@@ -111,7 +111,7 @@ public class BibEntry {
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
-        eventBus.post(new ChangeFieldEvent(BibEntry.ID_FIELD, id));
+        eventBus.post(new ChangedFieldEvent(BibEntry.ID_FIELD, id));
         this.id = id;
         changed = true;
     }
@@ -170,7 +170,7 @@ public class BibEntry {
         // sets off a change in database sorting etc.
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
-        eventBus.post(new ChangeFieldEvent(TYPE_HEADER, newType));
+        eventBus.post(new ChangedFieldEvent(TYPE_HEADER, newType));
     }
 
     /**
@@ -358,7 +358,7 @@ public class BibEntry {
         changed = true;
 
         fields.put(fieldName, value);
-        eventBus.post(new ChangeFieldEvent(fieldName, value));
+        eventBus.post(new ChangedFieldEvent(fieldName, value));
     }
 
     /**
@@ -376,7 +376,7 @@ public class BibEntry {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
         fields.remove(fieldName);
-        eventBus.post(new ChangeFieldEvent(fieldName, null));
+        eventBus.post(new ChangedFieldEvent(fieldName, null));
     }
 
     /**

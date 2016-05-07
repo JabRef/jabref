@@ -104,7 +104,7 @@ public class PreviewPanel extends JPanel
 
     private Optional<Pattern> highlightPattern = Optional.empty();
 
-    private ChangeFieldUpdateEvent currentChangeFieldUpdateEvent;
+    private ChangedFieldEvent currentChangeFieldUpdateEvent;
 
     /**
      * @param databaseContext
@@ -278,7 +278,7 @@ public class PreviewPanel extends JPanel
 
         if (entry.isPresent() && (entry.get() != newEntry)) {
             entry.ifPresent(e -> e.unregisterListener(this.currentChangeFieldUpdateEvent));
-            this.currentChangeFieldUpdateEvent = new ChangeFieldUpdateEvent();
+            this.currentChangeFieldUpdateEvent = new ChangedFieldEvent();
             newEntry.registerListener(this.currentChangeFieldUpdateEvent);
         }
 
@@ -296,10 +296,10 @@ public class PreviewPanel extends JPanel
     * Furthermore passing small objects (like ChangeFieldUpdateEvent)
     * is more efficient than passing the hole PreviewPanel object.
     */
-    private class ChangeFieldUpdateEvent {
+    private class ChangedFieldEvent {
 
         @Subscribe
-        public void listen(ChangeFieldUpdateEvent changeFieldUpdateEvent) {
+        public void listen(ChangedFieldEvent changedFieldEvent) {
             update();
         }
     }

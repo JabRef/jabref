@@ -15,9 +15,9 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.event.AddEntryEvent;
-import net.sf.jabref.event.ChangeEntryEvent;
-import net.sf.jabref.event.RemoveEntryEvent;
+import net.sf.jabref.event.AddedEntryEvent;
+import net.sf.jabref.event.ChangedEntryEvent;
+import net.sf.jabref.event.RemovedEntryEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.EventList;
@@ -32,35 +32,35 @@ public class ListSynchronizer {
     }
 
     @Subscribe
-    public void listen(AddEntryEvent addEntryEvent) {
+    public void listen(AddedEntryEvent addedEntryEvent) {
         lock();
         try {
-            list.add(addEntryEvent.getBibEntry());
+            list.add(addedEntryEvent.getBibEntry());
         } finally {
             unlock();
         }
     }
 
     @Subscribe
-    public void listen(RemoveEntryEvent removeEntryEvent) {
+    public void listen(RemovedEntryEvent removedEntryEvent) {
         lock();
         try {
-            list.remove(removeEntryEvent.getBibEntry());
+            list.remove(removedEntryEvent.getBibEntry());
         } finally {
             unlock();
         }
     }
 
     @Subscribe
-    public void listen(ChangeEntryEvent changeEntryEvent) {
+    public void listen(ChangedEntryEvent changedEntryEvent) {
         lock();
         try {
-            int index = list.indexOf(changeEntryEvent.getBibEntry());
+            int index = list.indexOf(changedEntryEvent.getBibEntry());
             if (index != -1) {
                 // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
                 // DatabaseChangeEvent.ADDED_ENTRY
                 // thus,
-                list.set(index, changeEntryEvent.getBibEntry());
+                list.set(index, changedEntryEvent.getBibEntry());
             }
         } finally {
             unlock();

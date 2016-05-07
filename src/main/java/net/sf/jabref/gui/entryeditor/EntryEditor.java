@@ -69,7 +69,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.event.ChangeFieldEvent;
+import net.sf.jabref.event.ChangedFieldEvent;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
@@ -935,9 +935,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class ChangeFieldListener {
 
         @Subscribe
-        public void listen(ChangeFieldEvent changeFieldEvent) {
-            String newValue = changeFieldEvent.getValue() == null ? "" : changeFieldEvent.getValue();
-            setField(changeFieldEvent.getFieldName(), newValue);
+        public void listen(ChangedFieldEvent changedFieldEvent) {
+            String newValue = changedFieldEvent.getValue() == null ? "" : changedFieldEvent.getValue();
+            setField(changedFieldEvent.getFieldName(), newValue);
         }
     }
 

@@ -190,7 +190,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void testAddEntryEventReceivement() {
+    public void testAddedEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
         BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
@@ -201,7 +201,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void testRemoveEntryEventReceivement() {
+    public void testRemovedEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
         BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();

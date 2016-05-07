@@ -10,17 +10,17 @@ public class TestEventListener {
 
 
     @Subscribe
-    public void listen(AddEntryEvent event) {
+    public void listen(AddedEntryEvent event) {
         this.bibEntry = event.getBibEntry();
     }
 
     @Subscribe
-    public void listen(RemoveEntryEvent event) {
+    public void listen(RemovedEntryEvent event) {
         this.bibEntry = event.getBibEntry();
     }
 
     @Subscribe
-    public void listen(ChangeEntryEvent event) {
+    public void listen(ChangedEntryEvent event) {
         this.bibEntry = event.getBibEntry();
     }
 

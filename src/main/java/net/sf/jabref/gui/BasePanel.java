@@ -60,8 +60,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.event.AddEntryEvent;
-import net.sf.jabref.event.ChangeEntryEvent;
+import net.sf.jabref.event.AddedEntryEvent;
+import net.sf.jabref.event.ChangedEntryEvent;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
@@ -1259,9 +1259,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class GroupTreeListener {
 
         @Subscribe
-        public void listen(AddEntryEvent addEntryEvent) {
+        public void listen(AddedEntryEvent addedEntryEvent) {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(addEntryEvent.getBibEntry());
+                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1281,13 +1281,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(AddEntryEvent addEntryEvent) {
-            searchAutoCompleter.addBibtexEntry(addEntryEvent.getBibEntry());
+        public void listen(AddedEntryEvent addedEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangeEntryEvent changeEntryEvent) {
-            searchAutoCompleter.addBibtexEntry(changeEntryEvent.getBibEntry());
+        public void listen(ChangedEntryEvent changedEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(changedEntryEvent.getBibEntry());
         }
     }
 
@@ -1298,13 +1298,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class AutoCompleteListener {
 
         @Subscribe
-        public void listen(AddEntryEvent addEntryEvent) {
-            BasePanel.this.autoCompleters.addEntry(addEntryEvent.getBibEntry());
+        public void listen(AddedEntryEvent addedEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangeEntryEvent changeEntryEvent) {
-            BasePanel.this.autoCompleters.addEntry(changeEntryEvent.getBibEntry());
+        public void listen(ChangedEntryEvent changedEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(changedEntryEvent.getBibEntry());
         }
     }
 
