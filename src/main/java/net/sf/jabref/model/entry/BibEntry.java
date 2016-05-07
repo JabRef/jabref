@@ -103,6 +103,20 @@ public class BibEntry {
     }
 
     /**
+     * Sets this entry's ID, provided the database containing it
+     * doesn't veto the change.
+     *
+     * @param id The ID to be used
+     */
+    public void setId(String id) {
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
+
+        eventBus.post(new ChangeFieldEvent(BibEntry.ID_FIELD, id));
+        this.id = id;
+        changed = true;
+    }
+
+    /**
      * Returns this entry's ID.
      */
     public String getId() {
@@ -164,20 +178,6 @@ public class BibEntry {
      */
     public void setType(EntryType type) {
         this.setType(type.getName());
-    }
-
-    /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
-     *
-     * @param id The ID to be used
-     */
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
-        eventBus.post(new ChangeFieldEvent(BibEntry.ID_FIELD, id));
-        this.id = id;
-        changed = true;
     }
 
     /**

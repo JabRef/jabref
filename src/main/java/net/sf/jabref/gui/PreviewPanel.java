@@ -288,6 +288,14 @@ public class PreviewPanel extends JPanel
         update();
     }
 
+
+    /**
+    * Listener class for ChangeFieldUpdateEvent.
+    *
+    * There should be a possibility to replace the listener and to set new listener for new entries.
+    * Furthermore passing small objects (like ChangeFieldUpdateEvent)
+    * is more efficient than passing the hole PreviewPanel object.
+    */
     private class ChangeFieldUpdateEvent {
 
         @Subscribe

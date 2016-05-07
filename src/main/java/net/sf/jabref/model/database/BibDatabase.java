@@ -86,7 +86,7 @@ public class BibDatabase {
      */
     private boolean followCrossrefs = true;
 
-    private final EventBus eventBus;
+    private final EventBus eventBus = new EventBus();
 
     /**
      * Returns the number of entries.
@@ -117,14 +117,6 @@ public class BibDatabase {
      */
     public boolean containsEntryWithId(String id) {
         return internalIDs.contains(id);
-    }
-
-    /**
-     * Constructor
-     * Creates an eventBus for each database.
-     */
-    public BibDatabase() {
-        this.eventBus = new EventBus();
     }
 
     public List<BibEntry> getEntries() {

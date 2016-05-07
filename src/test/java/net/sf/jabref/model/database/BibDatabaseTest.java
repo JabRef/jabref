@@ -192,23 +192,23 @@ public class BibDatabaseTest {
     @Test
     public void testAddEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
-        BibEntry shouldBeEntry = new BibEntry();
+        BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
         database.registerListener(tel);
-        database.insertEntry(shouldBeEntry);
-        BibEntry isEntry = tel.getBibEntry();
-        assertEquals(shouldBeEntry, isEntry);
+        database.insertEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
     public void testRemoveEntryEventReceivement() {
         BibDatabase database = new BibDatabase();
-        BibEntry shouldBeEntry = new BibEntry();
+        BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
-        database.insertEntry(shouldBeEntry);
+        database.insertEntry(expectedEntry);
         database.registerListener(tel);
-        database.removeEntry(shouldBeEntry);
-        BibEntry isEntry = tel.getBibEntry();
-        assertEquals(shouldBeEntry, isEntry);
+        database.removeEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
     }
 }

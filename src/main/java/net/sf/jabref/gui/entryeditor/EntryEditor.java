@@ -926,7 +926,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
         }
     }
-
+    
+    /**
+     * Update the JTextArea when a field has changed.
+     *
+     * @see java.beans.VetoableChangeListener#vetoableChange(java.beans.PropertyChangeEvent)
+     */
     private class ChangeFieldListener {
 
         @Subscribe
