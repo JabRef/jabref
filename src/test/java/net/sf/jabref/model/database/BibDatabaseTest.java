@@ -205,9 +205,7 @@ public class BibDatabaseTest {
         BibDatabase database = new BibDatabase();
         BibEntry shouldBeEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
-        database.registerListener(tel);
         database.insertEntry(shouldBeEntry);
-        tel = new TestEventListener();
         database.registerListener(tel);
         database.removeEntry(shouldBeEntry);
         BibEntry isEntry = tel.getBibEntry();
