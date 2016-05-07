@@ -6,9 +6,9 @@ public class ChangeFieldEvent {
     private final String fieldName;
     private final String value;
 
-    public ChangeFieldEvent(String fieldName, String value) {
+    public ChangeFieldEvent(String fieldName, String newValue) {
         this.fieldName = fieldName;
-        this.value = value;
+        this.value = newValue;
     }
 
     public String getFieldName() {
