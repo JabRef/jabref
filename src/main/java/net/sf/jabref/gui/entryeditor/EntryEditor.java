@@ -203,17 +203,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final TabListener tabListener = new TabListener();
 
-    private ChangeFieldListener currentChangeFieldListener;
-
-
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
         this.entry = entry;
 
-        this.currentChangeFieldListener = new ChangeFieldListener();
-
-        entry.registerListener(this.currentChangeFieldListener);
+        entry.registerListener(this);
         entry.registerListener(SpecialFieldUpdateListener.getInstance());
 
         displayedBibEntryType = entry.getType();
@@ -756,13 +751,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
         storeCurrentEdit();
 
         // Remove this instance as property listener for the entry:
-        this.entry.unregisterListener(this.currentChangeFieldListener);
+        this.entry.unregisterListener(this);
 
         this.entry = switchEntry;
 
         // Register as property listener for the new entry:
-        this.currentChangeFieldListener = new ChangeFieldListener();
-        this.entry.registerListener(currentChangeFieldListener);
+        this.entry.registerListener(this);
 
         updateAllFields();
         validateAllFields();
@@ -926,19 +920,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
         }
     }
-    
+
     /**
      * Update the JTextArea when a field has changed.
-     *
-     * @see java.beans.VetoableChangeListener#vetoableChange(java.beans.PropertyChangeEvent)
      */
-    private class ChangeFieldListener {
-
-        @Subscribe
-        public void listen(ChangedFieldEvent changedFieldEvent) {
-            String newValue = changedFieldEvent.getValue() == null ? "" : changedFieldEvent.getValue();
-            setField(changedFieldEvent.getFieldName(), newValue);
-        }
+    @Subscribe
+    public void listen(ChangedFieldEvent changedFieldEvent) {
+        String newValue = changedFieldEvent.getNewValue() == null ? "" : changedFieldEvent.getNewValue();
+        setField(changedFieldEvent.getFieldName(), newValue);
     }
 
     public void updateField(final Object sourceObject) {

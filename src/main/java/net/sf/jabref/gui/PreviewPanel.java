@@ -50,6 +50,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.event.ChangedFieldEvent;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
@@ -103,8 +104,6 @@ public class PreviewPanel extends JPanel
     private final CopyPreviewAction copyPreviewAction;
 
     private Optional<Pattern> highlightPattern = Optional.empty();
-
-    private ChangedFieldEvent currentChangeFieldUpdateEvent;
 
     /**
      * @param databaseContext
@@ -277,10 +276,10 @@ public class PreviewPanel extends JPanel
     public void setEntry(BibEntry newEntry) {
 
         if (entry.isPresent() && (entry.get() != newEntry)) {
-            entry.ifPresent(e -> e.unregisterListener(this.currentChangeFieldUpdateEvent));
-            this.currentChangeFieldUpdateEvent = new ChangedFieldEvent();
-            newEntry.registerListener(this.currentChangeFieldUpdateEvent);
+            entry.ifPresent(e -> e.unregisterListener(this));
         }
+
+        entry.ifPresent(e -> e.registerListener(this));
 
         entry = Optional.ofNullable(newEntry);
 
@@ -290,18 +289,11 @@ public class PreviewPanel extends JPanel
 
 
     /**
-    * Listener class for ChangeFieldUpdateEvent.
-    *
-    * There should be a possibility to replace the listener and to set new listener for new entries.
-    * Furthermore passing small objects (like ChangeFieldUpdateEvent)
-    * is more efficient than passing the hole PreviewPanel object.
+    * Listener class for ChangedFieldEvent.
     */
-    private class ChangedFieldEvent {
-
-        @Subscribe
-        public void listen(ChangedFieldEvent changedFieldEvent) {
-            update();
-        }
+    @Subscribe
+    public void listen(ChangedFieldEvent changedFieldEvent) {
+        update();
     }
 
     @Override

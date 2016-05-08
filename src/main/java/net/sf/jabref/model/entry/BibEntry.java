@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.beans.VetoableChangeSupport;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParseException;
@@ -52,8 +51,6 @@ public class BibEntry {
     private String id;
     private String type;
     private Map<String, String> fields = new HashMap<>();
-
-    private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -111,7 +108,7 @@ public class BibEntry {
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
-        eventBus.post(new ChangedFieldEvent(BibEntry.ID_FIELD, id));
+        eventBus.post(new ChangedFieldEvent(this, BibEntry.ID_FIELD, id));
         this.id = id;
         changed = true;
     }
@@ -170,7 +167,7 @@ public class BibEntry {
         // sets off a change in database sorting etc.
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
-        eventBus.post(new ChangedFieldEvent(TYPE_HEADER, newType));
+        eventBus.post(new ChangedFieldEvent(this, TYPE_HEADER, newType));
     }
 
     /**
@@ -358,7 +355,7 @@ public class BibEntry {
         changed = true;
 
         fields.put(fieldName, value);
-        eventBus.post(new ChangedFieldEvent(fieldName, value));
+        eventBus.post(new ChangedFieldEvent(this, fieldName, value));
     }
 
     /**
@@ -376,7 +373,7 @@ public class BibEntry {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
         fields.remove(fieldName);
-        eventBus.post(new ChangedFieldEvent(fieldName, null));
+        eventBus.post(new ChangedFieldEvent(this, fieldName, null));
     }
 
     /**
