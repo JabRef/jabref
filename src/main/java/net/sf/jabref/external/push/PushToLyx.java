@@ -75,6 +75,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     protected void initSettingsPanel() {
+        super.initSettingsPanel();
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
         settings.add(path);

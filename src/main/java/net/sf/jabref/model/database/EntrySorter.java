@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -43,17 +43,6 @@ public class EntrySorter implements DatabaseChangeListener {
 
     private void index() {
 
-        /*  Old version, from when set was a TreeSet.
-
-        // The boolean "changing" is true in the situation that an entry is about to change,
-        // and has temporarily been removed from the entry set in this sorter. So, if we index
-        // now, we will cause exceptions other places because one entry has been left out of
-        // the indexed array. Simply waiting foth this to change can lead to deadlocks,
-        // so we have no other choice than to return without indexing.
-        if (changing)
-            return;
-        */
-
         synchronized (set) {
 
             // Resort if necessary:
@@ -66,6 +55,8 @@ public class EntrySorter implements DatabaseChangeListener {
             // getValueAt() in EntryTableModel, which *has* to be efficient.
 
             int count = set.size();
+
+
             entryArray = new BibEntry[count];
             int piv = 0;
             for (BibEntry entry : set) {

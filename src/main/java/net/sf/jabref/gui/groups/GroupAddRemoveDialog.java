@@ -1,3 +1,18 @@
+/*  Copyright (C) 20013-2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -17,8 +32,6 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -67,9 +80,9 @@ public class GroupAddRemoveDialog implements BaseAction {
         selection = panel.getSelectedEntries();
 
         final JDialog diag = new JDialog(panel.frame(),
-                (add ? (move ? Localization.lang("Move to group") :
-                    Localization.lang("Add to group")) :
-                    Localization.lang("Remove from group")), true);
+                (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
+                        .lang("Remove from group")),
+                true);
         ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(new GroupTreeNodeViewModel(groups));
@@ -80,7 +93,10 @@ public class GroupAddRemoveDialog implements BaseAction {
         //      The scrollbar appears when the preferred size of a component is greater than the size of the viewport. If one hard coded the preferred size, it will never change according to the expansion/collapse. Thus the scrollbar cannot appear accordingly.
         //tree.setSelectionModel(new VetoableTreeSelectionModel());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addTreeSelectionListener(new SelectionListener());
+        tree.addTreeSelectionListener(e -> {
+            GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) e.getNewLeadSelectionPath().getLastPathComponent();
+            ok.setEnabled(checkGroupEnable(node));
+        });
 
         //STA add expand and collapse all buttons
         JButton jbExpandAll = new JButton("Expand All");
@@ -153,6 +169,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                 TreePath path = parent.pathByAddingChild(n);
                 expandAll(tree, path, expand);
             }
+
         }
         // "expand" / "collapse" occurs from bottom to top:
         if (expand) {
@@ -161,17 +178,6 @@ public class GroupAddRemoveDialog implements BaseAction {
             tree.collapsePath(parent);
         }
     }
-
-
-    private class SelectionListener implements TreeSelectionListener {
-
-        @Override
-        public void valueChanged(TreeSelectionEvent e) {
-            GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) e.getNewLeadSelectionPath().getLastPathComponent();
-            ok.setEnabled(checkGroupEnable(node));
-        }
-    }
-
 
     private boolean doAddOrRemove() {
         TreePath path = tree.getSelectionPath();
@@ -208,35 +214,11 @@ public class GroupAddRemoveDialog implements BaseAction {
     }
 
 
-    /*    private class VetoableTreeSelectionModel extends DefaultTreeSelectionModel {
-
-            @Override
-            public void addSelectionPath(TreePath path) {
-                if (checkPath(path))
-                    super.addSelectionPath(path);
-            }
-
-            public void setSelectionPath(TreePath path){
-                if (checkPath(path))
-                    super.setSelectionPath(path);
-
-            }
-
-            private boolean checkPath(TreePath path) {
-                GroupTreeNode node = (GroupTreeNode)path.getLastPathComponent();
-                AbstractGroup group = node.getGroup();
-                return (add ? group.supportsAdd() && !group.containsAll(GroupAddRemoveDialog.this.selection)
-                        : group.supportsRemove() && group.containsAny(GroupAddRemoveDialog.this.selection));
-            }
-        }
-        {
-
-        } */
-
     class AddRemoveGroupTreeCellRenderer extends GroupTreeCellRenderer {
 
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded,
+                boolean leaf, int row, boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) value;
