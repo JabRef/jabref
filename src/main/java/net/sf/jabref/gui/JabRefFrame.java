@@ -1596,6 +1596,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (tabCount == 0) {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
+            setEnabled(openAndSavedDatabasesOnlyActions, false);
         }
 
 
