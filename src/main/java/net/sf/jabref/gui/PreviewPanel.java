@@ -289,7 +289,7 @@ public class PreviewPanel extends JPanel
 
 
     /**
-    * Listener class for ChangedFieldEvent.
+    * Listener for ChangedFieldEvent.
     */
     @Subscribe
     public void listen(ChangedFieldEvent changedFieldEvent) {
