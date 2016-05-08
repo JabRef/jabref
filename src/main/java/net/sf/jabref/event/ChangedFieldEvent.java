@@ -3,11 +3,10 @@ package net.sf.jabref.event;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * <code>ChangedFieldEvent</code> is fired when a field of <code>BibEntry</code> has been modified.
+ * <code>ChangedFieldEvent</code> is fired when a field of <code>BibEntry</code> has been modified, removed or added.
  */
-public class ChangedFieldEvent {
+public class ChangedFieldEvent extends ChangedEntryEvent {
 
-    private final BibEntry bibEntry;
     private final String fieldName;
     private final String newValue;
 
@@ -17,13 +16,9 @@ public class ChangedFieldEvent {
      * @param newValue new field value
      */
     public ChangedFieldEvent(BibEntry bibEntry, String fieldName, String newValue) {
-        this.bibEntry = bibEntry;
+        super(bibEntry);
         this.fieldName = fieldName;
         this.newValue = newValue;
-    }
-
-    public BibEntry getBibEntry() {
-        return this.bibEntry;
     }
 
     public String getFieldName() {
