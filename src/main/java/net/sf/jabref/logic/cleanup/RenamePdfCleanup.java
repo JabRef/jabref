@@ -40,7 +40,7 @@ public class RenamePdfCleanup implements CleanupJob {
                             JournalAbbreviationRepository repository) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
-        this.repository = repository;
+        this.repository = Objects.requireNonNull(repository);
     }
 
     @Override
@@ -60,7 +60,6 @@ public class RenamePdfCleanup implements CleanupJob {
 
             StringBuilder newFilename = new StringBuilder(
                     FileUtil.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
-            //String oldFilename = bes.getField(GUIGlobals.FILE_FIELD); // would have to be stored for undoing purposes
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
