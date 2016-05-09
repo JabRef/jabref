@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -225,7 +226,7 @@ class EntryEditorTab {
             return getEntry().hasField(fieldEditor.getFieldName());
         } else {
             String entryValue = getEntry().getField(fieldEditor.getFieldName());
-            return (entryValue == null) || !entryValue.equals(text);
+            return !Objects.equals(entryValue, text);
         }
     }
 

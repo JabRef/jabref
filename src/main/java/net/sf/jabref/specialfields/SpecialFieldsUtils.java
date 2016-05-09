@@ -16,6 +16,7 @@
 package net.sf.jabref.specialfields;
 
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -115,7 +116,7 @@ public class SpecialFieldsUtils {
         String oldValue = be.getField(KEYWORDS_FIELD);
         be.putKeywords(keywordList);
         String updatedValue = be.getField(KEYWORDS_FIELD);
-        if (((oldValue == null) || !oldValue.equals(updatedValue)) && (ce != null)) {
+        if ((!Objects.equals(oldValue, updatedValue)) && (ce != null)) {
             ce.addEdit(new UndoableFieldChange(be, KEYWORDS_FIELD, oldValue, updatedValue));
         }
 

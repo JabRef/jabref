@@ -528,7 +528,7 @@ public class BibEntry implements Cloneable {
             }
             return;
         }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
+        if (!Objects.equals(oldValue, newValue)) {
             this.setField("keywords", newValue);
         }
     }

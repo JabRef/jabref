@@ -20,6 +20,7 @@ package net.sf.jabref.logic.labelpattern;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -488,7 +489,7 @@ public class LabelPatternUtil {
         String oldKey = entry.getCiteKey();
         int occurrences = database.getNumberOfKeyOccurrences(key);
 
-        if ((oldKey != null) && oldKey.equals(key)) {
+        if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 
@@ -516,7 +517,7 @@ public class LabelPatternUtil {
             String moddedKey = key + getAddition(number);
             occurrences = database.getNumberOfKeyOccurrences(moddedKey);
 
-            if ((oldKey != null) && oldKey.equals(moddedKey)) {
+            if (Objects.equals(oldKey, moddedKey)) {
                 occurrences--;
             }
 
@@ -525,7 +526,7 @@ public class LabelPatternUtil {
                 moddedKey = key + getAddition(number);
 
                 occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-                if ((oldKey != null) && oldKey.equals(moddedKey)) {
+                if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
             }

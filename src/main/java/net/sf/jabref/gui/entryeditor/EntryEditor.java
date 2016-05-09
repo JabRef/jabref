@@ -809,7 +809,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             for (String field : newEntry.getFieldNames()) {
                 String oldValue = entry.getField(field);
                 String newValue = newEntry.getField(field);
-                if ((oldValue == null) || !oldValue.equals(newValue)) {
+                if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter().format(newValue, field);
 
@@ -1089,7 +1089,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     newValue = null;
                 }
 
-                if (((oldValue == null) && (newValue == null)) || ((oldValue != null) && oldValue.equals(newValue))) {
+                if (((oldValue == null) && (newValue == null)) || (Objects.equals(oldValue, newValue))) {
                     return; // No change.
                 }
 
