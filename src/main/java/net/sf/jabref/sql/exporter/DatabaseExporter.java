@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -85,9 +85,10 @@ public class DatabaseExporter {
      * @param databaseContext the database to export
      * @param entriesToExport The list of the entries to export.
      * @param out             The output (PrintStream or Connection) object to which the DML should be written.
+     * @throws SQLException
      */
     public void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
-            Connection out, String dbName) throws Exception {
+            Connection out, String dbName) throws SQLException {
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(databaseContext, entriesToExport, savePrefs);
@@ -144,7 +145,7 @@ public class DatabaseExporter {
      */
 
     private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Connection connection,
-            final int database_id) throws SQLException {
+            final int database_id) {
 
         if (cursor == null) {
             // no groups passed
@@ -279,7 +280,7 @@ public class DatabaseExporter {
                 + "');");
 
         // recurse on child nodes (depth-first traversal)
-        try (Statement statement = ((Connection) out).createStatement();
+        try (Statement statement = out.createStatement();
                 ResultSet rs = statement.executeQuery(
                         "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
                                 + database_id + "' AND parent_id='" + parentID + "';")) {
@@ -308,7 +309,7 @@ public class DatabaseExporter {
     private static void populateGroupTypesTable(Connection out) throws SQLException {
         int quantity = 0;
 
-        try (Statement sm = ((Connection) out).createStatement();
+        try (Statement sm = out.createStatement();
                 ResultSet res = sm.executeQuery("SELECT COUNT(*) AS amount FROM group_types")) {
             res.next();
             quantity = res.getInt("amount");

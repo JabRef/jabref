@@ -18,7 +18,7 @@ package net.sf.jabref.model.entry;
 /**
  * This class models a BibTex String ("@String")
  */
-public class BibtexString {
+public class BibtexString implements Cloneable {
 
     /**
      * Type of a \@String.

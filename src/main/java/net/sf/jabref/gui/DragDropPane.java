@@ -152,6 +152,7 @@ class DragDropPane extends JTabbedPane {
 
         @Override
         public void paintComponent(Graphics g) {
+            super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
             g2.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, 0.9f)); // Set transparency
