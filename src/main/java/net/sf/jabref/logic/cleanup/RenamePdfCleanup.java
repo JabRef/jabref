@@ -31,13 +31,13 @@ import net.sf.jabref.model.entry.ParsedFileField;
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
-    private final Boolean onlyRelativePaths;
-    private int unsuccessfulRenames;
+    private final boolean onlyRelativePaths;
     private final JournalAbbreviationRepository repository;
 
+    private int unsuccessfulRenames;
 
-    public RenamePdfCleanup(Boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-            JournalAbbreviationRepository repository) {
+    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
+                            JournalAbbreviationRepository repository) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.repository = repository;
@@ -49,10 +49,12 @@ public class RenamePdfCleanup implements CleanupJob {
         List<ParsedFileField> fileList = typedEntry.getFiles();
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
+
         for (ParsedFileField flEntry : fileList) {
             String realOldFilename = flEntry.getLink();
 
             if (onlyRelativePaths && (new File(realOldFilename).isAbsolute())) {
+                newFileList.add(flEntry);
                 continue;
             }
 
@@ -69,19 +71,21 @@ public class RenamePdfCleanup implements CleanupJob {
                     databaseContext.getFileDirectory());
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
+                newFileList.add(flEntry);
                 continue;
             }
             String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
                     .concat(newFilename.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
-            Boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
+            boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
                     expandedOldFilePath);
             if (new File(newPath).exists() && ! pathsDifferOnlyByCase) {
                 // we do not overwrite files
                 // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
                 // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
+                newFileList.add(flEntry);
                 continue;
             }
 
@@ -122,7 +126,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
         }
 
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     public int getUnsuccessfulRenames() {

@@ -38,14 +38,14 @@ public class MoveFilesCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         if(!databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         List<String> paths = databaseContext.getFileDirectory();
         String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
         Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
         if(!targetDirectory.isPresent()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
@@ -57,12 +57,14 @@ public class MoveFilesCleanup implements CleanupJob {
 
             Optional<File> oldFile = FileUtil.expandFilename(oldFileName, paths);
             if(!oldFile.isPresent() || !oldFile.get().exists()) {
+                newFileList.add(fileEntry);
                 continue;
             }
 
             File targetFile = new File(targetDirectory.get(), oldFile.get().getName());
             if(targetFile.exists()) {
                 // We do not overwrite already existing files
+                newFileList.add(fileEntry);
                 continue;
             }
 
@@ -76,6 +78,7 @@ public class MoveFilesCleanup implements CleanupJob {
             }
             newFileList.add(newFileEntry);
         }
+
         if (changed) {
             Optional<FieldChange> change = typedEntry.setFiles(newFileList);
             if(change.isPresent()) {
@@ -84,7 +87,8 @@ public class MoveFilesCleanup implements CleanupJob {
                 return Collections.emptyList();
             }
         }
-        return new ArrayList<>();
+
+        return Collections.emptyList();
     }
 
 }

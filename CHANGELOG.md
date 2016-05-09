@@ -37,6 +37,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1271](https://github.com/JabRef/jabref/issues/1271): Authors with compound first names are displayed properly 
 - Fixed: Selecting invalid jstyle causes NPE and prevents opening of style selection dialog
 - Fixed: Move linked files to default directory works again
+- Fixed [#1327](https://github.com/JabRef/jabref/issues/1327): PDF cleanup changes order of linked pdfs
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic

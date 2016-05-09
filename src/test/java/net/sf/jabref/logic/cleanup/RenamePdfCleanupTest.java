@@ -2,6 +2,7 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
@@ -57,6 +58,22 @@ public class RenamePdfCleanupTest {
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
         assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+    }
+
+    @Test
+    public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
+        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        File tempFile = testFolder.newFile("Toot.tmp");
+
+        entry.setField("title", "test title");
+        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
+                new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
+
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        cleanup.cleanup(entry);
+
+        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
+                new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("","",""))), entry.getField("file"));
     }
 
     @Test
