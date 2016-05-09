@@ -94,16 +94,8 @@ public class AppendDatabaseAction implements BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    openIt(md.importEntries(), md.importStrings(),
-                            md.importGroups(), md.importSelectorWords());
-                }
-
-            });
-            //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
+            JabRefExecutorService.INSTANCE.execute(() -> openIt(md.importEntries(), md.importStrings(),
+                    md.importGroups(), md.importSelectorWords()));
         }
 
     }

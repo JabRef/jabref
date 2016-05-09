@@ -305,13 +305,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
                 final ParserResult finalReferenceToResult = result;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
             }
 
         }

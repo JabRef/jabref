@@ -328,7 +328,7 @@ public class BibEntry implements Cloneable {
     public void setField(Map<String, String> fields) {
         Objects.requireNonNull(fields, "fields must not be null");
 
-        fields.forEach((field, value) -> setField(field, value));
+        fields.forEach(this::setField);
     }
 
     /**

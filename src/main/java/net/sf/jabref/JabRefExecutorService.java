@@ -37,13 +37,10 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName("JabRef CachedThreadPool");
-            return thread;
-        }
+    private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef CachedThreadPool");
+        return thread;
     });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
 

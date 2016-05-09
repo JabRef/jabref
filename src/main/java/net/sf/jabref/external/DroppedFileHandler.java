@@ -339,13 +339,9 @@ public class DroppedFileHandler {
             renameCheckBox.setEnabled(true);
         }
 
-        ChangeListener cl = new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                renameCheckBox.setEnabled(!linkInPlace.isSelected());
-                renameToTextBox.setEnabled(!linkInPlace.isSelected());
-            }
+        ChangeListener cl = arg0 -> {
+            renameCheckBox.setEnabled(!linkInPlace.isSelected());
+            renameToTextBox.setEnabled(!linkInPlace.isSelected());
         };
 
         linkInPlace.setText(Localization.lang("Leave file in its current directory"));
