@@ -67,7 +67,6 @@ class FileTab extends JPanel implements PrefsTab {
     private boolean origAutoSaveSetting;
 
     private final JTextField fileDir;
-    private final JCheckBox bibLocationAsFileDir;
     private final JCheckBox bibLocAsPrimaryDir;
     private final JCheckBox runAutoFileSearch;
     private final JCheckBox allowFileAutoOpenBrowse;
@@ -82,11 +81,9 @@ class FileTab extends JPanel implements PrefsTab {
         this.frame = frame;
 
         fileDir = new JTextField(25);
-        bibLocationAsFileDir = new JCheckBox(Localization.lang("Allow file links relative to each bib file's location"));
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the bib file location rather than the file directory set above"));
-        bibLocationAsFileDir.addChangeListener(e -> bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected()));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
@@ -166,8 +163,6 @@ class FileTab extends JPanel implements PrefsTab {
         BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
         builder.append(new JButton(browse));
         builder.nextLine();
-        builder.append(bibLocationAsFileDir, 3);
-        builder.nextLine();
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
         builder.append(matchStartsWithKey, 3);
@@ -212,7 +207,6 @@ class FileTab extends JPanel implements PrefsTab {
     public void setValues() {
         fileDir.setText(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
-        bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
         regExpTextField.setText(prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
