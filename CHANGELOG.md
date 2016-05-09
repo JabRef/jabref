@@ -106,6 +106,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Implemented [#672](https://github.com/JabRef/jabref/issues/672): FileList now distributes its space dependent on the width of its columns
 - Added missing German translations
 - Swedish is added as a language option (still not a complete translation)
+- [#969](https://github.com/JabRef/jabref/issues/969) Adding and replacing old event system mechanisms with Google Guava EventBus.
 
 ### Fixed
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file

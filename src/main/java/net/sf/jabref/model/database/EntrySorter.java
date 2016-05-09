@@ -19,12 +19,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class EntrySorter implements DatabaseChangeListener {
+public class EntrySorter {
 
     private static final Log LOGGER = LogFactory.getLog(EntrySorter.class);
 
@@ -82,35 +86,37 @@ public class EntrySorter implements DatabaseChangeListener {
         }
     }
 
-    @Override
-    public void databaseChanged(DatabaseChangeEvent e) {
+    @Subscribe
+    public void listen(EntryAddedEvent EntryAddedEvent) {
         synchronized (set) {
-            int pos;
-            switch (e.getType()) {
-            case ADDED_ENTRY:
-                pos = -Collections.binarySearch(set, e.getEntry(), comp) - 1;
-                LOGGER.debug("Insert position = " + pos);
-                if (pos >= 0) {
-                    set.add(pos, e.getEntry());
-                } else {
-                    set.add(0, e.getEntry());
-                }
-                break;
-            case REMOVED_ENTRY:
-                set.remove(e.getEntry());
-                changed = true;
-                break;
-            case CHANGED_ENTRY:
-                pos = Collections.binarySearch(set, e.getEntry(), comp);
-                int posOld = set.indexOf(e.getEntry());
-                if (pos < 0) {
-                    set.remove(posOld);
-                    set.add(-posOld - 1, e.getEntry());
-                }
-                break;
-            default:
-                break;
+            int pos = -Collections.binarySearch(set, EntryAddedEvent.getBibEntry(), comp) - 1;
+            LOGGER.debug("Insert position = " + pos);
+            if (pos >= 0) {
+                set.add(pos, EntryAddedEvent.getBibEntry());
+            } else {
+                set.add(0, EntryAddedEvent.getBibEntry());
             }
         }
     }
+
+    @Subscribe
+    public void listen(EntryRemovedEvent entryRemovedEvent) {
+        synchronized (set) {
+            set.remove(entryRemovedEvent.getBibEntry());
+            changed = true;
+        }
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent entryChangedEvent) {
+        synchronized (set) {
+            int pos = Collections.binarySearch(set, entryChangedEvent.getBibEntry(), comp);
+            int posOld = set.indexOf(entryChangedEvent.getBibEntry());
+            if (pos < 0) {
+                set.remove(posOld);
+                set.add(-posOld - 1, entryChangedEvent.getBibEntry());
+            }
+        }
+    }
+
 }

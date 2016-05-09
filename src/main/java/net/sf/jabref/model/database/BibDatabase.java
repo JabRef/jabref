@@ -42,11 +42,14 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.MonthUtil;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -83,10 +86,7 @@ public class BibDatabase {
      */
     private boolean followCrossrefs = true;
 
-    /**
-     * Behavior
-     */
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
+    private final EventBus eventBus = new EventBus();
 
     /**
      * Returns the number of entries.
@@ -108,7 +108,7 @@ public class BibDatabase {
      */
     public synchronized EntrySorter getSorter(Comparator<BibEntry> comp) {
         EntrySorter sorter = new EntrySorter(entries, comp);
-        addDatabaseChangeListener(sorter);
+        eventBus.register(sorter);
         return sorter;
     }
 
@@ -184,7 +184,7 @@ public class BibDatabase {
 
         internalIDs.add(id);
         entries.add(entry);
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
+        eventBus.post(new EntryAddedEvent(entry));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
@@ -199,7 +199,7 @@ public class BibDatabase {
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
-            fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, toBeDeleted));
+            eventBus.post(new EntryRemovedEvent(toBeDeleted));
         }
     }
 
@@ -479,22 +479,6 @@ public class BibDatabase {
         return res;
     }
 
-
-
-    private void fireDatabaseChanged(DatabaseChangeEvent e) {
-        for (DatabaseChangeListener tmpListener : changeListeners) {
-            tmpListener.databaseChanged(e);
-        }
-    }
-
-    public void addDatabaseChangeListener(DatabaseChangeListener l) {
-        changeListeners.add(l);
-    }
-
-    public void removeDatabaseChangeListener(DatabaseChangeListener l) {
-        changeListeners.remove(l);
-    }
-
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -561,5 +545,22 @@ public class BibDatabase {
 
     public String getEpilog() {
         return epilog;
+    }
+
+    /**
+     * Registers an listener object (subscriber) to the internal event bus.
+     * All subscribers should contain at least one <code>@Subscribe</code> annotated
+     * method accepting one of the following event types:
+     *
+     *   - {@link EntryAddedEvent}
+     *   - {@link EntryChangedEvent}
+     *   - {@link EntryRemovedEvent}
+     *
+     * or another {@link EntryEvent} extending type.
+     *
+     * @param object Listener (subscriber)
+     */
+    public void registerListener(Object object) {
+        this.eventBus.register(object);
     }
 }

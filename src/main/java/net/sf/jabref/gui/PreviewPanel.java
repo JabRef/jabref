@@ -21,9 +21,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Objects;
@@ -53,6 +50,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
@@ -63,13 +61,15 @@ import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
  */
-public class PreviewPanel extends JPanel implements VetoableChangeListener, SearchQueryHighlightListener, EntryContainer {
+public class PreviewPanel extends JPanel
+        implements SearchQueryHighlightListener, EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
 
@@ -104,7 +104,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     private final CopyPreviewAction copyPreviewAction;
 
     private Optional<Pattern> highlightPattern = Optional.empty();
-
 
     /**
      * @param databaseContext
@@ -275,13 +274,25 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
     }
 
     public void setEntry(BibEntry newEntry) {
-        if(entry.isPresent() && (entry.get() != newEntry)) {
-            entry.ifPresent(e -> e.removePropertyChangeListener(this));
-            newEntry.addPropertyChangeListener(this);
+
+        if (entry.isPresent() && (entry.get() != newEntry)) {
+            entry.ifPresent(e -> e.unregisterListener(this));
         }
+
+        entry.ifPresent(e -> e.registerListener(this));
+
         entry = Optional.ofNullable(newEntry);
 
         updateLayout();
+        update();
+    }
+
+
+    /**
+    * Listener for ChangedFieldEvent.
+    */
+    @Subscribe
+    public void listen(FieldChangedEvent fieldChangedEvent) {
         update();
     }
 
@@ -309,19 +320,6 @@ public class PreviewPanel extends JPanel implements VetoableChangeListener, Sear
 
     private void scrollToTop() {
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
-    }
-
-    /**
-     * The PreviewPanel has registered itself as an event listener with the
-     * currently displayed BibEntry. If the entry changes, an event is
-     * received here, and we can update the preview immediately.
-     */
-    @Override
-    public void vetoableChange(PropertyChangeEvent evt)
-            throws PropertyVetoException {
-        // TODO updating here is not really necessary isn't it?
-        // Only if we are visible.
-        update();
     }
 
     @Override

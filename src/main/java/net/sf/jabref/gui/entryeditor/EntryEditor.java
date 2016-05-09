@@ -29,8 +29,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -71,6 +69,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
@@ -114,6 +113,7 @@ import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -123,11 +123,11 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * It hosts the tabs (required, general, optional) and the buttons to the left.
  * <p>
- * EntryEditor also registers itself as a VetoableChangeListener, receiving
+ * EntryEditor also registers itself to the event bus, receiving
  * events whenever a field of the entry changes, enabling the text fields to
  * update themselves if the change is made from somewhere else.
  */
-public class EntryEditor extends JPanel implements VetoableChangeListener, EntryContainer {
+public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -203,14 +203,14 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     private final TabListener tabListener = new TabListener();
 
-
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
         this.entry = entry;
 
-        this.entry.addPropertyChangeListener(this);
-        this.entry.addPropertyChangeListener(SpecialFieldUpdateListener.getInstance());
+        entry.registerListener(this);
+        entry.registerListener(SpecialFieldUpdateListener.getInstance());
+
         displayedBibEntryType = entry.getType();
 
         helpAction = new HelpAction(HelpFiles.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
@@ -751,12 +751,12 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
         storeCurrentEdit();
 
         // Remove this instance as property listener for the entry:
-        this.entry.removePropertyChangeListener(this);
-
-        // Register as property listener for the new entry:
-        switchEntry.addPropertyChangeListener(this);
+        this.entry.unregisterListener(this);
 
         this.entry = switchEntry;
+
+        // Register as property listener for the new entry:
+        this.entry.registerListener(this);
 
         updateAllFields();
         validateAllFields();
@@ -923,13 +923,11 @@ public class EntryEditor extends JPanel implements VetoableChangeListener, Entry
 
     /**
      * Update the JTextArea when a field has changed.
-     *
-     * @see java.beans.VetoableChangeListener#vetoableChange(java.beans.PropertyChangeEvent)
      */
-    @Override
-    public void vetoableChange(PropertyChangeEvent e) {
-        String newValue = e.getNewValue() == null ? "" : e.getNewValue().toString();
-        setField(e.getPropertyName(), newValue);
+    @Subscribe
+    public void listen(FieldChangedEvent fieldChangedEvent) {
+        String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
+        setField(fieldChangedEvent.getFieldName(), newValue);
     }
 
     public void updateField(final Object sourceObject) {
