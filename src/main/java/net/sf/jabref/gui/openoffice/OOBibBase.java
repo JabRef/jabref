@@ -329,7 +329,7 @@ class OOBibBase {
             }
 
             String keyString = String.join(",",
-                    entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                    entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -1211,7 +1211,7 @@ class OOBibBase {
                 }
                 Collections.sort(entries, new FieldComparator("year"));
                 String keyString = String.join(",",
-                        entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                        entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);

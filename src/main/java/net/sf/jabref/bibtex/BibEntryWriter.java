@@ -153,7 +153,7 @@ public class BibEntryWriter {
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
         Predicate<String> isNotBibtexKey = field -> !"bibtexkey".equals(field);
-        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(field -> field.length()).max().orElse(0);
+        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(String::length).max().orElse(0);
     }
 
     /**

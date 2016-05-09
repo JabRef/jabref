@@ -618,7 +618,7 @@ public class VM implements Warn {
          * second as long as the (integer) literal left on the stack by
          * executing the first is greater than 0.
          */
-        buildInFunctions.put("while$", context -> whileFunction(context));
+        buildInFunctions.put("while$", this::whileFunction);
 
         buildInFunctions.put("width$", new WidthFunction(this));
 
@@ -1049,14 +1049,8 @@ public class VM implements Warn {
      * Sorts the entry list using the values of the string entry variable sort.key$. It has no arguments.
      */
     private void sort() {
-        Collections.sort(entries, new Comparator<BstEntry>() {
-
-            @Override
-            public int compare(BstEntry o1, BstEntry o2) {
-                return (o1.localStrings.get("sort.key$")).compareTo(o2.localStrings
-                        .get("sort.key$"));
-            }
-        });
+        Collections.sort(entries, (o1, o2) -> (o1.localStrings.get("sort.key$"))
+                .compareTo(o2.localStrings.get("sort.key$")));
     }
 
     private void executeInContext(Object o, BstEntry context) {

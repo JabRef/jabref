@@ -218,7 +218,7 @@ class MSBibEntry {
         String city = getFromXml(bcol + "City", entry);
         String state = getFromXml(bcol + "StateProvince", entry);
         String country = getFromXml(bcol + "CountryRegion", entry);
-        StringBuffer addressBuffer = new StringBuffer();
+        StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
             addressBuffer.append(city).append(", ");
         }
@@ -859,7 +859,7 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        String allAuthors = authors.stream().map(name -> name.getFullname()).collect(Collectors.joining(" and "));
+        String allAuthors = authors.stream().map(PersonName::getFullname).collect(Collectors.joining(" and "));
 
         map.put(type, allAuthors);
     }

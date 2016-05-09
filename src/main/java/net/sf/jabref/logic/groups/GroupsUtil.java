@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -63,7 +64,7 @@ public class GroupsUtil {
                 String val = be.getField(field);
                 if ((val != null) && !val.isEmpty()) {
                     AuthorList al = AuthorList.parse(val);
-                    res.addAll(al.getAuthors().stream().map(author -> author.getLast())
+                    res.addAll(al.getAuthors().stream().map(Author::getLast)
                             .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
                             .collect(Collectors.toList()));
                 }

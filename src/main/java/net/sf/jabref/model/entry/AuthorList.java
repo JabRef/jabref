@@ -587,7 +587,7 @@ public class AuthorList {
             return authorsAlph;
         }
 
-        authorsAlph = getAuthors().stream().map(author -> author.getNameForAlphabetization())
+        authorsAlph = getAuthors().stream().map(Author::getNameForAlphabetization)
                 .collect(Collectors.joining(" and "));
         return authorsAlph;
     }
