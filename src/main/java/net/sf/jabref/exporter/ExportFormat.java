@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -308,6 +309,12 @@ public class ExportFormat implements IExportFormat {
             finalizeSaveSession(ss, outFile);
         }
 
+    }
+
+    @Override
+    public void performExport(final BibDatabaseContext databaseContext, Path file, final Charset encoding,
+            List<BibEntry> entries) throws Exception {
+        performExport(databaseContext, file.getFileName().toString(), encoding, entries);
     }
 
     /**
