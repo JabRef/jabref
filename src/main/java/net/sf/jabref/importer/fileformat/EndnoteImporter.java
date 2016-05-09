@@ -193,9 +193,7 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("J".equals(prefix)) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
-                    if (hm.get("journal") == null) {
-                        hm.put("journal", val);
-                    }
+                    hm.putIfAbsent("journal", val);
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
