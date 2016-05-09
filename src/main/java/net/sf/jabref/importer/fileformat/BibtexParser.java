@@ -553,12 +553,6 @@ public class BibtexParser {
         skipWhitespace();
         consume('=');
         String content = parseFieldContent(key);
-        // Now, if the field in question is set up to be fitted automatically
-        // with braces around
-        // capitals, we should remove those now when reading the field:
-        if (Globals.prefs.putBracesAroundCapitals(key)) {
-            content = StringUtil.removeBracesAroundCapitals(content);
-        }
         if (!content.isEmpty()) {
             if (entry.hasField(key)) {
                 // The following hack enables the parser to deal with multiple

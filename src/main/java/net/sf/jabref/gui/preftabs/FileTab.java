@@ -60,7 +60,6 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox reformatFileOnSaveAndExport;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
-    private final JTextField bracesAroundCapitalsFields;
     private final JTextField nonWrappableFields;
     private final JTextField doNotResolveStringsFor;
     private final JSpinner autoSaveInterval;
@@ -117,7 +116,6 @@ class FileTab extends JPanel implements PrefsTab {
 
         reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat .bib file on save and export"));
 
-        bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
 
@@ -136,11 +134,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(backup, 3);
         builder.nextLine();
 
-        JLabel label = new JLabel(Localization.lang("Store the following fields with braces around capital letters") + ":");
-        builder.append(label);
-        builder.append(bracesAroundCapitalsFields);
-        builder.nextLine();
-        label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
+        JLabel label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.append(label);
         builder.append(nonWrappableFields);
         builder.nextLine();
@@ -241,7 +235,6 @@ class FileTab extends JPanel implements PrefsTab {
         resolveStringsAll.setSelected(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        bracesAroundCapitalsFields.setText(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
         nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
         autoSave.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
@@ -291,10 +284,6 @@ class FileTab extends JPanel implements PrefsTab {
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         boolean updateSpecialFields = false;
-        if (!bracesAroundCapitalsFields.getText().trim().equals(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
-            prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
-            updateSpecialFields = true;
-        }
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;

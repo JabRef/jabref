@@ -256,7 +256,6 @@ public class JabRefPreferences {
     public static final String MARK_IMPORTED_ENTRIES = "markImportedEntries";
     public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
-    public static final String PUT_BRACES_AROUND_CAPITALS = "putBracesAroundCapitals";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
     public static final String PREVIEW_PRINT_BUTTON = "previewPrintButton";
@@ -407,7 +406,6 @@ public class JabRefPreferences {
 
     private final Preferences prefs;
 
-    private final Set<String> putBracesAroundCapitalsFields = new HashSet<>(4);
     private final Set<String> nonWrappableFields = new HashSet<>(5);
     private GlobalLabelPattern keyPattern;
 
@@ -765,7 +763,6 @@ public class JabRefPreferences {
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url");
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
-        defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
@@ -905,21 +902,9 @@ public class JabRefPreferences {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
 
-    public boolean putBracesAroundCapitals(String fieldName) {
-        return putBracesAroundCapitalsFields.contains(fieldName);
-    }
-
     public void updateSpecialFieldHandling() {
-        putBracesAroundCapitalsFields.clear();
-        String fieldString = get(PUT_BRACES_AROUND_CAPITALS);
-        if (!fieldString.isEmpty()) {
-            String[] fields = fieldString.split(";");
-            for (String field : fields) {
-                putBracesAroundCapitalsFields.add(field.trim());
-            }
-        }
         nonWrappableFields.clear();
-        fieldString = get(NON_WRAPPABLE_FIELDS);
+        String fieldString = get(NON_WRAPPABLE_FIELDS);
         if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
