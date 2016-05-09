@@ -137,9 +137,7 @@ public class BibEntryWriter {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
-        if (Strings.nullToEmpty(field).trim().isEmpty()) {
-            return;
-        } else {
+        if (!Strings.nullToEmpty(field).trim().isEmpty()) {
             out.write("  " + getFieldDisplayName(name, indentation));
 
             try {

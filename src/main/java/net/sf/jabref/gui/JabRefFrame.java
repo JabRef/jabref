@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -1558,7 +1559,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
-        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
+        openAndSavedDatabasesOnlyActions.addAll(Collections.singletonList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 

@@ -477,7 +477,7 @@ class StyleSelectDialog {
                 preview.setLayout(style.getReferenceFormat("default"));
 
                 // Update the preview's entry:
-                SwingUtilities.invokeLater((Runnable) () -> {
+                SwingUtilities.invokeLater(() -> {
                     preview.update();
                     preview.scrollRectToVisible(toRect);
                 });

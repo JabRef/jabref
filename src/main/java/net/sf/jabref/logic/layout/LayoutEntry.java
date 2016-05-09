@@ -19,6 +19,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -690,11 +691,11 @@ class LayoutEntry {
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(Arrays.asList(method));
+                        result.add(Collections.singletonList(method));
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(Arrays.asList(method));
+                    result.add(Collections.singletonList(method));
                 }
             }
             i++;

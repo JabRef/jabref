@@ -17,7 +17,7 @@ package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -124,7 +124,7 @@ public class ImportFormats {
                         return;
                     }
                     ImportMenuItem imi = new ImportMenuItem(frame, openInNew, format);
-                    imi.automatedImport(Arrays.asList(file.getAbsolutePath()));
+                    imi.automatedImport(Collections.singletonList(file.getAbsolutePath()));
 
                     // Make sure we remember which filter was used, to set the default
                     // for next time:

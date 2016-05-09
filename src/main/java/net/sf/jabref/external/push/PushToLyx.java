@@ -112,7 +112,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
         final File lyxpipe = lp;
 
-        JabRefExecutorService.INSTANCE.executeAndWait((Runnable) () -> {
+        JabRefExecutorService.INSTANCE.executeAndWait(() -> {
             try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyxOut = new BufferedWriter(fw)) {
                 String citeStr;
 

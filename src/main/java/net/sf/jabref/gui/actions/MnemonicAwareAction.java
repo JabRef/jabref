@@ -48,7 +48,7 @@ public abstract class MnemonicAwareAction extends AbstractAction {
             int i = name.indexOf('&');
             if (i >= 0) {
                 char mnemonic = Character.toUpperCase(name.charAt(i + 1));
-                putValue(Action.MNEMONIC_KEY, Integer.valueOf(mnemonic));
+                putValue(Action.MNEMONIC_KEY, (int) mnemonic);
                 value = name.substring(0, i) + name.substring(i + 1);
             } else {
                 value = name;

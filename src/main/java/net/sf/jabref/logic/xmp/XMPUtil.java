@@ -146,7 +146,7 @@ public class XMPUtil {
     }
 
     public static PDDocument loadWithAutomaticDecryption(InputStream inputStream)
-            throws IOException, EncryptedPdfsNotSupportedException {
+            throws IOException {
         PDDocument doc = PDDocument.load(inputStream);
         if (doc.isEncrypted()) {
             // try the empty string as user password
@@ -1166,8 +1166,7 @@ public class XMPUtil {
      * @throws TransformerException
      *             If the given BibEntry is malformed.
      */
-    public static void main(String[] args) throws IOException,
-    TransformerException {
+    public static void main(String[] args) throws IOException, TransformerException {
 
         // Don't forget to initialize the preferences
         if (Globals.prefs == null) {

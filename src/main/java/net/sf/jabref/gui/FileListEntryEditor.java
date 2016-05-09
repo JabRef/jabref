@@ -317,8 +317,7 @@ public class FileListEntryEditor {
                     if (fl.isAbsolute()) {
                         String flPath = fl.getCanonicalPath();
                         if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                            String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
-                            link = relFileName;
+                            link = fl.getCanonicalPath().substring(canPath.length() + 1);
                             found = true;
                             break;
                         }

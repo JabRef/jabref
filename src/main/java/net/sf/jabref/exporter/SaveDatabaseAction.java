@@ -382,7 +382,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             } else if (answer == JOptionPane.YES_OPTION) {
                 canceled = true;
 
-                JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+                JabRefExecutorService.INSTANCE.execute(() -> {
 
                     if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
                         // TODO: GUI handling of the situation when the externally modified file keeps being locked.
@@ -393,11 +393,11 @@ public class SaveDatabaseAction extends AbstractWorker {
                             panel.getBibDatabaseContext().getDatabaseFile());
                     JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                     if (scanner.changesFound()) {
-                        scanner.displayResult((ChangeScanner.DisplayResultCallback) resolved -> {
+                        scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.setUpdatedExternally(false);
                                 SwingUtilities
-                                        .invokeLater((Runnable) () -> panel.getSidePaneManager().hide("fileUpdate"));
+                                        .invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
                             } else {
                                 canceled = true;
                             }

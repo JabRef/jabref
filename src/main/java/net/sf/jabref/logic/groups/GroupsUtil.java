@@ -41,7 +41,7 @@ public class GroupsUtil {
         Set<String> res = new TreeSet<>();
         for (BibEntry be : db.getEntries()) {
             be.getFieldOptional(field).ifPresent(o -> {
-                StringTokenizer tok = new StringTokenizer(o.toString(), remove, false);
+                StringTokenizer tok = new StringTokenizer(o, remove, false);
                 while (tok.hasMoreTokens()) {
                     res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
