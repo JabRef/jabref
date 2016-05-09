@@ -618,7 +618,7 @@ public class JabRefPreferences {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
-        defaults.put(HIGHLIGHT_GROUPS_MATCHING, "");
+        defaults.put(HIGHLIGHT_GROUPS_MATCHING, "all");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
