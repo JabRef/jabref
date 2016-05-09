@@ -58,7 +58,7 @@ public class NormalizePagesFormatter implements Formatter {
         }
 
         // remove unwanted literals incl. whitespace
-        String cleanValue = value.replaceAll(REJECT_LITERALS, "");
+        String cleanValue = value.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         // replace
