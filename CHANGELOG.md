@@ -46,6 +46,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1365](https://github.com/JabRef/jabref/issues/1365): Default label pattern back to "[auth][year]"
 - Fixed [#796](https://github.com/JabRef/jabref/issues/796): Undoing more than one entry at the same time is now working
 - Fixed [1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
+- Fixed [#1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
 - Fixed [#1364](https://github.com/JabRef/jabref/issues/1364): Windows: install to APPDATA directory for non-admin users
 
 ### Removed
