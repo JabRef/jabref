@@ -41,6 +41,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Fixed [#1313](https://github.com/JabRef/jabref/issues/1313): Remove UI for a configuration option which was no longer available
 - Fixed [#1340](https://github.com/JabRef/jabref/issues/1340): Edit -> Mark Specific Color Dysfunctional on OSX
 - Fixed [1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
+- Fixed [#1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
 - Fixed [#1364](https://github.com/JabRef/jabref/issues/1364): Windows: install to APPDATA directory for non-admin users
 
 ### Removed
