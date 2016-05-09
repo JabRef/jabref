@@ -385,37 +385,33 @@ public class DatabaseExporter {
     public void exportDatabaseToDBMS(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
-        Connection conn = null;
         boolean redisplay = false;
-        try {
-            conn = this.connectToDB(databaseStrings);
-            createTables(conn);
-            Vector<Vector<String>> matrix = createExistentDBNamesMatrix(databaseStrings);
-            DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
-                    DBImportExportDialog.DialogType.EXPORTER);
-            if (dialogo.removeAction) {
-                dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
-                redisplay = true;
-            } else if (dialogo.hasDBSelected) {
-                dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                performExport(databaseContext, entriesToExport, conn, dbName);
-            }
-            if (!conn.getAutoCommit()) {
-                conn.commit();
-                conn.setAutoCommit(true);
-            }
-            if (redisplay) {
-                exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
-            }
-        } catch (SQLException ex) {
-            if ((conn != null) && !conn.getAutoCommit()) {
-                conn.rollback();
-            }
-            throw ex;
-        } finally {
-            if (conn != null) {
-                conn.close();
+        try(Connection conn = this.connectToDB(databaseStrings)) {
+            try {
+                createTables(conn);
+                Vector<Vector<String>> matrix = createExistentDBNamesMatrix(databaseStrings);
+                DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
+                        DBImportExportDialog.DialogType.EXPORTER);
+                if (dialogo.removeAction) {
+                    dbName = getDBName(matrix, databaseStrings, frame, dialogo);
+                    DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
+                    redisplay = true;
+                } else if (dialogo.hasDBSelected) {
+                    dbName = getDBName(matrix, databaseStrings, frame, dialogo);
+                    performExport(databaseContext, entriesToExport, conn, dbName);
+                }
+                if (!conn.getAutoCommit()) {
+                    conn.commit();
+                    conn.setAutoCommit(true);
+                }
+                if (redisplay) {
+                    exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
+                }
+            } catch (SQLException ex) {
+                if ((conn != null) && !conn.getAutoCommit()) {
+                    conn.rollback();
+                }
+                throw ex;
             }
         }
     }

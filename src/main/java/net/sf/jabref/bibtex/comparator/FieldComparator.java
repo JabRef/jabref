@@ -57,7 +57,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     enum FieldType {
-        NAME, TYPE, YEAR, MONTH, OTHER;
+        NAME, TYPE, YEAR, MONTH, OTHER
     }
 
     private final String[] field;
