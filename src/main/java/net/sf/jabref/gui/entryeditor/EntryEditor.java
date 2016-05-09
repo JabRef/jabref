@@ -69,7 +69,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.event.ChangedFieldEvent;
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
@@ -925,9 +925,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Update the JTextArea when a field has changed.
      */
     @Subscribe
-    public void listen(ChangedFieldEvent changedFieldEvent) {
-        String newValue = changedFieldEvent.getNewValue() == null ? "" : changedFieldEvent.getNewValue();
-        setField(changedFieldEvent.getFieldName(), newValue);
+    public void listen(FieldChangedEvent fieldChangedEvent) {
+        String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
+        setField(fieldChangedEvent.getFieldName(), newValue);
     }
 
     public void updateField(final Object sourceObject) {

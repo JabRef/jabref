@@ -60,8 +60,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.event.AddedEntryEvent;
-import net.sf.jabref.event.ChangedEntryEvent;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
@@ -1259,7 +1259,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class GroupTreeListener {
 
         @Subscribe
-        public void listen(AddedEntryEvent addedEntryEvent) {
+        public void listen(EntryAddedEvent addedEntryEvent) {
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
@@ -1281,13 +1281,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(AddedEntryEvent addedEntryEvent) {
+        public void listen(EntryAddedEvent addedEntryEvent) {
             searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangedEntryEvent changedEntryEvent) {
-            searchAutoCompleter.addBibtexEntry(changedEntryEvent.getBibEntry());
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -1298,13 +1298,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private class AutoCompleteListener {
 
         @Subscribe
-        public void listen(AddedEntryEvent addedEntryEvent) {
+        public void listen(EntryAddedEvent addedEntryEvent) {
             BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
         }
 
         @Subscribe
-        public void listen(ChangedEntryEvent changedEntryEvent) {
-            BasePanel.this.autoCompleters.addEntry(changedEntryEvent.getBibEntry());
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
         }
     }
 

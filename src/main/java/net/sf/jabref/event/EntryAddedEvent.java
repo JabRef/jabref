@@ -3,16 +3,16 @@ package net.sf.jabref.event;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * <code>AddedEntryEvent</code> is fired when a new <code>BibEntry</code> was added
+ * <code>EntryAddedEvent</code> is fired when a new <code>BibEntry</code> was added
  * to the database.
  */
 
-public class AddedEntryEvent extends EntryEvent {
+public class EntryAddedEvent extends EntryEvent {
 
     /**
      * @param bibEntry <code>BibEntry</code> object which has been added.
      */
-    public AddedEntryEvent(BibEntry bibEntry) {
+    public EntryAddedEvent(BibEntry bibEntry) {
         super(bibEntry);
     }
 

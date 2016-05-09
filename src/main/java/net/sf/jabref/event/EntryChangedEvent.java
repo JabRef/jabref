@@ -3,15 +3,15 @@ package net.sf.jabref.event;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * <code>ChangedEntryEvent</code> is fired when a <code>BibEntry</code> has been changed.
+ * <code>EntryChangedEvent</code> is fired when a <code>BibEntry</code> has been changed.
  */
 
-public class ChangedEntryEvent extends EntryEvent {
+public class EntryChangedEvent extends EntryEvent {
 
     /**
      * @param bibEntry <code>BibEntry</code> object the changes were applied on.
      */
-    public ChangedEntryEvent(BibEntry bibEntry) {
+    public EntryChangedEvent(BibEntry bibEntry) {
         super(bibEntry);
     }
 

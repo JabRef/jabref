@@ -7,12 +7,12 @@ import net.sf.jabref.model.entry.BibEntry;
  * from the database.
  */
 
-public class RemovedEntryEvent extends EntryEvent {
+public class EntryRemovedEvent extends EntryEvent {
 
     /**
      * @param bibEntry <code>BibEntry</code> object which has been removed.
      */
-    public RemovedEntryEvent(BibEntry bibEntry) {
+    public EntryRemovedEvent(BibEntry bibEntry) {
         super(bibEntry);
     }
 

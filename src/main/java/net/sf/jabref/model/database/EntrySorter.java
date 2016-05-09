@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.jabref.event.AddedEntryEvent;
-import net.sf.jabref.event.ChangedEntryEvent;
-import net.sf.jabref.event.RemovedEntryEvent;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
@@ -96,34 +96,34 @@ public class EntrySorter {
     }
 
     @Subscribe
-    public void listen(AddedEntryEvent addedEntryEvent) {
+    public void listen(EntryAddedEvent EntryAddedEvent) {
         synchronized (set) {
-            int pos = -Collections.binarySearch(set, addedEntryEvent.getBibEntry(), comp) - 1;
+            int pos = -Collections.binarySearch(set, EntryAddedEvent.getBibEntry(), comp) - 1;
             LOGGER.debug("Insert position = " + pos);
             if (pos >= 0) {
-                set.add(pos, addedEntryEvent.getBibEntry());
+                set.add(pos, EntryAddedEvent.getBibEntry());
             } else {
-                set.add(0, addedEntryEvent.getBibEntry());
+                set.add(0, EntryAddedEvent.getBibEntry());
             }
         }
     }
 
     @Subscribe
-    public void listen(RemovedEntryEvent removedEntryEvent) {
+    public void listen(EntryRemovedEvent entryRemovedEvent) {
         synchronized (set) {
-            set.remove(removedEntryEvent.getBibEntry());
+            set.remove(entryRemovedEvent.getBibEntry());
             changed = true;
         }
     }
 
     @Subscribe
-    public void listen(ChangedEntryEvent changedEntryEvent) {
+    public void listen(EntryChangedEvent entryChangedEvent) {
         synchronized (set) {
-            int pos = Collections.binarySearch(set, changedEntryEvent.getBibEntry(), comp);
-            int posOld = set.indexOf(changedEntryEvent.getBibEntry());
+            int pos = Collections.binarySearch(set, entryChangedEvent.getBibEntry(), comp);
+            int posOld = set.indexOf(entryChangedEvent.getBibEntry());
             if (pos < 0) {
                 set.remove(posOld);
-                set.add(-posOld - 1, changedEntryEvent.getBibEntry());
+                set.add(-posOld - 1, entryChangedEvent.getBibEntry());
             }
         }
     }

@@ -50,7 +50,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.event.ChangedFieldEvent;
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
@@ -292,7 +292,7 @@ public class PreviewPanel extends JPanel
     * Listener for ChangedFieldEvent.
     */
     @Subscribe
-    public void listen(ChangedFieldEvent changedFieldEvent) {
+    public void listen(FieldChangedEvent fieldChangedEvent) {
         update();
     }
 

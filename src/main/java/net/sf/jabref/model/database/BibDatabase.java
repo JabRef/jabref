@@ -42,8 +42,8 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.event.AddedEntryEvent;
-import net.sf.jabref.event.RemovedEntryEvent;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -184,7 +184,7 @@ public class BibDatabase {
 
         internalIDs.add(id);
         entries.add(entry);
-        eventBus.post(new AddedEntryEvent(entry));
+        eventBus.post(new EntryAddedEvent(entry));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
@@ -199,7 +199,7 @@ public class BibDatabase {
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
-            eventBus.post(new RemovedEntryEvent(toBeDeleted));
+            eventBus.post(new EntryRemovedEvent(toBeDeleted));
         }
     }
 
@@ -552,9 +552,9 @@ public class BibDatabase {
      * All subscribers should contain at least one <code>@Subscribe</code> annotated
      * method accepting one of the following event types:
      *
-     *   - {@link AddedEntryEvent}
-     *   - {@link ChangedEntryEvent}
-     *   - {@link RemovedEntryEvent}
+     *   - {@link EntryAddedEvent}
+     *   - {@link EntryChangedEvent}
+     *   - {@link EntryRemovedEvent}
      *
      * or another {@link EntryEvent} extending type.
      *
