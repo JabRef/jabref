@@ -36,6 +36,11 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void removeWhitespaceForSinglePageNumber() {
+        expectCorrect("   1  ", "1");
+    }
+
+    @Test
     public void ignoreWhitespaceInPageNumbersWithDoubleDash() {
         expectCorrect("43 -- 103", "43--103");
     }
@@ -63,6 +68,16 @@ public class NormalizePagesFormatterTest {
     @Test
     public void replacesLongDashWithDoubleDash() {
         expectCorrect("1 \u2014 50", "1--50");
+    }
+
+    @Test
+    public void removesPagePrefix() {
+        expectCorrect("p.50", "50");
+    }
+
+    @Test
+    public void removesPagesPrefix() {
+        expectCorrect("pp.50", "50");
     }
 
     @Test
