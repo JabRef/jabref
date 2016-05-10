@@ -278,9 +278,9 @@ public class PreviewPanel extends JPanel
         if (entry.isPresent() && (entry.get() != newEntry)) {
             entry.ifPresent(e -> e.unregisterListener(this));
         }
-
-        entry.ifPresent(e -> e.registerListener(this));
-
+        if(newEntry != null) {
+            newEntry.registerListener(this);
+        }
         entry = Optional.ofNullable(newEntry);
 
         updateLayout();
