@@ -117,9 +117,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         try {
             //open the search URL
-            URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
-
-            URLDownload dl = new URLDownload(url);
+            URLDownload dl = new URLDownload(IEEEXploreFetcher.URL_SEARCH);
 
             //add request header
             dl.addParameters("Accept", "application/json");
@@ -159,8 +157,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //fetch the raw Bibtex results from IEEEXplore
-            URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
-            String bibtexPage = new URLDownload(bibtexURL).downloadToString();
+            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson)).downloadToString();
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);

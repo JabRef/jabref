@@ -136,8 +136,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString();
         Matcher m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
         if (m.find()) {
             while (m.find()) {

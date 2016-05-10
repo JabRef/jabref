@@ -67,7 +67,7 @@ public class IEEE implements FullTextFinder {
         }
 
         // Download the HTML page containing a frame with the PDF
-        String framePage = new URLDownload(new URL(BASE_URL + stampString)).downloadToString(StandardCharsets.UTF_8);
+        String framePage = new URLDownload(BASE_URL + stampString).downloadToString(StandardCharsets.UTF_8);
         // Try to find the direct PDF link
         Matcher matcher = PDF_PATTERN.matcher(framePage);
         if (matcher.find()) {
