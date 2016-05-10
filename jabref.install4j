@@ -169,8 +169,7 @@
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
   if (Util.isAtLeastWindowsVista()) {
-    // http://www.clickomania.ch/fp/index.php/2013/04/16/was-es-mit-dem-appdata-ordner-auf-sich-hat/
-    context.setInstallationDirectory(new File(System.getProperty("localappdata"), "JabRef"));
+    context.setInstallationDirectory(new File(System.getProperty("LOCALAPPDATA"), "JabRef"));
   } else {
     context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));
   }   
