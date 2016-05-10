@@ -26,9 +26,9 @@ import java.util.Date;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
 
 import com.michaelbaranov.microba.calendar.DatePicker;
 

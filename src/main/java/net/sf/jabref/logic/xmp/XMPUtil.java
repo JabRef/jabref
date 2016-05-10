@@ -15,25 +15,46 @@
  */
 package net.sf.jabref.logic.xmp;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.LatexFieldFormatter;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ParserResult;
-
-import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
+import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -125,7 +146,7 @@ public class XMPUtil {
     }
 
     public static PDDocument loadWithAutomaticDecryption(InputStream inputStream)
-            throws IOException, EncryptedPdfsNotSupportedException {
+            throws IOException {
         PDDocument doc = PDDocument.load(inputStream);
         if (doc.isEncrypted()) {
             // try the empty string as user password
@@ -1145,8 +1166,7 @@ public class XMPUtil {
      * @throws TransformerException
      *             If the given BibEntry is malformed.
      */
-    public static void main(String[] args) throws IOException,
-    TransformerException {
+    public static void main(String[] args) throws IOException, TransformerException {
 
         // Don't forget to initialize the preferences
         if (Globals.prefs == null) {

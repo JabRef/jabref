@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import java.util.Locale;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
 
 /**
  * {@link Control} class allowing properties bundles to be in different encodings.

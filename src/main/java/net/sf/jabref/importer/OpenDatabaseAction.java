@@ -32,22 +32,32 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.exporter.SaveSession;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.logic.util.strings.StringUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,13 +75,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from
-        // the bib file:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for checking for new custom entry types loaded from the bib file:
+        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for converting legacy entries in ExplicitGroup
+        POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
         // Add the action for the new external file handling system in version 2.3:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
+        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
+        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -172,7 +183,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
             final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
-            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            JabRefExecutorService.INSTANCE.execute(() -> {
                 for (File theFile : theFiles) {
                     openTheFile(theFile, raisePanel);
                 }
@@ -294,13 +305,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 // if the database contents should be modified due to new features
                 // in this version of JabRef:
                 final ParserResult finalReferenceToResult = result;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
             }
 
         }
@@ -380,11 +385,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 }
                 LOGGER.debug("Synchronized special fields based on keywords");
-            }
-
-            if (!result.getMetaData().isGroupTreeValid()) {
-                result.addWarning(Localization.lang(
-                        "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
             }
 
             return result;

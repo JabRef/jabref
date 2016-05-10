@@ -1,6 +1,10 @@
 package net.sf.jabref.model.entry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class AuthorListParser {
 
@@ -43,9 +47,7 @@ public class AuthorListParser {
     }
 
 
-    private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for
-
-    // a token
+    private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
     // the following are offsets of an entry in a group of entries for one token
     private static final int OFFSET_TOKEN = 0; // String -- token itself;
@@ -133,6 +135,11 @@ public class AuthorListParser {
                 }
                 if (vonStart < 0) {
                     if (!tokenCase) {
+                        int previousTermToken = tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
+                        if(previousTermToken >= 0 && tokens.get(previousTermToken).equals('-')) {
+                            // We are in a first name which contained a hyphen
+                            break;
+                        }
                         vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
                         break;
                     }
@@ -349,11 +356,11 @@ public class AuthorListParser {
             if (c == '{') {
                 bracesLevel++;
             }
-            if ((c == '}') && (bracesLevel > 0)) {
-                bracesLevel--;
-            }
             if (firstLetterIsFound && (tokenAbbr < 0) && (bracesLevel == 0)) {
                 tokenAbbr = tokenEnd;
+            }
+            if ((c == '}') && (bracesLevel > 0)) {
+                bracesLevel--;
             }
             if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
                 if (bracesLevel == 0) {
@@ -382,11 +389,6 @@ public class AuthorListParser {
             if ((bracesLevel == 0) && ((",;~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
                 break;
             }
-            // Morten Alver 18 Apr 2006: Removed check for hyphen '-' above to
-            // prevent
-            // problems with names like Bailey-Jones getting broken up and
-            // sorted wrong.
-            // Aaron Chen 14 Sep 2008: Enable hyphen check for first names like Chang-Chin
             tokenEnd++;
         }
         if (tokenAbbr < 0) {

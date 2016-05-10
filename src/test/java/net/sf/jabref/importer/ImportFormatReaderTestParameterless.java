@@ -1,15 +1,17 @@
 package net.sf.jabref.importer;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class ImportFormatReaderTestParameterless {
 

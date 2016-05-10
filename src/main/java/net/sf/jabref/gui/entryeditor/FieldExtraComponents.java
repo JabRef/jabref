@@ -25,7 +25,12 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -77,7 +82,7 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (panel.getBibDatabaseContext().getMetaData().getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName()) != null) {
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
             FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, panel.getBibDatabaseContext().getMetaData(),
                     storeFieldAction, false, ", ");
             contentSelectors.add(ws);
@@ -184,8 +189,7 @@ public class FieldExtraComponents {
         doiButton.addActionListener(actionEvent -> {
                 Optional<DOI> doi = CrossRef.findDOI(entryEditor.getEntry());
                 if (doi.isPresent()) {
-                    JTextComponent field = (JTextComponent) fieldEditor.getTextComponent();
-                    field.setText(doi.get().getDOI());
+                    entryEditor.getEntry().setField("doi", doi.get().getDOI());
                 } else {
                     panel.frame().setStatus(Localization.lang("No DOI found"));
                 }

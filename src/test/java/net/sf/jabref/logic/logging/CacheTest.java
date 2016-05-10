@@ -1,7 +1,8 @@
 package net.sf.jabref.logic.logging;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class CacheTest {
 

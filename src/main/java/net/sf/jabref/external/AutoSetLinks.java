@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -89,9 +90,7 @@ public class AutoSetLinks {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
                 List<String> dirsS = databaseContext.getFileDirectory();
-                for (String dirs1 : dirsS) {
-                    dirs.add(new File(dirs1));
-                }
+                dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
     
                 // determine extensions
                 Collection<String> extensions = new ArrayList<>();
@@ -132,6 +131,7 @@ public class AutoSetLinks {
                             //System.out.println("Comp: "+existingEntry.getLink());
                             if (new File(existingEntry.link).equals(f)) {
                                 alreadyHas = true;
+                                foundAny = true;
                                 break;
                             }
                         }
@@ -185,14 +185,10 @@ public class AutoSetLinks {
                 });
             }
         };
-        SwingUtilities.invokeLater(new Runnable() {
-    
-            @Override
-            public void run() {
-                // show dialog which will be hidden when the task is done
-                if (diag != null) {
-                    diag.setVisible(true);
-                }
+        SwingUtilities.invokeLater(() -> {
+            // show dialog which will be hidden when the task is done
+            if (diag != null) {
+                diag.setVisible(true);
             }
         });
         return r;

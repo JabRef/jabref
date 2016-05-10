@@ -14,14 +14,18 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.logic.TypedBibEntry;
 
 public class RelativePathsCleanup implements CleanupJob {
 
@@ -37,6 +41,7 @@ public class RelativePathsCleanup implements CleanupJob {
         List<ParsedFileField> fileList = typedEntry.getFiles();
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
+
         for (ParsedFileField fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
             String newFileName = FileUtil.shortenFileName(new File(oldFileName), databaseContext.getFileDirectory())
@@ -49,6 +54,7 @@ public class RelativePathsCleanup implements CleanupJob {
             }
             newFileList.add(newFileEntry);
         }
+
         if (changed) {
             Optional<FieldChange> change = typedEntry.setFiles(newFileList);
             if(change.isPresent()) {
@@ -57,7 +63,8 @@ public class RelativePathsCleanup implements CleanupJob {
                 return Collections.emptyList();
             }
         }
-        return new ArrayList<>();
+
+        return Collections.emptyList();
     }
 
 }

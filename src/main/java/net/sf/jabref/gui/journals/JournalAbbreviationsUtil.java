@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.util.Collection;
+
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+
+import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class JournalAbbreviationsUtil {
 

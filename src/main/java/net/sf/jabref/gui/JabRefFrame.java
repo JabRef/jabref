@@ -15,19 +15,88 @@
 */
 package net.sf.jabref.gui;
 
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import javafx.application.Platform;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
-import net.sf.jabref.*;
-import net.sf.jabref.exporter.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.MenuElement;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.HighlightMatchingGroupPreferences;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.exporter.AutoSaveManager;
+import net.sf.jabref.exporter.ExportCustomizationDialog;
+import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.exporter.SaveAllAction;
+import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
+import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.actions.AutoLinkFilesAction;
+import net.sf.jabref.gui.actions.ErrorConsoleAction;
+import net.sf.jabref.gui.actions.IntegrityCheckAction;
+import net.sf.jabref.gui.actions.ManageKeywordsAction;
+import net.sf.jabref.gui.actions.MassSetFieldAction;
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.actions.NewDatabaseAction;
+import net.sf.jabref.gui.actions.NewEntryAction;
+import net.sf.jabref.gui.actions.NewSubDatabaseAction;
+import net.sf.jabref.gui.actions.SortTabsAction;
+import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupSelector;
-import net.sf.jabref.gui.actions.*;
-import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -45,11 +114,13 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.importer.*;
+import net.sf.jabref.importer.ImportCustomizationDialog;
+import net.sf.jabref.importer.ImportFormats;
+import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.integrity.IntegrityCheck;
-import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
@@ -59,20 +130,21 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.specialfields.*;
+import net.sf.jabref.specialfields.Printed;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
+
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
+import javafx.application.Platform;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
 
 /**
  * The main window of the application.
@@ -98,59 +170,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private PositionWindow pw;
 
-    private final GeneralAction checkIntegrity = new GeneralAction(Actions.CHECK_INTEGRITY, Localization.menuTitle("Check integrity") + ELLIPSES) {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            IntegrityCheck check = new IntegrityCheck(getCurrentBasePanel().getBibDatabaseContext());
-            List<IntegrityMessage> messages = check.checkBibtexDatabase();
-
-            if (messages.isEmpty()) {
-                JOptionPane.showMessageDialog(getCurrentBasePanel(), Localization.lang("No problems found."));
-            } else {
-                // prepare data model
-                Object[][] model = new Object[messages.size()][3];
-                int i = 0;
-                for (IntegrityMessage message : messages) {
-                    model[i][0] = message.getEntry().getCiteKey();
-                    model[i][1] = message.getFieldName();
-                    model[i][2] = message.getMessage();
-                    i++;
-                }
-
-                // construct view
-                JTable table = new JTable(
-                        model,
-                        new Object[] {"key", "field", "message"}
-                );
-
-                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                ListSelectionModel selectionModel = table.getSelectionModel();
-
-                selectionModel.addListSelectionListener(event -> {
-                    if (!event.getValueIsAdjusting()) {
-                        String citeKey = (String) model[table.getSelectedRow()][0];
-                        String fieldName = (String) model[table.getSelectedRow()][1];
-                        getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
-                    }
-                });
-
-                table.getColumnModel().getColumn(0).setPreferredWidth(80);
-                table.getColumnModel().getColumn(1).setPreferredWidth(30);
-                table.getColumnModel().getColumn(2).setPreferredWidth(250);
-                table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-                JScrollPane scrollPane = new JScrollPane(table);
-                String title = Localization.lang("%0 problem(s) found", String.valueOf(messages.size()));
-                JDialog dialog = new JDialog(JabRefFrame.this, title, false);
-                dialog.add(scrollPane);
-                dialog.setSize(600, 500);
-
-                // show view
-                dialog.setVisible(true);
-            }
-        }
-    };
-
+    private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
     private final ToolBar tlb = new ToolBar();
 
@@ -191,8 +211,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction forkMeOnGitHubAction = new ForkMeOnGitHubAction();
     private final AbstractAction donationAction = new DonateAction();
-    private final AbstractAction help = new HelpAction(Localization.menuTitle("JabRef help"), Localization.lang("JabRef help"),
-            HelpFiles.helpContents, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
+    private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
+            HelpFiles.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
@@ -1481,7 +1501,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
-        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
+        openAndSavedDatabasesOnlyActions.addAll(Collections.singletonList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1513,20 +1533,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int tabCount = tabbedPane.getTabCount();
         if (tabCount != previousTabCount) {
             previousTabCount = tabCount;
-            JabRefFrame.setEnabled(openDatabaseOnlyActions, tabCount > 0);
-            JabRefFrame.setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+            setEnabled(openDatabaseOnlyActions, tabCount > 0);
+            setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
         if (tabCount == 0) {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
+            setEnabled(openAndSavedDatabasesOnlyActions, false);
         }
 
-        boolean saved = false;
 
         if (tabCount > 0) {
-            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+            BasePanel current = getCurrentBasePanel();
+            if(current != null) {
+                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+                setEnabled(openAndSavedDatabasesOnlyActions, saved);
+            }
         }
-        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**

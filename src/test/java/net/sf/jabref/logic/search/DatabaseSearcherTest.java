@@ -2,12 +2,12 @@ package net.sf.jabref.logic.search;
 
 import java.util.Collections;
 
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DatabaseSearcherTest {
 
@@ -59,6 +59,6 @@ public class DatabaseSearcherTest {
         database.insertEntry(entry);
         BibDatabase newDatabase = new DatabaseSearcher(new SearchQuery("harrer", true, true), database)
                 .getDatabaseFromMatches();
-        BibtexEntryAssert.assertEquals(Collections.singletonList(entry), newDatabase.getEntries());
+        assertEquals(Collections.singletonList(entry), newDatabase.getEntries());
     }
 }

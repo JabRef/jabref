@@ -1,7 +1,9 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FileFinder {
 

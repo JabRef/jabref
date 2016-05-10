@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -41,18 +41,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import net.sf.jabref.Globals;
+
 import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinder;
-import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 class ContentSelectorDialog2 extends JDialog {
 
@@ -265,7 +264,7 @@ class ContentSelectorDialog2 extends JDialog {
         // If these were re-added, they will be added below, so it doesn't
         // cause any harm to remove them here.
         for (String fieldName : removedFields) {
-            metaData.remove(Globals.SELECTOR_META_PREFIX + fieldName);
+            metaData.clearContentSelectors(fieldName);
             changedFieldSet = true;
         }
 
@@ -283,22 +282,15 @@ class ContentSelectorDialog2 extends JDialog {
                     start++;
                 }
             }
-            List<String> data = metaData.getData(Globals.SELECTOR_META_PREFIX + fieldName);
-            boolean bNewField = false;
-            if (data == null) {
-                bNewField = true;
-                data = new ArrayList<>();
-                changedFieldSet = true;
 
-            } else {
-                data.clear();
-            }
-            for (int wrd = start; wrd < lm.size(); wrd++) {
-                String word = lm.get(wrd);
-                data.add(word);
-            }
-            if (bNewField) {
-                metaData.putData(Globals.SELECTOR_META_PREFIX + fieldName, data);
+            if (metaData.getContentSelectors(fieldName).isEmpty()) {
+                changedFieldSet = true;
+                List<String> data = new ArrayList<>();
+                for (int wrd = start; wrd < lm.size(); wrd++) {
+                    String word = lm.get(wrd);
+                    data.add(word);
+                }
+                metaData.setContentSelectors(fieldName, data);
             }
         }
 
@@ -323,8 +315,8 @@ class ContentSelectorDialog2 extends JDialog {
         fieldListModel.clear();
         SortedSet<String> contents = new TreeSet<>();
         for (String s : metaData) {
-            if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
-                contents.add(s.substring(Globals.SELECTOR_META_PREFIX.length()));
+            if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
+                contents.add(s.substring(MetaData.SELECTOR_META_PREFIX.length()));
             }
         }
         if (contents.isEmpty()) {
@@ -362,14 +354,11 @@ class ContentSelectorDialog2 extends JDialog {
             wordListModel = new DefaultListModel<>();
             wordList.setModel(wordListModel);
             wordListModels.put(currentField, wordListModel);
-            List<String> items = metaData.getData(Globals.SELECTOR_META_PREFIX + currentField);
-            if (items != null) {
-                Set<String> wordSet = new TreeSet<>(items);
-                int index = 0;
-                for (String s : wordSet) {
-                    wordListModel.add(index, s);
-                    index++;
-                }
+
+            int index = 0;
+            for (String s : metaData.getContentSelectors(currentField)) {
+                wordListModel.add(index, s);
+                index++;
             }
         } else {
             wordList.setModel(wordListModel);
@@ -454,7 +443,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(HelpFiles.contentSelectorHelp).getHelpButton());
+        bsb.addButton(new HelpAction(HelpFiles.CONTENT_SELECTOR).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

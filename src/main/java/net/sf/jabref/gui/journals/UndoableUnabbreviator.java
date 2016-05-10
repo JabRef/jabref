@@ -1,12 +1,12 @@
 package net.sf.jabref.gui.journals;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import javax.swing.undo.CompoundEdit;
+
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
-
-import javax.swing.undo.CompoundEdit;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class UndoableUnabbreviator {
 

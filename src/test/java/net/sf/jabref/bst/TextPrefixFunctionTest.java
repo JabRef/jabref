@@ -19,13 +19,8 @@ public class TextPrefixFunctionTest {
     }
 
     private static void assertPrefix(final String string, final String string2) {
-        Assert.assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, new Warn() {
-
-            @Override
-            public void warn(String s) {
-                Assert.fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2);
-            }
-        }));
+        Assert.assertEquals(string, BibtexTextPrefix.textPrefix(5, string2, s ->
+                Assert.fail("Should not Warn! text.prefix$ should be " + string + " for (5) " + string2)));
     }
 
 }

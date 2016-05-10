@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
-        "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <!--
   Checkstyle configuration that checks the sun coding conventions from:
@@ -29,9 +29,21 @@
 
     <module name="TreeWalker">
 
-        <!-- Checks for imports                              -->
-        <!-- See http://checkstyle.sf.net/config_import.html -->
         <module name="UnusedImports"/>
+
+        <module name="RedundantImport"/>
+
+        <module name="AvoidStarImport"/>
+
+        <module name="IllegalImport"/>
+
+        <module name="ImportOrder">
+            <property name="groups" value="java,javax,net.sf.jabref,*"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="bottom"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
+        </module>
 
     </module>
 

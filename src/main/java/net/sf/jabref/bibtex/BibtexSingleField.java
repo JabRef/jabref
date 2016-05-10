@@ -25,7 +25,7 @@ public class BibtexSingleField {
         STANDARD,
         PRIVATE,
         DISPLAYABLE,
-        WRITEABLE;
+        WRITEABLE
     }
 
 

@@ -168,7 +168,11 @@
                             <string>if (Util.hasFullAdminRights()) {
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
-  context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));   
+  if (Util.isAtLeastWindowsVista()) {
+    context.setInstallationDirectory(new File(System.getProperty("LOCALAPPDATA"), "JabRef"));
+  } else {
+    context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));
+  }   
 }
 return true;</string>
                           </void>

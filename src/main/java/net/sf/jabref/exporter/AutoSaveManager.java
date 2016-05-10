@@ -15,17 +15,17 @@
  */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
 
 /**
  * Background task and utilities for autosave feature.
@@ -98,7 +98,7 @@ public class AutoSaveManager {
 
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
-
+            ss.commit(backupFile);
         } catch (SaveException e) {
             LOGGER.error("Problem with automatic save", e);
             return false;

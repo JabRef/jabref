@@ -1,15 +1,16 @@
 package net.sf.jabref.logic.autocompleter;
 
-import static org.mockito.Mockito.*;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibEntry;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class EntireFieldAutoCompleterTest {
 

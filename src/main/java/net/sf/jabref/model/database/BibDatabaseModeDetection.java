@@ -5,7 +5,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.EntryType;
 
 public class BibDatabaseModeDetection {
     private static final List<EntryType> bibtex = BibtexEntryTypes.ALL;

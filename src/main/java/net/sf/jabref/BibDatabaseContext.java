@@ -1,7 +1,10 @@
 package net.sf.jabref;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -120,41 +123,21 @@ public class BibDatabaseContext {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
-        String key = Globals.prefs.get(JabRefPreferences.USER_FILE_DIR_INDIVIDUAL); // USER_SPECIFIC_FILE_DIR_FOR_DB
-        List<String> metaDataDirectory = metaData.getData(key);
-        if (metaDataDirectory == null || metaDataDirectory.isEmpty()) {
-            if(metaData.getDefaultFileDirectory().isPresent()) {
-                metaDataDirectory = Collections.singletonList(metaData.getDefaultFileDirectory().get());
-            }
+        Optional<String> userFileDirectory = metaData.getUserFileDirectory(Globals.prefs.getUser());
+        if(userFileDirectory.isPresent()) {
+            fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
         }
 
         // 2. metadata general directory
-        if ((metaDataDirectory != null) && !metaDataDirectory.isEmpty()) {
-            String dir;
-            dir = metaDataDirectory.get(0);
-            // If this directory is relative, we try to interpret it as relative to
-            // the file path of this bib file:
-            if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
-                String relDir;
-                if (".".equals(dir)) {
-                    // if dir is only "current" directory, just use its parent (== real current directory) as path
-                    relDir = getDatabaseFile().getParent();
-                } else {
-                    relDir = getDatabaseFile().getParent() + File.separator + dir;
-                }
-                // If this directory actually exists, it is very likely that the
-                // user wants us to use it:
-                if (new File(relDir).exists()) {
-                    dir = relDir;
-                }
-            }
+        Optional<String> metaDataDirectory = metaData.getDefaultFileDirectory();
+        if(metaDataDirectory.isPresent()) {
+            fileDirs.add(getFileDirectoryPath(metaDataDirectory.get()));
+        }
+
+        // 3. preferences directory
+        String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
+        if (dir != null) {
             fileDirs.add(dir);
-        } else {
-            // 3. preferences directory?
-            String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
-            if (dir != null) {
-                fileDirs.add(dir);
-            }
         }
 
         // 4. bib file directory
@@ -169,6 +152,27 @@ public class BibDatabaseContext {
         }
 
         return fileDirs;
+    }
+
+    private String getFileDirectoryPath(String directoryName) {
+        String dir = directoryName;
+        // If this directory is relative, we try to interpret it as relative to
+        // the file path of this bib file:
+        if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
+            String relDir;
+            if (".".equals(dir)) {
+                // if dir is only "current" directory, just use its parent (== real current directory) as path
+                relDir = getDatabaseFile().getParent();
+            } else {
+                relDir = getDatabaseFile().getParent() + File.separator + dir;
+            }
+            // If this directory actually exists, it is very likely that the
+            // user wants us to use it:
+            if (new File(relDir).exists()) {
+                dir = relDir;
+            }
+        }
+        return dir;
     }
 
     public List<String> getFileDirectory() {

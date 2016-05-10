@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.l10n;
 
-import org.junit.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,7 +9,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Checks that all property files are correctly encoded and can be loaded without errors.

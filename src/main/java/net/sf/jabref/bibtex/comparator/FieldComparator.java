@@ -15,21 +15,21 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.gui.maintable.MainTableFormat;
-import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
+
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
 
 /**
  *
@@ -57,7 +57,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     enum FieldType {
-        NAME, TYPE, YEAR, MONTH, OTHER;
+        NAME, TYPE, YEAR, MONTH, OTHER
     }
 
     private final String[] field;

@@ -3,9 +3,10 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 /**
  * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}
  */
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ClearFormatterTest {
 

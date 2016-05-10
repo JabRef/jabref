@@ -15,9 +15,12 @@
 */
 package net.sf.jabref.gui.renderer;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**

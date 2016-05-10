@@ -15,9 +15,11 @@
 */
 package net.sf.jabref.gui.actions;
 
-import net.sf.jabref.gui.IconTheme;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 
-import javax.swing.*;
+import net.sf.jabref.gui.IconTheme;
 
 /**
  * This class extends {@link AbstractAction} with the ability to set
@@ -46,7 +48,7 @@ public abstract class MnemonicAwareAction extends AbstractAction {
             int i = name.indexOf('&');
             if (i >= 0) {
                 char mnemonic = Character.toUpperCase(name.charAt(i + 1));
-                putValue(Action.MNEMONIC_KEY, Integer.valueOf(mnemonic));
+                putValue(Action.MNEMONIC_KEY, (int) mnemonic);
                 value = name.substring(0, i) + name.substring(i + 1);
             } else {
                 value = name;

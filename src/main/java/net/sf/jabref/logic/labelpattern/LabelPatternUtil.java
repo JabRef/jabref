@@ -18,9 +18,10 @@
 package net.sf.jabref.logic.labelpattern;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +31,10 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -487,7 +489,7 @@ public class LabelPatternUtil {
         String oldKey = entry.getCiteKey();
         int occurrences = database.getNumberOfKeyOccurrences(key);
 
-        if ((oldKey != null) && oldKey.equals(key)) {
+        if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 
@@ -499,7 +501,7 @@ public class LabelPatternUtil {
             if (!key.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, key);
+                    entry.setCiteKey(key);
                 } else {
                     database.setCiteKeyForEntry(entry, key);
                 }
@@ -515,7 +517,7 @@ public class LabelPatternUtil {
             String moddedKey = key + getAddition(number);
             occurrences = database.getNumberOfKeyOccurrences(moddedKey);
 
-            if ((oldKey != null) && oldKey.equals(moddedKey)) {
+            if (Objects.equals(oldKey, moddedKey)) {
                 occurrences--;
             }
 
@@ -524,7 +526,7 @@ public class LabelPatternUtil {
                 moddedKey = key + getAddition(number);
 
                 occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-                if ((oldKey != null) && oldKey.equals(moddedKey)) {
+                if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
             }
@@ -532,7 +534,7 @@ public class LabelPatternUtil {
             if (!moddedKey.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, moddedKey);
+                    entry.setCiteKey(moddedKey);
                 } else {
                     database.setCiteKeyForEntry(entry, moddedKey);
                 }

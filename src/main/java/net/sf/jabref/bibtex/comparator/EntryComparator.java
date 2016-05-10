@@ -15,13 +15,13 @@
 */
 package net.sf.jabref.bibtex.comparator;
 
+import java.util.Comparator;
+import java.util.Objects;
+
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.Comparator;
-import java.util.Objects;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is

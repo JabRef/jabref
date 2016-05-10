@@ -15,7 +15,14 @@
 */
 package net.sf.jabref.gui.worker;
 
-import net.sf.jabref.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import javax.swing.JMenuItem;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.JabRefFrame;
@@ -23,14 +30,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 
 /**
  *
@@ -49,7 +50,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
         this.level = level;
 
         //menuItem = new JMenuItem(Globals.menuTitle("Mark entries").replace("&",""));
-        menuItem = new JMenuItem("               ");
+        menuItem = new JMenuItem(Localization.lang("Level") + " " + level + "   ");
         menuItem.setMnemonic(String.valueOf(level + 1).charAt(0));
         menuItem.setBackground(Globals.prefs.getColor(JabRefPreferences.MARKED_ENTRY_BACKGROUND + this.level));
         menuItem.setOpaque(true);

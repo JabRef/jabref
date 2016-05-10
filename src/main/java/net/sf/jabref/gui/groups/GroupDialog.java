@@ -54,6 +54,7 @@ import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.ExplicitGroup;
@@ -293,6 +294,7 @@ class GroupDialog extends JDialog {
 
         m_ok.addActionListener(e -> {
                 mOkPressed = true;
+            try {
                 if (m_explicitRadioButton.isSelected()) {
                     if (m_editedGroup instanceof ExplicitGroup) {
                         // keep assignments from possible previous ExplicitGroup
@@ -308,11 +310,9 @@ class GroupDialog extends JDialog {
                 } else if (m_keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    mResultingGroup = new KeywordGroup(
-                            m_name.getText().trim(), m_kgSearchField.getText()
-                            .trim(), m_kgSearchTerm.getText().trim(),
-                            m_kgCaseSensitive.isSelected(), m_kgRegExp
-                            .isSelected(), getContext());
+                    mResultingGroup = new KeywordGroup(m_name.getText().trim(), m_kgSearchField.getText().trim(),
+                            m_kgSearchTerm.getText().trim(), m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected(),
+                            getContext());
                     if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
                             && mResultingGroup.supportsAdd()) {
                         addPreviousEntries();
@@ -322,14 +322,16 @@ class GroupDialog extends JDialog {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        mResultingGroup = new SearchGroup(m_name.getText()
-                                .trim(), m_sgSearchExpression.getText().trim(),
+                        mResultingGroup = new SearchGroup(m_name.getText().trim(), m_sgSearchExpression.getText().trim(),
                                 isCaseSensitive(), isRegex(), getContext());
                     } catch (Exception e1) {
                         // should never happen
                     }
                 }
                 dispose();
+            } catch (ParseException exception) {
+                jabrefFrame.showMessage(exception.getLocalizedMessage());
+            }
         });
 
         CaretListener caretListener = e -> updateComponents();

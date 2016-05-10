@@ -2,6 +2,7 @@ package net.sf.jabref.logic.search.matchers;
 
 import net.sf.jabref.logic.search.rules.MockSearchMatcher;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

@@ -20,9 +20,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Wraps the XMPUtility function to be used as an ImportFormat.

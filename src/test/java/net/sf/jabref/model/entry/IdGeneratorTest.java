@@ -15,10 +15,10 @@
  */
 package net.sf.jabref.model.entry;
 
+import java.util.HashSet;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashSet;
 
 public class IdGeneratorTest {
 

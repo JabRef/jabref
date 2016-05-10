@@ -1,11 +1,12 @@
 package net.sf.jabref.gui.keyboard;
 
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.table.AbstractTableModel;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.table.AbstractTableModel;
+
+import net.sf.jabref.logic.l10n.Localization;
 
 @SuppressWarnings("serial")
 public class KeyBindingTableModel extends AbstractTableModel {

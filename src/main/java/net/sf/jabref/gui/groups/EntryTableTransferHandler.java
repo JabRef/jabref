@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.gui.groups;
 
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
@@ -26,7 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,23 +37,23 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.gui.net.MonitoredURLDownload;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.TransferableFileLinkSelection;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.importer.ImportMenuItem;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
@@ -238,7 +241,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         // System.out.println("importing from " + tmpfile.getAbsolutePath());
 
         ImportMenuItem importer = new ImportMenuItem(frame, false);
-        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
+        importer.automatedImport(Collections.singletonList(tmpfile.getAbsolutePath()));
 
         return true;
     }
@@ -321,15 +324,11 @@ public class EntryTableTransferHandler extends TransferHandler {
         // Try to load bib files normally, and import the rest into the current
         // database.
         // This process must be spun off into a background thread:
-        JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow)
-                        .importPdfFiles(fileNames);
-                if (!importRes.getNoPdfFiles().isEmpty()) {
-                    loadOrImportFiles(importRes.getNoPdfFiles(), dropRow);
-                }
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            final ImportPdfFilesResult importRes = new PdfImporter(frame, panel, entryTable, dropRow)
+                    .importPdfFiles(fileNames);
+            if (!importRes.getNoPdfFiles().isEmpty()) {
+                loadOrImportFiles(importRes.getNoPdfFiles(), dropRow);
             }
         });
 
@@ -401,7 +400,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         // Import into new if entryTable==null, otherwise into current database:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
-        importer.automatedImport(Arrays.asList(tmpfile.getAbsolutePath()));
+        importer.automatedImport(Collections.singletonList(tmpfile.getAbsolutePath()));
 
         return true;
     }

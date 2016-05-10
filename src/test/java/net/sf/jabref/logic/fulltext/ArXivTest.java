@@ -1,13 +1,14 @@
 package net.sf.jabref.logic.fulltext;
 
-import net.sf.jabref.model.entry.BibEntry;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
+
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ArXivTest {
 

@@ -15,10 +15,11 @@
 */
 package net.sf.jabref.collab;
 
-import javax.swing.JEditorPane;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+
+import javax.swing.JEditorPane;
 
 class InfoPane extends JEditorPane {
 

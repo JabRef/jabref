@@ -238,14 +238,12 @@ public class BibDatabaseWriter {
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         List<FieldChange> changes = new ArrayList<>();
 
-        if (metaData.getData(MetaData.SAVE_ACTIONS) != null) {
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        if (saveActions.isPresent()) {
             // save actions defined -> apply for every entry
-            FieldFormatterCleanups saveActions = metaData.getSaveActions();
-
             for (BibEntry entry : toChange) {
-                changes.addAll(saveActions.applySaveActions(entry));
+                changes.addAll(saveActions.get().applySaveActions(entry));
             }
-
         }
 
         return changes;

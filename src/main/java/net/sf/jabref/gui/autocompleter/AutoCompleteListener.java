@@ -15,15 +15,20 @@
 */
 package net.sf.jabref.gui.autocompleter;
 
-import javax.swing.text.JTextComponent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
+
 import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.event.*;
-import java.util.List;
 
 /**
  * Created by Morten O. Alver, 16 Feb. 2007

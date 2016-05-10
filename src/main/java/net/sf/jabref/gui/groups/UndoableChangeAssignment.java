@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.gui.groups;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,17 +23,16 @@ import java.util.Set;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * @author jzieren
  */
 public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
-    private final Set<BibEntry> previousAssignments;
-    private final Set<BibEntry> newAssignments;
+    private final List<BibEntry> previousAssignments;
+    private final List<BibEntry> newAssignments;
     /**
      * The path to the edited node
      */
@@ -48,8 +47,8 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
      */
     public UndoableChangeAssignment(GroupTreeNodeViewModel node, Set<BibEntry> previousAssignments,
             Set<BibEntry> newAssignments) {
-        this.previousAssignments = new HashSet<>(previousAssignments);
-        this.newAssignments = new HashSet<>(newAssignments);
+        this.previousAssignments = new ArrayList<>(previousAssignments);
+        this.newAssignments = new ArrayList<>(newAssignments);
         this.root = node.getNode().getRoot();
         this.pathToNode = node.getNode().getIndexedPathFromRoot();
     }
@@ -70,11 +69,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
         Optional<GroupTreeNode> node = root.getDescendant(pathToNode);
         if (node.isPresent()) {
-            ExplicitGroup group = (ExplicitGroup) node.get().getGroup();
-            group.clearAssignments();
-            for (final BibEntry entry : previousAssignments) {
-                group.addEntry(entry);
-            }
+            node.get().getGroup().add(previousAssignments);
         }
     }
 
@@ -84,11 +79,7 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
 
         Optional<GroupTreeNode> node = root.getDescendant(pathToNode);
         if (node.isPresent()) {
-            ExplicitGroup group = (ExplicitGroup) node.get().getGroup();
-            group.clearAssignments();
-            for (final BibEntry entry : newAssignments) {
-                group.addEntry(entry);
-            }
+            node.get().getGroup().add(newAssignments);
         }
     }
 }

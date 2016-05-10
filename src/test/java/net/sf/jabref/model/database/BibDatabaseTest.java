@@ -1,8 +1,14 @@
 package net.sf.jabref.model.database;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.event.TestEventListener;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -15,13 +21,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class BibDatabaseTest {
@@ -71,7 +75,7 @@ public class BibDatabaseTest {
         database.insertEntry(entry);
         assertEquals(database.getEntries().size(), 1);
         assertEquals(database.getEntryCount(), 1);
-        BibtexEntryAssert.assertEquals(entry, database.getEntries().get(0));
+        assertEquals(entry, database.getEntries().get(0));
     }
 
     @Test
@@ -183,5 +187,28 @@ public class BibDatabaseTest {
         string = new BibtexString(id, "VLSI", "Very Large Scale Integration");
         database.addString(string);
         fail();
+    }
+
+    @Test
+    public void testAddedEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.registerListener(tel);
+        database.insertEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void testRemovedEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.insertEntry(expectedEntry);
+        database.registerListener(tel);
+        database.removeEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
     }
 }

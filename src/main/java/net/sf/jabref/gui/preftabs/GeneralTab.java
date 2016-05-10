@@ -15,21 +15,33 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
+
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 
@@ -43,7 +55,6 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox keyEmptyWarningDialog;
     private final JCheckBox enforceLegalKeys;
     private final JCheckBox confirmDelete;
-    private final JCheckBox allowEditing;
     private final JCheckBox memoryStick;
     private final JCheckBox inspectionWarnDupli;
     private final JCheckBox useTimeStamp;
@@ -77,7 +88,6 @@ class GeneralTab extends JPanel implements PrefsTab {
 
         biblatexMode = new JComboBox<>(BibDatabaseMode.values());
         biblatexMode.setRenderer(new DefaultBibModeRenderer());
-        allowEditing = new JCheckBox(Localization.lang("Allow editing in table cells"));
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
         defSort = new JCheckBox(Localization.lang("Sort automatically"));
@@ -134,7 +144,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(HelpFiles.ownerHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.OWNER).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -144,7 +154,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(HelpFiles.timeStampHelp).getHelpButton();
+        help = new HelpAction(HelpFiles.TIMESTAMP).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -178,7 +188,6 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        allowEditing.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_TABLE_EDITING));
         defSort.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
         ctrlClick.setSelected(prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
@@ -238,7 +247,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
-        prefs.putBoolean(JabRefPreferences.ALLOW_TABLE_EDITING, allowEditing.isSelected());
         prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();

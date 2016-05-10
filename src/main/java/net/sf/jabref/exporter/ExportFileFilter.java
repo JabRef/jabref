@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.exporter;
 
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
+
+import javax.swing.filechooser.FileFilter;
 
 /**
  * File filter that lets the user choose export format while choosing file to

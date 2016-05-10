@@ -1,10 +1,10 @@
 package net.sf.jabref.importer;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.File;
 import java.nio.file.Paths;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Nosh&Dan

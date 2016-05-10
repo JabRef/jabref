@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * Class for holding the information about customizable entry editor tabs.

@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.external.push;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM To change this template use File | Settings

@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.gui.util.comparator;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.TypedBibEntry;
-
 import java.util.Comparator;
 import java.util.Optional;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class FirstColumnComparator implements Comparator<BibEntry> {
 

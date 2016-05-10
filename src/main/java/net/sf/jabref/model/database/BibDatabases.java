@@ -1,11 +1,11 @@
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.IdGenerator;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 
 public class BibDatabases {
 

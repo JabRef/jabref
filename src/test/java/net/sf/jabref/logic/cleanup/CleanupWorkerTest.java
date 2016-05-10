@@ -2,14 +2,23 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
@@ -17,8 +26,13 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import org.junit.*;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import static org.mockito.Mockito.mock;
 
 public class CleanupWorkerTest {
@@ -26,7 +40,7 @@ public class CleanupWorkerTest {
     @Rule
     public TemporaryFolder bibFolder = new TemporaryFolder();
 
-    private CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
+    private final CleanupPreset emptyPreset = new CleanupPreset(EnumSet.noneOf(CleanupPreset.CleanupStep.class));
     private CleanupWorker worker;
     private File pdfFolder;
 
@@ -63,7 +77,7 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupDoesNothingByDefault() throws IOException {
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         entry.setField("pdf", "aPdfFile");
         entry.setField("some", "1st");
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
@@ -107,16 +121,6 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    public void cleanupSupercriptChangesFirstToLatex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);
-        BibEntry entry = new BibEntry();
-        entry.setField("some", "1st");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals("1\\textsuperscript{st}", entry.getField("some"));
-    }
-
-    @Test
     public void cleanupDoiRemovesLeadingHttp() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -137,6 +141,30 @@ public class CleanupWorkerTest {
         FieldChange expectedChange = new FieldChange(entry, "doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3",
                 "10.1016/0001-8708(80)90035-3");
         Assert.assertEquals(Collections.singletonList(expectedChange), changes);
+    }
+
+    @Test
+    public void cleanupDoiFindsDoiInURLFieldAndMoveItToDOIField() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        BibEntry entry = new BibEntry();
+        entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals("10.1016/0001-8708(80)90035-3", entry.getField("doi"));
+        Assert.assertNull(entry.getField("url"));
+    }
+
+    @Test
+    public void cleanupDoiReturnsChangeWhenDoiInURLField() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
+        BibEntry entry = new BibEntry();
+        entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
+
+        List<FieldChange> changes = worker.cleanup(preset, entry);
+        List<FieldChange> changeList = new ArrayList<>();
+        changeList.add(new FieldChange(entry, "doi", null, "10.1016/0001-8708(80)90035-3"));
+        changeList.add(new FieldChange(entry, "url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3", null));
+        Assert.assertEquals(changeList, changes);
     }
 
     @Test
@@ -218,7 +246,7 @@ public class CleanupWorkerTest {
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
-        entry.setField(BibEntry.KEY_FIELD, "Toot");
+        entry.setCiteKey("Toot");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
@@ -269,16 +297,6 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         Assert.assertEquals("$\\alpha\\beta$", entry.getField("title"));
-    }
-
-    @Test
-    public void cleanupUnicodeConvertsAcuteToLatex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_UNICODE_TO_LATEX);
-        BibEntry entry = new BibEntry();
-        entry.setField("abstract", "Réflexions");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals("R{\\'{e}}flexions", entry.getField("abstract"));
     }
 
     @Test

@@ -1,14 +1,16 @@
 package net.sf.jabref.gui.actions;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.text.JTextComponent;
+
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
-
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class PasteAction extends AbstractAction {
     private final Component target;

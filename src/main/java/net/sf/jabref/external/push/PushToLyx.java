@@ -21,17 +21,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
@@ -70,6 +75,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
     @Override
     protected void initSettingsPanel() {
+        super.initSettingsPanel();
         settings = new JPanel();
         settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
         settings.add(path);
@@ -106,7 +112,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
         final File lyxpipe = lp;
 
-        JabRefExecutorService.INSTANCE.executeAndWait((Runnable) () -> {
+        JabRefExecutorService.INSTANCE.executeAndWait(() -> {
             try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyxOut = new BufferedWriter(fw)) {
                 String citeStr;
 

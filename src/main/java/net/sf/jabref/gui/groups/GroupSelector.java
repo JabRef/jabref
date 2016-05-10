@@ -27,7 +27,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -49,26 +53,34 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
-import net.sf.jabref.logic.groups.*;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.search.SearchMatcher;
-import net.sf.jabref.logic.search.matchers.MatcherSet;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.matchers.NotMatcher;
-import net.sf.jabref.logic.search.matchers.MatcherSets;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SidePaneComponent;
+import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.groups.AbstractGroup;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.MoveGroupChange;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.search.SearchMatcher;
+import net.sf.jabref.logic.search.matchers.MatcherSet;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
+import net.sf.jabref.logic.search.matchers.NotMatcher;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,7 +114,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             Localization.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Localization.lang("Automatically assign new entry to selected groups"));
-    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit Group Membership"),
+    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit group membership"),
             false);
     private final Border editModeBorder = BorderFactory.createTitledBorder(
             BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED), "Edit mode", TitledBorder.RIGHT, TitledBorder.TOP,
@@ -149,27 +161,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         ButtonGroup nonHits = new ButtonGroup();
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
-        floatCb.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected());
-            }
-        });
-        andCb.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected());
-            }
-        });
-        invCb.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected());
-            }
-        });
+        floatCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected()));
+        andCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected()));
+        invCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected()));
         showOverlappingGroups.addChangeListener(new ChangeListener() {
 
             @Override
@@ -181,13 +175,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             }
         });
 
-        select.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected());
-            }
-        });
+        select.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected()));
         grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
@@ -216,19 +204,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         showNumberOfElements.isSelected());
                 if (groupsTree != null) {
                     groupsTree.invalidate();
-                    groupsTree.validate();
                     groupsTree.repaint();
                 }
             }
         });
 
-        autoAssignGroup.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent event) {
-                Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
-            }
-        });
+        autoAssignGroup.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected()));
 
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
@@ -270,40 +251,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 }
             }
         });
-        JButton expand = new JButton(IconTheme.JabRefIcon.ADD_ROW.getSmallIcon());
-        expand.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) + 1;
-                groupsTree.setVisibleRowCount(i);
-                groupsTree.revalidate();
-                groupsTree.repaint();
-                GroupSelector.this.revalidate();
-                GroupSelector.this.repaint();
-                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-                LOGGER.info("Height: " + GroupSelector.this.getHeight() + "; Preferred height: "
-                        + GroupSelector.this.getPreferredSize().getHeight());
-            }
-        });
-        JButton reduce = new JButton(IconTheme.JabRefIcon.REMOVE_ROW.getSmallIcon());
-        reduce.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int i = Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS) - 1;
-                if (i < 1) {
-                    i = 1;
-                }
-                groupsTree.setVisibleRowCount(i);
-                groupsTree.revalidate();
-                groupsTree.repaint();
-                GroupSelector.this.revalidate();
-                // _panel.sidePaneManager.revalidate();
-                GroupSelector.this.repaint();
-                Globals.prefs.putInt(JabRefPreferences.GROUPS_VISIBLE_ROWS, i);
-            }
-        });
 
         editModeCb.addActionListener(e -> setEditMode(editModeCb.getState()));
 
@@ -315,7 +262,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         newButton.setMinimumSize(butDim);
         refresh.setPreferredSize(butDim);
         refresh.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.groupsHelp)
+        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.GROUP)
                 .getHelpButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);
@@ -323,14 +270,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         autoGroup.setMinimumSize(butDim);
         openset.setPreferredSize(butDim);
         openset.setMinimumSize(butDim);
-        expand.setPreferredSize(butDim);
-        expand.setMinimumSize(butDim);
-        reduce.setPreferredSize(butDim);
-        reduce.setMinimumSize(butDim);
         Insets butIns = new Insets(0, 0, 0, 0);
         helpButton.setMargin(butIns);
-        reduce.setMargin(butIns);
-        expand.setMargin(butIns);
         openset.setMargin(butIns);
         newButton.addActionListener(e -> {
             GroupDialog gd = new GroupDialog(frame, panel, null);
@@ -363,14 +304,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
         autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
-        invCb.setToolTipText(Localization.lang("Show entries *not* in group selection"));
+        invCb.setToolTipText("<html>" + Localization.lang("Show entries <b>not</b> in group selection") + "</html>");
         showOverlappingGroups.setToolTipText(
                 Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
         select.setToolTipText(Localization.lang("Select entries in group selection"));
-        expand.setToolTipText(Localization.lang("Show one more row"));
-        reduce.setToolTipText(Localization.lang("Show one less rows"));
         editModeCb.setToolTipText(Localization.lang("Click group to toggle membership of selected entries"));
         ButtonGroup bgr = new ButtonGroup();
         bgr.add(andCb);
@@ -433,16 +372,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         con.fill = GridBagConstraints.HORIZONTAL;
         gb.setConstraints(openset, con);
         pan.add(openset);
-
-        con.gridwidth = 1;
-        con.gridx = 4;
-        con.gridy = 0;
-        gb.setConstraints(expand, con);
-        pan.add(expand);
-
-        con.gridx = 5;
-        gb.setConstraints(reduce, con);
-        pan.add(reduce);
 
         con.gridwidth = 6;
         con.gridy = 1;
@@ -678,7 +607,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (panel == null) {
             return; // ignore this event (happens for example if the file was closed)
         }
-        if (getLeafsOfSelection().stream().allMatch(node -> node.isAllEntriesGroup())) {
+        if (getLeafsOfSelection().stream().allMatch(GroupTreeNodeViewModel::isAllEntriesGroup)) {
             panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
             if (showOverlappingGroups.isSelected()) {
                 groupsTree.setHighlight2Cells(null);
@@ -822,6 +751,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     @Override
     public void componentOpening() {
         valueChanged(null);
+    }
+
+    @Override
+    public int getRescalingWeight() {
+        return 1;
     }
 
     @Override
