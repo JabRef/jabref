@@ -160,6 +160,21 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testBiblatexPageNumbersChecks() {
+        assertCorrect(withMode(createContext("pages", "1--2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "12"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "1-2"), BibDatabaseMode.BIBLATEX)); // only diff to bibtex
+        assertCorrect(withMode(createContext("pages", "1,2,3"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "43+"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("pages", "1 2"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("pages", "{1}-{2}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7,41,73--97"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7,41--42,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7--11,41--43,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7+,41--43,73"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
     public void testBibStringChecks() {
         assertCorrect(createContext("title", "Not a single hash mark"));
         assertCorrect(createContext("month", "#jan#"));
@@ -197,7 +212,7 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
-    public BibDatabaseContext createContext(String field, String value, MetaData metaData) {
+    private BibDatabaseContext createContext(String field, String value, MetaData metaData) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
@@ -205,7 +220,7 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 
-    public BibDatabaseContext createContext(String field, String value) {
+    private BibDatabaseContext createContext(String field, String value) {
         return createContext(field, value, new MetaData());
     }
 
