@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -229,7 +228,7 @@ class MedlineHandler extends DefaultHandler {
             BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
                 b.setField("author",
-                        MedlineHandler.UNICODE_CONVERTER.format(StringUtil.expandAuthorInitials(author)));
+                        MedlineHandler.UNICODE_CONVERTER.format(author));
                 // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
