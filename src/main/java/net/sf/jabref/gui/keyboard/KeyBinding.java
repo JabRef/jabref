@@ -61,6 +61,7 @@ public enum KeyBinding {
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O"),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3"),
     PASTE("Paste", Localization.lang("Paste"), "ctrl V"),
+    PULL_REMOTE_CHANGES("Pull remote changes", Localization.lang("Pull remote changes"), "ctrl shift R"),
     PREAMBLE_EDITOR_STORE_CHANGES("Preamble editor, store changes", Localization.lang("Preamble editor, store changes"), "alt S"),
     PREVIOUS_TAB("Previous tab", Localization.lang("Previous tab"), "ctrl PAGE_UP"),
     PRINT_ENTRY_PREVIEW("Print entry preview", Localization.lang("Print entry preview"), "alt P"),

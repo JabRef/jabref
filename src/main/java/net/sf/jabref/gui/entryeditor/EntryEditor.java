@@ -204,6 +204,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final TabListener tabListener = new TabListener();
 
+
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;

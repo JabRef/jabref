@@ -47,6 +47,7 @@ import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.event.location.EntryEventLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -87,6 +88,16 @@ public class BibDatabase {
 
 
     private final EventBus eventBus = new EventBus();
+
+    private DatabaseLocation location;
+
+    public BibDatabase() {
+        this(DatabaseLocation.LOCAL);
+    }
+
+    public BibDatabase(DatabaseLocation location) {
+        this.location = location;
+    }
 
     /**
      * Returns the number of entries.
@@ -166,12 +177,36 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry the entry to insert into the database
+     * @param entry BibEntry to insert
      * @return false if the insert was done without a duplicate warning
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return this.insertEntry(entry, false);
+        return insertEntry(entry, EntryEventLocation.ALL);
+    }
+
+    /**
+     * Inserts the entry, given that its ID is not already in use.
+     * use Util.createId(...) to make up a unique ID for an entry.
+     *
+     * @param entry BibEntry to insert
+     * @param eventLocation Event location which is affected by inserting a new entry
+     * @return false if the insert was done without a duplicate warning
+     */
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventLocation eventLocation)
+            throws KeyCollisionException {
+        Objects.requireNonNull(entry);
+
+        String id = entry.getId();
+        if (containsEntryWithId(id)) {
+            throw new KeyCollisionException("ID is already in use, please choose another");
+        }
+
+        internalIDs.add(id);
+        entries.add(entry);
+        entry.registerListener(this);
+        eventBus.post(new EntryAddedEvent(entry, eventLocation));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
@@ -202,15 +237,26 @@ public class BibDatabase {
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
      */
     public synchronized void removeEntry(BibEntry toBeDeleted) {
+        removeEntry(toBeDeleted, EntryEventLocation.ALL);
+    }
+
+    /**
+     * Removes the given entry.
+     * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
+     * @param eventLocation Event location which is affected by deleting the entry
+     */
+    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventLocation eventLocation) {
         Objects.requireNonNull(toBeDeleted);
 
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted));
+            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventLocation));
         }
     }
 
@@ -569,4 +615,13 @@ public class BibDatabase {
     private void relayEntryChangeEvent(FieldChangedEvent event) {
         eventBus.post(event);
     }
+
+    public void setLocation(DatabaseLocation location) {
+        this.location = location;
+    }
+
+    public DatabaseLocation getLocation() {
+        return this.location;
+    }
+
 }

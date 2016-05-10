@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
@@ -40,8 +41,8 @@ import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.sql.DBStrings;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,27 +50,25 @@ public class MetaData implements Iterable<String> {
 
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
     public static final String META_FLAG = "jabref-meta: ";
-    private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    private static final String SAVE_ACTIONS = "saveActions";
-    private static final String PREFIX_KEYPATTERN = "keypattern_";
-    private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    private static final String DATABASE_TYPE = "databaseType";
+    public static final String SAVE_ACTIONS = "saveActions";
+    public static final String PREFIX_KEYPATTERN = "keypattern_";
+    public static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    public static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
-    private static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String PROTECTED_FLAG_META = "protectedFlag";
 
-    private final Map<String, List<String>> metaData = new HashMap<>();
+    private Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
+    private final EventBus eventBus = new EventBus();
 
     private AbstractLabelPattern labelPattern;
 
-    private DBStrings dbStrings = new DBStrings();
-
     private Charset encoding = Globals.prefs.getDefaultEncoding();
-
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -158,7 +157,10 @@ public class MetaData implements Iterable<String> {
      * @param key the key to remove
      */
     public void remove(String key) {
-        metaData.remove(key);
+        if (metaData.containsKey(key)) { //otherwise redundant and disturbing events are going to be posted
+            metaData.remove(key);
+            postChange();
+        }
     }
 
     /**
@@ -169,6 +171,7 @@ public class MetaData implements Iterable<String> {
      */
     public void putData(String key, List<String> orderedData) {
         metaData.put(key, orderedData);
+        postChange();
     }
 
     /**
@@ -220,14 +223,6 @@ public class MetaData implements Iterable<String> {
             return Optional.of(res.toString());
         }
         return Optional.empty();
-    }
-
-    public DBStrings getDBStrings() {
-        return dbStrings;
-    }
-
-    public void setDBStrings(DBStrings dbStrings) {
-        this.dbStrings = dbStrings;
     }
 
     /**
@@ -446,6 +441,13 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
+     * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
+     */
+    private void postChange() {
+        eventBus.post(new MetaDataChangedEvent(this));
+    }
+
+    /**
      * Returns the encoding used during parsing.
      */
     public Charset getEncoding() {
@@ -454,5 +456,21 @@ public class MetaData implements Iterable<String> {
 
     public void setEncoding(Charset encoding) {
         this.encoding = Objects.requireNonNull(encoding);
+    }
+
+    public void clearMetaData() {
+        metaData.clear();
+    }
+
+    public Map<String, List<String>> getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(Map<String, List<String>> metaData) {
+        this.metaData = metaData;
+    }
+
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
     }
 }

@@ -85,7 +85,7 @@ public class FieldFormatterCleanups {
         return Objects.hash(actions, enabled);
     }
 
-    private static List<FieldFormatterCleanup> parse(String formatterString) {
+    public static List<FieldFormatterCleanup> parse(String formatterString) {
 
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data
@@ -214,7 +214,7 @@ public class FieldFormatterCleanups {
 
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
 
-        if (formatterMetaList != null && formatterMetaList.size() >= 2) {
+        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
             boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));
             String formatterString = formatterMetaList.get(1);
             return new FieldFormatterCleanups(enablementStatus, formatterString);

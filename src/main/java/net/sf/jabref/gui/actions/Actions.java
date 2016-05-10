@@ -18,7 +18,6 @@ public class Actions {
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String CUT = "cut";
     public static final String DB_CONNECT = "dbConnect";
-    public static final String DB_EXPORT = "dbExport";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
@@ -41,6 +40,7 @@ public class Actions {
     public static final String OPEN_URL = "openUrl";
     public static final String PASTE = "paste";
     public static final String PLAIN_TEXT_IMPORT = "plainTextImport";
+    public static final String PULL_REMOTE_CHANGES = "pullRemoteChanges";
     public static final String REDO = "redo";
     public static final String REMOVE_FROM_GROUP = "removeFromGroup";
     public static final String REPLACE_ALL = "replaceAll";

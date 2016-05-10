@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.event;
 
+import net.sf.jabref.event.location.EntryEventLocation;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -26,7 +27,7 @@ public class EntryAddedEvent extends EntryEvent {
     /**
      * flag if the addition is the undo of a deletion/cut
      */
-    private boolean isUndo;
+    private final boolean isUndo;
 
     /**
      * @param bibEntry the entry which has been added
@@ -45,7 +46,17 @@ public class EntryAddedEvent extends EntryEvent {
         this.isUndo = isUndo;
     }
 
+    /**
+     * @param bibEntry <code>BibEntry</code> object which has been added.
+     * @param location Location affected by this event
+     */
+    public EntryAddedEvent(BibEntry bibEntry, EntryEventLocation location) {
+        super(bibEntry, location);
+        this.isUndo = false;
+    }
+
     public boolean isUndo() {
         return isUndo;
     }
+
 }

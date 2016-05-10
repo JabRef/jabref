@@ -127,6 +127,7 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -140,12 +141,6 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.sql.DBConnectDialog;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
-import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.DbConnectAction;
-import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;
@@ -268,22 +263,28 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public String getTabTitle() {
         StringBuilder title = new StringBuilder();
+        DatabaseLocation databaseLocation = this.bibDatabaseContext.getDatabase().getLocation();
 
-        if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title.append(GUIGlobals.UNTITLED_TITLE);
+        if (databaseLocation == DatabaseLocation.LOCAL) {
+            if (this.bibDatabaseContext.getDatabaseFile() == null) {
+                title.append(GUIGlobals.UNTITLED_TITLE);
 
-            if (getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                // This also happens internally at basepanel to ensure consistency line 224
-                title.append('*');
+                if (getDatabase().hasEntries()) {
+                    // if the database is not empty and no file is assigned,
+                    // the database came from an import and has to be treated somehow
+                    // -> mark as changed
+                    // This also happens internally at basepanel to ensure consistency line 224
+                    title.append('*');
+                }
+            } else {
+                // check if file is modified
+                String changeFlag = isModified() ? "*" : "";
+                title.append(this.bibDatabaseContext.getDatabaseFile().getName()).append(changeFlag);
             }
-        } else {
-            // check if file is modified
-            String changeFlag = isModified() ? "*" : "";
-            title.append(getBibDatabaseContext().getDatabaseFile().getName()).append(changeFlag);
+        } else if (databaseLocation == DatabaseLocation.REMOTE) {
+            title.append(this.bibDatabaseContext.getDBSynchronizer().getDBName() + " (remote)");
         }
+
         return title.toString();
     }
 
@@ -398,98 +399,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.TOGGLE_GROUPS, (BaseAction) () -> {
             sidePaneManager.toggle("groups");
             frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-        });
-
-        // action for collecting database strings from user
-        actions.put(Actions.DB_CONNECT, new DbConnectAction(this));
-
-        // action for exporting database to external SQL database
-        actions.put(Actions.DB_EXPORT, new AbstractWorker() {
-
-            String errorMessage = "";
-            boolean connectedToDB;
-
-            // run first, in EDT:
-            @Override
-            public void init() {
-
-                DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                // get DBStrings from user if necessary
-                if (dbs.isConfigValid()) {
-                    connectedToDB = true;
-                } else {
-                    // init DB strings if necessary
-                    if (!dbs.isInitialized()) {
-                        dbs.initialize();
-                    }
-
-                    // show connection dialog
-                    DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                    dbd.setLocationRelativeTo(BasePanel.this);
-                    dbd.setVisible(true);
-
-                    connectedToDB = dbd.isConnectedToDB();
-
-                    // store database strings
-                    if (connectedToDB) {
-                        dbs = dbd.getDBStrings();
-                        bibDatabaseContext.getMetaData().setDBStrings(dbs);
-                        dbd.dispose();
-                    }
-                }
-            }
-
-            // run second, on a different thread:
-            @Override
-            public void run() {
-                if (!connectedToDB) {
-                    return;
-                }
-
-                final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                try {
-                    frame.output(Localization.lang("Attempting SQL export..."));
-                    final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                    final DatabaseExporter exporter = factory.getExporter(dbs.getDbPreferences().getServerType());
-                    exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
-                    dbs.isConfigValid(true);
-                } catch (Exception ex) {
-                    final String preamble = Localization
-                            .lang("Could not export to SQL database for the following reason:");
-                    errorMessage = SQLUtil.getExceptionMessage(ex);
-                    LOGGER.info("Could not export to SQL database", ex);
-                    dbs.isConfigValid(false);
-                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-                }
-
-                bibDatabaseContext.getMetaData().setDBStrings(dbs);
-            }
-
-            // run third, on EDT:
-            @Override
-            public void update() {
-
-                // if no error, report success
-                if (errorMessage.isEmpty()) {
-                    if (connectedToDB) {
-                        final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-                        frame.output(Localization.lang("%0 export successful", dbs.getDbPreferences().getServerType().getFormattedName()));
-                    }
-                } else { // show an error dialog if an error occurred
-                    final String preamble = Localization
-                            .lang("Could not export to SQL database for the following reason:");
-                    frame.output(preamble + "  " + errorMessage);
-
-                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-
-                    errorMessage = "";
-                }
-            }
-
         });
 
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
@@ -646,6 +555,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
+
+        actions.put(Actions.PULL_REMOTE_CHANGES, (BaseAction) () -> {
+            frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer().synchronizeLocalDatabase();
+        });
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 

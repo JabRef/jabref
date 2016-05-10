@@ -26,6 +26,7 @@ install: true
 # allow gui testing on travis
 before_script:
   - psql -c 'create database jabref;' -U postgres
+  - mysql -u root -e 'create database jabref'
 
 script:
   - ./gradlew check

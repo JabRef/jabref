@@ -9,6 +9,8 @@ import java.util.Optional;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
+import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.remote.DBSynchronizer;
 
 /**
  * Represents everything related to a .bib file.
@@ -22,6 +24,7 @@ public class BibDatabaseContext {
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
+    private DBSynchronizer dbSynchronizer;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -35,6 +38,14 @@ public class BibDatabaseContext {
         this(database, new Defaults());
     }
 
+    public BibDatabaseContext(DatabaseLocation location) {
+        this(new BibDatabase(location));
+    }
+
+    public BibDatabaseContext(DatabaseLocation location, Defaults defaults) {
+        this(new BibDatabase(location), defaults);
+    }
+
     public BibDatabaseContext(BibDatabase database, Defaults defaults) {
         this(database, new MetaData(), defaults);
     }
@@ -43,6 +54,12 @@ public class BibDatabaseContext {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
+
+        if (database.getLocation() == DatabaseLocation.REMOTE) {
+            this.dbSynchronizer = new DBSynchronizer(database, metaData);
+            this.database.registerListener(dbSynchronizer);
+            this.metaData.registerListener(dbSynchronizer);
+        }
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
@@ -177,5 +194,9 @@ public class BibDatabaseContext {
 
     public List<String> getFileDirectory() {
         return getFileDirectory(Globals.FILE_FIELD);
+    }
+
+    public DBSynchronizer getDBSynchronizer() {
+        return this.dbSynchronizer;
     }
 }
