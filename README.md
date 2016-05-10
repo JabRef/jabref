@@ -20,7 +20,7 @@ We use [install4j], the multi-platform installer builder.
 
 ### Background
 
-JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] (`.bib`) databases.
+JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] `.bib` databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
 You can customize the entry information shown in the main window, and sort by any of the standard BibTeX fields.
 JabRef can autogenerate BibTeX keys for your entries.
