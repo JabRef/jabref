@@ -105,6 +105,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.date.TimeStamp;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -114,6 +115,13 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
+import javafx.application.Platform;
+import javafx.concurrent.Worker;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.StackPane;
+import javafx.scene.web.WebView;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -313,6 +321,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // general fields from preferences
         addGeneralTabs();
+        // special tabs (like MathSciNet Reviews)
+        addSpecialTabs();
         // source tab
         addSourceTab();
     }
@@ -327,6 +337,41 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
+        }
+    }
+
+    private void addSpecialTabs() {
+
+        // MathSciNet Review
+        if(entry.hasField("MRNumber")) {
+            String mrNumberRaw = entry.getField("MRNumber");
+            // Take everything before whitespace or open bracket, so something like `619693 (82j:58046)` gets parsed correctly
+            String mrNumber = StringUtil.tokenizeToList(mrNumberRaw, " (").get(0);
+
+            JFXPanel reviewPane = new JFXPanel();
+            tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
+            tabs.add(reviewPane);
+
+            // Execute on JavaFX Application Thread
+            Platform.runLater(() -> {
+                StackPane root = new StackPane();
+                ProgressBar progress = new ProgressBar();
+                WebView browser = new WebView();
+                //root.getChildren().add(progress);
+                root.getChildren().addAll(browser, progress);
+                reviewPane.setScene(new Scene(root));
+
+                browser.getEngine().load("http://www.ams.org/mathscinet-getitem?mr=" + mrNumber);
+
+                // Update progress according to browser
+                progress.progressProperty().bind(browser.getEngine().getLoadWorker().progressProperty());
+                // Hide progress indicator if finished
+                browser.getEngine().getLoadWorker().stateProperty().addListener((observable, oldState, newState) -> {
+                    if(newState == Worker.State.SUCCEEDED) {
+                        progress.setVisible(false);
+                    }
+                });
+            });
         }
     }
 
