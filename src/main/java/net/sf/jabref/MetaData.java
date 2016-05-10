@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import net.sf.jabref.event.GroupUpdatedEvent;
+import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
@@ -43,8 +45,8 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.sql.DBStrings;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,13 +68,11 @@ public class MetaData implements Iterable<String> {
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
+    private final EventBus eventBus = new EventBus();
 
     private AbstractLabelPattern labelPattern;
 
-    private DBStrings dbStrings = new DBStrings();
-
     private Charset encoding = Globals.prefs.getDefaultEncoding();
-
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -82,7 +82,22 @@ public class MetaData implements Iterable<String> {
      */
     private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
+        setData(inData);
+    }
 
+    /**
+     * The MetaData object can be constructed with no data in it.
+     */
+    public MetaData() {
+        // No data
+    }
+
+    public static MetaData parse(Map<String, String> data) throws ParseException {
+        return new MetaData(data);
+    }
+
+    public void setData(Map<String, String> inData) throws ParseException {
+        clearMetaData();
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
             List<String> orderedData = new ArrayList<>();
@@ -98,23 +113,13 @@ public class MetaData implements Iterable<String> {
             if (GROUPSTREE.equals(entry.getKey())) {
                 putGroups(orderedData);
                 // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not support them anymore
+                eventBus.post(new GroupUpdatedEvent(this));
             } else if (SAVE_ACTIONS.equals(entry.getKey())) {
-                setSaveActions(FieldFormatterCleanups.parse(orderedData));
+                metaData.put(SAVE_ACTIONS, FieldFormatterCleanups.parse(orderedData).getAsStringList()); // Without MetaDataChangedEvent
             } else {
-                putData(entry.getKey(), orderedData);
+                metaData.put(entry.getKey(), orderedData);
             }
         }
-    }
-
-    /**
-     * The MetaData object can be constructed with no data in it.
-     */
-    public MetaData() {
-        // No data
-    }
-
-    public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data);
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
@@ -161,7 +166,10 @@ public class MetaData implements Iterable<String> {
      * @param key the key to remove
      */
     public void remove(String key) {
-        metaData.remove(key);
+        if (metaData.containsKey(key)) { //otherwise redundant and disturbing events are going to be posted
+            metaData.remove(key);
+            postChange();
+        }
     }
 
     /**
@@ -172,6 +180,7 @@ public class MetaData implements Iterable<String> {
      */
     public void putData(String key, List<String> orderedData) {
         metaData.put(key, orderedData);
+        postChange();
     }
 
     /**
@@ -182,6 +191,7 @@ public class MetaData implements Iterable<String> {
     private void putGroups(List<String> orderedData) throws ParseException {
         try {
             groupsRoot = GroupTreeNode.parse(orderedData, Globals.prefs);
+            eventBus.post(new GroupUpdatedEvent(this));
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
                     "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
@@ -198,6 +208,7 @@ public class MetaData implements Iterable<String> {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
+        eventBus.post(new GroupUpdatedEvent(this));
     }
 
     /**
@@ -223,14 +234,6 @@ public class MetaData implements Iterable<String> {
             return Optional.of(res.toString());
         }
         return Optional.empty();
-    }
-
-    public DBStrings getDBStrings() {
-        return dbStrings;
-    }
-
-    public void setDBStrings(DBStrings dbStrings) {
-        this.dbStrings = dbStrings;
     }
 
     /**
@@ -390,7 +393,6 @@ public class MetaData implements Iterable<String> {
             }
             serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
         }
-
         return serializedMetaData;
     }
 
@@ -449,6 +451,13 @@ public class MetaData implements Iterable<String> {
     }
 
     /**
+     * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
+     */
+    public void postChange() {
+        eventBus.post(new MetaDataChangedEvent(this));
+    }
+
+    /**
      * Returns the encoding used during parsing.
      */
     public Charset getEncoding() {
@@ -457,5 +466,17 @@ public class MetaData implements Iterable<String> {
 
     public void setEncoding(Charset encoding) {
         this.encoding = Objects.requireNonNull(encoding);
+    }
+
+    public void clearMetaData() {
+        metaData.clear();
+    }
+
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
+    }
+
+    public void unregisterListener(Object listener) {
+        this.eventBus.unregister(listener);
     }
 }

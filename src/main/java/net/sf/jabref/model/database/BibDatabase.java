@@ -43,6 +43,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -167,24 +168,24 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry the entry to insert into the database
+     * @param entry BibEntry to insert into the database
      * @return false if the insert was done without a duplicate warning
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return this.insertEntry(entry, false);
+        return insertEntry(entry, EntryEventSource.LOCAL);
     }
 
     /**
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry  the entry to insert into the database
-     * @param isUndo set to true if the insertion is caused by an undo
+     * @param entry BibEntry to insert
+     * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
-    public synchronized boolean insertEntry(BibEntry entry, boolean isUndo) throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource)
+            throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -196,22 +197,33 @@ public class BibDatabase {
         entries.add(entry);
         entry.registerListener(this);
 
-        eventBus.post(new EntryAddedEvent(entry, isUndo));
+        eventBus.post(new EntryAddedEvent(entry, eventSource));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
      */
     public synchronized void removeEntry(BibEntry toBeDeleted) {
+        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Removes the given entry.
+     * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
+     * @param eventSource Source the event is sent from
+     */
+    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
-            eventBus.post(new EntryRemovedEvent(toBeDeleted));
+            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
         }
     }
 
@@ -566,6 +578,14 @@ public class BibDatabase {
      */
     public void registerListener(Object listener) {
         this.eventBus.register(listener);
+    }
+
+    /**
+     * Unregisters an listener object.
+     * @param listener listener (subscriber) to remove
+     */
+    public void unregisterListener(Object listener) {
+        this.eventBus.unregister(listener);
     }
 
     @Subscribe

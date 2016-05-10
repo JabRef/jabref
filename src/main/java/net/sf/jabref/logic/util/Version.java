@@ -46,7 +46,8 @@ public class Version {
      * @param version must be in form of X.X (e.g., 3.3; 3.4dev)
      */
     public Version(String version) {
-        if ((version == null) || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)) {
+        if ((version == null) || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)
+                || "${version}".equals(version)) {
             return;
         }
 
