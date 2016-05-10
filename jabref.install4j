@@ -371,6 +371,63 @@ return true;</string>
                 </serializedBean>
                 <condition>context.getBooleanVariable("addToDockAction")</condition>
               </action>
+              <group name="Registry" id="239" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+                <serializedBean>
+                  <java class="java.beans.XMLDecoder">
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup" />
+                  </java>
+                </serializedBean>
+                <beans>
+                  <action name="PathAdmin" id="238" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\JabRef</string>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_LOCAL_MACHINE</string>
+                            </object>
+                          </void>
+                          <void property="value">
+                            <string>${installer:sys.installationDir}</string>
+                          </void>
+                          <void property="valueName">
+                            <string>Path</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>Util.hasFullAdminRights()</condition>
+                  </action>
+                  <action name="PathUnprivileged" id="240" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\JabRef</string>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_CURRENT_USER</string>
+                            </object>
+                          </void>
+                          <void property="value">
+                            <string>${installer:sys.installationDir}</string>
+                          </void>
+                          <void property="valueName">
+                            <string>Path</string>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>!Util.hasFullAdminRights()</condition>
+                  </action>
+                </beans>
+              </group>
             </actions>
             <formComponents />
           </screen>
