@@ -11,7 +11,6 @@ public class Actions {
     public static final String ADD_TO_GROUP = "addToGroup";
     public static final String AUTO_SET_FILE = "autoSetFile";
     public static final String BACK = "back";
-    public static final String CHECK_INTEGRITY = "checkIntegrity";
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
     public static final String COPY_KEY = "copyKey";
