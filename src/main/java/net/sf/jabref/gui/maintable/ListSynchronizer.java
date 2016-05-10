@@ -15,13 +15,15 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.model.database.DatabaseChangeEvent;
-import net.sf.jabref.model.database.DatabaseChangeListener;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.EventList;
+import com.google.common.eventbus.Subscribe;
 
-public class ListSynchronizer implements DatabaseChangeListener {
+public class ListSynchronizer {
 
     private final EventList<BibEntry> list;
 
@@ -29,27 +31,47 @@ public class ListSynchronizer implements DatabaseChangeListener {
         this.list = list;
     }
 
-    @Override
-    public void databaseChanged(DatabaseChangeEvent e) {
-        list.getReadWriteLock().writeLock().lock();
+    @Subscribe
+    public void listen(EntryAddedEvent entryAddedEvent) {
+        lock();
         try {
-            if (e.getType() == DatabaseChangeEvent.ChangeType.ADDED_ENTRY) {
-                list.add(e.getEntry());
-            } else if (e.getType() == DatabaseChangeEvent.ChangeType.REMOVED_ENTRY) {
-                list.remove(e.getEntry());
-            } else if (e.getType() == DatabaseChangeEvent.ChangeType.CHANGED_ENTRY) {
-                int index = list.indexOf(e.getEntry());
-                if (index != -1) {
-                    // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
-                    // DatabaseChangeEvent.ADDED_ENTRY
-                    // thus,
-                    list.set(index, e.getEntry());
-                }
-            }
+            list.add(entryAddedEvent.getBibEntry());
         } finally {
-            list.getReadWriteLock().writeLock().unlock();
+            unlock();
         }
-
     }
 
+    @Subscribe
+    public void listen(EntryRemovedEvent entryRemovedEvent) {
+        lock();
+        try {
+            list.remove(entryRemovedEvent.getBibEntry());
+        } finally {
+            unlock();
+        }
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent entryChangedEvent) {
+        lock();
+        try {
+            int index = list.indexOf(entryChangedEvent.getBibEntry());
+            if (index != -1) {
+                // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
+                // DatabaseChangeEvent.ADDED_ENTRY
+                // thus,
+                list.set(index, entryChangedEvent.getBibEntry());
+            }
+        } finally {
+            unlock();
+        }
+    }
+
+    private void lock() {
+        list.getReadWriteLock().writeLock().lock();
+    }
+
+    private void unlock() {
+        list.getReadWriteLock().writeLock().unlock();
+    }
 }

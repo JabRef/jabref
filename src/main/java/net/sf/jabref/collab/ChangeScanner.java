@@ -138,7 +138,7 @@ public class ChangeScanner implements Runnable {
 
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
-            SwingUtilities.invokeLater((Runnable) () -> {
+            SwingUtilities.invokeLater(() -> {
                 ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
                 dial.setLocationRelativeTo(frame);
                 dial.setVisible(true);
@@ -157,7 +157,7 @@ public class ChangeScanner implements Runnable {
     }
 
     private void storeTempDatabase() {
-        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+        JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
                         .withEncoding(panel.getEncoding());

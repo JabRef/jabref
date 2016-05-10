@@ -286,7 +286,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             final List<String> fieldNames = modelColumn.getBibtexFields();
 
             // Open it now. We do this in a thread, so the program won't freeze during the wait.
-            JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+            JabRefExecutorService.INSTANCE.execute(() -> {
                 panel.output(Localization.lang("External viewer called") + '.');
                 // check for all field names whether a link is present
                 // (is relevant for combinations such as "url/doi")

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General public static License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -85,9 +85,10 @@ public class DatabaseExporter {
      * @param databaseContext the database to export
      * @param entriesToExport The list of the entries to export.
      * @param out             The output (PrintStream or Connection) object to which the DML should be written.
+     * @throws SQLException
      */
     public void performExport(BibDatabaseContext databaseContext, List<BibEntry> entriesToExport,
-            Connection out, String dbName) throws Exception {
+            Connection out, String dbName) throws SQLException {
 
         SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         List<BibEntry> entries = BibDatabaseWriter.getSortedEntries(databaseContext, entriesToExport, savePrefs);
@@ -144,23 +145,11 @@ public class DatabaseExporter {
      */
 
     private int populateEntryGroupsTable(GroupTreeNode cursor, int parentID, int currentID, Connection connection,
-            final int database_id) throws SQLException {
+            final int database_id) {
 
         if (cursor == null) {
             // no groups passed
             return -1;
-        }
-
-        // if this group contains entries...
-        if (cursor.getGroup() instanceof ExplicitGroup) {
-            ExplicitGroup grp = (ExplicitGroup) cursor.getGroup();
-            for (BibEntry be : grp.getEntries()) {
-                SQLUtil.processQuery(connection, "INSERT INTO entry_group (entries_id, groups_id) " + "VALUES ("
-                        + "(SELECT entries_id FROM entries WHERE jabref_eid=" + '\'' + be.getId()
-                        + "' AND database_id = " + database_id + "), "
-                        + "(SELECT groups_id FROM groups WHERE database_id=" + '\'' + database_id + "' AND parent_id="
-                        + '\'' + parentID + "' AND label=" + '\'' + grp.getName() + "')" + ");");
-            }
         }
 
         // recurse on child nodes (depth-first traversal)
@@ -291,7 +280,7 @@ public class DatabaseExporter {
                 + "');");
 
         // recurse on child nodes (depth-first traversal)
-        try (Statement statement = ((Connection) out).createStatement();
+        try (Statement statement = out.createStatement();
                 ResultSet rs = statement.executeQuery(
                         "SELECT groups_id FROM groups WHERE label='" + cursor.getGroup().getName() + "' AND database_id='"
                                 + database_id + "' AND parent_id='" + parentID + "';")) {
@@ -320,7 +309,7 @@ public class DatabaseExporter {
     private static void populateGroupTypesTable(Connection out) throws SQLException {
         int quantity = 0;
 
-        try (Statement sm = ((Connection) out).createStatement();
+        try (Statement sm = out.createStatement();
                 ResultSet res = sm.executeQuery("SELECT COUNT(*) AS amount FROM group_types")) {
             res.next();
             quantity = res.getInt("amount");
@@ -396,37 +385,33 @@ public class DatabaseExporter {
     public void exportDatabaseToDBMS(final BibDatabaseContext databaseContext,
             List<BibEntry> entriesToExport, DBStrings databaseStrings, JabRefFrame frame) throws Exception {
         String dbName;
-        Connection conn = null;
         boolean redisplay = false;
-        try {
-            conn = this.connectToDB(databaseStrings);
-            createTables(conn);
-            Vector<Vector<String>> matrix = createExistentDBNamesMatrix(databaseStrings);
-            DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
-                    DBImportExportDialog.DialogType.EXPORTER);
-            if (dialogo.removeAction) {
-                dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
-                redisplay = true;
-            } else if (dialogo.hasDBSelected) {
-                dbName = getDBName(matrix, databaseStrings, frame, dialogo);
-                performExport(databaseContext, entriesToExport, conn, dbName);
-            }
-            if (!conn.getAutoCommit()) {
-                conn.commit();
-                conn.setAutoCommit(true);
-            }
-            if (redisplay) {
-                exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
-            }
-        } catch (SQLException ex) {
-            if ((conn != null) && !conn.getAutoCommit()) {
-                conn.rollback();
-            }
-            throw ex;
-        } finally {
-            if (conn != null) {
-                conn.close();
+        try(Connection conn = this.connectToDB(databaseStrings)) {
+            try {
+                createTables(conn);
+                Vector<Vector<String>> matrix = createExistentDBNamesMatrix(databaseStrings);
+                DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
+                        DBImportExportDialog.DialogType.EXPORTER);
+                if (dialogo.removeAction) {
+                    dbName = getDBName(matrix, databaseStrings, frame, dialogo);
+                    DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
+                    redisplay = true;
+                } else if (dialogo.hasDBSelected) {
+                    dbName = getDBName(matrix, databaseStrings, frame, dialogo);
+                    performExport(databaseContext, entriesToExport, conn, dbName);
+                }
+                if (!conn.getAutoCommit()) {
+                    conn.commit();
+                    conn.setAutoCommit(true);
+                }
+                if (redisplay) {
+                    exportDatabaseToDBMS(databaseContext, entriesToExport, databaseStrings, frame);
+                }
+            } catch (SQLException ex) {
+                if ((conn != null) && !conn.getAutoCommit()) {
+                    conn.rollback();
+                }
+                throw ex;
             }
         }
     }

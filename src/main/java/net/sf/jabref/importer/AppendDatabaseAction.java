@@ -35,6 +35,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
@@ -93,16 +94,8 @@ public class AppendDatabaseAction implements BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    openIt(md.importEntries(), md.importStrings(),
-                            md.importGroups(), md.importSelectorWords());
-                }
-
-            });
-            //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
+            JabRefExecutorService.INSTANCE.execute(() -> openIt(md.importEntries(), md.importStrings(),
+                    md.importGroups(), md.importSelectorWords()));
         }
 
     }
@@ -173,20 +166,20 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    ExplicitGroup group = null;
+                    try {
+                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    } catch (ParseException e) {
+                        LOGGER.error(e);
+                    }
                     newGroups.setGroup(group);
-                    appendedEntries.stream().map(group::addEntry);
+                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-
-                // for explicit groups, the entries copied to the mother fromDatabase have to
-                // be "reassigned", i.e. the old reference is removed and the reference
-                // to the new fromDatabase is added.
-                newGroups.replaceEntriesInExplicitGroup(originalEntries, appendedEntries);
             }
         }
 

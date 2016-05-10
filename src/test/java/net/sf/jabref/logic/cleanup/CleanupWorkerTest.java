@@ -121,16 +121,6 @@ public class CleanupWorkerTest {
     }
 
     @Test
-    public void cleanupSupercriptChangesFirstToLatex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);
-        BibEntry entry = new BibEntry();
-        entry.setField("some", "1st");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals("1\\textsuperscript{st}", entry.getField("some"));
-    }
-
-    @Test
     public void cleanupDoiRemovesLeadingHttp() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         BibEntry entry = new BibEntry();
@@ -307,16 +297,6 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         Assert.assertEquals("$\\alpha\\beta$", entry.getField("title"));
-    }
-
-    @Test
-    public void cleanupUnicodeConvertsAcuteToLatex() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_UNICODE_TO_LATEX);
-        BibEntry entry = new BibEntry();
-        entry.setField("abstract", "Réflexions");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals("R{\\'{e}}flexions", entry.getField("abstract"));
     }
 
     @Test

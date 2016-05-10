@@ -56,7 +56,7 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
                 if (code == null) {
                     sb.append((char) cpCurrent);
                 } else {
-                    sb.append("{\\" + code + '{' + (char) cpCurrent + "}}");
+                    sb.append("{\\").append(code).append('{').append((char) cpCurrent).append("}}");
                     consumed = true;
                 }
             } else {

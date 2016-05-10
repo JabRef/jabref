@@ -317,8 +317,7 @@ public class FileListEntryEditor {
                     if (fl.isAbsolute()) {
                         String flPath = fl.getCanonicalPath();
                         if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                            String relFileName = fl.getCanonicalPath().substring(canPath.length() + 1);
-                            link = relFileName;
+                            link = fl.getCanonicalPath().substring(canPath.length() + 1);
                             found = true;
                             break;
                         }
@@ -363,7 +362,7 @@ public class FileListEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(parent, initial, Globals.NONE,
+            String chosen = FileDialogs.getNewFile(parent, initial, "",
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

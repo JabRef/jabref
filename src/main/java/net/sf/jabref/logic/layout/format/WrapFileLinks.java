@@ -18,7 +18,7 @@ package net.sf.jabref.logic.layout.format;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +171,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         // ugly hack, the export routine has set a global variable before
                         // starting the export, which contains the database's file directory:
                         if (Globals.prefs.fileDirForDatabase == null) {
-                            dirs = Arrays.asList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
+                            dirs = Collections.singletonList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
                         } else {
                             dirs = Globals.prefs.fileDirForDatabase;
                         }

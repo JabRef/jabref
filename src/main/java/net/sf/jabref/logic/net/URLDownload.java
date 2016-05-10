@@ -123,7 +123,7 @@ public class URLDownload {
         }
         if (!postData.isEmpty()) {
             connection.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream());) {
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(postData);
             }
 

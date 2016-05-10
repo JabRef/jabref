@@ -809,7 +809,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     private void signalStopFetching() {
-        callBacks.forEach(c -> c.stopFetching());
+        callBacks.forEach(CallBack::stopFetching);
     }
 
     private void setWidths() {

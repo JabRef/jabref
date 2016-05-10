@@ -461,10 +461,10 @@ class ManageJournalsPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             String chosen;
             if (dir) {
-                chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE, JFileChooser.OPEN_DIALOG,
+                chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), "", JFileChooser.OPEN_DIALOG,
                         false);
             } else {
-                chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE, JFileChooser.OPEN_DIALOG,
+                chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), "", JFileChooser.OPEN_DIALOG,
                         false);
             }
             if (chosen != null) {

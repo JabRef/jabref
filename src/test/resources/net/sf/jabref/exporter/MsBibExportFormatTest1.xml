@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:SourceType>Report</b:SourceType>
+<b:BIBTEX_Entry>unpublished</b:BIBTEX_Entry>
+<b:ShortTitle>Turing</b:ShortTitle>
+<b:Comments>a Note</b:Comments>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Stoß</b:Last>
+<b:First>Hanns-Jörg</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+<b:Editor>
+<b:NameList>
+<b:Person>
+<b:Last>Alfred</b:Last>
+</b:Person>
+</b:NameList>
+</b:Editor>
+</b:Author>
+<b:NumberVolumes>10</b:NumberVolumes>
+<b:Edition>10</b:Edition>
+<b:StandardNumber> ISBN: ‎978-3-16-148410-0</b:StandardNumber>
+<b:City>Stuttgart</b:City>
+<b:StateProvince>Bawue</b:StateProvince>
+<b:CountryRegion>Deutschland</b:CountryRegion>
+<b:BookTitle>Turingmaschinen</b:BookTitle>
+<b:ChapterNumber>3</b:ChapterNumber>
+<b:PeriodicalTitle>peri</b:PeriodicalTitle>
+<b:ConferenceName>Turingmaschinen</b:ConferenceName>
+<b:Department>Gymnasium Unterrieden</b:Department>
+<b:Institution>Institution</b:Institution>
+<b:ThesisType>unpublished</b:ThesisType>
+<b:MonthAccessed>12</b:MonthAccessed>
+<b:DayAccessed>10</b:DayAccessed>
+<b:YearAccessed>2015</b:YearAccessed>
+<b:Month>July</b:Month>
+<b:ProductionCompany>produktion</b:ProductionCompany>
+<b:Medium>med</b:Medium>
+<b:RecordingNumber>record</b:RecordingNumber>
+<b:Theater>th</b:Theater>
+<b:Distributor>dist</b:Distributor>
+<b:Broadcaster>broad</b:Broadcaster>
+<b:Station>stat</b:Station>
+<b:Type>type</b:Type>
+<b:PatentNumber>pat</b:PatentNumber>
+<b:Court>court</b:Court>
+<b:Reporter>rep</b:Reporter>
+<b:CaseNumber>case</b:CaseNumber>
+<b:AbbreviatedCaseNumber>abb</b:AbbreviatedCaseNumber>
+<b:BIBTEX_Series>ser</b:BIBTEX_Series>
+<b:BIBTEX_Abstract>here should stand something about the content</b:BIBTEX_Abstract>
+<b:BIBTEX_CrossRef>cross</b:BIBTEX_CrossRef>
+<b:BIBTEX_HowPublished>how</b:BIBTEX_HowPublished>
+<b:BIBTEX_Affiliation>aff</b:BIBTEX_Affiliation>
+<b:BIBTEX_Contents>con</b:BIBTEX_Contents>
+<b:BIBTEX_Copyright>cop</b:BIBTEX_Copyright>
+<b:BIBTEX_Price>10</b:BIBTEX_Price>
+<b:BIBTEX_Size>1000</b:BIBTEX_Size>
+<b:BIBTEX_InType>intype</b:BIBTEX_InType>
+<b:BIBTEX_Paper>paper</b:BIBTEX_Paper>
+</b:Source>
+</b:Sources>

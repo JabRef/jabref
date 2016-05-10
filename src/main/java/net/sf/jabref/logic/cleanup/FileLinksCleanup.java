@@ -13,7 +13,6 @@
 */
 package net.sf.jabref.logic.cleanup;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class FileLinksCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
         if (!oldValue.isPresent()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         List<ParsedFileField> fileList = FileField.parse(oldValue.get());
@@ -45,6 +44,6 @@ public class FileLinksCleanup implements CleanupJob {
             FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
             return Collections.singletonList(change);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

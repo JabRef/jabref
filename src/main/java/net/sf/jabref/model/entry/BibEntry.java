@@ -15,10 +15,6 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
-import java.beans.VetoableChangeSupport;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.ParseException;
@@ -36,13 +32,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class BibEntry {
+public class BibEntry implements Cloneable {
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
@@ -54,8 +52,6 @@ public class BibEntry {
     private String type;
     private Map<String, String> fields = new HashMap<>();
 
-    private final VetoableChangeSupport changeSupport = new VetoableChangeSupport(this);
-
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
@@ -63,35 +59,89 @@ public class BibEntry {
     private String parsedSerialization;
 
     /*
-    * marks if the complete serialization, which was read from file, should be used.
-    * Is set to false, if parts of the entry change
+     * Marks whether the complete serialization, which was read from file, should be used.
+     *
+     * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
+
+
+    private final EventBus eventBus = new EventBus();
+
+
+    /**
+     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+     */
 
     public BibEntry() {
         this(IdGenerator.next());
     }
 
+    /**
+     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     *
+     * @param id The ID to be used
+     */
     public BibEntry(String id) {
         this(id, DEFAULT_TYPE);
     }
 
+    /**
+     * Constructs a new BibEntry with the given ID and given type
+     *
+     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
+     */
     public BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
-        changed = true;
         setType(type);
     }
 
     /**
-     * Returns an set containing the names of all fields that are
-     * set for this particular entry.
+     * Sets this entry's ID, provided the database containing it
+     * doesn't veto the change.
      *
-     * @return a set of existing field names
+     * @param id The ID to be used
      */
-    public Set<String> getFieldNames() {
-        return new TreeSet<>(fields.keySet());
+    public void setId(String id) {
+        Objects.requireNonNull(id, "Every BibEntry must have an ID");
+
+        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id));
+        this.id = id;
+        changed = true;
+    }
+
+    /**
+     * Returns this entry's ID.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the cite key AKA citation key AKA BibTeX key.
+     *
+     * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
+     *
+     * @param newCiteKey The cite key to set. Must not be null, may be empty to remove it.
+     */
+    public void setCiteKey(String newCiteKey) {
+        setField(KEY_FIELD, newCiteKey);
+    }
+
+    /**
+     * Returns the cite key AKA citation key AKA BibTeX key, or null if it is not set.
+     *
+     * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
+     */
+    public String getCiteKey() {
+        return fields.get(KEY_FIELD);
+    }
+
+    public boolean hasCiteKey() {
+        return !Strings.isNullOrEmpty(getCiteKey());
     }
 
     /**
@@ -106,24 +156,18 @@ public class BibEntry {
      */
     public void setType(String type) {
         String newType;
-        if ((type == null) || type.isEmpty()) {
+        if (Strings.isNullOrEmpty(type)) {
             newType = DEFAULT_TYPE;
         } else {
             newType = type;
         }
 
-        String oldType = this.type;
-
-        try {
-            // We set the type before throwing the changeEvent, to enable
-            // the change listener to access the new value if the change
-            // sets off a change in database sorting etc.
-            this.type = newType.toLowerCase(Locale.ENGLISH);
-            changed = true;
-            firePropertyChangedEvent(TYPE_HEADER, oldType, newType);
-        } catch (PropertyVetoException pve) {
-            LOGGER.warn(pve);
-        }
+        // We set the type before throwing the changeEvent, to enable
+        // the change listener to access the new value if the change
+        // sets off a change in database sorting etc.
+        this.type = newType.toLowerCase(Locale.ENGLISH);
+        changed = true;
+        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType));
     }
 
     /**
@@ -134,27 +178,13 @@ public class BibEntry {
     }
 
     /**
-     * Sets this entry's ID, provided the database containing it
-     * doesn't veto the change.
+     * Returns an set containing the names of all fields that are
+     * set for this particular entry.
+     *
+     * @return a set of existing field names
      */
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
-        try {
-            firePropertyChangedEvent(BibEntry.ID_FIELD, this.id, id);
-        } catch (PropertyVetoException pv) {
-            throw new IllegalStateException("Couldn't change ID: " + pv);
-        }
-
-        this.id = id;
-        changed = true;
-    }
-
-    /**
-     * Returns this entry's ID.
-     */
-    public String getId() {
-        return id;
+    public Set<String> getFieldNames() {
+        return new TreeSet<>(fields.keySet());
     }
 
     /**
@@ -292,28 +322,13 @@ public class BibEntry {
     }
 
     /**
-     * Returns the bibtex key, or null if it is not set.
-     */
-    public String getCiteKey() {
-        return fields.get(KEY_FIELD);
-    }
-
-    public void setCiteKey(String newCiteKey) {
-        setField(KEY_FIELD, newCiteKey);
-    }
-
-    public boolean hasCiteKey() {
-        return !Strings.isNullOrEmpty(getCiteKey());
-    }
-
-    /**
      * Sets a number of fields simultaneously. The given HashMap contains field
      * names as keys, each mapped to the value to set.
      */
     public void setField(Map<String, String> fields) {
         Objects.requireNonNull(fields, "fields must not be null");
 
-        fields.forEach((field, value) -> setField(field, value));
+        fields.forEach(this::setField);
     }
 
     /**
@@ -339,19 +354,8 @@ public class BibEntry {
 
         changed = true;
 
-        String oldValue = fields.get(fieldName);
-        try {
-            // We set the field before throwing the changeEvent, to enable
-            // the change listener to access the new value if the change
-            // sets off a change in database sorting etc.
-            fields.put(fieldName, value);
-            firePropertyChangedEvent(fieldName, oldValue, value);
-        } catch (PropertyVetoException pve) {
-            // Since we have already made the change, we must undo it since
-            // the change was rejected:
-            fields.put(fieldName, oldValue);
-            throw new IllegalArgumentException("Change rejected: " + pve);
-        }
+        fields.put(fieldName, value);
+        eventBus.post(new FieldChangedEvent(this, fieldName, value));
     }
 
     /**
@@ -368,14 +372,8 @@ public class BibEntry {
         if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
-        Object oldValue = fields.get(fieldName);
         fields.remove(fieldName);
-        try {
-            firePropertyChangedEvent(fieldName, oldValue, null);
-        } catch (PropertyVetoException pve) {
-            throw new IllegalArgumentException("Change rejected: " + pve);
-        }
-
+        eventBus.post(new FieldChangedEvent(this, fieldName, null));
     }
 
     /**
@@ -419,27 +417,6 @@ public class BibEntry {
             }
         }
         return false;
-    }
-
-    private void firePropertyChangedEvent(String fieldName, Object oldValue, Object newValue)
-            throws PropertyVetoException {
-        changeSupport.fireVetoableChange(new PropertyChangeEvent(this, fieldName, oldValue, newValue));
-    }
-
-    /**
-     * Adds a VetoableChangeListener, which is notified of field
-     * changes. This is useful for an object that needs to update
-     * itself each time a field changes.
-     */
-    public void addPropertyChangeListener(VetoableChangeListener listener) {
-        changeSupport.addVetoableChangeListener(listener);
-    }
-
-    /**
-     * Removes a property listener.
-     */
-    public void removePropertyChangeListener(VetoableChangeListener listener) {
-        changeSupport.removeVetoableChangeListener(listener);
     }
 
     /**
@@ -551,7 +528,7 @@ public class BibEntry {
             }
             return;
         }
-        if ((oldValue == null) || !oldValue.equals(newValue)) {
+        if (!Objects.equals(oldValue, newValue)) {
             this.setField("keywords", newValue);
         }
     }
@@ -606,7 +583,6 @@ public class BibEntry {
     }
 
     public Map<String, String> getFieldMap() {
-        // TODO Auto-generated method stub
         return fields;
     }
 
@@ -626,4 +602,13 @@ public class BibEntry {
     public int hashCode() {
         return Objects.hash(type, fields);
     }
+
+    public void registerListener(Object object) {
+        this.eventBus.register(object);
+    }
+
+    public void unregisterListener(Object object) {
+        this.eventBus.unregister(object);
+    }
+
 }

@@ -58,44 +58,23 @@ public class SearchGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s, int version) throws Exception {
+    public static AbstractGroup fromString(String s) {
         if (!s.startsWith(SearchGroup.ID)) {
-            throw new Exception(
-                    "Internal error: SearchGroup cannot be created from \"" + s
-                            + "\". "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID
-                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
-        switch (version) {
-        case 0:
-        case 1:
-        case 2: {
-            String name = tok.nextToken();
-            String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            // version 0 contained 4 additional booleans to specify search
-            // fields; these are ignored now, all fields are always searched
-            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                    GroupHierarchyType.INDEPENDENT);
-        }
-        case 3: {
-            String name = tok.nextToken();
-            int context = Integer.parseInt(tok.nextToken());
-            String expression = tok.nextToken();
-            boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-            boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-            // version 0 contained 4 additional booleans to specify search
-            // fields; these are ignored now, all fields are always searched
-            return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                    .unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                    GroupHierarchyType.getByNumber(context));
-        }
-        default:
-            throw new UnsupportedVersionException("SearchGroup", version);
-        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID.length()),
+                AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+
+        String name = tok.nextToken();
+        int context = Integer.parseInt(tok.nextToken());
+        String expression = tok.nextToken();
+        boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+        boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+        // version 0 contained 4 additional booleans to specify search
+        // fields; these are ignored now, all fields are always searched
+        return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                GroupHierarchyType.getByNumber(context));
     }
 
     @Override

@@ -60,14 +60,12 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox reformatFileOnSaveAndExport;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
-    private final JTextField bracesAroundCapitalsFields;
     private final JTextField nonWrappableFields;
     private final JTextField doNotResolveStringsFor;
     private final JSpinner autoSaveInterval;
     private boolean origAutoSaveSetting;
 
     private final JTextField fileDir;
-    private final JCheckBox bibLocationAsFileDir;
     private final JCheckBox bibLocAsPrimaryDir;
     private final JCheckBox runAutoFileSearch;
     private final JCheckBox allowFileAutoOpenBrowse;
@@ -82,11 +80,9 @@ class FileTab extends JPanel implements PrefsTab {
         this.frame = frame;
 
         fileDir = new JTextField(25);
-        bibLocationAsFileDir = new JCheckBox(Localization.lang("Allow file links relative to each bib file's location"));
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the bib file location rather than the file directory set above"));
-        bibLocationAsFileDir.addChangeListener(e -> bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected()));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
@@ -117,7 +113,6 @@ class FileTab extends JPanel implements PrefsTab {
 
         reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat .bib file on save and export"));
 
-        bracesAroundCapitalsFields = new JTextField(25);
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
 
@@ -136,11 +131,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(backup, 3);
         builder.nextLine();
 
-        JLabel label = new JLabel(Localization.lang("Store the following fields with braces around capital letters") + ":");
-        builder.append(label);
-        builder.append(bracesAroundCapitalsFields);
-        builder.nextLine();
-        label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
+        JLabel label = new JLabel(Localization.lang("Do not wrap the following fields when saving") + ":");
         builder.append(label);
         builder.append(nonWrappableFields);
         builder.nextLine();
@@ -165,8 +156,6 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(fileDir);
         BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
         builder.append(new JButton(browse));
-        builder.nextLine();
-        builder.append(bibLocationAsFileDir, 3);
         builder.nextLine();
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
@@ -212,7 +201,6 @@ class FileTab extends JPanel implements PrefsTab {
     public void setValues() {
         fileDir.setText(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
-        bibLocAsPrimaryDir.setEnabled(bibLocationAsFileDir.isSelected());
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
         regExpTextField.setText(prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY));
@@ -241,7 +229,6 @@ class FileTab extends JPanel implements PrefsTab {
         resolveStringsAll.setSelected(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS));
         resolveStringsStandard.setSelected(!resolveStringsAll.isSelected());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        bracesAroundCapitalsFields.setText(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS));
         nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
         autoSave.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
@@ -291,10 +278,6 @@ class FileTab extends JPanel implements PrefsTab {
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         boolean updateSpecialFields = false;
-        if (!bracesAroundCapitalsFields.getText().trim().equals(prefs.get(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS))) {
-            prefs.put(JabRefPreferences.PUT_BRACES_AROUND_CAPITALS, bracesAroundCapitalsFields.getText());
-            updateSpecialFields = true;
-        }
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;

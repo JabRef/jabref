@@ -190,28 +190,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return groups;
     }
 
-    /**
-     * For all explicit subgroups, replace the i'th entry of originalEntries with the i'th entry of newEntries.
-     */
-    public void replaceEntriesInExplicitGroup(List<BibEntry> originalEntries, List<BibEntry> newEntries) {
-
-        if(this.group instanceof ExplicitGroup) {
-            ExplicitGroup group = (ExplicitGroup)this.group;
-            for (int i = 0; i < originalEntries.size(); ++i) {
-                BibEntry entry = originalEntries.get(i);
-                if (group.contains(entry)) {
-                    group.removeEntry(entry);
-                    group.addEntry(newEntries.get(i));
-                }
-            }
-        }
-
-        // Traverse children
-        for(GroupTreeNode child : getChildren()) {
-            child.replaceEntriesInExplicitGroup(originalEntries, newEntries);
-        }
-    }
-
     public boolean supportsAddingEntries() {
         return group.supportsAdd();
     }

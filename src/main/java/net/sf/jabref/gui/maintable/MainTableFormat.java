@@ -17,6 +17,7 @@ package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -43,7 +44,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
     // These values are also used to put a heading into the table; see getColumnName(int)
     private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
     private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
-    private static final List<String> ARXIV = Arrays.asList("eprint");
+    private static final List<String> ARXIV = Collections.singletonList("eprint");
 
     private final BibDatabase database;
 

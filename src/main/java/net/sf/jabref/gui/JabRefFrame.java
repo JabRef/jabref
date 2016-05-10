@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -1558,7 +1559,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         severalDatabasesOnlyActions.addAll(Arrays
                 .asList(nextTab, prevTab, sortTabs));
 
-        openAndSavedDatabasesOnlyActions.addAll(Arrays.asList(openConsole));
+        openAndSavedDatabasesOnlyActions.addAll(Collections.singletonList(openConsole));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1590,20 +1591,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int tabCount = tabbedPane.getTabCount();
         if (tabCount != previousTabCount) {
             previousTabCount = tabCount;
-            JabRefFrame.setEnabled(openDatabaseOnlyActions, tabCount > 0);
-            JabRefFrame.setEnabled(severalDatabasesOnlyActions, tabCount > 1);
+            setEnabled(openDatabaseOnlyActions, tabCount > 0);
+            setEnabled(severalDatabasesOnlyActions, tabCount > 1);
         }
         if (tabCount == 0) {
             getBackAction().setEnabled(false);
             getForwardAction().setEnabled(false);
+            setEnabled(openAndSavedDatabasesOnlyActions, false);
         }
 
-        boolean saved = false;
 
         if (tabCount > 0) {
-            saved = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile() != null;
+            BasePanel current = getCurrentBasePanel();
+            if(current != null) {
+                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+                setEnabled(openAndSavedDatabasesOnlyActions, saved);
+            }
         }
-        JabRefFrame.setEnabled(openAndSavedDatabasesOnlyActions, saved);
     }
 
     /**

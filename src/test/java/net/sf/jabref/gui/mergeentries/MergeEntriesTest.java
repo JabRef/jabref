@@ -44,4 +44,38 @@ public class MergeEntriesTest {
     public void testGenerateDiffHighlightingSingleWordDeleteTextCharacterDiff() {
         assertEquals("foo<span class=del>bar</span>", MergeEntries.generateDiffHighlighting("foobar", "foo", ""));
     }
+
+    @Test
+    public void generateSymmetricHighlightingSingleWordAddTextWordDiff() {
+        assertEquals("<span class=change>foo</span>",
+                MergeEntries.generateSymmetricHighlighting("foo", "foobar", " "));
+    }
+
+    @Test
+    public void generateSymmetricHighlightingSingleWordAddTextCharacterDiff() {
+        assertEquals("foo", MergeEntries.generateSymmetricHighlighting("foo", "foobar", ""));
+    }
+
+    @Test
+    public void generateSymmetricHighlightingSingleWordDeleteTextWordDiff() {
+        assertEquals("<span class=change>foobar</span>",
+                MergeEntries.generateSymmetricHighlighting("foobar", "foo", " "));
+    }
+
+    @Test
+    public void generateSymmetricHighlightingSingleWordDeleteTextCharacterDiff() {
+        assertEquals("foo<span class=add>bar</span>", MergeEntries.generateSymmetricHighlighting("foobar", "foo", ""));
+    }
+
+    @Test
+    public void generateSymmetricHighlightingMultipleWordsDeleteTextCharacterDiff() {
+        assertEquals("foo<span class=add>bar</span> and <span class=add>some</span>thing",
+                MergeEntries.generateSymmetricHighlighting("foobar and something", "foo and thing", ""));
+    }
+
+    @Test
+    public void generateSymmetricHighlightingMultipleWordsDeleteTextWordDiff() {
+        assertEquals("foo <span class=add>bar</span> and <span class=add>some</span> thing",
+                MergeEntries.generateSymmetricHighlighting("foo bar and some thing", "foo and thing", " "));
+    }
 }

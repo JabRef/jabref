@@ -111,7 +111,7 @@ class FileListEditorTransferHandler extends TransferHandler {
                 files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
             }
 
-            SwingUtilities.invokeLater((Runnable) () -> {
+            SwingUtilities.invokeLater(() -> {
                 for (File file : files) {
                     // Find the file's extension, if any:
                     String name = file.getAbsolutePath();

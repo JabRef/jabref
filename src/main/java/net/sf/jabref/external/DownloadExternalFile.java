@@ -123,7 +123,7 @@ public class DownloadExternalFile {
         final URL urlF = url;
         final URLDownload udlF = udl;
 
-        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+        JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 udlF.downloadToFile(tmp);
             } catch (IOException e2) {

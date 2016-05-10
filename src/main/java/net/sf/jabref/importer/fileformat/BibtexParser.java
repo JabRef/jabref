@@ -28,14 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -196,7 +194,11 @@ public class BibtexParser {
         }
 
         // Instantiate meta data:
-        parserResult.setMetaData(new MetaData(meta, database));
+        try {
+            parserResult.setMetaData(new MetaData(meta));
+        } catch (ParseException exception) {
+            parserResult.addWarning(exception.getLocalizedMessage());
+        }
 
         parseRemainingContent();
 
@@ -549,12 +551,6 @@ public class BibtexParser {
         skipWhitespace();
         consume('=');
         String content = parseFieldContent(key);
-        // Now, if the field in question is set up to be fitted automatically
-        // with braces around
-        // capitals, we should remove those now when reading the field:
-        if (Globals.prefs.putBracesAroundCapitals(key)) {
-            content = StringUtil.removeBracesAroundCapitals(content);
-        }
         if (!content.isEmpty()) {
             if (entry.hasField(key)) {
                 // The following hack enables the parser to deal with multiple

@@ -17,6 +17,7 @@ package net.sf.jabref.gui.groups;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -44,7 +45,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
             int row, boolean tmpHasFocus) {
         // show as selected
-        selected = ((highlight1Cell != null) && highlight1Cell.equals(value)) || sel;
+        selected = (Objects.equals(highlight1Cell, value)) || sel;
         Component c = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, tmpHasFocus);
         // this is sometimes called from deep within somewhere, with a dummy
         // value (probably for layout etc.), so we've got to check here!
@@ -58,7 +59,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) value;
         JLabel label = (JLabel) c;
 
-        if ((highlightBorderCell != null) && (highlightBorderCell.equals(value))) {
+        if (Objects.equals(highlightBorderCell, value)) {
             label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         } else {
             label.setBorder(BorderFactory.createEmptyBorder());

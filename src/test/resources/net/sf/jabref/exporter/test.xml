@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1358810</b:Tag>
+<b:Title>Human-in-the-loop: rethinking security in mobile and pervasive systems</b:Title>
+<b:Year>2008</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Kostakos</b:Last>
+<b:First>Vassilis</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>3075-3080</b:Pages>
+<b:StandardNumber> ISBN: 978-1-60558-012-X DOI: http://doi.acm.org/10.1145/1358628.1358810</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>CHI '08: CHI '08 extended abstracts on Human factors in computing systems</b:BookTitle>
+<b:ConferenceName>CHI '08: CHI '08 extended abstracts on Human factors in computing systems</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Tag>820136</b:Tag>
+<b:Title>Design and usability in security systems: daily life as a context of use?</b:Title>
+<b:Year>2002</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Clear</b:Last>
+<b:First>Tony</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>13-14</b:Pages>
+<b:Volume>34</b:Volume>
+<b:StandardNumber> ISSN: 0097-8418 DOI: http://doi.acm.org/10.1145/820127.820136</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:JournalName>SIGCSE Bull.</b:JournalName>
+<b:Issue>4</b:Issue>
+</b:Source>
+<b:Source>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Tag>1373163</b:Tag>
+<b:Title>Useful Computer Security</b:Title>
+<b:Year>2008</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Churchill</b:Last>
+<b:First>Elizabeth</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Nelson</b:Last>
+<b:First>Les</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Smetters</b:Last>
+<b:Middle>K.</b:Middle>
+<b:First>Diana</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>10-12</b:Pages>
+<b:Volume>12</b:Volume>
+<b:StandardNumber> ISSN: 1089-7801 DOI: http://dx.doi.org/10.1109/MIC.2008.67</b:StandardNumber>
+<b:Publisher>IEEE Educational Activities Department</b:Publisher>
+<b:City>Piscataway</b:City>
+<b:StateProvince>NJ</b:StateProvince>
+<b:CountryRegion>USA</b:CountryRegion>
+<b:JournalName>IEEE Internet Computing</b:JournalName>
+<b:Issue>3</b:Issue>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>00000000</b:Tag>
+<b:Title>Are Usability and Security Two Opposite Directions in Computer Systems?</b:Title>
+<b:Year>2004</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Rozinov</b:Last>
+<b:First>Konstantin</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+</b:Source>
+<b:Source>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Tag>1025014</b:Tag>
+<b:Title>Password Memorability and Security: Empirical Results</b:Title>
+<b:Year>2004</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Yan</b:Last>
+<b:First>Jeff</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Blackwell</b:Last>
+<b:First>Alan</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Anderson</b:Last>
+<b:First>Ross</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Grant</b:Last>
+<b:First>Alasdair</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>25-31</b:Pages>
+<b:Volume>2</b:Volume>
+<b:StandardNumber> ISSN: 1540-7993 DOI: http://dx.doi.org/10.1109/MSP.2004.81</b:StandardNumber>
+<b:Publisher>IEEE Educational Activities Department</b:Publisher>
+<b:City>Piscataway</b:City>
+<b:StateProvince>NJ</b:StateProvince>
+<b:CountryRegion>USA</b:CountryRegion>
+<b:JournalName>IEEE Security and Privacy</b:JournalName>
+<b:Issue>5</b:Issue>
+</b:Source>
+<b:Source>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Tag>1102917</b:Tag>
+<b:Title>The trouble with login: on usability and computer security in ubiquitous computing</b:Title>
+<b:Year>2005</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Bardram</b:Last>
+<b:First>E.</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>357-367</b:Pages>
+<b:Volume>9</b:Volume>
+<b:StandardNumber> ISSN: 1617-4909 DOI: http://dx.doi.org/10.1007/s00779-005-0347-6</b:StandardNumber>
+<b:Publisher>Springer-Verlag</b:Publisher>
+<b:City>London</b:City>
+<b:StateProvince>U</b:StateProvince>
+<b:CountryRegion>K</b:CountryRegion>
+<b:JournalName>Personal Ubiquitous Comput.</b:JournalName>
+<b:Issue>6</b:Issue>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1137631</b:Tag>
+<b:Title>Extending XP practices to support security requirements engineering</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Bostr\"{o}m</b:Last>
+<b:First>Gustav</b:First>
+</b:Person>
+<b:Person>
+<b:Last>W\"{a}yrynen</b:Last>
+<b:First>Jaana</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Bod\'{e}n</b:Last>
+<b:First>Marine</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Beznosov</b:Last>
+<b:First>Konstantin</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Kruchten</b:Last>
+<b:First>Philippe</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>11-18</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137631</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:BookTitle>
+<b:ConferenceName>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1233448</b:Tag>
+<b:Title>Increasing security and usability of computer systems with graphical passwords</b:Title>
+<b:Year>2007</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Hinds</b:Last>
+<b:First>Cheryl</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Ekwueme</b:Last>
+<b:First>Chinedu</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>529-530</b:Pages>
+<b:StandardNumber> ISBN: 978-1-59593-629-5 DOI: http://doi.acm.org/10.1145/1233341.1233448</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>ACM-SE 45: Proceedings of the 45th annual southeast regional conference</b:BookTitle>
+<b:ConferenceName>ACM-SE 45: Proceedings of the 45th annual southeast regional conference</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>JournalArticle</b:SourceType>
+<b:Tag>10250999</b:Tag>
+<b:Title>Article with complex Authornames</b:Title>
+<b:Year>2004</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>von Hippel</b:Last>
+<b:First>Eric</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Reagle</b:Last>
+<b:Middle>Joseph M.</b:Middle>
+<b:First>Jr.,</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Sherry</b:Last>
+<b:Middle>F., Jr.</b:Middle>
+<b:First>John</b:First>
+</b:Person>
+<b:Person>
+<b:Last>van den Huevel</b:Last>
+<b:Middle>Johan A.</b:Middle>
+<b:First>Jr.,</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>25-31</b:Pages>
+<b:Volume>2</b:Volume>
+<b:StandardNumber> ISSN: 1540-7993 DOI: http://dx.doi.org/10.1109/MSP.2004.81</b:StandardNumber>
+<b:Publisher>IEEE Educational Activities Department</b:Publisher>
+<b:City>Piscataway</b:City>
+<b:StateProvince>NJ</b:StateProvince>
+<b:CountryRegion>USA</b:CountryRegion>
+<b:JournalName>IEEE Security and Privacy</b:JournalName>
+<b:Issue>5</b:Issue>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1132768</b:Tag>
+<b:Title>Security and usability: the case of the user authentication methods</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Braz</b:Last>
+<b:First>Christina</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Robert</b:Last>
+<b:First>Jean-Marc</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>199-203</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-350-6 DOI: http://doi.acm.org/10.1145/1132736.1132768</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>IHM '06: Proceedings of the 18th International Conferenceof the Association Francophone d'Interaction Homme-Machine</b:BookTitle>
+<b:ConferenceName>IHM '06: Proceedings of the 18th International Conferenceof the Association Francophone d'Interaction Homme-Machine</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1251435</b:Tag>
+<b:Title>Why Johnny can't encrypt: a usability evaluation of PGP 5.0</b:Title>
+<b:Year>1999</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Whitten</b:Last>
+<b:First>Alma</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Tygar</b:Last>
+<b:Middle>D.</b:Middle>
+<b:First>J.</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>14-14</b:Pages>
+<b:Publisher>USENIX Association</b:Publisher>
+<b:City>Berkeley</b:City>
+<b:StateProvince>CA</b:StateProvince>
+<b:CountryRegion>USA</b:CountryRegion>
+<b:BookTitle>SSYM'99: Proceedings of the 8th conference on USENIX Security Symposium</b:BookTitle>
+<b:ConferenceName>SSYM'99: Proceedings of the 8th conference on USENIX Security Symposium</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1182529</b:Tag>
+<b:Title>Question-based authentication using context data</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Nosseir</b:Last>
+<b:First>Ann</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Connor</b:Last>
+<b:First>Richard</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Revie</b:Last>
+<b:First>Crawford</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Terzis</b:Last>
+<b:First>Sotirios</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>429-432</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-325-5 DOI: http://doi.acm.org/10.1145/1182475.1182529</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>NordiCHI '06: Proceedings of the 4th Nordic conference on Human-computer interaction</b:BookTitle>
+<b:ConferenceName>NordiCHI '06: Proceedings of the 4th Nordic conference on Human-computer interaction</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1137636</b:Tag>
+<b:Title>Trust and tamper-proof software delivery</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Naedele</b:Last>
+<b:First>Martin</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Koch</b:Last>
+<b:Middle>E.</b:Middle>
+<b:First>Thomas</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>51-58</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137636</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:BookTitle>
+<b:ConferenceName>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1314293</b:Tag>
+<b:Title>Randomized radon transforms for biometric authentication via fingerprint hashing</b:Title>
+<b:Year>2007</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Jakubowski</b:Last>
+<b:Middle>H.</b:Middle>
+<b:First>Mariusz</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Venkatesan</b:Last>
+<b:First>Ramarathnam</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>90-94</b:Pages>
+<b:StandardNumber> ISBN: 978-1-59593-884-8 DOI: http://doi.acm.org/10.1145/1314276.1314293</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>DRM '07: Proceedings of the 2007 ACM workshop on Digital Rights Management</b:BookTitle>
+<b:ConferenceName>DRM '07: Proceedings of the 2007 ACM workshop on Digital Rights Management</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1137628</b:Tag>
+<b:Title>Introduction to software engineering for secure systems: SESS06 -- secure by design</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Bruschi</b:Last>
+<b:First>Danilo</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Win</b:Last>
+<b:Middle>De</b:Middle>
+<b:First>Bart</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Monga</b:Last>
+<b:First>Mattia</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>1-2</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137628</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:BookTitle>
+<b:ConferenceName>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1073004</b:Tag>
+<b:Title>Two experiences designing for effective security</b:Title>
+<b:Year>2005</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>de Paula</b:Last>
+<b:First>Rog\'{e}rio</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Ding</b:Last>
+<b:First>Xianghua</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Dourish</b:Last>
+<b:First>Paul</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Nies</b:Last>
+<b:First>Kari</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Pillet</b:Last>
+<b:First>Ben</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Redmiles</b:Last>
+<b:First>David</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Ren</b:Last>
+<b:First>Jie</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Rode</b:Last>
+<b:First>Jennifer</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Filho</b:Last>
+<b:Middle>Silva</b:Middle>
+<b:First>Roberto</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>25-34</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-178-3 DOI: http://doi.acm.org/10.1145/1073001.1073004</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SOUPS '05: Proceedings of the 2005 symposium on Usable privacy and security</b:BookTitle>
+<b:ConferenceName>SOUPS '05: Proceedings of the 2005 symposium on Usable privacy and security</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1137633</b:Tag>
+<b:Title>How secure is AOP and what can we do about it?</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Win</b:Last>
+<b:Middle>De</b:Middle>
+<b:First>Bart</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Piessens</b:Last>
+<b:First>Frank</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Joosen</b:Last>
+<b:First>Wouter</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>27-34</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137633</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:BookTitle>
+<b:ConferenceName>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</b:ConferenceName>
+</b:Source>
+<b:Source>
+<b:SourceType>Book</b:SourceType>
+<b:Tag>1098730</b:Tag>
+<b:Title>Security and Usability</b:Title>
+<b:Year>2005</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>Cranor</b:Last>
+<b:First>Lorrie</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Garfinkel</b:Last>
+<b:First>Simson</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:StandardNumber> ISBN: 0596008279</b:StandardNumber>
+<b:Publisher>O'Reilly Media, Inc.</b:Publisher>
+</b:Source>
+<b:Source>
+<b:SourceType>ConferenceProceedings</b:SourceType>
+<b:BIBTEX_Entry>inproceedings</b:BIBTEX_Entry>
+<b:Tag>1143122</b:Tag>
+<b:Title>Aligning usability and security: a usability study of Polaris</b:Title>
+<b:Year>2006</b:Year>
+<b:Author>
+<b:Author>
+<b:NameList>
+<b:Person>
+<b:Last>DeWitt</b:Last>
+<b:Middle>J.</b:Middle>
+<b:First>Alexander</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Kuljis</b:Last>
+<b:First>Jasna</b:First>
+</b:Person>
+</b:NameList>
+</b:Author>
+</b:Author>
+<b:Pages>1-7</b:Pages>
+<b:StandardNumber> ISBN: 1-59593-448-0 DOI: http://doi.acm.org/10.1145/1143120.1143122</b:StandardNumber>
+<b:Publisher>ACM</b:Publisher>
+<b:City>New York, NY, USA</b:City>
+<b:BookTitle>SOUPS '06: Proceedings of the second symposium on Usable privacy and security</b:BookTitle>
+<b:ConferenceName>SOUPS '06: Proceedings of the second symposium on Usable privacy and security</b:ConferenceName>
+</b:Source>
+</b:Sources>

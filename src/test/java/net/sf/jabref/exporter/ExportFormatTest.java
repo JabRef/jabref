@@ -1,9 +1,8 @@
 package net.sf.jabref.exporter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,11 +57,7 @@ public class ExportFormatTest {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
         exportFormat.performExport(databaseContext, filename, charset, entries);
-        try (FileInputStream stream = new FileInputStream(tmpFile);
-                InputStreamReader reader = new InputStreamReader(stream, charset)) {
-            char[] buffer = new char[512];
-            assertEquals(-1, reader.read(buffer)); // Empty file
-        }
+        assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile.toPath()));
     }
 
     @Test(expected = NullPointerException.class)

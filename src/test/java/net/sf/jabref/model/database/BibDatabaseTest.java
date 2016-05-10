@@ -8,6 +8,7 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.event.TestEventListener;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -186,5 +187,28 @@ public class BibDatabaseTest {
         string = new BibtexString(id, "VLSI", "Very Large Scale Integration");
         database.addString(string);
         fail();
+    }
+
+    @Test
+    public void testAddedEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.registerListener(tel);
+        database.insertEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void testRemovedEntryEventReceivement() {
+        BibDatabase database = new BibDatabase();
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.insertEntry(expectedEntry);
+        database.registerListener(tel);
+        database.removeEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
     }
 }

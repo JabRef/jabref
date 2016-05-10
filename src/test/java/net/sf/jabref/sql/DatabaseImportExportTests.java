@@ -7,6 +7,7 @@ import java.util.List;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -174,7 +175,7 @@ public class DatabaseImportExportTests {
         return databaseContext;
     }
 
-    private BibDatabaseContext createContextWithSingleEntrySingleGroup() {
+    private BibDatabaseContext createContextWithSingleEntrySingleGroup() throws ParseException {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());

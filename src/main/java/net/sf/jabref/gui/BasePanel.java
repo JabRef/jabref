@@ -60,6 +60,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
@@ -123,9 +125,6 @@ import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.DatabaseChangeEvent;
-import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -147,6 +146,7 @@ import net.sf.jabref.sql.SQLUtil;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 import ca.odell.glazedlists.event.ListEventListener;
+import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
@@ -241,7 +241,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         File file = bibDatabaseContext.getDatabaseFile();
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
-        this.database.addDatabaseChangeListener(new GroupTreeUpdater());
+        this.database.registerListener(new GroupTreeListener());
 
         if (file == null) {
             if (database.hasEntries()) {
@@ -1256,13 +1256,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
      * one or more groups are marked
      */
-    private class GroupTreeUpdater implements DatabaseChangeListener {
+    private class GroupTreeListener {
 
-        @Override
-        public void databaseChanged(final DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.ADDED_ENTRY) && Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
-                    && frame.groupToggle.isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(e.getEntry());
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
+                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
@@ -1279,13 +1278,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
      * harvest words from the entry
      */
-    private class SearchAutoCompleterUpdater implements DatabaseChangeListener {
+    private class SearchAutoCompleteListener {
 
-        @Override
-        public void databaseChanged(DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                searchAutoCompleter.addBibtexEntry(e.getEntry());
-            }
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -1293,13 +1295,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Ensures that auto completers are up to date when entries are changed AKA Let the auto completer, if any, harvest
      * words from the entry
      */
-    private class AutoCompletersUpdater implements DatabaseChangeListener {
+    private class AutoCompleteListener {
 
-        @Override
-        public void databaseChanged(DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                BasePanel.this.autoCompleters.addEntry(e.getEntry());
-            }
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -1348,8 +1353,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void createMainTable() {
-        database.addDatabaseChangeListener(tableModel.getEventList());
-        database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
+        database.registerListener(tableModel.getListSynchronizer());
+        database.registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
         tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
@@ -1512,7 +1517,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
-        this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
@@ -1520,7 +1525,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
                     autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
-            this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
+            this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
             autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);

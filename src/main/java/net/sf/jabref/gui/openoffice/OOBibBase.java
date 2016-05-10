@@ -329,7 +329,7 @@ class OOBibBase {
             }
 
             String keyString = String.join(",",
-                    entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                    entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -978,7 +978,7 @@ class OOBibBase {
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
-                        style.getNumCitationMarker(Arrays.asList(number++), minGroupingCount, true),
+                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true),
                         EnumSet.noneOf(OOUtil.Formatting.class));
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
@@ -1211,7 +1211,7 @@ class OOBibBase {
                 }
                 Collections.sort(entries, new FieldComparator("year"));
                 String keyString = String.join(",",
-                        entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                        entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);

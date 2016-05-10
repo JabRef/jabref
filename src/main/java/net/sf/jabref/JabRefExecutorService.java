@@ -21,7 +21,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
 
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 
@@ -37,13 +36,10 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName("JabRef CachedThreadPool");
-            return thread;
-        }
+    private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef CachedThreadPool");
+        return thread;
     });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
 

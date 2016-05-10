@@ -19,6 +19,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -194,7 +195,7 @@ public class BibDatabaseWriterTest {
     }
 
     @Test
-    public void writeGroups() throws IOException {
+    public void writeGroups() throws IOException, ParseException {
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
         groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING));
         metaData.setGroups(groupRoot);
@@ -206,14 +207,12 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
     @Test
-    public void writeGroupsAndEncoding() throws IOException {
+    public void writeGroupsAndEncoding() throws IOException, ParseException {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
@@ -229,9 +228,7 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 

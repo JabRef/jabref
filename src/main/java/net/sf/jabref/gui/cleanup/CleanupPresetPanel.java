@@ -20,14 +20,12 @@ import com.jgoodies.forms.layout.FormLayout;
 public class CleanupPresetPanel {
 
     private final BibDatabaseContext databaseContext;
-    private JCheckBox cleanUpSuperscripts;
     private JCheckBox cleanUpDOI;
     private JCheckBox cleanUpMovePDF;
     private JCheckBox cleanUpMakePathsRelative;
     private JCheckBox cleanUpRenamePDF;
     private JCheckBox cleanUpRenamePDFonlyRelativePaths;
     private JCheckBox cleanUpUpgradeExternalLinks;
-    private JCheckBox cleanUpUnicode;
     private JCheckBox cleanUpBibLatex;
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
@@ -43,7 +41,6 @@ public class CleanupPresetPanel {
     }
 
     private void init() {
-        cleanUpSuperscripts = new JCheckBox(Localization.lang("Convert 1st, 2nd, ... to real superscripts"));
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
@@ -64,7 +61,6 @@ public class CleanupPresetPanel {
         cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
         cleanUpUpgradeExternalLinks = new JCheckBox(
                 Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", Globals.FILE_FIELD));
-        cleanUpUnicode = new JCheckBox(Localization.lang("Run Unicode converter on title, author(s), and abstract"));
         cleanUpBibLatex = new JCheckBox(Localization.lang(
                 "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
@@ -74,27 +70,24 @@ public class CleanupPresetPanel {
         updateDisplay(cleanupPreset);
 
         FormLayout layout = new FormLayout("left:15dlu, pref:grow",
-                "pref, pref, pref, pref, pref, pref, pref, pref, pref,pref, 190dlu, fill:pref:grow,");
+                "pref, pref, pref, pref, pref, pref, pref,pref, 190dlu, fill:pref:grow,");
 
         FormBuilder builder = FormBuilder.create().layout(layout);
-        builder.add(cleanUpUnicode).xyw(1, 1, 2);
-        builder.add(cleanUpSuperscripts).xyw(1, 2, 2);
-        builder.add(cleanUpDOI).xyw(1, 3, 2);
-        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 4, 2);
-        builder.add(cleanUpMovePDF).xyw(1, 5, 2);
-        builder.add(cleanUpMakePathsRelative).xyw(1, 6, 2);
-        builder.add(cleanUpRenamePDF).xyw(1, 7, 2);
+        builder.add(cleanUpDOI).xyw(1, 1, 2);
+        builder.add(cleanUpUpgradeExternalLinks).xyw(1, 2, 2);
+        builder.add(cleanUpMovePDF).xyw(1, 3, 2);
+        builder.add(cleanUpMakePathsRelative).xyw(1, 4, 2);
+        builder.add(cleanUpRenamePDF).xyw(1, 5, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ")
                 .concat(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
-        builder.add(new JLabel(currentPattern)).xy(2, 8);
-        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 9);
-        builder.add(cleanUpBibLatex).xyw(1, 10, 2);
-        builder.add(cleanUpFormatters).xyw(1, 11, 2);
+        builder.add(new JLabel(currentPattern)).xy(2, 6);
+        builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);
+        builder.add(cleanUpBibLatex).xyw(1, 8, 2);
+        builder.add(cleanUpFormatters).xyw(1, 9, 2);
         panel = builder.build();
     }
 
     private void updateDisplay(CleanupPreset preset) {
-        cleanUpSuperscripts.setSelected(preset.isCleanUpSuperscripts());
         cleanUpDOI.setSelected(preset.isCleanUpDOI());
         if (cleanUpMovePDF.isEnabled()) {
             cleanUpMovePDF.setSelected(preset.isMovePDF());
@@ -104,7 +97,6 @@ public class CleanupPresetPanel {
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isRenamePdfOnlyRelativePaths());
         cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
         cleanUpUpgradeExternalLinks.setSelected(preset.isCleanUpUpgradeExternalLinks());
-        cleanUpUnicode.setSelected(preset.isConvertUnicodeToLatex());
         cleanUpBibLatex.setSelected(preset.isConvertToBiblatex());
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
     }
@@ -117,9 +109,10 @@ public class CleanupPresetPanel {
 
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
-        if (cleanUpSuperscripts.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_SUPERSCRIPTS);
+        if (cleanUpMovePDF.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.MOVE_PDF);
         }
+
         if (cleanUpDOI.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_DOI);
         }
@@ -133,12 +126,8 @@ public class CleanupPresetPanel {
                 activeJobs.add(CleanupPreset.CleanupStep.RENAME_PDF);
             }
         }
-
         if (cleanUpUpgradeExternalLinks.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
-        }
-        if (cleanUpUnicode.isSelected()) {
-            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_UNICODE_TO_LATEX);
         }
         if (cleanUpBibLatex.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);

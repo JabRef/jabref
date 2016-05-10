@@ -2,6 +2,7 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
@@ -60,6 +61,22 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
+    public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
+        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        File tempFile = testFolder.newFile("Toot.tmp");
+
+        entry.setField("title", "test title");
+        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
+                new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
+
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        cleanup.cleanup(entry);
+
+        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
+                new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("","",""))), entry.getField("file"));
+    }
+
+    @Test
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
         when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
         File tempFile = testFolder.newFile("Toot.tmp");
@@ -76,7 +93,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
         testFolder.newFile("Toot.pdf");
         ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));

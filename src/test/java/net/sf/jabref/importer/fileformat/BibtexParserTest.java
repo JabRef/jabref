@@ -19,6 +19,7 @@ import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
@@ -1408,7 +1409,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestGroupTree() throws IOException {
+    public void integrationTestGroupTree() throws IOException, ParseException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: groupsversion:3;}"
                 + Globals.NEWLINE +
@@ -1419,18 +1420,21 @@ public class BibtexParserTest {
                 + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;"
                 + Globals.NEWLINE
                 + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
+                + Globals.NEWLINE
+                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;"
                 + "}"));
 
         GroupTreeNode root = result.getMetaData().getGroups();
 
         assertEquals(new AllEntriesGroup(), root.getGroup());
-        assertEquals(2, root.getNumberOfChildren());
+        assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
                 root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
                 root.getChildren().get(1).getGroup());
+        assertEquals(Arrays.asList("Key1", "Key2"), ((ExplicitGroup)root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
 
     @Test

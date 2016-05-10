@@ -23,6 +23,7 @@ import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -329,7 +330,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             String oldValue = entry.getField(KEYWORDS_FIELD);
             entry.putKeywords(separatedKeywords);
             String updatedValue = entry.getField(KEYWORDS_FIELD);
-            if ((oldValue == null) || !oldValue.equals(updatedValue)) {
+            if (!Objects.equals(oldValue, updatedValue)) {
                     ce.addEdit(new UndoableFieldChange(entry, KEYWORDS_FIELD, oldValue, updatedValue));
             }
 

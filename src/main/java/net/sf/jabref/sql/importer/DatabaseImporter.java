@@ -32,6 +32,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.MetaData;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
@@ -219,7 +220,8 @@ public class DatabaseImporter {
             while (rsGroups.next()) {
                 AbstractGroup group = null;
                 String typeId = findGroupTypeName(rsGroups.getString("group_types_id"), conn);
-                switch (typeId) {
+                try {
+                    switch (typeId) {
                     case AllEntriesGroup.ID:
                         // register the id of the root node:
                         groups.put(rsGroups.getString("groups_id"), rootNode);
@@ -243,6 +245,9 @@ public class DatabaseImporter {
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
                                 GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
                         break;
+                    }
+                } catch (ParseException e) {
+                    LOGGER.error(e);
                 }
 
                 if (group != null) {
@@ -272,7 +277,7 @@ public class DatabaseImporter {
                         GroupTreeNode node = groups.get(groupId);
                         if ((node != null) && (node.getGroup() instanceof ExplicitGroup)) {
                             ExplicitGroup expGroup = (ExplicitGroup) node.getGroup();
-                            expGroup.addEntry(entries.get(entryId));
+                            expGroup.add(entries.get(entryId));
                         }
                     }
                 }

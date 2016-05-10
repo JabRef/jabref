@@ -36,6 +36,11 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void ignoreWhitespaceInPageNumbersWithDoubleDash() {
+        expectCorrect("43 -- 103", "43--103");
+    }
+
+    @Test
     public void keepCorrectlyFormattedPageNumbers() {
         expectCorrect("1--2", "1--2");
     }
@@ -48,6 +53,16 @@ public class NormalizePagesFormatterTest {
     @Test
     public void formatPageNumbersRegexNotMatching() {
         expectCorrect("12", "12");
+    }
+
+    @Test
+    public void doesNotRemoveLetters() {
+        expectCorrect("R1-R50", "R1-R50");
+    }
+
+    @Test
+    public void replacesLongDashWithDoubleDash() {
+        expectCorrect("1 \u2014 50", "1--50");
     }
 
     @Test
