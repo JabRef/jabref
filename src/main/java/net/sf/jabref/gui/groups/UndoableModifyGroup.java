@@ -15,13 +15,13 @@
 */
 package net.sf.jabref.gui.groups;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
-
-import java.util.List;
 
 class UndoableModifyGroup extends AbstractUndoableEdit {
 

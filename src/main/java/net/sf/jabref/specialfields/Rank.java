@@ -15,12 +15,13 @@
  */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.Icon;
+
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class Rank extends SpecialField {
 

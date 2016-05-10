@@ -28,6 +28,7 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

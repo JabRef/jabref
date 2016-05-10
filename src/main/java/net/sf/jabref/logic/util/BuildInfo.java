@@ -22,7 +22,12 @@ import java.util.Properties;
 public class BuildInfo {
 
     private static final String UNKOWN_VERSION = "*unknown*";
-    
+
+    public final static String OS = System.getProperty("os.name", UNKOWN_VERSION).toLowerCase();
+    public final static String OS_VERSION = System.getProperty("os.version", UNKOWN_VERSION).toLowerCase();
+    public final static String OS_ARCH = System.getProperty("os.arch", UNKOWN_VERSION).toLowerCase();
+    public final static String JAVA_VERSION = System.getProperty("java.version", UNKOWN_VERSION).toLowerCase();
+
     private final String version;
     private final String authors;
     private final String developers;

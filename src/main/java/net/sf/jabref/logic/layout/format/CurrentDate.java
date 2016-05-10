@@ -25,11 +25,10 @@
 */
 package net.sf.jabref.logic.layout.format;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-
-import java.text.SimpleDateFormat;
 
 /**
  * Inserts the current date (the time a database is being exported).

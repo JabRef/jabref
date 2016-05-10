@@ -15,10 +15,12 @@
  */
 package net.sf.jabref.logic.groups;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.*;
 
 public class EntriesGroupChange {
 

@@ -15,12 +15,12 @@
 */
 package net.sf.jabref.collab;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.database.BibDatabase;
-
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.model.database.BibDatabase;
 
 abstract class Change extends DefaultMutableTreeNode {
 

@@ -25,14 +25,16 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.importer.*;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.DuplicateCheck;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DBLPFetcher implements EntryFetcher {
 
@@ -165,8 +167,8 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return null;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_DBLP;
     }
 
     @Override

@@ -25,6 +25,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

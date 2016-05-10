@@ -17,6 +17,7 @@ package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;

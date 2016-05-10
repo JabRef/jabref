@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.autocompleter;
 
-import static org.mockito.Mockito.*;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
 
 public class AutoCompleterFactoryTest {
 

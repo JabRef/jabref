@@ -1,19 +1,21 @@
 package net.sf.jabref.gui.search;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import javax.swing.SwingWorker;
+
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
+import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Not reusable. Always create a new instance for each search!

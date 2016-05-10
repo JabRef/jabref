@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.model.entry.AuthorList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +22,7 @@ import java.util.Map;
 import net.sf.jabref.Globals;
 import net.sf.jabref.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.entry.AuthorList;
 
 /**
  * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:

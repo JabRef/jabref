@@ -86,10 +86,6 @@ public class LatexFieldFormatter {
         }
 
         String result = content;
-        boolean shouldWrapWithBraces = Globals.prefs.putBracesAroundCapitals(fieldName) && !BIBTEX_STRING.equals(fieldName);
-        if (shouldWrapWithBraces) {
-            result = StringUtil.putBracesAroundCapitals(result);
-        }
 
         // normalize newlines
         boolean shouldNormalizeNewlines = !result.contains(Globals.NEWLINE) && result.contains("\n");

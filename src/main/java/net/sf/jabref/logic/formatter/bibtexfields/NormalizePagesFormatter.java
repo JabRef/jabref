@@ -1,11 +1,11 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class includes sensible defaults for consistent formatting of BibTex page numbers.
@@ -20,7 +20,7 @@ public class NormalizePagesFormatter implements Formatter {
 
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
 
-    private static final String REJECT_LITERALS = "[^0-9,\\-\\+]";
+    private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,]";
     private static final String PAGES_REPLACE_PATTERN = "$1--$2";
 
 
@@ -37,7 +37,7 @@ public class NormalizePagesFormatter implements Formatter {
     /**
      * Format page numbers, separated either by commas or double-hyphens.
      * Converts the range number format of the <code>pages</code> field to page_number--page_number.
-     * Removes all literals except [0-9,-+].
+     * Removes unwanted literals except letters, numbers and -+ signs.
      * Keeps the existing String if the resulting field does not match the expected Regex.
      *
      * <example>
@@ -58,13 +58,13 @@ public class NormalizePagesFormatter implements Formatter {
         }
 
         // remove unwanted literals incl. whitespace
-        String cleanValue = value.replaceAll(REJECT_LITERALS, "");
+        String cleanValue = value.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         // replace
         String newValue = matcher.replaceFirst(PAGES_REPLACE_PATTERN);
         // replacement?
-        if(!newValue.equals(cleanValue)) {
+        if(matcher.matches()) {
             // write field
             return newValue;
         }

@@ -15,23 +15,41 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SidePaneComponent;
+import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
@@ -290,6 +308,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
     }
 
+    @Override
+    public int getRescalingWeight() {
+        return 0;
+    }
 
     private static class EntryFetcherComparator implements Comparator<EntryFetcher> {
 

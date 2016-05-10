@@ -17,39 +17,61 @@ package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.gui.help.HelpAction;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.gui.net.MonitoredURLDownload;
+import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.logic.l10n.Localization;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Sep 19, 2005 Time: 7:57:29 PM To browseOld this template use File |
@@ -141,7 +163,7 @@ class ManageJournalsPanel extends JPanel {
         bb.addButton(cancel);
         bb.addUnrelatedGap();
 
-        JButton help = new HelpAction(HelpFiles.journalAbbrHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.JOURNAL_ABBREV).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -439,10 +461,10 @@ class ManageJournalsPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             String chosen;
             if (dir) {
-                chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), Globals.NONE, JFileChooser.OPEN_DIALOG,
+                chosen = FileDialogs.getNewDir(frame, new File(comp.getText()), "", JFileChooser.OPEN_DIALOG,
                         false);
             } else {
-                chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Globals.NONE, JFileChooser.OPEN_DIALOG,
+                chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), "", JFileChooser.OPEN_DIALOG,
                         false);
             }
             if (chosen != null) {

@@ -17,17 +17,19 @@ package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.gui.*;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import javax.swing.JLabel;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import ca.odell.glazedlists.gui.TableFormat;
 
-import javax.swing.JLabel;
+import ca.odell.glazedlists.gui.TableFormat;
 
 /**
  * Class defining the contents and column headers of the main table.
@@ -42,7 +44,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
     // These values are also used to put a heading into the table; see getColumnName(int)
     private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
     private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
-    private static final List<String> ARXIV = Arrays.asList("eprint");
+    private static final List<String> ARXIV = Collections.singletonList("eprint");
 
     private final BibDatabase database;
 

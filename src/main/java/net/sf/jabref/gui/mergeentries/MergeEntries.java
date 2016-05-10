@@ -48,7 +48,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.logic.formatter.CaseChangers;
+import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -88,25 +88,16 @@ public class MergeEntries {
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
 
-
-    enum DiffStyle {
-        LATEXDIFF,
-        SYMMETRIC
-    }
-
-
     private static final String ADDITION_START = "<span class=add>";
     private static final String REMOVAL_START = "<span class=del>";
-    private static final String CHANGE_ADDITION_START = "<span class=cadd>";
-    private static final String CHANGE_REMOVAL_START = "<span class=cdel>";
+    private static final String CHANGE_START = "<span class=change>";
     private static final String TAG_END = "</span>";
     private static final String HTML_START = "<html><body>";
     private static final String HTML_END = "</body></html>";
     private static final String BODY_STYLE = "body{font:sans-serif}";
     private static final String ADDITION_STYLE = ".add{color:blue;text-decoration:underline}";
     private static final String REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
-    private static final String CHANGE_ADDITION_STYLE = ".cadd{color:green;text-decoration:underline}";
-    private static final String CHANGE_REMOVAL_STYLE = ".cdel{color:green;text-decoration:line-through;}";
+    private static final String CHANGE_STYLE = ".change{color:#006400;text-decoration:underline}";
 
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
@@ -243,7 +234,7 @@ public class MergeEntries {
         int row = 2;
         int maxLabelWidth = -1;
         for (String field : allFields) {
-            JLabel label = boldFontLabel(CaseChangers.TO_SENTENCE_CASE.format(field));
+            JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
             mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
             String leftString = leftEntry.getField(field);
             String rightString = rightEntry.getField(field);
@@ -385,13 +376,13 @@ public class MergeEntries {
                 rightString = generateDiffHighlighting(leftString, rightString, "");
                 break;
             case 3: // Symmetric style - word
-                String tmpLeftString = generateSymmetricHighlighting(rightString, leftString, " ");
-                rightString = generateSymmetricHighlighting(leftString, rightString, " ");
+                String tmpLeftString = generateSymmetricHighlighting(leftString, rightString, " ");
+                rightString = generateSymmetricHighlighting(rightString, leftString, " ");
                 leftString = tmpLeftString;
                 break;
-            case 4: // Symmetric style - word
-                tmpLeftString = generateSymmetricHighlighting(rightString, leftString, "");
-                rightString = generateSymmetricHighlighting(leftString, rightString, "");
+            case 4: // Symmetric style - character
+                tmpLeftString = generateSymmetricHighlighting(leftString, rightString, "");
+                rightString = generateSymmetricHighlighting(rightString, leftString, "");
                 leftString = tmpLeftString;
                 break;
             default: // Shouldn't happen
@@ -415,8 +406,7 @@ public class MergeEntries {
         sheet.addRule(BODY_STYLE);
         sheet.addRule(ADDITION_STYLE);
         sheet.addRule(REMOVAL_STYLE);
-        sheet.addRule(CHANGE_ADDITION_STYLE);
-        sheet.addRule(CHANGE_REMOVAL_STYLE);
+        sheet.addRule(CHANGE_STYLE);
         pane.setEditable(false);
         return pane;
     }
@@ -463,7 +453,7 @@ public class MergeEntries {
         return modifiedString;
     }
 
-    private String generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
+    public static String generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
         if ((baseString != null) && (modifiedString != null)) {
             List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
             List<Delta<String>> deltaList = new ArrayList<>(DiffUtils
@@ -476,26 +466,25 @@ public class MergeEntries {
                 switch (delta.getType()) {
                 case CHANGE:
                     for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? CHANGE_REMOVAL_START : "") + line);
+                        stringList.set(startPos + offset, (offset == 0 ? CHANGE_START : "") + line);
                         offset++;
                     }
-                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END
-                            + CHANGE_ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
+                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END);
                     break;
                 case DELETE:
-                    for (offset = 0; offset <= (lines.size() - 1); offset++) {
-                        stringList.set(startPos + offset, "");
+                    for (String line : lines) {
+                        stringList.set(startPos + offset, (offset == 0 ? ADDITION_START : "") + line);
+                        offset++;
                     }
+                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END);
                     break;
                 case INSERT:
-                    stringList.add(delta.getOriginal().getPosition(),
-                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
                     break;
                 default:
                     break;
                 }
             }
-            return HTML_START + String.join("", stringList) + HTML_END;
+            return String.join(separator, stringList);
         }
         return modifiedString;
     }
@@ -523,12 +512,10 @@ public class MergeEntries {
             return;
         }
         // Check if the type has changed
-        if (!identicalTypes) {
-            if (typeRadioButtons.get(0).isSelected()) {
-                mergedEntry.setType(leftEntry.getType());
-            } else {
-                mergedEntry.setType(rightEntry.getType());
-            }
+        if (!identicalTypes && typeRadioButtons.get(0).isSelected()) {
+            mergedEntry.setType(leftEntry.getType());
+        } else {
+            mergedEntry.setType(rightEntry.getType());
         }
 
         // Check the potentially different fields

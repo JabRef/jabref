@@ -2,10 +2,11 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link net.sf.jabref.logic.formatter.FormatterTest}

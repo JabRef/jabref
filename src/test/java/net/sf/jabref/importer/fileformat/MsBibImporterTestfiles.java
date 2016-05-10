@@ -6,6 +6,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryAssert;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,11 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
 
 @RunWith(Parameterized.class)
 public class MsBibImporterTestfiles {
@@ -56,7 +57,7 @@ public class MsBibImporterTestfiles {
         MsBibImporter testImporter = new MsBibImporter();
         try (InputStream is = MsBibImporter.class.getResourceAsStream(xmlFileName)) {
             List<BibEntry> result = testImporter.importEntries(is, new OutputPrinterToNull());
-            BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
+            BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
         }
     }
 

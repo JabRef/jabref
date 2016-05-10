@@ -20,7 +20,7 @@ We use [install4j], the multi-platform installer builder.
 
 ### Background
 
-JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] (`.bib`) databases.
+JabRef is a graphical Java application for editing [BibTeX] and [Biblatex] `.bib` databases.
 JabRef lets you organize your entries into overlapping logical groups, and with a single click limit your view to a single group or an intersection or union of several groups.
 You can customize the entry information shown in the main window, and sort by any of the standard BibTeX fields.
 JabRef can autogenerate BibTeX keys for your entries.
@@ -87,6 +87,13 @@ and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
 
+## Testing
+
+`gradlew test` executes the normal unit tests.
+If you want to test the UI, execute `gradlew integrationTest`.
+Sources for the integration test are kept in `src/integrationTest`.
+
+
 ## Release Process
 
 Requires [install4j].
@@ -103,10 +110,10 @@ All binaries are created inside the directory `build/releases`.
 ### Releasing Developer Releases
 
 Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
-The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortend git hash*.
+The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortened git hash*.
 
-Normal: `JabRef--3.0dev.jar`
-With `-Pdev=true`: `JabRef-3.0dev--snapshot--2015-11-20--master--cc4f5d1.jar`
+ * Normal: `JabRef--3.0dev.jar`
+ * With `-Pdev=true`: `JabRef-3.0dev--snapshot--2015-11-20--master--cc4f5d1.jar`
 
 ## License
 

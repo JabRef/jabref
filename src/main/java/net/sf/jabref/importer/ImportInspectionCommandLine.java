@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
@@ -66,10 +66,5 @@ public class ImportInspectionCommandLine implements ImportInspector {
             return entries;
         }
         return Collections.emptyList();
-    }
-
-    @Override
-    public void toFront() {
-        // Nothing
     }
 }

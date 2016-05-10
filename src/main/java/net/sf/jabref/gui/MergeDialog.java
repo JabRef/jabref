@@ -15,16 +15,25 @@
 */
 package net.sf.jabref.gui;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * <p>Title: MergeDialog</p>

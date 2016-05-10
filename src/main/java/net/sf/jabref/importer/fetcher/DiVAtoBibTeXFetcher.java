@@ -25,19 +25,21 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class DiVAtoBibTeXFetcher implements EntryFetcher {
 
@@ -123,8 +125,8 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "DiVAtoBibTeXHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_DIVA_TO_BIBTEX;
     }
 
     @Override

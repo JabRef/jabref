@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.external.push;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;

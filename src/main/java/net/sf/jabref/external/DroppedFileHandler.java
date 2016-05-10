@@ -20,28 +20,36 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -331,13 +339,9 @@ public class DroppedFileHandler {
             renameCheckBox.setEnabled(true);
         }
 
-        ChangeListener cl = new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                renameCheckBox.setEnabled(!linkInPlace.isSelected());
-                renameToTextBox.setEnabled(!linkInPlace.isSelected());
-            }
+        ChangeListener cl = arg0 -> {
+            renameCheckBox.setEnabled(!linkInPlace.isSelected());
+            renameToTextBox.setEnabled(!linkInPlace.isSelected());
         };
 
         linkInPlace.setText(Localization.lang("Leave file in its current directory"));

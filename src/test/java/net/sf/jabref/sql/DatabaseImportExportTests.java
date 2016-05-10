@@ -1,9 +1,5 @@
 package net.sf.jabref.sql;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +7,7 @@ import java.util.List;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -54,6 +50,21 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToMySQLSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
+        DatabaseType databaseType = DatabaseType.MYSQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("mysql", "localhost", "root", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToMySQLSingleEntrySingleGroup() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
@@ -84,6 +95,21 @@ public class DatabaseImportExportTests {
     }
 
     @Test
+    public void testExportToPostgresSingleEntryUsingQuoteSymbol() throws Exception {
+        Assume.assumeTrue(DevEnvironment.isCIServer());
+
+        BibDatabaseContext databaseContext = createContextWithSingleEntryUsingQuoteSymbol();
+        DatabaseType databaseType = DatabaseType.POSTGRESQL;
+
+        String databaseName = "jabref";
+        DBStrings strings = new DBStrings();
+        strings.setPassword("");
+        strings.setDbPreferences(new DBStringsPreferences("postgresql", "localhost", "postgres", "jabref"));
+
+        testDatabaseExport(databaseContext, databaseType, databaseName, strings);
+    }
+
+    @Test
     public void testExportToPostgresSingleEntrySingleGroup() throws Exception {
         Assume.assumeTrue(DevEnvironment.isCIServer());
 
@@ -98,7 +124,8 @@ public class DatabaseImportExportTests {
         testDatabaseExport(databaseContext, databaseType, databaseName, strings);
     }
 
-    private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings) throws Exception {
+    private void testDatabaseExport(BibDatabaseContext databaseContext, DatabaseType databaseType, String databaseName, DBStrings strings)
+            throws Exception {
         DatabaseExporter db = new DBExporterAndImporterFactory().getExporter(databaseType);
         try (Connection connection = db.connectToDB(strings)) {
             db.createTables(connection);
@@ -117,43 +144,11 @@ public class DatabaseImportExportTests {
         try (Connection connection = importer.connectToDB(strings)) {
             List<DBImporterResult> results = importer.performImport(strings, Collections.singletonList(databaseName), databaseContext.getMode());
             assertEquals(1, results.size());
-            BibtexEntryAssert.assertEquals(databaseContext.getDatabase().getEntries(),
+            assertEquals(databaseContext.getDatabase().getEntries(),
                     results.get(0).getDatabaseContext().getDatabase().getEntries());
 
             assertEquals(databaseContext.getMetaData().getGroups(), results.get(0).getDatabaseContext().getMetaData().getGroups());
         }
-    }
-
-    @Test
-    public void testExportToFileSingleEntry() throws Exception {
-        BibDatabaseContext databaseContext = createContextWithSingleEntry();
-        for (DatabaseType databaseType : DatabaseType.values()) {
-            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry.sql", databaseType);
-        }
-    }
-
-    @Test
-    public void testExportToFileSingleEntrySingleGroup() throws Exception {
-        BibDatabaseContext databaseContext = createContextWithSingleEntrySingleGroup();
-        for (DatabaseType databaseType : DatabaseType.values()) {
-            testExportToFile(databaseContext, "src/test/resources/net/sf/jabref/sql/database-export-single-entry-single-group.sql", databaseType);
-        }
-    }
-
-    private void testExportToFile(BibDatabaseContext databaseContext, String path, DatabaseType databaseType) throws Exception {
-        DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(databaseType);
-
-        Path tempFile = Files.createTempFile("jabref", "database-export" + databaseType.getFormattedName());
-        exporter.exportDatabaseAsFile(databaseContext,
-                databaseContext.getDatabase().getEntries(),
-                tempFile.toAbsolutePath().toString(),
-                StandardCharsets.UTF_8);
-
-        Path expectSqlFile = Paths.get(path);
-        assertEquals(
-                String.join("\n", Files.readAllLines(expectSqlFile, StandardCharsets.UTF_8)),
-                String.join("\n", Files.readAllLines(tempFile, StandardCharsets.UTF_8))
-        );
     }
 
     private BibDatabaseContext createContextWithSingleEntry() {
@@ -168,7 +163,19 @@ public class DatabaseImportExportTests {
         return databaseContext;
     }
 
-    private BibDatabaseContext createContextWithSingleEntrySingleGroup() {
+    private BibDatabaseContext createContextWithSingleEntryUsingQuoteSymbol() {
+        BibEntry entry = new BibEntry("id1");
+        entry.setCiteKey("einstein");
+        entry.setType("article");
+        entry.setField("author", "Albert L{\\'{u}}cia Einstein");
+        entry.setField("title", "Die grundlage der allgemeinen relativitätstheorie}");
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+        return databaseContext;
+    }
+
+    private BibDatabaseContext createContextWithSingleEntrySingleGroup() throws ParseException {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
         GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());

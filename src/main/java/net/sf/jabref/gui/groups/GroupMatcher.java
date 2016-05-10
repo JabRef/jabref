@@ -15,8 +15,9 @@
 */
 package net.sf.jabref.gui.groups;
 
-import ca.odell.glazedlists.matchers.Matcher;
 import net.sf.jabref.model.entry.BibEntry;
+
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * Matcher for filtering or sorting the table according to whether entries

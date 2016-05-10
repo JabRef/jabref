@@ -15,6 +15,15 @@
  */
 package net.sf.jabref.gui.worker;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibEntryWriter;
 import net.sf.jabref.exporter.LatexFieldFormatter;
@@ -24,17 +33,9 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp

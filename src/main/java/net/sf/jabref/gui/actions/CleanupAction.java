@@ -17,7 +17,8 @@ package net.sf.jabref.gui.actions;
 
 import java.util.List;
 import java.util.Objects;
-import javax.swing.*;
+
+import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -48,15 +49,12 @@ public class CleanupAction extends AbstractWorker {
     private boolean canceled;
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
-    private final CleanupPresetPanel presetPanel;
 
 
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
         this.frame = panel.frame();
         this.preferences = Objects.requireNonNull(preferences);
-        this.presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
-                CleanupPreset.loadFromPreferences(preferences));
     }
 
     @Override
@@ -79,7 +77,9 @@ public class CleanupAction extends AbstractWorker {
         if (canceled) {
             return;
         }
-        int choice = showDialog();
+        CleanupPresetPanel presetPanel = new CleanupPresetPanel(panel.getBibDatabaseContext(),
+                CleanupPreset.loadFromPreferences(preferences));
+        int choice = showDialog(presetPanel);
         if (choice != JOptionPane.OK_OPTION) {
             canceled = true;
             return;
@@ -147,7 +147,7 @@ public class CleanupAction extends AbstractWorker {
         frame.unblock();
     }
 
-    private int showDialog() {
+    private int showDialog(CleanupPresetPanel presetPanel) {
         String dialogTitle = Localization.lang("Cleanup entries");
 
         Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getPanel()};

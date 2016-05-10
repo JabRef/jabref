@@ -15,8 +15,16 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.util.Optional;
+
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
@@ -26,9 +34,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Optional;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -75,7 +82,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(HelpFiles.remoteHelp).getHelpButton());
+        p.add(new HelpAction(HelpFiles.REMOTE).getHelpButton());
         builder.append(p);
 
         // IEEE

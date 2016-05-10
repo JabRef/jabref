@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.openoffice;
 
-import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,10 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
@@ -28,6 +23,14 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class OOBibStyleTest {
@@ -491,4 +494,26 @@ public class OOBibStyleTest {
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }
+
+
+    public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
+        String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
+        OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationRepository.class));
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta and Gamma Epsilon and Ypsilon Tau");
+        entry.setField("title", "JabRef Manual");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("von Beta, Epsilon, and Tau, 2016",
+                style.getCitationMarker(entries, entryDBMap, true, null, null));
+
+    }
+
 }

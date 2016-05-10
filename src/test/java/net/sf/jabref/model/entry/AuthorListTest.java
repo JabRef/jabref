@@ -580,4 +580,29 @@ public class AuthorListTest {
     public void createCorrectInitials() {
         Assert.assertEquals("J. G.", AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
     }
+
+    @Test
+    public void parseNameWithBracesAroundFirstName() throws Exception {
+        //TODO: Be more intelligent and abbreviate the first name correctly
+        Author expected = new Author("Tse-tung", "{Tse-tung}.", null, "Mao", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("{Tse-tung} Mao"));
+    }
+
+    @Test
+    public void parseNameWithBracesAroundLastName() throws Exception {
+        Author expected = new Author("Hans", "H.", null, "van den Bergen", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("{van den Bergen}, Hans"));
+    }
+
+    @Test
+    public void parseNameWithHyphenInFirstName() throws Exception {
+        Author expected = new Author("Tse-tung", "T.-t.", null, "Mao", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Tse-tung Mao"));
+    }
+
+    @Test
+    public void parseNameWithHyphenInLastName() throws Exception {
+        Author expected = new Author("Firstname", "F.", null, "Bailey-Jones", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Firstname Bailey-Jones"));
+    }
 }

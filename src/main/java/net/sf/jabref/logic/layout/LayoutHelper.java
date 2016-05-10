@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 

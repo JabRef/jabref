@@ -15,13 +15,15 @@
 */
 package net.sf.jabref.logic.groups;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
+import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.search.matchers.MatcherSets;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -186,28 +188,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
 
         return groups;
-    }
-
-    /**
-     * For all explicit subgroups, replace the i'th entry of originalEntries with the i'th entry of newEntries.
-     */
-    public void replaceEntriesInExplicitGroup(List<BibEntry> originalEntries, List<BibEntry> newEntries) {
-
-        if(this.group instanceof ExplicitGroup) {
-            ExplicitGroup group = (ExplicitGroup)this.group;
-            for (int i = 0; i < originalEntries.size(); ++i) {
-                BibEntry entry = originalEntries.get(i);
-                if (group.contains(entry)) {
-                    group.removeEntry(entry);
-                    group.addEntry(newEntries.get(i));
-                }
-            }
-        }
-
-        // Traverse children
-        for(GroupTreeNode child : getChildren()) {
-            child.replaceEntriesInExplicitGroup(originalEntries, newEntries);
-        }
     }
 
     public boolean supportsAddingEntries() {

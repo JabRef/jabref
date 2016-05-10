@@ -22,20 +22,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.*;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.l10n.Localization;
+
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import net.sf.jabref.logic.l10n.Localization;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * <p>Title: </p>
@@ -124,7 +137,7 @@ public class ExportCustomizationDialog extends JDialog {
         JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new HelpAction(HelpFiles.exportCustomizationHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.CUSTOM_EXPORTS).getHelpButton();
 
         // Key bindings:
         JPanel main = new JPanel();

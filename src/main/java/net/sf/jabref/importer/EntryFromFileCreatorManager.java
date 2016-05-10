@@ -31,10 +31,11 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators.
@@ -213,7 +214,7 @@ public final class EntryFromFileCreatorManager {
 
             @Override
             public String toString() {
-                return "All external files";
+                return Localization.lang("All external files");
             }
         };
     }

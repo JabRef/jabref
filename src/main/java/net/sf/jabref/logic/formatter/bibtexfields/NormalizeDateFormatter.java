@@ -1,12 +1,12 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.Optional;
+
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..

@@ -28,7 +28,42 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.SidePaneComponent;
+import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -36,17 +71,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.actions.BrowseAction;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.*;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -73,7 +97,8 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
-    private final JButton help = new HelpAction("OpenOfficeIntegration").getHelpButton();
+    private final JButton help = new HelpAction(Localization.lang("OpenOffice/LibreOffice integration"),
+            HelpFiles.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
     private SidePaneManager manager;
@@ -219,7 +244,6 @@ public class OpenOfficePanel extends AbstractWorker {
                                     .lang("You must select either a valid style file, or use one of the default styles."),
                             Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.warn("Problem with style file", ex);
-                    return;
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang(
@@ -438,7 +462,7 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
                 InvocationTargetException e) {
             LOGGER.error("Could not add URL to system classloader", e);
-            throw new IOException("Error, could not add URL to system classloader");
+            throw new IOException("Error, could not add URL to system classloader", e);
 
         }
     }
@@ -671,6 +695,11 @@ public class OpenOfficePanel extends AbstractWorker {
         @Override
         public void componentOpening() {
             preferences.setShowPanel(true);
+        }
+
+        @Override
+        public int getRescalingWeight() {
+            return 0;
         }
     }
 

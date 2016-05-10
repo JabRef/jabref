@@ -15,14 +15,17 @@
 */
 package net.sf.jabref.logic.search;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Silberer, Zirn

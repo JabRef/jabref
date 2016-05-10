@@ -15,22 +15,6 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OAI2Handler;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.entry.MonthUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import javax.swing.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -40,6 +24,26 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Locale;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OAI2Handler;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.MonthUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  *
@@ -229,9 +233,8 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        // there is no helppage
-        return null;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_OAI2_ARXIV;
     }
 
     @Override

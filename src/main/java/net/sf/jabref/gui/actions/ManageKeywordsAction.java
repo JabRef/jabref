@@ -23,6 +23,7 @@ import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,15 +42,17 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -57,8 +60,6 @@ import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -329,7 +330,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             String oldValue = entry.getField(KEYWORDS_FIELD);
             entry.putKeywords(separatedKeywords);
             String updatedValue = entry.getField(KEYWORDS_FIELD);
-            if ((oldValue == null) || !oldValue.equals(updatedValue)) {
+            if (!Objects.equals(oldValue, updatedValue)) {
                     ce.addEdit(new UndoableFieldChange(entry, KEYWORDS_FIELD, oldValue, updatedValue));
             }
 

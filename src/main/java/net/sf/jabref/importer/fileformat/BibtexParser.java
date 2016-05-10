@@ -19,18 +19,29 @@ import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import net.sf.jabref.*;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -183,7 +194,11 @@ public class BibtexParser {
         }
 
         // Instantiate meta data:
-        parserResult.setMetaData(new MetaData(meta, database));
+        try {
+            parserResult.setMetaData(new MetaData(meta));
+        } catch (ParseException exception) {
+            parserResult.addWarning(exception.getLocalizedMessage());
+        }
 
         parseRemainingContent();
 
@@ -500,7 +515,7 @@ public class BibtexParser {
             skipWhitespace();
         }
         String key = parseKey();
-        result.setField(BibEntry.KEY_FIELD, key);
+        result.setCiteKey(key);
         skipWhitespace();
 
         while (true) {
@@ -536,12 +551,6 @@ public class BibtexParser {
         skipWhitespace();
         consume('=');
         String content = parseFieldContent(key);
-        // Now, if the field in question is set up to be fitted automatically
-        // with braces around
-        // capitals, we should remove those now when reading the field:
-        if (Globals.prefs.putBracesAroundCapitals(key)) {
-            content = StringUtil.removeBracesAroundCapitals(content);
-        }
         if (!content.isEmpty()) {
             if (entry.hasField(key)) {
                 // The following hack enables the parser to deal with multiple
@@ -685,7 +694,7 @@ public class BibtexParser {
                         }
 
                         // Finished, now reverse newKey and remove whitespaces:
-                        parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key.",
+                        parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key.",
                                 String.valueOf(line)));
                         key = newKey.reverse();
                     }
@@ -693,12 +702,12 @@ public class BibtexParser {
                 break;
 
             case ',':
-                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (contains whitespaces).",
+                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (contains whitespaces).",
                         String.valueOf(line)));
                 break;
 
             case '\n':
-                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX-key (comma missing).",
+                parserResult.addWarning(Localization.lang("Line %0: Found corrupted BibTeX key (comma missing).",
                         String.valueOf(line)));
                 break;
 

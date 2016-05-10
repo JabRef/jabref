@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -76,7 +77,7 @@ class BibTeXMLHandler extends DefaultHandler {
                     }
                 }
                 if (bibtexKey != null) {
-                    b.setField(BibEntry.KEY_FIELD, bibtexKey);
+                    b.setCiteKey(bibtexKey);
                 }
             } else if ("article".equals(local) || "inbook".equals(local) || "book".equals(local)
                     || "booklet".equals(local) || "incollection".equals(local) || "inproceedings".equals(local)

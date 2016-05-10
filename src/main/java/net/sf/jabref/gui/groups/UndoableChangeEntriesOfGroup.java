@@ -15,13 +15,13 @@
 */
 package net.sf.jabref.gui.groups;
 
-import net.sf.jabref.logic.groups.EntriesGroupChange;
+import javax.swing.undo.AbstractUndoableEdit;
+
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.undo.AbstractUndoableEdit;
 
 public class UndoableChangeEntriesOfGroup {
 

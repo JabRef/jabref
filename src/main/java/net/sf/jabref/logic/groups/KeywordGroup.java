@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -52,7 +54,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-                        GroupHierarchyType context) throws IllegalArgumentException {
+                        GroupHierarchyType context) throws ParseException {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -63,9 +65,13 @@ public class KeywordGroup extends AbstractGroup {
         }
     }
 
-    private void compilePattern() throws IllegalArgumentException {
-        pattern = caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b")
-                : Pattern.compile("\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
+    private void compilePattern() throws ParseException {
+        try {
+            pattern = caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
+                    "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
+        } catch (PatternSyntaxException exception) {
+            throw new ParseException(Localization.lang("Syntax error in regular-expression pattern", searchExpression));
+        }
     }
 
     /**
@@ -74,52 +80,23 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, int version) throws Exception {
+    public static AbstractGroup fromString(String s) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
-            throw new Exception(
-                    "Internal error: KeywordGroup cannot be created from \""
-                            + s
-                            + "\". "
-                    + "Please report this on https://github.com/JabRef/jabref/issues");
+            throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
                 .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
-        switch (version) {
-            case 0: {
-                String name = tok.nextToken();
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                // assume caseSensitive=false and regExp=true for old groups
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), false, true, GroupHierarchyType.INDEPENDENT);
-            }
-            case 1:
-            case 2: {
-                String name = tok.nextToken();
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                        GroupHierarchyType.INDEPENDENT);
-            }
-            case 3: {
-                String name = tok.nextToken();
-                int context = Integer.parseInt(tok.nextToken());
-                String field = tok.nextToken();
-                String expression = tok.nextToken();
-                boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
-                boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-                return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR), StringUtil
-                        .unquote(field, AbstractGroup.QUOTE_CHAR), StringUtil.unquote(expression,
-                        AbstractGroup.QUOTE_CHAR), caseSensitive, regExp, GroupHierarchyType.getByNumber(context));
-            }
-            default:
-                throw new UnsupportedVersionException("KeywordGroup", version);
-        }
+
+        String name = tok.nextToken();
+        int context = Integer.parseInt(tok.nextToken());
+        String field = tok.nextToken();
+        String expression = tok.nextToken();
+        boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
+        boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
+        return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+                GroupHierarchyType.getByNumber(context));
     }
 
     /**
@@ -307,11 +284,10 @@ public class KeywordGroup extends AbstractGroup {
         try {
             return new KeywordGroup(getName(), searchField, searchExpression,
                     caseSensitive, regExp, getContext());
-        } catch (Throwable t) {
-            // this should never happen, because the constructor obviously
-            // succeeded in creating _this_ instance!
+        } catch (ParseException exception) {
+            // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
             LOGGER.error("Internal error in KeywordGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
+                    + "Please report this on https://github.com/JabRef/jabref/issues", exception);
             return null;
         }
     }

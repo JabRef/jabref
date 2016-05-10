@@ -26,7 +26,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -41,9 +46,13 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.FieldProperties;
+import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.bibtex.comparator.EntryComparator;
+import net.sf.jabref.bibtex.comparator.FieldComparator;
+import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -52,21 +61,15 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.TransferableBibtexEntry;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableNameFormatter;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.util.comparator.IconComparator;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.bibtex.comparator.EntryComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -78,6 +81,8 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with

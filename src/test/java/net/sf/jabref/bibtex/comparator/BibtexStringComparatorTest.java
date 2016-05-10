@@ -1,11 +1,12 @@
 package net.sf.jabref.bibtex.comparator;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Test;
 
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BibtexStringComparatorTest {
 

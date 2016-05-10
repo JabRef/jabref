@@ -15,18 +15,6 @@
  */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -35,6 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JPanel;
+
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
@@ -87,8 +88,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "CiteSeerHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_CITESEERX;
     }
 
     @Override

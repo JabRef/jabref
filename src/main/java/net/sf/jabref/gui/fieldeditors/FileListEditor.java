@@ -26,6 +26,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -200,7 +202,28 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (row >= 0) {
                 FileListEntry entry = tableModel.getEntry(row);
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(entry.link);
+                    String path = "";
+                    // absolute path
+                    if (Paths.get(entry.link).isAbsolute()) {
+                        path = Paths.get(entry.link).toString();
+                    } else {
+                        // relative to file folder
+                        for (String folder : databaseContext.getFileDirectory()) {
+                            Path file = Paths.get(folder, entry.link);
+                            if (Files.exists(file)) {
+                                path = file.toString();
+                                break;
+                            }
+                        }
+                    }
+                    if (!path.isEmpty()) {
+                        JabRefDesktop.openFolderAndSelectFile(path);
+                    } else {
+                        JOptionPane.showMessageDialog(frame,
+                                Localization.lang("File not found"),
+                                Localization.lang("Error"),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (IOException ex) {
                     LOGGER.debug("Cannot open folder", ex);
                 }
@@ -422,7 +445,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     auto.setEnabled(true);
 
                     if (e.getID() > 0) {
-                        entryEditor.updateField(FileListEditor.this);
+                        entryEditor.updateField(this);
                         adjustColumnWidth();
                         frame.output(Localization.lang("Finished automatically setting external links."));
                     } else {

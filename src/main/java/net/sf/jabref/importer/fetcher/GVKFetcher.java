@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,17 +19,15 @@ import java.util.Map;
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
-
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Fetch or search from GVK http://gso.gbv.de/sru/DB=2.1/
@@ -62,8 +62,8 @@ public class GVKFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "GVKHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_GVK;
     }
 
     @Override

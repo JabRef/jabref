@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;

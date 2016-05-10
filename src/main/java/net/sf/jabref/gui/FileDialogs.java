@@ -55,7 +55,7 @@ public class FileDialogs {
         OpenFileFilter off = null;
         if (extension == null) {
             off = new OpenFileFilter();
-        } else if (!extension.equals(Globals.NONE)) {
+        } else if (!extension.isEmpty()) {
             off = new OpenFileFilter(extension);
         }
 
@@ -67,7 +67,7 @@ public class FileDialogs {
         // Fix for:
         // http://sourceforge.net/tracker/index.php?func=detail&aid=1538769&group_id=92314&atid=600306
         if (files != null) {
-            return Arrays.asList((String) files);
+            return Collections.singletonList((String) files);
         }
         return Collections.emptyList();
     }
@@ -98,7 +98,7 @@ public class FileDialogs {
 
         if (extension == null) {
             off = new OpenFileFilter();
-        } else if (!extension.equals(Globals.NONE)) {
+        } else if (!extension.isEmpty()) {
             off = new OpenFileFilter(extension);
         }
 

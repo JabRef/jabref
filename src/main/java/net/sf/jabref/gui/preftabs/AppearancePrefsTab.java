@@ -21,19 +21,26 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.*;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.logic.l10n.Localization;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
     private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);

@@ -15,8 +15,31 @@
  */
 package net.sf.jabref.gui.cleanup;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import net.sf.jabref.MetaData;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
@@ -25,20 +48,8 @@ import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.List;
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 public class FieldFormatterCleanupsPanel extends JPanel {
 
@@ -63,8 +74,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
-        List<String> saveActionsMetaList = metaData.getData(MetaData.SAVE_ACTIONS);
-        setValues(FieldFormatterCleanups.parseFromString(saveActionsMetaList));
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
     }
 
     public void setValues(FieldFormatterCleanups formatterCleanups) {
@@ -74,7 +85,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         this.removeAll();
 
         List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
-        //The copy is necessary becaue the original List is unmodifiable
+        //The copy is necessary because the original List is unmodifiable
         List<FieldFormatterCleanup> actionsToDisplay = new ArrayList<>(configuredActions);
         buildLayout(actionsToDisplay);
 
@@ -197,6 +208,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
         fieldNames.add(BibEntry.KEY_FIELD);
+        fieldNames.add("all");
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
 
@@ -205,9 +217,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         builder.add(selectFieldCombobox).xy(1, 1);
 
         List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream()
-                .map(formatter -> formatter.getKey()).collect(Collectors.toList());
+                .map(Formatter::getName).collect(Collectors.toList());
         List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream()
-                .map(formatter -> formatter.getDescription()).collect(Collectors.toList());
+                .map(Formatter::getDescription).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
         formattersCombobox.setRenderer(new DefaultListCellRenderer() {
 
@@ -246,11 +258,11 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
         // if all actions have been removed, remove the save actions from the MetaData
         if (formatterCleanups.getConfiguredActions().isEmpty()) {
-            metaData.remove(MetaData.SAVE_ACTIONS);
+            metaData.clearSaveActions();
             return;
         }
 
-        metaData.putData(MetaData.SAVE_ACTIONS, formatterCleanups.convertToString());
+        metaData.setSaveActions(formatterCleanups);
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {
@@ -276,9 +288,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
-        String selectedFormatterKey = formattersCombobox.getSelectedItem().toString();
+        String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
         for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
-            if (formatter.getKey().equals(selectedFormatterKey)) {
+            if (formatter.getName().equals(selectedFormatterName)) {
                 selectedFormatter = formatter;
                 break;
             }

@@ -1,19 +1,24 @@
 package net.sf.jabref.bibtex;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Predicate;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.exporter.LatexFieldFormatter;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.*;
-import java.util.function.Predicate;
 
 import com.google.common.base.Strings;
-import net.sf.jabref.logic.TypedBibEntry;
 
 public class BibEntryWriter {
 
@@ -132,9 +137,7 @@ public class BibEntryWriter {
         String field = entry.getField(name);
         // only write field if is is not empty or if empty fields should be included
         // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
-        if (Strings.nullToEmpty(field).trim().isEmpty()) {
-            return;
-        } else {
+        if (!Strings.nullToEmpty(field).trim().isEmpty()) {
             out.write("  " + getFieldDisplayName(name, indentation));
 
             try {
@@ -148,7 +151,7 @@ public class BibEntryWriter {
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
         Predicate<String> isNotBibtexKey = field -> !"bibtexkey".equals(field);
-        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(field -> field.length()).max().orElse(0);
+        return entry.getFieldNames().stream().filter(isNotBibtexKey).mapToInt(String::length).max().orElse(0);
     }
 
     /**

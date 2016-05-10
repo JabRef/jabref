@@ -15,13 +15,13 @@
  */
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
+import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
 
 /**
  * Versatile author name formatter that takes arguments to control the formatting style.

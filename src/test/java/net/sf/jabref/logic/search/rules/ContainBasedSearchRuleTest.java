@@ -1,10 +1,11 @@
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.*;
-
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import org.junit.Assert;
 import org.junit.Test;
 

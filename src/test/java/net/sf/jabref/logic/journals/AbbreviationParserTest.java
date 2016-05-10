@@ -1,7 +1,8 @@
 package net.sf.jabref.logic.journals;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 public class AbbreviationParserTest {
 

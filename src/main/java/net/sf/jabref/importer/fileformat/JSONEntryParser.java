@@ -19,13 +19,13 @@ package net.sf.jabref.importer.fileformat;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.MonthUtil;
 
 public class JSONEntryParser {
 

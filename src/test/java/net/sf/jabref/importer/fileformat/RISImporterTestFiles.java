@@ -1,9 +1,17 @@
 package net.sf.jabref.importer.fileformat;
 
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 @RunWith(Parameterized.class)
 public class RISImporterTestFiles {
@@ -52,7 +54,7 @@ public class RISImporterTestFiles {
         try (InputStream risStream = RISImporterTest.class.getResourceAsStream(fileName + ".ris")) {
 
             List<BibEntry> risEntries = risImporter.importEntries(risStream, new OutputPrinterToNull());
-            BibtexEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
+            BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
 
         }
     }

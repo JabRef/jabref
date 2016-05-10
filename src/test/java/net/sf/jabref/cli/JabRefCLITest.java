@@ -1,9 +1,9 @@
 package net.sf.jabref.cli;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 public class JabRefCLITest {
 

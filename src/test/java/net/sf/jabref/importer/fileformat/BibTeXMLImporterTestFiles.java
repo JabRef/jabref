@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.bibtex.BibEntryAssert;
 import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -74,7 +74,7 @@ public class BibTeXMLImporterTestFiles {
             if (bibtexmlEntries.isEmpty()) {
                 Assert.assertEquals(Collections.emptyList(), bibtexmlEntries);
             } else {
-                BibtexEntryAssert.assertEquals(BibTeXMLImporterTest.class, bibFileName, bibtexmlEntries);
+                BibEntryAssert.assertEquals(BibTeXMLImporterTest.class, bibFileName, bibtexmlEntries);
             }
         }
     }

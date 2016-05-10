@@ -1,13 +1,14 @@
 package net.sf.jabref;
 
+import java.io.File;
+import java.io.IOException;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * A base class for Testing in JabRef that comes along with some useful

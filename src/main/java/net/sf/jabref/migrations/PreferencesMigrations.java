@@ -1,10 +1,10 @@
 package net.sf.jabref.migrations;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 
 public class PreferencesMigrations {
 

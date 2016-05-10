@@ -14,14 +14,15 @@
 
 package net.sf.jabref.logic.cleanup;
 
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.formatter.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Formats a given entry field with the specified formatter.
@@ -38,7 +39,7 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if ("all".equals(field)) {
+        if ("all".equals(field.toLowerCase(Locale.ENGLISH))) {
             return cleanupAllFields(entry);
         } else {
             return cleanupSingleField(field, entry);
@@ -68,6 +69,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         } else {
             if(newValue.isEmpty()) {
                 entry.clearField(fieldKey);
+                newValue = null;
             } else {
                 entry.setField(fieldKey, newValue);
             }
