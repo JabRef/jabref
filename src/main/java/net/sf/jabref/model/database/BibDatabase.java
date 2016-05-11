@@ -43,13 +43,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
+import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.MonthUtil;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -184,6 +187,8 @@ public class BibDatabase {
 
         internalIDs.add(id);
         entries.add(entry);
+        entry.registerListener(this);
+
         eventBus.post(new EntryAddedEvent(entry));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
@@ -549,18 +554,20 @@ public class BibDatabase {
 
     /**
      * Registers an listener object (subscriber) to the internal event bus.
-     * All subscribers should contain at least one <code>@Subscribe</code> annotated
-     * method accepting one of the following event types:
+     * The following events are posted:
      *
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
      *   - {@link EntryRemovedEvent}
      *
-     * or another {@link EntryEvent} extending type.
-     *
-     * @param object Listener (subscriber)
+     * @param listener listener (subscriber) to add
      */
-    public void registerListener(Object object) {
-        this.eventBus.register(object);
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
+    }
+
+    @Subscribe
+    private void relayEntryChangeEvent(FieldChangedEvent event) {
+        eventBus.post(event);
     }
 }

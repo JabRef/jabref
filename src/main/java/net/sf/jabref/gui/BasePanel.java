@@ -1252,14 +1252,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    /**
-     * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
-     * one or more groups are marked
-     */
     private class GroupTreeListener {
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
+            // Automatically add new entry to the selected group (or set of groups)
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
@@ -1271,6 +1268,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
             }
+
+            // Update group display (for example to reflect that the number of contained entries has changed)
+            frame.getGroupSelector().revalidateGroups();
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            // Update group display in order to take changes into account
+            frame.getGroupSelector().revalidateGroups();
         }
     }
 
