@@ -4,7 +4,6 @@ import java.io.File;
 
 import net.sf.jabref.JabRefMain;
 
-import org.assertj.swing.finder.JFileChooserFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JFileChooserFixture;
 import org.assertj.swing.fixture.JTableFixture;
@@ -13,7 +12,6 @@ import org.junit.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UndoTest extends AssertJSwingJUnitTestCase {
@@ -42,13 +40,16 @@ public class UndoTest extends AssertJSwingJUnitTestCase {
     }
 
     private void importBibIntoNewDatabase(FrameFixture mainFrame, String path) {
-        mainFrame.menuItemWithPath("File", "Import into new database").click();
+        // have to replace backslashes with normal slashes b/c assertJ can't type the former one on windows
+        path = path.replace("\\", "/");
 
-        JFileChooserFixture openFileDialog = JFileChooserFinder.findFileChooser().withTimeout(10_000).using(robot());
+        mainFrame.menuItemWithPath("File", "Import into new database").click();
+        JFileChooserFixture openFileDialog = mainFrame.fileChooser();
         robot().settings().delayBetweenEvents(1);
         openFileDialog.fileNameTextBox().enterText(path);
-        robot().settings().delayBetweenEvents(50);
+        robot().settings().delayBetweenEvents(1_000);
         openFileDialog.approve();
+        robot().settings().delayBetweenEvents(50);
     }
 
     @Test
@@ -57,14 +58,17 @@ public class UndoTest extends AssertJSwingJUnitTestCase {
         importBibIntoNewDatabase(mainFrame, getTestFilePath("testbib/testjabref.bib"));
 
         JTableFixture entryTable = mainFrame.table();
+
         assertTrue("The database must have at least 2 entries for the test to begin!", entryTable.rowCount() >= 2);
         entryTable.selectRows(0, 1);
+        entryTable.requireSelectedRows(0, 1);
 
-        int rowCount = entryTable.rowCount();
+        int oldRowCount = entryTable.rowCount();
         mainFrame.menuItemWithPath("Edit", "Cut").click();
         mainFrame.menuItemWithPath("Edit", "Undo").click();
-        assertEquals(rowCount, entryTable.rowCount());
+        entryTable.requireRowCount(oldRowCount);
 
+        mainFrame.menuItemWithPath("File", "Close database").click();
         mainFrame.menuItemWithPath("File", "Close database").click();
         exitJabRef(mainFrame);
     }
