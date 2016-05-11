@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
-import com.mysql.jdbc.StringUtils;
+import com.google.common.base.Strings;
 
 /**
  * This class includes sensible defaults for consistent formatting of BibTex page numbers.
@@ -68,7 +68,7 @@ public class NormalizePagesFormatter implements Formatter {
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         if(matcher.matches()) {
             // replace
-            if(StringUtils.isNullOrEmpty(matcher.group(2))) {
+            if(Strings.isNullOrEmpty(matcher.group(2))) {
                 return matcher.replaceFirst(SINGLE_PAGE_REPLACE_PATTERN);
             } else {
                 return matcher.replaceFirst(PAGES_REPLACE_PATTERN);
