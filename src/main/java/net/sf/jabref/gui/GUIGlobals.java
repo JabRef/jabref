@@ -145,7 +145,7 @@ public class GUIGlobals {
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
         GUIGlobals.TABLE_ICONS.put("eprint", label);
 
-        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
         GUIGlobals.TABLE_ICONS.put("doi", label);
 

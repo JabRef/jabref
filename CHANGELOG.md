@@ -28,6 +28,7 @@ to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by
 - Added an option in the about dialog to easily copy the version information of JabRef
 - Integrity check table can be sorted by clicking on column headings
 - Added \SOFTWARE\Jabref 'Path' registry entry for installation path inside the installer
+- Added an additional icon to distinguish DOI and URL links ([feature request #696](https://github.com/JabRef/jabref/issues/696))
 
 ### Fixed
 - Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database

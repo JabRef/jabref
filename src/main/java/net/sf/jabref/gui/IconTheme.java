@@ -87,7 +87,7 @@ public class IconTheme {
         REMOVE_NOBOX("\uf374") /*css: minus */,
         FILE("\uf214"), /* css: file*/
         PDF_FILE("\uf225"), /* css: file-pdf*/
-        DOI("\uf59f") /*css: web*/,
+        DOI("\uF072") /*css: barcode-scan*/,
         DUPLICATE("\uf191") /*css: content-duplicate */,
         EDIT("\uf3eb") /*css: pencil */,
         NEW("\uf224") /* css: file-outline */,
