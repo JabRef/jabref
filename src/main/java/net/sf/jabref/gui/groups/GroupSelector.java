@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
@@ -1235,12 +1236,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     public void showMatchingGroups(List<BibEntry> list, boolean requireAll) {
         if ((list == null) || (list.isEmpty())) { // nothing selected
-            groupsTree.setHighlight3Cells(null);
+            groupsTree.setMatchingGroups(Collections.emptyList());
             groupsTree.revalidate();
             return;
         }
         List<GroupTreeNode> nodeList = groupsRoot.getNode().getContainingGroups(list, requireAll);
-        groupsTree.setHighlight3Cells(nodeList.toArray());
+        groupsTree.setMatchingGroups(nodeList);
         // ensure that all highlighted nodes are visible
         for (GroupTreeNode node : nodeList) {
             node.getParent().ifPresent(
@@ -1250,11 +1251,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     /**
-     * Show groups that, if selected, would show at least one of the entries found in the specified search.
+     * Show groups that, if selected, would show at least one of the entries in the specified list.
      */
-    private void showOverlappingGroups(List<BibEntry> matches) { //DatabaseSearch search) {
+    private void showOverlappingGroups(List<BibEntry> matches) {
         List<GroupTreeNode> nodes = groupsRoot.getNode().getMatchingGroups(matches);
-        groupsTree.setHighlight2Cells(nodes.toArray());
+        groupsTree.setHighlight2Cells(nodes);
     }
 
     public GroupsTree getGroupsTree() {

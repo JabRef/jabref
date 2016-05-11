@@ -17,6 +17,8 @@ package net.sf.jabref.gui.groups;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
@@ -25,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
@@ -37,7 +40,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     /** The cell over which the user is currently dragging */
     private Object highlight1Cell;
     private Object[] highlight2Cells;
-    private Object[] highlight3Cells;
+    private List<GroupTreeNode> matchingGroups = new ArrayList<>();
     private Object highlightBorderCell;
 
 
@@ -66,7 +69,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
 
         Boolean red = printInRed(value);
-        Boolean underlined = printUnderlined(value);
+        Boolean underlined = printUnderlined(viewModel);
         StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
         if (red) {
@@ -114,15 +117,12 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         return false;
     }
 
-    private boolean printUnderlined(Object value) {
-        if (highlight3Cells != null) {
-            for (Object highlight3Cell : highlight3Cells) {
-                if (highlight3Cell.equals(value)) {
-                    return true;
-                }
-            }
+    private boolean printUnderlined(GroupTreeNodeViewModel viewModel) {
+        if(viewModel.isAllEntriesGroup()) {
+            // Do not underline all entries group
+            return false;
         }
-        return false;
+        return matchingGroups.contains(viewModel.getNode());
     }
 
     /**
@@ -142,10 +142,11 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * Highlights the specified cells (by underlining), or disables highlight if cells == null.
+     * Highlights the specified groups by underlining.
      */
-    public void setHighlight3Cells(Object[] cells) {
-        this.highlight3Cells = cells;
+    public void setMatchingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        this.matchingGroups = nodes;
     }
 
     /**

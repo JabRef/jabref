@@ -39,6 +39,7 @@ import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -52,6 +53,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.util.Util;
@@ -398,9 +400,12 @@ public class GroupsTree extends JTree implements DragSourceListener,
         repaint();
     }
 
-    /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight3Cells(Object[] cells) {
-        localCellRenderer.setHighlight3Cells(cells);
+    /**
+     * Highlights the specified groups by underlining
+     **/
+    public void setMatchingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        localCellRenderer.setMatchingGroups(nodes);
         repaint();
     }
 
