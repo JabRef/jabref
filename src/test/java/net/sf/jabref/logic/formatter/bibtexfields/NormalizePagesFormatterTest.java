@@ -61,22 +61,22 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
-    public void doesNotRemoveLetters() {
+    public void doNotRemoveLetters() {
         expectCorrect("R1-R50", "R1-R50");
     }
 
     @Test
-    public void replacesLongDashWithDoubleDash() {
+    public void replaceLongDashWithDoubleDash() {
         expectCorrect("1 \u2014 50", "1--50");
     }
 
     @Test
-    public void removesPagePrefix() {
+    public void removePagePrefix() {
         expectCorrect("p.50", "50");
     }
 
     @Test
-    public void removesPagesPrefix() {
+    public void removePagesPrefix() {
         expectCorrect("pp.50", "50");
     }
 
