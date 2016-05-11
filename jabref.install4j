@@ -169,7 +169,7 @@
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
   if (Util.isAtLeastWindowsVista()) {
-    context.setInstallationDirectory(new File(System.getProperty("LOCALAPPDATA"), "JabRef"));
+    context.setInstallationDirectory(new File(System.getenv("LOCALAPPDATA"), "JabRef"));
   } else {
     context.setInstallationDirectory(new File(System.getProperty("user.home"), "JabRef"));
   }   
