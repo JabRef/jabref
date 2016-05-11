@@ -39,7 +39,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /** The cell over which the user is currently dragging */
     private Object highlight1Cell;
-    private Object[] highlight2Cells;
+    private List<GroupTreeNode> overlappingGroups = new ArrayList<>();
     private List<GroupTreeNode> matchingGroups = new ArrayList<>();
     private Object highlightBorderCell;
 
@@ -68,7 +68,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             label.setBorder(BorderFactory.createEmptyBorder());
         }
 
-        Boolean red = printInRed(value);
+        Boolean red = printInRed(viewModel) && !selected; // do not print currently selected node in red
         Boolean underlined = printUnderlined(viewModel);
         StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
@@ -106,15 +106,13 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         return c;
     }
 
-    private boolean printInRed(Object value) {
-        if (highlight2Cells != null) {
-            for (Object highlight2Cell : highlight2Cells) {
-                if (highlight2Cell.equals(value)) {
-                    return true;
-                }
-            }
+    private boolean printInRed(GroupTreeNodeViewModel viewModel) {
+        if(viewModel.isAllEntriesGroup()) {
+            // Do not print all entries group in red
+            return false;
         }
-        return false;
+
+        return overlappingGroups.contains(viewModel.getNode());
     }
 
     private boolean printUnderlined(GroupTreeNodeViewModel viewModel) {
@@ -135,10 +133,11 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * Highlights the specified cells (in red), or disables highlight if cells == null.
+     * Highlights the specified groups in red.
      */
-    public void setHighlight2Cells(Object[] cells) {
-        this.highlight2Cells = cells;
+    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        this.overlappingGroups = nodes;
     }
 
     /**

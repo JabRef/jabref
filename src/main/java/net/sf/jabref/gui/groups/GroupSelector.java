@@ -162,7 +162,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             public void stateChanged(ChangeEvent event) {
                 Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING, showOverlappingGroups.isSelected());
                 if (!showOverlappingGroups.isSelected()) {
-                    groupsTree.setHighlight2Cells(null);
+                    groupsTree.setOverlappingGroups(Collections.emptyList());
                 }
             }
         });
@@ -571,7 +571,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (getLeafsOfSelection().stream().allMatch(GroupTreeNodeViewModel::isAllEntriesGroup)) {
             panel.mainTable.getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
             if (showOverlappingGroups.isSelected()) {
-                groupsTree.setHighlight2Cells(null);
+                groupsTree.setOverlappingGroups(Collections.emptyList());
             }
             frame.output(Localization.lang("Displaying no groups") + ".");
             return;
@@ -1255,7 +1255,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     private void showOverlappingGroups(List<BibEntry> matches) {
         List<GroupTreeNode> nodes = groupsRoot.getNode().getMatchingGroups(matches);
-        groupsTree.setHighlight2Cells(nodes);
+        groupsTree.setOverlappingGroups(nodes);
     }
 
     public GroupsTree getGroupsTree() {

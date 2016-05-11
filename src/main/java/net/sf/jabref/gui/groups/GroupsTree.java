@@ -394,9 +394,12 @@ public class GroupsTree extends JTree implements DragSourceListener,
         repaint();
     }
 
-    /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight2Cells(Object[] cells) {
-        localCellRenderer.setHighlight2Cells(cells);
+    /**
+     * Highlights the specified groups in red
+     **/
+    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        localCellRenderer.setOverlappingGroups(nodes);
         repaint();
     }
 
