@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

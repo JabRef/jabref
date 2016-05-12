@@ -17,7 +17,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
