@@ -6,9 +6,7 @@ Here, the categories "Changed" for added and changed functionality,
 "Fixed" for fixed functionality, and
 "Removed" for removed functionality is used.
 
-We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`,
-to [sourceforge bugs](https://sourceforge.net/p/jabref/bugs/) by using `bug NUM`, and
-to [sourceforge feature requests](https://sourceforge.net/p/jabref/features/) by using `feature request NUM`.
+We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 
 ## [Unreleased]
