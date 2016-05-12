@@ -197,12 +197,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         sb.append(name);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
-            if (group instanceof ExplicitGroup) {
-                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
-            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
+            if (group instanceof ExplicitGroup || group instanceof KeywordGroup || group instanceof SearchGroup) {
                 int hits = 0;
                 BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
-                if(currentBasePanel != null) {
+                if (currentBasePanel != null) {
                     for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
                         if (group.contains(entry)) {
                             hits++;
