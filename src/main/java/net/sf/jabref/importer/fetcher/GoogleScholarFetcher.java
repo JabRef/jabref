@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -174,9 +173,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static void runConfig() throws IOException {
         try {
-            new URLDownload(new URL("http://scholar.google.com")).downloadToString();
+            new URLDownload("http://scholar.google.com").downloadToString();
             //save("setting.html", ud.getStringContent());
-            String settingsPage = new URLDownload(new URL(GoogleScholarFetcher.URL_SETTING)).downloadToString();
+            String settingsPage = new URLDownload(GoogleScholarFetcher.URL_SETTING).downloadToString();
             // Get the form items and their values from the page:
             Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
             // Override the important ones:
@@ -186,7 +185,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             String request = formItems.entrySet().stream().map(Object::toString)
                     .collect(Collectors.joining("&", GoogleScholarFetcher.URL_SETPREFS + "?", "&submit="));
             // Download the URL to set preferences:
-            new URLDownload(new URL(request)).downloadToString();
+            new URLDownload(request).downloadToString();
 
         } catch (UnsupportedEncodingException ex) {
             LOGGER.error("Unsupported encoding.", ex);
@@ -217,8 +216,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString();
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
 
@@ -265,8 +263,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException {
         try {
-            URL url = new URL(GoogleScholarFetcher.URL_START + link);
-            String s = new URLDownload(url).downloadToString();
+            String s = new URLDownload(GoogleScholarFetcher.URL_START + link).downloadToString();
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {

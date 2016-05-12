@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -136,8 +135,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString();
         Matcher m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
         if (m.find()) {
             while (m.find()) {
