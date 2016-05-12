@@ -52,13 +52,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 31, 2005
- * Time: 10:46:03 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
@@ -71,10 +64,10 @@ public class DatabasePropertiesDialog extends JDialog {
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
     private SaveOrderConfig oldSaveOrderConfig;
-    private SaveOrderConfig defaultSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
+
     private JRadioButton saveInSpecifiedOrder;
 
     private final JCheckBox protect = new JCheckBox(
@@ -150,7 +143,6 @@ public class DatabasePropertiesDialog extends JDialog {
         pack();
 
         AbstractAction closeAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -196,14 +188,11 @@ public class DatabasePropertiesDialog extends JDialog {
     private void setValues() {
         encoding.setSelectedItem(panel.getEncoding());
 
-        defaultSaveOrderConfig = new SaveOrderConfig();
-        defaultSaveOrderConfig.setSaveInOriginalOrder();
-
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
         if (!storedSaveOrderConfig.isPresent()) {
             saveInOriginalOrder.setSelected(true);
-            oldSaveOrderConfig = null;
+            oldSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
             selected = false;
         } else {
             SaveOrderConfig saveOrderConfig = storedSaveOrderConfig.get();
@@ -266,10 +255,11 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+        SaveOrderConfig newSaveOrderConfig;
         if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig.setSaveInOriginalOrder();
+            newSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
         } else {
+            newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
             newSaveOrderConfig.setSaveInSpecifiedOrder();
         }
 
@@ -282,7 +272,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if (saveOrderConfigChanged) {
-            if (newSaveOrderConfig.equals(defaultSaveOrderConfig)) {
+            if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
                 metaData.clearSaveOrderConfig();
             } else {
                 metaData.setSaveOrderConfig(newSaveOrderConfig);
