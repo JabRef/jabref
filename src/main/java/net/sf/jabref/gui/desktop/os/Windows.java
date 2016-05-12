@@ -9,9 +9,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 
 public class Windows implements NativeDesktop {
-
     private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
-
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
@@ -23,12 +21,10 @@ public class Windows implements NativeDesktop {
             String quotePath = "\"" + filePath +"\"";
             Runtime.getRuntime().exec(new String[] {"explorer.exe", quotePath});
         }
-
     }
 
     @Override
     public String detectProgramPath(String programName, String directoryName) {
-
         String progFiles = System.getenv("ProgramFiles(x86)");
         if (progFiles == null) {
             progFiles = System.getenv("ProgramFiles");
@@ -41,7 +37,7 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        Runtime.getRuntime().exec(Paths.get(application) + " " + Paths.get(filePath));
+        new ProcessBuilder(Paths.get(application).toString(), Paths.get(filePath).toString()).start();
     }
 
     @Override
@@ -49,13 +45,12 @@ public class Windows implements NativeDesktop {
         String cmd = "explorer.exe";
         String arg = "/select,";
         String[] commandWithArgs = {cmd, arg, filePath};
-        //Array variant, because otherwise the Tokenizer, which is internally run, kills the whitespaces in the path
+        // Array variant, because otherwise the Tokenizer, which is internally run, kills the whitespaces in the path
         Runtime.getRuntime().exec(commandWithArgs);
     }
 
     @Override
     public void openConsole(String absolutePath) throws IOException {
-
         Runtime.getRuntime().exec("cmd.exe /c start", null, new File(absolutePath));
     }
 }
