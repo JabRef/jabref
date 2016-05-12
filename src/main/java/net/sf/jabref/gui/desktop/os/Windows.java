@@ -14,12 +14,13 @@ public class Windows implements NativeDesktop {
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
+
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath +"\"";
-            Runtime.getRuntime().exec(new String[] {"explorer.exe", quotePath});
+            new ProcessBuilder("explorer.exe", quotePath).start();
         }
     }
 
@@ -42,15 +43,13 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(String filePath) throws IOException {
-        String cmd = "explorer.exe";
-        String arg = "/select,";
-        String[] commandWithArgs = {cmd, arg, filePath};
-        // Array variant, because otherwise the Tokenizer, which is internally run, kills the whitespaces in the path
-        Runtime.getRuntime().exec(commandWithArgs);
+        new ProcessBuilder("explorer.exe", "/select,", filePath).start();
     }
 
     @Override
     public void openConsole(String absolutePath) throws IOException {
-        Runtime.getRuntime().exec("cmd.exe /c start", null, new File(absolutePath));
+        ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
+        process.directory(new File(absolutePath));
+        process.start();
     }
 }
