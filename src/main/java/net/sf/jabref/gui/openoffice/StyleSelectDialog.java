@@ -132,8 +132,9 @@ class StyleSelectDialog {
             addDialog.setDirectoryPath(preferences.getCurrentStyle());
             addDialog.setVisible(true);
             addDialog.getFileName().ifPresent(fileName -> {
-                loader.addStyle(fileName);
-                preferences.setCurrentStyle(fileName);
+                if (loader.addStyleIfValid(fileName)) {
+                    preferences.setCurrentStyle(fileName);
+                }
             });
             updateStyles();
 
@@ -310,6 +311,7 @@ class StyleSelectDialog {
      * settings, and add the styles to the list of styles.
      */
     private void updateStyles() {
+
         table.clearSelection();
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
