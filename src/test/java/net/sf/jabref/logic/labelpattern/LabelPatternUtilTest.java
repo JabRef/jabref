@@ -723,4 +723,12 @@ public class LabelPatternUtilTest {
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r"));
     }
 
+    @Test
+    public void testApplyModifiers() {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Green Scheduling of Whatever");
+        assertEquals("GSW", LabelPatternUtil.makeLabel(entry, "shorttitleINI"));
+        assertEquals("GreenSchedulingWhatever", LabelPatternUtil.makeLabel(entry, "shorttitle"));
+    }
+
 }

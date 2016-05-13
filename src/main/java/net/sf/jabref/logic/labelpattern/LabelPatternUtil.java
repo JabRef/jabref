@@ -564,9 +564,9 @@ public class LabelPatternUtil {
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
-                    for (String word1 : words) {
-                        if (!word1.isEmpty()) {
-                            abbreviateSB.append(word1.charAt(0));
+                    for (String word : words) {
+                        if (!word.isEmpty()) {
+                            abbreviateSB.append(word.charAt(0));
                         }
                     }
                     resultingLabel = abbreviateSB.toString();
@@ -740,6 +740,8 @@ public class LabelPatternUtil {
                 return lastPage(entry.getField("pages"));
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3, entry.getField("title"));
+            } else if ("shorttitleINI".equals(val)) {
+                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField("title")), new String[] {"abbr"}, 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField("title"));
             } else if ("shortyear".equals(val)) {
@@ -825,6 +827,10 @@ public class LabelPatternUtil {
      * Determines "number" words out of the "title" field in the given BibTeX entry
      */
     public static String getTitleWords(int number, String title) {
+        return keepLettersAndDigitsOnly(getTitleWordsWithSpaces(number, title));
+    }
+
+    private static String getTitleWordsWithSpaces(int number, String title) {
         String ss = new RemoveLatexCommands().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
@@ -861,7 +867,7 @@ public class LabelPatternUtil {
             words++;
         }
 
-        return keepLettersAndDigitsOnly(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {

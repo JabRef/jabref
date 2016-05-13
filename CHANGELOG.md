@@ -47,6 +47,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#796](https://github.com/JabRef/jabref/issues/796): Undoing more than one entry at the same time is now working
 - Fixed [#1353](https://github.com/JabRef/jabref/issues/1353): Fetch-Preview did not display updated BibTeX-Key after clicking on `Generate Now`
 - Fixed [#1381](https://github.com/JabRef/jabref/issues/1381): File links containing blanks are broken if non-default viewer is set
+- Fixed sourceforge bug 1000: shorttitleINI can generate the initials of the shorttitle
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
