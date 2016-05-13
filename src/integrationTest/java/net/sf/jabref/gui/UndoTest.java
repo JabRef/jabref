@@ -1,20 +1,16 @@
 package net.sf.jabref.gui;
 
-import java.io.File;
-
 import net.sf.jabref.JabRefMain;
 
 import org.assertj.swing.fixture.FrameFixture;
-import org.assertj.swing.fixture.JFileChooserFixture;
 import org.assertj.swing.fixture.JTableFixture;
-import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 import static org.junit.Assert.assertTrue;
 
-public class UndoTest extends AssertJSwingJUnitTestCase {
+public class UndoTest extends AbstractUITest {
 
     private AWTExceptionHandler awtExceptionHandler;
 
@@ -33,23 +29,6 @@ public class UndoTest extends AssertJSwingJUnitTestCase {
     private void exitJabRef(FrameFixture mainFrame) {
         mainFrame.menuItemWithPath("File", "Quit").click();
         awtExceptionHandler.assertNoExceptions();
-    }
-
-    private String getTestFilePath(String fileName) {
-        return new File(this.getClass().getClassLoader().getResource(fileName).getFile()).getAbsolutePath();
-    }
-
-    private void importBibIntoNewDatabase(FrameFixture mainFrame, String path) {
-        // have to replace backslashes with normal slashes b/c assertJ can't type the former one on windows
-        path = path.replace("\\", "/");
-
-        mainFrame.menuItemWithPath("File", "Import into new database").click();
-        JFileChooserFixture openFileDialog = mainFrame.fileChooser();
-        robot().settings().delayBetweenEvents(1);
-        openFileDialog.fileNameTextBox().enterText(path);
-        robot().settings().delayBetweenEvents(1_000);
-        openFileDialog.approve();
-        robot().settings().delayBetweenEvents(50);
     }
 
     @Test
