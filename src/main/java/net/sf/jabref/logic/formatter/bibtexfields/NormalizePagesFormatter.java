@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
+import com.google.common.base.Strings;
+
 /**
  * This class includes sensible defaults for consistent formatting of BibTex page numbers.
  *
@@ -18,10 +20,11 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class NormalizePagesFormatter implements Formatter {
 
-    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)-{1,2}(\\d+)\\Z");
+    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)(?:-{1,2}(\\d+))?\\Z");
 
     private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,]";
     private static final String PAGES_REPLACE_PATTERN = "$1--$2";
+    private static final String SINGLE_PAGE_REPLACE_PATTERN = "$1";
 
 
     @Override
@@ -57,17 +60,21 @@ public class NormalizePagesFormatter implements Formatter {
             return value;
         }
 
+        // Remove pages prefix
+        String cleanValue = value.replace("pp.", "").replace("p.","");
         // remove unwanted literals incl. whitespace
-        String cleanValue = value.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
+        cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
-        // replace
-        String newValue = matcher.replaceFirst(PAGES_REPLACE_PATTERN);
-        // replacement?
         if(matcher.matches()) {
-            // write field
-            return newValue;
+            // replace
+            if(Strings.isNullOrEmpty(matcher.group(2))) {
+                return matcher.replaceFirst(SINGLE_PAGE_REPLACE_PATTERN);
+            } else {
+                return matcher.replaceFirst(PAGES_REPLACE_PATTERN);
+            }
         }
+        // no replacement
         return value;
     }
 

@@ -68,7 +68,7 @@ import org.apache.commons.logging.LogFactory;
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
-    private String name;
+    private String name = "";
     private final SortedSet<String> journals = new TreeSet<>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
@@ -229,7 +229,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private void initialize(InputStream stream) throws IOException {
-        name = null;
+
         try (Reader reader = new InputStreamReader(stream, encoding)) {
             readFormatFile(reader);
         }

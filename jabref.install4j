@@ -58,8 +58,8 @@
     <components />
   </files>
   <launchers>
-    <launcher name="JabRef" id="23" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="./src/main/resources/images/icons/JabRef-icon-mac.icns" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
-      <executable name="JabRef" type="1" iconSet="true" iconFile="" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
+    <launcher name="JabRef" id="23" customizedId="" external="false" excludeFromMenu="false" unixMode="755" menuName="" icnsFile="./src/main/resources/icons/jabref.icns" customMacBundleIdentifier="false" macBundleIdentifier="" swtApp="false" fileset="" macBundleBinary="JavaApplicationStub" addMacEntitlements="false" macEntitlementsFile="" useCustomMacosExecutableName="false" customMacosExecutableName="">
+      <executable name="JabRef" type="1" iconSet="true" iconFile="./src/main/resources/icons/jabref.ico" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="true" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false" singleInstanceActivate="true" dpiAware="false">
         <versionInfo include="true" fileVersion="${compiler:versionFourDots}" fileDescription="${compiler:sys.fullName}" legalCopyright="${compiler:sys.fullName}" internalName="${compiler:sys.fullName}" productName="" />
       </executable>
       <splashScreen show="false" width="0" height="0" bitmapFile="" windowsNative="false" textOverlay="false">
@@ -86,9 +86,7 @@
       <infoPlist mode="1" file="">
         <content />
       </infoPlist>
-      <iconImageFiles>
-        <file path="./src/main/resources/images/icons/JabRef-icon-48.png" />
-      </iconImageFiles>
+      <iconImageFiles />
     </launcher>
   </launchers>
   <installerGui installerType="1" addOnAppId="" suggestPreviousLocations="true" autoUpdateDescriptorUrl="" useAutoUpdateBaseUrl="false" autoUpdateBaseUrl="">
@@ -461,7 +459,7 @@ return true;</string>
                       </void>
                       <void property="macIconFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>./src/main/resources/images/icons/JabRef-icon-mac.icns</string>
+                          <string>./src/main/resources/icons/jabref.icns</string>
                         </object>
                       </void>
                       <void property="macRole">
@@ -475,7 +473,7 @@ return true;</string>
                       </void>
                       <void property="windowsIconFile">
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>./src/main/resources/images/icons/JabRef-icon.png</string>
+                          <string>./src/main/resources/icons/jabref.ico</string>
                         </object>
                       </void>
                     </object>

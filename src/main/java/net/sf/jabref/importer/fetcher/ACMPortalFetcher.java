@@ -141,9 +141,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         LinkedHashMap<String, JLabel> previews = new LinkedHashMap<>();
 
         try {
-            URL url = new URL(address);
-
-            URLDownload dl = new URLDownload(url);
+            URLDownload dl = new URLDownload(address);
 
             String page = dl.downloadToString();
 
@@ -352,9 +350,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             // get abstract
             if (downloadAbstract) {
-                url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
-                URLDownload dl = new URLDownload(url);
-
+                URLDownload dl = new URLDownload(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
                 String page = dl.downloadToString();
 
                 Matcher absM = ACMPortalFetcher.ABSTRACT_PATTERN.matcher(page);

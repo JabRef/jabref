@@ -206,4 +206,10 @@ public class SaveOrderConfig {
         return res;
     }
 
+    public static SaveOrderConfig getDefaultSaveOrder() {
+        SaveOrderConfig standard = new SaveOrderConfig();
+        standard.setSaveInOriginalOrder();
+        return standard;
+    }
+
 }

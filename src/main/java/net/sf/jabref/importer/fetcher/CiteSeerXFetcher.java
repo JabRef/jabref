@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -128,8 +127,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString();
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));
@@ -141,9 +139,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
-
-        URL url = new URL(urlString);
-        String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
+        String cont = new URLDownload(urlString).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);

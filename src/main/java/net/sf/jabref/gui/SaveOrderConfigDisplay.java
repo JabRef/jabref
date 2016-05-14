@@ -116,6 +116,7 @@ public class SaveOrderConfigDisplay {
         saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
         saveOrderConfig.sortCriteria[2].field = getSelectedItemAsLowerCaseTrim(saveTerSort);
         saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
+
         return saveOrderConfig;
     }
 
