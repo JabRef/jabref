@@ -34,9 +34,9 @@ public class Windows implements NativeDesktop {
             progFiles = System.getenv("ProgramFiles");
         }
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            return Paths.get(progFiles, directoryName, programName, DEFAULT_EXECUTABLE_EXTENSION).toString();
+            return Paths.get(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
         }
-        return Paths.get(progFiles, programName, DEFAULT_EXECUTABLE_EXTENSION).toString();
+        return Paths.get(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
     }
 
     @Override
