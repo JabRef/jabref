@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -42,13 +42,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * User: alver
- *
- * Date: Oct 18, 2006
- *
- * Time: 9:35:08 PM
- */
 public class ExportFormats {
 
     private static final Log LOGGER = LogFactory.getLog(ExportFormats.class);
