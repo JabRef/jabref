@@ -177,6 +177,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
+    private boolean validEntry = true;
 
     private final List<Object> tabs = new ArrayList<>();
 
@@ -1213,7 +1214,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
-                storeSource();
+                validEntry = storeSource();
             }
 
             // Make sure we scroll to the entry if it moved in the table.
@@ -1404,18 +1405,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
             Object activeTab = tabs.get(tabbed.getSelectedIndex());
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
-                EntryEditorTab fp = (EntryEditorTab) activeTab;
-                FieldEditor fe = fp.getActive();
-                fe.clearAutoCompleteSuggestion();
-                updateField(fe);
+                EntryEditorTab tab = (EntryEditorTab) activeTab;
+                FieldEditor fieldEditor = tab.getActive();
+                fieldEditor.clearAutoCompleteSuggestion();
+                updateField(fieldEditor);
             } else {
                 // Source panel.
                 updateField(activeTab);
             }
 
-
-            panel.runCommand(Actions.SAVE);
-
+            if (validEntry) {
+                panel.runCommand(Actions.SAVE);
+            }
         }
     }
 
