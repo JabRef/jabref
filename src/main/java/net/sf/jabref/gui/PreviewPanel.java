@@ -275,13 +275,9 @@ public class PreviewPanel extends JPanel
 
     public void setEntry(BibEntry newEntry) {
 
-        if (entry.isPresent() && (entry.get() != newEntry)) {
-            entry.ifPresent(e -> e.unregisterListener(this));
-        }
-        if(newEntry != null) {
-            newEntry.registerListener(this);
-        }
+        entry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
         entry = Optional.ofNullable(newEntry);
+        entry.ifPresent(e -> e.registerListener(this));
 
         updateLayout();
         update();
