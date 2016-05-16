@@ -29,6 +29,9 @@ public class HtmlExportFormatTest {
     public Charset charset;
     public List<BibEntry> entries;
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -49,9 +52,6 @@ public class HtmlExportFormatTest {
     public void tearDown() {
         exportFormat = null;
     }
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void emitWellFormedHtml() throws Exception {
