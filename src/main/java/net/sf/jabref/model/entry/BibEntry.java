@@ -36,6 +36,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.JOptionPane;
+
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.google.common.base.Strings;
@@ -222,9 +224,12 @@ public class BibEntry {
 
         // Finally, handle dates
         if ("date".equals(name)) {
+
             String year = getField("year");
+
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
-            if (year != null) {
+
+            if ((year != null)) {
                 if (month.isValid()) {
                     return year + '-' + month.twoDigitNumber;
                 } else {
@@ -299,7 +304,12 @@ public class BibEntry {
     }
 
     public void setCiteKey(String newCiteKey) {
-        setField(KEY_FIELD, newCiteKey);
+        if ((newCiteKey.length() >= 2) && Character.isLetter(newCiteKey.charAt(0))) {
+            setField(KEY_FIELD, newCiteKey);
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Key deve ter no minimo 2 digitos e iniciar com uma letra");
+        }
     }
 
     public boolean hasCiteKey() {
@@ -502,11 +512,12 @@ public class BibEntry {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public String getPublicationDate() {
+        String year = getField("year");
         if (!hasField("year")) {
             return null;
         }
 
-        String year = getField("year");
+
 
         if (hasField("month")) {
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
