@@ -293,7 +293,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Write footer
-            if ((endLayout != null) && (this.encoding != null)) {
+            if (endLayout != null) {
                 ps.write(endLayout.doLayout(databaseContext, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
