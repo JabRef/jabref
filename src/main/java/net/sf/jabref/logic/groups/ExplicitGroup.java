@@ -168,10 +168,6 @@ public class ExplicitGroup extends KeywordGroup {
         return ExplicitGroup.ID;
     }
 
-    public int getNumEntries() {
-        return legacyEntryKeys.size();
-    }
-
     @Override
     public int hashCode() {
         return super.hashCode();

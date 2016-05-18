@@ -611,4 +611,8 @@ public class BibEntry implements Cloneable {
         this.eventBus.unregister(object);
     }
 
+    public BibEntry withField(String field, String value) {
+        setField(field, value);
+        return this;
+    }
 }

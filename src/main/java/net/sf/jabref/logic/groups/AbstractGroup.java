@@ -169,6 +169,21 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     /**
+     * Determines the number of entries in the specified list which are matched by this group.
+     * @param entries list of entries to be searched
+     * @return number of hits
+     */
+    public int numberOfHits(List<BibEntry> entries) {
+        int hits = 0;
+        for (BibEntry entry : entries) {
+            if (this.contains(entry)) {
+                hits++;
+            }
+        }
+        return hits;
+    }
+
+    /**
      * Returns true if this group is dynamic, i.e. uses a search definition or
      * equiv. that might match new entries, or false if this group contains a
      * fixed set of entries and thus will never match a new entry that was not
