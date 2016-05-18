@@ -290,47 +290,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testExpandAuthorInitialsAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("AO Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
-        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O, Jr."));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
-        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O and O Moore"));
-        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
-                StringUtil.expandAuthorInitials("Moore, O and O Moore and Moore, OO"));
-    }
-
-    @Test
-    public void testExpandAuthorInitialsDoNotAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A. O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A.-O."));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O. Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("A. O. Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
-        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O., Jr."));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
-        assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
-        assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
-        assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
-        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O. and O. Moore"));
-        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
-                StringUtil.expandAuthorInitials("Moore, O. and O. Moore and Moore, O. O."));
-    }
-
-    @Test
     public void testRepeatSpaces() {
         assertEquals("", StringUtil.repeatSpaces(0));
         assertEquals(" ", StringUtil.repeatSpaces(1));
