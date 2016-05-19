@@ -1,4 +1,4 @@
-package net.sf.jabref.importer.fileformat;
+package net.sf.jabref.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

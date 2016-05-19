@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.MetaData;
+import net.sf.jabref.bibtex.FieldContentParser;
 import net.sf.jabref.bibtex.FieldProperties;
 import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.importer.ParserResult;
