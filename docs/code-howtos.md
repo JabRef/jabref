@@ -26,6 +26,7 @@ This page provides some development support in the form of howtos. See also [[Hi
     * [keywords sync](#keywords-sync)
   * [Working with BibTeX data](#working-with-bibtex-data)
     * [Working with authors](#working-with-authors)
+  * [Benchmarks](#benchmarks)
 
 ## Generic code how tos
 
@@ -293,3 +294,10 @@ Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent doe
 ### Working with authors
 
 You can normalize the authors using `net.sf.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `net.sf.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the von parts or the junior information).
+
+## Benchmarks
+- Benchmarks can be executed by running the `jmh` gradle task (this functionality uses the [JMH Gradle plugin]( https://github.com/melix/jmh-gradle-plugin))
+- Best practices:
+  - Read test input from `@State` objects
+  - Return result of calculations (either explicitly or via a `BlackHole` object)
+- [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
