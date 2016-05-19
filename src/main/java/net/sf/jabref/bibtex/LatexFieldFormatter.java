@@ -35,8 +35,6 @@ public class LatexFieldFormatter {
 
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
-    private static final int LINE_LENGTH = 65; // Maximum
-
 
     private StringBuilder stringBuilder;
 
@@ -46,6 +44,7 @@ public class LatexFieldFormatter {
     private final char valueDelimiterStartOfValue;
     private final char valueDelimiterEndOfValue;
     private final List<String> doNotResolveStringsFors;
+    private final int lineLength;
 
     private final FieldContentParser parser;
 
@@ -61,6 +60,7 @@ public class LatexFieldFormatter {
         valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
         valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
         doNotResolveStringsFors = Globals.prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
+        lineLength = Globals.prefs.getInt(JabRefPreferences.LINE_LENGTH);
 
         parser = new FieldContentParser();
     }
@@ -272,7 +272,7 @@ public class LatexFieldFormatter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, LINE_LENGTH));
+        stringBuilder.append(StringUtil.wrap(s, lineLength));
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {
