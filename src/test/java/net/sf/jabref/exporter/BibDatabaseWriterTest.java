@@ -269,6 +269,7 @@ public class BibDatabaseWriterTest {
                         + Globals.NEWLINE + Globals.NEWLINE
                         + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
                 stringWriter.toString());
+        EntryTypes.removeAllCustomEntryTypes();
     }
 
     @Test
