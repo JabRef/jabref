@@ -102,7 +102,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Localization.lang("Intersection"), true);
     private final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Localization.lang("Float"), true);
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
-    private final JCheckBoxMenuItem select = new JCheckBoxMenuItem(Localization.lang("Select matches"), false);
     private final JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
             Localization.lang("Highlight overlapping groups"));
     private final JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
@@ -167,7 +166,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             }
         });
 
-        select.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_SELECT_MATCHES, select.isSelected()));
         grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
@@ -205,7 +203,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
-        select.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SELECT_MATCHES));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
         showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
@@ -216,8 +213,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         settings.add(orCb);
         settings.addSeparator();
         settings.add(invCb);
-        settings.addSeparator();
-        settings.add(select);
         settings.addSeparator();
         settings.add(editModeCb);
         settings.addSeparator();
@@ -280,7 +275,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         });
         floatCb.addActionListener(e -> valueChanged(null));
         highlCb.addActionListener(e -> valueChanged(null));
-        select.addActionListener(e -> valueChanged(null));
         hideNonHits.addActionListener(e -> valueChanged(null));
         grayOut.addActionListener(e -> valueChanged(null));
         newButton.setToolTipText(Localization.lang("New group"));
@@ -293,7 +287,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
-        select.setToolTipText(Localization.lang("Select entries in group selection"));
         editModeCb.setToolTipText(Localization.lang("Click group to toggle membership of selected entries"));
         ButtonGroup bgr = new ButtonGroup();
         bgr.add(andCb);
