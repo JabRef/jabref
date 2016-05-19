@@ -31,6 +31,7 @@ apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
+apply from: 'localization.gradle'
 
 group = "net.sf.jabref"
 version = "3.4dev"
