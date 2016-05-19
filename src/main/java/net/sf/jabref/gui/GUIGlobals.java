@@ -60,6 +60,7 @@ public class GUIGlobals {
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
     public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
+    public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
 
     public static final int WIDTH_ICON_COL = 26;
 

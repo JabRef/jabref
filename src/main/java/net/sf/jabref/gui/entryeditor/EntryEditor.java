@@ -17,7 +17,6 @@ package net.sf.jabref.gui.entryeditor;
 
 import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -1076,8 +1075,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public class StoreFieldAction extends AbstractAction {
 
-        private final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
-
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
@@ -1218,7 +1215,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     fieldEditor.setValidBackgroundColor();
                 }
                 if (fieldEditor.getTextComponent().hasFocus()) {
-                    fieldEditor.setBackground(ACTIVE_EDITOR_COLOR);
+                    fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
