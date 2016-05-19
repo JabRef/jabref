@@ -17,6 +17,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>3075-3080</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1358628.1358810</b:DOI>
 <b:StandardNumber> ISBN: 978-1-60558-012-X DOI: http://doi.acm.org/10.1145/1358628.1358810</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -40,6 +41,7 @@
 </b:Author>
 <b:Pages>13-14</b:Pages>
 <b:Volume>34</b:Volume>
+<b:DOI>http://doi.acm.org/10.1145/820127.820136</b:DOI>
 <b:StandardNumber> ISSN: 0097-8418 DOI: http://doi.acm.org/10.1145/820127.820136</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -72,6 +74,7 @@
 </b:Author>
 <b:Pages>10-12</b:Pages>
 <b:Volume>12</b:Volume>
+<b:DOI>http://dx.doi.org/10.1109/MIC.2008.67</b:DOI>
 <b:StandardNumber> ISSN: 1089-7801 DOI: http://dx.doi.org/10.1109/MIC.2008.67</b:StandardNumber>
 <b:Publisher>IEEE Educational Activities Department</b:Publisher>
 <b:City>Piscataway</b:City>
@@ -126,6 +129,7 @@
 </b:Author>
 <b:Pages>25-31</b:Pages>
 <b:Volume>2</b:Volume>
+<b:DOI>http://dx.doi.org/10.1109/MSP.2004.81</b:DOI>
 <b:StandardNumber> ISSN: 1540-7993 DOI: http://dx.doi.org/10.1109/MSP.2004.81</b:StandardNumber>
 <b:Publisher>IEEE Educational Activities Department</b:Publisher>
 <b:City>Piscataway</b:City>
@@ -151,6 +155,7 @@
 </b:Author>
 <b:Pages>357-367</b:Pages>
 <b:Volume>9</b:Volume>
+<b:DOI>http://dx.doi.org/10.1007/s00779-005-0347-6</b:DOI>
 <b:StandardNumber> ISSN: 1617-4909 DOI: http://dx.doi.org/10.1007/s00779-005-0347-6</b:StandardNumber>
 <b:Publisher>Springer-Verlag</b:Publisher>
 <b:City>London</b:City>
@@ -192,6 +197,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>11-18</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1137627.1137631</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137631</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -219,6 +225,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>529-530</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1233341.1233448</b:DOI>
 <b:StandardNumber> ISBN: 978-1-59593-629-5 DOI: http://doi.acm.org/10.1145/1233341.1233448</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -257,6 +264,7 @@
 </b:Author>
 <b:Pages>25-31</b:Pages>
 <b:Volume>2</b:Volume>
+<b:DOI>http://dx.doi.org/10.1109/MSP.2004.81</b:DOI>
 <b:StandardNumber> ISSN: 1540-7993 DOI: http://dx.doi.org/10.1109/MSP.2004.81</b:StandardNumber>
 <b:Publisher>IEEE Educational Activities Department</b:Publisher>
 <b:City>Piscataway</b:City>
@@ -286,6 +294,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>199-203</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1132736.1132768</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-350-6 DOI: http://doi.acm.org/10.1145/1132736.1132768</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -350,6 +359,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>429-432</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1182475.1182529</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-325-5 DOI: http://doi.acm.org/10.1145/1182475.1182529</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -378,6 +388,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>51-58</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1137627.1137636</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137636</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -406,6 +417,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>90-94</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1314276.1314293</b:DOI>
 <b:StandardNumber> ISBN: 978-1-59593-884-8 DOI: http://doi.acm.org/10.1145/1314276.1314293</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -438,6 +450,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>1-2</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1137627.1137628</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137628</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -494,6 +507,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>25-34</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1073001.1073004</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-178-3 DOI: http://doi.acm.org/10.1145/1073001.1073004</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -526,6 +540,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>27-34</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1137627.1137633</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-411-1 DOI: http://doi.acm.org/10.1145/1137627.1137633</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
@@ -576,6 +591,7 @@
 </b:Author>
 </b:Author>
 <b:Pages>1-7</b:Pages>
+<b:DOI>http://doi.acm.org/10.1145/1143120.1143122</b:DOI>
 <b:StandardNumber> ISBN: 1-59593-448-0 DOI: http://doi.acm.org/10.1145/1143120.1143122</b:StandardNumber>
 <b:Publisher>ACM</b:Publisher>
 <b:City>New York, NY, USA</b:City>
