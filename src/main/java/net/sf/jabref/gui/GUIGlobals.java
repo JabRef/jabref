@@ -43,6 +43,7 @@ import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
+
     private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
@@ -58,6 +59,7 @@ public class GUIGlobals {
     public static Color validFieldBackgroundColor;
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
+    public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
 
     public static final int WIDTH_ICON_COL = 26;
 

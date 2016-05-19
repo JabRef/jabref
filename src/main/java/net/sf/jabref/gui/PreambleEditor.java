@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -154,8 +153,6 @@ class PreambleEditor extends JDialog {
 
     class StoreFieldAction extends AbstractAction {
 
-        private final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
-
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
@@ -182,7 +179,7 @@ class PreambleEditor extends JDialog {
                         (base, panel, base.getPreamble(), toSet));
                 base.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {
-                    ed.setLabelColor(NULL_FIELD_COLOR);
+                    ed.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
                 } else {
                     ed.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
