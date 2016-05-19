@@ -2,6 +2,7 @@ package net.sf.jabref.logic.bibtex;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -40,7 +41,8 @@ public class EntryTypesTestBibtex {
         assertEquals(BibtexEntryTypes.ARTICLE, EntryTypes.getType("article", BibDatabaseMode.BIBTEX).get());
         assertEquals(Optional.empty(), EntryTypes.getType("aaaaarticle", BibDatabaseMode.BIBTEX));
         assertEquals(Optional.empty(), EntryTypes.getStandardType("aaaaarticle", BibDatabaseMode.BIBTEX));
-        assertEquals(19, EntryTypes.getAllValues(BibDatabaseMode.BIBTEX).size());
+
+        assertEquals("Values: " + EntryTypes.getAllValues(BibDatabaseMode.BIBTEX).stream().map(entryType -> entryType.getName()).collect(Collectors.toList()), 19, EntryTypes.getAllValues(BibDatabaseMode.BIBTEX).size());
         assertEquals(19, EntryTypes.getAllTypes(BibDatabaseMode.BIBTEX).size());
 
         // Edit the "article" entry type
