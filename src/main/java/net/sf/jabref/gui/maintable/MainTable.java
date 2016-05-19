@@ -83,8 +83,6 @@ public class MainTable extends JTable {
 
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
-    private static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
-
     private final MainTableFormat tableFormat;
     private final BasePanel panel;
 
@@ -289,9 +287,9 @@ public class MainTable extends JTable {
         for (int i = 1; i < cm.getColumnCount(); i++) {
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
             if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
-                cm.getColumn(i).setPreferredWidth(WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMinWidth(WIDTH_ICON_COL_RANKING);
-                cm.getColumn(i).setMaxWidth(WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
+                cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
             } else if (mainTableColumn.isIconColumn()) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);

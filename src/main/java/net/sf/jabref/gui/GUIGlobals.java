@@ -63,6 +63,7 @@ public class GUIGlobals {
     public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
 
     public static final int WIDTH_ICON_COL = 26;
+    public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
     static {
         // Set up entry editor colors, first time:
