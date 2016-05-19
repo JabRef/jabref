@@ -326,7 +326,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
             }
             undoManager.addEdit(undoRemove);
-        } else if (changesAdd != null) {
+        } else if (changesAdd.isPresent()) {
             undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
         }
     }

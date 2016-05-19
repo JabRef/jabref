@@ -45,6 +45,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1364](https://github.com/JabRef/jabref/issues/1364): Windows: install to LOCALAPPDATA directory for non-admin users
 - Fixed [#1365](https://github.com/JabRef/jabref/issues/1365): Default label pattern back to `[auth][year]`
 - Fixed [#796](https://github.com/JabRef/jabref/issues/796): Undoing more than one entry at the same time is now working
+- Fixed [#1122](https://github.com/JabRef/jabref/issues/1122): Group view is immediately updated after adding an entry to a group
+- Fixed [#171](https://github.com/JabRef/jabref/issues/171): Dragging an entry to a group preserves scrolling
 - Fixed [#1353](https://github.com/JabRef/jabref/issues/1353): Fetch-Preview did not display updated BibTeX-Key after clicking on `Generate Now`
 - Fixed [#1381](https://github.com/JabRef/jabref/issues/1381): File links containing blanks are broken if non-default viewer is set
 - Fixed sourceforge bug 1000: shorttitleINI can generate the initials of the shorttitle
@@ -55,7 +57,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
 - Removed support of old groups format, which was used prior to JabRef version 1.6. If you happen to have a 10 years old .bib file, then JabRef 3.3 can be used to convert it to the current format.
 - Removed possibility to automatically add braces via Option - Preferences - File - Store the following fields with braces around capital letters. Please use save actions instead for adding braces automatically.
+- Removed button to refresh groups view. This button shouldn't be needed anymore. Please report any cases where the groups view is not updated automatically.
 - Medline and GVK importer no longer try to expand author initials (i.e.  `EH Wissler -> E. H. Wissler`).
+
 
 
 
