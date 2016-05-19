@@ -116,10 +116,9 @@ import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
-import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 import org.apache.commons.logging.Log;
@@ -355,19 +354,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Execute on JavaFX Application Thread
             Platform.runLater(() -> {
                 StackPane root = new StackPane();
-                ProgressBar progress = new ProgressBar();
+                ProgressIndicator progress = new ProgressIndicator();
+                progress.setMaxSize(100, 100);
                 WebView browser = new WebView();
-                //root.getChildren().add(progress);
+
+                // Quick hack to disable navigating
+                browser.addEventFilter(javafx.scene.input.MouseEvent.ANY, javafx.scene.input.MouseEvent::consume);
+                browser.setContextMenuEnabled(false);
+
                 root.getChildren().addAll(browser, progress);
                 reviewPane.setScene(new Scene(root));
 
                 browser.getEngine().load("http://www.ams.org/mathscinet-getitem?mr=" + mrNumber);
 
-                // Update progress according to browser
-                progress.progressProperty().bind(browser.getEngine().getLoadWorker().progressProperty());
-                // Hide progress indicator if finished
-                browser.getEngine().getLoadWorker().stateProperty().addListener((observable, oldState, newState) -> {
-                    if(newState == Worker.State.SUCCEEDED) {
+                // Hide progress indicator if finished (over 70% loaded)
+                browser.getEngine().getLoadWorker().progressProperty().addListener((observable, oldValue, newValue) -> {
+                    if (newValue.doubleValue() >= 0.7) {
                         progress.setVisible(false);
                     }
                 });
