@@ -114,10 +114,12 @@ public class ExportToClipboardAction extends AbstractWorker {
             List<BibEntry> entries = panel.getSelectedEntries();
 
             // Write to file:
-            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(), panel.getEncoding(), entries);
+            format.performExport(panel.getBibDatabaseContext(), tmp.getPath(),
+                    panel.getBibDatabaseContext().getMetaData().getEncoding(), entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
-            try (Reader reader = new InputStreamReader(new FileInputStream(tmp), panel.getEncoding())) {
+            try (Reader reader = new InputStreamReader(new FileInputStream(tmp),
+                    panel.getBibDatabaseContext().getMetaData().getEncoding())) {
                 int s;
                 while ((s = reader.read()) != -1) {
                     sb.append((char) s);

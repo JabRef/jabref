@@ -1381,13 +1381,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
+                addTab(pr.getDatabaseContext(), raisePanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
-            addTab(pr.getDatabaseContext(), pr.getEncoding(), raisePanel);
+            addTab(pr.getDatabaseContext(), raisePanel);
         }
     }
 
@@ -1580,21 +1580,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public BasePanel addTab(BibDatabaseContext databaseContext, Charset encoding, boolean raisePanel) {
-        Objects.requireNonNull(databaseContext);
-
-        Charset usedEncoding;
-        if (encoding == null) {
-            usedEncoding = Globals.prefs.getDefaultEncoding();
-        } else {
-            usedEncoding = encoding;
-        }
-
-        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext, usedEncoding);
-        addTab(bp, raisePanel);
-        return bp;
-    }
-
     private List<String> collectDatabaseFilePaths() {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
@@ -1647,6 +1632,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
+    }
+
+    public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
+        Objects.requireNonNull(databaseContext);
+        BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
+        addTab(bp, raisePanel);
+        return bp;
     }
 
     /**

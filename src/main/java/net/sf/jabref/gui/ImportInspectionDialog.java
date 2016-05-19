@@ -700,7 +700,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 // Create a new BasePanel for the entries:
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                panel = new BasePanel(frame, new BibDatabaseContext(defaults), Globals.prefs.getDefaultEncoding());
+                panel = new BasePanel(frame, new BibDatabaseContext(defaults));
             }
 
             boolean groupingCanceled = false;

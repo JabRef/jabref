@@ -320,7 +320,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
 
         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults), result.getEncoding());
+        BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults));
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));

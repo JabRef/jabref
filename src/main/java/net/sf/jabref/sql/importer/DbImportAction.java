@@ -27,7 +27,6 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -190,7 +189,7 @@ public class DbImportAction extends AbstractWorker {
         for (DBImporterResult res : databases) {
             databaseContext = res.getDatabaseContext();
             if (databaseContext != null) {
-                BasePanel pan = frame.addTab(databaseContext, Globals.prefs.getDefaultEncoding(), true);
+                BasePanel pan = frame.addTab(databaseContext, true);
                 pan.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();

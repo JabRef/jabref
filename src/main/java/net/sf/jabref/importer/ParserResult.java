@@ -16,7 +16,6 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,8 +42,6 @@ public class ParserResult {
     private final List<String> duplicateKeys = new ArrayList<>();
 
     private String errorMessage;
-    // Which encoding was used?
-    private Charset encoding;
 
     private boolean postponedAutosaveFound;
     private boolean invalid;
@@ -105,23 +102,6 @@ public class ParserResult {
 
     public void setFile(File f) {
         file = f;
-    }
-
-    /**
-     * Sets the variable indicating which encoding was used during parsing.
-     *
-     * @param enc the encoding.
-     */
-    public void setEncoding(Charset enc) {
-        encoding = enc;
-    }
-
-    /**
-     * Returns the encoding used during parsing, or null if not specified (indicates that
-     * prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
-     */
-    public Charset getEncoding() {
-        return encoding;
     }
 
     /**

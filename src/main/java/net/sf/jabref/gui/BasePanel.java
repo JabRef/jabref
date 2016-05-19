@@ -180,8 +180,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private boolean saving;
     private boolean updatedExternally;
 
-    private Charset encoding;
-
     // AutoCompleter used in the search bar
     private AutoCompleter<String> searchAutoCompleter;
     // The undo manager.
@@ -222,12 +220,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final SearchBar searchBar;
     private ContentAutoCompleters autoCompleters;
 
-    public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext, Charset encoding) {
+    public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
         Objects.requireNonNull(frame);
-        Objects.requireNonNull(encoding);
         Objects.requireNonNull(bibDatabaseContext);
 
-        this.encoding = encoding;
         this.bibDatabaseContext = bibDatabaseContext;
 
         this.sidePaneManager = frame.getSidePaneManager();
@@ -303,14 +299,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public JabRefFrame frame() {
         return frame;
-    }
-
-    public Charset getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(Charset encoding) {
-        this.encoding = encoding;
     }
 
     public void output(String s) {
@@ -1172,7 +1160,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         if (commit) {
             session.commit(file);
-            this.encoding = enc; // Make sure to remember which encoding we used.
+            this.bibDatabaseContext.getMetaData().setEncoding(enc); // Make sure to remember which encoding we used.
         } else {
             session.cancel();
         }
