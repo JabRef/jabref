@@ -13,7 +13,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref;
 
 import java.awt.Font;
@@ -42,6 +41,7 @@ import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -50,7 +50,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JabRefGUI {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
@@ -61,7 +60,6 @@ public class JabRefGUI {
     private final List<File> postponed = new ArrayList<>();
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
-
 
     public JabRefGUI(List<ParserResult> loaded, boolean isBlank) {
         this.loaded = loaded;
@@ -75,9 +73,10 @@ public class JabRefGUI {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
 
-        // This property is set to make the Mac OSX Java VM move the menu bar to
-        // the top of the screen, where Mac users expect it to be.
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
+        if (OS.OS_X) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
 
         // Set antialiasing on everywhere. This only works in JRE >= 1.5.
         // Or... it doesn't work, period.

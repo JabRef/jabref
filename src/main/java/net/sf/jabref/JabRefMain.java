@@ -13,7 +13,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref;
 
 import java.net.Authenticator;
@@ -40,15 +39,11 @@ import org.apache.commons.logging.LogFactory;
  * JabRef MainClass
  */
 public class JabRefMain {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefMain.class);
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> start(args));
     }
-
-
 
     private static void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
@@ -112,5 +107,4 @@ public class JabRefMain {
                 .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
                         argumentProcessor.isBlank()));
     }
-
 }
