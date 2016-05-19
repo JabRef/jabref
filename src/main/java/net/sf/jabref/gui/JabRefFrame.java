@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -164,9 +163,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PreferencesDialog prefsDialog;
 
     private int lastTabbedPanelSelectionIndex = -1;
-
-    private static final Color ACTIVE_TABBED_COLOR = GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
-    private static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
 
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
@@ -616,7 +612,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         positionWindowOnScreen();
 
         tabbedPane.setBorder(null);
-        tabbedPane.setForeground(INACTIVE_TABBED_COLOR);
+        tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -1025,10 +1021,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
-            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, INACTIVE_TABBED_COLOR);
+            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.INACTIVE_TABBED_COLOR);
         }
         if ((now > -1) && (now < len)) {
-            tabbedPane.setForegroundAt(now, ACTIVE_TABBED_COLOR);
+            tabbedPane.setForegroundAt(now, GUIGlobals.ACTIVE_TABBED_COLOR);
         }
         lastTabbedPanelSelectionIndex = now;
     }
