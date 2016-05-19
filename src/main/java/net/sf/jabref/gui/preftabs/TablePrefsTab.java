@@ -32,9 +32,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

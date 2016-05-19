@@ -37,8 +37,6 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
@@ -56,6 +54,8 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 
 public class FieldExtraComponents {

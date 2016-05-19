@@ -28,7 +28,7 @@
 // modified : r.nagel 25.04.2006
 //            export/import of some definition from/to a xml file
 
-package net.sf.jabref.bibtex;
+package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,6 @@ import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {

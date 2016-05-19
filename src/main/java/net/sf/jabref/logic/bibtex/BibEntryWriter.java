@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -16,8 +16,10 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.google.common.base.Strings;
+
 
 public class BibEntryWriter {
 

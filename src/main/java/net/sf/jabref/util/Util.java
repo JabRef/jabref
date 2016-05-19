@@ -27,13 +27,13 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * utility functions

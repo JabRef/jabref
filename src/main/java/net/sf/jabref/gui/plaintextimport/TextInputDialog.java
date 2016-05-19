@@ -111,10 +111,6 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.bibtex.LatexFieldFormatter;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.FileDialogs;
@@ -125,11 +121,15 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;

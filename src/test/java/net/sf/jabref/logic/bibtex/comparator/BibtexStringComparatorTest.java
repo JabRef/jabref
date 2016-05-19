@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex.comparator;
+package net.sf.jabref.logic.bibtex.comparator;
 
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;

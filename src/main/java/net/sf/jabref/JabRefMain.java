@@ -20,7 +20,6 @@ import java.net.Authenticator;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
@@ -32,6 +31,7 @@ import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

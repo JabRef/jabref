@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +21,7 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter

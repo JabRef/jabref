@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +36,7 @@ public class FieldContentParser {
 
     public FieldContentParser() {
         multiLineFields = new HashSet<>();
-        // the following two are also coded in net.sf.jabref.bibtex.LatexFieldFormatter.format(String, String)
+        // the following two are also coded in net.sf.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field

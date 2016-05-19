@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import java.io.IOException;
 import java.io.StringReader;

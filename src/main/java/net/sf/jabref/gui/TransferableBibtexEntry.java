@@ -24,8 +24,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;

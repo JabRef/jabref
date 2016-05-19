@@ -66,10 +66,6 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.bibtex.LatexFieldFormatter;
 import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
@@ -101,6 +97,8 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
@@ -111,6 +109,8 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;

@@ -7,12 +7,12 @@ import java.util.Optional;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;

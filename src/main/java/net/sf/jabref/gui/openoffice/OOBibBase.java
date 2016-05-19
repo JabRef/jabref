@@ -46,8 +46,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.openoffice.OOBibStyle;

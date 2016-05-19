@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

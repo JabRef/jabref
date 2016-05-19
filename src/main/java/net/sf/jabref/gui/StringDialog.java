@@ -47,8 +47,6 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.LatexFieldFormatter;
-import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -57,6 +55,8 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;

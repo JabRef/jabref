@@ -45,9 +45,9 @@ import javax.swing.text.html.StyleSheet;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.LatexFieldFormatter;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;

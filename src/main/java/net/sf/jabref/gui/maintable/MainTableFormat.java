@@ -35,10 +35,6 @@ import ca.odell.glazedlists.gui.TableFormat;
  * Class defining the contents and column headers of the main table.
  */
 public class MainTableFormat implements TableFormat<BibEntry> {
-    // Character separating field names that are to be used in sequence as
-    // fallbacks for a single column (e.g. "author/editor" to use editor where
-    // author is not set):
-    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
@@ -140,7 +136,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // stored column name will be used as columnName
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+            String[] fields = columnName.split(Globals.prefs.get(JabRefPreferences.COL_DEFINITION_FIELD_SEPARATOR));
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 
