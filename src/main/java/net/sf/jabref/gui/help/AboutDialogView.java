@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.gui.help;
 
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.DialogPane;
+
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Alert.AlertType;
 
 public class AboutDialogView extends FXMLView {
 

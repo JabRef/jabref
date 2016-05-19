@@ -20,8 +20,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.Icon;
 
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import javafx.application.Platform;
+
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 
 public class AboutAction extends MnemonicAwareAction {
 
