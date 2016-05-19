@@ -108,6 +108,7 @@ class MSBibEntry {
     private String thesisType;
     private String internetSiteTitle;
     private String dateAccessed;
+    private String doi;
     private String url;
     private String productionCompany;
     private String publicationTitle;
@@ -267,6 +268,7 @@ class MSBibEntry {
             dateAccessed = null;
         }
 
+        doi = getFromXml(bcol + "DOI", entry);
         url = getFromXml(bcol + "URL", entry);
         productionCompany = getFromXml(bcol + "ProductionCompany", entry);
 
@@ -434,8 +436,11 @@ class MSBibEntry {
         if (bibtex.hasField(MSBIB + "accessed")) {
             dateAccessed = bibtex.getField(MSBIB + "accessed");
         }
+        if (bibtex.hasField("doi")) {
+            doi = bibtex.getField("doi");
+        }
         if (bibtex.hasField("url")) {
-            url = bibtex.getField("url"); /* SM: 2010.10: lower case */
+            url = bibtex.getField("url");
         }
         if (bibtex.hasField(MSBIB + "productioncompany")) {
             productionCompany = bibtex.getField(MSBIB + "productioncompany");
@@ -539,14 +544,12 @@ class MSBibEntry {
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private int getLCID(String language) {
         // TODO: add language to LCID mapping
-
         return 0;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private String getLanguage(int LCID) {
         // TODO: add language to LCID mapping
-
         return "english";
     }
 
@@ -797,6 +800,7 @@ class MSBibEntry {
         /* SM 2010.10 added month export */
         addField(document, msbibEntry, "Month", month);
 
+        addField(document, msbibEntry, "DOI", doi);
         addField(document, msbibEntry, "URL", url);
         addField(document, msbibEntry, "ProductionCompany", productionCompany);
         addField(document, msbibEntry, "PublicationTitle", publicationTitle);
@@ -1006,6 +1010,9 @@ class MSBibEntry {
 
         if (dateAccessed != null) {
             hm.put(MSBIB + "accessed", dateAccessed);
+        }
+        if (doi != null) {
+            hm.put("doi", doi);
         }
         if (url != null) {
             hm.put("url", url);

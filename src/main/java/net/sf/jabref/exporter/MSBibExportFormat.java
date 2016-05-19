@@ -49,19 +49,16 @@ class MSBibExportFormat extends ExportFormat {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
-        if (entries.isEmpty()) { // Only export if entries exist
+        if (entries.isEmpty()) {
             return;
         }
-        // forcing to use UTF8 output format for some problems with
-        // xml export in other encodings
-        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
-        MSBibDatabase md = new MSBibDatabase(databaseContext.getDatabase(), entries);
-        try (VerifyingWriter ps = ss.getWriter()) {
+        // forcing to use UTF8 output format for some problems with xml export in other encodings
+        SaveSession session = new SaveSession(StandardCharsets.UTF_8, false);
+        MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
-        // PS: DOES NOT SUPPORT EXPORTING ONLY A SET OF ENTRIES
-
+        try (VerifyingWriter ps = session.getWriter()) {
             try {
-                DOMSource source = new DOMSource(md.getDOMrepresentation());
+                DOMSource source = new DOMSource(msBibDatabase.getDOMrepresentation());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -69,7 +66,7 @@ class MSBibExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(ss, new File(file));
+            finalizeSaveSession(session, new File(file));
         } catch (SaveException | IOException ex) {
             throw new IOException(ex.getMessage());
         }
