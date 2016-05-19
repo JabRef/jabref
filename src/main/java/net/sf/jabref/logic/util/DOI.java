@@ -7,6 +7,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.importer.fetcher.CrossRef;
+import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -118,6 +123,32 @@ public class DOI {
             result = Optional.of(new DOI(matcher.group(1)));
         }
         return result;
+    }
+
+    /**
+     * Tries to retrieve a DOI for an existing BibEntry.
+     *
+     * @param entry the BibteX entry
+     * @return an Optional containing the DOI or an empty Optional
+     */
+    public static Optional<DOI> fromBibEntry(BibEntry entry) {
+        Optional<DOI> doi = CrossRef.findDOI(entry);
+        if (doi.isPresent()) {
+            // get bibentry from doi
+            DOItoBibTeXFetcher fetcher = new DOItoBibTeXFetcher();
+            BibEntry newEntry = fetcher.getEntryFromDOI(doi.get().getDOI(), null);
+            // check for duplicate
+            //DuplicateCheck duplicate = new DuplicateCheck();
+            // TODO: compare whole entry? Needs mode and has some assumptions, like:
+            // First check if they are of the same type - a necessary condition
+            // FIXME: does not remove enclosing brackets...
+            String oldTitle = new LatexCleanupFormatter().format(entry.getField("title"));
+            String newTitle = new LatexCleanupFormatter().format(newEntry.getField("title"));
+            if (oldTitle.equalsIgnoreCase(newTitle)) {
+                return doi;
+            }
+        }
+        return Optional.empty();
     }
 
     /**

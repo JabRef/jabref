@@ -187,12 +187,12 @@ public class FieldExtraComponents {
         // lookup doi
         JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
         doiButton.addActionListener(actionEvent -> {
-                Optional<DOI> doi = CrossRef.findDOI(entryEditor.getEntry());
-                if (doi.isPresent()) {
-                    entryEditor.getEntry().setField("doi", doi.get().getDOI());
-                } else {
-                    panel.frame().setStatus(Localization.lang("No DOI found"));
-                }
+            Optional<DOI> doi = DOI.fromBibEntry(entryEditor.getEntry());
+            if (doi.isPresent()) {
+                entryEditor.getEntry().setField("doi", doi.get().getDOI());
+            } else {
+                panel.frame().setStatus(Localization.lang("No DOI found"));
+            }
         });
         // fetch bibtex data
         JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
