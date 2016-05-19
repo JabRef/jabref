@@ -263,6 +263,7 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -855,6 +856,7 @@ public class JabRefPreferences {
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+        defaults.put(MAX_BACK_HISTORY_SIZE, 10);
     }
 
     public String getUser() {
