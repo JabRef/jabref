@@ -309,7 +309,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    public BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
+    private BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
 
         String fileName = file.getPath();
         BibDatabase database = result.getDatabase();
