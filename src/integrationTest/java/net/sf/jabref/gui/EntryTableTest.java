@@ -20,6 +20,7 @@ public class EntryTableTest extends AbstractUITest{
     private final static String TEST_FILE_NAME = "testbib/testjabref.bib";
     private final static int DOWN = KeyEvent.VK_DOWN;
     private final static int UP = KeyEvent.VK_UP;
+    private final static int TITLE_COLUMN_INDEX = 5;
 
     @Test
     public void scrollThroughEntryList() {
@@ -40,15 +41,20 @@ public class EntryTableTest extends AbstractUITest{
         robot().settings().delayBetweenEvents(SPEED_NORMAL);
 
         firstCell.click();
+        //is the first table entry selected?
+        assertColumnValue(entryTable, 0, TITLE_COLUMN_INDEX, entryTable.selectionValue());
 
+        //go throught the table and check if the entry with the correct index is selected
         for (int i=0; i < SCROLL_ACTION_EXECUTION; i++) {
             robot().pressAndReleaseKey(DOWN);
             Assert.assertTrue(entryTable.selectionValue() != null);
+            assertColumnValue(entryTable, i+1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
-
-        for (int i = 0; i < SCROLL_ACTION_EXECUTION; i++) {
+        //do the same going up again
+        for (int i = SCROLL_ACTION_EXECUTION; i > 0; i--) {
             robot().pressAndReleaseKey(UP);
             Assert.assertTrue(entryTable.selectionValue() != null);
+            assertColumnValue(entryTable, i-1, TITLE_COLUMN_INDEX, entryTable.selectionValue());
         }
 
         closeDatabase();
