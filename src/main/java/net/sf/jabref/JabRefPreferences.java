@@ -265,6 +265,7 @@ public class JabRefPreferences {
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
     public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
     public static final String LINE_LENGTH = "lineLength"; // Maximum
+    public static final String INDENT = "indent"; //	Indent for formatted bibtex output.
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -859,6 +860,7 @@ public class JabRefPreferences {
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
         defaults.put(MAX_BACK_HISTORY_SIZE, 10);
         defaults.put(LINE_LENGTH, 65);
+        defaults.put(INDENT, 4);
     }
 
     public String getUser() {

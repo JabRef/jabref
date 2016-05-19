@@ -131,9 +131,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
-    //	Constants controlling formatted bibtex output.
-    private static final int INDENT = 4;
-
     // A reference to the entry this object works on.
     private BibEntry entry;
     // The currently displayed type
@@ -544,7 +541,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(INDENT);
+        source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.focusListener);
