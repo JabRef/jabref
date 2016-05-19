@@ -15,15 +15,7 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -128,7 +120,11 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
+
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
+
+    //	Constants controlling formatted bibtex output.
+    private static final int INDENT = 4;
 
     // A reference to the entry this object works on.
     private BibEntry entry;
@@ -540,7 +536,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(GUIGlobals.INDENT);
+        source.setTabSize(INDENT);
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.focusListener);
@@ -1070,6 +1066,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public class StoreFieldAction extends AbstractAction {
+
+        private final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
+
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
@@ -1210,7 +1209,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     fieldEditor.setValidBackgroundColor();
                 }
                 if (fieldEditor.getTextComponent().hasFocus()) {
-                    fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
+                    fieldEditor.setBackground(ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {

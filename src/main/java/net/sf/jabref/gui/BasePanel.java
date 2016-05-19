@@ -156,6 +156,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
+    // Divider size for BaseFrame split pane. 0 means non-resizable.
+    private static final int SPLIT_PANE_DIVIDER_SIZE = 4;
+
+    private static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
+
     private final BibDatabase database;
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
@@ -1478,7 +1483,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setupMainPanel() {
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+        splitPane.setDividerSize(SPLIT_PANE_DIVIDER_SIZE);
 
         // check whether a mainTable already existed and a floatSearch was active
         boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
@@ -2256,7 +2261,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Add the entry we are leaving to the history:
             if (showing != null) {
                 previousEntries.add(showing);
-                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE) {
+                if (previousEntries.size() > MAX_BACK_HISTORY_SIZE) {
                     previousEntries.remove(0);
                 }
             }

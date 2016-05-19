@@ -558,7 +558,7 @@ public class JabRefPreferences {
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-        defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
+        defaults.put(NUMBER_COL_WIDTH, 32);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
@@ -632,7 +632,7 @@ public class JabRefPreferences {
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
         defaults.put(MENU_FONT_SIZE, 11);
-        defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
+        defaults.put(TABLE_ROW_PADDING, 9);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
         defaults.put(TABLE_BACKGROUND, "255:255:255");

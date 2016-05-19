@@ -15,15 +15,7 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
@@ -151,6 +143,9 @@ import osx.macadapter.MacAdapter;
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
 
+    // Frame titles.
+    private static final String FRAME_TITLE = "JabRef";
+
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
     private static final String ELLIPSES = "...";
 
@@ -160,6 +155,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PreferencesDialog prefsDialog;
 
     private int lastTabbedPanelSelectionIndex = -1;
+
+    private static final Color ACTIVE_TABBED_COLOR = GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
+    private static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
 
     // The sidepane manager takes care of populating the sidepane.
     private SidePaneManager sidePaneManager;
@@ -578,7 +576,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
 
-        setTitle(GUIGlobals.FRAME_TITLE);
+        setTitle(FRAME_TITLE);
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -609,7 +607,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         positionWindowOnScreen();
 
         tabbedPane.setBorder(null);
-        tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
+        tabbedPane.setForeground(INACTIVE_TABBED_COLOR);
 
         /*
          * The following state listener makes sure focus is registered with the
@@ -668,7 +666,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // no database open
         if (panel == null) {
-            setTitle(GUIGlobals.FRAME_TITLE);
+            setTitle(FRAME_TITLE);
             return;
         }
 
@@ -677,10 +675,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
+            setTitle(FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
         } else {
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().getPath();
-            setTitle(GUIGlobals.FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+            setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         }
     }
 
@@ -1018,10 +1016,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         int now = tabbedPane.getSelectedIndex();
         int len = tabbedPane.getTabCount();
         if ((lastTabbedPanelSelectionIndex > -1) && (lastTabbedPanelSelectionIndex < len)) {
-            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, GUIGlobals.INACTIVE_TABBED_COLOR);
+            tabbedPane.setForegroundAt(lastTabbedPanelSelectionIndex, INACTIVE_TABBED_COLOR);
         }
         if ((now > -1) && (now < len)) {
-            tabbedPane.setForegroundAt(now, GUIGlobals.ACTIVE_TABBED_COLOR);
+            tabbedPane.setForegroundAt(now, ACTIVE_TABBED_COLOR);
         }
         lastTabbedPanelSelectionIndex = now;
     }

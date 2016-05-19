@@ -24,7 +24,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -48,8 +47,11 @@ import org.apache.commons.logging.LogFactory;
  * If committing fails, the temporary file will not be deleted.
  */
 public class SaveSession {
+
     private static final Log LOGGER = LogFactory.getLog(SaveSession.class);
 
+    // Filenames.
+    private static final String BACKUP_EXTENSION = ".bak";
     public static final String LOCKFILE_SUFFIX = ".lock";
 
     // The age in ms of a lockfile before JabRef will offer to "steal" the locked file:
@@ -101,7 +103,7 @@ public class SaveSession {
         if (file.exists() && backup) {
             String name = file.getName();
             String path = file.getParent();
-            File backupFile = new File(path, name + GUIGlobals.BACKUP_EXTENSION);
+            File backupFile = new File(path, name + BACKUP_EXTENSION);
             try {
                 FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {

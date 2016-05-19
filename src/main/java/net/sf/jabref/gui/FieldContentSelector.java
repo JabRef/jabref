@@ -43,6 +43,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
+    private static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
     private final JComboBox<String> comboBox;
 
     private final FieldEditor editor;
@@ -93,8 +94,8 @@ public class FieldContentSelector extends JComponent {
             @Override
             public Dimension getPreferredSize() {
                 Dimension parents = super.getPreferredSize();
-                if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH) {
-                    parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+                if (parents.width > MAX_CONTENT_SELECTOR_WIDTH) {
+                    parents.width = MAX_CONTENT_SELECTOR_WIDTH;
                 }
                 return parents;
             }

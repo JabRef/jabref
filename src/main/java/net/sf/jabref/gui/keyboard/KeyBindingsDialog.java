@@ -30,7 +30,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -38,6 +37,9 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 @SuppressWarnings("serial")
 public class KeyBindingsDialog extends JDialog {
+
+    private static final int KEYBIND_COL_0 = 200;
+    private static final int KEYBIND_COL_1 = 80; // Added to the font size when determining table
 
     private final JButton ok = new JButton(Localization.lang("OK"));
 
@@ -100,8 +102,8 @@ public class KeyBindingsDialog extends JDialog {
 
         // has to be done each time as the columnModel is dependent on the tableModel
         TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.KEYBIND_COL_0);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.KEYBIND_COL_1);
+        cm.getColumn(0).setPreferredWidth(KEYBIND_COL_0);
+        cm.getColumn(1).setPreferredWidth(KEYBIND_COL_1);
     }
 
     private void activateListeners() {

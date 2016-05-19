@@ -21,7 +21,6 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.importer.fileformat.FieldContentParser;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -37,6 +36,7 @@ public class LatexFieldFormatter {
 
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
+    private static final int LINE_LENGTH = 65; // Maximum
 
 
     private StringBuilder stringBuilder;
@@ -273,7 +273,7 @@ public class LatexFieldFormatter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, GUIGlobals.LINE_LENGTH));
+        stringBuilder.append(StringUtil.wrap(s, LINE_LENGTH));
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {

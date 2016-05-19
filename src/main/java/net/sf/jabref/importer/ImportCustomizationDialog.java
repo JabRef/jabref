@@ -44,7 +44,6 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -62,14 +61,19 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ImportCustomizationDialog extends JDialog {
 
+    // Column widths for import customization dialog table:
+    private static final int IMPORT_DIALOG_COL_0_WIDTH = 200;
+    private static final int IMPORT_DIALOG_COL_1_WIDTH = 80;
+    private static final int IMPORT_DIALOG_COL_2_WIDTH = 200;
+    private static final int IMPORT_DIALOG_COL_3_WIDTH = 200;
+
     private final JTable customImporterTable;
 
     private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     /**
      *
-     * @param frame_
-     * @throws HeadlessException
+     * @param frame
      */
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
@@ -77,10 +81,10 @@ public class ImportCustomizationDialog extends JDialog {
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
         TableColumnModel cm = customImporterTable.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH);
-        cm.getColumn(3).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH);
+        cm.getColumn(0).setPreferredWidth(IMPORT_DIALOG_COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(IMPORT_DIALOG_COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(IMPORT_DIALOG_COL_2_WIDTH);
+        cm.getColumn(3).setPreferredWidth(IMPORT_DIALOG_COL_3_WIDTH);
         JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -227,8 +231,8 @@ public class ImportCustomizationDialog extends JDialog {
     */
     @Override
     public Dimension getSize() {
-        int width = GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
-                + GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH;
+        int width = IMPORT_DIALOG_COL_0_WIDTH + IMPORT_DIALOG_COL_1_WIDTH
+                + IMPORT_DIALOG_COL_2_WIDTH + IMPORT_DIALOG_COL_3_WIDTH;
         return new Dimension(width, width / 2);
     }
 
