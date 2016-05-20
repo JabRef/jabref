@@ -115,8 +115,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
 
         JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
-        auto = new JButton(Localization.lang("Auto"));
-        JButton download = new JButton(Localization.lang("Download"));
+        auto = new JButton(Localization.lang("Get fulltext"));
+        JButton download = new JButton(Localization.lang("Download from URL"));
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
