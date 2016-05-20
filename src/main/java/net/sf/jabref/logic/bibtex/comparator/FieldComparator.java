@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
@@ -72,7 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     public FieldComparator(String field, boolean reversed) {
         this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(GUIGlobals.COL_DEFINITION_FIELD_SEPARATOR);
+        this.field = fieldName.split(Globals.COL_DEFINITION_FIELD_SEPARATOR);
         fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
 
