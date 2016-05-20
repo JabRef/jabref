@@ -61,6 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed possibility to automatically add braces via Option - Preferences - File - Store the following fields with braces around capital letters. Please use save actions instead for adding braces automatically.
 - Removed button to refresh groups view. This button shouldn't be needed anymore. Please report any cases where the groups view is not updated automatically.
 - Medline and GVK importer no longer try to expand author initials (i.e.  `EH Wissler -> E. H. Wissler`).
+- Removed not-working option "Select Matches" under Groups -> Settings.
 
 
 

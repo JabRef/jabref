@@ -195,7 +195,6 @@ public class JabRefPreferences {
     public static final String GROUP_SHOW_DYNAMIC = "groupShowDynamic";
     public static final String GROUP_SHOW_ICONS = "groupShowIcons";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_SELECT_MATCHES = "groupSelectMatches";
     public static final String GROUP_SHOW_OVERLAPPING = "groupShowOverlapping";
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
@@ -605,7 +604,6 @@ public class JabRefPreferences {
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
-        defaults.put(GROUP_SELECT_MATCHES, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, "keywords");
         defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
         defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
