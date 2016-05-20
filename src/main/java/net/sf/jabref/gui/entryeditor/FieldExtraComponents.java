@@ -46,7 +46,6 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
