@@ -12,6 +12,7 @@ dependencies {
 
 task checkTranslations(type: JavaExec) {
     description "Print empty and duplicate translations."
+    group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
@@ -20,6 +21,7 @@ task checkTranslations(type: JavaExec) {
 
 task checkTranslationsSummary(type: JavaExec) {
     description "Print summary of empty and duplicate translations."
+    group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
@@ -28,6 +30,7 @@ task checkTranslationsSummary(type: JavaExec) {
 
 task showMissingTranslationKeys(type: JavaExec) {
     description "Prints differences between the English translation and translations in other languages."
+    group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
@@ -36,6 +39,7 @@ task showMissingTranslationKeys(type: JavaExec) {
 
 task generateMissingTranslationKeys(type: JavaExec) {
     description "Prints differences between the English translation and translations in other languages, and updates translations if possible."
+    group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
