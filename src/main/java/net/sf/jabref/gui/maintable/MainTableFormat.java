@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -136,7 +137,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // stored column name will be used as columnName
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(Globals.prefs.get(JabRefPreferences.COL_DEFINITION_FIELD_SEPARATOR));
+            String[] fields = columnName.split(GUIGlobals.COL_DEFINITION_FIELD_SEPARATOR);
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 

@@ -64,6 +64,10 @@ public class GUIGlobals {
 
     public static final int WIDTH_ICON_COL = 26;
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
+    // Character separating field names that are to be used in sequence as
+    // fallbacks for a single column (e.g. "author/editor" to use editor where
+    // author is not set):
+    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     static {
         // Set up entry editor colors, first time:

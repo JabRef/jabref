@@ -49,6 +49,7 @@ import net.sf.jabref.exporter.CustomExportList;
 import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.external.DroppedFileHandler;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
@@ -80,9 +81,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JabRefPreferences {
-    // Character separating field names that are to be used in sequence as
-    // fallbacks for a single column (e.g. "author/editor" to use editor where
-    // author is not set):
+
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
@@ -269,7 +268,6 @@ public class JabRefPreferences {
     public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
     public static final String LINE_LENGTH = "lineLength"; // Maximum
     public static final String INDENT = "indent"; //	Indent for formatted bibtex output.
-    public static final String COL_DEFINITION_FIELD_SEPARATOR = "colDefinitionFieldSeparator";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -865,7 +863,6 @@ public class JabRefPreferences {
         defaults.put(MAX_BACK_HISTORY_SIZE, 10);
         defaults.put(LINE_LENGTH, 65);
         defaults.put(INDENT, 4);
-        defaults.put(COL_DEFINITION_FIELD_SEPARATOR, "/");
     }
 
     public String getUser() {
