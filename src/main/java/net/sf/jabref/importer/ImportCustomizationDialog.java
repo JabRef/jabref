@@ -62,10 +62,10 @@ import org.apache.commons.logging.LogFactory;
 public class ImportCustomizationDialog extends JDialog {
 
     // Column widths for import customization dialog table:
-    private static final int IMPORT_DIALOG_COL_0_WIDTH = 200;
-    private static final int IMPORT_DIALOG_COL_1_WIDTH = 80;
-    private static final int IMPORT_DIALOG_COL_2_WIDTH = 200;
-    private static final int IMPORT_DIALOG_COL_3_WIDTH = 200;
+    private static final int COL_0_WIDTH = 200;
+    private static final int COL_1_WIDTH = 80;
+    private static final int COL_2_WIDTH = 200;
+    private static final int COL_3_WIDTH = 200;
 
     private final JTable customImporterTable;
 
@@ -81,10 +81,10 @@ public class ImportCustomizationDialog extends JDialog {
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
         TableColumnModel cm = customImporterTable.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(IMPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(IMPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(IMPORT_DIALOG_COL_2_WIDTH);
-        cm.getColumn(3).setPreferredWidth(IMPORT_DIALOG_COL_3_WIDTH);
+        cm.getColumn(0).setPreferredWidth(COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(COL_2_WIDTH);
+        cm.getColumn(3).setPreferredWidth(COL_3_WIDTH);
         JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -231,8 +231,8 @@ public class ImportCustomizationDialog extends JDialog {
     */
     @Override
     public Dimension getSize() {
-        int width = IMPORT_DIALOG_COL_0_WIDTH + IMPORT_DIALOG_COL_1_WIDTH
-                + IMPORT_DIALOG_COL_2_WIDTH + IMPORT_DIALOG_COL_3_WIDTH;
+        int width = COL_0_WIDTH + COL_1_WIDTH
+                + COL_2_WIDTH + COL_3_WIDTH;
         return new Dimension(width, width / 2);
     }
 
