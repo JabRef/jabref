@@ -22,7 +22,6 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
