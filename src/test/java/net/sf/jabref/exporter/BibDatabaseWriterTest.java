@@ -254,22 +254,25 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws IOException {
-        EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
-        BibEntry entry = new BibEntry();
-        entry.setType("customizedType");
-        database.insertEntry(entry);
+        try {
+            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
+            BibEntry entry = new BibEntry();
+            entry.setType("customizedType");
+            database.insertEntry(entry);
 
-        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
-                new SavePreferences());
+            databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
+                    new SavePreferences());
 
-        assertEquals(
-                Globals.NEWLINE +
-                        "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
-                        + "@Comment{jabref-meta: databaseType:bibtex;}"
-                        + Globals.NEWLINE + Globals.NEWLINE
-                        + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
-                stringWriter.toString());
-        EntryTypes.removeAllCustomEntryTypes();
+            assertEquals(
+                    Globals.NEWLINE +
+                            "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+                            + "@Comment{jabref-meta: databaseType:bibtex;}"
+                            + Globals.NEWLINE + Globals.NEWLINE
+                            + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
+                    stringWriter.toString());
+        } finally {
+            EntryTypes.removeAllCustomEntryTypes();
+        }
     }
 
     @Test
