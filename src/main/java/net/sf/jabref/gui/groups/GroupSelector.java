@@ -334,6 +334,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         JScrollPane groupsTreePane = new JScrollPane(groupsTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        sp.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         con.gridx = 0;
