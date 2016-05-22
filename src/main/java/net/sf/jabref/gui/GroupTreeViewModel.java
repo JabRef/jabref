@@ -20,7 +20,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
@@ -137,19 +136,27 @@ public class GroupTreeViewModel {
 
         final Node disclosureNode;
         groupTree.setRowFactory(treeTable -> {
-            //TreeTableRow row = new TreeTableRow();
-            TreeTableRow row = new TreeTableRow<NewGroupNodeViewModel>() {
+            TreeTableRow<NewGroupNodeViewModel> row = new TreeTableRow();
+            /*TreeTableRow row = new TreeTableRow<NewGroupNodeViewModel>() {
 
                 @Override
                 protected Skin<?> createDefaultSkin() {
                     return new CheckBoxTreeTableRowSkin<>(this);
                 }
             };
-            //*/
+            */
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
-                boolean active = newTreeItem == treeTable.getRoot();
-                row.pseudoClassStateChanged(rootPseudoClass, active);
+                boolean isRoot = newTreeItem == treeTable.getRoot();
+                row.pseudoClassStateChanged(rootPseudoClass, isRoot);
+
+                boolean isFirstLevel = newTreeItem != null && newTreeItem.getParent() == treeTable.getRoot();
+                row.pseudoClassStateChanged(subElementPseudoClass, !isFirstLevel);
+
             });
+            // Remove disclosure node:
+            // simply setting to null is not enough since it would be replaced by the default node in this case
+            row.setDisclosureNode(null);
+            row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
             return row;
         });
 
