@@ -4,19 +4,25 @@
 }
 
 .tree-table-cell {
-	-fx-padding: 0.75em 0em 0.75em 0em;
+	-fx-padding: 0.65em 0em 0.65em 0em;
+    -fx-font-size: 13px;
 }
 
 .tree-table-row-cell:sub > .tree-table-cell {
-	-fx-padding: 0.30em 0em 0.30em 0em;
+	-fx-padding: 0.20em 0em 0.20em 0em;
+}
+
+.tree-table-row-cell:sub > .numberColumn {
+    -fx-padding: 0.20em 0.2em 0.20em 0em;
 }
 
 .tree-table-row-cell:root {
-	-fx-border-width: 0 0 1 0;
-	-fx-border-color:darkgrey;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color:darkgrey;
 }
+
 .tree-table-cell:root {
-	-fx-padding: 1.25em 10 1em 10;
+    -fx-padding: 0.65em 0em 0.65em 1em;
 }
 
 .tree-table-row-cell:hover {
@@ -42,7 +48,7 @@
 
 .column-header-background {
 	visibility: hidden; /* hide column header */
-	-fx-padding: -1em;
+	-fx-padding: -0.8em;
 }
 
 .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
@@ -57,7 +63,26 @@
 }
 
 .numberColumn {
-	-fx-alignment: center-right;
+    -fx-alignment: top-right;
+    -fx-padding: 0.65em 0.2em 0.65em 0em;
+}
+
+.numberColumn > .hits {
+    -fx-font-size: 11;
+    -fx-background-color: #c6c6c4;
+    -fx-padding: 0.2em 0.4em 0.2em 0.4em;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10px;
+}
+/*
+.numberColumn > .hits > .text {
+    -fx-fill: white;
+}
+*/
+.disclosureNodeColumn {
+    -fx-alignment: top-right;
+    -fx-padding: 1.15em 0.2em 0.65em 0.2em;
+    -fx-font-size: 12px;
 }
 
 .tree-table-row-cell > .tree-table-cell > .icon {
@@ -66,3 +91,4 @@
     -fx-fill: #5e5f5e;
     -fx-translate-x: -5px;
 }
+
