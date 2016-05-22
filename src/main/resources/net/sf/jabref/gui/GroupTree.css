@@ -28,6 +28,13 @@
 	-fx-text-fill: white;
 }
 
+.tree-table-row-cell:selected > .tree-table-cell > .icon, .tree-table-row-cell:pressed > .tree-table-cell > .icon {
+	-fx-fill: white;
+}
+.tree-table-row-cell:selected > .tree-disclosure-node > .arrow, .tree-table-row-cell:pressed > .tree-disclosure-node > .arrow {
+	-fx-background-color: white;
+}
+
 .tree-table-row-cell:empty {
 	-fx-background-color: transparent; /* hide cells which are not bound to a group */
 }
@@ -47,8 +54,8 @@
 	-fx-alignment: center-right;
 }
 
-.icon {
-	-fx-font-family: 'MaterialDesignIcons';
-	-fx-font-size: 16;
-	-fx-fill: #5e5f5e;
+.tree-table-row-cell > .tree-table-cell > .icon {
+    -fx-font-family: 'MaterialDesignIcons';
+    -fx-font-size: 16;
+    -fx-fill: #5e5f5e;
 }
