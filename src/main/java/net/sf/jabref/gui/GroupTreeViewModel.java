@@ -150,7 +150,7 @@ public class GroupTreeViewModel {
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
                 boolean isFirstLevel = newTreeItem != null && newTreeItem.getParent() == treeTable.getRoot();
-                row.pseudoClassStateChanged(subElementPseudoClass, !isFirstLevel);
+                row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
 
             });
             // Remove disclosure node:
