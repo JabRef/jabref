@@ -16,7 +16,7 @@
 	-fx-border-color:darkgrey;
 }
 .tree-table-cell:root {
-	-fx-padding: 1.25em 0em 1em 0em;
+	-fx-padding: 1.25em 10 1em 10;
 }
 
 .tree-table-row-cell:hover {
