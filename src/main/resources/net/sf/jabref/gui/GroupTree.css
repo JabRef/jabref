@@ -7,7 +7,7 @@
 	-fx-padding: 0.75em 0em 0.75em 0em;
 }
 
-.tree-table-cell:sub {
+.tree-table-row-cell:sub > .tree-table-cell {
 	-fx-padding: 0.30em 0em 0.30em 0em;
 }
 
@@ -64,4 +64,5 @@
     -fx-font-family: 'MaterialDesignIcons';
     -fx-font-size: 16;
     -fx-fill: #5e5f5e;
+    -fx-translate-x: -5px;
 }
