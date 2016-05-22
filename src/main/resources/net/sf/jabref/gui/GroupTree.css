@@ -1,0 +1,54 @@
+.tree-table-view, .tree-table-row-cell {
+	-fx-background-color: #dadad8 ;
+	-fx-table-cell-border-color: transparent; /* hide grid lines */
+}
+
+.tree-table-cell {
+	-fx-padding: 0.75em 0em 0.75em 0em;
+}
+
+.tree-table-cell:sub {
+	-fx-padding: 0.30em 0em 0.30em 0em;
+}
+
+.tree-table-row-cell:root {
+	-fx-border-width: 0 0 1 0;
+	-fx-border-color:darkgrey;
+}
+.tree-table-cell:root {
+	-fx-padding: 1.25em 0em 1em 0em;
+}
+
+.tree-table-row-cell:hover {
+	-fx-background-color: lightgrey;
+}
+
+.tree-table-row-cell:selected, .tree-table-row-cell:pressed {
+	-fx-background-color: rgb(106, 159, 205);
+	-fx-text-fill: white;
+}
+
+.tree-table-row-cell:empty {
+	-fx-background-color: transparent; /* hide cells which are not bound to a group */
+}
+
+.column-header-background {
+	visibility: hidden; /* hide column header */
+	-fx-padding: -1em;
+}
+
+.tree-table-row-cell > .tree-disclosure-node > .arrow {
+	-fx-background-color: #5e5f5e;
+	-fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
+	-fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
+}
+
+.numberColumn {
+	-fx-alignment: center-right;
+}
+
+.icon {
+	-fx-font-family: 'MaterialDesignIcons';
+	-fx-font-size: 16;
+	-fx-fill: #5e5f5e;
+}
