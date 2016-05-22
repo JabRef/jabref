@@ -27,13 +27,13 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.GroupTreeViewModel">
+<AnchorPane prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.GroupTreeViewModel">
     <children>
       <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-7.0">
          <columns>
-            <TreeTableColumn fx:id="mainColumn" />
+            <TreeTableColumn fx:id="mainColumn" prefWidth="50.0" />
             <TreeTableColumn fx:id="numberColumn" maxWidth="60.0" minWidth="40.0" prefWidth="50.0" styleClass="numberColumn" />
-            <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0" prefWidth="75.0" text="Column X" />
+            <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0" text="Column X" styleClass="disclosureNodeColumn" />
          </columns>
          <columnResizePolicy>
             <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

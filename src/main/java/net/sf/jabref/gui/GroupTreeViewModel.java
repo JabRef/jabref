@@ -20,6 +20,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
@@ -60,16 +61,33 @@ public class GroupTreeViewModel {
                 new TreeItem<>(new NewGroupNodeViewModel("Emma", false, 50, IconTheme.JabRefIcon.HELP, true)),
                 new TreeItem<>(new NewGroupNodeViewModel("Michael", false, 30, true)));
 
-        TreeItem<NewGroupNodeViewModel> keywords = new TreeItem<>(new NewGroupNodeViewModel("keywords", false, 300,
+        TreeItem<NewGroupNodeViewModel> journals = new TreeItem<>(new NewGroupNodeViewModel("Journals", false, 300,
                 IconTheme.JabRefIcon.MAKE_KEY, false));
-        keywords.setExpanded(true);
-        keywords.getChildren().addAll(
+        journals.setExpanded(true);
+        journals.getChildren().addAll(
                 new TreeItem<>(new NewGroupNodeViewModel("JabRef", false, 295, true)),
                 new TreeItem<>(new NewGroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true)),
                 new TreeItem<>(new NewGroupNodeViewModel("JavaFX", false, 1, true)),
                 new TreeItem<>(new NewGroupNodeViewModel("FXML", false, 1, true)));
 
-        root.getChildren().addAll(authors, keywords);
+        TreeItem<NewGroupNodeViewModel> keywords = new TreeItem<>(
+                new NewGroupNodeViewModel("keywords", false, 300, IconTheme.JabRefIcon.MAKE_KEY, false));
+        keywords.setExpanded(true);
+        TreeItem<NewGroupNodeViewModel> keywordSub = new TreeItem<>(
+                new NewGroupNodeViewModel("deeper", false, 20, IconTheme.JabRefIcon.SOURCE, false));
+        keywordSub.setExpanded(true);
+        keywordSub.getChildren().addAll(new TreeItem<>(new NewGroupNodeViewModel("JabRef", false, 295, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true))
+        );
+        keywords.getChildren().addAll(
+                new TreeItem<>(new NewGroupNodeViewModel("JabRef", false, 295, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true)),
+                keywordSub,
+                new TreeItem<>(new NewGroupNodeViewModel("JavaFX", false, 1, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("FXML", false, 1, true))
+        );
+
+        root.getChildren().addAll(authors, journals, keywords);
 
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
         PseudoClass subElementPseudoClass = PseudoClass.getPseudoClass("sub");
@@ -106,6 +124,28 @@ public class GroupTreeViewModel {
         });
 
         numberColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().getHits());
+        numberColumn.setCellFactory(column -> {
+            TreeTableCell<NewGroupNodeViewModel, Integer> cell = new TreeTableCell<NewGroupNodeViewModel, Integer>() {
+
+                @Override
+                protected void updateItem(Integer hits, boolean empty) {
+                    super.updateItem(hits, empty);
+                    if (empty) {
+                        setGraphic(null);
+                    } else {
+                        final StackPane node = new StackPane();
+                        node.getStyleClass().setAll("hits");
+                        Text text = new Text(hits.toString());
+                        text.getStyleClass().setAll("text");
+                        node.getChildren().add(text);
+                        node.setMaxWidth(Control.USE_PREF_SIZE);
+
+                        setGraphic(node);
+                    }
+                }
+            };
+            return cell;
+        });
 
         disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         disclosureNodeColumn.setCellFactory(column -> {
@@ -117,7 +157,6 @@ public class GroupTreeViewModel {
                     if (empty || item == null) {
                         setGraphic(null);
                     } else if (!item.isLeaf()) {
-
                         final StackPane disclosureNode = new StackPane();
                         disclosureNode.getStyleClass().setAll("tree-disclosure-node");
 
