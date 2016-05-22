@@ -31,7 +31,8 @@
 .tree-table-row-cell:selected > .tree-table-cell > .icon, .tree-table-row-cell:pressed > .tree-table-cell > .icon {
 	-fx-fill: white;
 }
-.tree-table-row-cell:selected > .tree-disclosure-node > .arrow, .tree-table-row-cell:pressed > .tree-disclosure-node > .arrow {
+.tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow,
+.tree-table-row-cell:pressed > .tree-table-cell > .tree-disclosure-node > .arrow {
 	-fx-background-color: white;
 }
 
@@ -44,10 +45,15 @@
 	-fx-padding: -1em;
 }
 
-.tree-table-row-cell > .tree-disclosure-node > .arrow {
+.tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-max-height: 7px;
+    -fx-max-width: 7px;
 	-fx-background-color: #5e5f5e;
 	-fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
 	-fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
+}
+.tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-rotate: 90;
 }
 
 .numberColumn {

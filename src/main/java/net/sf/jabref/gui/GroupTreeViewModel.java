@@ -15,21 +15,20 @@
 */
 package net.sf.jabref.gui;
 
-import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.TableColumnBase;
+import javafx.scene.control.Skin;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 
 import com.sun.javafx.scene.control.skin.TreeTableRowSkin;
 
@@ -45,31 +44,31 @@ public class GroupTreeViewModel {
     private TreeTableColumn<NewGroupNodeViewModel,Integer> numberColumn;
 
     @FXML
-    private TreeTableColumn<NewGroupNodeViewModel,Integer> disclosureNodeColumn;
+    private TreeTableColumn<NewGroupNodeViewModel,NewGroupNodeViewModel> disclosureNodeColumn;
 
     @FXML
     public void initialize() {
         TreeItem<NewGroupNodeViewModel> root = new TreeItem<>(new NewGroupNodeViewModel("All Entries", true, 30000,
-                IconTheme.JabRefIcon.CLOSE));
+                IconTheme.JabRefIcon.CLOSE, false));
         root.setExpanded(true);
 
         TreeItem<NewGroupNodeViewModel> authors = new TreeItem<>(new NewGroupNodeViewModel("Authors", false, 300,
-                IconTheme.JabRefIcon.PRIORITY));
+                IconTheme.JabRefIcon.PRIORITY, false));
         authors.setExpanded(true);
         authors.getChildren().addAll(
-                new TreeItem<>(new NewGroupNodeViewModel("Ethan", false, 100)),
-                new TreeItem<>(new NewGroupNodeViewModel("Isabella", false, 40)),
-                new TreeItem<>(new NewGroupNodeViewModel("Emma", false, 50, IconTheme.JabRefIcon.HELP)),
-                new TreeItem<>(new NewGroupNodeViewModel("Michael", false, 30)));
+                new TreeItem<>(new NewGroupNodeViewModel("Ethan", false, 100, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Isabella", false, 40, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Emma", false, 50, IconTheme.JabRefIcon.HELP, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Michael", false, 30, true)));
 
         TreeItem<NewGroupNodeViewModel> keywords = new TreeItem<>(new NewGroupNodeViewModel("keywords", false, 300,
-                IconTheme.JabRefIcon.MAKE_KEY));
+                IconTheme.JabRefIcon.MAKE_KEY, false));
         keywords.setExpanded(true);
         keywords.getChildren().addAll(
-                new TreeItem<>(new NewGroupNodeViewModel("JabRef", false, 295)),
-                new TreeItem<>(new NewGroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES)),
-                new TreeItem<>(new NewGroupNodeViewModel("JavaFX", false, 1)),
-                new TreeItem<>(new NewGroupNodeViewModel("FXML", false, 1)));
+                new TreeItem<>(new NewGroupNodeViewModel("JabRef", false, 295, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("JavaFX", false, 1, true)),
+                new TreeItem<>(new NewGroupNodeViewModel("FXML", false, 1, true)));
 
         root.getChildren().addAll(authors, keywords);
 
@@ -104,24 +103,49 @@ public class GroupTreeViewModel {
                         newTreeItem != null && newTreeItem.getParent() != cell.getTreeTableView().getRoot());
             });
             */
-
             return cell;
         });
 
         numberColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().getHits());
 
+        disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
+        disclosureNodeColumn.setCellFactory(column -> {
+            TreeTableCell<NewGroupNodeViewModel, NewGroupNodeViewModel> cell = new TreeTableCell<NewGroupNodeViewModel, NewGroupNodeViewModel>() {
+
+                @Override
+                protected void updateItem(NewGroupNodeViewModel item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else if (!item.isLeaf()) {
+
+                        final StackPane disclosureNode = new StackPane();
+                        disclosureNode.getStyleClass().setAll("tree-disclosure-node");
+
+                        final StackPane disclosureNodeArrow = new StackPane();
+                        disclosureNodeArrow.getStyleClass().setAll("arrow");
+                        disclosureNode.getChildren().add(disclosureNodeArrow);
+
+                        setGraphic(disclosureNode);
+                    }
+                }
+            };
+            return cell;
+        });
+
         //groupTree.setTreeColumn(disclosureNodeColumn);
 
+        final Node disclosureNode;
         groupTree.setRowFactory(treeTable -> {
-            TreeTableRow row = new TreeTableRow();
-            /*
+            //TreeTableRow row = new TreeTableRow();
             TreeTableRow row = new TreeTableRow<NewGroupNodeViewModel>() {
+
                 @Override
                 protected Skin<?> createDefaultSkin() {
                     return new CheckBoxTreeTableRowSkin<>(this);
                 }
             };
-            */
+            //*/
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
                 boolean active = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, active);
@@ -138,6 +162,17 @@ public class GroupTreeViewModel {
             super(control);
         }
 
+        @Override
+        protected Node getDisclosureNode() {
+            return null;
+        }
+
+        @Override
+        protected void layoutChildren(double x, double y, double w, double h) {
+            getSkinnable().getDisclosureNode().setVisible(false);
+            super.layoutChildren(x, y, w, h);
+        }
+/*
         @Override
         protected void layoutChildren(double x, double y, double w, double h) {
             super.layoutChildren(x, y, w, h);
@@ -183,7 +218,7 @@ public class GroupTreeViewModel {
                 x += tableCell.getWidth();
             }
         }
-
+        */
     }
 
     public static class NewGroupNodeViewModel {
@@ -192,17 +227,19 @@ public class GroupTreeViewModel {
         private final boolean isRoot;
         private ObservableValue<Integer> hits;
         private String iconCode;
+        private boolean isLeaf;
 
-        private NewGroupNodeViewModel(String name, boolean isRoot, int hits) {
-            this(name, isRoot, hits, IconTheme.JabRefIcon.QUALITY);
+        private NewGroupNodeViewModel(String name, boolean isRoot, int hits, boolean isLeaf) {
+            this(name, isRoot, hits, IconTheme.JabRefIcon.QUALITY, isLeaf);
         }
-        private NewGroupNodeViewModel(String name, boolean isRoot, int hits, IconTheme.JabRefIcon icon) {
-            this(name, isRoot, hits, icon.getCode());
+        private NewGroupNodeViewModel(String name, boolean isRoot, int hits, IconTheme.JabRefIcon icon, boolean isLeaf) {
+            this(name, isRoot, hits, icon.getCode(), isLeaf);
         }
-        private NewGroupNodeViewModel(String name, boolean isRoot, int hits, String iconCode) {
+        private NewGroupNodeViewModel(String name, boolean isRoot, int hits, String iconCode, boolean isLeaf) {
             this.name = name;
             this.isRoot = isRoot;
             this.iconCode = iconCode;
+            this.isLeaf = isLeaf;
             this.hits = new SimpleObjectProperty<>(hits);
         }
 
@@ -224,6 +261,10 @@ public class GroupTreeViewModel {
 
         public String getIconCode() {
             return iconCode;
+        }
+
+        public boolean isLeaf() {
+            return isLeaf;
         }
     }
 }
