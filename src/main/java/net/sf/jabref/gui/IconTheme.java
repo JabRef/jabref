@@ -44,9 +44,9 @@ public class IconTheme {
 
     public static Font FONT;
     public static Font FONT_16;
+    public static javafx.scene.text.Font FX_FONT;
 
     /* Colors */
-
     // JabRef's default colors
     public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
     public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
@@ -55,7 +55,6 @@ public class IconTheme {
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
 
-
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
@@ -63,13 +62,15 @@ public class IconTheme {
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
 
-
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     static {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
+            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+                FX_FONT = javafx.scene.text.Font.loadFont(stream2, DEFAULT_SIZE);
+            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
