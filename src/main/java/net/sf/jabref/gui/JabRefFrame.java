@@ -70,6 +70,8 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import javafx.application.Platform;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HighlightMatchingGroupPreferences;
@@ -141,7 +143,6 @@ import net.sf.jabref.sql.importer.DbImportAction;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
-import javafx.application.Platform;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -571,6 +572,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void init() {
+
         tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         MyGlassPane glassPane = new MyGlassPane();
@@ -878,7 +880,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
-        splitPane.setDividerSize(2);
+        splitPane.setDividerSize(-3);
         splitPane.setBorder(null);
         //getContentPane().setBackground(GUIGlobals.lightGray);
         con.fill = GridBagConstraints.HORIZONTAL;
