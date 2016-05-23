@@ -18,6 +18,8 @@ public class ProtectTermsFormatterTest {
         assertEquals("{VLSI}", formatter.format("{VLSI}"));
         assertEquals("VLsI", formatter.format("VLsI"));
         assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
+        assertEquals("{BPEL}", formatter.format("{BPEL}"));
+        assertEquals("{Testing BPEL Engine Performance: A Survey}", formatter.format("{Testing BPEL Engine Performance: A Survey}"));
     }
 
     @Test
