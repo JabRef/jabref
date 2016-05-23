@@ -357,7 +357,7 @@ public class MetaData implements Iterable<String> {
                 stringBuilder.append(StringUtil.quote(dataItem, ";", '\\')).append(";");
 
                 //in case of save actions, add an additional newline after the enabled flag
-                if (metaItem.getKey().equals(SAVE_ACTIONS) && "enabled".equals(dataItem)) {
+                if (metaItem.getKey().equals(SAVE_ACTIONS) && ("enabled".equals(dataItem) || "disabled".equals(dataItem))) {
                     stringBuilder.append(Globals.NEWLINE);
                 }
             }
