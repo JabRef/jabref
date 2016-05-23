@@ -45,12 +45,10 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.exporter.CustomExportList;
 import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
@@ -75,12 +73,14 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JabRefPreferences {
+
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
@@ -263,6 +263,9 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
+    public static final String LINE_LENGTH = "lineLength"; // Maximum
+    public static final String INDENT = "indent"; //	Indent for formatted bibtex output.
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -557,7 +560,7 @@ public class JabRefPreferences {
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-        defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
+        defaults.put(NUMBER_COL_WIDTH, 32);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
@@ -630,7 +633,7 @@ public class JabRefPreferences {
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
         defaults.put(MENU_FONT_SIZE, 11);
-        defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
+        defaults.put(TABLE_ROW_PADDING, 9);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
         defaults.put(TABLE_BACKGROUND, "255:255:255");
@@ -854,6 +857,9 @@ public class JabRefPreferences {
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+        defaults.put(MAX_BACK_HISTORY_SIZE, 10);
+        defaults.put(LINE_LENGTH, 65);
+        defaults.put(INDENT, 4);
     }
 
     public String getUser() {

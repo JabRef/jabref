@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.logic.bibtex;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,7 +8,6 @@ import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabaseMode;

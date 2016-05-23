@@ -7,13 +7,14 @@ import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class MainTableColumn {
 
@@ -63,7 +64,7 @@ public class MainTableColumn {
             return null;
         }
 
-        StringJoiner joiner = new StringJoiner(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+        StringJoiner joiner = new StringJoiner(Globals.COL_DEFINITION_FIELD_SEPARATOR);
         for (String field : bibtexFields) {
             joiner.add(field);
         }

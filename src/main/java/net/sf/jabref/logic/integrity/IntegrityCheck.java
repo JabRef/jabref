@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.ParsedFileField;
 
 public class IntegrityCheck {

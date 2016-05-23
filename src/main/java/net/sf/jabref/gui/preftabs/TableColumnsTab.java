@@ -46,8 +46,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexSingleField;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
@@ -57,6 +55,8 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexSingleField;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;

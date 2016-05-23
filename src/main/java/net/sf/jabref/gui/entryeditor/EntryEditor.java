@@ -66,11 +66,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
@@ -101,6 +97,8 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
@@ -111,6 +109,8 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
@@ -128,6 +128,7 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
+
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -540,7 +541,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(GUIGlobals.INDENT);
+        source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.focusListener);
@@ -1070,6 +1071,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public class StoreFieldAction extends AbstractAction {
+
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");

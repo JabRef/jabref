@@ -29,10 +29,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.bibtex.FieldContentParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -40,7 +39,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

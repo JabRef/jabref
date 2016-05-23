@@ -33,7 +33,7 @@ import javax.swing.JScrollPane;
  */
 public class SidePane extends JPanel {
 
-    private final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
+    private final Dimension PREFERRED_SIZE = new Dimension(175, 100);
 
     private final GridBagLayout gridBagLayout = new GridBagLayout();
 

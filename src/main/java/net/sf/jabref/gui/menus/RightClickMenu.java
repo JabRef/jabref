@@ -29,7 +29,6 @@ import javax.swing.event.PopupMenuListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.FileListTableModel;
@@ -40,6 +39,7 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;

@@ -1,4 +1,4 @@
-package net.sf.jabref.bibtex;
+package net.sf.jabref.model.entry;
 
 import java.util.EnumSet;
 import java.util.Set;

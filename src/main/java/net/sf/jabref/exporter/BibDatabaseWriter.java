@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -35,12 +35,13 @@ import java.util.stream.Collectors;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
+import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
 import net.sf.jabref.logic.util.strings.StringUtil;

@@ -151,6 +151,9 @@ import osx.macadapter.MacAdapter;
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
 
+    // Frame titles.
+    private static final String FRAME_TITLE = "JabRef";
+
     private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
     private static final String ELLIPSES = "...";
 
@@ -578,7 +581,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         MyGlassPane glassPane = new MyGlassPane();
         setGlassPane(glassPane);
 
-        setTitle(GUIGlobals.FRAME_TITLE);
+        setTitle(FRAME_TITLE);
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -668,7 +671,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // no database open
         if (panel == null) {
-            setTitle(GUIGlobals.FRAME_TITLE);
+            setTitle(FRAME_TITLE);
             return;
         }
 
@@ -677,10 +680,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(GUIGlobals.FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
+            setTitle(FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
         } else {
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().getPath();
-            setTitle(GUIGlobals.FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+            setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         }
     }
 

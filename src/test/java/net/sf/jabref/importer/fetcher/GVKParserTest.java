@@ -10,7 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;

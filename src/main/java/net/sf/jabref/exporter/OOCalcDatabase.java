@@ -22,8 +22,8 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.layout.format.GetOpenOfficeType;
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.layout.format.RemoveWhitespace;

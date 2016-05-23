@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.bibtex.comparator;
+package net.sf.jabref.logic.bibtex.comparator;
 
 import java.text.Collator;
 import java.text.ParseException;
@@ -22,13 +22,13 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.gui.maintable.MainTableFormat;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
@@ -72,7 +72,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     public FieldComparator(String field, boolean reversed) {
         this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+        this.field = fieldName.split(Globals.COL_DEFINITION_FIELD_SEPARATOR);
         fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
 

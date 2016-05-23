@@ -1,4 +1,4 @@
-package net.sf.jabref.exporter;
+package net.sf.jabref.logic.bibtex;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -9,9 +9,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by joerg on 05.10.2015.
- */
 public class LatexFieldFormatterTests {
 
     private LatexFieldFormatter formatter;
