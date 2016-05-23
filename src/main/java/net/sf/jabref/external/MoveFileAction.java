@@ -110,7 +110,7 @@ public class MoveFileAction extends AbstractAction {
                 if (toFileDir) {
                     // Determine which name to suggest:
                     String suggName = FileUtil
-                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
+                            .createFileNameFromPattern(eEditor.getDatabase(), eEditor.getEntry(),
                                     Globals.journalAbbreviationLoader.getRepository())
                             .concat(entry.type.isPresent() ? "." + entry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),

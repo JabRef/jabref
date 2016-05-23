@@ -59,7 +59,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             StringBuilder newFilename = new StringBuilder(
-                    FileUtil.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
+                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repository));
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));

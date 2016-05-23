@@ -5,12 +5,27 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class FileUtilTest {
+    @Test
+    public void testGetLinkedFileName() {
+        Globals.prefs = JabRefPreferences.getInstance();
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle", FileUtil.createFileNameFromPattern(null, entry, Globals.journalAbbreviationLoader.getRepository()));
+    }
 
     @Test
     public void testGetFileExtensionSimpleFile() {
