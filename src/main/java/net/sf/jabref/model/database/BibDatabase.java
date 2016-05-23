@@ -175,9 +175,24 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
+     * @param entry the entry to insert into the database
      * @return false if the insert was done without a duplicate warning
+     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
+        return this.insertEntry(entry, false);
+    }
+
+    /**
+     * Inserts the entry, given that its ID is not already in use.
+     * use Util.createId(...) to make up a unique ID for an entry.
+     *
+     * @param entry  the entry to insert into the database
+     * @param isUndo set to true if the insertion is caused by an undo
+     * @return false if the insert was done without a duplicate warning
+     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
+     */
+    public synchronized boolean insertEntry(BibEntry entry, boolean isUndo) throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -189,7 +204,7 @@ public class BibDatabase {
         entries.add(entry);
         entry.registerListener(this);
 
-        eventBus.post(new EntryAddedEvent(entry));
+        eventBus.post(new EntryAddedEvent(entry, isUndo));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
