@@ -389,8 +389,7 @@ public class FileUtil {
      * @param repository
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
-            JournalAbbreviationRepository repository) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, JournalAbbreviationRepository repository) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;

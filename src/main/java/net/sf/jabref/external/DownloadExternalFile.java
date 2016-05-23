@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
@@ -267,7 +268,8 @@ public class DownloadExternalFile {
     }
     // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
-        String plannedName = bibtexKey == null ? "set-filename" : bibtexKey;
+        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader.getRepository());
+
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }

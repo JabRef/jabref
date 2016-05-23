@@ -5,12 +5,56 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FileUtilTest {
+    @Before
+    public void setUp() {
+        Globals.prefs = mock(JabRefPreferences.class);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+    }
+
+    @After
+    public void tearDown() {
+        Globals.prefs = null;
+        Globals.journalAbbreviationLoader = null;
+    }
+
+    @Test
+    public void testGetLinkedFileNameDefault() {
+        // bibkey - title
+        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle", FileUtil.createFileNameFromPattern(null, entry, Globals.journalAbbreviationLoader.getRepository()));
+    }
+
+    @Test
+    public void testGetLinkedFileNameBibTeXKey() {
+        // bibkey
+        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey");
+
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, Globals.journalAbbreviationLoader.getRepository()));
+    }
 
     @Test
     public void testGetFileExtensionSimpleFile() {
