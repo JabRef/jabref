@@ -132,23 +132,7 @@ public class DOI {
      * @return an Optional containing the DOI or an empty Optional
      */
     public static Optional<DOI> fromBibEntry(BibEntry entry) {
-        Optional<DOI> doi = CrossRef.findDOI(entry);
-        if (doi.isPresent()) {
-            // get bibentry from doi
-            DOItoBibTeXFetcher fetcher = new DOItoBibTeXFetcher();
-            BibEntry newEntry = fetcher.getEntryFromDOI(doi.get().getDOI(), null);
-            // check for duplicate
-            //DuplicateCheck duplicate = new DuplicateCheck();
-            // TODO: compare whole entry? Needs mode and has some assumptions, like:
-            // First check if they are of the same type - a necessary condition
-            // FIXME: does not remove enclosing brackets...
-            String oldTitle = new LatexCleanupFormatter().format(entry.getField("title"));
-            String newTitle = new LatexCleanupFormatter().format(newEntry.getField("title"));
-            if (oldTitle.equalsIgnoreCase(newTitle)) {
-                return doi;
-            }
-        }
-        return Optional.empty();
+        return CrossRef.findDOI(entry);
     }
 
     /**
