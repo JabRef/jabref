@@ -356,7 +356,7 @@ public class AuthorListParser {
             if (c == '{') {
                 bracesLevel++;
             }
-            if (firstLetterIsFound && (tokenAbbr < 0) && (bracesLevel == 0)) {
+            if (firstLetterIsFound && (tokenAbbr < 0) && (bracesLevel == 0 || c == '{')) {
                 tokenAbbr = tokenEnd;
             }
             if ((c == '}') && (bracesLevel > 0)) {

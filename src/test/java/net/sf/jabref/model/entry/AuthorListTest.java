@@ -605,4 +605,10 @@ public class AuthorListTest {
         Author expected = new Author("Firstname", "F.", null, "Bailey-Jones", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Firstname Bailey-Jones"));
     }
+
+    @Test
+    public void parseNameWithBraces() throws Exception {
+        Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
+    }
 }
