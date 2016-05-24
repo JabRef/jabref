@@ -172,21 +172,10 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
-    public void testWithNbibFile() throws IOException {
-        try (InputStream stream = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.nbib");
-                InputStream bibIn = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.bib")) {
-            List<BibEntry> actual = importer.importEntries(stream, new OutputPrinterToNull());
-            BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", actual);
-        }
-    }
-
-    @Test
-    public void testWithNbibFile() throws IOException {
-        try (InputStream stream = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.nbib");
-                InputStream bibIn = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.bib")) {
-            List<BibEntry> actual = importer.importEntries(stream, new OutputPrinterToNull());
-            BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", actual);
-        }
+    public void testWithNbibFile() throws IOException, URISyntaxException {
+        Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
     }
 
     @Test
