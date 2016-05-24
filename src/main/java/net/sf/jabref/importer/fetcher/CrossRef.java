@@ -80,9 +80,9 @@ public class CrossRef {
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
-        final int threshold = 2;
+        final int threshold = 4;
         // TODO: formatter might not be good enough! outer {} latex \mbox{} ~ commands
-        // TODO: remove bracesformatter
+        // TODO: remove bracesformatter does not remove {A} and {B}...
         final String entryTitle = new RemoveBracesFormatter().format(entry.getField("title"));
 
         // currently only title
@@ -94,16 +94,23 @@ public class CrossRef {
             String dataTitle = data.getJSONArray("title").getString(0);
 
             if (editDistanceIgnoreCase(entryTitle, dataTitle) <= threshold) {
+                //LOGGER.info("OK: " + editDistanceIgnoreCase(entryTitle, dataTitle));
                 return true;
             }
+            //LOGGER.info("FAIL: " + editDistanceIgnoreCase(entryTitle, dataTitle));
 
             // subtitle
             // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
-            String dataWithSubTitle = "";
             if (data.getJSONArray("subtitle").length() > 0) {
-                dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
+                String dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
+                if (editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= threshold) {
+                    //LOGGER.info("OK: " + editDistanceIgnoreCase(entryTitle, dataWithSubTitle));
+                    return true;
+                }
+                //LOGGER.info("FAIL: " + editDistanceIgnoreCase(entryTitle, dataWithSubTitle));
             }
-            return editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= threshold;
+
+            return false;
         } catch(JSONException ex) {
             return false;
         }

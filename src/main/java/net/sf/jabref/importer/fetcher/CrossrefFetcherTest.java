@@ -21,6 +21,7 @@ public class CrossrefFetcherTest {
 
         BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Desktop\\Github\\references\\references.bib"));
         //BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Desktop\\Vorlesungen\\Promotion\\Paper\\master.bib"));
+        //BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Downloads\\TEST.bib"));
         ParserResult result = parser.parse();
         BibDatabase db = result.getDatabase();
 
