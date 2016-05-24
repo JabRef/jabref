@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.jabref.Globals;
@@ -19,9 +21,7 @@ public class CrossrefFetcherTest {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
 
-        BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Desktop\\Github\\references\\references.bib"));
-        //BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Desktop\\Vorlesungen\\Promotion\\Paper\\master.bib"));
-        //BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Downloads\\TEST.bib"));
+        BibtexParser parser = new BibtexParser(new FileReader(args[0]));
         ParserResult result = parser.parse();
         BibDatabase db = result.getDatabase();
 
@@ -36,8 +36,10 @@ public class CrossrefFetcherTest {
         List<BibEntry> entries = db.getEntries();
         CountDownLatch countDownLatch = new CountDownLatch(entries.size());
 
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+
         for (BibEntry entry : entries) {
-            new Thread() {
+            executorService.execute(new Runnable() {
 
                 @Override
                 public void run() {
@@ -58,13 +60,13 @@ public class CrossrefFetcherTest {
                     } else {
                         Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
                         if (crossrefDOI.isPresent()) {
-                            //System.out.println("New DOI found for: " + entry);
+                            System.out.println("New DOI found for: " + entry);
                             doiNew.incrementAndGet();
                         }
                     }
                     countDownLatch.countDown();
                 }
-            }.start();
+            });
 
         }
         countDownLatch.await();
@@ -75,5 +77,7 @@ public class CrossrefFetcherTest {
         System.out.println("DOIs found: " + doiFound);
         System.out.println("DOIs identical: " + doiIdentical);
         System.out.println("New DOIs found: " + doiNew);
+
+        executorService.shutdown();
     }
 }
