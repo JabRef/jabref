@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.Author;
 
 import com.google.common.base.CharMatcher;
 
