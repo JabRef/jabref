@@ -97,6 +97,10 @@ public class MetaData implements Iterable<String> {
             if (GROUPSTREE.equals(entry.getKey())) {
                 putGroups(orderedData);
                 // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not use them here
+            } else if (SAVE_ACTIONS.equals(entry.getKey())) {
+                boolean enablementStatus = "enabled".equals(orderedData.get(0));
+                String formatterString = orderedData.get(1);
+                setSaveActions(new FieldFormatterCleanups(enablementStatus, formatterString));
             } else {
                 putData(entry.getKey(), orderedData);
             }
@@ -112,7 +116,7 @@ public class MetaData implements Iterable<String> {
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
         List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
-        if(storedSaveOrderConfig != null) {
+        if (storedSaveOrderConfig != null) {
             return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
         }
         return Optional.empty();
@@ -320,7 +324,7 @@ public class MetaData implements Iterable<String> {
 
     public List<String> getContentSelectors(String fieldName) {
         List<String> contentSelectors = getData(SELECTOR_META_PREFIX + fieldName);
-        if(contentSelectors == null) {
+        if (contentSelectors == null) {
             return Collections.emptyList();
         } else {
             return contentSelectors;
@@ -378,7 +382,7 @@ public class MetaData implements Iterable<String> {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
 
-            for(String groupNode : groupsRoot.getTreeAsString()) {
+            for (String groupNode : groupsRoot.getTreeAsString()) {
                 stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
                 stringBuilder.append(Globals.NEWLINE);
