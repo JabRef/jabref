@@ -452,7 +452,7 @@ public class BibtexParserTest {
                 + "  url = {http://james.howison.name/publications.html}"
                 + "\n"
                 + "}))"));
-        assertNull(result.getEncoding());
+        assertEquals(Globals.prefs.getDefaultEncoding(), result.getMetaData().getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());

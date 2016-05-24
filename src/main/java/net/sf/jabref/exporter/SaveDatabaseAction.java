@@ -129,7 +129,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
 
                 // Save the database:
-                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getEncoding());
+                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false,
+                        panel.getBibDatabaseContext().getMetaData().getEncoding());
 
                 Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
             } else {
@@ -245,7 +246,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         try {
             if (commit) {
                 session.commit(file);
-                panel.setEncoding(encoding); // Make sure to remember which encoding we used.
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
             } else {
                 session.cancel();
             }
@@ -257,7 +258,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
                 session.commit(file);
-                panel.setEncoding(encoding);
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding);
             } else {
                 commit = false;
             }

@@ -228,7 +228,9 @@ public class ExportFormats {
                         public void run() {
                             try {
                                 format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                                        finFile.getPath(), frame.getCurrentBasePanel().getEncoding(), finEntries);
+                                        finFile.getPath(),
+                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding(),
+                                        finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);
                                 if (ex.getMessage() == null) {

@@ -78,7 +78,7 @@ public class AutosaveStartupPrompter implements Runnable {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(file);
-                    BasePanel panel = frame.addTab(databaseContext, pr.getEncoding(), first);
+                    BasePanel panel = frame.addTab(databaseContext, first);
                     location.put(pr, frame.getBasePanelCount() - 1);
                     if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();

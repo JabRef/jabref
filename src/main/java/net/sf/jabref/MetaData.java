@@ -18,6 +18,7 @@ package net.sf.jabref;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,6 +69,8 @@ public class MetaData implements Iterable<String> {
     private AbstractLabelPattern labelPattern;
 
     private DBStrings dbStrings = new DBStrings();
+
+    private Charset encoding = Globals.prefs.getDefaultEncoding();
 
 
     /**
@@ -438,5 +441,16 @@ public class MetaData implements Iterable<String> {
 
     public void clearSaveOrderConfig() {
         remove(SAVE_ORDER_CONFIG);
+    }
+
+    /**
+     * Returns the encoding used during parsing.
+     */
+    public Charset getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = Objects.requireNonNull(encoding);
     }
 }

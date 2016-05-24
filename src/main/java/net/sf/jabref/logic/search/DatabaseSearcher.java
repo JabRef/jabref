@@ -42,21 +42,16 @@ public class DatabaseSearcher {
         this.database = Objects.requireNonNull(database);
     }
 
-    /**
-     *
-     * @return BibDatabase, never null
-     */
-    public BibDatabase getDatabaseFromMatches() {
+    public List<BibEntry> getMatches() {
         LOGGER.debug("Search term: " + query);
 
         if (!query.isValid()) {
             LOGGER.warn("Search failed: illegal search expression");
-            return BibDatabases.createDatabase(Collections.emptyList());
+            return Collections.emptyList();
         }
 
         List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).collect(Collectors.toList());
-
-        return BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(matchEntries));
+        return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 
 }

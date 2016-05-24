@@ -160,7 +160,7 @@ public class ChangeScanner implements Runnable {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
-                        .withEncoding(panel.getEncoding());
+                        .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding());
 
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));

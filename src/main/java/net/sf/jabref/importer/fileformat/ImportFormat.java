@@ -88,7 +88,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     public ParserResult importDatabase(Path filePath, Charset encoding) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
             ParserResult parserResult = importDatabase(bufferedReader);
-            parserResult.setEncoding(encoding);
+            parserResult.getMetaData().setEncoding(encoding);
             parserResult.setFile(filePath.toFile());
             return parserResult;
         }

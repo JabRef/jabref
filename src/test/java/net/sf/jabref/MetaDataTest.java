@@ -20,6 +20,7 @@ public class MetaDataTest {
 
     @Before
     public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
         metaData = new MetaData();
     }
 

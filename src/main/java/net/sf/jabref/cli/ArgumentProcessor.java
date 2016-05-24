@@ -160,15 +160,16 @@ public class ArgumentProcessor {
         String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
         //$ stands for a blank
         ParserResult pr = loaded.get(loaded.size() - 1);
+        BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
         SearchQuery query = new SearchQuery(searchTerm,
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
                 Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
-        BibDatabase newBase = new DatabaseSearcher(query, dataBase).getDatabaseFromMatches(); //newBase contains only match entries
+        List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
-        //export database
-        if (newBase.hasEntries()) {
+        //export matches
+        if (!matches.isEmpty()) {
             String formatName;
 
             //read in the export format, take default format if no format entered
@@ -195,8 +196,7 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    BibDatabaseContext databaseContext = new BibDatabaseContext(newBase, pr.getMetaData());
-                    format.performExport(databaseContext, data[1], pr.getEncoding(), newBase.getEntries());
+                    format.performExport(databaseContext, data[1], databaseContext.getMetaData().getEncoding(), matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + ex.getMessage());
@@ -373,7 +373,8 @@ public class ArgumentProcessor {
             } else {
                 // We have an ExportFormat instance:
                 try {
-                    format.performExport(pr.getDatabaseContext(), data[0], pr.getEncoding(), null);
+                    format.performExport(pr.getDatabaseContext(), data[0],
+                            pr.getDatabaseContext().getMetaData().getEncoding(), null);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + ex.getMessage());

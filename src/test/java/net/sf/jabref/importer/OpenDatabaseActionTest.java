@@ -46,25 +46,25 @@ public class OpenDatabaseActionTest {
     @Test
     public void useFallbackEncodingIfNoHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibNoHeader, defaultEncoding);
-        Assert.assertEquals(defaultEncoding, result.getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useFallbackEncodingIfUnknownHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibWrongHeader, defaultEncoding);
-        Assert.assertEquals(defaultEncoding, result.getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, StandardCharsets.US_ASCII);
-        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, StandardCharsets.US_ASCII);
-        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getMetaData().getEncoding());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class OpenDatabaseActionTest {
     @Test
     public void correctlyParseEncodingWithoutNewline() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibEncodingWithoutNewline, defaultEncoding);
-        Assert.assertEquals(StandardCharsets.US_ASCII, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding());
 
         BibDatabase db = result.getDatabase();
         Assert.assertEquals("testPreamble", db.getPreamble());
