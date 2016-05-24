@@ -3,7 +3,6 @@ package net.sf.jabref.importer.fetcher;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
