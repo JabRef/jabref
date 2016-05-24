@@ -172,6 +172,24 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
+    public void testWithNbibFile() throws IOException {
+        try (InputStream stream = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.nbib");
+                InputStream bibIn = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.bib")) {
+            List<BibEntry> actual = importer.importEntries(stream, new OutputPrinterToNull());
+            BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", actual);
+        }
+    }
+
+    @Test
+    public void testWithNbibFile() throws IOException {
+        try (InputStream stream = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.nbib");
+                InputStream bibIn = MedlinePlainImporter.class.getResourceAsStream("NbibImporterTest.bib")) {
+            List<BibEntry> actual = importer.importEntries(stream, new OutputPrinterToNull());
+            BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", actual);
+        }
+    }
+
+    @Test
     public void testAllArticleTypes() throws IOException {
         try (BufferedReader reader = readerForString("PMID-22664795" + "\n" +
                 "MH  - Female\n" +
