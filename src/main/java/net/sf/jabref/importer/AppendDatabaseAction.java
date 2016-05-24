@@ -19,31 +19,37 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.GroupTreeNode;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.MergeDialog;
 import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,16 +94,8 @@ public class AppendDatabaseAction implements BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    openIt(md.importEntries(), md.importStrings(),
-                            md.importGroups(), md.importSelectorWords());
-                }
-
-            });
-            //frame.getFileHistory().newFile(panel.fileToOpen.getPath());
+            JabRefExecutorService.INSTANCE.execute(() -> openIt(md.importEntries(), md.importStrings(),
+                    md.importGroups(), md.importSelectorWords()));
         }
 
     }
@@ -130,8 +128,8 @@ public class AppendDatabaseAction implements BaseAction {
                     throws KeyCollisionException {
 
         BibDatabase fromDatabase = pr.getDatabase();
-        ArrayList<BibEntry> appendedEntries = new ArrayList<>();
-        ArrayList<BibEntry> originalEntries = new ArrayList<>();
+        List<BibEntry> appendedEntries = new ArrayList<>();
+        List<BibEntry> originalEntries = new ArrayList<>();
         BibDatabase database = panel.getDatabase();
 
         NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
@@ -168,44 +166,26 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    ExplicitGroup group = null;
+                    try {
+                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                    } catch (ParseException e) {
+                        LOGGER.error(e);
+                    }
                     newGroups.setGroup(group);
-                    appendedEntries.stream().map(group::addEntry);
+                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-                // for explicit groups, the entries copied to the mother fromDatabase have to
-                // be "reassigned", i.e. the old reference is removed and the reference
-                // to the new fromDatabase is added.
-                GroupTreeNode node;
-                ExplicitGroup group;
-                BibEntry entry;
-
-                for (Enumeration<GroupTreeNode> e = newGroups
-                        .preorderEnumeration(); e.hasMoreElements(); ) {
-                    node = e.nextElement();
-                    if (!(node.getGroup() instanceof ExplicitGroup)) {
-                        continue;
-                    }
-                    group = (ExplicitGroup) node.getGroup();
-                    for (int i = 0; i < originalEntries.size(); ++i) {
-                        entry = originalEntries.get(i);
-                        if (group.contains(entry)) {
-                            group.removeEntry(entry);
-                            group.addEntry(appendedEntries.get(i));
-                        }
-                    }
-                }
-                frame.getGroupSelector().revalidateGroups();
             }
         }
 
         if (importSelectorWords) {
             for (String s : meta) {
-                if (s.startsWith(Globals.SELECTOR_META_PREFIX)) {
+                if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
                     panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
                 }
             }
@@ -215,5 +195,4 @@ public class AppendDatabaseAction implements BaseAction {
         panel.undoManager.addEdit(ce);
         panel.markBaseChanged();
     }
-
 }

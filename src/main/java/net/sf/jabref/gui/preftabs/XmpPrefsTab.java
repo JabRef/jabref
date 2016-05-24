@@ -15,23 +15,35 @@
 */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.Globals;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.logic.l10n.Localization;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * Preference Tab for XMP.
@@ -40,6 +52,7 @@ import java.util.stream.Collectors;
  */
 class XmpPrefsTab extends JPanel implements PrefsTab {
 
+    private final JabRefPreferences prefs;
     private boolean tableChanged;
 
     private int rowCount;
@@ -55,7 +68,8 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
     /**
      * Customization of external program paths.
      */
-    public XmpPrefsTab() {
+    public XmpPrefsTab(JabRefPreferences prefs) {
+        this.prefs = Objects.requireNonNull(prefs);
         setLayout(new BorderLayout());
 
         TableModel tableModel = new AbstractTableModel() {
@@ -135,7 +149,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         tablePanel.add(toolbar, BorderLayout.EAST);
 
         // Build Prefs Tabs
-        builder.appendSeparator(Localization.lang("XMP Export Privacy Settings"));
+        builder.appendSeparator(Localization.lang("XMP export privacy settings"));
         builder.nextLine();
 
         builder.append(pan);
@@ -246,7 +260,7 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
         // table setup table. This needs to be done either if changes were made, or
         // if the checkbox is checked and no field values have been stored previously:
         if (tableChanged ||
-                (privacyFilterCheckBox.isSelected() && !Globals.prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
+                (privacyFilterCheckBox.isSelected() && !prefs.hasKey(JabRefPreferences.XMP_PRIVACY_FILTERS))) {
 
             // First we remove all rows with empty names.
             for (int i = tableRows.size() - 1; i >= 0; i--) {
@@ -269,6 +283,6 @@ class XmpPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Localization.lang("XMP metadata");
+        return Localization.lang("XMP-metadata");
     }
 }

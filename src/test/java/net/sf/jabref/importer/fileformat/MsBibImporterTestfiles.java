@@ -14,6 +14,12 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +63,7 @@ public class MsBibImporterTestfiles {
         String bibFileName = fileName + ".bib";
         MsBibImporter testImporter = new MsBibImporter();
         List<BibEntry> result = testImporter.importDatabase(xmlFile, Charset.defaultCharset()).getDatabase().getEntries();
-        BibtexEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
+        BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
     }
 
 }

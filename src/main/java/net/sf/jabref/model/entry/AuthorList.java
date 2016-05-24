@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.model.entry;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -152,6 +155,10 @@ public class AuthorList {
      */
     protected AuthorList(List<Author> authors) {
         this.authors = Objects.requireNonNull(authors);
+    }
+
+    protected AuthorList(Author author) {
+        this(Collections.singletonList(author));
     }
 
     /**
@@ -414,7 +421,7 @@ public class AuthorList {
 
     @Override
     public String toString() {
-        return getAsLastFirstNamesWithAnd(false);
+        return authors.toString();
     }
 
     /**
@@ -580,7 +587,7 @@ public class AuthorList {
             return authorsAlph;
         }
 
-        authorsAlph = getAuthors().stream().map(author -> author.getNameForAlphabetization())
+        authorsAlph = getAuthors().stream().map(Author::getNameForAlphabetization)
                 .collect(Collectors.joining(" and "));
         return authorsAlph;
     }

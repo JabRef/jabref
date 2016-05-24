@@ -17,13 +17,16 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.Globals;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -87,7 +90,7 @@ public class RisImporter extends ImportFormat {
             String startPage = "";
             String endPage = "";
             String comment = "";
-            HashMap<String, String> hm = new HashMap<>();
+            Map<String, String> hm = new HashMap<>();
 
             String[] fields = entry1.split("\n");
 
@@ -191,7 +194,7 @@ public class RisImporter extends ImportFormat {
                         if (oldAb == null) {
                             hm.put("abstract", val);
                         } else {
-                            hm.put("abstract", oldAb + "\n" + val);
+                            hm.put("abstract", oldAb + Globals.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
                         hm.put("url", val);

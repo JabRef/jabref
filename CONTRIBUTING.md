@@ -96,9 +96,14 @@ because <additional rationale>.
 
 
 ### When adding a new Localization.lang entry
-Run `python scripts/syncLang.py -s` to search for new untranslated strings.
-If everything is OK, run `python scripts/syncLang.py -s -u` to update `JabRef_en.properties`.
+Add new Localization.lang("KEY") to Java file.
+Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
+Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
+With `gradlew generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
+Tests are green again.
 
+You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
+Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly)
 
 
 ### Create a pull request

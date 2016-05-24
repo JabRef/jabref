@@ -12,10 +12,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
+import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -23,8 +23,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.google.common.base.Strings;
 
 public class GVKParser {
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
@@ -366,10 +364,10 @@ public class GVKParser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField("author", StringUtil.expandAuthorInitials(author));
+            result.setField("author", author);
         }
         if (editor != null) {
-            result.setField("editor", StringUtil.expandAuthorInitials(editor));
+            result.setField("editor", editor);
         }
         if (title != null) {
             result.setField("title", title);

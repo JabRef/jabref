@@ -3,9 +3,14 @@ package net.sf.jabref.logic.util.strings;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.FileField;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
 
@@ -285,36 +290,16 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testExpandAuthorInitialsAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("AO Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
+    public void testRepeatSpaces() {
+        assertEquals("", StringUtil.repeatSpaces(0));
+        assertEquals(" ", StringUtil.repeatSpaces(1));
+        assertEquals("       ", StringUtil.repeatSpaces(7));
     }
 
     @Test
-    public void testExpandAuthorInitialsDoNotAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A. O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A.-O."));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O. Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("A. O. Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
-        assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
-        assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
-        assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
+    public void testRepeat() {
+        assertEquals("", StringUtil.repeat(0, 'a'));
+        assertEquals("a", StringUtil.repeat(1, 'a'));
+        assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
     }
-
 }

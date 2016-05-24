@@ -19,18 +19,21 @@ package net.sf.jabref.external.push;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import net.sf.jabref.*;
-
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,7 +48,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
     protected JPanel settings;
-    protected final JTextField Path = new JTextField(30);
+    protected final JTextField path = new JTextField(30);
     protected String commandPath;
     protected String commandPathPreferenceKey;
     protected FormBuilder builder;
@@ -137,7 +140,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         if (settings == null) {
             initSettingsPanel();
         }
-        Path.setText(commandPath);
+        path.setText(commandPath);
         return settings;
     }
 
@@ -145,7 +148,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * Function to initialize parameters. Currently it is expected that commandPathPreferenceKey is set to the path of
      * the application.
      */
-    abstract protected void initParameters();
+    protected abstract void initParameters();
 
     /**
      * Create a FormBuilder, fill it with a textbox for the path and store the JPanel in settings
@@ -153,7 +156,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected void initSettingsPanel() {
         builder = FormBuilder.create();
         builder.layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "p"));
-        StringBuffer label = new StringBuffer(Localization.lang("Path to %0", getApplicationName()));
+        StringBuilder label = new StringBuilder(Localization.lang("Path to %0", getApplicationName()));
         // In case the application name and the actual command is not the same, add the command in brackets
         if (getCommandName() == null) {
             label.append(':');
@@ -161,8 +164,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             label.append(" (").append(getCommandName()).append("):");
         }
         builder.add(label.toString()).xy(1, 1);
-        builder.add(Path).xy(3, 1);
-        BrowseAction action = BrowseAction.buildForFile(Path);
+        builder.add(path).xy(3, 1);
+        BrowseAction action = BrowseAction.buildForFile(path);
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(action);
         builder.add(browse).xy(5, 1);
@@ -171,7 +174,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public void storeSettings() {
-        Globals.prefs.put(commandPathPreferenceKey, Path.getText());
+        Globals.prefs.put(commandPathPreferenceKey, path.getText());
     }
 
     protected String getCiteCommand() {

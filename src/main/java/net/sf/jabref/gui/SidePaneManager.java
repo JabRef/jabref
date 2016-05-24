@@ -26,11 +26,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Manages visibility of SideShowComponents in a given newly constructed

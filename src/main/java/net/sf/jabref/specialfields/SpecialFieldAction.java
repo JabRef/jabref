@@ -15,16 +15,16 @@
 */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.model.entry.BibEntry;
 import java.util.List;
+
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.BaseAction;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.l10n.Localization;
 
 public class SpecialFieldAction implements BaseAction {
 

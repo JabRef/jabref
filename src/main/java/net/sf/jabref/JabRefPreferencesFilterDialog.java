@@ -1,13 +1,21 @@
 package net.sf.jabref;
 
-import net.sf.jabref.gui.WrapLayout;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.List;
 import java.util.Objects;
+
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+
+import net.sf.jabref.gui.WrapLayout;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class JabRefPreferencesFilterDialog extends JDialog {
 

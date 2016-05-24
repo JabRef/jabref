@@ -1,11 +1,9 @@
 package net.sf.jabref.model.entry;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import net.sf.jabref.bibtex.InternalBibtexFields;
-
-import java.util.List;
 
 public class IEEETranEntryTypesTest {
 

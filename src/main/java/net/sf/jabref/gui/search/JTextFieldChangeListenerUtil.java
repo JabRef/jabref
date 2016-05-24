@@ -1,14 +1,17 @@
 package net.sf.jabref.gui.search;
 
-import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.util.Objects;
+
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import java.beans.PropertyChangeEvent;
-import java.util.Objects;
 
 /**
  * Taken from http://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield

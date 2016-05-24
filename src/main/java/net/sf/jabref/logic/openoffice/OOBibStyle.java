@@ -15,22 +15,37 @@
 */
 package net.sf.jabref.logic.openoffice;
 
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.JabRef;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.strings.StringUtil;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.regex.Pattern;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +68,7 @@ import org.apache.commons.logging.LogFactory;
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String UNDEFINED_CITATION_MARKER = "??";
-    private String name;
+    private String name = "";
     private final SortedSet<String> journals = new TreeSet<>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
@@ -152,7 +167,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.repository = Objects.requireNonNull(repository);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(JabRef.class.getResource(resourcePath).openStream());
+        initialize(JabRefMain.class.getResource(resourcePath).openStream());
         fromResource = true;
         path = resourcePath;
     }
@@ -214,7 +229,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private void initialize(InputStream stream) throws IOException {
-        name = null;
+
         try (Reader reader = new InputStreamReader(stream, encoding)) {
             readFormatFile(reader);
         }
@@ -387,7 +402,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if ((index > 0) && (index <= (line.length() - 1))) {
             String propertyName = line.substring(0, index).trim();
             String value = line.substring(index + 1);
-            if ((value.trim().length() > 2) && QUOTED.matcher(value.trim()).matches()) {
+            if ((value.trim().length() > 1) && QUOTED.matcher(value.trim()).matches()) {
                 value = value.trim().substring(1, value.trim().length() - 1);
             }
             Object toSet = value;

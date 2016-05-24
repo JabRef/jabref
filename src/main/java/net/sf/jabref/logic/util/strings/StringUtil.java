@@ -15,13 +15,16 @@
  */
 package net.sf.jabref.logic.util.strings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.CharMatcher;
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.Author;
+
+import com.google.common.base.CharMatcher;
 
 public class StringUtil {
 
@@ -623,50 +626,31 @@ public class StringUtil {
     }
 
     /**
-     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
+     * Return a String with n spaces
      *
-     * @param name
-     * @return The name after expanding initials.
+     * @param n Number of spaces
+     * @return String with n spaces
      */
-    public static String expandAuthorInitials(String name) {
-        String[] authors = name.split(" and ");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].contains(", ")) {
-                String[] names = authors[i].split(", ");
-                if (names.length > 0) {
-                    sb.append(names[0]);
-                    if (names.length > 1) {
-                        sb.append(", ");
-                    }
-                }
-                for (int j = 1; j < names.length; j++) {
-                    if (j == 1) {
-                        sb.append(Author.addDotIfAbbreviation(names[j]));
-                    } else {
-                        sb.append(names[j]);
-                    }
-                    if (j < (names.length - 1)) {
-                        sb.append(", ");
-                    }
-                }
+    public static String repeatSpaces(int n) {
+        return repeat(n, ' ');
+    }
 
-            } else {
-                String[] names = authors[i].split(" ");
-                if (names.length > 0) {
-                    sb.append(Author.addDotIfAbbreviation(names[0]));
-                }
-                for (int j = 1; j < names.length; j++) {
-                    sb.append(' ');
-                    sb.append(names[j]);
-                }
-            }
-            if (i < (authors.length - 1)) {
-                sb.append(" and ");
-            }
+    /**
+     * Return a String with n copies of the char c
+     *
+     * @param n Number of copies
+     * @param c char to copy
+     * @return String with n copies of c
+     */
+    public static String repeat(int n, char c) {
+        StringBuilder resultSB = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+            resultSB.append(c);
         }
 
-        return sb.toString().trim();
+        return resultSB.toString();
+
     }
 
 }

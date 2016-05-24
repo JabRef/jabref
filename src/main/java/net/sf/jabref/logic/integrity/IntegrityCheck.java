@@ -1,20 +1,27 @@
 package net.sf.jabref.logic.integrity;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
-
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 public class IntegrityCheck {
 
@@ -45,16 +52,22 @@ public class IntegrityCheck {
 
         if (!bibDatabaseContext.isBiblatexMode()) {
             result.addAll(new TitleChecker().check(entry));
+            result.addAll(new PagesChecker().check(entry));
+        } else {
+            result.addAll(new BiblatexPagesChecker().check(entry));
         }
 
         result.addAll(new BracketChecker("title").check(entry));
         result.addAll(new YearChecker().check(entry));
-        result.addAll(new PagesChecker().check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new AbbreviationChecker("journal").check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
+        result.addAll(new BibStringChecker().check(entry));
+        result.addAll(new HTMLCharacterChecker().check(entry));
+        result.addAll(new BooktitleChecker().check(entry));
+        result.addAll(new ISSNChecker().check(entry));
 
         return result;
     }
@@ -76,6 +89,24 @@ public class IntegrityCheck {
 
             if ("proceedings".equalsIgnoreCase(entry.getType())) {
                 return Collections.singletonList(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, "pages"));
+            }
+
+            return Collections.emptyList();
+        }
+    }
+
+    private static class BooktitleChecker implements Checker {
+
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            String field = "booktitle";
+            Optional<String> value = entry.getFieldOptional(field);
+            if (!value.isPresent()) {
+                return Collections.emptyList();
+            }
+
+            if (value.get().toLowerCase(Locale.ENGLISH).endsWith("conference on")) {
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("booktitle ends with 'conference on'"), entry, field));
             }
 
             return Collections.emptyList();
@@ -115,7 +146,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("file");
+            Optional<String> value = entry.getFieldOptional(Globals.FILE_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -129,7 +160,7 @@ public class IntegrityCheck {
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
-                                    "file"));
+                                    Globals.FILE_FIELD));
                 }
             }
 
@@ -200,7 +231,7 @@ public class IntegrityCheck {
                     counter++;
                 } else if (a == '}') {
                     if (counter == 0) {
-                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly braket"), entry, field));
+                        return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected closing curly bracket"), entry, field));
                     } else {
                         counter--;
                     }
@@ -208,7 +239,7 @@ public class IntegrityCheck {
             }
 
             if (counter > 0) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly braket"), entry, field));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("unexpected opening curly bracket"), entry, field));
             }
 
             return Collections.emptyList();
@@ -317,6 +348,94 @@ public class IntegrityCheck {
             }
 
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Same as {@link PagesChecker} but allows single dash as well
+     */
+    private static class BiblatexPagesChecker implements Checker {
+
+        private static final String PAGES_EXP = ""
+                + "\\A"                       // begin String
+                + "\\d+"                      // number
+                + "(?:"                       // non-capture group
+                + "\\+|\\-{1,2}\\d+"            // + or --number (range)
+                + ")?"                        // optional group
+                + "(?:"                       // non-capture group
+                + ","                         // comma
+                + "\\d+(?:\\+|\\-{1,2}\\d+)?"   // repeat former pattern
+                + ")*"                        // repeat group 0,*
+                + "\\z";                      // end String
+
+        private static final Predicate<String> VALID_PAGE_NUMBER = Pattern.compile(PAGES_EXP).asPredicate();
+
+        /**
+         * Checks, if the page numbers String conforms to the BibTex manual
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            Optional<String> value = entry.getFieldOptional("pages");
+            if (!value.isPresent()) {
+                return Collections.emptyList();
+            }
+
+            if (!VALID_PAGE_NUMBER.test(value.get().trim())) {
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, "pages"));
+            }
+
+            return Collections.emptyList();
+        }
+    }
+
+    private static class BibStringChecker implements Checker {
+
+        // Detect # if it doesn't have a \ in front of it or if it starts the string
+        private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
+
+
+        /**
+         * Checks, if there is an even number of unescaped #
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
+                int hashCount = 0;
+                while (hashMatcher.find()) {
+                    hashCount++;
+                }
+                if ((hashCount % 2) == 1) {
+                    results.add(
+                            new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
+                                    field.getKey()));
+                }
+            }
+            return results;
+        }
+    }
+
+    private static class HTMLCharacterChecker implements Checker {
+
+        // Detect any HTML encoded character,
+        private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
+
+
+        /**
+         * Checks, if there are any HTML encoded characters in the fields
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                Matcher characterMatcher = HTML_CHARACTER_PATTERN.matcher(field.getValue());
+                if (characterMatcher.find()) {
+                    results.add(new IntegrityMessage(Localization.lang("HTML encoded character found"), entry,
+                            field.getKey()));
+                }
+            }
+            return results;
         }
     }
 

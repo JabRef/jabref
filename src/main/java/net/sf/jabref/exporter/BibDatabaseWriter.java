@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -18,26 +18,42 @@ package net.sf.jabref.exporter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.model.entry.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.bibtex.comparator.CrossRefEntryComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
+import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.id.IdComparator;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryType;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class BibDatabaseWriter {
 
@@ -223,14 +239,12 @@ public class BibDatabaseWriter {
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         List<FieldChange> changes = new ArrayList<>();
 
-        if (metaData.getData(MetaData.SAVE_ACTIONS) != null) {
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        if (saveActions.isPresent()) {
             // save actions defined -> apply for every entry
-            FieldFormatterCleanups saveActions = metaData.getSaveActions();
-
             for (BibEntry entry : toChange) {
-                changes.addAll(saveActions.applySaveActions(entry));
+                changes.addAll(saveActions.get().applySaveActions(entry));
             }
-
         }
 
         return changes;
@@ -323,13 +337,7 @@ public class BibDatabaseWriter {
             }
         }
 
-        StringBuilder suffixSB = new StringBuilder();
-        for (int i = maxKeyLength - bs.getName().length(); i > 0; i--) {
-            suffixSB.append(' ');
-        }
-        String suffix = suffixSB.toString();
-
-        fw.write(STRING_PREFIX + "{" + bs.getName() + suffix + " = ");
+        fw.write(STRING_PREFIX + "{" + bs.getName() + StringUtil.repeatSpaces(maxKeyLength - bs.getName().length()) + " = ");
         if (bs.getContent().isEmpty()) {
             fw.write("{}");
         } else {
@@ -360,7 +368,7 @@ public class BibDatabaseWriter {
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
         // First, make a Map of all entries:
-        HashMap<String, BibtexString> remaining = new HashMap<>();
+        Map<String, BibtexString> remaining = new HashMap<>();
         int maxKeyLength = 0;
         for (BibtexString string : strings) {
             remaining.put(string.getName(), string);

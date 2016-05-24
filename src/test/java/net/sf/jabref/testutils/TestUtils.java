@@ -1,6 +1,6 @@
 package net.sf.jabref.testutils;
 
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefMain;
 
 /**
@@ -28,8 +28,8 @@ public class TestUtils {
      * Closes the current instance of JabRef.
      */
     public static void closeJabRef() {
-        if (JabRef.mainFrame != null) {
-            JabRef.mainFrame.dispose();
+        if (JabRefGUI.getMainFrame() != null) {
+            JabRefGUI.getMainFrame().dispose();
         }
     }
 

@@ -15,26 +15,26 @@
  */
 package net.sf.jabref.importer.fetcher;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JPanel;
+
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
@@ -87,8 +87,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "CiteSeerHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_CITESEERX;
     }
 
     @Override
@@ -127,8 +127,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString();
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));
@@ -140,9 +139,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
-
-        URL url = new URL(urlString);
-        String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
+        String cont = new URLDownload(urlString).downloadToString(StandardCharsets.UTF_8);
 
         // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);

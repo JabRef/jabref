@@ -1,24 +1,24 @@
 package net.sf.jabref.bst;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.bst.VM.BstEntry;
-import net.sf.jabref.bst.VM.StackFunction;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ParserResult;
-
-import org.antlr.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.bst.VM.BstEntry;
+import net.sf.jabref.bst.VM.StackFunction;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.antlr.runtime.RecognitionException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class TestVM {
 

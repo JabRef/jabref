@@ -32,8 +32,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 
 public class ParserResult {
-    public static final ParserResult INVALID_FORMAT = new ParserResult(null, null, null);
-    public static final ParserResult FILE_LOCKED = new ParserResult(null, null, null);
+
+    private static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
     private final BibDatabase base;
     private MetaData metaData;
     private final Map<String, EntryType> entryTypes;
@@ -55,7 +55,7 @@ public class ParserResult {
     }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), null, new HashMap<>());
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), new MetaData(), new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
@@ -198,5 +198,14 @@ public class ParserResult {
 
     public BibDatabaseContext getDatabaseContext() {
         return new BibDatabaseContext(base, metaData, file);
+    }
+
+    public boolean isNullResult() {
+        // TODO Auto-generated method stub
+        return this == NULL_RESULT;
+    }
+
+    public static ParserResult getNullResult() {
+        return NULL_RESULT;
     }
 }

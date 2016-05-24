@@ -18,8 +18,8 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Arrays;
 import java.util.Objects;
 
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * Returns an autocompleter to a given fieldname.

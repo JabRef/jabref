@@ -26,19 +26,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.groups.EntryTableTransferHandler;
+import net.sf.jabref.gui.EntryContainer;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.groups.EntryTableTransferHandler;
+import net.sf.jabref.logic.util.io.FileUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class FileListEditorTransferHandler extends TransferHandler {
     private DataFlavor urlFlavor;
@@ -110,18 +111,17 @@ class FileListEditorTransferHandler extends TransferHandler {
                 files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
             }
 
-            SwingUtilities.invokeLater((Runnable) () -> {
+            SwingUtilities.invokeLater(() -> {
                 for (File file : files) {
                     // Find the file's extension, if any:
                     String name = file.getAbsolutePath();
-                    FileUtil.getFileExtension(name).ifPresent(extension -> {
-                        ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension).ifPresent(fileType -> {
-                            if (droppedFileHandler == null) {
-                                droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
-                            }
-                            droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
-                        });
-                    });
+                    FileUtil.getFileExtension(name).ifPresent(extension -> ExternalFileTypes.getInstance()
+                            .getExternalFileTypeByExt(extension).ifPresent(fileType -> {
+                                if (droppedFileHandler == null) {
+                                    droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());
+                                }
+                                droppedFileHandler.handleDroppedfile(name, fileType, entryContainer.getEntry());
+                            }));
                 }
             });
             if (!files.isEmpty()) {

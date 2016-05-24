@@ -15,19 +15,41 @@
 */
 package net.sf.jabref.logic.net;
 
-import net.sf.jabref.Globals;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.CookieHandler;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.jabref.Globals;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
+ * URL download to a string.
+ * <p>
+ * Example:
+ * URLDownload dl = new URLDownload(URL);
+ * String content = dl.downloadToString(ENCODING);
+ * dl.downloadToFile(FILE); // available in FILE
+ * String contentType = dl.determineMimeType();
+ *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  *
  * @author Erik Putrycz erik.putrycz-at-nrc-cnrc.gc.ca
@@ -44,17 +66,16 @@ public class URLDownload {
     private String postData = "";
 
     /**
-     * URL download to a string.
-     * <p>
-     * Example
-     * URLDownload dl = new URLDownload(URL);
-     * String content = dl.downloadToString(ENCODING);
-     * dl.downloadToFile(FILE); // available in FILE
-     * String contentType = dl.determineMimeType();
-     *
+     * @param address the URL to download from
+     * @throws MalformedURLException if no protocol is specified in the address, or an unknown protocol is found
+     */
+    public URLDownload(String address) throws MalformedURLException {
+        this(new URL(address));
+    }
+
+    /**
      * @param source The URL to download.
      */
-
     public URLDownload(URL source) {
         this.source = source;
 
@@ -110,7 +131,7 @@ public class URLDownload {
         }
         if (!postData.isEmpty()) {
             connection.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream());) {
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(postData);
             }
 

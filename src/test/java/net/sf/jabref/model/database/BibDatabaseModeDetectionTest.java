@@ -1,16 +1,17 @@
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.CustomEntryType;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.CustomEntryType;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class BibDatabaseModeDetectionTest {
     @Test

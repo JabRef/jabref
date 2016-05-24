@@ -22,20 +22,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.*;
-import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
+import net.sf.jabref.logic.l10n.Localization;
+
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import net.sf.jabref.logic.l10n.Localization;
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * <p>Title: </p>
@@ -48,6 +60,11 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class ExportCustomizationDialog extends JDialog {
 
+    // Column widths for export customization dialog table:
+    private static final int COL_0_WIDTH = 50;
+    private static final int COL_1_WIDTH = 200;
+    private static final int COL_2_WIDTH = 30;
+
     public ExportCustomizationDialog(final JabRefFrame frame) {
 
         super(frame, Localization.lang("Manage custom exports"), false);
@@ -55,9 +72,9 @@ public class ExportCustomizationDialog extends JDialog {
                 Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         JTable table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(GUIGlobals.EXPORT_DIALOG_COL_2_WIDTH);
+        cm.getColumn(0).setPreferredWidth(COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(COL_2_WIDTH);
         JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -124,7 +141,7 @@ public class ExportCustomizationDialog extends JDialog {
         JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new HelpAction(HelpFiles.exportCustomizationHelp).getHelpButton();
+        JButton help = new HelpAction(HelpFiles.CUSTOM_EXPORTS).getHelpButton();
 
         // Key bindings:
         JPanel main = new JPanel();

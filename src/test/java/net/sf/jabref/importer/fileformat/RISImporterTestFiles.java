@@ -1,17 +1,15 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -53,6 +51,6 @@ public class RISImporterTestFiles {
     @Test
     public void testImportEntries() throws IOException {
         List<BibEntry> risEntries = risImporter.importDatabase(risFile, Charset.defaultCharset()).getDatabase().getEntries();
-        BibtexEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
+        BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
     }
 }

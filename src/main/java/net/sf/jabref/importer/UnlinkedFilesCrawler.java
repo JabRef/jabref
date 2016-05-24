@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.CheckableTreeNode;
 import net.sf.jabref.gui.FindUnlinkedFilesDialog.FileNodeWrapper;
+import net.sf.jabref.model.database.BibDatabase;
 
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
@@ -21,7 +21,7 @@ public class UnlinkedFilesCrawler {
     /**
      * File filter, that accepts directories only.
      */
-    private final static FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
+    private static final FileFilter DIRECTORY_FILTER = pathname -> (pathname != null) && pathname.isDirectory();
 
     private final BibDatabase database;
 
@@ -52,7 +52,7 @@ public class UnlinkedFilesCrawler {
      * resolve its recursion and return what it has saved so far.
      */
     public CheckableTreeNode searchDirectory(File directory, UnlinkedPDFFileFilter ff, AtomicBoolean state, ChangeListener changeListener) {
-        /* Cancellation of the search from outside! */
+        /* Cancelation of the search from outside! */
         if ((state == null) || !state.get()) {
             return null;
         }

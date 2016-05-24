@@ -15,41 +15,55 @@
 */
 package net.sf.jabref;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
+
+import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.GroupsParser;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.sql.DBStrings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.migrations.VersionHandling;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.sql.DBStrings;
-
 public class MetaData implements Iterable<String> {
-    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
     public static final String META_FLAG = "jabref-meta: ";
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
-    public static final String SAVE_ACTIONS = "saveActions";
+    private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+
+    private static final String SAVE_ACTIONS = "saveActions";
     private static final String PREFIX_KEYPATTERN = "keypattern_";
     private static final String KEYPATTERNDEFAULT = "keypatterndefault";
     private static final String DATABASE_TYPE = "databaseType";
-    private static final String GROUPSVERSION = "groupsversion";
+
     private static final String GROUPSTREE = "groupstree";
-    private static final String GROUPS = "groups";
     private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    public static final String SELECTOR_META_PREFIX = "selector_";
+    private static final String PROTECTED_FLAG_META = "protectedFlag";
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
-
-    private boolean groupTreeValid = true;
 
     private AbstractLabelPattern labelPattern;
 
@@ -62,54 +76,26 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData, BibDatabase db) {
+    public MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
-        boolean groupsTreePresent = false;
-        List<String> flatGroupsData = null;
-        List<String> treeGroupsData = null;
-        // The first version (0) lacked a version specification,
-        // thus this value defaults to 0.
-        int groupsVersionOnDisk = 0;
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
-            String unit;
             List<String> orderedData = new ArrayList<>();
             // We must allow for ; and \ in escape sequences.
             try {
+                String unit;
                 while ((unit = getNextUnit(data)) != null) {
                     orderedData.add(unit);
                 }
             } catch (IOException ex) {
                 LOGGER.error("Weird error while parsing meta data.", ex);
             }
-            if (GROUPSVERSION.equals(entry.getKey())) {
-                if (!orderedData.isEmpty()) {
-                    groupsVersionOnDisk = Integer.parseInt(orderedData.get(0));
-                }
-            } else if (GROUPSTREE.equals(entry.getKey())) {
-                groupsTreePresent = true;
-                treeGroupsData = orderedData; // save for later user
-                // actual import operation is handled later because "groupsversion"
-                // tag might not yet have been read
-            } else if (GROUPS.equals(entry.getKey())) {
-                flatGroupsData = orderedData;
+            if (GROUPSTREE.equals(entry.getKey())) {
+                putGroups(orderedData);
+                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not use them here
             } else {
                 putData(entry.getKey(), orderedData);
-            }
-        }
-
-        // this possibly handles import of a previous groups version
-        if (groupsTreePresent) {
-            putGroups(treeGroupsData, db, groupsVersionOnDisk);
-        }
-
-        if (!groupsTreePresent && (flatGroupsData != null)) {
-            try {
-                groupsRoot = VersionHandling.importFlatGroups(flatGroupsData);
-                groupTreeValid = true;
-            } catch (IllegalArgumentException ex) {
-                groupTreeValid = true;
             }
         }
     }
@@ -133,11 +119,11 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(Globals.SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "author", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "journal", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(Globals.SELECTOR_META_PREFIX + "review", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "author", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + "review", new Vector<>());
     }
 
     /**
@@ -182,18 +168,13 @@ public class MetaData implements Iterable<String> {
      * Parse the groups metadata string
      *
      * @param orderedData The vector of metadata strings
-     * @param db          The BibDatabase this metadata belongs to
-     * @param version     The group tree version
      */
-    private void putGroups(List<String> orderedData, BibDatabase db, int version) {
+    private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = VersionHandling.importGroups(orderedData, db,
-                    version);
-            groupTreeValid = true;
-        } catch (Exception e) {
-            // we cannot really do anything about this here
-            LOGGER.error("Problem parsing groups from MetaData", e);
-            groupTreeValid = false;
+            groupsRoot = GroupsParser.importGroups(orderedData);
+        } catch (ParseException e) {
+            throw new ParseException(Localization.lang(
+                    "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
         }
     }
 
@@ -207,7 +188,6 @@ public class MetaData implements Iterable<String> {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = root;
-        groupTreeValid = true;
     }
 
     /**
@@ -243,10 +223,6 @@ public class MetaData implements Iterable<String> {
         this.dbStrings = dbStrings;
     }
 
-    public boolean isGroupTreeValid() {
-        return groupTreeValid;
-    }
-
     /**
      * @return the stored label patterns
      */
@@ -259,13 +235,13 @@ public class MetaData implements Iterable<String> {
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
-            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
                 List<String> value = getData(key);
-                String type = key.substring(MetaData.PREFIX_KEYPATTERN.length());
+                String type = key.substring(PREFIX_KEYPATTERN.length());
                 labelPattern.addLabelPattern(type, value.get(0));
             }
         }
-        List<String> defaultPattern = getData(MetaData.KEYPATTERNDEFAULT);
+        List<String> defaultPattern = getData(KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
             labelPattern.setDefaultValue(defaultPattern.get(0));
         }
@@ -284,7 +260,7 @@ public class MetaData implements Iterable<String> {
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            if (key.startsWith(MetaData.PREFIX_KEYPATTERN)) {
+            if (key.startsWith(PREFIX_KEYPATTERN)) {
                 iterator.remove();
             }
         }
@@ -292,7 +268,7 @@ public class MetaData implements Iterable<String> {
         // set new value if it is not a default value
         Set<String> allKeys = labelPattern.getAllKeys();
         for (String key : allKeys) {
-            String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
+            String metaDataKey = PREFIX_KEYPATTERN + key;
             if (!labelPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(labelPattern.getValue(key).get(0));
@@ -302,28 +278,28 @@ public class MetaData implements Iterable<String> {
 
         // store default pattern
         if (labelPattern.getDefaultValue() == null) {
-            this.remove(MetaData.KEYPATTERNDEFAULT);
+            this.remove(KEYPATTERNDEFAULT);
         } else {
             List<String> data = new ArrayList<>();
             data.add(labelPattern.getDefaultValue().get(0));
-            this.putData(MetaData.KEYPATTERNDEFAULT, data);
+            this.putData(KEYPATTERNDEFAULT, data);
         }
 
         this.labelPattern = labelPattern;
     }
 
-    public FieldFormatterCleanups getSaveActions() {
+    public Optional<FieldFormatterCleanups> getSaveActions() {
         if (this.getData(SAVE_ACTIONS) == null) {
-            return new FieldFormatterCleanups(false, new ArrayList<>());
+            return Optional.empty();
         } else {
             boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
             String formatterString = this.getData(SAVE_ACTIONS).get(1);
-            return new FieldFormatterCleanups(enablementStatus, formatterString);
+            return Optional.of(new FieldFormatterCleanups(enablementStatus, formatterString));
         }
     }
 
     public Optional<BibDatabaseMode> getMode() {
-        List<String> data = getData(MetaData.DATABASE_TYPE);
+        List<String> data = getData(DATABASE_TYPE);
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
@@ -331,7 +307,7 @@ public class MetaData implements Iterable<String> {
     }
 
     public boolean isProtected() {
-        List<String> data = getData(Globals.PROTECTED_FLAG_META);
+        List<String> data = getData(PROTECTED_FLAG_META);
         if ((data == null) || data.isEmpty()) {
             return false;
         } else {
@@ -340,7 +316,12 @@ public class MetaData implements Iterable<String> {
     }
 
     public List<String> getContentSelectors(String fieldName) {
-        return getData(Globals.SELECTOR_META_PREFIX + fieldName);
+        List<String> contentSelectors = getData(SELECTOR_META_PREFIX + fieldName);
+        if(contentSelectors == null) {
+            return Collections.emptyList();
+        } else {
+            return contentSelectors;
+        }
     }
 
     public Optional<String> getDefaultFileDirectory() {
@@ -376,7 +357,7 @@ public class MetaData implements Iterable<String> {
                 stringBuilder.append(StringUtil.quote(dataItem, ";", '\\')).append(";");
 
                 //in case of save actions, add an additional newline after the enabled flag
-                if (metaItem.getKey().equals(SAVE_ACTIONS) && "enabled".equals(dataItem)) {
+                if (metaItem.getKey().equals(SAVE_ACTIONS) && ("enabled".equals(dataItem) || "disabled".equals(dataItem))) {
                     stringBuilder.append(Globals.NEWLINE);
                 }
             }
@@ -390,22 +371,16 @@ public class MetaData implements Iterable<String> {
 
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getChildCount() > 0)) {
-
-            // write version first
-            serializedMetaData.put(MetaData.GROUPSVERSION, Integer.toString(VersionHandling.CURRENT_VERSION) + ";");
-
-            // now write actual groups
+        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(Globals.NEWLINE);
-            // GroupsTreeNode.toString() uses "\n" for separation
-            StringTokenizer tok = new StringTokenizer(groupsRoot.getTreeAsString(), Globals.NEWLINE);
-            while (tok.hasMoreTokens()) {
-                stringBuilder.append(StringUtil.quote(tok.nextToken(), ";", '\\'));
+
+            for(String groupNode : groupsRoot.getTreeAsString()) {
+                stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
                 stringBuilder.append(Globals.NEWLINE);
             }
-            serializedMetaData.put(MetaData.GROUPSTREE, stringBuilder.toString());
+            serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
         }
 
         return serializedMetaData;
@@ -418,19 +393,19 @@ public class MetaData implements Iterable<String> {
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
         List<String> serialized = saveOrderConfig.getConfigurationList();
-        putData(MetaData.SAVE_ORDER_CONFIG, serialized);
+        putData(SAVE_ORDER_CONFIG, serialized);
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
+        putData(DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
     }
 
     public void markAsProtected() {
-        putData(Globals.PROTECTED_FLAG_META, Collections.singletonList("true"));
+        putData(PROTECTED_FLAG_META, Collections.singletonList("true"));
     }
 
     public void setContentSelectors(String fieldName, List<String> contentSelectors) {
-        putData(Globals.SELECTOR_META_PREFIX + fieldName, contentSelectors);
+        putData(SELECTOR_META_PREFIX + fieldName, contentSelectors);
     }
 
     public void setDefaultFileDirectory(String path) {
@@ -442,6 +417,26 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setUserFileDirectory(String user, String path) {
-        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path));
+        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim()));
+    }
+
+    public void clearUserFileDirectory(String user) {
+        remove(FILE_DIRECTORY + '-' + user);
+    }
+
+    public void clearContentSelectors(String fieldName) {
+        remove(SELECTOR_META_PREFIX + fieldName);
+    }
+
+    public void markAsNotProtected() {
+        remove(PROTECTED_FLAG_META);
+    }
+
+    public void clearSaveActions() {
+        remove(SAVE_ACTIONS);
+    }
+
+    public void clearSaveOrderConfig() {
+        remove(SAVE_ORDER_CONFIG);
     }
 }

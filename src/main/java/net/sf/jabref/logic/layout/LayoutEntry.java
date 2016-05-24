@@ -17,25 +17,87 @@ package net.sf.jabref.logic.layout;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.logic.layout.format.*;
+import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
+import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
+import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
+import net.sf.jabref.logic.layout.format.AuthorFirstAbbrLastCommas;
+import net.sf.jabref.logic.layout.format.AuthorFirstAbbrLastOxfordCommas;
+import net.sf.jabref.logic.layout.format.AuthorFirstFirst;
+import net.sf.jabref.logic.layout.format.AuthorFirstFirstCommas;
+import net.sf.jabref.logic.layout.format.AuthorFirstLastCommas;
+import net.sf.jabref.logic.layout.format.AuthorFirstLastOxfordCommas;
+import net.sf.jabref.logic.layout.format.AuthorLF_FF;
+import net.sf.jabref.logic.layout.format.AuthorLF_FFAbbr;
+import net.sf.jabref.logic.layout.format.AuthorLastFirst;
+import net.sf.jabref.logic.layout.format.AuthorLastFirstAbbrCommas;
+import net.sf.jabref.logic.layout.format.AuthorLastFirstAbbrOxfordCommas;
+import net.sf.jabref.logic.layout.format.AuthorLastFirstAbbreviator;
+import net.sf.jabref.logic.layout.format.AuthorLastFirstCommas;
+import net.sf.jabref.logic.layout.format.AuthorLastFirstOxfordCommas;
+import net.sf.jabref.logic.layout.format.AuthorNatBib;
+import net.sf.jabref.logic.layout.format.AuthorOrgSci;
+import net.sf.jabref.logic.layout.format.Authors;
+import net.sf.jabref.logic.layout.format.CompositeFormat;
+import net.sf.jabref.logic.layout.format.CreateBibORDFAuthors;
+import net.sf.jabref.logic.layout.format.CreateDocBookAuthors;
+import net.sf.jabref.logic.layout.format.CurrentDate;
+import net.sf.jabref.logic.layout.format.DOICheck;
+import net.sf.jabref.logic.layout.format.DOIStrip;
+import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.FileLink;
+import net.sf.jabref.logic.layout.format.FirstPage;
+import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
+import net.sf.jabref.logic.layout.format.FormatPagesForXML;
+import net.sf.jabref.logic.layout.format.GetOpenOfficeType;
+import net.sf.jabref.logic.layout.format.HTMLChars;
+import net.sf.jabref.logic.layout.format.HTMLParagraphs;
+import net.sf.jabref.logic.layout.format.IfPlural;
+import net.sf.jabref.logic.layout.format.Iso690FormatDate;
+import net.sf.jabref.logic.layout.format.Iso690NamesAuthors;
+import net.sf.jabref.logic.layout.format.JournalAbbreviator;
+import net.sf.jabref.logic.layout.format.LastPage;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.logic.layout.format.NameFormatter;
+import net.sf.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
+import net.sf.jabref.logic.layout.format.NotFoundFormatter;
 import net.sf.jabref.logic.layout.format.Number;
+import net.sf.jabref.logic.layout.format.Ordinal;
+import net.sf.jabref.logic.layout.format.RTFChars;
+import net.sf.jabref.logic.layout.format.RemoveBrackets;
+import net.sf.jabref.logic.layout.format.RemoveBracketsAddComma;
+import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.layout.format.RemoveTilde;
+import net.sf.jabref.logic.layout.format.RemoveWhitespace;
+import net.sf.jabref.logic.layout.format.Replace;
+import net.sf.jabref.logic.layout.format.RisAuthors;
+import net.sf.jabref.logic.layout.format.RisKeywords;
+import net.sf.jabref.logic.layout.format.RisMonth;
+import net.sf.jabref.logic.layout.format.ToLowerCase;
+import net.sf.jabref.logic.layout.format.ToUpperCase;
+import net.sf.jabref.logic.layout.format.WrapContent;
+import net.sf.jabref.logic.layout.format.WrapFileLinks;
+import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 
 class LayoutEntry {
 
@@ -157,122 +219,12 @@ class LayoutEntry {
             return value;
         case LayoutHelper.IS_FIELD_START:
         case LayoutHelper.IS_GROUP_START:
-            String field;
-            if (type == LayoutHelper.IS_GROUP_START) {
-                field = BibDatabase.getResolvedField(text, bibtex, database);
-            } else if (text.matches(".*(;|(\\&+)).*")) {
-                // split the strings along &, && or ; for AND formatter
-                String[] parts = text.split("\\s*(;|(\\&+))\\s*");
-                field = null;
-                for (String part : parts) {
-                    field = BibDatabase.getResolvedField(part, bibtex, database);
-                    if (field == null) {
-                        break;
-                    }
-
-                }
-            } else {
-                // split the strings along |, ||  for OR formatter
-                String[] parts = text.split("\\s*(\\|+)\\s*");
-                field = null;
-                for (String part : parts) {
-                    field = BibDatabase.getResolvedField(part, bibtex, database);
-                    if (field != null) {
-                        break;
-                    }
-                }
-            }
-
-            if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
-                    && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
-                return null;
-            } else {
-                if (type == LayoutHelper.IS_GROUP_START) {
-                    LayoutHelper.setCurrentGroup(field);
-                }
-                StringBuilder sb = new StringBuilder(100);
-                String fieldText;
-                boolean previousSkipped = false;
-
-                for (int i = 0; i < layoutEntries.size(); i++) {
-                    fieldText = layoutEntries.get(i).doLayout(bibtex, database);
-
-                    if (fieldText == null) {
-                        if ((i + 1) < layoutEntries.size()) {
-                            if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
-                                i++;
-                                previousSkipped = true;
-                                continue;
-                            }
-                        }
-                    } else {
-
-                        // if previous was skipped --> remove leading line
-                        // breaks
-                        if (previousSkipped) {
-                            int eol = 0;
-
-                            while ((eol < fieldText.length())
-                                    && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
-                                eol++;
-                            }
-
-                            if (eol < fieldText.length()) {
-                                sb.append(fieldText.substring(eol));
-                            }
-                        } else {
-                            /*
-                             * if fieldText is not null and the bibtexentry is marked
-                             * as a searchhit, try to highlight the searched words
-                             *
-                            */
-                            if (bibtex.isSearchHit()) {
-                                sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
-                            } else {
-                                sb.append(fieldText);
-                            }
-
-                        }
-                    }
-
-                    previousSkipped = false;
-                }
-
-                return sb.toString();
-            }
+            return handleFieldOrGroupStart(bibtex, database, highlightPattern);
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
         case LayoutHelper.IS_OPTION_FIELD:
-            String fieldEntry;
-
-            if ("bibtextype".equals(text)) {
-                fieldEntry = bibtex.getType();
-            } else {
-                // changed section begin - arudert
-                // resolve field (recognized by leading backslash) or text
-                String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
-                        database) : BibDatabase.getText(text, database);
-                // changed section end - arudert
-                if (fieldText == null) {
-                    fieldEntry = "";
-                } else {
-                    fieldEntry = fieldText;
-                }
-            }
-
-            if (option != null) {
-                for (LayoutFormatter anOption : option) {
-                    fieldEntry = anOption.format(fieldEntry);
-                }
-            }
-
-            // If a post formatter has been set, call it:
-            if (postFormatter != null) {
-                fieldEntry = postFormatter.format(fieldEntry);
-            }
-
-            return fieldEntry;
+            return handleOptionField(bibtex, database);
         case LayoutHelper.IS_ENCODING_NAME:
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
@@ -280,6 +232,124 @@ class LayoutEntry {
             return BibDatabase.getResolvedField("encoding", bibtex, database);
         default:
             return "";
+        }
+    }
+
+    private String handleOptionField(BibEntry bibtex, BibDatabase database) {
+        String fieldEntry;
+
+        if ("bibtextype".equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else {
+            // changed section begin - arudert
+            // resolve field (recognized by leading backslash) or text
+            String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
+                    database) : BibDatabase.getText(text, database);
+            // changed section end - arudert
+            if (fieldText == null) {
+                fieldEntry = "";
+            } else {
+                fieldEntry = fieldText;
+            }
+        }
+
+        if (option != null) {
+            for (LayoutFormatter anOption : option) {
+                fieldEntry = anOption.format(fieldEntry);
+            }
+        }
+
+        // If a post formatter has been set, call it:
+        if (postFormatter != null) {
+            fieldEntry = postFormatter.format(fieldEntry);
+        }
+
+        return fieldEntry;
+    }
+
+    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+        String field;
+        if (type == LayoutHelper.IS_GROUP_START) {
+            field = BibDatabase.getResolvedField(text, bibtex, database);
+        } else if (text.matches(".*(;|(\\&+)).*")) {
+            // split the strings along &, && or ; for AND formatter
+            String[] parts = text.split("\\s*(;|(\\&+))\\s*");
+            field = null;
+            for (String part : parts) {
+                field = BibDatabase.getResolvedField(part, bibtex, database);
+                if (field == null) {
+                    break;
+                }
+
+            }
+        } else {
+            // split the strings along |, ||  for OR formatter
+            String[] parts = text.split("\\s*(\\|+)\\s*");
+            field = null;
+            for (String part : parts) {
+                field = BibDatabase.getResolvedField(part, bibtex, database);
+                if (field != null) {
+                    break;
+                }
+            }
+        }
+
+        if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
+                && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
+            return null;
+        } else {
+            if (type == LayoutHelper.IS_GROUP_START) {
+                LayoutHelper.setCurrentGroup(field);
+            }
+            StringBuilder sb = new StringBuilder(100);
+            String fieldText;
+            boolean previousSkipped = false;
+
+            for (int i = 0; i < layoutEntries.size(); i++) {
+                fieldText = layoutEntries.get(i).doLayout(bibtex, database);
+
+                if (fieldText == null) {
+                    if ((i + 1) < layoutEntries.size()) {
+                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
+                            i++;
+                            previousSkipped = true;
+                            continue;
+                        }
+                    }
+                } else {
+
+                    // if previous was skipped --> remove leading line
+                    // breaks
+                    if (previousSkipped) {
+                        int eol = 0;
+
+                        while ((eol < fieldText.length())
+                                && ((fieldText.charAt(eol) == '\n') || (fieldText.charAt(eol) == '\r'))) {
+                            eol++;
+                        }
+
+                        if (eol < fieldText.length()) {
+                            sb.append(fieldText.substring(eol));
+                        }
+                    } else {
+                        /*
+                         * if fieldText is not null and the bibtexentry is marked
+                         * as a searchhit, try to highlight the searched words
+                         *
+                        */
+                        if (bibtex.isSearchHit()) {
+                            sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
+                        } else {
+                            sb.append(fieldText);
+                        }
+
+                    }
+                }
+
+                previousSkipped = false;
+            }
+
+            return sb.toString();
         }
     }
 
@@ -360,7 +430,7 @@ class LayoutEntry {
     }
 
     private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
-        
+
         switch (name) {
         case "HTMLToLatexFormatter": // For backward compatibility
         case "HtmlToLatex":
@@ -621,11 +691,11 @@ class LayoutEntry {
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(Arrays.asList(method));
+                        result.add(Collections.singletonList(method));
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(Arrays.asList(method));
+                    result.add(Collections.singletonList(method));
                 }
             }
             i++;

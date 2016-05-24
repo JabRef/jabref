@@ -15,26 +15,26 @@
  */
 package net.sf.jabref.sql;
 
-import net.sf.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.sql.exporter.DBExporter;
-
-import javax.swing.*;
-import java.sql.Connection;
 import java.awt.event.ActionEvent;
+import java.sql.Connection;
+
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.actions.BaseAction;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 27, 2008 Time: 6:05:13 PM To
  * change this template use File | Settings | File Templates.
- *
+ * <p>
  * Jan 20th Adjusted to accomodate changes on SQL Exporter module by ifsteinm
- *
  */
 public class DbConnectAction implements BaseAction {
 
     private final BasePanel panel;
-
 
     public DbConnectAction(BasePanel panel) {
         this.panel = panel;
@@ -44,7 +44,6 @@ public class DbConnectAction implements BaseAction {
         return new DbImpAction();
     }
 
-
     private class DbImpAction extends AbstractAction {
 
         @Override
@@ -53,7 +52,6 @@ public class DbConnectAction implements BaseAction {
 
         }
     }
-
 
     @Override
     public void action() {
@@ -71,36 +69,36 @@ public class DbConnectAction implements BaseAction {
         dbd.setVisible(true);
 
         // connect to database to test DBStrings
-        if (dbd.isConnectedToDB()) {
+        if (!dbd.isConnectedToDB()) {
+            return;
+        }
 
-            dbs = dbd.getDBStrings();
+        dbs = dbd.getDBStrings();
 
-            try {
+        try {
 
-                panel.frame().output(
-                        Localization.lang("Establishing SQL connection..."));
-                DBExporter exporter = (new DBExporterAndImporterFactory())
-                        .getExporter(dbs.getServerType());
-                try (Connection conn = exporter.connectToDB(dbs)) {
-                    // Nothing
-                }
-                dbs.isConfigValid(true);
-                panel.frame().output(
-                        Localization.lang("SQL connection established."));
-            } catch (Exception ex) {
-                String errorMessage = SQLUtil.getExceptionMessage(ex);
-                dbs.isConfigValid(false);
-
-                String preamble = Localization.lang("Could not connect to SQL database for the following reason:");
-                panel.frame().output(preamble + "  " + errorMessage);
-
-                JOptionPane.showMessageDialog(panel.frame(), preamble + '\n' + errorMessage,
-                        Localization.lang("Connect to SQL database"),
-                        JOptionPane.ERROR_MESSAGE);
-            } finally {
-                panel.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
-                dbd.dispose();
+            panel.frame().output(
+                    Localization.lang("Establishing SQL connection..."));
+            DatabaseExporter exporter = new DBExporterAndImporterFactory().getExporter(dbs.getDbPreferences().getServerType());
+            try (Connection conn = exporter.connectToDB(dbs)) {
+                // Nothing
             }
+            dbs.isConfigValid(true);
+            panel.frame().output(
+                    Localization.lang("SQL connection established."));
+        } catch (Exception ex) {
+            String errorMessage = SQLUtil.getExceptionMessage(ex);
+            dbs.isConfigValid(false);
+
+            String preamble = Localization.lang("Could not connect to SQL database for the following reason:");
+            panel.frame().output(preamble + "  " + errorMessage);
+
+            JOptionPane.showMessageDialog(panel.frame(), preamble + '\n' + errorMessage,
+                    Localization.lang("Connect to SQL database"),
+                    JOptionPane.ERROR_MESSAGE);
+        } finally {
+            panel.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
+            dbd.dispose();
         }
     }
 }

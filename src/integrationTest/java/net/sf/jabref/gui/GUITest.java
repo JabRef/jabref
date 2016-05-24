@@ -1,17 +1,26 @@
 package net.sf.jabref.gui;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.swing.JButton;
+
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
+import org.assertj.swing.fixture.AbstractWindowFixture;
+import org.assertj.swing.fixture.DialogFixture;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.image.ScreenshotTaker;
 import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.assertj.swing.timing.Pause;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import javax.swing.*;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 import static org.assertj.swing.finder.WindowFinder.findFrame;
@@ -58,7 +67,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
     }
 
     @Test
-    public void testCreateBibtexEntry() {
+    public void testCreateBibtexEntry() throws IOException {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
 
         newDatabase(mainFrame);
@@ -72,20 +81,21 @@ public class GUITest extends AssertJSwingJUnitTestCase {
                         return "Book".equals(jButton.getText());
                     }
                 }).click();
-
+        takeScreenshot(mainFrame, "MainWindowWithOneDatabase");
         exitJabRef(mainFrame);
     }
 
     @Ignore
     @Test
-    public void testOpenAndSavePreferences() {
+    public void testOpenAndSavePreferences() throws IOException {
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
         mainFrame.menuItemWithPath("Options", "Preferences").click();
 
         robot().waitForIdle();
 
-        findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot())
-                .button(new GenericTypeMatcher<JButton>(JButton.class) {
+        DialogFixture preferencesDialog = findDialog(PreferencesDialog.class).withTimeout(10_000).using(robot());
+        takeScreenshot(preferencesDialog, "PreferencesDialog");
+        preferencesDialog.button(new GenericTypeMatcher<JButton>(JButton.class) {
 
                     @Override
                     protected boolean isMatching(@Nonnull JButton jButton) {
@@ -117,7 +127,7 @@ public class GUITest extends AssertJSwingJUnitTestCase {
     }
 
     @Test
-    public void testDatabasePropertiesDialog() {
+    public void testDatabasePropertiesDialog() throws IOException {
 
         FrameFixture mainFrame = findFrame(JabRefFrame.class).withTimeout(10_000).using(robot());
         newDatabase(mainFrame);
@@ -126,8 +136,9 @@ public class GUITest extends AssertJSwingJUnitTestCase {
 
         robot().waitForIdle();
 
-        findDialog(DatabasePropertiesDialog.class).withTimeout(10_000).using(robot())
-                .button(new GenericTypeMatcher<JButton>(JButton.class) {
+        DialogFixture databasePropertiesDialog = findDialog(DatabasePropertiesDialog.class).withTimeout(10_000).using(robot());
+        takeScreenshot(databasePropertiesDialog, "DatabasePropertiesDialog");
+        databasePropertiesDialog.button(new GenericTypeMatcher<JButton>(JButton.class) {
 
                     @Override
                     protected boolean isMatching(@Nonnull JButton jButton) {
@@ -136,5 +147,20 @@ public class GUITest extends AssertJSwingJUnitTestCase {
                 }).click();
 
         exitJabRef(mainFrame);
+    }
+
+    private void takeScreenshot(AbstractWindowFixture<?, ?, ?> dialog, String filename) throws IOException {
+        ScreenshotTaker screenshotTaker = new ScreenshotTaker();
+        Path folder = Paths.get("build", "screenshots");
+        // Create build/srceenshots folder if not present
+        if (!Files.exists(folder)) {
+            Files.createDirectory(folder);
+        }
+        Path file = folder.resolve(filename + ".png").toAbsolutePath();
+        // Delete already present file
+        if (Files.exists(file)) {
+            Files.delete(file);
+        }
+        screenshotTaker.saveComponentAsPng(dialog.target(), file.toString());
     }
 }

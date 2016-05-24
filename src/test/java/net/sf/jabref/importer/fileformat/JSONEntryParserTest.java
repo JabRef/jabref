@@ -16,11 +16,11 @@
 
 package net.sf.jabref.importer.fileformat;
 
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.Assert;
-
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class JSONEntryParserTest {
 

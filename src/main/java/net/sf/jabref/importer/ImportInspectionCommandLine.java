@@ -16,12 +16,13 @@
 package net.sf.jabref.importer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 public class ImportInspectionCommandLine implements ImportInspector {
 
@@ -64,11 +65,6 @@ public class ImportInspectionCommandLine implements ImportInspector {
         if (fetcher.processQuery(query, ImportInspectionCommandLine.this, status)) {
             return entries;
         }
-        return null;
-    }
-
-    @Override
-    public void toFront() {
-        // Nothing
+        return Collections.emptyList();
     }
 }

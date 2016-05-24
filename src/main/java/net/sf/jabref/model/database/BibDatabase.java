@@ -29,11 +29,30 @@ Modified for use in JabRef
  */
 package net.sf.jabref.model.database;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
+import net.sf.jabref.event.EntryRemovedEvent;
+import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.MonthUtil;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,10 +89,7 @@ public class BibDatabase {
      */
     private boolean followCrossrefs = true;
 
-    /**
-     * Behavior
-     */
-    private final Set<DatabaseChangeListener> changeListeners = new HashSet<>();
+    private final EventBus eventBus = new EventBus();
 
     /**
      * Returns the number of entries.
@@ -95,7 +111,7 @@ public class BibDatabase {
      */
     public synchronized EntrySorter getSorter(Comparator<BibEntry> comp) {
         EntrySorter sorter = new EntrySorter(entries, comp);
-        addDatabaseChangeListener(sorter);
+        eventBus.register(sorter);
         return sorter;
     }
 
@@ -145,7 +161,7 @@ public class BibDatabase {
     }
 
     public synchronized List<BibEntry> getEntriesByKey(String key) {
-        ArrayList<BibEntry> result = new ArrayList<>();
+        List<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries) {
             if (key.equals(entry.getCiteKey())) {
@@ -171,7 +187,9 @@ public class BibDatabase {
 
         internalIDs.add(id);
         entries.add(entry);
-        fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.ADDED_ENTRY, entry));
+        entry.registerListener(this);
+
+        eventBus.post(new EntryAddedEvent(entry));
         return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
@@ -186,7 +204,7 @@ public class BibDatabase {
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
-            fireDatabaseChanged(new DatabaseChangeEvent(this, DatabaseChangeEvent.ChangeType.REMOVED_ENTRY, toBeDeleted));
+            eventBus.post(new EntryRemovedEvent(toBeDeleted));
         }
     }
 
@@ -199,7 +217,7 @@ public class BibDatabase {
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
-            entry.setField(BibEntry.KEY_FIELD, key);
+            entry.setCiteKey(key);
         }
         return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
     }
@@ -466,22 +484,6 @@ public class BibDatabase {
         return res;
     }
 
-
-
-    private void fireDatabaseChanged(DatabaseChangeEvent e) {
-        for (DatabaseChangeListener tmpListener : changeListeners) {
-            tmpListener.databaseChanged(e);
-        }
-    }
-
-    public void addDatabaseChangeListener(DatabaseChangeListener l) {
-        changeListeners.add(l);
-    }
-
-    public void removeDatabaseChangeListener(DatabaseChangeListener l) {
-        changeListeners.remove(l);
-    }
-
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -548,5 +550,24 @@ public class BibDatabase {
 
     public String getEpilog() {
         return epilog;
+    }
+
+    /**
+     * Registers an listener object (subscriber) to the internal event bus.
+     * The following events are posted:
+     *
+     *   - {@link EntryAddedEvent}
+     *   - {@link EntryChangedEvent}
+     *   - {@link EntryRemovedEvent}
+     *
+     * @param listener listener (subscriber) to add
+     */
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
+    }
+
+    @Subscribe
+    private void relayEntryChangeEvent(FieldChangedEvent event) {
+        eventBus.post(event);
     }
 }

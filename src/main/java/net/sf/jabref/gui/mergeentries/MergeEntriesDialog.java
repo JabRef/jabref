@@ -16,10 +16,12 @@
 package net.sf.jabref.gui.mergeentries;
 
 import java.util.List;
-import javax.swing.*;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import com.jgoodies.forms.layout.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
+
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -28,6 +30,12 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 /**
  * @author Oscar
@@ -88,7 +96,7 @@ public class MergeEntriesDialog extends JDialog {
         JButton cancel = new JButton(Localization.lang("Cancel"));
         cancel.setActionCommand("cancel");
         cancel.addActionListener(e -> {
-            panel.output(Localization.lang("Cancelled merging entries"));
+            panel.output(Localization.lang("Canceled merging entries"));
             dispose();
         });
 

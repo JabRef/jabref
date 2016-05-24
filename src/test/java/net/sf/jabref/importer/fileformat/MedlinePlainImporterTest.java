@@ -14,7 +14,8 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -135,7 +136,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertNotNull(entries);
             Assert.assertEquals(1, entries.size());
-            BibtexEntryAssert.assertEquals(nis, entries.get(0));
+            BibEntryAssert.assertEquals(nis, entries.get(0));
         }
     }
 
@@ -149,13 +150,14 @@ public class MedlinePlainImporterTest {
                         + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16");
         List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
-        BibEntry expectedEntry = new BibEntry();
-        expectedEntry.setField("comment",
-                "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
-                        + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n" + "Comment10"
-                        + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n" + "Comment14" + "\n"
-                        + "Comment15" + "\n" + "Comment16");
-        BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            BibEntry expectedEntry = new BibEntry();
+            expectedEntry.setField("comment",
+                    "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
+                            + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
+                            + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
+                            + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+        }
     }
 
     @Test
@@ -165,7 +167,7 @@ public class MedlinePlainImporterTest {
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setField("keywords", "Female, Male");
-            BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 
@@ -181,8 +183,8 @@ public class MedlinePlainImporterTest {
 
             BibEntry expectedEntry = new BibEntry();
             expectedEntry.setType("article");
-            expectedEntry.setField("keywords", "Female");
-            BibtexEntryAssert.assertEquals(Arrays.asList(expectedEntry), actualEntries);
+            expectedEntry.setField("keywords", "Female")
+            Assert.assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
 

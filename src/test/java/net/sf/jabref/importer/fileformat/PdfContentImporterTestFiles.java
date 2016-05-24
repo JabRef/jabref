@@ -11,7 +11,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.BeforeClass;
@@ -52,7 +52,7 @@ public class PdfContentImporterTestFiles {
         PdfContentImporter importer = new PdfContentImporter();
         Path pdfFile = Paths.get(PdfContentImporter.class.getResource(pdfFileName).toURI());
         List<BibEntry> result = importer.importDatabase(pdfFile, Charset.defaultCharset()).getDatabase().getEntries();
-        BibtexEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
+        BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
     }
 
 }

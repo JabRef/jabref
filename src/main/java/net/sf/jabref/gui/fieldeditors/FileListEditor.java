@@ -26,6 +26,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +51,7 @@ import javax.swing.table.TableCellRenderer;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.external.AutoSetLinks;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -112,8 +115,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
 
         JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
-        auto = new JButton(Localization.lang("Auto"));
-        JButton download = new JButton(Localization.lang("Download"));
+        auto = new JButton(Localization.lang("Get fulltext"));
+        JButton download = new JButton(Localization.lang("Download from URL"));
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
@@ -199,7 +202,28 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (row >= 0) {
                 FileListEntry entry = tableModel.getEntry(row);
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(entry.link);
+                    String path = "";
+                    // absolute path
+                    if (Paths.get(entry.link).isAbsolute()) {
+                        path = Paths.get(entry.link).toString();
+                    } else {
+                        // relative to file folder
+                        for (String folder : databaseContext.getFileDirectory()) {
+                            Path file = Paths.get(folder, entry.link);
+                            if (Files.exists(file)) {
+                                path = file.toString();
+                                break;
+                            }
+                        }
+                    }
+                    if (!path.isEmpty()) {
+                        JabRefDesktop.openFolderAndSelectFile(path);
+                    } else {
+                        JOptionPane.showMessageDialog(frame,
+                                Localization.lang("File not found"),
+                                Localization.lang("Error"),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (IOException ex) {
                     LOGGER.debug("Cannot open folder", ex);
                 }
@@ -391,7 +415,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      *
      * @param entry      The entry to edit.
      * @param openBrowse True to indicate that a Browse dialog should be immediately opened.
-     * @return true if the edit was accepted, false if it was cancelled.
+     * @return true if the edit was accepted, false if it was canceled.
      */
     private boolean editListEntry(FileListEntry entry, boolean openBrowse) {
         if (editor == null) {
@@ -416,27 +440,24 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE.execute(net.sf.jabref.util.Util.autoSetLinks(entries, null, null, tableModel, databaseContext, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                auto.setEnabled(true);
+        JabRefExecutorService.INSTANCE
+                .execute(AutoSetLinks.autoSetLinks(entries, null, null, tableModel, databaseContext, e -> {
+                    auto.setEnabled(true);
 
-                if (e.getID() > 0) {
-                    entryEditor.updateField(FileListEditor.this);
-                    adjustColumnWidth();
-                    frame.output(Localization.lang("Finished automatically setting external links."));
-                } else {
-                    frame.output(Localization.lang("Finished automatically setting external links.")
-                            + " " + Localization.lang("No files found."));
+                    if (e.getID() > 0) {
+                        entryEditor.updateField(this);
+                        adjustColumnWidth();
+                        frame.output(Localization.lang("Finished automatically setting external links."));
+                    } else {
+                        frame.output(Localization.lang("Finished automatically setting external links.") + " "
+                                + Localization.lang("No files found."));
 
-                    // auto download file as no file found before
-                    frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
-                }
-                // reset
-                auto.setEnabled(true);
-            }
-        }, dialog));
-
+                        // auto download file as no file found before
+                        frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+                    }
+                    // reset
+                    auto.setEnabled(true);
+                } , dialog));
     }
 
     /**
@@ -466,7 +487,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     /**
      * This is the callback method that the DownloadExternalFile class uses to report the result
-     * of a download operation. This call may never come, if the user cancelled the operation.
+     * of a download operation. This call may never come, if the user canceled the operation.
      *
      * @param file The FileListEntry linking to the resulting local file.
      */

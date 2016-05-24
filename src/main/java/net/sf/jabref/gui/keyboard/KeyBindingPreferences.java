@@ -1,20 +1,22 @@
 package net.sf.jabref.gui.keyboard;
 
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.util.OS;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.awt.*;
+import java.awt.AWTError;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.List;
+
+import javax.swing.KeyStroke;
+
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.util.OS;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class KeyBindingPreferences {
 

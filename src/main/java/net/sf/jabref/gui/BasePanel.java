@@ -19,10 +19,8 @@ import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -62,6 +60,8 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
+import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
 import net.sf.jabref.exporter.SaveDatabaseAction;
@@ -76,14 +76,15 @@ import net.sf.jabref.external.FindFullTextAction;
 import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
-import net.sf.jabref.groups.GroupSelector;
-import net.sf.jabref.groups.GroupTreeNode;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.groups.GroupAddRemoveDialog;
+import net.sf.jabref.gui.groups.GroupSelector;
+import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
 import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
@@ -110,7 +111,6 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.importer.AppendDatabaseAction;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
@@ -125,9 +125,6 @@ import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.DatabaseChangeEvent;
-import net.sf.jabref.model.database.DatabaseChangeEvent.ChangeType;
-import net.sf.jabref.model.database.DatabaseChangeListener;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -146,9 +143,10 @@ import net.sf.jabref.sql.DBExporterAndImporterFactory;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DbConnectAction;
 import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.sql.exporter.DBExporter;
+import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 import ca.odell.glazedlists.event.ListEventListener;
+import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
@@ -158,12 +156,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
+    // Divider size for BaseFrame split pane. 0 means non-resizable.
+    private static final int SPLIT_PANE_DIVIDER_SIZE = 4;
+
     private final BibDatabase database;
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
 
     // To contain instantiated entry editors. This is to save time
-    private BasePanelMode mode;
+    // As most enums, this must not be null
+    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private EntryEditor currentEditor;
 
     private PreviewPanel currentPreview;
@@ -242,7 +244,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         File file = bibDatabaseContext.getDatabaseFile();
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
-        this.database.addDatabaseChangeListener(new GroupTreeUpdater());
+        this.database.registerListener(new GroupTreeListener());
 
         if (file == null) {
             if (database.hasEntries()) {
@@ -364,93 +366,66 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         });
 
+        //when you modify this action be sure to adjust Actions.DELETE
+        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.CUT, (BaseAction) () -> {
             runCommand(Actions.COPY);
-            List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (!bes.isEmpty()) {
-                // Create a CompoundEdit to make the action undoable.
-                NamedCompound ce = new NamedCompound(
-                        (bes.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
-                // Loop through the list of entries, and delete them.
-                for (BibEntry be : bes) {
-                    ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
-                    database.removeEntry(be);
-                    ensureNotShowing(be);
-                }
-                frame.output(formatOutputMessage(Localization.lang("Cut"), bes.size()));
-                ce.end();
-                undoManager.addEdit(ce);
-                markBaseChanged();
-
-                //no entry is selected anymore, thus hide the preview panel
-                hideBottomComponent();
+            List<BibEntry> entries = mainTable.getSelectedEntries();
+            if (entries.isEmpty()) {
+                return;
             }
+
+            NamedCompound compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
+            for (BibEntry entry : entries) {
+                compound.addEdit(new UndoableRemoveEntry(database, entry, BasePanel.this));
+                database.removeEntry(entry);
+                ensureNotShowingBottomPanel(entry);
+            }
+            compound.end();
+            undoManager.addEdit(compound);
+
+            frame.output(formatOutputMessage(Localization.lang("Cut"), entries.size()));
+            markBaseChanged();
         });
 
+        //when you modify this action be sure to adjust Actions.CUT,
+        //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.DELETE, (BaseAction) () -> {
-            List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (!bes.isEmpty()) {
-                if (showDeleteConfirmationDialog(bes.size())) {
-                    // Create a CompoundEdit to make the action undoable.
-                    NamedCompound ce = new NamedCompound(
-                            (bes.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
-                    // Loop through the list of entries, and delete them.
-                    for (BibEntry be : bes) {
-                        ce.addEdit(new UndoableRemoveEntry(database, be, BasePanel.this));
-                        database.removeEntry(be);
-                        ensureNotShowing(be);
-                    }
-                    markBaseChanged();
-                    frame.output(formatOutputMessage(Localization.lang("Deleted"), bes.size()));
-                    ce.end();
-                    undoManager.addEdit(ce);
-                }
-                //no entry is selected anymore, thus hide the preview panel
-                hideBottomComponent();
+            List<BibEntry> entries = mainTable.getSelectedEntries();
+            if (entries.isEmpty()) {
+                return;
             }
+            if (!showDeleteConfirmationDialog(entries.size())) {
+                return;
+            }
+
+            NamedCompound compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
+            for (BibEntry entry : entries) {
+                compound.addEdit(new UndoableRemoveEntry(database, entry, BasePanel.this));
+                database.removeEntry(entry);
+                ensureNotShowingBottomPanel(entry);
+            }
+            compound.end();
+            undoManager.addEdit(compound);
+
+            markBaseChanged();
+            frame.output(formatOutputMessage(Localization.lang("Deleted"), entries.size()));
         });
 
         // The action for pasting entries or cell contents.
-        // Edited by Seb Wills <saw27@mrao.cam.ac.uk> on 14-Apr-04:
         //  - more robust detection of available content flavors (doesn't only look at first one offered)
         //  - support for parsing string-flavor clipboard contents which are bibtex entries.
         //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
         //                       (b) copy and paste entries between multiple instances of JabRef (since
         //         only the text representation seems to get as far as the X clipboard, at least on my system)
         actions.put(Actions.PASTE, (BaseAction) () -> {
-            // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
-            Transferable content = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-            if (content != null) {
-                Collection<BibEntry> bes = null;
-                if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
-                    // We have determined that the clipboard data is a set of entries.
-                    try {
-                        bes = (Collection<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
-                    } catch (UnsupportedFlavorException | ClassCastException ex) {
-                        LOGGER.warn("Could not paste this type", ex);
-                    } catch (IOException ex) {
-                        LOGGER.warn("Could not paste", ex);
-                    }
-                } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                    try {
-                        BibtexParser bp = new BibtexParser(
-                                new StringReader((String) content.getTransferData(DataFlavor.stringFlavor)));
-                        BibDatabase db = bp.parse().getDatabase();
-                        LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
-                        if (db.hasEntries()) {
-                            bes = db.getEntries();
-                        }
-                    } catch (UnsupportedFlavorException ex) {
-                        LOGGER.warn("Could not paste this type", ex);
-                    } catch (Throwable ex) {
-                        LOGGER.warn("Could not paste", ex);
-                    }
-
-                }
+                Collection<BibEntry> bes = new ClipBoardManager().extractBibEntriesFromClipboard();
 
                 // finally we paste in the entries (if any), which either came from TransferableBibtexEntries
                 // or were parsed from a string
-                if ((bes != null) && (!bes.isEmpty())) {
+                if (!bes.isEmpty()) {
 
                     NamedCompound ce = new NamedCompound(
                             (bes.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
@@ -492,8 +467,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                     highlightEntry(firstBE);
                 }
-            }
-
         });
 
         actions.put(Actions.SELECT_ALL, (BaseAction) mainTable::selectAll);
@@ -538,7 +511,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String errorMessage = "";
             boolean connectedToDB;
 
-
             // run first, in EDT:
             @Override
             public void init() {
@@ -573,29 +545,29 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // run second, on a different thread:
             @Override
             public void run() {
-
-                if (connectedToDB) {
-
-                    final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                    try {
-                        frame.output(Localization.lang("Attempting SQL export..."));
-                        final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                        final DBExporter exporter = factory.getExporter(dbs.getServerType());
-                        exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
-                        dbs.isConfigValid(true);
-                    } catch (Exception ex) {
-                        final String preamble = Localization
-                                .lang("Could not export to SQL database for the following reason:");
-                        errorMessage = SQLUtil.getExceptionMessage(ex);
-                        LOGGER.info("Could not export to SQL database", ex);
-                        dbs.isConfigValid(false);
-                        JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                                Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-                    }
-
-                    bibDatabaseContext.getMetaData().setDBStrings(dbs);
+                if (!connectedToDB) {
+                    return;
                 }
+
+                final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
+
+                try {
+                    frame.output(Localization.lang("Attempting SQL export..."));
+                    final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
+                    final DatabaseExporter exporter = factory.getExporter(dbs.getDbPreferences().getServerType());
+                    exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
+                    dbs.isConfigValid(true);
+                } catch (Exception ex) {
+                    final String preamble = Localization
+                            .lang("Could not export to SQL database for the following reason:");
+                    errorMessage = SQLUtil.getExceptionMessage(ex);
+                    LOGGER.info("Could not export to SQL database", ex);
+                    dbs.isConfigValid(false);
+                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
+                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
+                }
+
+                bibDatabaseContext.getMetaData().setDBStrings(dbs);
             }
 
             // run third, on EDT:
@@ -606,7 +578,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (errorMessage.isEmpty()) {
                     if (connectedToDB) {
                         final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-                        frame.output(Localization.lang("%0 export successful", dbs.getServerType()));
+                        frame.output(Localization.lang("%0 export successful", dbs.getDbPreferences().getServerType().getFormattedName()));
                     }
                 } else { // show an error dialog if an error occurred
                     final String preamble = Localization
@@ -633,7 +605,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             List<BibEntry> entries;
             int numSelected;
-            boolean cancelled;
+            boolean canceled;
 
 
             // Run first, in EDT:
@@ -660,7 +632,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // First check if any entries have keys set already. If so, possibly remove
                 // them from consideration, or warn about overwriting keys.
                 // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
-                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
+                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext(); ) {
                     bes = i.next();
                     if (bes.getCiteKey() != null) {
                         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -678,7 +650,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             }
                             if (answer == JOptionPane.NO_OPTION) {
                                 // Ok, break off the operation.
-                                cancelled = true;
+                                canceled = true;
                                 return;
                             }
                             // No need to check more entries, because the user has already confirmed
@@ -688,14 +660,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                HashMap<BibEntry, Object> oldvals = new HashMap<>();
+                Map<BibEntry, Object> oldvals = new HashMap<>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
                 if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     for (BibEntry entry : entries) {
                         bes = entry;
                         // Store the old value:
-                        oldvals.put(bes, bes.getField(BibEntry.KEY_FIELD));
+                        oldvals.put(bes, bes.getCiteKey());
                         database.setCiteKeyForEntry(bes, null);
                     }
                 }
@@ -707,7 +679,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     bes = entry;
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
-                            bes.getField(BibEntry.KEY_FIELD)));
+                            bes.getCiteKey()));
                 }
                 ce.end();
                 undoManager.addEdit(ce);
@@ -717,7 +689,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void update() {
                 database.setFollowCrossrefs(true);
-                if (cancelled) {
+                if (canceled) {
                     frame.unblock();
                     return;
                 }
@@ -887,19 +859,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     item.openLink();
                 }));
 
-        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> {
-            JabRefExecutorService.INSTANCE.execute(() -> {
-                final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                        bibDatabaseContext.getFileDirectory());
-                for (final File f : files) {
-                    try {
-                        JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
-                    } catch (IOException e) {
-                        LOGGER.info("Could not open folder", e);
-                    }
+        actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
+            final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
+                    bibDatabaseContext.getFileDirectory());
+            for (final File f : files) {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
                 }
-            });
-        });
+            }
+        }));
 
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
@@ -1058,7 +1028,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             csd.setVisible(true);
         });
 
-        actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame, getDatabase()));
+        actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this));
@@ -1238,7 +1208,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             etd.setVisible(true);
             actualType = etd.getChoice();
         }
-        if (actualType != null) { // Only if the dialog was not cancelled.
+        if (actualType != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {
@@ -1285,26 +1255,31 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
 
-    /**
-     * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
-     * one or more groups are marked
-     */
-    private class GroupTreeUpdater implements DatabaseChangeListener {
+    private class GroupTreeListener {
 
-        @Override
-        public void databaseChanged(final DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.ADDED_ENTRY) && Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
-                    && frame.groupToggle.isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(e.getEntry());
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            // Automatically add new entry to the selected group (or set of groups)
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
+                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
                     // it is possible that the user selected nothing. Therefore, checked for "!= null"
                     for (final TreePath tree : selection) {
-                        ((GroupTreeNode) tree.getLastPathComponent()).addToGroup(entries);
+                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
                     }
                 }
                 SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
             }
+
+            // Update group display (for example to reflect that the number of contained entries has changed)
+            frame.getGroupSelector().revalidateGroups();
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            // Update group display in order to take changes into account
+            frame.getGroupSelector().revalidateGroups();
         }
     }
 
@@ -1312,13 +1287,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
      * harvest words from the entry
      */
-    private class SearchAutoCompleterUpdater implements DatabaseChangeListener {
+    private class SearchAutoCompleteListener {
 
-        @Override
-        public void databaseChanged(DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                searchAutoCompleter.addBibtexEntry(e.getEntry());
-            }
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -1326,13 +1304,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Ensures that auto completers are up to date when entries are changed AKA Let the auto completer, if any, harvest
      * words from the entry
      */
-    private class AutoCompletersUpdater implements DatabaseChangeListener {
+    private class AutoCompleteListener {
 
-        @Override
-        public void databaseChanged(DatabaseChangeEvent e) {
-            if ((e.getType() == ChangeType.CHANGED_ENTRY) || (e.getType() == ChangeType.ADDED_ENTRY)) {
-                BasePanel.this.autoCompleters.addEntry(e.getEntry());
-            }
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -1381,8 +1362,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void createMainTable() {
-        database.addDatabaseChangeListener(tableModel.getEventList());
-        database.addDatabaseChangeListener(SpecialFieldDatabaseChangeListener.getInstance());
+        database.registerListener(tableModel.getListSynchronizer());
+        database.registerListener(SpecialFieldDatabaseChangeListener.getInstance());
 
         tableFormat = new MainTableFormat(database);
         tableFormat.updateTableFormat();
@@ -1450,7 +1431,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
                 final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNode node = path == null ? null : (GroupTreeNode) path.getLastPathComponent();
+                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path.getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
@@ -1506,7 +1487,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setupMainPanel() {
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setDividerSize(GUIGlobals.SPLIT_PANE_DIVIDER_SIZE);
+        splitPane.setDividerSize(SPLIT_PANE_DIVIDER_SIZE);
 
         // check whether a mainTable already existed and a floatSearch was active
         boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
@@ -1545,7 +1526,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Set up name autocompleter for search:
         instantiateSearchAutoCompleter();
-        this.getDatabase().addDatabaseChangeListener(new SearchAutoCompleterUpdater());
+        this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
@@ -1553,7 +1534,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
                     autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
-            this.getDatabase().addDatabaseChangeListener(new AutoCompletersUpdater());
+            this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
             autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);
@@ -1784,13 +1765,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * Closes the entry editor if it is showing the given entry.
-     *
-     * @param be a <code>BibEntry</code> value
+     * Closes the entry editor or preview panel if it is showing the given entry.
      */
-    public void ensureNotShowing(BibEntry be) {
-        if ((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == be)) {
-            selectionListener.entryEditorClosing(currentEditor);
+    public void ensureNotShowingBottomPanel(BibEntry entry) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry)) ||
+                ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
+            hideBottomComponent();
         }
     }
 
@@ -2066,7 +2046,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         }
                     }
                     if (entry == null) {
-                        output(Localization.lang("No url defined") + '.');
+                        output(Localization.lang("No URL defined") + '.');
                     } else {
                         try {
                             JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
@@ -2285,7 +2265,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Add the entry we are leaving to the history:
             if (showing != null) {
                 previousEntries.add(showing);
-                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE) {
+                if (previousEntries.size() > Globals.prefs.getInt(JabRefPreferences.MAX_BACK_HISTORY_SIZE)) {
                     previousEntries.remove(0);
                 }
             }
@@ -2368,7 +2348,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         private final BibEntry entry;
         private final BasePanel basePanel;
 
-
         public SearchAndOpenFile(final BibEntry entry, final BasePanel basePanel) {
             this.entry = entry;
             this.basePanel = basePanel;
@@ -2388,7 +2367,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (basePanel.getBibDatabaseContext().getFileDirectory().size() > 0) {
+            if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
                 for (final String mdDir : mdDirs) {
                     dirs.add(new File(mdDir));

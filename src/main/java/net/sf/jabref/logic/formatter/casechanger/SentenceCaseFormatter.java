@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
-import net.sf.jabref.logic.formatter.CaseChangers;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -21,7 +20,7 @@ public class SentenceCaseFormatter implements Formatter {
      */
     @Override
     public String format(String input) {
-        Title title = new Title(CaseChangers.TO_LOWER_CASE.format(input));
+        Title title = new Title(new LowerCaseFormatter().format(input));
 
         title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 

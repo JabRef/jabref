@@ -15,14 +15,6 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.*;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,7 +23,23 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.swing.filechooser.FileFilter;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for export formats based on templates.
@@ -240,7 +248,7 @@ public class ExportFormat implements IExportFormat {
                     LOGGER.warn(missingFormatters);
                 }
             }
-            HashMap<String, Layout> layouts = new HashMap<>();
+            Map<String, Layout> layouts = new HashMap<>();
             Layout layout;
 
             ExportFormats.entryNumber = 0;
@@ -285,7 +293,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Write footer
-            if ((endLayout != null) && (this.encoding != null)) {
+            if (endLayout != null) {
                 ps.write(endLayout.doLayout(databaseContext, this.encoding));
                 missingFormatters.addAll(endLayout.getMissingFormatters());
             }
@@ -303,6 +311,12 @@ public class ExportFormat implements IExportFormat {
 
     }
 
+    @Override
+    public void performExport(final BibDatabaseContext databaseContext, Path file, final Charset encoding,
+            List<BibEntry> entries) throws Exception {
+        performExport(databaseContext, file.getFileName().toString(), encoding, entries);
+    }
+
     /**
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.
@@ -310,7 +324,7 @@ public class ExportFormat implements IExportFormat {
      * @param lfFileName The layout filename.
      */
     private static Map<String, String> readFormatterFile(String lfFileName) {
-        HashMap<String, String> formatters = new HashMap<>();
+        Map<String, String> formatters = new HashMap<>();
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {

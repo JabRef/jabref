@@ -16,13 +16,11 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.awt.BorderLayout;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -37,22 +35,25 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import net.sf.jabref.*;
-import net.sf.jabref.importer.*;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLDownload;
-import net.sf.jabref.model.entry.BibEntry;
 
 public class IEEEXploreFetcher implements EntryFetcher {
 
@@ -115,9 +116,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         try {
             //open the search URL
-            URL url = new URL(IEEEXploreFetcher.URL_SEARCH);
-
-            URLDownload dl = new URLDownload(url);
+            URLDownload dl = new URLDownload(IEEEXploreFetcher.URL_SEARCH);
 
             //add request header
             dl.addParameters("Accept", "application/json");
@@ -157,8 +156,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //fetch the raw Bibtex results from IEEEXplore
-            URL bibtexURL = new URL(createBibtexQueryURL(searchResultsJson));
-            String bibtexPage = new URLDownload(bibtexURL).downloadToString();
+            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson)).downloadToString();
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
@@ -166,7 +164,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error while fetching from %0", "IEEEXplore"),
+                status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
@@ -183,7 +181,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
         } catch (ConnectException | UnknownHostException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", "IEEEXplore"), DIALOG_TITLE,
+            status.showMessage(Localization.lang("Could not connect to %0", getTitle()), DIALOG_TITLE,
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException | JSONException e) {
             status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
@@ -200,12 +198,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "IEEEXploreHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_IEEEXPLORE;
     }
 
     /**
-     * This method is called by the dialog when the user has cancelled the import.
+     * This method is called by the dialog when the user has canceled the import.
      */
     @Override
     public void stopFetching() {

@@ -30,6 +30,7 @@ import javax.swing.text.BadLocationException;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,9 +65,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             StringWriter stringWriter = new StringWriter();
             try {
                 editorPane.getEditorKit().write(stringWriter, editorPane.getDocument(), editorPane.getSelectionStart(), editorPane.getSelectionEnd());
-            } catch (IOException e) {
-                LOGGER.warn("Cannot write preview", e);
-            } catch (BadLocationException e) {
+            } catch (BadLocationException | IOException e) {
                 LOGGER.warn("Cannot write preview", e);
             }
 

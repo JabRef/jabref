@@ -15,7 +15,12 @@
 */
 package net.sf.jabref.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Collection;
 
 import javax.swing.Box;
@@ -28,7 +33,7 @@ import javax.swing.JScrollPane;
  */
 public class SidePane extends JPanel {
 
-    private final Dimension PREFERRED_SIZE = new Dimension(GUIGlobals.SPLIT_PANE_DIVIDER_LOCATION, 100);
+    private final Dimension PREFERRED_SIZE = new Dimension(175, 100);
 
     private final GridBagLayout gridBagLayout = new GridBagLayout();
 
@@ -67,15 +72,20 @@ public class SidePane extends JPanel {
     public void setComponents(Collection<SidePaneComponent> comps) {
         mainPanel.removeAll();
 
-        constraint.weighty = 0;
-        for (Component c : comps) {
+        int totalWeights = 0;
+        for (SidePaneComponent c : comps) {
+            constraint.weighty = c.getRescalingWeight();
+            totalWeights += c.getRescalingWeight();
             gridBagLayout.setConstraints(c, constraint);
             mainPanel.add(c);
         }
-        constraint.weighty = 1;
-        Component bx = Box.createVerticalGlue();
-        gridBagLayout.setConstraints(bx, constraint);
-        mainPanel.add(bx);
+        if(totalWeights <= 0) {
+            // Fill vertical space so that components start at top
+            constraint.weighty = 1;
+            Component bx = Box.createVerticalGlue();
+            gridBagLayout.setConstraints(bx, constraint);
+            mainPanel.add(bx);
+        }
 
         revalidate();
         repaint();

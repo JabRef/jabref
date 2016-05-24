@@ -1,8 +1,13 @@
 package net.sf.jabref.importer;
 
-import net.sf.jabref.JabRef;
-import net.sf.jabref.gui.JabRefFrame;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JTextField;
+
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefMain;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.importer.fetcher.ACMPortalFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
@@ -14,10 +19,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import javax.swing.*;
-
-import java.util.ArrayList;
 
 /**
  * Tests GeneralFetcher
@@ -58,7 +59,7 @@ public class GeneralFetcherTest {
     @Before
     public void setUp() {
         JabRefMain.main(new String[0]);
-        GeneralFetcherTest.jrf = JabRef.mainFrame;
+        GeneralFetcherTest.jrf = JabRefGUI.getMainFrame();
         GeneralFetcherTest.spm = GeneralFetcherTest.jrf.getSidePaneManager();
         GeneralFetcherTest.acmpf = new ACMPortalFetcher();
         ArrayList<EntryFetcher> al = new ArrayList<>();

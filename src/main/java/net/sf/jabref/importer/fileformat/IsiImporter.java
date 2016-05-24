@@ -25,8 +25,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.formatter.CaseChangers;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -139,7 +140,7 @@ public class IsiImporter extends ImportFormat {
 
                 String s = map.get(aSubsup);
                 if (s.toUpperCase().equals(s)) {
-                    s = CaseChangers.TO_TITLE_CASE.format(s);
+                    s = new TitleCaseFormatter().format(s);
                     map.put(aSubsup, s);
                 }
             }

@@ -1,10 +1,10 @@
 package net.sf.jabref.model.database;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}

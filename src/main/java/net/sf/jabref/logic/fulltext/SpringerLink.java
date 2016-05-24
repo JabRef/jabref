@@ -15,20 +15,21 @@
  */
 package net.sf.jabref.logic.fulltext;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
+import java.util.Optional;
+
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.BibEntry;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.logic.util.DOI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
-
-import java.net.URL;
-import java.io.*;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * FullTextFinder implementation that attempts to find a PDF URL at SpringerLink.

@@ -47,27 +47,25 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.BibDatabaseContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.IdGenerator;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -77,10 +75,11 @@ import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
@@ -111,9 +110,7 @@ class StyleSelectDialog {
     private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
 
     private boolean okPressed;
-
     private final StyleLoader loader;
-
     private final OpenOfficePreferences preferences;
 
 
@@ -128,15 +125,19 @@ class StyleSelectDialog {
     }
 
     private void init() {
-
-
         setupPopupMenu();
 
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
+            addDialog.setDirectoryPath(preferences.getCurrentStyle());
             addDialog.setVisible(true);
-            addDialog.getFileName().ifPresent(loader::addStyle);
+            addDialog.getFileName().ifPresent(fileName -> {
+                if (loader.addStyleIfValid(fileName)) {
+                    preferences.setCurrentStyle(fileName);
+                }
+            });
             updateStyles();
+
         });
         addButton.setToolTipText(Localization.lang("Add style file"));
 
@@ -150,7 +151,6 @@ class StyleSelectDialog {
         preview.setEntry(prevEntry);
 
         setupTable();
-
         updateStyles();
 
         // Build dialog
@@ -173,13 +173,11 @@ class StyleSelectDialog {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                        if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                            JOptionPane.showMessageDialog(diag,
-                                    Localization
-                                            .lang("You must select a valid style file."),
-                                    Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
+                    JOptionPane.showMessageDialog(diag, Localization.lang("You must select a valid style file."),
+                            Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 okPressed = true;
                 storeSettings();
                 diag.dispose();
@@ -259,24 +257,21 @@ class StyleSelectDialog {
         popup.add(remove);
         popup.add(reload);
 
-
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
-        edit.addActionListener(actionEvent -> {
-            getSelectedStyle().ifPresent(style -> {
-                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-                String link = style.getPath();
-                try {
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
-                    } else {
-                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
-                                new UnknownExternalFileType("jstyle"));
-                    }
-                } catch (IOException e) {
-                    LOGGER.warn("Problem open style file editor", e);
+        edit.addActionListener(actionEvent -> getSelectedStyle().ifPresent(style -> {
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+            String link = style.getPath();
+            try {
+                if (type.isPresent()) {
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+                } else {
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
+                            new UnknownExternalFileType("jstyle"));
                 }
-            });
-        });
+            } catch (IOException e) {
+                LOGGER.warn("Problem open style file editor", e);
+            }
+        }));
 
         // Add action listener to "Show" menu item, which is supposed to open the style file in a dialog:
         show.addActionListener(actionEvent -> getSelectedStyle().ifPresent(this::displayStyle));
@@ -316,6 +311,7 @@ class StyleSelectDialog {
      * settings, and add the styles to the list of styles.
      */
     private void updateStyles() {
+
         table.clearSelection();
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
@@ -362,6 +358,7 @@ class StyleSelectDialog {
         }
         return Optional.empty();
     }
+
     /**
      * Get the currently selected style.
      * @return the selected style, or empty if no style is selected.
@@ -428,7 +425,7 @@ class StyleSelectDialog {
     }
 
     private void tablePopup(MouseEvent e) {
-            popup.show(e.getComponent(), e.getX(), e.getY());
+        popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
     private void displayStyle(OOBibStyle style) {
@@ -482,7 +479,7 @@ class StyleSelectDialog {
                 preview.setLayout(style.getReferenceFormat("default"));
 
                 // Update the preview's entry:
-                SwingUtilities.invokeLater((Runnable) () -> {
+                SwingUtilities.invokeLater(() -> {
                     preview.update();
                     preview.scrollRectToVisible(toRect);
                 });
@@ -500,7 +497,7 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, ".jstyle"));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();
@@ -550,5 +547,10 @@ class StyleSelectDialog {
             }
             return Optional.empty();
         }
+
+        public void setDirectoryPath(String path) {
+            this.newFile.setText(path);
+        }
+
     }
 }

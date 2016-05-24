@@ -1,10 +1,11 @@
 package net.sf.jabref.gui.actions;
 
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.EntryType;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
 
 public class ChangeTypeAction extends AbstractAction {
 

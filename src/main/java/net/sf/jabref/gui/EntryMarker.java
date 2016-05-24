@@ -15,17 +15,18 @@
  */
 package net.sf.jabref.gui;
 
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class EntryMarker {
 
@@ -147,7 +148,7 @@ public class EntryMarker {
      * @param ce
      */
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
-        TreeSet<Object> owners = new TreeSet<>();
+        Set<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
             entry.getFieldOptional(InternalBibtexFields.OWNER).ifPresent(owners::add);
         }

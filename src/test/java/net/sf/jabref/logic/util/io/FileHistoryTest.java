@@ -1,14 +1,15 @@
 package net.sf.jabref.logic.util.io;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
+
+import net.sf.jabref.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.jabref.JabRefPreferences;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class FileHistoryTest {
 

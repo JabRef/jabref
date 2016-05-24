@@ -1,15 +1,16 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -60,7 +61,6 @@ public class BiblioscapeImporterTestTypes {
         entry.setField("year", "1999");
         entry.setType(expectedBibType);
 
-        Assert.assertEquals(1, bibEntries.size());
-        BibtexEntryAssert.assertEquals(entry, bibEntries.get(0));
+        Assert.assertEquals(Collections.singletonList(entry), bibEntries);
     }
 }

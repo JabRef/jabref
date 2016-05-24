@@ -1,9 +1,14 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
 
 public class SearchQueryHighlightObservable {
 
@@ -68,7 +73,7 @@ public class SearchQueryHighlightObservable {
         if (searchQuery.isGrammarBasedSearch()) {
             pattern = Optional.empty();
         } else if (searchQuery.isRegularExpression()) {
-            pattern = getPatternForWords(Arrays.asList(searchQuery.getQuery()), true, searchQuery.isCaseSensitive());
+            pattern = getPatternForWords(Collections.singletonList(searchQuery.getQuery()), true, searchQuery.isCaseSensitive());
         } else {
             pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
         }

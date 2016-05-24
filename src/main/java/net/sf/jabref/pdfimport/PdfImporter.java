@@ -37,7 +37,6 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.maintable.MainTable;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
@@ -141,8 +140,8 @@ public class PdfImporter {
         }
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
-        boolean neverShow = Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE);
-        int globalChoice = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE);
+        int globalChoice = Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
 
         List<BibEntry> res = new ArrayList<>();
@@ -271,14 +270,14 @@ public class PdfImporter {
         etd.setVisible(true);
         EntryType type = etd.getChoice();
 
-        if (type != null) { // Only if the dialog was not cancelled.
+        if (type != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, type.getName());
             try {
                 panel.getDatabase().insertEntry(be);
 
                 // Set owner/timestamp if options are enabled:
-                ArrayList<BibEntry> list = new ArrayList<>();
+                List<BibEntry> list = new ArrayList<>();
                 list.add(be);
                 UpdateField.setAutomaticFields(list, true, true);
 

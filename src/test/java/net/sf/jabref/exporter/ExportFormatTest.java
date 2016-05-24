@@ -1,31 +1,30 @@
 package net.sf.jabref.exporter;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.BibDatabaseContext;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import com.google.common.base.Charsets;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import com.google.common.base.Charsets;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class ExportFormatTest {
@@ -58,11 +57,7 @@ public class ExportFormatTest {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
         exportFormat.performExport(databaseContext, filename, charset, entries);
-        try (FileInputStream stream = new FileInputStream(tmpFile);
-                InputStreamReader reader = new InputStreamReader(stream, charset)) {
-            char[] buffer = new char[512];
-            assertEquals(-1, reader.read(buffer)); // Empty file
-        }
+        assertEquals(Collections.emptyList(), Files.readAllLines(tmpFile.toPath()));
     }
 
     @Test(expected = NullPointerException.class)

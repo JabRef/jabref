@@ -7,10 +7,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
@@ -18,6 +15,9 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 /**
  * Uses XMPUtils to get one BibEntry for a PDF-File.
@@ -56,7 +56,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             return Optional.empty();
         }
 
-        PdfImporter pi = new PdfImporter(JabRef.mainFrame, JabRef.mainFrame.getCurrentBasePanel(), JabRef.mainFrame.getCurrentBasePanel().mainTable, -1);
+        PdfImporter pi = new PdfImporter(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable, -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
         if (res.getEntries().size() == 1) {

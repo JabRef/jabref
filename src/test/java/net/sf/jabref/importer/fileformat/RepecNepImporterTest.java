@@ -12,6 +12,8 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -55,7 +57,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest1.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibtexEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
 
@@ -65,7 +67,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest2.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibtexEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
 
@@ -75,7 +77,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest3.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibtexEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
     }
 

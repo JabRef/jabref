@@ -13,6 +13,12 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +62,7 @@ public class SilverPlatterImporterTest {
     public final void testImportEntries() throws Exception {
         try (InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
             List<BibEntry> entries = testImporter.importDatabase(txtFile, Charset.defaultCharset()).getDatabase().getEntries();
-            BibtexEntryAssert.assertEquals(bibIn, entries);
+            BibEntryAssert.assertEquals(bibIn, entries);
         }
     }
 }

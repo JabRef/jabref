@@ -1,12 +1,11 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.importer.OutputPrinterToNull;
 
 import org.junit.Assert;
 import org.junit.Before;

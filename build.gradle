@@ -31,10 +31,11 @@ apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
+apply from: 'localization.gradle'
 
 group = "net.sf.jabref"
-version = "3.3dev"
-project.ext.threeDotVersion = "3.2.0.1"
+version = "3.4dev"
+project.ext.threeDotVersion = "3.3.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -68,9 +69,12 @@ dependencies {
 
     compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
 
-    compile 'org.apache.pdfbox:pdfbox:1.8.11'
-    compile 'org.apache.pdfbox:fontbox:1.8.11'
-    compile 'org.apache.pdfbox:jempbox:1.8.11'
+    // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
+    compile 'org.apache.pdfbox:pdfbox:1.8.12'
+    compile 'org.apache.pdfbox:fontbox:1.8.12'
+    compile 'org.apache.pdfbox:jempbox:1.8.12'
+
+    // required for reading write-procted PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.54'
 
     compile 'commons-cli:commons-cli:1.3.1'
@@ -79,6 +83,8 @@ dependencies {
     compile 'org.openoffice:jurt:4.1.2'
     compile 'org.openoffice:ridl:4.1.2'
     compile 'org.openoffice:unoil:4.1.2'
+
+    compile 'com.googlecode.java-diff-utils:diffutils:1.3.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -96,7 +102,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.jsoup:jsoup:1.8.3'
+    compile 'org.jsoup:jsoup:1.9.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.5'
@@ -106,7 +112,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'com.github.tomakehurst:wiremock:1.58'
-	testCompile 'org.assertj:assertj-swing-junit:3.2.0'
+	testCompile 'org.assertj:assertj-swing-junit:3.3.0'
 }
 
 sourceSets {
@@ -209,7 +215,7 @@ javadoc {
 test {
     testLogging {
         events "failed"
-        exceptionFormat "short"
+        exceptionFormat "full"
     }
 }
 
@@ -325,6 +331,7 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
+    toolVersion = '6.17'
 }
 
 task release(dependsOn: ["media", "releaseJar"]) {

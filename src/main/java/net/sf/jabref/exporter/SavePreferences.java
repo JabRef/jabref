@@ -1,10 +1,10 @@
 package net.sf.jabref.exporter;
 
+import java.nio.charset.Charset;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.config.SaveOrderConfig;
-
-import java.nio.charset.Charset;
 
 public class SavePreferences {
 

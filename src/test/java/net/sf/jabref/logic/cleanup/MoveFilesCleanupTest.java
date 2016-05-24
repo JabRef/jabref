@@ -2,16 +2,23 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
-import net.sf.jabref.*;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -39,17 +46,41 @@ public class MoveFilesCleanupTest {
     @Test
     public void movesFileFromSubfolder() throws IOException {
         File subfolder = bibFolder.newFolder();
-        File tempFile = new File(subfolder, "test.pdf");
-        tempFile.createNewFile();
+        File fileBefore = new File(subfolder, "test.pdf");
+        assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
         BibEntry entry = new BibEntry();
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
+        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         cleanup.cleanup(entry);
 
-        assertFalse(new File(subfolder, "test.pdf").exists());
-        assertTrue(new File(pdfFolder, "test.pdf").exists());
+        assertFalse(fileBefore.exists());
+        File fileAfter = new File(pdfFolder, "test.pdf");
+        assertTrue(fileAfter.exists());
+
+        assertEquals(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), "")), entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderMultiple() throws IOException {
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+        assertTrue(fileBefore.createNewFile());;
+        assertTrue(fileBefore.exists());
+
+        BibEntry entry = new BibEntry();
+        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""), fileField, new ParsedFileField("","",""))));
+
+        cleanup.cleanup(entry);
+
+        assertFalse(fileBefore.exists());
+        File fileAfter = new File(pdfFolder, "test.pdf");
+        assertTrue(fileAfter.exists());
+
+        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
+                new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("","",""))), entry.getField("file"));
     }
 }

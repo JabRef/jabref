@@ -15,28 +15,10 @@ public class CompositeFormatTest {
             Assert.assertEquals("No Change", f.format("No Change"));
         }
         {
-            LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {new LayoutFormatter() {
-
-                @Override
-                public String format(String fieldText) {
-                    return fieldText + fieldText;
-                }
-
-            }, new LayoutFormatter() {
-
-                @Override
-                public String format(String fieldText) {
-                    return "A" + fieldText;
-                }
-
-            }, new LayoutFormatter() {
-
-                @Override
-                public String format(String fieldText) {
-                    return "B" + fieldText;
-                }
-
-            }});
+            LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {
+                    fieldText -> fieldText + fieldText,
+                    fieldText -> "A" + fieldText,
+                    fieldText -> "B" + fieldText});
 
             Assert.assertEquals("BAff", f.format("f"));
         }

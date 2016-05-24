@@ -1,8 +1,11 @@
 package net.sf.jabref.logic.config;
 
-import net.sf.jabref.JabRefPreferences;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
-import java.util.*;
+import net.sf.jabref.JabRefPreferences;
 
 /**
  * Stores the save order config from MetaData
@@ -201,6 +204,12 @@ public class SaveOrderConfig {
         res.add(Boolean.toString(sortCriteria[2].descending));
 
         return res;
+    }
+
+    public static SaveOrderConfig getDefaultSaveOrder() {
+        SaveOrderConfig standard = new SaveOrderConfig();
+        standard.setSaveInOriginalOrder();
+        return standard;
     }
 
 }

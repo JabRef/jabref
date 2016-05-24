@@ -24,50 +24,63 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.UIManager;
 
+import net.sf.jabref.exporter.CustomExportList;
+import net.sf.jabref.exporter.ExportComparator;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.formatter.BibtexFieldFormatters;
-import net.sf.jabref.logic.formatter.bibtexfields.*;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.exporter.CustomExportList;
-import net.sf.jabref.exporter.ExportComparator;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.importer.CustomImportList;
-import net.sf.jabref.logic.remote.RemotePreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
-
 public class JabRefPreferences {
+
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
@@ -182,7 +195,6 @@ public class JabRefPreferences {
     public static final String GROUP_SHOW_DYNAMIC = "groupShowDynamic";
     public static final String GROUP_SHOW_ICONS = "groupShowIcons";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_SELECT_MATCHES = "groupSelectMatches";
     public static final String GROUP_SHOW_OVERLAPPING = "groupShowOverlapping";
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
@@ -243,7 +255,6 @@ public class JabRefPreferences {
     public static final String MARK_IMPORTED_ENTRIES = "markImportedEntries";
     public static final String GENERATE_KEYS_AFTER_INSPECTION = "generateKeysAfterInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
-    public static final String PUT_BRACES_AROUND_CAPITALS = "putBracesAroundCapitals";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";
     public static final String DO_NOT_RESOLVE_STRINGS_FOR = "doNotResolveStringsFor";
     public static final String PREVIEW_PRINT_BUTTON = "previewPrintButton";
@@ -251,6 +262,10 @@ public class JabRefPreferences {
     public static final String PREVIEW_0 = "preview0";
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
+    public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
+    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
+    public static final String LINE_LENGTH = "lineLength"; // Maximum
+    public static final String INDENT = "indent"; //	Indent for formatted bibtex output.
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -272,7 +287,6 @@ public class JabRefPreferences {
     public static final String DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP = "displayKeyWarningDialogAtStartup";
     public static final String DIALOG_WARNING_FOR_EMPTY_KEY = "dialogWarningForEmptyKey";
     public static final String DIALOG_WARNING_FOR_DUPLICATE_KEY = "dialogWarningForDuplicateKey";
-    public static final String ALLOW_TABLE_EDITING = "allowTableEditing";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -314,8 +328,6 @@ public class JabRefPreferences {
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
-    public static final String USER_FILE_DIR_INDIVIDUAL = "userFileDirIndividual";
-    public static final String USER_FILE_DIR_IND_LEGACY = "userFileDirInd_Legacy";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
@@ -328,8 +340,6 @@ public class JabRefPreferences {
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
     public static final String CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS = "CleanUpRenamePDFonlyRelativePaths";
     public static final String CLEANUP_UPGRADE_EXTERNAL_LINKS = "CleanUpUpgradeExternalLinks";
-    public static final String CLEANUP_SUPERSCRIPTS = "CleanUpSuperscripts";
-    public static final String CLEANUP_UNICODE = "CleanUpUnicode";
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
@@ -341,8 +351,8 @@ public class JabRefPreferences {
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
-        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", BibtexFieldFormatters.NORMALIZE_PAGES));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("date", BibtexFieldFormatters.NORMALIZE_DATE));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup("date", new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
@@ -351,6 +361,10 @@ public class JabRefPreferences {
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
+
+    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
+    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
+    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -394,7 +408,6 @@ public class JabRefPreferences {
 
     private final Preferences prefs;
 
-    private final Set<String> putBracesAroundCapitalsFields = new HashSet<>(4);
     private final Set<String> nonWrappableFields = new HashSet<>(5);
     private GlobalLabelPattern keyPattern;
 
@@ -417,7 +430,7 @@ public class JabRefPreferences {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public String[] fileDirForDatabase;
+    public List<String> fileDirForDatabase;
 
     // The following field is used as a global variable during the export of a database.
     // It is used to hold custom name formatters defined by a custom export filter.
@@ -446,7 +459,7 @@ public class JabRefPreferences {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(JabRef.class);
+        prefs = Preferences.userNodeForPackage(JabRefMain.class);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -547,7 +560,7 @@ public class JabRefPreferences {
                 PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-        defaults.put(NUMBER_COL_WIDTH, GUIGlobals.NUMBER_COL_LENGTH);
+        defaults.put(NUMBER_COL_WIDTH, 32);
         defaults.put(WORKING_DIRECTORY, USER_HOME);
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
@@ -582,6 +595,9 @@ public class JabRefPreferences {
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_PANE_POS_X, 0);
         defaults.put(SEARCH_PANE_POS_Y, 0);
+
+        defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
+
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -591,7 +607,6 @@ public class JabRefPreferences {
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
-        defaults.put(GROUP_SELECT_MATCHES, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, "keywords");
         defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
         defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
@@ -602,7 +617,7 @@ public class JabRefPreferences {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
-        defaults.put(HIGHLIGHT_GROUPS_MATCHING, "");
+        defaults.put(HIGHLIGHT_GROUPS_MATCHING, "all");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(GROUPS_VISIBLE_ROWS, 8);
@@ -618,7 +633,7 @@ public class JabRefPreferences {
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
         defaults.put(MENU_FONT_SIZE, 11);
-        defaults.put(TABLE_ROW_PADDING, GUIGlobals.TABLE_ROW_PADDING);
+        defaults.put(TABLE_ROW_PADDING, 9);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
         defaults.put(TABLE_BACKGROUND, "255:255:255");
@@ -695,7 +710,6 @@ public class JabRefPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(ALLOW_TABLE_EDITING, Boolean.FALSE);
         defaults.put(DIALOG_WARNING_FOR_DUPLICATE_KEY, Boolean.TRUE);
         defaults.put(DIALOG_WARNING_FOR_EMPTY_KEY, Boolean.TRUE);
         defaults.put(DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
@@ -704,7 +718,7 @@ public class JabRefPreferences {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(SEARCH_MODE_FLOAT, Boolean.FALSE);
-        defaults.put(DEFAULT_LABEL_PATTERN, "[authors3][year]");
+        defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
         defaults.put(PREVIEW_0,
@@ -750,7 +764,6 @@ public class JabRefPreferences {
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url");
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
-        defaults.put(PUT_BRACES_AROUND_CAPITALS, "");//"title;journal;booktitle;review;abstract");
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
         defaults.put(MARK_IMPORTED_ENTRIES, Boolean.TRUE);
@@ -822,11 +835,12 @@ public class JabRefPreferences {
         //defaults.put("tempDir", System.getProperty("java.io.tmpdir"));
         LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
-        defaults.put(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
+
+        defaults.put(PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
+        defaults.put(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
-        defaults.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        defaults.put(PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
@@ -843,14 +857,17 @@ public class JabRefPreferences {
         defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+        defaults.put(MAX_BACK_HISTORY_SIZE, 10);
+        defaults.put(LINE_LENGTH, 65);
+        defaults.put(INDENT, 4);
+    }
 
+    public String getUser() {
         try {
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '@' + InetAddress.getLocalHost().getHostName()); // Legacy setting name - was a bug: @ not allowed inside BibTeX comment text. Retained for backward comp.
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName()); // Valid setting name
+            return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
-            LOGGER.info("Hostname not found.", ex);
-            defaults.put(USER_FILE_DIR_IND_LEGACY, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
-            defaults.put(USER_FILE_DIR_INDIVIDUAL, Globals.FILE_FIELD + Globals.DIR_SUFFIX + '-' + get(DEFAULT_OWNER));
+            LOGGER.debug("Hostname not found.", ex);
+            return get(DEFAULT_OWNER);
         }
     }
 
@@ -889,21 +906,9 @@ public class JabRefPreferences {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
     }
 
-    public boolean putBracesAroundCapitals(String fieldName) {
-        return putBracesAroundCapitalsFields.contains(fieldName);
-    }
-
     public void updateSpecialFieldHandling() {
-        putBracesAroundCapitalsFields.clear();
-        String fieldString = get(PUT_BRACES_AROUND_CAPITALS);
-        if (!fieldString.isEmpty()) {
-            String[] fields = fieldString.split(";");
-            for (String field : fields) {
-                putBracesAroundCapitalsFields.add(field.trim());
-            }
-        }
         nonWrappableFields.clear();
-        fieldString = get(NON_WRAPPABLE_FIELDS);
+        String fieldString = get(NON_WRAPPABLE_FIELDS);
         if (!fieldString.isEmpty()) {
             String[] fields = fieldString.split(";");
             for (String field : fields) {
@@ -1274,6 +1279,17 @@ public class JabRefPreferences {
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_PRIOPT, number);
     }
 
+    public void purgeCustomEntryTypes() {
+        int number = 0;
+        if(getCustomEntryType(number) != null) {
+            number++;
+        }
+
+        for(int i = 0; i < number; i++) {
+            purgeCustomEntryTypes(i);
+        }
+    }
+
     /**
      * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
      *
@@ -1349,15 +1365,12 @@ public class JabRefPreferences {
     }
 
     private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
-
-        storage.put(CLEANUP_SUPERSCRIPTS, preset.isCleanUpSuperscripts());
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
         storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
         storage.put(CLEANUP_RENAME_PDF_ONLY_RELATIVE_PATHS, preset.isRenamePdfOnlyRelativePaths());
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
-        storage.put(CLEANUP_UNICODE, preset.isConvertUnicodeToLatex());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().convertToString()));

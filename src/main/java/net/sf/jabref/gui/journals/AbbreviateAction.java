@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui.journals;
 
+import java.util.List;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-
-import java.util.List;
 
 /**
  * Converts journal full names to either iso or medline abbreviations for all selected entries.

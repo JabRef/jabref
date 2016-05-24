@@ -15,10 +15,17 @@
  */
 package net.sf.jabref.gui.preftabs;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
+import java.awt.BorderLayout;
+import java.util.Optional;
+
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
@@ -27,9 +34,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Optional;
+import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
 
 class AdvancedTab extends JPanel implements PrefsTab {
 
@@ -41,12 +47,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
-    private final JabRef jabRef;
     private final RemotePreferences remotePreferences;
 
 
-    public AdvancedTab(JabRefPreferences prefs, JabRef jabRef) {
-        this.jabRef = jabRef;
+    public AdvancedTab(JabRefPreferences prefs) {
         preferences = prefs;
         remotePreferences = new RemotePreferences(preferences);
 
@@ -78,12 +82,12 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(HelpFiles.remoteHelp).getHelpButton());
+        p.add(new HelpAction(HelpFiles.REMOTE).getHelpButton());
         builder.append(p);
 
         // IEEE
         builder.nextLine();
-        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplorer"));
+        builder.appendSeparator(Localization.lang("Search %0", "IEEEXplore"));
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(useIEEEAbrv);
@@ -146,7 +150,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
         remotePreferences.setUseRemoteServer(useRemoteServer.isSelected());
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(jabRef), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
         } else {
             Globals.REMOTE_LISTENER.stop();
         }

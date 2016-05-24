@@ -24,15 +24,22 @@
 
 package net.sf.jabref.importer.fetcher;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import javax.swing.*;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
@@ -40,6 +47,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,8 +70,8 @@ public class ADSFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return null;
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_ADS;
     }
 
     @Override
@@ -75,9 +83,8 @@ public class ADSFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             /* Remove "doi:" scheme identifier */
-            query = query.replaceAll("^(doi:|DOI:)", "");
             /* Allow fetching only 1 key */
-            String key = query;
+            String key = query.replaceAll("^(doi:|DOI:)", "");
             /* Query ADS and load the results into the BibDatabase */
             status.setStatus(Localization.lang("Processing %0", key));
             BibDatabase bd = importADSEntries(key, status);

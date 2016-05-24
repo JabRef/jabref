@@ -15,15 +15,19 @@
 */
 package net.sf.jabref.gui.fieldeditors;
 
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.model.entry.EntryUtil;
-
-import java.awt.*;
-
-import javax.swing.*;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea.

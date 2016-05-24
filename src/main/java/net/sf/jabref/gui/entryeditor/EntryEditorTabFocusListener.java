@@ -15,15 +15,18 @@
 */
 package net.sf.jabref.gui.entryeditor;
 
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
 
 /*
  * Focus listener that fires the storeFieldAction when a TextArea loses

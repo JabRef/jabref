@@ -44,7 +44,7 @@ import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.importer.fileformat.BibtexImporter;
+import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -71,13 +71,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from
-        // the bib file:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for checking for new custom entry types loaded from the bib file:
+        POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
+        // Add the action for converting legacy entries in ExplicitGroup
+        POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
         // Add the action for the new external file handling system in version 2.3:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
+        POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
-        OpenDatabaseAction.POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
+        POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
@@ -248,9 +249,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     result = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
-                    result = null;
+                    result = ParserResult.getNullResult();
                 }
-                if ((result == null) || (result == ParserResult.INVALID_FORMAT)) {
+                if (result.isNullResult()) {
                     JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
 
@@ -337,18 +338,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Open and parse file
         ParserResult result = new BibtexImporter().importDatabase(fileToOpen.toPath(), defaultEncoding);
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            NamedCompound compound = new NamedCompound("SpecialFieldSync");
-            for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
+            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                NamedCompound compound = new NamedCompound("SpecialFieldSync");
+                for (BibEntry entry : result.getDatabase().getEntries()) {
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
+                }
+                LOGGER.debug("Synchronized special fields based on keywords");
             }
-            LOGGER.info("Synchronized special fields based on keywords");
-        }
-
-        if (!result.getMetaData().isGroupTreeValid()) {
-            result.addWarning(Localization.lang(
-                    "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."));
-        }
 
         return result;
     }

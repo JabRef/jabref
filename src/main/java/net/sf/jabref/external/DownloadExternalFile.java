@@ -15,7 +15,19 @@
 */
 package net.sf.jabref.external;
 
-import net.sf.jabref.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.JabRefFrame;
@@ -25,17 +37,8 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -47,7 +50,7 @@ import java.util.Optional;
  * method on the callback FileListEditor, which then needs to take care of linking to the file.
  * The local filename is passed as an argument to the downloadCompleted() method.
  * <p/>
- * If the download is cancelled, or failed, the user is informed. The callback is never called.
+ * If the download is canceled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
@@ -121,7 +124,7 @@ public class DownloadExternalFile {
         final URL urlF = url;
         final URLDownload udlF = udl;
 
-        JabRefExecutorService.INSTANCE.execute((Runnable) () -> {
+        JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 udlF.downloadToFile(tmp);
             } catch (IOException e2) {
@@ -170,23 +173,19 @@ public class DownloadExternalFile {
         editor = new FileListEntryEditor(frame, entry, true, false, databaseContext);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
-        editor.setExternalConfirm(new ConfirmCloseFileListEntryEditor() {
-
-            @Override
-            public boolean confirmClose(FileListEntry entry) {
-                File f = directory == null ? new File(entry.link) : expandFilename(directory, entry.link);
-                if (f.isDirectory()) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
-                            Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                if (f.exists()) {
-                    return JOptionPane.showConfirmDialog(frame,
-                            Localization.lang("'%0' exists. Overwrite file?", f.getName()),
-                            Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
-                } else {
-                    return true;
-                }
+        editor.setExternalConfirm(closeEntry -> {
+            File f = directory == null ? new File(closeEntry.link) : expandFilename(directory, closeEntry.link);
+            if (f.isDirectory()) {
+                JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
+                        Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (f.exists()) {
+                return JOptionPane.showConfirmDialog(frame,
+                        Localization.lang("'%0' exists. Overwrite file?", f.getName()),
+                        Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION;
+            } else {
+                return true;
             }
         });
         if (dontShowDialog) {
@@ -231,7 +230,7 @@ public class DownloadExternalFile {
                 LOGGER.info("Cannot delete temporary file");
             }
         } else {
-            // Cancelled. Just delete the temp file:
+            // Canceled. Just delete the temp file:
             if (downloadFinished && !tmp.delete()) {
                 LOGGER.info("Cannot delete temporary file");
             }
@@ -269,7 +268,8 @@ public class DownloadExternalFile {
     }
     // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
-        String plannedName = bibtexKey == null ? "set-filename" : bibtexKey;
+        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader.getRepository());
+
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
         }
@@ -327,7 +327,7 @@ public class DownloadExternalFile {
                 // No occurrence, or at the end
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') > 0) {
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
                     return "";
                 } else {
                     return suffix; // return the first one we found, anyway.
@@ -335,7 +335,7 @@ public class DownloadExternalFile {
             } else {
                 // Check if there are path separators in the suffix - if so, it is definitely
                 // not a proper suffix, so we should give up:
-                if (link.substring(index + 1).indexOf('/') > 0) {
+                if (link.substring(index + 1).indexOf('/') >= 1) {
                     return "";
                 } else {
                     return link.substring(index + 1);

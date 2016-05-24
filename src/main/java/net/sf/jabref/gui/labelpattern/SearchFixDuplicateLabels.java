@@ -15,20 +15,21 @@
  */
 package net.sf.jabref.gui.labelpattern;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableKeyChange;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.JCheckBox;
+
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
+import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Function for resolving duplicate BibTeX keys.
@@ -49,7 +50,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         // Find all multiple occurences of BibTeX keys.
         dupes = new HashMap<>();
 
-        HashMap<String, BibEntry> foundKeys = new HashMap<>();
+        Map<String, BibEntry> foundKeys = new HashMap<>();
         BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
             String key = entry.getCiteKey();
@@ -63,7 +64,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         dupes.get(key).add(entry);
                     } else {
                         // Construct a list of entries for this key:
-                        ArrayList<BibEntry> al = new ArrayList<>();
+                        List<BibEntry> al = new ArrayList<>();
                         // Add both the first one we found, and the one we found just now:
                         al.add(foundKeys.get(key));
                         al.add(entry);

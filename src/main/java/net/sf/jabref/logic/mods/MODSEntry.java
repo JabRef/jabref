@@ -16,7 +16,12 @@
 package net.sf.jabref.logic.mods;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,10 +31,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -107,7 +112,7 @@ class MODSEntry {
         }
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            id = bibtex.getField(BibEntry.KEY_FIELD);
+            id = bibtex.getCiteKey();
         }
         if (bibtex.hasField("place")) {
             if (CHARFORMAT) {

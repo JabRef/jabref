@@ -1,17 +1,18 @@
 package net.sf.jabref.importer.fetcher;
 
+import java.util.Objects;
+import java.util.Optional;
+
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.entry.BibEntry;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A class for fetching DOIs from CrossRef
@@ -45,7 +46,7 @@ public class CrossRef {
             JSONArray items = response.getBody().getObject().getJSONObject("message").getJSONArray("items");
             String dataTitle = items.getJSONObject(0).getJSONArray("title").getString(0);
             String dataDOI = items.getJSONObject(0).getString("DOI");
-            LOGGER.info("DOI " + dataDOI + "for " + title + "found.");
+            LOGGER.info("DOI " + dataDOI + " for " + title + " found.");
             return DOI.build(dataDOI);
         } catch (UnirestException e) {
             LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);
@@ -54,18 +55,19 @@ public class CrossRef {
     }
 
     private static String enhanceQuery(String query, BibEntry entry) {
+        StringBuilder enhancedQuery = new StringBuilder(query);
         // author
         String author = entry.getField("author");
-        if (author != null && !author.isEmpty()) {
-            query = query.concat("+" + author);
+        if ((author != null) && !author.isEmpty()) {
+            enhancedQuery.append('+').append(author);
         }
 
         // year
         String year = entry.getField("year");
-        if (year != null && !year.isEmpty()) {
-            query = query.concat("+" + year);
+        if ((year != null) && !year.isEmpty()) {
+            enhancedQuery.append('+').append(year);
         }
 
-        return query;
+        return enhancedQuery.toString();
     }
 }

@@ -1,11 +1,11 @@
 package net.sf.jabref.exporter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,16 +16,17 @@ import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.ExplicitGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
+import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.EntryTypes;
@@ -194,9 +195,9 @@ public class BibDatabaseWriterTest {
     }
 
     @Test
-    public void writeGroups() throws IOException {
+    public void writeGroups() throws IOException, ParseException {
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING));
         metaData.setGroups(groupRoot);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -206,18 +207,16 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
     @Test
-    public void writeGroupsAndEncoding() throws IOException {
+    public void writeGroupsAndEncoding() throws IOException, ParseException {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.add(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addChild(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);
@@ -229,9 +228,7 @@ public class BibDatabaseWriterTest {
                 + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
                 + "0 AllEntriesGroup:;" + Globals.NEWLINE
                 + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE
-                + Globals.NEWLINE
-                + "@Comment{jabref-meta: groupsversion:3;}" + Globals.NEWLINE, stringWriter.toString());
+                + "}" + Globals.NEWLINE, stringWriter.toString());
         // @formatter:on
     }
 
@@ -257,21 +254,25 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws IOException {
-        EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
-        BibEntry entry = new BibEntry();
-        entry.setType("customizedType");
-        database.insertEntry(entry);
+        try {
+            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
+            BibEntry entry = new BibEntry();
+            entry.setType("customizedType");
+            database.insertEntry(entry);
 
-        databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
-                new SavePreferences());
+            databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.singletonList(entry),
+                    new SavePreferences());
 
-        assertEquals(
-                Globals.NEWLINE +
-                        "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
-                        + "@Comment{jabref-meta: databaseType:bibtex;}"
-                        + Globals.NEWLINE + Globals.NEWLINE
-                        + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
-                stringWriter.toString());
+            assertEquals(
+                    Globals.NEWLINE +
+                            "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+                            + "@Comment{jabref-meta: databaseType:bibtex;}"
+                            + Globals.NEWLINE + Globals.NEWLINE
+                            + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
+                    stringWriter.toString());
+        } finally {
+            EntryTypes.removeAllCustomEntryTypes();
+        }
     }
 
     @Test

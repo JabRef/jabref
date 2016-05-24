@@ -17,10 +17,17 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
 
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
@@ -84,7 +91,7 @@ public class SilverPlatterImporter extends ImportFormat {
         }
         String[] entries = sb.toString().split("__::__");
         String type = "";
-        HashMap<String, String> h = new HashMap<>();
+        Map<String, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
                 continue;

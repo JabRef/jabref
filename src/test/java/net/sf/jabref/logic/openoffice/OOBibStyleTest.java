@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRef;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -63,7 +63,7 @@ public class OOBibStyleTest {
     @Test
     public void testAuthorYearAsFile() throws URISyntaxException, IOException {
 
-        File defFile = Paths.get(JabRef.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile();
 
         OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
@@ -495,4 +495,26 @@ public class OOBibStyleTest {
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }
+
+
+    public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
+        String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
+        OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationRepository.class));
+        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
+        List<BibEntry> entries = new ArrayList<>();
+        BibDatabase database = new BibDatabase();
+
+        BibEntry entry = new BibEntry();
+        entry.setType("article");
+        entry.setField("author", "Alpha von Beta and Gamma Epsilon and Ypsilon Tau");
+        entry.setField("title", "JabRef Manual");
+        entry.setField("year", "2016");
+        database.insertEntry(entry);
+        entries.add(entry);
+        entryDBMap.put(entry, database);
+        assertEquals("von Beta, Epsilon, and Tau, 2016",
+                style.getCitationMarker(entries, entryDBMap, true, null, null));
+
+    }
+
 }

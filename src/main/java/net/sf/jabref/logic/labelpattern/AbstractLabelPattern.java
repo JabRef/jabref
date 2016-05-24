@@ -17,7 +17,11 @@
 */
 package net.sf.jabref.logic.labelpattern;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A small table, where an entry type is associated with a label pattern (an
@@ -47,7 +51,7 @@ public abstract class AbstractLabelPattern {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         AbstractLabelPattern that = (AbstractLabelPattern) o;
@@ -101,8 +105,7 @@ public abstract class AbstractLabelPattern {
      * Checks whether this pattern is customized or the default value.
      */
     public final boolean isDefaultValue(String key) {
-        final Object _obj = data.get(key);
-        return _obj == null;
+        return data.get(key) == null;
     }
 
     /**

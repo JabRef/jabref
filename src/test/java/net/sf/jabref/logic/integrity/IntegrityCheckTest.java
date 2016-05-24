@@ -2,29 +2,38 @@ package net.sf.jabref.logic.integrity;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-import net.sf.jabref.*;
-import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
 
 public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
@@ -103,6 +112,7 @@ public class IntegrityCheckTest {
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
@@ -129,6 +139,12 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testBooktitleChecks() {
+        assertCorrect(createContext("booktitle", "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", "proceedings"));
+        assertWrong(createContext("booktitle", "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", "proceedings"));
+    }
+
+    @Test
     public void testPageNumbersChecks() {
         assertCorrect(createContext("pages", "1--2"));
         assertCorrect(createContext("pages", "12"));
@@ -143,6 +159,50 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("pages", "7+,41--43,73"));
     }
 
+    @Test
+    public void testBiblatexPageNumbersChecks() {
+        assertCorrect(withMode(createContext("pages", "1--2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "12"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "1-2"), BibDatabaseMode.BIBLATEX)); // only diff to bibtex
+        assertCorrect(withMode(createContext("pages", "1,2,3"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "43+"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("pages", "1 2"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("pages", "{1}-{2}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7,41,73--97"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7,41--42,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7--11,41--43,73"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("pages", "7+,41--43,73"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testBibStringChecks() {
+        assertCorrect(createContext("title", "Not a single hash mark"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "#einstein# and #newton#"));
+        assertWrong(createContext("month", "#jan"));
+        assertWrong(createContext("author", "#einstein# #amp; #newton#"));
+    }
+
+    @Test
+    public void testHTMLCharacterChecks() {
+        assertCorrect(createContext("title", "Not a single {HTML} character"));
+        assertCorrect(createContext("month", "#jan#"));
+        assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
+        assertWrong(createContext("author", "Lenhard, J&#227;rg"));
+        assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
+    }
+
+    @Test
+    public void testISSNChecks() {
+        assertCorrect(createContext("issn", "0020-7217"));
+        assertCorrect(createContext("issn", "0020-7217"));
+        assertCorrect(createContext("issn", "1687-6180"));
+        assertCorrect(createContext("issn", "2434-561x"));
+        assertWrong(createContext("issn", "Some other stuff"));
+        assertWrong(createContext("issn", "0020-7218"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
@@ -152,7 +212,7 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
-    public BibDatabaseContext createContext(String field, String value, MetaData metaData) {
+    private BibDatabaseContext createContext(String field, String value, MetaData metaData) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
@@ -160,7 +220,7 @@ public class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 
-    public BibDatabaseContext createContext(String field, String value) {
+    private BibDatabaseContext createContext(String field, String value) {
         return createContext(field, value, new MetaData());
     }
 

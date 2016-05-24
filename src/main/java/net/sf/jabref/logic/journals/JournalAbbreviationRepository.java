@@ -15,10 +15,18 @@
 */
 package net.sf.jabref.logic.journals;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.util.*;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
@@ -87,7 +95,7 @@ public class JournalAbbreviationRepository {
     }
 
     public void addEntries(List<Abbreviation> abbreviationsToAdd) {
-        abbreviationsToAdd.forEach(abbreviation -> addEntry(abbreviation));
+        abbreviationsToAdd.forEach(this::addEntry);
     }
 
     public SortedSet<Abbreviation> getAbbreviations() {

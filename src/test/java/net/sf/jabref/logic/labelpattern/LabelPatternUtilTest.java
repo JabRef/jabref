@@ -1,16 +1,17 @@
 package net.sf.jabref.logic.labelpattern;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class LabelPatternUtilTest {
 
@@ -720,6 +721,14 @@ public class LabelPatternUtilTest {
         // Use preferences setting
         assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA"));
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r"));
+    }
+
+    @Test
+    public void testApplyModifiers() {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Green Scheduling of Whatever");
+        assertEquals("GSW", LabelPatternUtil.makeLabel(entry, "shorttitleINI"));
+        assertEquals("GreenSchedulingWhatever", LabelPatternUtil.makeLabel(entry, "shorttitle"));
     }
 
 }

@@ -1,25 +1,5 @@
 package net.sf.jabref.gui.desktop;
 
-import net.sf.jabref.*;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeEntryEditor;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
-import net.sf.jabref.gui.*;
-import net.sf.jabref.gui.desktop.os.*;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
-
-import javax.swing.*;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +7,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
+import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypeEntryEditor;
+import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileListEntry;
+import net.sf.jabref.gui.FileListEntryEditor;
+import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.desktop.os.DefaultDesktop;
+import net.sf.jabref.gui.desktop.os.Linux;
+import net.sf.jabref.gui.desktop.os.NativeDesktop;
+import net.sf.jabref.gui.desktop.os.OSX;
+import net.sf.jabref.gui.desktop.os.Windows;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * TODO: Replace by http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html
@@ -38,6 +46,7 @@ public class JabRefDesktop {
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
+    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -80,7 +89,7 @@ public class JabRefDesktop {
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
-                link = Util.ARXIV_LOOKUP_PREFIX + link;
+                link = ARXIV_LOOKUP_PREFIX + link;
             }
         }
 
@@ -193,7 +202,7 @@ public class JabRefDesktop {
                 // Finally, open the file:
                 return openExternalFileAnyFormat(databaseContext, link, Optional.of(newType));
             } else {
-                // Cancelled:
+                // Canceled:
                 frame.output(cancelMessage);
                 return false;
             }
@@ -229,7 +238,7 @@ public class JabRefDesktop {
                 // Finally, open the link:
                 return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
             } else {
-                // Cancelled:
+                // Canceled:
                 frame.output(cancelMessage);
                 return false;
             }

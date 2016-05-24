@@ -21,16 +21,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 /**
  * The menu item used in the popup menu for opening external resources associated

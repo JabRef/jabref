@@ -15,13 +15,20 @@
 */
 package net.sf.jabref.gui;
 
-import com.jgoodies.forms.builder.ButtonBarBuilder;
-import net.sf.jabref.logic.l10n.Localization;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.Timer;
+
+import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * Dialog shown when closing of application needs to wait for a save operation to finish.
@@ -31,7 +38,7 @@ public class WaitForSaveOperation implements ActionListener {
     private final JabRefFrame frame;
     private final JDialog diag;
     private final Timer t = new Timer(500, this);
-    private boolean cancelled;
+    private boolean canceled;
 
 
     public WaitForSaveOperation(JabRefFrame frame) {
@@ -48,7 +55,7 @@ public class WaitForSaveOperation implements ActionListener {
         bb.addButton(cancel);
         bb.addGlue();
         cancel.addActionListener(e -> {
-            cancelled = true;
+            canceled = true;
             t.stop();
             diag.dispose();
         });
@@ -69,8 +76,8 @@ public class WaitForSaveOperation implements ActionListener {
 
     }
 
-    public boolean cancelled() {
-        return cancelled;
+    public boolean canceled() {
+        return canceled;
     }
 
     @Override

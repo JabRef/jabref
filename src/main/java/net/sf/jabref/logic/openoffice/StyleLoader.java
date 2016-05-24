@@ -24,10 +24,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 public class StyleLoader {
 
@@ -64,15 +64,23 @@ public class StyleLoader {
         return result;
     }
 
-    public void addStyle(String filename) {
+    /**
+     * Adds the given style to the list of styles
+     * @param filename The filename of the style
+     * @return True if the added style is valid, false otherwise
+     */
+    public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
-            } else {
+            } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
+                return true;
+            } else {
+                LOGGER.error(String.format("Style with filename %s is invalid", filename));
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
@@ -80,6 +88,7 @@ public class StyleLoader {
         } catch (IOException e) {
             LOGGER.info("Problem reading external style file " + filename, e);
         }
+        return false;
 
     }
 
@@ -89,7 +98,12 @@ public class StyleLoader {
         List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                externalStyles.add(new OOBibStyle(new File(filename), repository, encoding));
+                OOBibStyle style = new OOBibStyle(new File(filename), repository, encoding);
+                if (style.isValid()) { //Problem!
+                    externalStyles.add(style);
+                } else {
+                    LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find external style file " + filename, e);

@@ -48,9 +48,4 @@ public interface ImportInspector {
      *            The entry to add.
      */
     void addEntry(BibEntry entry);
-
-    /**
-     * If this is a graphical dialog, bring it to the front.
-     */
-    void toFront();
 }

@@ -64,7 +64,7 @@ public class FileDialogs {
         // Fix for:
         // http://sourceforge.net/tracker/index.php?func=detail&aid=1538769&group_id=92314&atid=600306
         if (files != null) {
-            return Arrays.asList((String) files);
+            return Collections.singletonList((String) files);
         }
         return Collections.emptyList();
     }

@@ -15,7 +15,10 @@
  */
 package net.sf.jabref.gui.keyboard;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class KeyBindingRepository {
 

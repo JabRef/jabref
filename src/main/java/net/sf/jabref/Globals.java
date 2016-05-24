@@ -37,6 +37,10 @@ public class Globals {
     // Signature written at the top of the .bib file.
     public static final String SIGNATURE = "This file was created with JabRef";
     public static final String ENCODING_PREFIX = "Encoding: ";
+    // Character separating field names that are to be used in sequence as
+    // fallbacks for a single column (e.g. "author/editor" to use editor where
+    // author is not set):
+    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
     // Newlines
     // will be overridden in initialization due to feature #857 @ JabRef.java
     public static String NEWLINE = System.lineSeparator();
@@ -46,8 +50,7 @@ public class Globals {
 
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
 
-    public static final String SELECTOR_META_PREFIX = "selector_";
-    public static final String PROTECTED_FLAG_META = "protectedFlag";
+
 
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
 

@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.gui;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -132,7 +135,7 @@ public class FileListTableModel extends AbstractTableModel {
         }
 
         List<ParsedFileField> fields = FileField.parse(value);
-        ArrayList<FileListEntry> files = new ArrayList<>();
+        List<FileListEntry> files = new ArrayList<>();
 
         for(ParsedFileField entry : fields) {
             if (entry.isEmpty()) {

@@ -15,9 +15,15 @@
 */
 package net.sf.jabref.importer;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,8 +31,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.importer.fileformat.BiblioscapeImporter;
-import net.sf.jabref.importer.fileformat.BibteXMLImporter;
 import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.importer.fileformat.CopacImporter;
 import net.sf.jabref.importer.fileformat.EndnoteImporter;
@@ -43,9 +49,9 @@ import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.importer.fileformat.RepecNepImporter;
 import net.sf.jabref.importer.fileformat.RisImporter;
 import net.sf.jabref.importer.fileformat.SilverPlatterImporter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,7 +73,7 @@ public class ImportFormatReader {
 
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter());
-        formats.add(new BibteXMLImporter());
+        formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter());
         formats.add(new FreeCiteImporter());
@@ -154,9 +160,7 @@ public class ImportFormatReader {
             sb.append("  ");
             sb.append(imFo.getFormatName());
 
-            for (int j = 0; j < pad; j++) {
-                sb.append(' ');
-            }
+            sb.append(StringUtil.repeatSpaces(pad));
 
             sb.append(" : ");
             sb.append(imFo.getId());

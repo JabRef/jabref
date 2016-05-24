@@ -17,7 +17,8 @@ package net.sf.jabref.specialfields;
 
 import java.util.Optional;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JLabel;
 
 import net.sf.jabref.gui.JabRefFrame;
 

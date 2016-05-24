@@ -26,29 +26,48 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.zip.ZipFile;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
+
+import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.*;
-import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.util.FocusRequester;
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JDialog {
+
+    // Column widths for import customization dialog table:
+    private static final int COL_0_WIDTH = 200;
+    private static final int COL_1_WIDTH = 80;
+    private static final int COL_2_WIDTH = 200;
+    private static final int COL_3_WIDTH = 200;
 
     private final JTable customImporterTable;
 
@@ -64,10 +83,10 @@ public class ImportCustomizationDialog extends JDialog {
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
         TableColumnModel cm = customImporterTable.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH);
-        cm.getColumn(3).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH);
+        cm.getColumn(0).setPreferredWidth(COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(COL_2_WIDTH);
+        cm.getColumn(3).setPreferredWidth(COL_3_WIDTH);
         JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -178,7 +197,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new HelpAction(HelpFiles.importCustomizationHelp).getHelpButton();
+        JButton helpButton = new HelpAction(HelpFiles.CUSTOM_IMPORTS).getHelpButton();
 
 
         // Key bindings:
@@ -216,8 +235,8 @@ public class ImportCustomizationDialog extends JDialog {
     */
     @Override
     public Dimension getSize() {
-        int width = GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
-                + GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH;
+        int width = COL_0_WIDTH + COL_1_WIDTH
+                + COL_2_WIDTH + COL_3_WIDTH;
         return new Dimension(width, width / 2);
     }
 

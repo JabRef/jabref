@@ -1,27 +1,30 @@
 package net.sf.jabref.model.database;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.event.TestEventListener;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.IdGenerator;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class BibDatabaseTest {
@@ -29,22 +32,15 @@ public class BibDatabaseTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    private BibDatabase database;
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
+
+        database = new BibDatabase();
     }
 
-    @After
-    public void tearDown() {
-        Globals.prefs = null;
-    }
-
-    /**
-     * Some basic test cases for resolving strings.
-     *
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
     @Test
     public void resolveStrings() throws IOException {
         try (FileInputStream stream = new FileInputStream("src/test/resources/net/sf/jabref/util/twente.bib");
@@ -63,20 +59,16 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void insertEntry() {
-        BibDatabase database = new BibDatabase();
-        assertEquals(Collections.emptyList(), database.getEntries());
-
+    public void insertEntryAddsEntryToEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
         assertEquals(database.getEntries().size(), 1);
         assertEquals(database.getEntryCount(), 1);
-        BibtexEntryAssert.assertEquals(entry, database.getEntries().get(0));
+        assertEquals(entry, database.getEntries().get(0));
     }
 
     @Test
-    public void containsEntryId() {
-        BibDatabase database = new BibDatabase();
+    public void containsEntryIdFindsEntry() {
         BibEntry entry = new BibEntry();
         assertFalse(database.containsEntryWithId(entry.getId()));
         database.insertEntry(entry);
@@ -85,8 +77,6 @@ public class BibDatabaseTest {
 
     @Test(expected = KeyCollisionException.class)
     public void insertEntryWithSameIdThrowsException() {
-        BibDatabase database = new BibDatabase();
-
         BibEntry entry0 = new BibEntry();
         database.insertEntry(entry0);
 
@@ -96,9 +86,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void removeEntry() {
-        BibDatabase database = new BibDatabase();
-
+    public void removeEntryRemovesEntryFromEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
@@ -109,28 +97,24 @@ public class BibDatabaseTest {
 
     @Test(expected = NullPointerException.class)
     public void insertNullEntryThrowsException() {
-        BibDatabase database = new BibDatabase();
         database.insertEntry(null);
         fail();
     }
 
     @Test(expected = NullPointerException.class)
     public void removeNullEntryThrowsException() {
-        BibDatabase database = new BibDatabase();
         database.removeEntry(null);
         fail();
     }
 
     @Test
     public void emptyDatabaseHasNoStrings() {
-        BibDatabase database = new BibDatabase();
         assertEquals(Collections.emptySet(), database.getStringKeySet());
         assertTrue(database.hasNoStrings());
     }
 
     @Test
-    public void insertString() {
-        BibDatabase database = new BibDatabase();
+    public void insertStringUpdatesStringList() {
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
@@ -142,8 +126,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void insertAndRemoveString() {
-        BibDatabase database = new BibDatabase();
+    public void removeStringUpdatesStringList() {
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
         database.removeString(string.getId());
@@ -156,8 +139,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void hasStringLabel() {
-        BibDatabase database = new BibDatabase();
+    public void hasStringLabelFindsString() {
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
         assertTrue(database.hasStringLabel("DSP"));
@@ -166,7 +148,6 @@ public class BibDatabaseTest {
 
     @Test(expected = KeyCollisionException.class)
     public void addSameStringLabelTwiceThrowsKeyCollisionException() {
-        BibDatabase database = new BibDatabase();
         BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
         database.addString(string);
         string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processor");
@@ -176,12 +157,44 @@ public class BibDatabaseTest {
 
     @Test(expected = KeyCollisionException.class)
     public void addSameStringIdTwiceThrowsKeyCollisionException() {
-        BibDatabase database = new BibDatabase();
         String id = IdGenerator.next();
         BibtexString string = new BibtexString(id, "DSP", "Digital Signal Processing");
         database.addString(string);
         string = new BibtexString(id, "VLSI", "Very Large Scale Integration");
         database.addString(string);
         fail();
+    }
+
+    @Test
+    public void insertEntryPostsAddedEntryEvent() {
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.registerListener(tel);
+        database.insertEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void removeEntryPostsRemovedEntryEvent() {
+        BibEntry expectedEntry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.insertEntry(expectedEntry);
+        database.registerListener(tel);
+        database.removeEntry(expectedEntry);
+        BibEntry actualEntry = tel.getBibEntry();
+        assertEquals(expectedEntry, actualEntry);
+    }
+
+    @Test
+    public void changingEntryPostsChangeEntryEvent() {
+        BibEntry entry = new BibEntry();
+        TestEventListener tel = new TestEventListener();
+        database.insertEntry(entry);
+        database.registerListener(tel);
+
+        entry.setField("test", "some value");
+
+        assertEquals(entry, tel.getBibEntry());
     }
 }

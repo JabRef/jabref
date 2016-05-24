@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**

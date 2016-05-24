@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.msbib;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,28 +23,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.logic.layout.LayoutFormatter;
+
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
-import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -68,7 +57,6 @@ import org.w3c.dom.NodeList;
  * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
  */
 class MSBibEntry {
-    private static final Log LOGGER = LogFactory.getLog(MSBibEntry.class);
 
     private String sourceType = "Misc";
     private String bibTexEntry;
@@ -120,6 +108,7 @@ class MSBibEntry {
     private String thesisType;
     private String internetSiteTitle;
     private String dateAccessed;
+    private String doi;
     private String url;
     private String productionCompany;
     private String publicationTitle;
@@ -161,7 +150,7 @@ class MSBibEntry {
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
     // WORD SPACE , SPACE WORD SPACE , SPACE WORD
     // tested using http://www.javaregex.com/test.html
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s*[,]?\\s*(\\w+)\\s*[,]?\\s*(\\w+)\\b");
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w+)\\s?[,]?\\s?(\\w+)\\b");
 
     // Allows 20.3-2007|||20/3-  2007 etc.
     // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
@@ -230,7 +219,7 @@ class MSBibEntry {
         String city = getFromXml(bcol + "City", entry);
         String state = getFromXml(bcol + "StateProvince", entry);
         String country = getFromXml(bcol + "CountryRegion", entry);
-        StringBuffer addressBuffer = new StringBuffer();
+        StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
             addressBuffer.append(city).append(", ");
         }
@@ -279,6 +268,7 @@ class MSBibEntry {
             dateAccessed = null;
         }
 
+        doi = getFromXml(bcol + "DOI", entry);
         url = getFromXml(bcol + "URL", entry);
         productionCompany = getFromXml(bcol + "ProductionCompany", entry);
 
@@ -319,7 +309,7 @@ class MSBibEntry {
         sourceType = getMSBibSourceType(bibtex);
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            tag = bibtex.getField(BibEntry.KEY_FIELD);
+            tag = bibtex.getCiteKey();
         }
 
         if (bibtex.hasField("language")) {
@@ -446,16 +436,17 @@ class MSBibEntry {
         if (bibtex.hasField(MSBIB + "accessed")) {
             dateAccessed = bibtex.getField(MSBIB + "accessed");
         }
+        if (bibtex.hasField("doi")) {
+            doi = bibtex.getField("doi");
+        }
         if (bibtex.hasField("url")) {
-            url = bibtex.getField("url"); /* SM: 2010.10: lower case */
+            url = bibtex.getField("url");
         }
         if (bibtex.hasField(MSBIB + "productioncompany")) {
             productionCompany = bibtex.getField(MSBIB + "productioncompany");
         }
 
-        if (("ElectronicSource".equals(sourceType)
-                || "Art".equals(sourceType)
-                || "Misc".equals(sourceType))
+        if (("ElectronicSource".equals(sourceType) || "Art".equals(sourceType) || "Misc".equals(sourceType))
                 && (bibtex.hasField("title"))) {
             publicationTitle = bibtex.getField("title");
         }
@@ -548,34 +539,17 @@ class MSBibEntry {
             editors = getAuthors(bibtex.getField("editor"));
         }
 
-        boolean FORMATXML = false;
-        if (FORMATXML) {
-            title = format(title);
-            bibTexAbstract = format(bibTexAbstract);
-        }
-    }
-
-    private String format(String value) {
-        if (value == null) {
-            return null;
-        }
-        String result;
-        LayoutFormatter chars = new XMLChars();
-        result = chars.format(value);
-        return result;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private int getLCID(String language) {
         // TODO: add language to LCID mapping
-
         return 0;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     private String getLanguage(int LCID) {
         // TODO: add language to LCID mapping
-
         return "english";
     }
 
@@ -703,18 +677,6 @@ class MSBibEntry {
         return result;
     }
 
-    private Node getDOMrepresentation() {
-        Node result = null;
-        try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-            result = getDOMrepresentation(documentBuilder.newDocument());
-        } catch (ParserConfigurationException e) {
-            LOGGER.warn("Could not create DocumentBuilder", e);
-        }
-        return result;
-    }
-
     private void addField(Document document, Element parent, String name, String value) {
         if (value == null) {
             return;
@@ -748,7 +710,7 @@ class MSBibEntry {
         }
 
         Matcher matcher = ADDRESS_PATTERN.matcher(address);
-        if (matcher.matches() && (matcher.groupCount() > 3)) {
+        if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
@@ -764,7 +726,7 @@ class MSBibEntry {
         }
 
         Matcher matcher = DATE_PATTERN.matcher(date);
-        if (matcher.matches() && (matcher.groupCount() > 3)) {
+        if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "Month" + extra, matcher.group(1));
             addField(document, parent, "Day" + extra, matcher.group(2));
             addField(document, parent, "Year" + extra, matcher.group(3));
@@ -772,7 +734,6 @@ class MSBibEntry {
     }
 
     public Element getDOMrepresentation(Document document) {
-
 
         Element msbibEntry = document.createElement(B_COLON + "Source");
 
@@ -836,9 +797,10 @@ class MSBibEntry {
 
         addDate(document, msbibEntry, dateAccessed, "Accessed");
 
-            /* SM 2010.10 added month export */
+        /* SM 2010.10 added month export */
         addField(document, msbibEntry, "Month", month);
 
+        addField(document, msbibEntry, "DOI", doi);
         addField(document, msbibEntry, "URL", url);
         addField(document, msbibEntry, "ProductionCompany", productionCompany);
         addField(document, msbibEntry, "PublicationTitle", publicationTitle);
@@ -868,7 +830,7 @@ class MSBibEntry {
         addField(document, msbibEntry, BIBTEX + "Price", bibTexPrice);
         addField(document, msbibEntry, BIBTEX + "Size", bibTexSize);
 
-            /* SM: 2010.10 end intype, paper support */
+        /* SM: 2010.10 end intype, paper support */
         addField(document, msbibEntry, BIBTEX + "InType", bibTexInType);
         addField(document, msbibEntry, BIBTEX + "Paper", bibTexPaper);
 
@@ -901,7 +863,7 @@ class MSBibEntry {
         if (authors == null) {
             return;
         }
-        String allAuthors = authors.stream().map(name -> name.getFullname()).collect(Collectors.joining(" and "));
+        String allAuthors = authors.stream().map(PersonName::getFullname).collect(Collectors.joining(" and "));
 
         map.put(type, allAuthors);
     }
@@ -954,7 +916,7 @@ class MSBibEntry {
 
         // Todo: add check for BibTexEntry types
 
-        HashMap<String, String> hm = new HashMap<>();
+        Map<String, String> hm = new HashMap<>();
 
         if (tag != null) {
             hm.put(BibEntry.KEY_FIELD, tag);
@@ -1049,6 +1011,9 @@ class MSBibEntry {
         if (dateAccessed != null) {
             hm.put(MSBIB + "accessed", dateAccessed);
         }
+        if (doi != null) {
+            hm.put("doi", doi);
+        }
         if (url != null) {
             hm.put("url", url);
         }
@@ -1128,26 +1093,6 @@ class MSBibEntry {
 
         entry.setField(hm);
         return entry;
-    }
-
-    /*
-     * render as XML
-     *
-     * TODO This is untested.
-     */
-    @Override
-    public String toString() {
-        StringWriter result = new StringWriter();
-        try {
-            DOMSource source = new DOMSource(getDOMrepresentation());
-            StreamResult streamResult = new StreamResult(result);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.transform(source, streamResult);
-        } catch (TransformerException e) {
-            LOGGER.warn("Could not build XML representation", e);
-        }
-        return result.toString();
     }
 
 }

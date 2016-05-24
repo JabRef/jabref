@@ -26,8 +26,8 @@ public class SilverPlatterImporterTestNotRecognized {
 
     @Test
     public final void testIsNotRecognizedFormat() throws Exception {
-        List<String> notAccept = Arrays.asList("emptyFile.xml", "IsiImporterTest1.isi",
-                "InspecSilverPlatterImporterTest.txt", "oai2.xml", "RisImporterTest1.ris");
+        List<String> notAccept = Arrays.asList("emptyFile.xml", "IsiImporterTest1.isi", "oai2.xml",
+                "RisImporterTest1.ris", "InspecImportTest2.txt");
         for (String s : notAccept) {
             Path file = Paths.get(SilverPlatterImporter.class.getResource(s).toURI());
             Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));

@@ -1,15 +1,17 @@
 package net.sf.jabref.logic.util;
 
-import static org.junit.Assert.*;
-
 import java.util.Optional;
+
+import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class UpdateFieldTest {
@@ -56,7 +58,7 @@ public class UpdateFieldTest {
         assertNull(change.get().getOldValue());
         assertEquals("year", change.get().getField());
         assertEquals("2016", change.get().getNewValue());
-        BibtexEntryAssert.assertEquals(entry, change.get().getEntry());
+        assertEquals(entry, change.get().getEntry());
     }
 
     @Test
@@ -66,7 +68,7 @@ public class UpdateFieldTest {
         assertEquals("2015", change.get().getOldValue());
         assertEquals("year", change.get().getField());
         assertEquals("2016", change.get().getNewValue());
-        BibtexEntryAssert.assertEquals(entry, change.get().getEntry());
+        assertEquals(entry, change.get().getEntry());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class UpdateFieldTest {
         assertNull(change.get().getNewValue());
         assertEquals("year", change.get().getField());
         assertEquals("2016", change.get().getOldValue());
-        BibtexEntryAssert.assertEquals(entry, change.get().getEntry());
+        assertEquals(entry, change.get().getEntry());
     }
 
     @Test
@@ -149,7 +151,7 @@ public class UpdateFieldTest {
         assertNull(change.get().getNewValue());
         assertEquals("year", change.get().getField());
         assertEquals("2016", change.get().getOldValue());
-        BibtexEntryAssert.assertEquals(entry, change.get().getEntry());
+        assertEquals(entry, change.get().getEntry());
     }
 
     @Test

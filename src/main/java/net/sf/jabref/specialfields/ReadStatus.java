@@ -16,8 +16,9 @@
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -30,7 +31,7 @@ public class ReadStatus extends SpecialField {
 
 
     private ReadStatus() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        List<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearReadStatus", Localization.lang("Clear read status"), null,
                 Localization.lang("No read status information")));
         Icon tmpicon;

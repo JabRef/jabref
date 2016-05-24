@@ -23,8 +23,9 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;

@@ -15,7 +15,8 @@
 */
 package net.sf.jabref.collab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;

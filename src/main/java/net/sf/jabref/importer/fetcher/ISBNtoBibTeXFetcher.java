@@ -26,18 +26,19 @@ import java.util.Scanner;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class uses ebook.de's ISBN to BibTeX Converter to convert an ISBN to a BibTeX entry <br />
@@ -115,7 +116,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         } catch (UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host
             // It is more likely that we don't have an internet connection
-            status.showMessage(Localization.lang("No_Internet_Connection."));
+            status.showMessage(Localization.lang("No_internet_connection."));
             LOGGER.debug("No internet connection", e);
             return false;
         } catch (Exception e) {
@@ -133,8 +134,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public String getHelpPage() {
-        return "ISBNtoBibTeXHelp";
+    public HelpFiles getHelpPage() {
+        return HelpFiles.FETCHER_ISBN_TO_BIBTEX;
     }
 
     @Override

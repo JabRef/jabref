@@ -16,8 +16,9 @@
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
@@ -28,7 +29,7 @@ public class Relevance extends SpecialField {
 
 
     private Relevance() {
-        ArrayList<SpecialFieldValue> values = new ArrayList<>();
+        List<SpecialFieldValue> values = new ArrayList<>();
         // action directly set by JabRefFrame
         // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
         values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(),

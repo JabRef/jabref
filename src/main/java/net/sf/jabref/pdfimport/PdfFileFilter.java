@@ -20,7 +20,7 @@ import java.io.FileFilter;
 
 public class PdfFileFilter implements FileFilter {
 
-    public final static PdfFileFilter INSTANCE = new PdfFileFilter();
+    public static final PdfFileFilter INSTANCE = new PdfFileFilter();
 
     @Override
     public boolean accept(File file) {

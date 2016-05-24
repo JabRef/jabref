@@ -18,9 +18,10 @@
 package net.sf.jabref.logic.labelpattern;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +31,10 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -487,7 +489,7 @@ public class LabelPatternUtil {
         String oldKey = entry.getCiteKey();
         int occurrences = database.getNumberOfKeyOccurrences(key);
 
-        if ((oldKey != null) && oldKey.equals(key)) {
+        if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
         }
 
@@ -499,7 +501,7 @@ public class LabelPatternUtil {
             if (!key.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, key);
+                    entry.setCiteKey(key);
                 } else {
                     database.setCiteKeyForEntry(entry, key);
                 }
@@ -515,7 +517,7 @@ public class LabelPatternUtil {
             String moddedKey = key + getAddition(number);
             occurrences = database.getNumberOfKeyOccurrences(moddedKey);
 
-            if ((oldKey != null) && oldKey.equals(moddedKey)) {
+            if (Objects.equals(oldKey, moddedKey)) {
                 occurrences--;
             }
 
@@ -524,7 +526,7 @@ public class LabelPatternUtil {
                 moddedKey = key + getAddition(number);
 
                 occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-                if ((oldKey != null) && oldKey.equals(moddedKey)) {
+                if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
             }
@@ -532,7 +534,7 @@ public class LabelPatternUtil {
             if (!moddedKey.equals(oldKey)) {
                 if (!database.containsEntryWithId(entry.getId())) {
                     // entry does not (yet) exist in the database, just update the entry
-                    entry.setField(BibEntry.KEY_FIELD, moddedKey);
+                    entry.setCiteKey(moddedKey);
                 } else {
                     database.setCiteKeyForEntry(entry, moddedKey);
                 }
@@ -562,9 +564,9 @@ public class LabelPatternUtil {
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
-                    for (String word1 : words) {
-                        if (!word1.isEmpty()) {
-                            abbreviateSB.append(word1.charAt(0));
+                    for (String word : words) {
+                        if (!word.isEmpty()) {
+                            abbreviateSB.append(word.charAt(0));
                         }
                     }
                     resultingLabel = abbreviateSB.toString();
@@ -738,6 +740,8 @@ public class LabelPatternUtil {
                 return lastPage(entry.getField("pages"));
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3, entry.getField("title"));
+            } else if ("shorttitleINI".equals(val)) {
+                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField("title")), new String[] {"abbr"}, 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField("title"));
             } else if ("shortyear".equals(val)) {
@@ -823,6 +827,10 @@ public class LabelPatternUtil {
      * Determines "number" words out of the "title" field in the given BibTeX entry
      */
     public static String getTitleWords(int number, String title) {
+        return keepLettersAndDigitsOnly(getTitleWordsWithSpaces(number, title));
+    }
+
+    private static String getTitleWordsWithSpaces(int number, String title) {
         String ss = new RemoveLatexCommands().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
@@ -859,7 +867,7 @@ public class LabelPatternUtil {
             words++;
         }
 
-        return keepLettersAndDigitsOnly(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {

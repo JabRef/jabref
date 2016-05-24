@@ -15,24 +15,24 @@
 */
 package net.sf.jabref.exporter;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.mods.MODSDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.OutputKeys;
-import java.util.List;
-import java.util.Objects;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.io.File;
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.logic.mods.MODSDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * ExportFormat for exporting in MODS XML format.

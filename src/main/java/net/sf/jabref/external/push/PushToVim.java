@@ -15,21 +15,27 @@
  */
 package net.sf.jabref.external.push;
 
-import net.sf.jabref.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
-import javax.swing.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA. User: alver Date: Mar 7, 2007 Time: 6:55:56 PM To change this template use File | Settings
@@ -37,7 +43,7 @@ import java.util.List;
  */
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
+    private static final Log LOGGER = LogFactory.getLog(PushToVim.class);
 
     private final JTextField vimServer = new JTextField(30);
 
@@ -68,7 +74,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
     protected void initSettingsPanel() {
         super.initSettingsPanel();
         builder.appendRows("2dlu, p");
-        builder.add(Localization.lang("Vim Server Name") + ":").xy(1, 3);
+        builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
         builder.add(vimServer).xy(3, 3);
         settings = builder.build();
     }
@@ -96,33 +102,29 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
             final Process p = Runtime.getRuntime().exec(com);
 
-            Runnable errorListener = new Runnable() {
-
-                @Override
-                public void run() {
-                    try (InputStream out = p.getErrorStream()) {
-                        int c;
-                        StringBuilder sb = new StringBuilder();
-                        try {
-                            while ((c = out.read()) != -1) {
-                                sb.append((char) c);
-                            }
-                        } catch (IOException e) {
-                            LOGGER.warn("Could not read from stderr.", e);
-                        }
-                        // Error stream has been closed. See if there were any errors:
-                        if (!sb.toString().trim().isEmpty()) {
-                            LOGGER.warn("Push to Vim error: " + sb);
-                            couldNotConnect = true;
+            JabRefExecutorService.INSTANCE.executeAndWait(() -> {
+                try (InputStream out = p.getErrorStream()) {
+                    int c;
+                    StringBuilder sb = new StringBuilder();
+                    try {
+                        while ((c = out.read()) != -1) {
+                            sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        LOGGER.warn("File problem.", e);
+                        LOGGER.warn("Could not read from stderr.", e);
                     }
+                    // Error stream has been closed. See if there were any errors:
+                    if (!sb.toString().trim().isEmpty()) {
+                        LOGGER.warn("Push to Vim error: " + sb);
+                        couldNotConnect = true;
+                    }
+                } catch (IOException e) {
+                    LOGGER.warn("File problem.", e);
                 }
-            };
-            JabRefExecutorService.INSTANCE.executeAndWait(errorListener);
+            });
         } catch (IOException excep) {
             couldNotCall = true;
+            LOGGER.warn("Problem pushing to Vim.", excep);
         }
 
     }

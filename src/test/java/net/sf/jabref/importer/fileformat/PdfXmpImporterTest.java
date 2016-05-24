@@ -1,10 +1,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,7 +10,6 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

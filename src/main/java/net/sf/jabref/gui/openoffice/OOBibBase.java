@@ -15,6 +15,48 @@
 */
 package net.sf.jabref.gui.openoffice;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.openoffice.OOBibStyle;
+import net.sf.jabref.logic.openoffice.OOPreFormatter;
+import net.sf.jabref.logic.openoffice.OOUtil;
+import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -25,7 +67,10 @@ import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.comp.helper.Bootstrap;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.container.*;
+import com.sun.star.container.XEnumeration;
+import com.sun.star.container.XEnumerationAccess;
+import com.sun.star.container.XNameAccess;
+import com.sun.star.container.XNamed;
 import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XController;
@@ -38,40 +83,26 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
-import com.sun.star.text.*;
+import com.sun.star.text.XBookmarksSupplier;
+import com.sun.star.text.XDocumentIndexesSupplier;
+import com.sun.star.text.XFootnote;
+import com.sun.star.text.XReferenceMarksSupplier;
+import com.sun.star.text.XText;
+import com.sun.star.text.XTextContent;
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
+import com.sun.star.text.XTextRangeCompare;
+import com.sun.star.text.XTextSection;
+import com.sun.star.text.XTextSectionsSupplier;
+import com.sun.star.text.XTextViewCursor;
+import com.sun.star.text.XTextViewCursorSupplier;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-
-import net.sf.jabref.bibtex.comparator.FieldComparator;
-import net.sf.jabref.bibtex.comparator.FieldComparatorStack;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.openoffice.OOBibStyle;
-import net.sf.jabref.logic.openoffice.OOPreFormatter;
-import net.sf.jabref.logic.openoffice.OOUtil;
-import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -298,7 +329,7 @@ class OOBibBase {
             }
 
             String keyString = String.join(",",
-                    entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                    entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -947,7 +978,7 @@ class OOBibBase {
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
-                        style.getNumCitationMarker(Arrays.asList(number++), minGroupingCount, true),
+                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true),
                         EnumSet.noneOf(OOUtil.Formatting.class));
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
@@ -1180,7 +1211,7 @@ class OOBibBase {
                 }
                 Collections.sort(entries, new FieldComparator("year"));
                 String keyString = String.join(",",
-                        entries.stream().map(entry -> entry.getCiteKey()).collect(Collectors.toList()));
+                        entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);

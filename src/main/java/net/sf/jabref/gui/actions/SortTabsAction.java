@@ -31,9 +31,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * in alphabetical order.
  */
 public class SortTabsAction extends MnemonicAwareAction implements Comparator<String> {
-
     private final JabRefFrame frame;
-
 
     public SortTabsAction(JabRefFrame frame) {
         putValue(Action.NAME, Localization.menuTitle("Sort tabs"));
@@ -44,7 +42,7 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
     @Override
     public void actionPerformed(ActionEvent e) {
         // Make a sorted Map that compares case-insensitively:
-        TreeMap<String, BasePanel> map = new TreeMap<>(this);
+        Map<String, BasePanel> map = new TreeMap<>(this);
 
         for (BasePanel panel : frame.getBasePanelList()) {
             map.put(panel.getTabTitle(), panel);

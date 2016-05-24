@@ -8,15 +8,15 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
-import net.sf.jabref.model.entry.BibEntry;
 
 public class GVKParserTest {
 
@@ -34,7 +34,7 @@ public class GVKParserTest {
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibtexEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i));
+                BibEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i));
                 i++;
             }
         }

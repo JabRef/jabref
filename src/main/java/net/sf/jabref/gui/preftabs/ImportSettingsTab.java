@@ -16,9 +16,20 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import javax.swing.*;
+import java.util.Objects;
 
-import net.sf.jabref.Globals;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.pdfimport.ImportDialog;
 
@@ -27,11 +38,8 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ImportSettingsTab extends JPanel implements PrefsTab {
 
-    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
-    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
     public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
 
-    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
             "bibtexkey",
             "bibtexkey - title",
@@ -41,6 +49,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"
     };
 
+    private final JabRefPreferences prefs;
     private final JRadioButton radioButtonXmp;
     private final JRadioButton radioButtonPDFcontent;
     private final JRadioButton radioButtonNoMeta;
@@ -51,7 +60,9 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     private final JButton selectFileNamePattern;
 
 
-    public ImportSettingsTab() {
+    public ImportSettingsTab(JabRefPreferences prefs) {
+        this.prefs = Objects.requireNonNull(prefs);
+
         setLayout(new BorderLayout());
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
@@ -108,8 +119,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        useDefaultPDFImportStyle.setSelected(Globals.prefs.getBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE));
-        int style = Globals.prefs.getInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE));
+        int style = prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
         case ImportDialog.NOMETA:
             radioButtonNoMeta.setSelected(true);
@@ -128,12 +139,12 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             radioButtonPDFcontent.setSelected(true);
             break;
         }
-        fileNamePattern.setText(Globals.prefs.get(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN));
+        fileNamePattern.setText(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
     }
 
     @Override
     public void storeSettings() {
-        Globals.prefs.putBoolean(ImportSettingsTab.PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
+        prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
         int style = ImportSettingsTab.DEFAULT_STYLE;
         if (radioButtonNoMeta.isSelected()) {
             style = ImportDialog.NOMETA;
@@ -144,8 +155,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         } else if (radioButtononlyAttachPDF.isSelected()) {
             style = ImportDialog.ONLYATTACH;
         }
-        Globals.prefs.putInt(ImportSettingsTab.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
-        Globals.prefs.put(ImportSettingsTab.PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
+        prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
+        prefs.put(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
     }
 
     @Override

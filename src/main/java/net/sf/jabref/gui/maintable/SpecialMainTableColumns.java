@@ -1,19 +1,26 @@
 package net.sf.jabref.gui.maintable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.JLabel;
+
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.*;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.specialfields.Printed;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
+import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class SpecialMainTableColumns {
 
@@ -31,7 +38,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_RANKING),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_RANKING),
             new JLabel(SpecialFieldsUtils.FIELDNAME_RANKING)) {
 
         @Override
@@ -46,7 +53,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_PRIORITY,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRIORITY),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_PRIORITY),
             new JLabel(Priority.getInstance().getRepresentingIcon())) {
 
         @Override
@@ -63,7 +70,7 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_READ,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_READ),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_READ),
             new JLabel(ReadStatus.getInstance().getRepresentingIcon())) {
 
         @Override
@@ -80,20 +87,20 @@ public class SpecialMainTableColumns {
     };
 
     public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_RELEVANCE,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_RELEVANCE),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_RELEVANCE),
             new JLabel(Relevance.getInstance().getRepresentingIcon()));
 
     public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_PRINTED,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRINTED),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_PRINTED),
             new JLabel(Printed.getInstance().getRepresentingIcon()));
 
     public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_QUALITY,
-            Arrays.asList(SpecialFieldsUtils.FIELDNAME_QUALITY),
+            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_QUALITY),
             new JLabel(Quality.getInstance().getRepresentingIcon()));
 
 
     public static final MainTableColumn FILE_COLUMN = new MainTableColumn(Globals.FILE_FIELD,
-            Arrays.asList(Globals.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
+            Collections.singletonList(Globals.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -160,7 +167,7 @@ public class SpecialMainTableColumns {
 
 
 
-        return new MainTableColumn(externalFileTypeName, Arrays.asList(Globals.FILE_FIELD), new JLabel()) {
+        return new MainTableColumn(externalFileTypeName, Collections.singletonList(Globals.FILE_FIELD), new JLabel()) {
 
             @Override
             public boolean isFileFilter() {

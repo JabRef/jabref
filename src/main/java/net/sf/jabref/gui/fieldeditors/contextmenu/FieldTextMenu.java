@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
@@ -70,7 +72,7 @@ public class FieldTextMenu implements MouseListener {
 
             copyAction.setEnabled(copyStatus);
 
-            String data = ClipBoardManager.CLIPBOARD.getClipboardContents();
+            String data = new ClipBoardManager().getClipboardContents();
             boolean pasteStatus = false;
             if (!data.isEmpty()) {
                 pasteStatus = true;

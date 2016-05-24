@@ -1,11 +1,5 @@
 package net.sf.jabref.importer.fileformat;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -17,29 +11,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.BibtexEntryAssert;
 import net.sf.jabref.exporter.FieldFormatterCleanups;
-import net.sf.jabref.groups.GroupTreeNode;
-import net.sf.jabref.groups.structure.AllEntriesGroup;
-import net.sf.jabref.groups.structure.GroupHierarchyType;
-import net.sf.jabref.groups.structure.KeywordGroup;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.ExplicitGroup;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
+
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the BibtexParser
@@ -65,7 +64,7 @@ public class BibtexParserTest {
         expected.setType("article");
         expected.setCiteKey("test");
         expected.setField("author", "Ed von Test");
-        BibtexEntryAssert.assertEquals(Arrays.asList(expected), parsed);
+        assertEquals(Collections.singletonList(expected), parsed);
     }
 
     @Test
@@ -92,7 +91,7 @@ public class BibtexParserTest {
         expected.setCiteKey("canh05");
         expected.setField("author", "Crowston, K. and Annabi, H.");
         expected.setField("title", "Title A");
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -333,7 +332,7 @@ public class BibtexParserTest {
         secondEntry.setField("author", "Norton Bar");
         expected.add(secondEntry);
 
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -373,7 +372,7 @@ public class BibtexParserTest {
         secondEntry.setCiteKey("foo");
         expected.add(secondEntry);
 
-        BibtexEntryAssert.assertEquals(expected, parsed);
+        assertEquals(expected, parsed);
     }
 
     @Test
@@ -641,13 +640,12 @@ public class BibtexParserTest {
         assertTrue(result.hasWarnings());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals(1, c.size());
 
-        BibEntry e = c.iterator().next();
-        assertEquals("article", e.getType());
-        assertEquals("", e.getCiteKey());
-        assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        BibEntry e = new BibEntry();
+        e.setField("author", "Ed von Test");
+        e.setType("article");
+
+        assertEquals(Collections.singletonList(e), c);
     }
 
     @Test
@@ -1337,10 +1335,11 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse();
 
-        List<String> saveActions = parserResult.getMetaData().getData(MetaData.SAVE_ACTIONS);
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
-        assertEquals("enabled", saveActions.get(0));
-        assertEquals("title[lower_case]", saveActions.get(1));
+        assertTrue(saveActions.isEnabled());
+        assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
+                saveActions.getConfiguredActions());
     }
 
     @Test
@@ -1349,7 +1348,7 @@ public class BibtexParserTest {
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
 
         ParserResult parserResult = parser.parse();
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1410,7 +1409,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestGroupTree() throws IOException {
+    public void integrationTestGroupTree() throws IOException, ParseException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: groupsversion:3;}"
                 + Globals.NEWLINE +
@@ -1421,18 +1420,21 @@ public class BibtexParserTest {
                 + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;"
                 + Globals.NEWLINE
                 + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
+                + Globals.NEWLINE
+                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;"
                 + "}"));
 
         GroupTreeNode root = result.getMetaData().getGroups();
 
         assertEquals(new AllEntriesGroup(), root.getGroup());
-        assertEquals(2, root.getChildCount());
+        assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
-                ((GroupTreeNode) root.getChildAt(0)).getGroup());
+                root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
-                ((GroupTreeNode) root.getChildAt(1)).getGroup());
+                root.getChildren().get(1).getGroup());
+        assertEquals(Arrays.asList("Key1", "Key2"), ((ExplicitGroup)root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
 
     @Test
@@ -1482,6 +1484,6 @@ public class BibtexParserTest {
         c.setCiteKey("c");
         expected.add(c);
 
-        BibtexEntryAssert.assertEquals(expected, result.getDatabase().getEntries());
+        assertEquals(expected, result.getDatabase().getEntries());
     }
 }
