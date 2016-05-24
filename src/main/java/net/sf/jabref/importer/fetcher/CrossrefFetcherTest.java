@@ -36,7 +36,7 @@ public class CrossrefFetcherTest {
         List<BibEntry> entries = db.getEntries();
         CountDownLatch countDownLatch = new CountDownLatch(entries.size());
 
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
 
         for (BibEntry entry : entries) {
             executorService.execute(new Runnable() {
