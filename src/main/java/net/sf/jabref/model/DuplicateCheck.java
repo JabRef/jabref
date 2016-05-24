@@ -132,10 +132,6 @@ public class DuplicateCheck {
         return new double[] {0.5, 0.0};
     }
 
-    public static boolean compareField(String field, BibEntry one, BibEntry two) {
-        return compareSingleField(field, one, two) >= duplicateThreshold;
-    }
-
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
         String s1 = one.getField(field);
         String s2 = two.getField(field);
