@@ -15,6 +15,8 @@ import info.debatty.java.stringsimilarity.Levenshtein;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A class for fetching DOIs from CrossRef
@@ -25,6 +27,7 @@ public class CrossRef {
     private static final Log LOGGER = LogFactory.getLog(CrossRef.class);
 
     private static final String API_URL = "http://api.crossref.org";
+    private static final Levenshtein METRIC_DISTANCE = new Levenshtein();
 
     public static Optional<DOI> findDOI(BibEntry entry) {
         Objects.requireNonNull(entry);
@@ -49,7 +52,7 @@ public class CrossRef {
             // quality check
             if (checkValidity(entry, items)) {
                 String dataDOI = items.getJSONObject(0).getString("DOI");
-                LOGGER.info("DOI " + dataDOI + " for " + title + " found.");
+                LOGGER.debug("DOI " + dataDOI + " for " + title + " found.");
                 return DOI.build(dataDOI);
             }
         } catch (UnirestException e) {
@@ -76,15 +79,35 @@ public class CrossRef {
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
+        final int threshold = 5;
+        // TODO: formatter might not be good enough! outer {} latex \mbox{} ~ commands
+        final String entryTitle = new LatexCleanupFormatter().format(entry.getField("title"));
+
         // currently only title
         // title: [ "How the Mind Hurts and Heals the Body." ]
-        String dataTitle = result.getJSONObject(0).getJSONArray("title").getString(0);
-        // author: [ { affiliation: [ ], family: "Ray", given: "Oakley" } ]
-        // JSONArray dataAuthors = result.getJSONObject(0).getJSONArray("author");
-        Levenshtein levenshtein = new Levenshtein();
-        // TODO: formatter might not be goog enough!
-        String entryTitle = new LatexCleanupFormatter().format(entry.getField("title"));
-        double editDistance = levenshtein.distance(entryTitle.toLowerCase(), dataTitle.toLowerCase());
-        return editDistance <= 5;
+        // subtitle: [ "" ]
+        try {
+            // title
+            JSONObject data = result.getJSONObject(0);
+            String dataTitle = data.getJSONArray("title").getString(0);
+
+            if (editDistanceIgnoreCase(entryTitle, dataTitle) <= threshold) {
+                return true;
+            }
+
+            // subtitle
+            // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
+            String dataWithSubTitle = "";
+            if (data.getJSONArray("subtitle").length() > 0) {
+                dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
+            }
+            return editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= threshold;
+        } catch(JSONException ex) {
+            return false;
+        }
+    }
+
+    private static double editDistanceIgnoreCase(String a, String b) {
+        return METRIC_DISTANCE.distance(a.toLowerCase(), b.toLowerCase());
     }
 }
