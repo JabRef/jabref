@@ -8,8 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.fetcher.CrossRef;
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
