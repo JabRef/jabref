@@ -2,7 +2,10 @@ package net.sf.jabref.importer.fetcher;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -13,7 +16,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class CrossrefFetcherTest {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
 
         BibtexParser parser = new BibtexParser(new FileReader("C:\\Users\\Stefan\\Desktop\\Github\\references\\references.bib"));
@@ -23,34 +26,47 @@ public class CrossrefFetcherTest {
 
         int total = result.getDatabase().getEntryCount();
 
-        int dois = 0;
-        int doiFound = 0;
-        int doiNew = 0;
-        int doiIdentical = 0;
+        AtomicInteger dois = new AtomicInteger();
+        AtomicInteger doiFound = new AtomicInteger();
+        AtomicInteger doiNew = new AtomicInteger();
+        AtomicInteger doiIdentical = new AtomicInteger();
 
-        for (BibEntry entry : db.getEntries()) {
-            Optional<DOI> origDOI = DOI.build(entry.getField("doi"));
-            if (origDOI.isPresent()) {
-                dois++;
-                Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
-                if (crossrefDOI.isPresent()) {
-                    doiFound++;
-                    if (origDOI.get().getDOI().equalsIgnoreCase(crossrefDOI.get().getDOI())) {
-                        doiIdentical++;
+
+        List<BibEntry> entries = db.getEntries();
+        CountDownLatch countDownLatch = new CountDownLatch(entries.size());
+
+        for (BibEntry entry : entries) {
+            new Thread() {
+
+                @Override
+                public void run() {
+                    Optional<DOI> origDOI = DOI.build(entry.getField("doi"));
+                    if (origDOI.isPresent()) {
+                        dois.incrementAndGet();
+                        Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
+                        if (crossrefDOI.isPresent()) {
+                            doiFound.incrementAndGet();
+                            if (origDOI.get().getDOI().equalsIgnoreCase(crossrefDOI.get().getDOI())) {
+                                doiIdentical.incrementAndGet();
+                            } else {
+                                System.out.println("DOI not identical for : " + entry);
+                            }
+                        } else {
+                            System.out.println("DOI not found for: " + entry);
+                        }
                     } else {
-                        System.out.println("DOI not identical for : " + entry);
+                        Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
+                        if (crossrefDOI.isPresent()) {
+                            //System.out.println("New DOI found for: " + entry);
+                            doiNew.incrementAndGet();
+                        }
                     }
-                } else {
-                    System.out.println("DOI not found for: " + entry);
+                    countDownLatch.countDown();
                 }
-            } else {
-                Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
-                if (crossrefDOI.isPresent()) {
-                    //System.out.println("New DOI found for: " + entry);
-                    doiNew++;
-                }
-            }
+            }.start();
+
         }
+        countDownLatch.await();
 
         System.out.println("---------------------------------");
         System.out.println("Total DB size: " + total);

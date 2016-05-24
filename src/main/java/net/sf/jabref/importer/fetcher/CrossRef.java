@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -79,9 +80,10 @@ public class CrossRef {
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
-        final int threshold = 5;
+        final int threshold = 2;
         // TODO: formatter might not be good enough! outer {} latex \mbox{} ~ commands
-        final String entryTitle = new LatexCleanupFormatter().format(entry.getField("title"));
+        // TODO: remove bracesformatter
+        final String entryTitle = new RemoveBracesFormatter().format(entry.getField("title"));
 
         // currently only title
         // title: [ "How the Mind Hurts and Heals the Body." ]
