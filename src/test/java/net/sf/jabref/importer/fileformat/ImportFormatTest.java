@@ -76,7 +76,7 @@ public class ImportFormatTest {
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
                 new Object[]{new BibtexImporter()},
-                new Object[]{new BibteXMLImporter()},
+                new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
                 new Object[]{new EndnoteImporter()},
                 new Object[]{new FreeCiteImporter()},

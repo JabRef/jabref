@@ -1,6 +1,6 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -13,7 +13,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -69,7 +68,7 @@ public class InspecImportTest {
         expectedEntry.setField("volume", "19");
 
         BibEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
-                InspecImportTest.class.getResourceAsStream("InspecImportTest2.txt"), inspecImp);
+                InspecImportTest.class.getResource("InspecImportTest2.txt"), inspecImp);
     }
 
     @Test

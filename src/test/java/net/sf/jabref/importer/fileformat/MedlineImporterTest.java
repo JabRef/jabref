@@ -1,7 +1,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,14 +13,11 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -47,10 +44,10 @@ public class MedlineImporterTest {
      * @return A list of Names
      * @throws IOException
      */
-    public List<String> getTestFiles() throws IOException {
-        List<String> files = new ArrayList<>();
+    public List<Path> getTestFiles() throws IOException {
+        List<Path> files = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(n -> files.add(n.getFileName().toString()));
+            stream.forEach(files::add);
         }
         return files;
     }
@@ -59,15 +56,6 @@ public class MedlineImporterTest {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         this.medlineImporter = new MedlineImporter();
-    }
-
-    @Test
-    public void testExceptionOnInputStream() throws IOException {
-        try (InputStream is = Mockito.mock(InputStream.class)) {
-            Mockito.doThrow(new IOException()).when(is).read();
-            List<BibEntry> entry = medlineImporter.importEntries(is, new OutputPrinterToNull());
-            Assert.assertTrue(entry.isEmpty());
-        }
     }
 
     @Test
@@ -83,18 +71,16 @@ public class MedlineImporterTest {
 
     @Test
     public void testGetCLIId() {
-        assertEquals("medline", medlineImporter.getCLIId());
+        assertEquals("medline", medlineImporter.getId());
     }
 
     @Test
     public void testIsRecognizedFormatReject() throws IOException {
-       List<String> list = getTestFiles().stream().filter(n -> !n.startsWith("MedlineImporter"))
+       List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
                 .collect(Collectors.toList());
 
-        for (String str : list) {
-            try (InputStream is = MedlineImporter.class.getResourceAsStream(str)) {
-                Assert.assertFalse(medlineImporter.isRecognizedFormat(is));
-            }
+        for (Path file : list) {
+            Assert.assertFalse(file.toString(), medlineImporter.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 }

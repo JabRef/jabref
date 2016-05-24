@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -497,7 +498,7 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, ".jstyle"));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".jstyle")));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

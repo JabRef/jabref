@@ -120,6 +120,7 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;

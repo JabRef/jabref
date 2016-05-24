@@ -2,6 +2,8 @@ package net.sf.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -515,14 +517,19 @@ public class ArgumentProcessor {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
                 try {
-                    List<BibEntry> entries;
+                    Path file;
                     if (OS.WINDOWS) {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], data[0], JabRefGUI.getMainFrame());
+                        file = Paths.get(data[0]);
                     } else {
-                        entries = Globals.IMPORT_FORMAT_READER.importFromFile(data[1],
-                                data[0].replace("~", System.getProperty("user.home")), JabRefGUI.getMainFrame());
+                        file = Paths.get(data[0].replace("~", System.getProperty("user.home")));
                     }
-                    return Optional.of(new ParserResult(entries));
+                    ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
+
+                    if(result.hasWarnings()) {
+                        JabRefGUI.getMainFrame().showMessage(result.getErrorMessage());
+                    }
+
+                    return Optional.of(result);
                 } catch (IllegalArgumentException ex) {
                     System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
                     return Optional.empty();

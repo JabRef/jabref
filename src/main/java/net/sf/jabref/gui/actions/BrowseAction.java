@@ -17,6 +17,8 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -37,21 +39,21 @@ public final class BrowseAction extends AbstractAction {
     private final JTextField comp;
     private final boolean dir;
     private final JComponent focusTarget;
-    private final String extension;
+    private final List<String> extension;
 
     public static BrowseAction buildForDir(JFrame frame, JTextField tc) {
-        return new BrowseAction(frame, tc, true, null, "");
+        return new BrowseAction(frame, tc, true, null, Collections.emptyList());
     }
 
     public static BrowseAction buildForDir(JTextField tc) {
-        return new BrowseAction(null, tc, true, null, "");
+        return new BrowseAction(null, tc, true, null, Collections.emptyList());
     }
 
     public static BrowseAction buildForFile(JTextField tc) {
-        return new BrowseAction(null, tc, false, null, "");
+        return new BrowseAction(null, tc, false, null, Collections.emptyList());
     }
 
-    public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget, String extension) {
+    public static BrowseAction buildForFile(JTextField tc, JComponent focusTarget, List<String> extension) {
         return new BrowseAction(null, tc, false, focusTarget, extension);
 }
 
@@ -59,7 +61,7 @@ public final class BrowseAction extends AbstractAction {
         return new BrowseAction(null, tc, true, focusTarget, null);
     }
 
-    private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget, String extension) {
+    private BrowseAction(JFrame frame, JTextField tc, boolean dir, JComponent focusTarget, List<String> extension) {
         super(Localization.lang("Browse"));
         this.frame = frame;
         this.dir = dir;

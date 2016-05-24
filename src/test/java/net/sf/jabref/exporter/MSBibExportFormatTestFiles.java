@@ -2,7 +2,7 @@ package net.sf.jabref.exporter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +16,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.importer.fileformat.BibtexImporter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -32,7 +31,6 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
 public class MSBibExportFormatTestFiles {
@@ -71,14 +69,15 @@ public class MSBibExportFormatTestFiles {
     }
 
     @Test
-    public final void testPerformExport() throws IOException {
+    public final void testPerformExport() throws IOException, URISyntaxException {
         String xmlFileName = filename.replace(".bib", ".xml");
+        Path importFile = Paths.get(MSBibExportFormatTestFiles.class.getResource(filename).toURI());
         String tempFilename = tempFile.getCanonicalPath();
-        try (InputStream bibIn = MSBibExportFormat.class.getResourceAsStream(filename)) {
-            List<BibEntry> entries = testImporter.importEntries(bibIn, new OutputPrinterToNull());
-            assertNotNull(entries);
-            msBibExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
-        }
+        List<BibEntry> entries = testImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase()
+                .getEntries();
+
+        msBibExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+
         List<String> expected = Files.readAllLines(Paths.get(PATH_TO_FILE + xmlFileName));
         List<String> exported = Files.readAllLines(Paths.get(tempFilename));
         assertEquals(expected, exported);

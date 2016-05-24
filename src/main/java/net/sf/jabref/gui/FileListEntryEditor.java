@@ -23,6 +23,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -364,7 +365,7 @@ public class FileListEntryEditor {
             } else {
                 workingDir = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String selection = FileDialogs.getNewFile(parent, initial, Collections.emptyList(),
+            String selection = FileDialogs.getNewFile(parent, workingDir, Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
             if (selection != null) {
                 File newFile = new File(selection);

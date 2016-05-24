@@ -1,7 +1,8 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,8 +14,8 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,12 +43,6 @@ public class CopacImporterTest {
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
-    @Test(expected = IOException.class)
-    public void testImportEntriesException() throws IOException {
-        CopacImporter importer = new CopacImporter();
-        importer.importEntries(null, new OutputPrinterToNull());
-    }
-
     @Test
     public void testIsNotRecognizedFormat() throws IOException, URISyntaxException {
         CopacImporter importer = new CopacImporter();
@@ -60,13 +55,10 @@ public class CopacImporterTest {
     }
 
     @Test
-    public void testImportEmptyEntries() throws IOException {
+    public void testImportEmptyEntries() throws IOException, URISyntaxException {
         CopacImporter importer = new CopacImporter();
-
-        try (InputStream is = CopacImporterTest.class.getResourceAsStream("Empty.txt")) {
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-            Assert.assertEquals(0, entries.size());
-            Assert.assertEquals(Collections.emptyList(), entries);
-        }
+        Path path = Paths.get(CopacImporterTest.class.getResource("Empty.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(path, Charset.defaultCharset()).getDatabase().getEntries();
+        Assert.assertEquals(Collections.emptyList(), entries);
     }
 }

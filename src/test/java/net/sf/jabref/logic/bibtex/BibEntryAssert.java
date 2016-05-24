@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -27,7 +30,7 @@ public class BibEntryAssert {
      * @param resourceName the resource to read
      * @param entry the entry to compare with
      */
-    public static void assertEquals(Class<? extends Object> clazz, String resourceName, BibEntry entry)
+    public static void assertEquals(Class<?> clazz, String resourceName, BibEntry entry)
             throws IOException {
         Assert.assertNotNull(clazz);
         Assert.assertNotNull(resourceName);
@@ -45,7 +48,7 @@ public class BibEntryAssert {
      * @param resourceName the resource to read
      * @param asIsEntries a list containing a single entry to compare with
      */
-    public static void assertEquals(Class<? extends Object> clazz, String resourceName, List<BibEntry> asIsEntries)
+    public static void assertEquals(Class<?> clazz, String resourceName, List<BibEntry> asIsEntries)
             throws IOException {
         Assert.assertNotNull(clazz);
         Assert.assertNotNull(resourceName);
@@ -73,14 +76,14 @@ public class BibEntryAssert {
      * @param actualEntries a list containing a single entry to compare with
      */
     public static void assertEquals(InputStream expectedInputStream, List<BibEntry> actualEntries)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         Assert.assertNotNull(expectedInputStream);
         Assert.assertNotNull(actualEntries);
         Assert.assertEquals(getListFromInputStream(expectedInputStream), actualEntries);
     }
 
     public static void assertEquals(List<BibEntry> expectedEntries, InputStream actualInputStream)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         Assert.assertNotNull(actualInputStream);
         Assert.assertNotNull(expectedEntries);
         Assert.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));
@@ -94,34 +97,43 @@ public class BibEntryAssert {
      * @param actual the entry to compare with
      */
     public static void assertEquals(InputStream expected, BibEntry actual)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         assertEquals(expected, Collections.singletonList(actual));
     }
 
     /**
-     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is filtered through importerForActualIs to convert to a list of BibEntries.
+     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is filtered through importFormat to convert to a list of BibEntries.
      * @param expectedIs A BibtexImporter InputStream.
-     * @param actualIs Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
-     * @param importerForActualIs The fileformat you want to use to convert the actualIs to the list of expected BibEntries
+     * @param fileToImport The path to the file to be imported.
+     * @param importFormat The fileformat you want to use to read the passed file to get the list of expected BibEntries
      * @throws IOException
      */
-    public static void assertEquals(InputStream expectedIs, InputStream actualIs, ImportFormat importerForActualIs)
+    public static void assertEquals(InputStream expectedIs, Path fileToImport, ImportFormat importFormat)
             throws IOException {
-        List<BibEntry> actualEntries = importerForActualIs.importEntries(actualIs, new OutputPrinterToNull());
-        Assert.assertEquals(getListFromInputStream(expectedIs), actualEntries);
+        assertEquals(getListFromInputStream(expectedIs), fileToImport, importFormat);
+    }
+
+    public static void assertEquals(InputStream expectedIs, URL fileToImport, ImportFormat importFormat)
+            throws URISyntaxException, IOException {
+        assertEquals(expectedIs, Paths.get(fileToImport.toURI()), importFormat);
     }
 
     /**
      * Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a list of BibEntries.
-     * @param expectedIs A BibtexImporter InputStream.
-     * @param actualIs Your ImportFormat InputStream you want to compare with a BibtexImporter ImportStream.
-     * @param importerForActualIs The fileformat you want to use to convert the actualIs to the list of expected BibEntries
+     * @param expected A BibtexImporter InputStream.
+     * @param fileToImport The path to the file to be imported.
+     * @param importFormat The fileformat you want to use to read the passed file to get the list of expected BibEntries
      * @throws IOException
      */
-    public static void assertEquals(List<BibEntry> expected, InputStream actualIs, ImportFormat importerForActualIs)
+    public static void assertEquals(List<BibEntry> expected, Path fileToImport, ImportFormat importFormat)
             throws IOException {
-        List<BibEntry> actualEntries = importerForActualIs.importEntries(actualIs, new OutputPrinterToNull());
+        List<BibEntry> actualEntries = importFormat.importDatabase(fileToImport, Charset.defaultCharset())
+                .getDatabase().getEntries();
         Assert.assertEquals(expected, actualEntries);
     }
 
+    public static void assertEquals(List<BibEntry> expected, URL fileToImport, ImportFormat importFormat)
+            throws URISyntaxException, IOException {
+        assertEquals(expected, Paths.get(fileToImport.toURI()), importFormat);
+    }
 }
