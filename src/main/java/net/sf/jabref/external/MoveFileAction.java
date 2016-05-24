@@ -18,6 +18,7 @@ package net.sf.jabref.external;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -142,7 +143,8 @@ public class MoveFileAction extends AbstractAction {
                     }
                     chosenFile = sb.toString();
                 } else {
-                    chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
+                    chosenFile = FileDialogs.getNewFile(frame, file, Collections.singletonList(extension),
+                            JFileChooser.SAVE_DIALOG, false);
                 }
                 if (chosenFile == null) {
                     return; // canceled

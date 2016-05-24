@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -25,8 +25,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import javax.xml.stream.XMLInputFactory;
@@ -36,7 +36,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -55,22 +55,22 @@ public class FreeCiteImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        // TODO: We don't know how to recognize text files, therefore we return
-        // "false"
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        // TODO: We don't know how to recognize text files, therefore we return "false"
         return false;
     }
 
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
+    public ParserResult importDatabase(BufferedReader reader)
             throws IOException {
-        try (Scanner scan = new Scanner(in)) {
+        try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
-            return importEntries(text, status);
+            return importEntries(text);
         }
     }
 
-    public List<BibEntry> importEntries(String text, OutputPrinter status) {
+    public ParserResult importEntries(String text) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
@@ -87,10 +87,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return Collections.emptyList();
+            return new ParserResult();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return Collections.emptyList();
+            return new ParserResult();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -104,13 +104,11 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IllegalStateException e) {
             LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return Collections.emptyList();
+            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
-
         List<BibEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -223,15 +221,25 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return Collections.emptyList();
+            return new ParserResult();
         }
 
-        return res;
+        return new ParserResult(res);
     }
 
     @Override
     public String getFormatName() {
         return "text citations";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

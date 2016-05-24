@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.msbib;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,14 +62,14 @@ public class MSBibDatabase {
         }
     }
 
-    public List<BibEntry> importEntries(InputStream stream) {
+    public List<BibEntry> importEntries(BufferedReader reader) {
         entries = new HashSet<>();
         Document inputDocument;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.
                     newInstance().
                     newDocumentBuilder();
-            inputDocument = documentBuilder.parse(stream);
+            inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
             return Collections.emptyList();

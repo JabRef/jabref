@@ -22,6 +22,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -103,7 +104,7 @@ class CustomExportDialog extends JDialog {
         JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(e -> {
                 File directory = new File(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
-                String chosenStr = FileDialogs.getNewFile(parent, directory, ".layout",
+                String chosenStr = FileDialogs.getNewFile(parent, directory, Collections.singletonList(".layout"),
                         JFileChooser.OPEN_DIALOG, false);
                 if (chosenStr == null) {
                     return;

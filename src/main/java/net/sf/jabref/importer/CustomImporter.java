@@ -136,7 +136,6 @@ public class CustomImporter implements Comparable<CustomImporter> {
         try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
             Class<?> clazz = Class.forName(className, true, cl);
             ImportFormat importFormat = (ImportFormat) clazz.newInstance();
-            importFormat.setIsCustomImporter(true);
             return importFormat;
         }
     }

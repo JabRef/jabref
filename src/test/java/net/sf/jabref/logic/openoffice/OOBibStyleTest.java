@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +16,9 @@ import java.util.Set;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
@@ -142,8 +143,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testGetCitationMarker() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -163,8 +164,8 @@ public class OOBibStyleTest {
 
     @Test
     public void testLayout() throws IOException {
-        File testBibtexFile = new File("src/test/resources/testbib/complex.bib");
-        ParserResult result = BibtexParser.parse(ImportFormatReader.getReader(testBibtexFile, StandardCharsets.UTF_8));
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 mock(JournalAbbreviationRepository.class));
         BibDatabase db = result.getDatabase();

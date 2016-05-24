@@ -1,11 +1,12 @@
 package net.sf.jabref.importer;
 
 import java.io.IOException;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +17,7 @@ import static org.junit.Assert.fail;
 public class ImportFormatReaderTestParameterless {
 
     private ImportFormatReader reader;
-    private ImportFormatReader.UnknownFormatImport unknownFormat;
-    public List<BibEntry> result;
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -26,21 +26,21 @@ public class ImportFormatReaderTestParameterless {
     }
 
     @Test
-    public void testImportUnknownFormatNotWorking() {
-        String fileName = ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").getFile();
-        unknownFormat = reader.importUnknownFormat(fileName);
+    public void testImportUnknownFormatNotWorking() throws URISyntaxException {
+        Path file = Paths.get(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
+        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
         assertNull(unknownFormat);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNullImportUnknownFormat() {
-        unknownFormat = reader.importUnknownFormat(null);
+        reader.importUnknownFormat((Path)null);
         fail();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testImportFromFileUnknownFormat() throws IOException {
-        result = reader.importFromFile("someunknownformat", "doesn't matter", new OutputPrinterToNull());
+        reader.importFromFile("someunknownformat", Paths.get("somepath"));
         fail();
     }
 }

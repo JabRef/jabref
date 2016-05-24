@@ -17,7 +17,6 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +24,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -41,56 +39,42 @@ public class RisImporter extends ImportFormat {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "RIS";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "ris";
+    public List<String> getExtensions() {
+        return null;
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public String getDescription() {
+        return null;
+    }
 
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "AU  - *" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
+                return true;
             }
         }
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                sb.append(str);
-                sb.append('\n');
-            }
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+            sb.append('\n');
         }
 
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
@@ -269,14 +253,14 @@ public class RisImporter extends ImportFormat {
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            List<Object> toRemove = new ArrayList<>();
+            List<String> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key.getKey());
                 }
             }
-            for (Object aToRemove : toRemove) {
+            for (String aToRemove : toRemove) {
                 hm.remove(aToRemove);
 
             }
@@ -287,7 +271,7 @@ public class RisImporter extends ImportFormat {
 
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
 
     }
 }

@@ -1,14 +1,16 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -28,28 +30,24 @@ public class MsBibImporterTest {
         List<String> notAccepted = Arrays.asList("CopacImporterTest1.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
         for (String s : notAccepted) {
-            try (InputStream stream = MsBibImporter.class.getResourceAsStream(s)) {
-                Assert.assertFalse(testImporter.isRecognizedFormat(stream));
-            }
+            Path file = Paths.get(MsBibImporter.class.getResource(s).toURI());
+            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
         }
-
     }
 
     @Test
-    public final void testImportEntriesEmpty() throws IOException {
+    public final void testImportEntriesEmpty() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
-
-        List<BibEntry> entries = testImporter.importEntries(
-                MsBibImporterTest.class.getResourceAsStream("MsBibImporterTest.xml"), new OutputPrinterToNull());
+        Path file = Paths.get(MsBibImporter.class.getResource("MsBibImporterTest.xml").toURI());
+        List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public final void testImportEntriesNotRecognizedFormat() throws IOException {
+    public final void testImportEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
-
-        List<BibEntry> entries = testImporter.importEntries(
-                MsBibImporterTest.class.getResourceAsStream("CopacImporterTest1.txt"), new OutputPrinterToNull());
+        Path file = Paths.get(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
+        List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(0, entries.size());
     }
 
@@ -62,7 +60,7 @@ public class MsBibImporterTest {
     @Test
     public final void testGetCommandLineId() {
         MsBibImporter testImporter = new MsBibImporter();
-        Assert.assertEquals("msbib", testImporter.getCommandLineId());
+        Assert.assertEquals("msbib", testImporter.getId());
     }
 
 }

@@ -1,7 +1,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -37,7 +36,7 @@ public class MedlineImporterTestFiles {
     private MedlineImporter medlineImporter;
 
     @Parameter
-    public String fileName;
+    public Path importFile;
 
 
     @Before
@@ -47,33 +46,29 @@ public class MedlineImporterTestFiles {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException {
-        List<String> files = new ArrayList<>();
+    public static Collection<Path> files() throws IOException {
+        List<Path> files = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(n -> files.add(n.getFileName().toString()));
+            stream.forEach(files::add);
         }
-        return files.stream().filter(n -> n.startsWith("MedlineImporterTest")).filter(n -> n.endsWith(".xml"))
+        return files.stream().filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest") && n.getFileName().toString().endsWith(".xml"))
                 .collect(Collectors.toList());
     }
 
     @Test
     public void testIsRecognizedFormat() throws IOException {
-        try (InputStream stream = MedlineImporterTest.class.getResourceAsStream(fileName)) {
-            Assert.assertTrue(medlineImporter.isRecognizedFormat(stream));
-        }
+        Assert.assertTrue(medlineImporter.isRecognizedFormat(importFile, Charset.defaultCharset()));
     }
 
     @Test
     @Ignore
     public void testImportEntries() throws IOException {
-        try (InputStream inputStream = MedlineImporterTest.class.getResourceAsStream(fileName)) {
-            List<BibEntry> medlineEntries = medlineImporter.importEntries(inputStream, new OutputPrinterToNull());
-            String bibFileName = fileName.replace(".xml", ".bib");
+            List<BibEntry> medlineEntries = medlineImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase().getEntries();
+            String bibFileName = importFile.getFileName().toString().replace(".xml", ".bib");
             if (medlineEntries.isEmpty()) {
                 assertEquals(Collections.emptyList(), medlineEntries);
             } else {
                 BibEntryAssert.assertEquals(MedlineImporterTest.class, bibFileName, medlineEntries);
             }
-        }
     }
 }

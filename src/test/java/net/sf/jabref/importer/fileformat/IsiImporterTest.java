@@ -1,14 +1,16 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -32,14 +34,6 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void testImportEntriesException() throws IOException {
-        thrown.expect(IOException.class);
-
-        IsiImporter importer = new IsiImporter();
-        importer.importEntries(null, new OutputPrinterToNull());
-    }
-
-    @Test
     public void testParseMonthException() {
         IsiImporter.parseMonth("20l06 06-07");
     }
@@ -55,11 +49,11 @@ public class IsiImporterTest {
     public void testGetCLIId() {
         IsiImporter importer = new IsiImporter();
 
-        Assert.assertEquals(importer.getCLIId(), "isi");
+        Assert.assertEquals(importer.getId(), "isi");
     }
 
     @Test
-    public void testIsRecognizedFormatAccepted() throws IOException {
+    public void testIsRecognizedFormatAccepted() throws IOException, URISyntaxException {
 
         IsiImporter importer = new IsiImporter();
 
@@ -67,23 +61,21 @@ public class IsiImporterTest {
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi");
 
         for (String str : list) {
-            try (InputStream is = IsiImporterTest.class.getResourceAsStream(str)) {
-                Assert.assertTrue(importer.isRecognizedFormat(is));
-            }
+            Path file = Paths.get(IsiImporterTest.class.getResource(str).toURI());
+            Assert.assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
     @Test
-    public void testIsRecognizedFormatRejected() throws IOException {
+    public void testIsRecognizedFormatRejected() throws IOException, URISyntaxException {
 
         IsiImporter importer = new IsiImporter();
 
         List<String> list = Arrays.asList("IsiImporterTestEmpty.isi");
 
         for (String str : list) {
-            try (InputStream is = IsiImporterTest.class.getResourceAsStream(str)) {
-                Assert.assertFalse(importer.isRecognizedFormat(is));
-            }
+            Path file = Paths.get(IsiImporterTest.class.getResource(str).toURI());
+            Assert.assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
@@ -133,109 +125,97 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void testImportEntries1() throws IOException {
+    public void testImportEntries1() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        Assert.assertEquals(1, entries.size());
+        BibEntry entry = entries.get(0);
+        Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
+        Assert.assertEquals(
+                "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
+                entry.getField("author"));
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTest1.isi")) {
-
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-            Assert.assertEquals(1, entries.size());
-            BibEntry entry = entries.get(0);
-            Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
-            Assert.assertEquals(
-                    "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
-                    entry.getField("author"));
-
-            Assert.assertEquals("article", entry.getType());
-            Assert.assertEquals("Optical Materials", entry.getField("journal"));
-            Assert.assertEquals("2006", entry.getField("year"));
-            Assert.assertEquals("28", entry.getField("volume"));
-            Assert.assertEquals("5", entry.getField("number"));
-            Assert.assertEquals("467--72", entry.getField("pages"));
-        }
+        Assert.assertEquals("article", entry.getType());
+        Assert.assertEquals("Optical Materials", entry.getField("journal"));
+        Assert.assertEquals("2006", entry.getField("year"));
+        Assert.assertEquals("28", entry.getField("volume"));
+        Assert.assertEquals("5", entry.getField("number"));
+        Assert.assertEquals("467--72", entry.getField("pages"));
     }
 
     @Test
-    public void testImportEntries2() throws IOException {
+    public void testImportEntries2() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        Assert.assertEquals(3, entries.size());
+        BibEntry entry = entries.get(0);
+        Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTest2.isi")) {
-
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-            Assert.assertEquals(3, entries.size());
-            BibEntry entry = entries.get(0);
-            Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
-
-            Assert.assertEquals("misc", entry.getType());
-            Assert.assertEquals("Optical Materials", entry.getField("journal"));
-            Assert.assertEquals("2006", entry.getField("year"));
-            Assert.assertEquals("28", entry.getField("volume"));
-            Assert.assertEquals("5", entry.getField("number"));
-            Assert.assertEquals("467-72", entry.getField("pages"));
-        }
+        Assert.assertEquals("misc", entry.getType());
+        Assert.assertEquals("Optical Materials", entry.getField("journal"));
+        Assert.assertEquals("2006", entry.getField("year"));
+        Assert.assertEquals("28", entry.getField("volume"));
+        Assert.assertEquals("5", entry.getField("number"));
+        Assert.assertEquals("467-72", entry.getField("pages"));
     }
 
     @Test
-    public void testImportEntriesINSPEC() throws IOException {
+    public void testImportEntriesINSPEC() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestInspec.isi")) {
+        Assert.assertEquals(2, entries.size());
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-
-            Assert.assertEquals(2, entries.size());
-            BibEntry a = entries.get(0);
-            BibEntry b = entries.get(1);
-
-            if (a.getField("title")
-                    .equals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals")) {
-                BibEntry tmp = a;
-                a = b;
-                b = tmp;
-            }
-
-            Assert.assertEquals(
-                    "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
-                    a.getField("title"));
-            Assert.assertEquals("article", a.getType());
-
-            Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.",
-                    a.getField("author"));
-            Assert.assertEquals("Applied Physics Letters", a.getField("journal"));
-            Assert.assertEquals("2006", a.getField("year"));
-            Assert.assertEquals("#jul#", a.getField("month"));
-            Assert.assertEquals("89", a.getField("volume"));
-            Assert.assertEquals("4", a.getField("number"));
-            Assert.assertEquals(
-                    "Lorem ipsum abstract",
-                    a.getField("abstract"));
-            Assert.assertEquals("Aip", a.getField("publisher"));
-
-            Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
-                    b.getField("title"));
-            Assert.assertEquals("article", b.getType());
+        if (a.getField("title")
+                .equals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals")) {
+            BibEntry tmp = a;
+            a = b;
+            b = tmp;
         }
+
+        Assert.assertEquals(
+                "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
+                a.getField("title"));
+        Assert.assertEquals("article", a.getType());
+
+        Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.",
+                a.getField("author"));
+        Assert.assertEquals("Applied Physics Letters", a.getField("journal"));
+        Assert.assertEquals("2006", a.getField("year"));
+        Assert.assertEquals("#jul#", a.getField("month"));
+        Assert.assertEquals("89", a.getField("volume"));
+        Assert.assertEquals("4", a.getField("number"));
+        Assert.assertEquals(
+                "Lorem ipsum abstract",
+                a.getField("abstract"));
+        Assert.assertEquals("Aip", a.getField("publisher"));
+
+        Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
+                b.getField("title"));
+        Assert.assertEquals("article", b.getType());
     }
 
     @Test
-    public void testImportEntriesWOS() throws IOException {
+    public void testImportEntriesWOS() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestWOS.isi")) {
+        Assert.assertEquals(2, entries.size());
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+        Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn2P2S6 crystals",
+                a.getField("title"));
+        Assert.assertEquals("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation",
+                b.getField("title"));
 
-            Assert.assertEquals(2, entries.size());
-            BibEntry a = entries.get(0);
-            BibEntry b = entries.get(1);
-
-            Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn2P2S6 crystals",
-                    a.getField("title"));
-            Assert.assertEquals("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation",
-                    b.getField("title"));
-
-            Assert.assertEquals("Journal of Physics-condensed Matter", a.getField("journal"));
-        }
+        Assert.assertEquals("Journal of Physics-condensed Matter", a.getField("journal"));
     }
 
     @Test
@@ -279,115 +259,96 @@ public class IsiImporterTest {
     }
 
     @Test
-    public void testGetIsCustomImporter() {
+    public void testImportIEEEExport() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
-        Assert.assertEquals(false, importer.isCustomImporter());
+        Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+
+        Assert.assertEquals(1, entries.size());
+        BibEntry a = entries.get(0);
+        Assert.assertEquals("article", a.getType());
+        Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
+        Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
+                + "Images Exploiting Directional Filtering, Perceptual "
+                + "Grouping, and Simple Topological Concepts", a.getField("title"));
+        Assert.assertEquals("4", a.getField("volume"));
+        Assert.assertEquals("3", a.getField("number"));
+        Assert.assertEquals("1545-598X", a.getField("SN"));
+        Assert.assertEquals("387--391", a.getField("pages"));
+        Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
+        Assert.assertEquals("2006", a.getField("year"));
+        Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
+        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
     }
 
     @Test
-    public void testImportIEEEExport() throws IOException {
+    public void testIEEEImport() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IEEEImport1.txt")) {
+        Assert.assertEquals(1, entries.size());
+        BibEntry a = entries.get(0);
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-
-            Assert.assertEquals(1, entries.size());
-            BibEntry a = entries.get(0);
-            Assert.assertEquals("article", a.getType());
-            Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
-            Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
-                    + "Images Exploiting Directional Filtering, Perceptual "
-                    + "Grouping, and Simple Topological Concepts", a.getField("title"));
-            Assert.assertEquals("4", a.getField("volume"));
-            Assert.assertEquals("3", a.getField("number"));
-            Assert.assertEquals("1545-598X", a.getField("SN"));
-            Assert.assertEquals("387--391", a.getField("pages"));
-            Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
-            Assert.assertEquals("2006", a.getField("year"));
-            Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("Lorem ipsum abstract",
-                    a.getField("abstract"));
-
-        }
+        Assert.assertEquals("article", a.getType());
+        Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
+        Assert.assertEquals(
+                "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts",
+                a.getField("title"));
+        Assert.assertEquals("4", a.getField("volume"));
+        Assert.assertEquals("3", a.getField("number"));
+        Assert.assertEquals("1545-598X", a.getField("SN"));
+        Assert.assertEquals("387--391", a.getField("pages"));
+        Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
+        Assert.assertEquals("2006", a.getField("year"));
+        Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
+        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
     }
 
     @Test
-    public void testIEEEImport() throws IOException {
+    public void testImportEntriesMedline() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
 
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IEEEImport1.txt")) {
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+        Assert.assertEquals(2, entries.size());
+        BibEntry a = entries.get(0);
+        BibEntry b = entries.get(1);
 
-            Assert.assertEquals(1, entries.size());
-            BibEntry a = entries.get(0);
+        Assert.assertEquals("Effects of modafinil on cognitive performance and alertness during sleep deprivation.",
+                a.getField("title"));
 
-            Assert.assertEquals("article", a.getType());
-            Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
-            Assert.assertEquals(
-                    "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts",
-                    a.getField("title"));
-            Assert.assertEquals("4", a.getField("volume"));
-            Assert.assertEquals("3", a.getField("number"));
-            Assert.assertEquals("1545-598X", a.getField("SN"));
-            Assert.assertEquals("387--391", a.getField("pages"));
-            Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
-            Assert.assertEquals("2006", a.getField("year"));
-            Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-            Assert.assertEquals("Lorem ipsum abstract",
-                    a.getField("abstract"));
+        Assert.assertEquals("Wesensten, Nancy J.", a.getField("author"));
+        Assert.assertEquals("Curr Pharm Des", a.getField("journal"));
+        Assert.assertEquals("2006", a.getField("year"));
+        Assert.assertEquals(null, a.getField("month"));
+        Assert.assertEquals("12", a.getField("volume"));
+        Assert.assertEquals("20", a.getField("number"));
+        Assert.assertEquals("2457--71", a.getField("pages"));
+        Assert.assertEquals("article", a.getType());
 
-        }
+        Assert.assertEquals(
+                "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
+                b.getField("title"));
+        Assert.assertEquals(
+                "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
+                b.getField("author"));
+        Assert.assertEquals("2006", b.getField("year"));
+        Assert.assertEquals("#may#", b.getField("month"));
+        Assert.assertEquals("13", b.getField("volume"));
+        Assert.assertEquals("3", b.getField("number"));
+        Assert.assertEquals("411--22", b.getField("pages"));
+        Assert.assertEquals("article", b.getType());
     }
 
     @Test
-    public void testImportEntriesMedline() throws IOException {
+    public void testImportEntriesEmpty() throws IOException, URISyntaxException {
         IsiImporter importer = new IsiImporter();
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestMedline.isi")) {
+        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
-            Assert.assertEquals(2, entries.size());
-            BibEntry a = entries.get(0);
-            BibEntry b = entries.get(1);
-
-            Assert.assertEquals("Effects of modafinil on cognitive performance and alertness during sleep deprivation.",
-                    a.getField("title"));
-
-            Assert.assertEquals("Wesensten, Nancy J.", a.getField("author"));
-            Assert.assertEquals("Curr Pharm Des", a.getField("journal"));
-            Assert.assertEquals("2006", a.getField("year"));
-            Assert.assertEquals(null, a.getField("month"));
-            Assert.assertEquals("12", a.getField("volume"));
-            Assert.assertEquals("20", a.getField("number"));
-            Assert.assertEquals("2457--71", a.getField("pages"));
-            Assert.assertEquals("article", a.getType());
-
-            Assert.assertEquals(
-                    "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
-                    b.getField("title"));
-            Assert.assertEquals(
-                    "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
-                    b.getField("author"));
-            Assert.assertEquals("2006", b.getField("year"));
-            Assert.assertEquals("#may#", b.getField("month"));
-            Assert.assertEquals("13", b.getField("volume"));
-            Assert.assertEquals("3", b.getField("number"));
-            Assert.assertEquals("411--22", b.getField("pages"));
-            Assert.assertEquals("article", b.getType());
-        }
-    }
-
-    @Test
-    public void testImportEntriesEmpty() throws IOException {
-        IsiImporter importer = new IsiImporter();
-
-        try (InputStream is = IsiImporterTest.class.getResourceAsStream("IsiImporterTestEmpty.isi")) {
-
-            List<BibEntry> entries = importer.importEntries(is, new OutputPrinterToNull());
-
-            Assert.assertEquals(1, entries.size());
-        }
+        Assert.assertEquals(1, entries.size());
     }
 }

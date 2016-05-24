@@ -2328,8 +2328,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() throws SaveException {
 
             String chosenFile = FileDialogs.getNewFile(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib", JFileChooser.SAVE_DIALOG,
-                    false);
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
+                    JFileChooser.SAVE_DIALOG, false);
             if (chosenFile != null) {
                 File expFile = new File(chosenFile);
                 if (!expFile.exists() || (JOptionPane.showConfirmDialog(frame,

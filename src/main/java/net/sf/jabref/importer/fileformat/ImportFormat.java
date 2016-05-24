@@ -15,68 +15,101 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.importer.ParserResult;
 
 /**
  * Role of an importer for JabRef.
- *
- * <p>Importers are sorted according to following criteria
- * <ol><li>
- *   custom importers come first, then importers shipped with JabRef
- * </li><li>
- *   then importers are sorted by name.
- * </li></ol>
- * </p>
  */
 public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Using this when I have no database open or when I read
      * non bibtex file formats (used by the ImportFormatReader.java)
+     *
+     * TODO: Is this field really needed or would calling IdGenerator.next() suffice?
      */
     public static final String DEFAULT_BIBTEXENTRY_ID = "__ID";
 
-    private boolean isCustomImporter;
-
-
     /**
-     * Constructor for custom importers.
+     * Check whether the source is in the correct format for this importer.
+     *
+     * The effect of this method is primarily to avoid unnecessary processing of
+     * files when searching for a suitable import format. If this method returns
+     * false, the import routine will move on to the next import format.
+     *
+     * Thus the correct behaviour is to return false if it is certain that the file is
+     * not of the suitable type, and true otherwise. Returning true is the safe choice if not certain.
      */
-    public ImportFormat() {
-        this.isCustomImporter = false;
+    protected abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
+
+    public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
+        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+            return isRecognizedFormat(bufferedReader);
+        }
     }
 
     /**
-     * Check whether the source is in the correct format for this importer.
-     */
-    public abstract boolean isRecognizedFormat(InputStream in) throws IOException;
-
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
+     * Parse the database in the source.
      *
      * This method can be called in two different contexts - either when importing in
      * a specified format, or when importing in unknown format. In the latter case,
      * JabRef cycles through all available import formats. No error messages or feedback
      * is displayed from individual import formats in this case.
      *
-     * If importing in a specified format, and an empty list is returned, JabRef reports
-     * that no entries were found. If an IOException is thrown, JabRef displays the exception's
-     * message in unmodified form.
+     * If importing in a specified format and an empty database is returned, JabRef reports
+     * that no entries were found.
      *
-     * This method should never return null. Return an empty list instead.
+     * This method should never return null.
      *
-     * TODO the return type should be changed to "ParseResult" as the parser could use a different encoding than the default encoding
+     * @param input the input to read from
      */
-    public abstract List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException;
+    protected abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
 
     /**
-     * Name of this import format.
+     * Parse the database in the specified file.
+     *
+     * Importer having the facilities to detect the correct encoding of a file should overwrite this method,
+     * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
+     *
+     * @param filePath the path to the file which should be imported
+     * @param encoding the encoding used to decode the file
+     */
+    public ParserResult importDatabase(Path filePath, Charset encoding) throws IOException {
+        try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
+            ParserResult parserResult = importDatabase(bufferedReader);
+            parserResult.setEncoding(encoding);
+            parserResult.setFile(filePath.toFile());
+            return parserResult;
+        }
+    }
+
+    public static BufferedReader getUTF8Reader(Path filePath) throws IOException {
+        return getReader(filePath, StandardCharsets.UTF_8);
+    }
+
+    public static BufferedReader getUTF16Reader(Path filePath) throws IOException {
+        return getReader(filePath, StandardCharsets.UTF_16);
+    }
+
+    public static BufferedReader getReader(Path filePath, Charset encoding)
+            throws IOException {
+        InputStream stream = new FileInputStream(filePath.toFile());
+        return new BufferedReader(new InputStreamReader(stream, encoding));
+    }
+
+    /**
+     * Returns the name of this import format.
      *
      * <p>The name must be unique.</p>
      *
@@ -85,20 +118,20 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     public abstract String getFormatName();
 
     /**
-     * Extensions that this importer can read.
+     * Returns the file extensions that this importer can read.
+     * The extension should contain the leading dot, so for example ".bib"
      *
-     * @return comma separated list of extensions or <code>null</code> for the default
+     * @return list of supported file extensions (not null but may be empty)
      */
-    public String getExtensions() {
-        return null;
-    }
+    public abstract List<String> getExtensions();
 
     /**
-     * Short, one token ID to identify the format from the command line.
+     * Returns a one-word ID which identifies this import format.
+     * Used for example, to identify the format when used from the command line.
      *
-     * @return command line ID
+     * @return ID, must be unique and not <code>null</code>
      */
-    public String getCLIId() {
+    public String getId() {
         String id = getFormatName();
         StringBuilder result = new StringBuilder(id.length());
         for (int i = 0; i < id.length(); i++) {
@@ -111,91 +144,43 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     }
 
     /**
-     * Description  of the ImportFormat.
+     * Returns the description of the import format.
      *
-     * <p>Implementors of ImportFormats should override this. Ideally, it should specify
+     * The description should specify
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import
      * </li><li>
-     *   by what criteria it {@link #isRecognizedFormat(InputStream) recognizes} an import format
+     *   by what criteria it {@link #isRecognizedFormat(BufferedReader) recognizes} an import format
      * </li></ul>
      *
      * @return description of the import format
      */
-    public String getDescription() {
-        return "No description available for " + getFormatName() + ".";
-    }
+    public abstract String getDescription();
 
-    /**
-     * Sets if this is a custom importer.
-     *
-     * <p>For custom importers added dynamically to JabRef, this will be
-     * set automatically by JabRef.</p>
-     *
-     * @param isCustomImporter if this is a custom importer
-     */
-    public final void setIsCustomImporter(boolean isCustomImporter) {
-        this.isCustomImporter = isCustomImporter;
-    }
-
-    /**
-     * Wether this importer is a custom importer.
-     *
-     * <p>Custom importers will have precedence over built-in importers.</p>
-     *
-     * @return  wether this is a custom importer
-     */
-    public final boolean isCustomImporter() {
-        return this.isCustomImporter;
-    }
-
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         return getFormatName().hashCode();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
         }
-
-        if (o instanceof ImportFormat) {
-            ImportFormat format = (ImportFormat) o;
-            return (format.isCustomImporter() == isCustomImporter()) && format.getFormatName().equals(getFormatName());
+        if(!(obj instanceof ImportFormat)) {
+            return false;
         }
-        return false;
+        ImportFormat other = (ImportFormat)obj;
+        return Objects.equals(this.getFormatName(), other.getFormatName());
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return getFormatName();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
-    public int compareTo(ImportFormat importer) {
-        int result;
-        if (isCustomImporter() == importer.isCustomImporter()) {
-            result = getFormatName().compareTo(importer.getFormatName());
-        } else {
-            result = isCustomImporter() ? 1 : -1;
-        }
-        return result;
+    public int compareTo(ImportFormat o) {
+        return getFormatName().compareTo(o.getFormatName());
     }
 }

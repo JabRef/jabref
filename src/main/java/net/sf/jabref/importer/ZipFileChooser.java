@@ -110,7 +110,7 @@ class ZipFileChooser extends JDialog {
                 try {
                     ImportFormat importFormat = importer.getInstance();
                     importer.setName(importFormat.getFormatName());
-                    importer.setCliId(importFormat.getCLIId());
+                    importer.setCliId(importFormat.getId());
                     importCustomizationDialog.addOrReplaceImporter(importer);
                     dispose();
                 } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {

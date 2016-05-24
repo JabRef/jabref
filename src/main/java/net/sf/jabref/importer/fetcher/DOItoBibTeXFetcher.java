@@ -22,9 +22,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
@@ -32,6 +32,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
@@ -57,7 +58,11 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        BibEntry entry = getEntryFromDOI(query, status);
+        ParserResult parserResult = new ParserResult();
+        BibEntry entry = getEntryFromDOI(query, parserResult);
+        if(parserResult.hasWarnings()) {
+            status.showMessage(parserResult.getErrorMessage());
+        }
         if (entry != null) {
             inspector.addEntry(entry);
             return true;
@@ -81,15 +86,14 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    public BibEntry getEntryFromDOI(String doiStr, OutputPrinter status) {
+    public BibEntry getEntryFromDOI(String doiStr, ParserResult parserResult) {
+        Objects.requireNonNull(parserResult);
+
         DOI doi;
         try {
             doi = new DOI(doiStr);
         } catch (IllegalArgumentException e) {
-            status.showMessage(Localization.lang("Invalid DOI: '%0'.", doiStr),
-                    Localization.lang("Get BibTeX entry from DOI"),
-                    JOptionPane.INFORMATION_MESSAGE);
-            LOGGER.warn("Invalid DOI", e);
+            parserResult.addWarning(Localization.lang("Invalid DOI: '%0'.", doiStr));
             return null;
         }
 
@@ -115,11 +119,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             dl.addParameters("Accept", "application/x-bibtex");
             bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
-            if (status != null) {
-                status.showMessage(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()),
-                        Localization.lang("Get BibTeX entry from DOI"),
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
+            parserResult.addWarning(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()));
             LOGGER.debug("Unknown DOI", e);
             return null;
         } catch (IOException e) {

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Collections;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -303,8 +304,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         String chosenFile;
         File f = null;
         while (f == null) {
-            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), ".bib",
-                    JFileChooser.SAVE_DIALOG, false, null);
+            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+                    Collections.singletonList(".bib"), JFileChooser.SAVE_DIALOG, false, null);
             if (chosenFile == null) {
                 canceled = true;
                 return; // canceled

@@ -16,9 +16,7 @@
 package net.sf.jabref.pdfimport;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +38,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -185,15 +184,16 @@ public class PdfImporter {
     }
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
-        BibEntry entry;
         List<BibEntry> localRes = new ArrayList<>();
         PdfXmpImporter importer = new PdfXmpImporter();
-        try (InputStream in = new FileInputStream(fileName)) {
-            localRes.addAll(importer.importEntries(in, frame));
-        } catch (IOException ex) {
-            LOGGER.warn("Cannot import entries", ex);
+        Path filePath = Paths.get(fileName);
+        ParserResult result = importer.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        if (result.hasWarnings()) {
+            frame.showMessage(result.getErrorMessage());
         }
+        localRes.addAll(result.getDatabase().getEntries());
 
+        BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
@@ -229,28 +229,23 @@ public class PdfImporter {
     }
 
     private void doContentImport(String fileName, List<BibEntry> res) {
-        File file = new File(fileName);
-        BibEntry entry;
-        try (InputStream in = new FileInputStream(file)) {
-            PdfContentImporter contentImporter = new PdfContentImporter();
-            List<BibEntry> localRes = contentImporter.importEntries(in, frame);
 
-            if (localRes.isEmpty()) {
-                // import failed -> generate default entry
-                entry = createNewBlankEntry(fileName);
-                res.add(entry);
-                return;
-            }
+        PdfContentImporter contentImporter = new PdfContentImporter();
+        Path filePath = Paths.get(fileName);
+        ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        if (result.hasWarnings()) {
+            frame.showMessage(result.getErrorMessage());
+        }
 
-            // only one entry is imported
-            entry = localRes.get(0);
-        } catch (IOException e) {
+        if (!result.getDatabase().hasEntries()) {
             // import failed -> generate default entry
-            LOGGER.info("Import failed", e);
-            entry = createNewBlankEntry(fileName);
+            BibEntry entry = createNewBlankEntry(fileName);
             res.add(entry);
             return;
         }
+
+        // only one entry is imported
+        BibEntry entry = result.getDatabase().getEntries().get(0);
 
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
@@ -311,22 +306,4 @@ public class PdfImporter {
         }
         return null;
     }
-
-    public MainTable getEntryTable() {
-        return entryTable;
-    }
-
-    public void setEntryTable(MainTable entryTable) {
-        this.entryTable = entryTable;
-    }
-
-    public int getDropRow() {
-        return dropRow;
-    }
-
-    public void setDropRow(int dropRow) {
-        this.dropRow = dropRow;
-    }
-
-
 }

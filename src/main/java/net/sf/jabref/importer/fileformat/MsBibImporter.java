@@ -15,18 +15,19 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
 
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 /**
  * Importer for the MS Office 2007 XML bibliography format
@@ -37,14 +38,10 @@ import org.w3c.dom.Document;
 public class MsBibImporter extends ImportFormat {
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         /*
-            This method is available for checking if a file can be of the MSBib type.
-            The effect of this method is primarily to avoid unnecessary processing of
-            files when searching for a suitable import format. If this method returns
-            false, the import routine will move on to the next import format.
-
             The correct behaviour is to return false if it is certain that the file is
             not of the MsBib type, and true otherwise. Returning true is the safe choice
             if not certain.
@@ -54,33 +51,34 @@ public class MsBibImporter extends ImportFormat {
             DocumentBuilder dbuild = DocumentBuilderFactory.
                     newInstance().
                     newDocumentBuilder();
-            docin = dbuild.parse(in);
+            docin = dbuild.parse(new InputSource(reader));
         } catch (Exception e) {
             return false;
         }
         return (docin == null) || docin.getDocumentElement().getTagName().contains("Sources");
     }
 
-    /**
-     * String used to identify this import filter on the command line.
-     * @return "msbib"
-     */
-    public String getCommandLineId() {
-        return "msbib";
-    }
-
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         MSBibDatabase dbase = new MSBibDatabase();
-
-        return dbase.importEntries(in);
+        return new ParserResult(dbase.importEntries(reader));
     }
 
     @Override
     public String getFormatName() {
-        // This method should return the name of this import format.
         return "MSBib";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 
 }

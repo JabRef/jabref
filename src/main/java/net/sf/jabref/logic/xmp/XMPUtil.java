@@ -145,9 +145,13 @@ public class XMPUtil {
         return result;
     }
 
-    public static PDDocument loadWithAutomaticDecryption(InputStream inputStream)
-            throws IOException {
+    public static PDDocument loadWithAutomaticDecryption(Path filePath) throws IOException {
+        return loadWithAutomaticDecryption(new FileInputStream(filePath.toFile()));
+    }
+
+    public static PDDocument loadWithAutomaticDecryption(InputStream inputStream) throws IOException {
         PDDocument doc = PDDocument.load(inputStream);
+
         if (doc.isEncrypted()) {
             // try the empty string as user password
             StandardDecryptionMaterial sdm = new StandardDecryptionMaterial("");
@@ -228,6 +232,10 @@ public class XMPUtil {
             return Collections.emptyList();
         }
         return result;
+    }
+
+    public static Collection<BibEntry> readXMP(Path filePath) throws IOException {
+        return readXMP(filePath.toFile());
     }
 
     /**

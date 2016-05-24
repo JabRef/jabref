@@ -17,16 +17,15 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -57,56 +56,47 @@ public class IsiImporter extends ImportFormat {
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "ISI";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public List<String> getExtensions() {
+        return null;
+    }
+
+    @Override
+    public String getId() {
         return "isi";
     }
 
-
-
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public String getDescription() {
+        return null;
+    }
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < 50)) {
 
-            String str;
-            int i = 0;
-            while (((str = in.readLine()) != null) && (i < 50)) {
-
-                /**
-                 * The following line gives false positives for RIS files, so it
-                 * should not be uncommented. The hypen is a characteristic of the
-                 * RIS format.
-                 *
-                 * str = str.replace(" - ", "")
-                 */
-                if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
-                    return true;
-                }
-
-                i++;
+            /**
+             * The following line gives false positives for RIS files, so it
+             * should not be uncommented. The hypen is a characteristic of the
+             * RIS format.
+             *
+             * str = str.replace(" - ", "")
+             */
+            if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
+                return true;
             }
+
+            i++;
         }
         return false;
     }
-
-
 
     public static void processSubSup(Map<String, String> map) {
 
@@ -156,45 +146,37 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null) {
-            throw new IOException("No stream given.");
-        }
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
-            // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
-            String str;
+        // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
+        // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
+        String str;
 
-            while ((str = in.readLine()) != null) {
-                if (str.length() < 3) {
-                    continue;
-                }
+        while ((str = reader.readLine()) != null) {
+            if (str.length() < 3) {
+                continue;
+            }
 
-                // beginning of a new item
-                if ("PT ".equals(str.substring(0, 3))) {
-                    sb.append("::").append(str);
+            // beginning of a new item
+            if ("PT ".equals(str.substring(0, 3))) {
+                sb.append("::").append(str);
+            } else {
+                String beg = str.substring(0, 3).trim();
+
+                // I could have used the fieldPattern regular expression instead
+                // however this seems to be
+                // quick and dirty and it works!
+                if (beg.length() == 2) {
+                    sb.append(" ## "); // mark the beginning of each field
+                    sb.append(str);
                 } else {
-                    String beg = str.substring(0, 3).trim();
-
-                    // I could have used the fieldPattern regular expression instead
-                    // however this seems to be
-                    // quick and dirty and it works!
-                    if (beg.length() == 2) {
-                        sb.append(" ## "); // mark the beginning of each field
-                        sb.append(str);
-                    } else {
-                        sb.append("EOLEOL"); // mark the end of each line
-                        sb.append(str.trim()); // remove the initial spaces
-                    }
+                    sb.append("EOLEOL"); // mark the end of each line
+                    sb.append(str.trim()); // remove the initial spaces
                 }
             }
         }
@@ -355,7 +337,7 @@ public class IsiImporter extends ImportFormat {
 
             bibitems.add(b);
         }
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 
     private static String parsePages(String value) {

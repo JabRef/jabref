@@ -17,15 +17,13 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -36,60 +34,46 @@ public class InspecImporter extends ImportFormat {
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "INSPEC";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "inspec";
+    public List<String> getExtensions() {
+        return null;
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-        // Our strategy is to look for the "PY <year>" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
+    public String getDescription() {
+        return null;
+    }
 
-            while ((str = in.readLine()) != null) {
-                if (INSPEC_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        // Our strategy is to look for the "PY <year>" line.
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (INSPEC_PATTERN.matcher(str).find()) {
+                return true;
             }
         }
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            while ((str = in.readLine()) != null) {
-                if (str.length() < 2) {
-                    continue;
-                }
-                if (str.indexOf("Record") == 0) {
-                    sb.append("__::__").append(str);
-                } else {
-                    sb.append("__NEWFIELD__").append(str);
-                }
+        while ((str = reader.readLine()) != null) {
+            if (str.length() < 2) {
+                continue;
+            }
+            if (str.indexOf("Record") == 0) {
+                sb.append("__::__").append(str);
+            } else {
+                sb.append("__NEWFIELD__").append(str);
             }
         }
         String[] entries = sb.toString().split("__::__");
@@ -156,6 +140,6 @@ public class InspecImporter extends ImportFormat {
 
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 }
