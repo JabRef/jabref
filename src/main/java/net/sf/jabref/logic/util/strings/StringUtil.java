@@ -627,51 +627,6 @@ public class StringUtil {
     }
 
     /**
-     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
-     *
-     * @param name
-     * @return The name after expanding initials.
-     */
-    public static String expandAuthorInitials(String name) {
-        String[] authors = name.split(" and ");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].contains(", ")) {
-                String[] names = authors[i].split(", ");
-                if (names.length > 0) {
-                    sb.append(names[0]);
-                    if (names.length > 1) {
-                        sb.append(", ");
-                    }
-                }
-                for (int j = 1; j < names.length; j++) {
-                    if (j == 1) {
-                        sb.append(Author.addDotIfAbbreviation(names[j]));
-                    } else {
-                        sb.append(names[j]);
-                    }
-                    if (j < (names.length - 1)) {
-                        sb.append(", ");
-                    }
-                }
-            } else {
-                String[] names = authors[i].split(" ");
-                if (names.length > 0) {
-                    sb.append(Author.addDotIfAbbreviation(names[0]));
-                }
-                for (int j = 1; j < names.length; j++) {
-                    sb.append(' ');
-                    sb.append(names[j]);
-                }
-            }
-            if (i < (authors.length - 1)) {
-                sb.append(" and ");
-            }
-        }
-        return sb.toString().trim();
-    }
-
-    /**
      * Return a String with n spaces
      *
      * @param n Number of spaces

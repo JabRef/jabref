@@ -229,7 +229,6 @@ class MedlineHandler extends DefaultHandler {
             if (!"".equals(author)) {
                 b.setField("author",
                         MedlineHandler.UNICODE_CONVERTER.format(author));
-                // b.setField("author",Util.replaceSpecialCharacters(ImportFormatReader.expandAuthorInitials(author)));
                 author = "";
             }
             if (!"".equals(title)) {
