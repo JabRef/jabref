@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.importer.fetcher.CrossRef;
+import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -118,6 +121,16 @@ public class DOI {
             result = Optional.of(new DOI(matcher.group(1)));
         }
         return result;
+    }
+
+    /**
+     * Tries to retrieve a DOI for an existing BibEntry.
+     *
+     * @param entry the BibteX entry
+     * @return an Optional containing the DOI or an empty Optional
+     */
+    public static Optional<DOI> fromBibEntry(BibEntry entry) {
+        return CrossRef.findDOI(entry);
     }
 
     /**

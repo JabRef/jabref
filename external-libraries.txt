@@ -72,6 +72,11 @@ Project: Unirest for Java
 URL:     https://github.com/Mashape/unirest-java
 License: MIT
 
+Id:      info.debatty:java-string-similarity
+Project: Java String Similarity
+URL:     https://github.com/tdebatty/java-string-similarity
+License: MIT
+
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/

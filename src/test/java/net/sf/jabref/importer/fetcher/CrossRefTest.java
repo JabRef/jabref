@@ -1,6 +1,7 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -34,11 +35,27 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findIncompleteTitle() {
+    public void notFindIncompleteTitle() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Towards Application Portability");
         entry.setField("author", "Stefan Kolb and Guido Wirtz");
+        assertEquals(Optional.empty(), CrossRef.findDOI(entry));
+    }
+
+    @Test
+    public void acceptTitleUnderThreshold() {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Towards Application Portability in Platform as a Service----");
+        entry.setField("author", "Stefan Kolb and Guido Wirtz");
         assertEquals("10.1109/sose.2014.26", CrossRef.findDOI(entry).get().getDOI().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Test
+    public void notAcceptTitleOverThreshold() {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Towards Application Portability in Platform as a Service-----");
+        entry.setField("author", "Stefan Kolb and Guido Wirtz");
+        assertEquals(Optional.empty(), CrossRef.findDOI(entry));
     }
 
     @Test
