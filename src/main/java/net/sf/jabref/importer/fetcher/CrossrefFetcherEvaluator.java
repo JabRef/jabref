@@ -17,7 +17,10 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
-public class CrossrefFetcherTest {
+/**
+ * Useful for checking out new algorithm improvements and thresholds. Not used inside the JabRef code itself.
+ */
+public class CrossrefFetcherEvaluator {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
 
