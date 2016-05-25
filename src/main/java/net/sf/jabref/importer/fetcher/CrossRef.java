@@ -1,5 +1,6 @@
 package net.sf.jabref.importer.fetcher;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -109,6 +110,6 @@ public class CrossRef {
     }
 
     private static double editDistanceIgnoreCase(String a, String b) {
-        return METRIC_DISTANCE.distance(a.toLowerCase(), b.toLowerCase());
+        return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }
