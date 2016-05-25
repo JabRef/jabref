@@ -172,6 +172,13 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
+    public void testWithNbibFile() throws IOException, URISyntaxException {
+        Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
+    }
+
+    @Test
     public void testAllArticleTypes() throws IOException {
         try (BufferedReader reader = readerForString("PMID-22664795" + "\n" +
                 "MH  - Female\n" +
