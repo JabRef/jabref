@@ -47,6 +47,7 @@ public class MedlinePlainImporter extends ImportFormat {
     private static final Pattern CREATE_DATE_PATTERN = Pattern.compile("\\d{4}/[0123]?\\d/\\s?[012]\\d:[0-5]\\d");
     private static final Pattern COMPLETE_DATE_PATTERN = Pattern.compile("\\d{8}");
 
+
     @Override
     public String getFormatName() {
         return "MedlinePlain";
@@ -69,8 +70,8 @@ public class MedlinePlainImporter extends ImportFormat {
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)
         String str;
         while ((str = reader.readLine()) != null) {
-            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find() || PMCR_PATTERN.matcher(str)
-                    .find()) {
+            if (PMID_PATTERN.matcher(str).find() || PMC_PATTERN.matcher(str).find()
+                    || PMCR_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
@@ -99,25 +100,25 @@ public class MedlinePlainImporter extends ImportFormat {
             String author = "";
             String editor = "";
             String comment = "";
-            Map<String, String> hm = new HashMap<>();
+            Map<String, String> fields = new HashMap<>();
 
-            String[] fields = entry1.split("\n");
+            String[] lines = entry1.split("\n");
 
-            for (int j = 0; j < fields.length; j++) {
+            for (int j = 0; j < lines.length; j++) {
 
-                StringBuilder current = new StringBuilder(fields[j]);
+                StringBuilder current = new StringBuilder(lines[j]);
                 boolean done = false;
 
-                while (!done && (j < (fields.length - 1))) {
-                    if (fields[j + 1].length() <= 4) {
+                while (!done && (j < (lines.length - 1))) {
+                    if (lines[j + 1].length() <= 4) {
                         j++;
                         continue;
                     }
-                    if (fields[j + 1].charAt(4) != '-') {
+                    if (lines[j + 1].charAt(4) != '-') {
                         if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))) {
                             current.append(' ');
                         }
-                        current.append(fields[j + 1].trim());
+                        current.append(lines[j + 1].trim());
                         j++;
                     } else {
                         done = true;
@@ -131,11 +132,11 @@ public class MedlinePlainImporter extends ImportFormat {
                 if ("PT".equals(label)) {
                     type = addSourceType(value, type);
                 }
-                addDates(hm, label, value);
-                addAbstract(hm, label, value);
-                addTitles(hm, label, value, type);
-                addIDs(hm, label, value);
-                addStandardNumber(hm, label, value);
+                addDates(fields, label, value);
+                addAbstract(fields, label, value);
+                addTitles(fields, label, value, type);
+                addIDs(fields, label, value);
+                addStandardNumber(fields, label, value);
 
                 if ("FAU".equals(label)) {
                     if ("".equals(author)) {
@@ -149,66 +150,58 @@ public class MedlinePlainImporter extends ImportFormat {
                     } else {
                         editor += " and " + value;
                     }
-                } else if ("PG".equals(label)) {
-                    hm.put("pages", value);
-                } else if ("PL".equals(label)) {
-                    hm.put("address", value);
-                } else if ("PHST".equals(label)) {
-                    hm.put("history", value);
-                } else if ("PST".equals(label)) {
-                    hm.put("publication-status", value);
-                } else if ("VI".equals(label)) {
-                    hm.put("volume", value);
-                } else if ("LA".equals(label)) {
-                    hm.put("language", value);
-                } else if ("PUBM".equals(label)) {
-                    hm.put("model", value);
-                } else if ("RN".equals(label)) {
-                    hm.put("registry-number", value);
-                } else if ("NM".equals(label)) {
-                    hm.put("substance-name", value);
-                } else if ("OCI".equals(label)) {
-                    hm.put("copyright-owner", value);
-                } else if ("CN".equals(label)) {
-                    hm.put("corporate", value);
-                } else if ("IP".equals(label)) {
-                    hm.put("issue", value);
-                } else if ("EN".equals(label)) {
-                    hm.put("edition", value);
-                } else if ("GS".equals(label)) {
-                    hm.put("gene-symbol", value);
-                } else if ("GN".equals(label)) {
-                    hm.put("note", value);
-                } else if ("GR".equals(label)) {
-                    hm.put("grantno", value);
-                } else if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
-                    String oldInvestigator = hm.get("investigator");
+                }
+
+                //store the fields in a map
+                Map<String, String> hashMap = new HashMap<>();
+                hashMap.put("PG", "pages");
+                hashMap.put("PL", "address");
+                hashMap.put("PHST", "history");
+                hashMap.put("PST", "publication-status");
+                hashMap.put("VI", "volume");
+                hashMap.put("LA", "language");
+                hashMap.put("LA", "language");
+                hashMap.put("PUBM", "model");
+                hashMap.put("RN", "registry-number");
+                hashMap.put("NM", "substance-name");
+                hashMap.put("OCI", "copyright-owner");
+                hashMap.put("CN", "corporate");
+                hashMap.put("IP", "issue");
+                hashMap.put("EN", "edition");
+                hashMap.put("GS", "gene-symbol");
+                hashMap.put("GN", "note");
+                hashMap.put("GR", "grantno");
+                hashMap.put("SO", "source");
+                hashMap.put("NR", "number-of-references");
+                hashMap.put("SFM", "space-flight-mission");
+                hashMap.put("STAT", "status");
+                hashMap.put("SB", "subset");
+                hashMap.put("OTO", "termowner");
+                hashMap.put("OWN", "owner");
+
+                //add the fields to hm
+                for (Map.Entry<String, String> mapEntry : hashMap.entrySet()) {
+                    String medlineKey = mapEntry.getKey();
+                    String bibtexKey = mapEntry.getValue();
+                    if (medlineKey.equals(label)) {
+                        fields.put(bibtexKey, value);
+                    }
+                }
+
+                if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
+                    String oldInvestigator = fields.get("investigator");
                     if (oldInvestigator == null) {
-                        hm.put("investigator", value);
+                        fields.put("investigator", value);
                     } else {
-                        hm.put("investigator", oldInvestigator + ", " + value);
+                        fields.put("investigator", oldInvestigator + ", " + value);
                     }
-                } else if ("OTO".equals(label)) {
-                    hm.put("termowner", value);
-                } else if ("OWN".equals(label)) {
-                    hm.put("owner", value);
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!hm.containsKey("keywords")) {
-                        hm.put("keywords", value);
+                    if (!fields.containsKey("keywords")) {
+                        fields.put("keywords", value);
                     } else {
-                        String kw = hm.get("keywords");
-                        hm.put("keywords", kw + ", " + value);
+                        String kw = fields.get("keywords");
+                        fields.put("keywords", kw + ", " + value);
                     }
-                } else if ("SO".equals(label)) {
-                    hm.put("source", value);
-                } else if ("NR".equals(label)) {
-                    hm.put("number-of-references", value);
-                } else if ("SFM".equals(label)) {
-                    hm.put("space-flight-mission", value);
-                } else if ("STAT".equals(label)) {
-                    hm.put("status", value);
-                } else if ("SB".equals(label)) {
-                    hm.put("subset", value);
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
                         || "RPI".equals(label) || "RPF".equals(label) || "RIN".equals(label) || "ROF".equals(label)
@@ -219,19 +212,19 @@ public class MedlinePlainImporter extends ImportFormat {
                     comment = comment + value;
                 }
             }
-            fixAuthors(hm, author, "author");
-            fixAuthors(hm, editor, "editor");
+            fixAuthors(fields, author, "author");
+            fixAuthors(fields, editor, "editor");
             if (!comment.isEmpty()) {
-                hm.put("comment", comment);
+                fields.put("comment", comment);
             }
 
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            hm.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(hm::remove);
+            fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);
 
             // create one here
-            b.setField(hm);
+            b.setField(fields);
             bibitems.add(b);
 
         }
@@ -243,22 +236,34 @@ public class MedlinePlainImporter extends ImportFormat {
     private String addSourceType(String value, String type) {
         String val = value.toLowerCase(Locale.ENGLISH);
         String theType = type;
-        if ("book".equals(val)) {
+        switch (val) {
+        case "book":
             theType = "book";
-        } else if ("journal article".equals(val) || "classical article".equals(val)
-                || "corrected and republished article".equals(val) || "historical article".equals(value)
-                || "introductory journal article".equals(val) || "newspaper article".equals(val)) {
+            break;
+        case "journal article":
+        case "classical article":
+        case "corrected and republished article":
+        case "historical article":
+        case "introductory journal article":
+        case "newspaper article":
             theType = "article";
-        } else if ("clinical conference".equals(val) || "consensus development conference".equals(val)
-                || "consensus development conference, nih".equals(val)) {
+            break;
+        case "clinical conference":
+        case "consensus development conference":
+        case "consensus development conference, nih":
             theType = "conference";
-        } else if ("technical report".equals(val)) {
+            break;
+        case "technical report":
             theType = "techreport";
-        } else if ("editorial".equals(val)) {
-            theType = "inproceedings";//"incollection";"inbook";
-        } else if ("overall".equals(val)) {
+            break;
+        case "editorial":
+            theType = "inproceedings";
+            break;
+        case "overall":
             theType = "proceedings";
-        } else if ("".equals(theType)) {
+            break;
+        }
+        if ("".equals(theType)) {
             theType = "other";
         }
         return theType;
