@@ -1,5 +1,7 @@
 package net.sf.jabref.model.database;
 
+import java.util.Locale;
+
 public enum BibDatabaseMode {
     BIBTEX,
     BIBLATEX;
@@ -22,5 +24,9 @@ public enum BibDatabaseMode {
 
     public static BibDatabaseMode fromPreference(boolean isBibLatex) {
         return isBibLatex ? BIBLATEX : BIBTEX;
+    }
+
+    public static BibDatabaseMode parse(String data) {
+        return BibDatabaseMode.valueOf(data.toUpperCase(Locale.ENGLISH));
     }
 }

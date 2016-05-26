@@ -118,7 +118,7 @@ public class MetaData implements Iterable<String> {
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
         List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
         if (storedSaveOrderConfig != null) {
-            return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
+            return Optional.of(SaveOrderConfig.parse(storedSaveOrderConfig));
         }
         return Optional.empty();
     }
@@ -300,9 +300,7 @@ public class MetaData implements Iterable<String> {
         if (this.getData(SAVE_ACTIONS) == null) {
             return Optional.empty();
         } else {
-            boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
-            String formatterString = this.getData(SAVE_ACTIONS).get(1);
-            return Optional.of(new FieldFormatterCleanups(enablementStatus, formatterString));
+            return Optional.of(FieldFormatterCleanups.parse(getData(SAVE_ACTIONS)));
         }
     }
 
@@ -311,7 +309,7 @@ public class MetaData implements Iterable<String> {
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase(Locale.ENGLISH)));
+        return Optional.of(BibDatabaseMode.parse(data.get(0)));
     }
 
     public boolean isProtected() {
