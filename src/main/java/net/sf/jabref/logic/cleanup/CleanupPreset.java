@@ -74,7 +74,7 @@ public class CleanupPreset {
             activeJobs.add(CleanupStep.FIX_FILE_LINKS);
         }
 
-        FieldFormatterCleanups formatterCleanups = FieldFormatterCleanups.parseFromString(
+        FieldFormatterCleanups formatterCleanups = FieldFormatterCleanups.parse(
                 preferences.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
 
         return new CleanupPreset(activeJobs, formatterCleanups);

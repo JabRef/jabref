@@ -95,11 +95,9 @@ public class MetaData implements Iterable<String> {
             }
             if (GROUPSTREE.equals(entry.getKey())) {
                 putGroups(orderedData);
-                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not use them here
+                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not support them anymore
             } else if (SAVE_ACTIONS.equals(entry.getKey())) {
-                boolean enablementStatus = "enabled".equals(orderedData.get(0));
-                String formatterString = orderedData.get(1);
-                setSaveActions(new FieldFormatterCleanups(enablementStatus, formatterString));
+                setSaveActions(FieldFormatterCleanups.parse(orderedData));
             } else {
                 putData(entry.getKey(), orderedData);
             }
