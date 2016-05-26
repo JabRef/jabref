@@ -350,7 +350,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> serialize() {
+    public Map<String, String> getAsString() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 

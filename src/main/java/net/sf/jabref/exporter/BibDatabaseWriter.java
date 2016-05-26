@@ -281,7 +281,7 @@ public class BibDatabaseWriter {
             return;
         }
 
-        Map<String, String> serializedMetaData = metaData.serialize();
+        Map<String, String> serializedMetaData = metaData.getAsString();
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
 
