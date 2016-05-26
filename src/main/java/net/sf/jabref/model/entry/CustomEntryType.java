@@ -124,4 +124,16 @@ public class CustomEntryType implements EntryType {
     public int hashCode() {
         return super.hashCode();
     }
+
+    public String getAsString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(ENTRYTYPE_FLAG);
+        builder.append(getName());
+        builder.append(": req[");
+        builder.append(getRequiredFieldsString());
+        builder.append("] opt[");
+        builder.append(String.join(";", getOptionalFields()));
+        builder.append("]");
+        return builder.toString();
+    }
 }
