@@ -30,7 +30,6 @@ import java.util.Objects;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -281,7 +280,7 @@ public class BibtexParser {
                 .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
+            CustomEntryType typ = CustomEntryType.parse(comment);
             if(typ == null) {
                 parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
                         comment);
