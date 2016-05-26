@@ -79,7 +79,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData) throws ParseException {
+    private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
@@ -112,6 +112,10 @@ public class MetaData implements Iterable<String> {
      */
     public MetaData() {
         // No data
+    }
+
+    public static MetaData parse(Map<String, String> data) throws ParseException {
+        return new MetaData(data);
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
