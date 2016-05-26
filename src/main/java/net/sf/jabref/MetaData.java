@@ -36,7 +36,6 @@ import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
@@ -182,7 +181,7 @@ public class MetaData implements Iterable<String> {
      */
     private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = GroupsParser.importGroups(orderedData);
+            groupsRoot = GroupTreeNode.parse(orderedData);
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
                     "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);

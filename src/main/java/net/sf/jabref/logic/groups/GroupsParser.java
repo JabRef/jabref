@@ -25,7 +25,7 @@ import net.sf.jabref.logic.l10n.Localization;
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
-public class GroupsParser {
+class GroupsParser {
 
     public static GroupTreeNode importGroups(List<String> orderedData) throws ParseException {
         GroupTreeNode cursor = null;

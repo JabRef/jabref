@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
@@ -212,5 +213,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     @Override
     public GroupTreeNode copyNode() {
         return new GroupTreeNode(group);
+    }
+
+    public static GroupTreeNode parse(List<String> orderedData) throws ParseException {
+        return GroupsParser.importGroups(orderedData);
     }
 }
