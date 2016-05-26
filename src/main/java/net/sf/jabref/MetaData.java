@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -393,17 +392,17 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setSaveActions(FieldFormatterCleanups saveActions) {
-        List<String> actionsSerialized = saveActions.convertToString();
+        List<String> actionsSerialized = saveActions.getAsString();
         putData(SAVE_ACTIONS, actionsSerialized);
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        List<String> serialized = saveOrderConfig.getConfigurationList();
+        List<String> serialized = saveOrderConfig.getAsString();
         putData(SAVE_ORDER_CONFIG, serialized);
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
+        putData(DATABASE_TYPE, Collections.singletonList(mode.getAsString()));
     }
 
     public void markAsProtected() {

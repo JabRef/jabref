@@ -29,4 +29,8 @@ public enum BibDatabaseMode {
     public static BibDatabaseMode parse(String data) {
         return BibDatabaseMode.valueOf(data.toUpperCase(Locale.ENGLISH));
     }
+
+    public String getAsString() {
+        return getFormattedName().toLowerCase(Locale.ENGLISH);
+    }
 }

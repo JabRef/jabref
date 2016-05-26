@@ -124,7 +124,7 @@ public class CleanupPreset {
         preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
         preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
 
-        preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.convertToString());
+        preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.getAsString());
     }
 
     private Boolean isActive(CleanupStep step) {

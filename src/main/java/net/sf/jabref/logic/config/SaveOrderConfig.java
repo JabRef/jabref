@@ -192,7 +192,7 @@ public class SaveOrderConfig {
     /**
      * Outputs the current configuration to be consumed later by the constructor
      */
-    public List<String> getConfigurationList() {
+    public List<String> getAsString() {
         List<String> res = new ArrayList<>(7);
         if (saveInOriginalOrder) {
             res.add("original");
