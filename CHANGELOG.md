@@ -29,6 +29,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added an additional icon to distinguish DOI and URL links ([feature request #696](https://github.com/JabRef/jabref/issues/696))
 - Added nbib fields to Medlineplain importer
 - Implemented [#1342](https://github.com/JabRef/jabref/issues/1342): show description of case converters as tooltip 
+- Updated German translation
 
 ### Fixed
 - Fixed [#473](https://github.com/JabRef/jabref/issues/473): Values in an entry containing symbols like ' are now properly escaped for exporting to the database
