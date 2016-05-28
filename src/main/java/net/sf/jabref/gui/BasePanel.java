@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -1245,6 +1247,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class GroupTreeListener {
 
+        private final Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                // Update group display (for example to reflect that the number of contained entries has changed)
+                frame.getGroupSelector().revalidateGroups();
+            }
+
+        };
+
+        /**
+         * Only access when you have the lock of the task instance
+         *
+         * Guarded by "task"
+         */
+        private TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                task.run();
+            }
+        };
+
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // Automatically add new entry to the selected group (or set of groups)
@@ -1260,14 +1283,28 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
             }
 
-            // Update group display (for example to reflect that the number of contained entries has changed)
-            frame.getGroupSelector().revalidateGroups();
+            scheduleUpdate();
+        }
+
+        private void scheduleUpdate() {
+            // This is a quickfix/dirty hack.
+            // a better solution would be using RxJava or something reactive instead
+            // nevertheless it works correctly
+            synchronized (task) {
+                timerTask.cancel();
+                timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        task.run();
+                    }
+                };
+                JabRefExecutorService.INSTANCE.submit(timerTask, 200);
+            }
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            // Update group display in order to take changes into account
-            frame.getGroupSelector().revalidateGroups();
+            scheduleUpdate();
         }
     }
 

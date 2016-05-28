@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -42,6 +44,8 @@ public class JabRefExecutorService implements Executor {
         return thread;
     });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
+
+    private final Timer timer = new Timer("timer");
 
     private JabRefExecutorService() {}
 
@@ -136,12 +140,17 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
+    public void submit(TimerTask timerTask, long millisecondsDelay) {
+        timer.schedule(timerTask, millisecondsDelay);
+    }
+
     public void shutdownEverything() {
         this.executorService.shutdown();
         for(Thread thread : startedThreads) {
             thread.interrupt();
         }
         startedThreads.clear();
+        timer.cancel();
     }
 
 }
