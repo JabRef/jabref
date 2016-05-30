@@ -105,7 +105,7 @@ public class ClipBoardManager implements ClipboardOwner {
                 // fetch from doi
                 if (DOI.build(data).isPresent()) {
                     LOGGER.info("Found DOI in clipboard");
-                    BibEntry entry = new DOItoBibTeXFetcher().getEntryFromDOI(new DOI(data).getDOI(), null);
+                    BibEntry entry = new DOItoBibTeXFetcher().getEntryFromDOI(new DOI(data).getDOI());
                     if (entry != null) {
                         result.add(entry);
                     }
