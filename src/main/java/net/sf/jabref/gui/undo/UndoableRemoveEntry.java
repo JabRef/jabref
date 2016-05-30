@@ -58,7 +58,7 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
     @Override
     public void undo() {
         super.undo();
-        base.insertEntry(entry);
+        base.insertEntry(entry, true);
     }
 
     @Override
