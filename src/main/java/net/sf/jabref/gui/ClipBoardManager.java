@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -105,10 +106,8 @@ public class ClipBoardManager implements ClipboardOwner {
                 // fetch from doi
                 if (DOI.build(data).isPresent()) {
                     LOGGER.info("Found DOI in clipboard");
-                    BibEntry entry = new DOItoBibTeXFetcher().getEntryFromDOI(new DOI(data).getDOI());
-                    if (entry != null) {
-                        result.add(entry);
-                    }
+                    Optional<BibEntry> entry = new DOItoBibTeXFetcher().getEntryFromDOI(new DOI(data).getDOI());
+                    entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
                     BibtexParser bp = new BibtexParser(new StringReader(data));
