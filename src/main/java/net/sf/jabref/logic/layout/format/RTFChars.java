@@ -39,16 +39,12 @@ import org.apache.commons.logging.LogFactory;
  *   5.) Replace --- by \emdash and -- by \endash.
  */
 public class RTFChars implements LayoutFormatter {
-
-    // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
-
     @Override
     public String format(String field) {
-
         StringBuilder sb = new StringBuilder("");
         StringBuilder currentCommand = null;
         boolean escaped = false;
@@ -133,7 +129,7 @@ public class RTFChars implements LayoutFormatter {
 
                     // Then look for italics etc.,
                     // but first check if we are already at the end of the string.
-                    if (i >= (field.length() - 1)) {
+                    if (i >= field.length() - 1) {
                         break testContent;
                     }
 
@@ -204,7 +200,7 @@ public class RTFChars implements LayoutFormatter {
                 count++;
                 break;
             case ' ':
-                if (commandNestedInBraces) {
+                if (!commandNestedInBraces) {
                     // in any case, a space terminates the loop
                     break loop;
                 }
