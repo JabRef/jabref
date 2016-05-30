@@ -39,7 +39,7 @@ public class RTFCharsTest {
     public void testLaTeXHighlighting() {
         Assert.assertEquals("{\\i hallo}", formatter.format("\\emph{hallo}"));
         Assert.assertEquals("{\\i hallo}", formatter.format("{\\emph hallo}"));
-        Assert.assertEquals("{An article title with {\\i a book title} emphasized", formatter.format("An article title with \\emph{a book title} emphasized"));
+        Assert.assertEquals("An article title with {\\i a book title} emphasized", formatter.format("An article title with \\emph{a book title} emphasized"));
 
         Assert.assertEquals("{\\i hallo}", formatter.format("\\textit{hallo}"));
         Assert.assertEquals("{\\i hallo}", formatter.format("{\\textit hallo}"));
