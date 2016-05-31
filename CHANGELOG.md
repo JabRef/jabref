@@ -62,6 +62,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1421](https://github.com/JabRef/jabref/issues/1421): Auto downloader should try to retrieve DOI if not present and fetch afterwards
 - Fixed [#1457](https://github.com/JabRef/jabref/issues/1457): Support multiple words inside LaTeX commands to RTF export
 - Entries retain their groupmembership when undoing their cut/deletion
+- Fixed [#1450](https://github.com/JabRef/jabref/issues/1450): EntryEditor is restored in the correct size after preference changes
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic

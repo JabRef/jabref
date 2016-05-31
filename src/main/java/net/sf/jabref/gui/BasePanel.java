@@ -1518,6 +1518,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void setupMainPanel() {
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setDividerSize(SPLIT_PANE_DIVIDER_SIZE);
+        adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         // check whether a mainTable already existed and a floatSearch was active
         boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
