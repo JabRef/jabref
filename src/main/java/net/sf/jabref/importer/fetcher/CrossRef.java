@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -81,7 +82,8 @@ public class CrossRef {
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
-        final String entryTitle = new RemoveBracesFormatter().format(entry.getField("title"));
+        // TODO: use latex-free version instead in the future
+        final String entryTitle = removeLaTeX(entry.getField("title"));
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]
@@ -109,7 +111,18 @@ public class CrossRef {
         }
     }
 
+    private static String removeLaTeX(String text) {
+        String result;
+        // remove braces
+        result = new RemoveBracesFormatter().format(text);
+        // convert to unicode
+        result = new LatexToUnicodeFormatter().format(result);
+
+        return result;
+    }
+
     private static double editDistanceIgnoreCase(String a, String b) {
+        // TODO: locale is dependent on the language of the strings?!
         return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }
