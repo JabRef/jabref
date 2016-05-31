@@ -26,9 +26,6 @@ public abstract class SpecialField {
     // currently, menuString is used for undo string
     // public static String TEXT_UNDO;
 
-    // Plain string; NOT treated by Globals.lang
-    public String TEXT_DONE_PATTERN;
-
     private List<SpecialFieldValue> values;
     private List<String> keywords;
     private HashMap<String, SpecialFieldValue> map;
@@ -63,6 +60,8 @@ public abstract class SpecialField {
     public abstract String getMenuString();
 
     public abstract String getToolTip();
+
+    public abstract String getTextDone(String... params);
 
     public boolean isSingleValueField() {
         return false;

@@ -35,7 +35,6 @@ public class Relevance extends SpecialField {
         values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(),
                 Localization.lang("Toggle relevance")));
         this.setValues(values);
-        TEXT_DONE_PATTERN = "Toggled relevance for %0 entries";
     }
 
     @Override
@@ -58,6 +57,11 @@ public class Relevance extends SpecialField {
     @Override
     public String getToolTip() {
         return this.getValues().get(0).getToolTipText();
+    }
+
+    @Override
+    public String getTextDone(String... params) {
+        return Localization.lang("Toggled relevance for %0 entries", params);
     }
 
     @Override

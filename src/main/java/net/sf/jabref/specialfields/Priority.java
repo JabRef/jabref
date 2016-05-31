@@ -46,7 +46,6 @@ public class Priority extends SpecialField {
         values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Localization.lang("Set priority to low"),
                 tmpicon, Localization.lang("Priority low")));
         this.setValues(values);
-        TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";
     }
 
     public static Priority getInstance() {
@@ -69,6 +68,11 @@ public class Priority extends SpecialField {
     @Override
     public String getToolTip() {
         return Localization.lang("Priority");
+    }
+
+    @Override
+    public String getTextDone(String... params) {
+        return Localization.lang("Set priority to '%0' for %1 entries", params);
     }
 
     @Override

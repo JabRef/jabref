@@ -29,8 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class SpecialFieldAction implements BaseAction {
 
     private final JabRefFrame frame;
-    private final String doneTextPattern;
-    private final SpecialField c;
+    private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
@@ -41,21 +40,18 @@ public class SpecialFieldAction implements BaseAction {
     /**
      *
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
-     * @param doneTextPattern - the pattern to use to update status information shown in MainFrame
      */
     public SpecialFieldAction(
             JabRefFrame frame,
-            SpecialField c,
+            SpecialField specialField,
             String value,
             boolean nullFieldIfValueIsTheSame,
-            String undoText,
-            String doneTextPattern) {
+            String undoText) {
         this.frame = frame;
-        this.c = c;
+        this.specialField = specialField;
         this.value = value;
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
         this.undoText = undoText;
-        this.doneTextPattern = doneTextPattern;
     }
 
     @Override
@@ -68,7 +64,7 @@ public class SpecialFieldAction implements BaseAction {
             NamedCompound ce = new NamedCompound(undoText);
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                SpecialFieldsUtils.updateField(c, value, be, ce, nullFieldIfValueIsTheSame);
+                SpecialFieldsUtils.updateField(specialField, value, be, ce, nullFieldIfValueIsTheSame);
             }
             ce.end();
             if (ce.hasEdits()) {
@@ -77,9 +73,9 @@ public class SpecialFieldAction implements BaseAction {
                 frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame) {
-                    outText = Localization.lang(doneTextPattern, Integer.toString(bes.size()));
+                    outText = specialField.getTextDone(Integer.toString(bes.size()));
                 } else {
-                    outText = Localization.lang(doneTextPattern, value, Integer.toString(bes.size()));
+                    outText = specialField.getTextDone(value, Integer.toString(bes.size()));
                 }
                 frame.output(outText);
             } else {

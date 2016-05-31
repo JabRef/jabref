@@ -34,7 +34,6 @@ public class Printed extends SpecialField {
         values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toggle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(),
                 Localization.lang("Toggle print status")));
         this.setValues(values);
-        TEXT_DONE_PATTERN = "Toggled print status for %0 entries";
     }
 
     @Override
@@ -62,6 +61,11 @@ public class Printed extends SpecialField {
     @Override
     public String getMenuString() {
         return Localization.lang("Printed");
+    }
+
+    @Override
+    public String getTextDone(String... params) {
+        return Localization.lang("Toggled print status for %0 entries", params);
     }
 
     @Override

@@ -28,8 +28,6 @@ public class Rank extends SpecialField {
     private static Rank INSTANCE;
 
     private Rank() {
-        TEXT_DONE_PATTERN = "Set rank to '%0' for %1 entries";
-
         List<SpecialFieldValue> values = new ArrayList<>();
         // lab.setName("i");
         values.add(new SpecialFieldValue(this, null, "clearRank", Localization.lang("Clear rank"), null,
@@ -63,6 +61,10 @@ public class Rank extends SpecialField {
     @Override
     public String getToolTip() {
         return Localization.lang("Rank");
+    }
+
+    @Override public String getTextDone(String... params) {
+        return Localization.lang("Set rank to '%0' for %1 entries", params);
     }
 
     @Override
