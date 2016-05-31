@@ -116,7 +116,7 @@ public class MSBibDatabase {
             msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
 
             for (MSBibEntry entry : entries) {
-                Node node = entry.getDOMrepresentation(result);
+                Node node = entry.getDOM(result);
                 msbibCollection.appendChild(node);
             }
 

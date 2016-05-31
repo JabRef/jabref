@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,6 +81,8 @@ public class MSBibExportFormatTestFiles {
 
         List<String> expected = Files.readAllLines(Paths.get(PATH_TO_FILE + xmlFileName));
         List<String> exported = Files.readAllLines(Paths.get(tempFilename));
+        Collections.sort(expected);
+        Collections.sort(exported);
         assertEquals(expected, exported);
     }
 }
