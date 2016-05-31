@@ -40,9 +40,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 /**
- * @author Oscar
- *
- *         Dialog for merging Bibtex entry with data fetched from DOI
+ * Dialog for merging Bibtex entry with data fetched from DOI
  */
 public class MergeEntryDOIDialog extends JDialog {
 
@@ -72,7 +70,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
         this.originalEntry = panel.getSelectedEntries().get(0);
         panel.output(Localization.lang("Fetching info based on DOI"));
-        this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi"), null);
+        this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi")).orElse(null);
 
         if (this.doiEntry == null) {
             panel.output("");

@@ -163,7 +163,7 @@ public class DOI {
      *
      * @return an encoded URL representation of the DOI
      */
-    public String getURLAsASCIIString() {
+    public String getURIAsASCIIString() {
         return getURI().map(URI::toASCIIString).orElse("");
     }
 }

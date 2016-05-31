@@ -80,7 +80,7 @@ public class JabRefDesktop {
         } else if ("doi".equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
             if (doiUrl.isPresent()) {
-                link = doiUrl.get().getURLAsASCIIString();
+                link = doiUrl.get().getURIAsASCIIString();
             }
             // should be opened in browser
             fieldName = "url";

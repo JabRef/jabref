@@ -1,28 +1,10 @@
-/*  Copyright (C) 2014 JabRef contributors.
-    Copyright (C) 2015 Oliver Kopp
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.sf.jabref.importer.fetcher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.JPanel;
@@ -50,24 +32,21 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
-
     @Override
     public void stopFetching() {
-        // nothing needed as the fetching is a single HTTP GET
+        // not needed as the fetching is a single HTTP GET
     }
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         ParserResult parserResult = new ParserResult();
-        BibEntry entry = getEntryFromDOI(query, parserResult);
-        if(parserResult.hasWarnings()) {
+        Optional<BibEntry> entry = getEntryFromDOI(query, parserResult);
+        if (parserResult.hasWarnings()) {
             status.showMessage(parserResult.getErrorMessage());
         }
-        if (entry != null) {
-            inspector.addEntry(entry);
-            return true;
-        }
-        return false;
+        entry.ifPresent(e -> inspector.addEntry(e));
+
+        return entry.isPresent();
     }
 
     @Override
@@ -86,67 +65,73 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         return null;
     }
 
-    public BibEntry getEntryFromDOI(String doiStr, ParserResult parserResult) {
-        Objects.requireNonNull(parserResult);
+    public Optional<BibEntry> getEntryFromDOI(String doiStr) {
+        return getEntryFromDOI(doiStr, null);
+    }
 
-        DOI doi;
-        try {
-            doi = new DOI(doiStr);
-        } catch (IllegalArgumentException e) {
-            parserResult.addWarning(Localization.lang("Invalid DOI: '%0'.", doiStr));
-            return null;
-        }
+    public Optional<BibEntry> getEntryFromDOI(String doiStr, ParserResult parserResult) {
+        Optional<DOI> doi = DOI.build(doiStr);
 
-        // Send the request
-
-        // construct URL
-        URL url;
-        try {
-            Optional<URI> uri = doi.getURI();
-            if (uri.isPresent()) {
-                url = uri.get().toURL();
-            } else {
-                return null;
+        if (!doi.isPresent()) {
+            if (parserResult != null) {
+                parserResult.addWarning(Localization.lang("Invalid DOI: '%0'.", doiStr));
             }
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Bad URL", e);
-            return null;
+            return Optional.empty();
         }
 
-        String bibtexString = "";
         try {
-            URLDownload dl = new URLDownload(url);
-            dl.addParameters("Accept", "application/x-bibtex");
-            bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
+            URL doiURL = new URL(doi.get().getURIAsASCIIString());
+
+            // BibTeX data
+            URLDownload download = new URLDownload(doiURL);
+            download.addParameters("Accept", "application/x-bibtex");
+            String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
+            bibtexString = cleanupEncoding(bibtexString);
+
+            // BibTeX entry
+            BibEntry entry = BibtexParser.singleFromString(bibtexString);
+
+            if (entry == null) {
+                return Optional.empty();
+            }
+            // Optionally re-format BibTeX entry
+            formatTitleField(entry);
+
+            return Optional.of(entry);
+        } catch (MalformedURLException e) {
+            LOGGER.warn("Bad DOI URL", e);
+            return Optional.empty();
         } catch (FileNotFoundException e) {
-            parserResult.addWarning(Localization.lang("Unknown DOI: '%0'.", doi.getDOI()));
+            if (parserResult != null) {
+                parserResult.addWarning(Localization.lang("Unknown DOI: '%0'.", doi.get().getDOI()));
+            }
             LOGGER.debug("Unknown DOI", e);
-            return null;
+            return Optional.empty();
         } catch (IOException e) {
             LOGGER.warn("Communication problems", e);
-            return null;
+            return Optional.empty();
         }
+    }
 
-        //Usually includes an en-dash in the page range. Char is in cp1252 but not
+    private void formatTitleField(BibEntry entry) {
+        // Optionally add curly brackets around key words to keep the case
+        entry.getFieldOptional("title").ifPresent(title -> {
+            // Unit formatting
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
+                title = unitsToLatexFormatter.format(title);
+            }
+
+            // Case keeping
+            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
+                title = protectTermsFormatter.format(title);
+            }
+            entry.setField("title", title);
+        });
+    }
+
+    private String cleanupEncoding(String bibtex) {
+        // Usually includes an en-dash in the page range. Char is in cp1252 but not
         // ISO 8859-1 (which is what latex expects). For convenience replace here.
-        bibtexString = bibtexString.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
-        BibEntry entry = BibtexParser.singleFromString(bibtexString);
-
-        if (entry != null) {
-            // Optionally add curly brackets around key words to keep the case
-            entry.getFieldOptional("title").ifPresent(title -> {
-                // Unit formatting
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                    title = unitsToLatexFormatter.format(title);
-                }
-
-                // Case keeping
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                    title = protectTermsFormatter.format(title);
-                }
-                entry.setField("title", title);
-            });
-        }
-        return entry;
+        return bibtex.replaceAll("(pages=\\{[0-9]+)\u2013([0-9]+\\})", "$1--$2");
     }
 }
