@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
@@ -318,8 +319,7 @@ class MSBibEntry {
 
         if (bibtex.hasField("title")) {
             String temp = bibtex.getField("title");
-            // TODO: remove LaTex syntax
-            title = new RemoveBrackets().format(temp);
+            title = removeLaTeX(temp);
         }
         if (bibtex.hasField("year")) {
             year = bibtex.getField("year");
@@ -539,6 +539,15 @@ class MSBibEntry {
             editors = getAuthors(bibtex.getField("editor"));
         }
 
+    }
+
+    private String removeLaTeX(String text) {
+        // TODO: just use latex free version everywhere in the future
+        // TODO: use for every field?
+        String result = new RemoveBrackets().format(text);
+        result = new LatexToUnicodeFormatter().format(result);
+
+        return result;
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
