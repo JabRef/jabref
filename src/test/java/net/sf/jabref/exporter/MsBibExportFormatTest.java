@@ -57,22 +57,4 @@ public class MsBibExportFormatTest {
         msBibExportFormat.performExport(databaseContext, tempFileName, charset, entries);
         assertEquals(Collections.emptyList(), Files.readAllLines(tempFile.toPath()));
     }
-
-    @Test
-    public final void testPerformExportWithTestBib() throws IOException {
-        try (FileInputStream stream = new FileInputStream("src/test/resources/net/sf/jabref/bibtexFiles/test.bib");
-                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(reader);
-            BibDatabase database = result.getDatabase();
-            String tempFilename = tempFile.getCanonicalPath();
-            List<BibEntry> entries = database.getEntries();
-            assertNotNull(entries);
-            msBibExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
-            List<String> expected = Files.readAllLines(Paths.get("src/test/resources/net/sf/jabref/exporter/test.xml"));
-            List<String> exported = Files.readAllLines(Paths.get(tempFilename));
-            Collections.sort(expected);
-            Collections.sort(exported);
-            assertEquals(expected, exported);
-        }
-    }
 }
