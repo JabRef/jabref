@@ -3,7 +3,6 @@ package net.sf.jabref.logic.msbib;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -11,9 +10,6 @@ import java.util.stream.Collectors;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-
-import com.google.common.collect.HashBiMap;
 
 public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";

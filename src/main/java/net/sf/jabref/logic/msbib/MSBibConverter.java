@@ -2,8 +2,6 @@ package net.sf.jabref.logic.msbib;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
