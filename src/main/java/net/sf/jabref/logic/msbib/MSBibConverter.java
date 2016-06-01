@@ -20,7 +20,7 @@ public class MSBibConverter {
         // memorize original type
         result.bibtexType = entry.getType();
         // define new type
-        result.msbibType = getMSBibType(entry).name();
+        result.msbibType = MSBibMapping.getMSBibEntryType(entry.getType()).name();
 
         for (String field : entry.getFieldNames()) {
             // clean field
@@ -116,30 +116,6 @@ public class MSBibConverter {
         }
 
         return result;
-    }
-
-    protected static MSBibEntryType getMSBibType(BibEntry entry) {
-        Map<String, MSBibEntryType> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-        entryTypeMapping.put("book", MSBibEntryType.Book);
-        entryTypeMapping.put("inbook", MSBibEntryType.BookSection);
-        entryTypeMapping.put("booklet", MSBibEntryType.BookSection);
-        entryTypeMapping.put("incollection", MSBibEntryType.BookSection);
-        entryTypeMapping.put("article", MSBibEntryType.JournalArticle);
-        entryTypeMapping.put("inproceedings", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("conference", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("proceedings", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("collection", MSBibEntryType.ConferenceProceedings);
-        entryTypeMapping.put("techreport", MSBibEntryType.Report);
-        entryTypeMapping.put("manual", MSBibEntryType.Report);
-        entryTypeMapping.put("mastersthesis", MSBibEntryType.Report);
-        entryTypeMapping.put("phdthesis", MSBibEntryType.Report);
-        entryTypeMapping.put("unpublished", MSBibEntryType.Report);
-        entryTypeMapping.put("patent", MSBibEntryType.Patent);
-        entryTypeMapping.put("misc", MSBibEntryType.Misc);
-        entryTypeMapping.put("electronic", MSBibEntryType.Misc);
-
-        return entryTypeMapping.getOrDefault(entry.getType(), MSBibEntryType.Misc);
     }
 
     private static List<PersonName> getAuthors(String authors) {

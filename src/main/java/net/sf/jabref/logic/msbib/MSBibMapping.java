@@ -1,6 +1,10 @@
 package net.sf.jabref.logic.msbib;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import com.google.common.collect.HashBiMap;
 
@@ -60,6 +64,45 @@ public class MSBibMapping {
         bibtexToMSBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
+    }
+
+    public static String getBibTeXEntryType(String msbibType) {
+        final String defaultType = BibtexEntryTypes.MISC.getName();
+
+        Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        entryTypeMapping.put("Book", BibtexEntryTypes.BOOK.getName());
+        entryTypeMapping.put("BookSection", BibtexEntryTypes.INBOOK.getName());
+        entryTypeMapping.put("JournalArticle", BibtexEntryTypes.ARTICLE.getName());
+        entryTypeMapping.put("ArticleInAPeriodical", BibtexEntryTypes.ARTICLE.getName());
+        entryTypeMapping.put("ConferenceProceedings", BibtexEntryTypes.CONFERENCE.getName());
+        entryTypeMapping.put("Report", BibtexEntryTypes.TECHREPORT.getName());
+
+        return entryTypeMapping.getOrDefault(msbibType, defaultType);
+    }
+
+    public static MSBibEntryType getMSBibEntryType(String bibtexType) {
+        Map<String, MSBibEntryType> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        entryTypeMapping.put("book", MSBibEntryType.Book);
+        entryTypeMapping.put("inbook", MSBibEntryType.BookSection);
+        entryTypeMapping.put("booklet", MSBibEntryType.BookSection);
+        entryTypeMapping.put("incollection", MSBibEntryType.BookSection);
+        entryTypeMapping.put("article", MSBibEntryType.JournalArticle);
+        entryTypeMapping.put("inproceedings", MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put("conference", MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put("proceedings", MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put("collection", MSBibEntryType.ConferenceProceedings);
+        entryTypeMapping.put("techreport", MSBibEntryType.Report);
+        entryTypeMapping.put("manual", MSBibEntryType.Report);
+        entryTypeMapping.put("mastersthesis", MSBibEntryType.Report);
+        entryTypeMapping.put("phdthesis", MSBibEntryType.Report);
+        entryTypeMapping.put("unpublished", MSBibEntryType.Report);
+        entryTypeMapping.put("patent", MSBibEntryType.Patent);
+        entryTypeMapping.put("misc", MSBibEntryType.Misc);
+        entryTypeMapping.put("electronic", MSBibEntryType.Misc);
+
+        return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }
 
     public static String getMSBibField(String bibtexFieldName) {

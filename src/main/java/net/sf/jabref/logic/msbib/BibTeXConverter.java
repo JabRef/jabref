@@ -22,10 +22,11 @@ public class BibTeXConverter {
         BibEntry result;
 
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, mapMSBibToBibtexType(entry.msbibType));
+            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.msbibType));
         } else {
             // TODO: the cite key should not be the ID?!
-            result = new BibEntry(entry.getCiteKey(), mapMSBibToBibtexType(entry.msbibType)); // id assumes an existing database so don't
+            // id assumes an existing database so don't
+            result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.msbibType));
         }
 
         Map<String, String> fieldValues = new HashMap<>();
@@ -106,20 +107,5 @@ public class BibTeXConverter {
         parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
         parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
         parseSingleStandardNumber("DOI", "doi", standardNum, map);
-    }
-
-    protected static String mapMSBibToBibtexType(String msbibType) {
-        final String defaultType = BibtexEntryTypes.MISC.getName();
-
-        Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
-        entryTypeMapping.put("Book", BibtexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("BookSection", BibtexEntryTypes.INBOOK.getName());
-        entryTypeMapping.put("JournalArticle", BibtexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ArticleInAPeriodical", BibtexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ConferenceProceedings", BibtexEntryTypes.CONFERENCE.getName());
-        entryTypeMapping.put("Report", BibtexEntryTypes.TECHREPORT.getName());
-
-        return entryTypeMapping.getOrDefault(msbibType, defaultType);
     }
 }
