@@ -15,13 +15,13 @@
  */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.logic.l10n.Localization;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.Icon;
+
+import net.sf.jabref.logic.l10n.Localization;
 
 public abstract class SpecialField {
 
