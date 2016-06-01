@@ -13,197 +13,73 @@ import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
+import com.google.common.collect.HashBiMap;
+
 public class BibTeXConverter {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
-    
+
+    public static final Map<String, String> msbibToBibTeX = HashBiMap.create(MSBibConverter.bibtexToMSBib).inverse();
+
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
 
-        if (entry.tag == null) {
+        if (entry.getCiteKey() == null) {
             result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, mapMSBibToBibtexType(entry.msbibType));
         } else {
-            result = new BibEntry(entry.tag, mapMSBibToBibtexType(entry.msbibType)); // id assumes an existing database so don't
+            // TODO: the cite key should not be the ID?!
+            result = new BibEntry(entry.getCiteKey(), mapMSBibToBibtexType(entry.msbibType)); // id assumes an existing database so don't
         }
 
-        // Todo: add check for BibTexEntry types
+        Map<String, String> fieldValues = new HashMap<>();
 
-        Map<String, String> hm = new HashMap<>();
+        // add String fields
+        for (Map.Entry<String, String> field : entry.fields.entrySet()) {
+            String msField = field.getKey();
+            String value = field.getValue();
 
-        if (entry.tag != null) {
-            hm.put(BibEntry.KEY_FIELD, entry.tag);
+            if (value != null && msbibToBibTeX.get(msField) != null) {
+                fieldValues.put(msbibToBibTeX.get(msField), value);
+            }
         }
 
         if (entry.LCID >= 0) {
-            hm.put("language", entry.getLanguage(entry.LCID));
-        }
-        if (entry.title != null) {
-            hm.put("title", entry.title);
-        }
-        if (entry.year != null) {
-            hm.put("year", entry.year);
-        }
-        if (entry.shortTitle != null) {
-            hm.put(MSBIB_PREFIX + "shorttitle", entry.shortTitle);
-        }
-        if (entry.comments != null) {
-            hm.put("note", entry.comments);
+            fieldValues.put("language", entry.getLanguage(entry.LCID));
         }
 
-        addAuthor(hm, "author", entry.authors);
-        addAuthor(hm, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
-        addAuthor(hm, "editor", entry.editors);
-        addAuthor(hm, MSBIB_PREFIX + "translator", entry.translators);
-        addAuthor(hm, MSBIB_PREFIX + "producername", entry.producerNames);
-        addAuthor(hm, MSBIB_PREFIX + "composer", entry.composers);
-        addAuthor(hm, MSBIB_PREFIX + "conductor", entry.conductors);
-        addAuthor(hm, MSBIB_PREFIX + "performer", entry.performers);
-        addAuthor(hm, MSBIB_PREFIX + "writer", entry.writers);
-        addAuthor(hm, MSBIB_PREFIX + "director", entry.directors);
-        addAuthor(hm, MSBIB_PREFIX + "compiler", entry.compilers);
-        addAuthor(hm, MSBIB_PREFIX + "interviewer", entry.interviewers);
-        addAuthor(hm, MSBIB_PREFIX + "interviewee", entry.interviewees);
-        addAuthor(hm, MSBIB_PREFIX + "inventor", entry.inventors);
-        addAuthor(hm, MSBIB_PREFIX + "counsel", entry.counsels);
+        addAuthor(fieldValues, "author", entry.authors);
+        addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
+        addAuthor(fieldValues, "editor", entry.editors);
+        addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
+        addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
+        addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
+        addAuthor(fieldValues, MSBIB_PREFIX + "conductor", entry.conductors);
+        addAuthor(fieldValues, MSBIB_PREFIX + "performer", entry.performers);
+        addAuthor(fieldValues, MSBIB_PREFIX + "writer", entry.writers);
+        addAuthor(fieldValues, MSBIB_PREFIX + "director", entry.directors);
+        addAuthor(fieldValues, MSBIB_PREFIX + "compiler", entry.compilers);
+        addAuthor(fieldValues, MSBIB_PREFIX + "interviewer", entry.interviewers);
+        addAuthor(fieldValues, MSBIB_PREFIX + "interviewee", entry.interviewees);
+        addAuthor(fieldValues, MSBIB_PREFIX + "inventor", entry.inventors);
+        addAuthor(fieldValues, MSBIB_PREFIX + "counsel", entry.counsels);
 
         if (entry.pages != null) {
-            hm.put("pages", entry.pages.toString("--"));
+            fieldValues.put("pages", entry.pages.toString("--"));
         }
-        if (entry.volume != null) {
-            hm.put("volume", entry.volume);
-        }
-        if (entry.numberOfVolumes != null) {
-            hm.put(MSBIB_PREFIX + "numberofvolume", entry.numberOfVolumes);
-        }
-        if (entry.edition != null) {
-            hm.put("edition", entry.edition);
-        }
-        if (entry.edition != null) {
-            hm.put("edition", entry.edition);
-        }
-        parseStandardNumber(entry.standardNumber, hm);
+        parseStandardNumber(entry.standardNumber, fieldValues);
 
-        if (entry.publisher != null) {
-            hm.put("publisher", entry.publisher);
-        }
-        if (entry.publisher != null) {
-            hm.put("publisher", entry.publisher);
-        }
         if (entry.address != null) {
-            hm.put("address", entry.address);
-        }
-        if (entry.bookTitle != null) {
-            hm.put("booktitle", entry.bookTitle);
-        }
-        if (entry.chapterNumber != null) {
-            hm.put("chapter", entry.chapterNumber);
-        }
-        if (entry.journalName != null) {
-            hm.put("journal", entry.journalName);
-        }
-        if (entry.issue != null) {
-            hm.put("number", entry.issue);
-        }
-        if (entry.month != null) {
-            hm.put("month", entry.month);
-        }
-        if (entry.periodicalTitle != null) {
-            hm.put("organization", entry.periodicalTitle);
+            fieldValues.put("address", entry.address);
         }
         if (entry.conferenceName != null) {
-            hm.put("organization", entry.conferenceName);
-        }
-        if (entry.department != null) {
-            hm.put("school", entry.department);
-        }
-        if (entry.institution != null) {
-            hm.put("institution", entry.institution);
+            fieldValues.put("organization", entry.conferenceName);
         }
 
         if (entry.dateAccessed != null) {
-            hm.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
-        }
-        if (entry.doi != null) {
-            hm.put("doi", entry.doi);
-        }
-        if (entry.url != null) {
-            hm.put("url", entry.url);
-        }
-        if (entry.productionCompany != null) {
-            hm.put(MSBIB_PREFIX + "productioncompany", entry.productionCompany);
+            fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
         }
 
-        if (entry.medium != null) {
-            hm.put(MSBIB_PREFIX + "medium", entry.medium);
-        }
-
-        if (entry.recordingNumber != null) {
-            hm.put(MSBIB_PREFIX + "recordingnumber", entry.recordingNumber);
-        }
-        if (entry.theater != null) {
-            hm.put(MSBIB_PREFIX + "theater", entry.theater);
-        }
-        if (entry.distributor != null) {
-            hm.put(MSBIB_PREFIX + "distributor", entry.distributor);
-        }
-
-        if (entry.broadcaster != null) {
-            hm.put(MSBIB_PREFIX + "broadcaster", entry.broadcaster);
-        }
-        if (entry.station != null) {
-            hm.put(MSBIB_PREFIX + "station", entry.station);
-        }
-        if (entry.type != null) {
-            hm.put(MSBIB_PREFIX + "type", entry.type);
-        }
-        if (entry.patentNumber != null) {
-            hm.put(MSBIB_PREFIX + "patentnumber", entry.patentNumber);
-        }
-        if (entry.court != null) {
-            hm.put(MSBIB_PREFIX + "court", entry.court);
-        }
-        if (entry.reporter != null) {
-            hm.put(MSBIB_PREFIX + "reporter", entry.reporter);
-        }
-        if (entry.caseNumber != null) {
-            hm.put(MSBIB_PREFIX + "casenumber", entry.caseNumber);
-        }
-        if (entry.abbreviatedCaseNumber != null) {
-            hm.put(MSBIB_PREFIX + "abbreviatedcasenumber", entry.abbreviatedCaseNumber);
-        }
-
-        if (entry.bibTexSeries != null) {
-            hm.put("series", entry.bibTexSeries);
-        }
-        if (entry.bibTexAbstract != null) {
-            hm.put("abstract", entry.bibTexAbstract);
-        }
-        if (entry.bibTexKeyWords != null) {
-            hm.put("keywords", entry.bibTexKeyWords);
-        }
-        if (entry.bibTexCrossRef != null) {
-            hm.put("crossref", entry.bibTexCrossRef);
-        }
-        if (entry.bibTexHowPublished != null) {
-            hm.put("howpublished", entry.bibTexHowPublished);
-        }
-        if (entry.bibTexAffiliation != null) {
-            hm.put("affiliation", entry.bibTexAffiliation);
-        }
-        if (entry.bibTexContents != null) {
-            hm.put("contents", entry.bibTexContents);
-        }
-        if (entry.bibTexCopyright != null) {
-            hm.put("copyright", entry.bibTexCopyright);
-        }
-        if (entry.bibTexPrice != null) {
-            hm.put("price", entry.bibTexPrice);
-        }
-        if (entry.bibTexSize != null) {
-            hm.put("size", entry.bibTexSize);
-        }
-
-        result.setField(hm);
+        result.setField(fieldValues);
         return result;
     }
 

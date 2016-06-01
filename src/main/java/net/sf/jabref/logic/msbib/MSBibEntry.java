@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
@@ -29,28 +28,18 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * History
- * May 03, 2007 - Added export functionality
- * May 15, 2007 - Added import functionality
- * May 16, 2007 - Changed all interger entries to strings,
- * except LCID which must be an integer.
- * To avoid exception during integer parsing
- * the exception is caught and LCID is set to zero.
- * Jan 06, 2012 - Changed the XML element ConferenceName to present
- * the Booktitle instead of the organization field content
+ * MSBib entry representation
  *
- * @author S M Mahbub Murshed (udvranto@yahoo.com)
- * @version 2.0.0
  * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
  * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
- * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
+ * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
  */
 class MSBibEntry {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
-    private static final String MSBIB_PREFIX = "msbib-";
 
     private static final String B_COLON = "b:";
 
@@ -84,21 +73,15 @@ class MSBibEntry {
     public String month;
     public String day;
 
-    public String shortTitle;
     public String comments;
     public PageNumbers pages;
     public String volume;
-    public String numberOfVolumes;
     public String edition;
 
     public String standardNumber;
     public String publisher;
     public String address;
-    public String bookTitle;
-    public String chapterNumber;
-    public String journalName;
     public String issue;
-    public String periodicalTitle;
     public String conferenceName;
     public String department;
     public String institution;
@@ -111,30 +94,8 @@ class MSBibEntry {
     public String publicationTitle;
     public String medium;
     public String albumTitle;
-    public String recordingNumber;
-    public String theater;
-    public String distributor;
     public String broadcastTitle;
-    public String broadcaster;
-    public String station;
     public String type;
-    public String patentNumber;
-    public String court;
-    public String reporter;
-    public String caseNumber;
-    public String abbreviatedCaseNumber;
-    public String bibTexSeries;
-    public String bibTexAbstract;
-    public String bibTexKeyWords;
-    public String bibTexCrossRef;
-    public String bibTexHowPublished;
-    public String bibTexAffiliation;
-    public String bibTexContents;
-    public String bibTexCopyright;
-    public String bibTexPrice;
-    public String bibTexSize;
-    public String bibTexInType;
-    public String bibTexPaper;
 
     // reduced subset, supports only "CITY , STATE, COUNTRY"
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
@@ -152,27 +113,39 @@ class MSBibEntry {
 
     }
 
-    public MSBibEntry(Element entry, String bcol) {
-        populateFromXml(entry, bcol);
+    public MSBibEntry(Element entry) {
+        populateFromXml(entry);
     }
 
-    private String getFromXml(String name, Element entry) {
+    public String getCiteKey() {
+        return fields.get("Tag");
+    }
+
+    private String getXmlElementTextContent(String name, Element entry) {
         String value = null;
-        NodeList nodeLst = entry.getElementsByTagName(name);
+        NodeList nodeLst = entry.getElementsByTagNameNS("*", name);
         if (nodeLst.getLength() > 0) {
             value = nodeLst.item(0).getTextContent();
         }
         return value;
     }
 
-    private void populateFromXml(Element entry, String bcol) {
+    private void populateFromXml(Element entry) {
+        for (int i = 0; i < entry.getChildNodes().getLength(); i++) {
+            Node node = entry.getChildNodes().item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                String key = node.getLocalName();
+                String value = node.getTextContent();
+
+                fields.put(key, value);
+            }
+        }
+
         String temp;
 
-        msbibType = getFromXml(bcol + "SourceType", entry);
+        msbibType = getXmlElementTextContent("SourceType", entry);
 
-        tag = getFromXml(bcol + "Tag", entry);
-
-        temp = getFromXml(bcol + "LCID", entry);
+        temp = getXmlElementTextContent("LCID", entry);
         if (temp != null) {
             try {
                 LCID = Integer.parseInt(temp);
@@ -181,32 +154,21 @@ class MSBibEntry {
             }
         }
 
-        title = getFromXml(bcol + "Title", entry);
-        year = getFromXml(bcol + "Year", entry);
-        month = getFromXml(bcol + "Month", entry);
-        day = getFromXml(bcol + "Day", entry);
+        day = getXmlElementTextContent("Day", entry);
 
-        shortTitle = getFromXml(bcol + "ShortTitle", entry);
-        comments = getFromXml(bcol + "Comments", entry);
-
-        temp = getFromXml(bcol + "Pages", entry);
+        temp = getXmlElementTextContent("Pages", entry);
         if (temp != null) {
             pages = new PageNumbers(temp);
         }
 
-        volume = getFromXml(bcol + "Volume", entry);
+        publicationTitle = getXmlElementTextContent("PublicationTitle", entry);
+        albumTitle = getXmlElementTextContent("AlbumTitle", entry);
+        broadcastTitle = getXmlElementTextContent("BroadcastTitle", entry);
+        standardNumber = getXmlElementTextContent("StandardNumber", entry);
 
-        numberOfVolumes = getFromXml(bcol + "NumberVolumes", entry);
-
-        edition = getFromXml(bcol + "Edition", entry);
-
-        standardNumber = getFromXml(bcol + "StandardNumber", entry);
-
-        publisher = getFromXml(bcol + "Publisher", entry);
-
-        String city = getFromXml(bcol + "City", entry);
-        String state = getFromXml(bcol + "StateProvince", entry);
-        String country = getFromXml(bcol + "CountryRegion", entry);
+        String city = getXmlElementTextContent("City", entry);
+        String state = getXmlElementTextContent("StateProvince", entry);
+        String country = getXmlElementTextContent("CountryRegion", entry);
         StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
             addressBuffer.append(city).append(", ");
@@ -222,25 +184,13 @@ class MSBibEntry {
             address = null;
         }
 
-        bookTitle = getFromXml(bcol + "BookTitle", entry);
+        conferenceName = getXmlElementTextContent("ConferenceName", entry);
 
-        chapterNumber = getFromXml(bcol + "ChapterNumber", entry);
-
-        journalName = getFromXml(bcol + "JournalName", entry);
-
-        issue = getFromXml(bcol + "Issue", entry);
-
-        periodicalTitle = getFromXml(bcol + "PeriodicalTitle", entry);
-
-        conferenceName = getFromXml(bcol + "ConferenceName", entry);
-        department = getFromXml(bcol + "Department", entry);
-        institution = getFromXml(bcol + "Institution", entry);
-
-        thesisType = getFromXml(bcol + "ThesisType", entry);
-        internetSiteTitle = getFromXml(bcol + "InternetSiteTitle", entry);
-        String month = getFromXml(bcol + "MonthAccessed", entry);
-        String day = getFromXml(bcol + "DayAccessed", entry);
-        String year = getFromXml(bcol + "YearAccessed", entry);
+        thesisType = getXmlElementTextContent("ThesisType", entry);
+        internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
+        String month = getXmlElementTextContent("MonthAccessed", entry);
+        String day = getXmlElementTextContent("DayAccessed", entry);
+        String year = getXmlElementTextContent("YearAccessed", entry);
         dateAccessed = "";
         if (month != null) {
             dateAccessed += month + ' ';
@@ -256,80 +206,50 @@ class MSBibEntry {
             dateAccessed = null;
         }
 
-        doi = getFromXml(bcol + "DOI", entry);
-        url = getFromXml(bcol + "URL", entry);
-        productionCompany = getFromXml(bcol + "ProductionCompany", entry);
-
-        publicationTitle = getFromXml(bcol + "PublicationTitle", entry);
-        medium = getFromXml(bcol + "Medium", entry);
-        albumTitle = getFromXml(bcol + "AlbumTitle", entry);
-        recordingNumber = getFromXml(bcol + "RecordingNumber", entry);
-        theater = getFromXml(bcol + "Theater", entry);
-        distributor = getFromXml(bcol + "Distributor", entry);
-        broadcastTitle = getFromXml(bcol + "BroadcastTitle", entry);
-        broadcaster = getFromXml(bcol + "Broadcaster", entry);
-        station = getFromXml(bcol + "Station", entry);
-        type = getFromXml(bcol + "Type", entry);
-        patentNumber = getFromXml(bcol + "PatentNumber", entry);
-        court = getFromXml(bcol + "Court", entry);
-        reporter = getFromXml(bcol + "Reporter", entry);
-        caseNumber = getFromXml(bcol + "CaseNumber", entry);
-        abbreviatedCaseNumber = getFromXml(bcol + "AbbreviatedCaseNumber", entry);
-        bibTexSeries = getFromXml(bcol + BIBTEX_PREFIX + "Series", entry);
-        bibTexAbstract = getFromXml(bcol + BIBTEX_PREFIX + "Abstract", entry);
-        bibTexKeyWords = getFromXml(bcol + BIBTEX_PREFIX + "KeyWords", entry);
-        bibTexCrossRef = getFromXml(bcol + BIBTEX_PREFIX + "CrossRef", entry);
-        bibTexHowPublished = getFromXml(bcol + BIBTEX_PREFIX + "HowPublished", entry);
-        bibTexAffiliation = getFromXml(bcol + BIBTEX_PREFIX + "Affiliation", entry);
-        bibTexContents = getFromXml(bcol + BIBTEX_PREFIX + "Contents", entry);
-        bibTexCopyright = getFromXml(bcol + BIBTEX_PREFIX + "Copyright", entry);
-        bibTexPrice = getFromXml(bcol + BIBTEX_PREFIX + "Price", entry);
-        bibTexSize = getFromXml(bcol + BIBTEX_PREFIX + "Size", entry);
-
-        NodeList nodeLst = entry.getElementsByTagName(bcol + "Author");
+        NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
-            getAuthors((Element) nodeLst.item(0), bcol);
+            getAuthors((Element) nodeLst.item(0));
         }
     }
 
-    private void getAuthors(Element authorsElem, String bcol) {
-        authors = getSpecificAuthors("Author", authorsElem, bcol);
-        bookAuthors = getSpecificAuthors("BookAuthor", authorsElem, bcol);
-        editors = getSpecificAuthors("Editor", authorsElem, bcol);
-        translators = getSpecificAuthors("Translator", authorsElem, bcol);
-        producerNames = getSpecificAuthors("ProducerName", authorsElem, bcol);
-        composers = getSpecificAuthors("Composer", authorsElem, bcol);
-        conductors = getSpecificAuthors("Conductor", authorsElem, bcol);
-        performers = getSpecificAuthors("Performer", authorsElem, bcol);
-        writers = getSpecificAuthors("Writer", authorsElem, bcol);
-        directors = getSpecificAuthors("Director", authorsElem, bcol);
-        compilers = getSpecificAuthors("Compiler", authorsElem, bcol);
-        interviewers = getSpecificAuthors("Interviewer", authorsElem, bcol);
-        interviewees = getSpecificAuthors("Interviewee", authorsElem, bcol);
-        inventors = getSpecificAuthors("Inventor", authorsElem, bcol);
-        counsels = getSpecificAuthors("Counsel", authorsElem, bcol);
+    private void getAuthors(Element authorsElem) {
+        authors = getSpecificAuthors("Author", authorsElem);
+        bookAuthors = getSpecificAuthors("BookAuthor", authorsElem);
+        editors = getSpecificAuthors("Editor", authorsElem);
+        translators = getSpecificAuthors("Translator", authorsElem);
+        producerNames = getSpecificAuthors("ProducerName", authorsElem);
+        composers = getSpecificAuthors("Composer", authorsElem);
+        conductors = getSpecificAuthors("Conductor", authorsElem);
+        performers = getSpecificAuthors("Performer", authorsElem);
+        writers = getSpecificAuthors("Writer", authorsElem);
+        directors = getSpecificAuthors("Director", authorsElem);
+        compilers = getSpecificAuthors("Compiler", authorsElem);
+        interviewers = getSpecificAuthors("Interviewer", authorsElem);
+        interviewees = getSpecificAuthors("Interviewee", authorsElem);
+        inventors = getSpecificAuthors("Inventor", authorsElem);
+        counsels = getSpecificAuthors("Counsel", authorsElem);
     }
 
-    private List<PersonName> getSpecificAuthors(String type, Element authors, String bcol) {
+    private List<PersonName> getSpecificAuthors(String type, Element authors) {
         List<PersonName> result = null;
-        NodeList nodeLst = authors.getElementsByTagName(bcol + type);
+        NodeList nodeLst = authors.getElementsByTagNameNS("*", type);
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagName(bcol + "NameList");
+        nodeLst = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "NameList");
         if (nodeLst.getLength() <= 0) {
             return result;
         }
-        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagName(bcol + "Person");
+        NodeList person = ((Element) nodeLst.item(0)).getElementsByTagNameNS("*", "Person");
         if (person.getLength() <= 0) {
             return result;
         }
 
         result = new LinkedList<>();
         for (int i = 0; i < person.getLength(); i++) {
-            NodeList firstName = ((Element) person.item(i)).getElementsByTagName(bcol + "First");
-            NodeList lastName = ((Element) person.item(i)).getElementsByTagName(bcol + "Last");
-            NodeList middleName = ((Element) person.item(i)).getElementsByTagName(bcol + "Middle");
+            NodeList firstName = ((Element) person.item(i)).getElementsByTagNameNS("*", "First");
+            NodeList lastName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Last");
+            NodeList middleName = ((Element) person.item(i)).getElementsByTagNameNS("*", "Middle");
             PersonName name = new PersonName();
             if (firstName.getLength() > 0) {
                 name.setFirstname(firstName.item(0).getTextContent());
@@ -463,7 +383,6 @@ class MSBibEntry {
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
         } else {
-            /* SM: 2010.10 generalized */
             addField(document, parent, "City", address);
         }
     }

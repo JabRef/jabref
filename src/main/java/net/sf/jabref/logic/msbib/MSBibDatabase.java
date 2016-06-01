@@ -53,7 +53,7 @@ public class MSBibDatabase {
         entries = new HashSet<>();
     }
 
-    // TODO: why an additonal entry list?
+    // TODO: why an additonal entry list? entries are included inside database!
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
             addEntries(database.getEntries());
@@ -66,28 +66,26 @@ public class MSBibDatabase {
         entries = new HashSet<>();
         Document inputDocument;
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.
-                    newInstance().
-                    newDocumentBuilder();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
             return Collections.emptyList();
         }
-        String bcol = "b:";
-        NodeList rootList = inputDocument.getElementsByTagName("b:Sources");
+        NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         if (rootList.getLength() == 0) {
-            rootList = inputDocument.getElementsByTagName("Sources");
-            bcol = "";
+            rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         }
         List<BibEntry> bibitems = new ArrayList<>();
         if (rootList.getLength() == 0) {
             return bibitems;
         }
 
-        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagName(bcol + "Source");
+        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
-            MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i), bcol);
+            MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));
             entries.add(entry);
             bibitems.add(BibTeXConverter.convert(entry));
         }
@@ -103,7 +101,7 @@ public class MSBibDatabase {
         }
     }
 
-    public Document getDOMrepresentation() {
+    public Document getDOM() {
         Document result = null;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.

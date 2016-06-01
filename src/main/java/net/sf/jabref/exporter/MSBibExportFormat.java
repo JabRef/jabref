@@ -58,7 +58,7 @@ class MSBibExportFormat extends ExportFormat {
 
         try (VerifyingWriter ps = session.getWriter()) {
             try {
-                DOMSource source = new DOMSource(msBibDatabase.getDOMrepresentation());
+                DOMSource source = new DOMSource(msBibDatabase.getDOM());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");

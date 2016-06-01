@@ -48,6 +48,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
             return "";
         }
         int i;
+        // TODO: document what does this do
         String field = inField.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
 

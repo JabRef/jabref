@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.msbib;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,20 +11,15 @@ import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.google.common.collect.HashBiMap;
+
 public class MSBibConverter {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
 
-    public static MSBibEntry convert(BibEntry entry) {
-        MSBibEntry result = new MSBibEntry();
+    public static final Map<String, String> bibtexToMSBib = HashBiMap.create();
 
-        // memorize original type
-        result.bibtexType = entry.getType();
-        // define new type
-        result.msbibType = getMSBibType(entry).name();
-
-        final Map<String, String> bibtexToMSBib = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-
+    static {
         bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
         bibtexToMSBib.put("title", "Title");
         bibtexToMSBib.put("year", "Year");
@@ -74,7 +69,15 @@ public class MSBibConverter {
         bibtexToMSBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
+    }
 
+    public static MSBibEntry convert(BibEntry entry) {
+        MSBibEntry result = new MSBibEntry();
+
+        // memorize original type
+        result.bibtexType = entry.getType();
+        // define new type
+        result.msbibType = getMSBibType(entry).name();
 
         for (Map.Entry<String, String> field : bibtexToMSBib.entrySet()) {
             String texField = field.getKey();
@@ -141,7 +144,6 @@ public class MSBibConverter {
             result.address = entry.getField("address");
         }
 
-        /* SM: 2010.10 Modified for default source types */
         if (entry.hasField("type")) {
             result.thesisType = entry.getField("type");
         } else {
@@ -201,8 +203,9 @@ public class MSBibConverter {
     }
 
     private static List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new LinkedList<>();
+        List<PersonName> result = new ArrayList<>();
 
+        // TODO: case-insensitive?!
         if (authors.contains(" and ")) {
             String[] names = authors.split(" and ");
             for (String name : names) {
@@ -216,7 +219,6 @@ public class MSBibConverter {
 
     private static String removeLaTeX(String text) {
         // TODO: just use latex free version everywhere in the future
-        // TODO: use for every field?
         String result = new RemoveBrackets().format(text);
         result = new LatexToUnicodeFormatter().format(result);
 

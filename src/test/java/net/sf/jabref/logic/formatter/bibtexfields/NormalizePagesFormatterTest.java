@@ -36,8 +36,9 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
-    public void removeWhitespaceForSinglePageNumber() {
+    public void removeWhitespace() {
         expectCorrect("   1  ", "1");
+        expectCorrect("   1 -- 2  ", "1--2");
     }
 
     @Test
