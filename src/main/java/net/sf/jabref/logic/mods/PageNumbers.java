@@ -75,7 +75,7 @@ public class PageNumbers {
 
     @Override
     public String toString() {
-        return toString("--");
+        return toString("-");
     }
 
 }

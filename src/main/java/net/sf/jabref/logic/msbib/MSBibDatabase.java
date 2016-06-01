@@ -50,10 +50,10 @@ public class MSBibDatabase {
     private Set<MSBibEntry> entries;
 
     public MSBibDatabase() {
-        // maybe make this sorted later...
         entries = new HashSet<>();
     }
 
+    // TODO: why an additonal entry list?
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
             addEntries(database.getEntries());
@@ -89,7 +89,7 @@ public class MSBibDatabase {
         for (int i = 0; i < sourceList.getLength(); i++) {
             MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i), bcol);
             entries.add(entry);
-            bibitems.add(entry.getBibtexRepresentation());
+            bibitems.add(BibTeXConverter.convert(entry));
         }
 
         return bibitems;
@@ -98,7 +98,7 @@ public class MSBibDatabase {
     private void addEntries(List<BibEntry> entriesToAdd) {
         entries = new HashSet<>();
         for (BibEntry entry : entriesToAdd) {
-            MSBibEntry newMods = new MSBibEntry(entry);
+            MSBibEntry newMods = MSBibConverter.convert(entry);
             entries.add(newMods);
         }
     }
