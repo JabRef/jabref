@@ -60,23 +60,12 @@ public class Priority extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_PRIORITY;
     }
 
+    @Override public String getLocalizedFieldName() {
+        return Localization.lang("Priority");
+    }
+
     @Override
     public Icon getRepresentingIcon() {
         return this.icon;
-    }
-
-    @Override
-    public String getToolTip() {
-        return Localization.lang("Priority");
-    }
-
-    @Override
-    public String getTextDone(String... params) {
-        return Localization.lang("Set priority to '%0' for %1 entries", params);
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Priority");
     }
 }

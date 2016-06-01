@@ -71,7 +71,7 @@ public class SpecialFieldAction implements BaseAction {
                 frame.getCurrentBasePanel().markBaseChanged();
                 frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
-                if (nullFieldIfValueIsTheSame) {
+                if (nullFieldIfValueIsTheSame || value==null) {
                     outText = specialField.getTextDone(Integer.toString(bes.size()));
                 } else {
                     outText = specialField.getTextDone(value, Integer.toString(bes.size()));

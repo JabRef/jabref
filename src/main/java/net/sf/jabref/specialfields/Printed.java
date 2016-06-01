@@ -41,6 +41,11 @@ public class Printed extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_PRINTED;
     }
 
+    @Override
+    public String getLocalizedFieldName() {
+        return Localization.lang("Printed");
+    }
+
     public static Printed getInstance() {
         if (Printed.INSTANCE == null) {
             Printed.INSTANCE = new Printed();
@@ -51,21 +56,6 @@ public class Printed extends SpecialField {
     @Override
     public Icon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
-    }
-
-    @Override
-    public String getToolTip() {
-        return this.getValues().get(0).getToolTipText();
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Printed");
-    }
-
-    @Override
-    public String getTextDone(String... params) {
-        return Localization.lang("Toggled print status for %0 entries", params);
     }
 
     @Override

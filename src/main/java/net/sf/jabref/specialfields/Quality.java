@@ -42,6 +42,11 @@ public class Quality extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_QUALITY;
     }
 
+    @Override
+    public String getLocalizedFieldName() {
+        return Localization.lang("Quality");
+    }
+
     public static Quality getInstance() {
         if (Quality.INSTANCE == null) {
             Quality.INSTANCE = new Quality();
@@ -52,20 +57,6 @@ public class Quality extends SpecialField {
     @Override
     public Icon getRepresentingIcon() {
         return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-    }
-
-    @Override
-    public String getToolTip() {
-        return this.getValues().get(0).getToolTipText();
-    }
-
-    @Override public String getTextDone(String... params) {
-        return Localization.lang("Toggled quality for %0 entries", params);
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Quality");
     }
 
     @Override

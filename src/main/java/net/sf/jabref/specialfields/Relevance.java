@@ -42,6 +42,11 @@ public class Relevance extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_RELEVANCE;
     }
 
+    @Override
+    public String getLocalizedFieldName() {
+        return Localization.lang("Relevance");
+    }
+
     public static Relevance getInstance() {
         if (Relevance.INSTANCE == null) {
             Relevance.INSTANCE = new Relevance();
@@ -52,21 +57,6 @@ public class Relevance extends SpecialField {
     @Override
     public Icon getRepresentingIcon() {
         return this.getValues().get(0).getIcon();
-    }
-
-    @Override
-    public String getToolTip() {
-        return this.getValues().get(0).getToolTipText();
-    }
-
-    @Override
-    public String getTextDone(String... params) {
-        return Localization.lang("Toggled relevance for %0 entries", params);
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Relevance");
     }
 
     @Override

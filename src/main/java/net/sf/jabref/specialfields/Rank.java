@@ -58,18 +58,7 @@ public class Rank extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_RANKING;
     }
 
-    @Override
-    public String getToolTip() {
+    @Override public String getLocalizedFieldName() {
         return Localization.lang("Rank");
     }
-
-    @Override public String getTextDone(String... params) {
-        return Localization.lang("Set rank to '%0' for %1 entries", params);
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Rank");
-    }
-
 }

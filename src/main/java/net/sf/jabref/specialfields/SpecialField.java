@@ -15,6 +15,8 @@
  */
 package net.sf.jabref.specialfields;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,13 +57,35 @@ public abstract class SpecialField {
 
     public abstract String getFieldName();
 
+    public abstract String getLocalizedFieldName();
+
     public abstract Icon getRepresentingIcon();
 
-    public abstract String getMenuString();
+    public String getMenuString() {
+        return getLocalizedFieldName();
+    }
 
-    public abstract String getToolTip();
+    public String getToolTip() {
+        return getLocalizedFieldName();
+    }
 
-    public abstract String getTextDone(String... params);
+    public String getTextDone(String... params) {
+        if(isSingleValueField()) {
+            if(params.length == 1 && params[0] != null) {
+                return Localization.lang("Toggled '%0' for %1 entries", getLocalizedFieldName(), params[0]);
+            }
+        } else {
+            if (params.length == 2 && params[0] != null) {
+                String[] allParams = {getLocalizedFieldName(), params[0], params[1]};
+                return Localization.lang("Set '%0' to '%1' for %2 entries", allParams);
+            } else if (params.length == 1) {
+                return Localization.lang("Cleared '%0' for %1 entries", getLocalizedFieldName(), params[0]);
+            }
+        }
+
+         return "";
+
+    }
 
     public boolean isSingleValueField() {
         return false;
