@@ -11,65 +11,8 @@ import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 
-import com.google.common.collect.HashBiMap;
-
 public class MSBibConverter {
-    private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
-
-    public static final Map<String, String> bibtexToMSBib = HashBiMap.create();
-
-    static {
-        bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
-        bibtexToMSBib.put("title", "Title");
-        bibtexToMSBib.put("year", "Year");
-        bibtexToMSBib.put("month", "Month");
-        bibtexToMSBib.put("note", "Comments");
-        bibtexToMSBib.put("volume", "Volume");
-        bibtexToMSBib.put("edition", "Edition");
-        bibtexToMSBib.put("publisher", "Publisher");
-        bibtexToMSBib.put("booktitle", "BookTitle");
-        //bibtexToMSBib.put("booktitle", "ConferenceName");
-        bibtexToMSBib.put("chapter", "ChapterNumber");
-        bibtexToMSBib.put("journal", "JournalName");
-        bibtexToMSBib.put("number", "Issue");
-        bibtexToMSBib.put("school", "Department");
-        bibtexToMSBib.put("institution", "Institution");
-        bibtexToMSBib.put("doi", "DOI");
-        bibtexToMSBib.put("url", "URL");
-        // BibTeX only fields
-        bibtexToMSBib.put("series", BIBTEX_PREFIX + "Series");
-        bibtexToMSBib.put("abstract", BIBTEX_PREFIX + "Abstract");
-        bibtexToMSBib.put("keywords", BIBTEX_PREFIX + "KeyWords");
-        bibtexToMSBib.put("crossref", BIBTEX_PREFIX + "CrossRef");
-        bibtexToMSBib.put("howpublished", BIBTEX_PREFIX + "HowPublished");
-        bibtexToMSBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
-        bibtexToMSBib.put("contents", BIBTEX_PREFIX + "Contents");
-        bibtexToMSBib.put("copyright", BIBTEX_PREFIX + "Copyright");
-        bibtexToMSBib.put("price", BIBTEX_PREFIX + "Price");
-        bibtexToMSBib.put("size", BIBTEX_PREFIX + "Size");
-        bibtexToMSBib.put("intype", BIBTEX_PREFIX + "InType");
-        bibtexToMSBib.put("paper", BIBTEX_PREFIX + "Paper");
-        // MSBib only fields
-        //bibtexToMSBib.put(MSBIB_PREFIX + "day", "");
-        bibtexToMSBib.put(MSBIB_PREFIX + "shorttitle", "ShortTitle");
-        bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
-        bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        //bibtexToMSBib.put(MSBIB_PREFIX + "accessed", "Accessed");
-        bibtexToMSBib.put(MSBIB_PREFIX + "medium", "Medium");
-        bibtexToMSBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "theater", "Theater");
-        bibtexToMSBib.put(MSBIB_PREFIX + "distributor", "Distributor");
-        bibtexToMSBib.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
-        bibtexToMSBib.put(MSBIB_PREFIX + "station", "Station");
-        bibtexToMSBib.put(MSBIB_PREFIX + "type", "Type");
-        bibtexToMSBib.put(MSBIB_PREFIX + "patentnumber", "PatentNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "court", "Court");
-        bibtexToMSBib.put(MSBIB_PREFIX + "reporter", "Reporter");
-        bibtexToMSBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
-    }
 
     public static MSBibEntry convert(BibEntry entry) {
         MSBibEntry result = new MSBibEntry();
@@ -79,15 +22,12 @@ public class MSBibConverter {
         // define new type
         result.msbibType = getMSBibType(entry).name();
 
-        for (Map.Entry<String, String> field : bibtexToMSBib.entrySet()) {
-            String texField = field.getKey();
-            String msField = field.getValue();
+        for (String field : entry.getFieldNames()) {
+            // clean field
+            String unicodeField = removeLaTeX(entry.getField(field));
 
-            if (entry.hasField(texField)) {
-                // clean field
-                String unicodeField = removeLaTeX(entry.getField(texField));
-
-                result.fields.put(msField, unicodeField);
+            if (MSBibMapping.getMSBibField(field) != null) {
+                result.fields.put(MSBibMapping.getMSBibField(field), unicodeField);
             }
         }
 

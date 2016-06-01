@@ -16,10 +16,7 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import com.google.common.collect.HashBiMap;
 
 public class BibTeXConverter {
-    private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
-
-    public static final Map<String, String> msbibToBibTeX = HashBiMap.create(MSBibConverter.bibtexToMSBib).inverse();
 
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
@@ -38,8 +35,8 @@ public class BibTeXConverter {
             String msField = field.getKey();
             String value = field.getValue();
 
-            if (value != null && msbibToBibTeX.get(msField) != null) {
-                fieldValues.put(msbibToBibTeX.get(msField), value);
+            if (value != null && MSBibMapping.getBibTeXField(msField) != null) {
+                fieldValues.put(MSBibMapping.getBibTeXField(msField), value);
             }
         }
 
