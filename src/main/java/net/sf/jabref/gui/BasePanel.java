@@ -963,15 +963,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Relevance.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Relevance.getInstance(),
                         Relevance.getInstance().getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle relevance"), Localization.lang("Toggled relevance for %0 entries")));
+                        Localization.lang("Toggle relevance")));
         actions.put(Quality.getInstance().getValues().get(0).getActionName(),
                 new SpecialFieldAction(frame, Quality.getInstance(),
                         Quality.getInstance().getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle quality assured"),
-                        Localization.lang("Toggled quality for %0 entries")));
+                        Localization.lang("Toggle quality assured")));
         actions.put(Printed.getInstance().getValues().get(0).getActionName(), new SpecialFieldAction(frame,
                 Printed.getInstance(), Printed.getInstance().getValues().get(0).getFieldValue().get(), true,
-                Localization.lang("Toggle print status"), Localization.lang("Toggled print status for %0 entries")));
+                Localization.lang("Toggle print status")));
 
         for (SpecialFieldValue prio : Priority.getInstance().getValues()) {
             actions.put(prio.getActionName(), prio.getAction(this.frame));

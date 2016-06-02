@@ -35,12 +35,16 @@ public class Quality extends SpecialField {
                 Localization.lang("Toggle quality assured"), IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon(),
                 Localization.lang("Toggle quality assured")));
         this.setValues(values);
-        TEXT_DONE_PATTERN = "Toggled quality for %0 entries";
     }
 
     @Override
     public String getFieldName() {
         return SpecialFieldsUtils.FIELDNAME_QUALITY;
+    }
+
+    @Override
+    public String getLocalizedFieldName() {
+        return Localization.lang("Quality");
     }
 
     public static Quality getInstance() {
@@ -53,16 +57,6 @@ public class Quality extends SpecialField {
     @Override
     public Icon getRepresentingIcon() {
         return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-    }
-
-    @Override
-    public String getToolTip() {
-        return this.getValues().get(0).getToolTipText();
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Quality");
     }
 
     @Override
