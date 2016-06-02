@@ -39,13 +39,9 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
  */
 class MSBibEntry {
-    private static final String BIBTEX_PREFIX = "BIBTEX_";
-
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
 
-    public String msbibType = "Misc";
-    public String bibtexType;
     public String tag;
     public static final String GUID = null;
     public int LCID = -1;
@@ -115,6 +111,10 @@ class MSBibEntry {
         populateFromXml(entry);
     }
 
+    public String getType() {
+        return fields.get("SourceType");
+    }
+
     public String getCiteKey() {
         return fields.get("Tag");
     }
@@ -140,8 +140,6 @@ class MSBibEntry {
         }
 
         String temp;
-
-        msbibType = getXmlElementTextContent("SourceType", entry);
 
         temp = getXmlElementTextContent("LCID", entry);
         if (temp != null) {
@@ -273,8 +271,6 @@ class MSBibEntry {
 
         // FIXME: old
         // Not based on bibtex content = additional
-        addField(document, rootNode, "SourceType", msbibType);
-        addField(document, rootNode, BIBTEX_PREFIX + "Entry", bibtexType);
         addField(document, rootNode, "GUID", GUID);
 
         if (LCID >= 0) {

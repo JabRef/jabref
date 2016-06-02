@@ -18,11 +18,11 @@ public class BibTeXConverter {
         BibEntry result;
 
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.msbibType));
+            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.getType()));
         } else {
             // TODO: the cite key should not be the ID?!
             // id assumes an existing database so don't
-            result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.msbibType));
+            result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.getType()));
         }
 
         Map<String, String> fieldValues = new HashMap<>();

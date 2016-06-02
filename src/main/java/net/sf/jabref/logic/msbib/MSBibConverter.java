@@ -11,14 +11,15 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class MSBibConverter {
     private static final String MSBIB_PREFIX = "msbib-";
+    private static final String BIBTEX_PREFIX = "BIBTEX_";
 
     public static MSBibEntry convert(BibEntry entry) {
         MSBibEntry result = new MSBibEntry();
 
         // memorize original type
-        result.bibtexType = entry.getType();
+        String bibtexType = result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType());
         // define new type
-        result.msbibType = MSBibMapping.getMSBibEntryType(entry.getType()).name();
+        String msbibType = result.fields.put("SourceType", MSBibMapping.getMSBibEntryType(entry.getType()).name());
 
         for (String field : entry.getFieldNames()) {
             // clean field
@@ -42,11 +43,11 @@ public class MSBibConverter {
             result.dateAccessed = entry.getField(MSBIB_PREFIX + "accessed");
         }
 
-        if ("SoundRecording".equals(result.msbibType) && (entry.hasField("title"))) {
+        if ("SoundRecording".equals(msbibType) && (entry.hasField("title"))) {
             result.albumTitle = entry.getField("title");
         }
 
-        if ("Interview".equals(result.msbibType) && (entry.hasField("title"))) {
+        if ("Interview".equals(msbibType) && (entry.hasField("title"))) {
             result.broadcastTitle = entry.getField("title");
         }
 
@@ -96,12 +97,12 @@ public class MSBibConverter {
             }
         }
 
-        if (("InternetSite".equals(result.msbibType) || "DocumentFromInternetSite".equals(result.msbibType))
+        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
                 && (entry.hasField("title"))) {
             result.internetSiteTitle = entry.getField("title");
         }
 
-        if (("ElectronicSource".equals(result.msbibType) || "Art".equals(result.msbibType) || "Misc".equals(result.msbibType))
+        if (("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType))
                 && (entry.hasField("title"))) {
             result.publicationTitle = entry.getField("title");
         }
