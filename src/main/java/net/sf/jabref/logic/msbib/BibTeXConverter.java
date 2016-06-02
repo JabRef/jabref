@@ -16,6 +16,7 @@ public class BibTeXConverter {
 
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
+        Map<String, String> fieldValues = new HashMap<>();
 
         if (entry.getCiteKey() == null) {
             result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.getType()));
@@ -24,8 +25,6 @@ public class BibTeXConverter {
             // id assumes an existing database so don't
             result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.getType()));
         }
-
-        Map<String, String> fieldValues = new HashMap<>();
 
         // add String fields
         for (Map.Entry<String, String> field : entry.fields.entrySet()) {
@@ -37,8 +36,10 @@ public class BibTeXConverter {
             }
         }
 
-        if (entry.LCID >= 0) {
-            fieldValues.put("language", entry.getLanguage(entry.LCID));
+        // Value must be converted
+        if (fieldValues.containsKey("language")) {
+            int lcid = Integer.valueOf(fieldValues.get("language"));
+            fieldValues.put("language", MSBibMapping.getLanguage(lcid));
         }
 
         addAuthor(fieldValues, "author", entry.authors);
@@ -60,11 +61,13 @@ public class BibTeXConverter {
         if (entry.pages != null) {
             fieldValues.put("pages", entry.pages.toString("--"));
         }
+
         parseStandardNumber(entry.standardNumber, fieldValues);
 
         if (entry.address != null) {
             fieldValues.put("address", entry.address);
         }
+        // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
         if (entry.conferenceName != null) {
             fieldValues.put("organization", entry.conferenceName);
         }
@@ -73,7 +76,9 @@ public class BibTeXConverter {
             fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
         }
 
+        // set all fields
         result.setField(fieldValues);
+
         return result;
     }
 

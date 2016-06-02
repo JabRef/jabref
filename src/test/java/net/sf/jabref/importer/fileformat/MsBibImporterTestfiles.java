@@ -39,7 +39,7 @@ public class MsBibImporterTestfiles {
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> fileNames() {
         Object[][] data = new Object[][] {{"MsBibImporterTest1"}, {"MsBibImporterTest2"}, {"MsBibImporterTest3"},
-                {"MsBibImporterTest4"}, {"MsBibImporterTest5"}, {"MsBibImporterTest6"}};
+                {"MsBibImporterTest4"}, {"MsBibImporterTest5"}, {"MsBibImporterTest6"}, {"MsBibLCID"}};
         return Arrays.asList(data);
     }
 

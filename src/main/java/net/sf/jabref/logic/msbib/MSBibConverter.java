@@ -17,7 +17,7 @@ public class MSBibConverter {
         MSBibEntry result = new MSBibEntry();
 
         // memorize original type
-        String bibtexType = result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType());
+        result.fields.put(BIBTEX_PREFIX + "Entry", entry.getType());
         // define new type
         String msbibType = result.fields.put("SourceType", MSBibMapping.getMSBibEntryType(entry.getType()).name());
 
@@ -43,20 +43,19 @@ public class MSBibConverter {
             result.dateAccessed = entry.getField(MSBIB_PREFIX + "accessed");
         }
 
+        // TODO: currently this can never happen
         if ("SoundRecording".equals(msbibType) && (entry.hasField("title"))) {
             result.albumTitle = entry.getField("title");
         }
 
+        // TODO: currently this can never happen
         if ("Interview".equals(msbibType) && (entry.hasField("title"))) {
             result.broadcastTitle = entry.getField("title");
         }
 
+        // Value must be converted
         if (entry.hasField("language")) {
-            result.LCID = result.getLCID(entry.getField("language"));
-        }
-
-        if (entry.hasField(MSBIB_PREFIX + "day")) {
-            result.day = entry.getField(MSBIB_PREFIX + "day");
+            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField("language"))));
         }
 
         result.standardNumber = "";
@@ -97,11 +96,13 @@ public class MSBibConverter {
             }
         }
 
+        // TODO: currently this can never happen
         if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
                 && (entry.hasField("title"))) {
             result.internetSiteTitle = entry.getField("title");
         }
 
+        // TODO: currently only Misc can happen
         if (("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType))
                 && (entry.hasField("title"))) {
             result.publicationTitle = entry.getField("title");

@@ -55,7 +55,7 @@ public class MSBibExportFormatTestFiles {
     public static Collection<String> fileNames() throws IOException {
         try (Stream<Path> stream = Files.list(Paths.get(PATH_TO_FILE))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("MsBibExportFormat")).collect(Collectors.toList());
+                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
         }
     }
 

@@ -21,6 +21,7 @@ public class MSBibMapping {
         bibtexToMSBib.put("month", "Month");
         bibtexToMSBib.put("note", "Comments");
         bibtexToMSBib.put("volume", "Volume");
+        bibtexToMSBib.put("language", "LCID");
         bibtexToMSBib.put("edition", "Edition");
         bibtexToMSBib.put("publisher", "Publisher");
         bibtexToMSBib.put("booktitle", "BookTitle");
@@ -47,10 +48,10 @@ public class MSBibMapping {
         bibtexToMSBib.put("intype", BIBTEX_PREFIX + "InType");
         bibtexToMSBib.put("paper", BIBTEX_PREFIX + "Paper");
         // MSBib only fields
-        //bibtexToMSBib.put(PREFIX + "day", "");
         bibtexToMSBib.put(MSBIB_PREFIX + "shorttitle", "ShortTitle");
         bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
+        //bibtexToMSBib.put(MSBIB_PREFIX + "day", "Day");
         //bibtexToMSBib.put(PREFIX + "accessed", "Accessed");
         bibtexToMSBib.put(MSBIB_PREFIX + "medium", "Medium");
         bibtexToMSBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
@@ -104,6 +105,19 @@ public class MSBibMapping {
         entryTypeMapping.put("electronic", MSBibEntryType.Misc);
 
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
+    }
+
+    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+    public static int getLCID(String language) {
+        // TODO: add language to LCID mapping
+        // 0 is English
+        return 0;
+    }
+
+    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+    public static String getLanguage(int LCID) {
+        // TODO: add language to LCID mapping
+        return "english";
     }
 
     public static String getMSBibField(String bibtexFieldName) {

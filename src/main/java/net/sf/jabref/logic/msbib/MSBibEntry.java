@@ -42,9 +42,6 @@ class MSBibEntry {
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
 
-    public String tag;
-    public static final String GUID = null;
-    public int LCID = -1;
     public List<PersonName> authors;
     public List<PersonName> bookAuthors;
     public List<PersonName> editors;
@@ -58,38 +55,20 @@ class MSBibEntry {
     public List<PersonName> compilers;
     public List<PersonName> interviewers;
     public List<PersonName> interviewees;
-
     public List<PersonName> inventors;
     public List<PersonName> counsels;
-    public String title;
-    public String year;
 
-    public String month;
-    public String day;
-
-    public String comments;
     public PageNumbers pages;
-    public String volume;
-    public String edition;
 
     public String standardNumber;
-    public String publisher;
     public String address;
-    public String issue;
     public String conferenceName;
-    public String department;
-    public String institution;
     public String thesisType;
     public String internetSiteTitle;
     public String dateAccessed;
-    public String doi;
-    public String url;
-    public String productionCompany;
     public String publicationTitle;
-    public String medium;
     public String albumTitle;
     public String broadcastTitle;
-    public String type;
 
     // reduced subset, supports only "CITY , STATE, COUNTRY"
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
@@ -139,28 +118,13 @@ class MSBibEntry {
             }
         }
 
-        String temp;
-
-        temp = getXmlElementTextContent("LCID", entry);
-        if (temp != null) {
-            try {
-                LCID = Integer.parseInt(temp);
-            } catch (NumberFormatException e) {
-                LCID = -1;
-            }
-        }
-
-        day = getXmlElementTextContent("Day", entry);
-
-        temp = getXmlElementTextContent("Pages", entry);
+        String temp = getXmlElementTextContent("Pages", entry);
         if (temp != null) {
             pages = new PageNumbers(temp);
         }
 
-        publicationTitle = getXmlElementTextContent("PublicationTitle", entry);
-        albumTitle = getXmlElementTextContent("AlbumTitle", entry);
-        broadcastTitle = getXmlElementTextContent("BroadcastTitle", entry);
         standardNumber = getXmlElementTextContent("StandardNumber", entry);
+        conferenceName = getXmlElementTextContent("ConferenceName", entry);
 
         String city = getXmlElementTextContent("City", entry);
         String state = getXmlElementTextContent("StateProvince", entry);
@@ -180,9 +144,6 @@ class MSBibEntry {
             address = null;
         }
 
-        conferenceName = getXmlElementTextContent("ConferenceName", entry);
-
-        thesisType = getXmlElementTextContent("ThesisType", entry);
         internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
         String month = getXmlElementTextContent("MonthAccessed", entry);
         String day = getXmlElementTextContent("DayAccessed", entry);
@@ -269,14 +230,6 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        // FIXME: old
-        // Not based on bibtex content = additional
-        addField(document, rootNode, "GUID", GUID);
-
-        if (LCID >= 0) {
-            addField(document, rootNode, "LCID", Integer.toString(LCID));
-        }
-
         // based on bibtex content
         if (dateAccessed != null) {
             Matcher matcher = DATE_PATTERN.matcher(dateAccessed);
@@ -318,25 +271,11 @@ class MSBibEntry {
         addField(document, rootNode, "ThesisType", thesisType);
         addField(document, rootNode, "InternetSiteTitle", internetSiteTitle);
 
-        addField(document, rootNode, "ProductionCompany", productionCompany);
         addField(document, rootNode, "PublicationTitle", publicationTitle);
         addField(document, rootNode, "AlbumTitle", albumTitle);
         addField(document, rootNode, "BroadcastTitle", broadcastTitle);
 
         return rootNode;
-    }
-
-    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    public int getLCID(String language) {
-        // TODO: add language to LCID mapping
-        // 0 is English
-        return 0;
-    }
-
-    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-    public String getLanguage(int LCID) {
-        // TODO: add language to LCID mapping
-        return "english";
     }
 
     private void addField(Document document, Element parent, String name, String value) {
