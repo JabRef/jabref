@@ -17,7 +17,7 @@ dependencies:
 
 test:
   override:
-    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace
+    - ./gradlew -Pdev=false -Pinstall4jDir="install4j6" release --stacktrace
 
 deployment:
   release:
