@@ -60,13 +60,13 @@ public class MSBibConverter {
 
         result.standardNumber = "";
         if (entry.hasField("isbn")) {
-            result.standardNumber += " ISBN: " + entry.getField("isbn"); /* SM: 2010.10: lower case */
+            result.standardNumber += " ISBN: " + entry.getField("isbn");
         }
         if (entry.hasField("issn")) {
-            result.standardNumber += " ISSN: " + entry.getField("issn"); /* SM: 2010.10: lower case */
+            result.standardNumber += " ISSN: " + entry.getField("issn");
         }
         if (entry.hasField("lccn")) {
-            result.standardNumber += " LCCN: " + entry.getField("lccn"); /* SM: 2010.10: lower case */
+            result.standardNumber += " LCCN: " + entry.getField("lccn");
         }
         if (entry.hasField("mrnumber")) {
             result.standardNumber += " MRN: " + entry.getField("mrnumber");

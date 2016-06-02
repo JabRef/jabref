@@ -47,6 +47,9 @@ import org.xml.sax.SAXException;
 public class MSBibDatabase {
     private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
+    public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
+    public static final String PREFIX = "b:";
+
     private Set<MSBibEntry> entries;
 
     public MSBibDatabase() {
@@ -102,26 +105,28 @@ public class MSBibDatabase {
     }
 
     public Document getDOM() {
-        Document result = null;
+        Document document = null;
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.
-                    newInstance().
-                    newDocumentBuilder();
-            result = documentBuilder.newDocument();
-            Element msbibCollection = result.createElement("b:Sources");
-            msbibCollection.setAttribute("SelectedStyle", "");
-            msbibCollection.setAttribute("xmlns", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
-            msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            document = documentBuilder.newDocument();
+
+            Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
+            rootNode.setAttribute("SelectedStyle", "");
 
             for (MSBibEntry entry : entries) {
-                Node node = entry.getDOM(result);
-                msbibCollection.appendChild(node);
+                Node node = entry.getDOM(document);
+                rootNode.appendChild(node);
             }
 
-            result.appendChild(msbibCollection);
+            document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
-            LOGGER.warn("Could not build document", e);
+            LOGGER.warn("Could not build XML document", e);
         }
-        return result;
+
+        return document;
     }
 }

@@ -25,6 +25,7 @@ public class MSBibMapping {
         bibtexToMSBib.put("publisher", "Publisher");
         bibtexToMSBib.put("booktitle", "BookTitle");
         //bibtexToMSBib.put("booktitle", "ConferenceName");
+        //bibtexToMSBib.put("pages", "Pages");
         bibtexToMSBib.put("chapter", "ChapterNumber");
         bibtexToMSBib.put("journal", "JournalName");
         bibtexToMSBib.put("number", "Issue");
@@ -46,11 +47,11 @@ public class MSBibMapping {
         bibtexToMSBib.put("intype", BIBTEX_PREFIX + "InType");
         bibtexToMSBib.put("paper", BIBTEX_PREFIX + "Paper");
         // MSBib only fields
-        //bibtexToMSBib.put(MSBIB_PREFIX + "day", "");
+        //bibtexToMSBib.put(PREFIX + "day", "");
         bibtexToMSBib.put(MSBIB_PREFIX + "shorttitle", "ShortTitle");
         bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        //bibtexToMSBib.put(MSBIB_PREFIX + "accessed", "Accessed");
+        //bibtexToMSBib.put(PREFIX + "accessed", "Accessed");
         bibtexToMSBib.put(MSBIB_PREFIX + "medium", "Medium");
         bibtexToMSBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "theater", "Theater");

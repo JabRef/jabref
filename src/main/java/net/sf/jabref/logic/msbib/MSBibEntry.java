@@ -41,8 +41,6 @@ import org.w3c.dom.NodeList;
 class MSBibEntry {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
 
-    private static final String B_COLON = "b:";
-
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
 
@@ -267,7 +265,7 @@ class MSBibEntry {
     }
 
     public Element getDOM(Document document) {
-        Element rootNode = document.createElement(B_COLON + "Source");
+        Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
         for (Map.Entry<String, String> entry : fields.entrySet()) {
             addField(document, rootNode, entry.getKey(), entry.getValue());
@@ -293,7 +291,7 @@ class MSBibEntry {
             }
         }
 
-        Element allAuthors = document.createElement(B_COLON + "Author");
+        Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
         addAuthor(document, allAuthors, "Author", authors);
         addAuthor(document, allAuthors, "BookAuthor", bookAuthors);
@@ -349,7 +347,7 @@ class MSBibEntry {
         if (value == null) {
             return;
         }
-        Element elem = document.createElement(B_COLON + name);
+        Element elem = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + name);
         elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
         parent.appendChild(elem);
     }
@@ -358,10 +356,10 @@ class MSBibEntry {
         if (authorsLst == null) {
             return;
         }
-        Element authorTop = document.createElement(B_COLON + entryName);
-        Element nameList = document.createElement(B_COLON + "NameList");
+        Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);
+        Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "NameList");
         for (PersonName name : authorsLst) {
-            Element person = document.createElement(B_COLON + "Person");
+            Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Person");
             addField(document, person, "Last", name.getSurname());
             addField(document, person, "Middle", name.getMiddlename());
             addField(document, person, "First", name.getFirstname());
