@@ -63,7 +63,7 @@ public class KeyBindingsDialog extends JDialog {
         updateTableData();
         //JScrollPane listScroller = new JScrollPane(list);
         JScrollPane listScroller = new JScrollPane(table);
-        listScroller.setPreferredSize(new Dimension(250, 400));
+        listScroller.setPreferredSize(new Dimension(500, 500));
         getContentPane().add(listScroller, BorderLayout.CENTER);
 
         grabB.addKeyListener(new KeyBindingsListener(table));

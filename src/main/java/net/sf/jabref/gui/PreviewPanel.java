@@ -187,10 +187,6 @@ public class PreviewPanel extends JPanel
         final String copy = "copy";
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
         actionMap.put(copy, this.copyPreviewAction);
-
-        final String print = "print";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), print);
-        actionMap.put(print, this.printAction);
     }
 
     private JPopupMenu createPopupMenu() {
@@ -332,7 +328,6 @@ public class PreviewPanel extends JPanel
             super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW));
         }
 
 
