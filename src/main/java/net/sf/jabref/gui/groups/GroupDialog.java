@@ -97,7 +97,7 @@ class GroupDialog extends JDialog {
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField m_kgSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final TextField m_kgSearchTerm = new TextField("keywords", "", false);
+    private final TextField m_kgSearchTerm = new TextField("keywords", "", false, null);
     private final JCheckBox m_kgCaseSensitive = new JCheckBox(Localization.lang("Case sensitive"));
     private final JCheckBox m_kgRegExp = new JCheckBox(Localization.lang("regular expression"));
     // for SearchGroup

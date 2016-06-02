@@ -60,7 +60,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-class EntryEditorTab {
+public class EntryEditorTab {
 
     private final JPanel panel = new JPanel();
 
@@ -151,11 +151,11 @@ class EntryEditorTab {
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
             if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.FILE_EDITOR)) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
+                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent, this);
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;
             } else {
-                fieldEditor = new TextArea(field, null);
+                fieldEditor = new TextArea(field, null, this);
                 bPanel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
@@ -197,7 +197,7 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true);
+            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true, this);
             setupJTextComponent(textField, null);
 
             editors.put(BibEntry.KEY_FIELD, textField);
@@ -410,5 +410,9 @@ class EntryEditorTab {
         keys.clear();
         keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
         component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
+    }
+
+    public BibEntry getBibEntry() {
+        return entry;
     }
 }

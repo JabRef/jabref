@@ -93,7 +93,7 @@ class PreambleEditor extends JDialog {
 
         String content = base.getPreamble();
 
-        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
+        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content, null);
 
         setupJTextComponent((TextArea) ed);
 

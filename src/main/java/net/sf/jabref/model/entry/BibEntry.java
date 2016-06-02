@@ -41,6 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
+
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
@@ -64,7 +65,6 @@ public class BibEntry implements Cloneable {
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
-
 
     private final EventBus eventBus = new EventBus();
 
@@ -376,6 +376,28 @@ public class BibEntry implements Cloneable {
         eventBus.post(new FieldChangedEvent(this, fieldName, null));
     }
 
+    private String normalizeFieldName(String fieldName) {
+        Objects.requireNonNull(fieldName, "field name must not be null");
+
+        return fieldName.toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Hide single chosen optional Field
+     * @param name field name has to be checked
+     */
+
+    public void toggleFieldConcealment(String name) {
+
+        if (fields.containsKey(name)) {
+            fields.put("_" + name, fields.get(name));
+            fields.remove(name);
+        } else if (fields.containsKey("_" + name)) {
+            fields.put(name, fields.get("_" + name));
+            fields.remove("_" + name);
+        }
+    }
+
     /**
      * Determines whether this entry has all the given fields present. If a non-null
      * database argument is given, this method will try to look up missing fields in
@@ -493,7 +515,6 @@ public class BibEntry implements Cloneable {
         }
         return year;
     }
-
 
     public void setParsedSerialization(String parsedSerialization) {
         changed = false;
