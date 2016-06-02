@@ -18,12 +18,18 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.Icon;
 
 import net.sf.jabref.logic.l10n.Localization;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class SpecialField {
+
+    private static final Log LOGGER = LogFactory.getLog(SpecialField.class);
 
     // currently, menuString is used for undo string
     // public static String TEXT_UNDO;
@@ -70,21 +76,23 @@ public abstract class SpecialField {
     }
 
     public String getTextDone(String... params) {
-        if(isSingleValueField()) {
-            if(params.length == 1 && params[0] != null) {
-                return Localization.lang("Toggled '%0' for %1 entries", getLocalizedFieldName(), params[0]);
-            }
+        Objects.requireNonNull(params);
+
+        if (isSingleValueField() && (params.length == 1) && (params[0] != null)) {
+            // Single value fields can be toggled only
+            return Localization.lang("Toggled '%0' for %1 entries", getLocalizedFieldName(), params[0]);
+        } else if (!isSingleValueField() && (params.length == 2) && (params[0] != null) && (params[1] != null)) {
+            // setting a multi value special field - the setted value is displayed, too
+            String[] allParams = {getLocalizedFieldName(), params[0], params[1]};
+            return Localization.lang("Set '%0' to '%1' for %2 entries", allParams);
+        } else if (!isSingleValueField() && (params.length == 1) && (params[0] != null)) {
+            // clearing a multi value specialfield
+            return Localization.lang("Cleared '%0' for %1 entries", getLocalizedFieldName(), params[0]);
         } else {
-            if (params.length == 2 && params[0] != null) {
-                String[] allParams = {getLocalizedFieldName(), params[0], params[1]};
-                return Localization.lang("Set '%0' to '%1' for %2 entries", allParams);
-            } else if (params.length == 1) {
-                return Localization.lang("Cleared '%0' for %1 entries", getLocalizedFieldName(), params[0]);
-            }
+            // invalid usage
+            LOGGER.info("Creation of special field status change message failed: illegal argument combination.");
+            return "";
         }
-
-         return "";
-
     }
 
     public boolean isSingleValueField() {
