@@ -9,6 +9,15 @@ Here, the categories "Changed" for added and changed functionality,
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 
+## [Unreleased]
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
 ## [3.4] - 2016-06-02
 
 ### Changed
@@ -367,6 +376,7 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.4...HEAD
 [3.4]: https://github.com/JabRef/jabref/compare/v3.3...v3.4
 [3.3]: https://github.com/JabRef/jabref/compare/v3.2...v3.3
 [3.2]: https://github.com/JabRef/jabref/compare/v3.1...v3.2
