@@ -9,7 +9,7 @@ Here, the categories "Changed" for added and changed functionality,
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 
-## [Unreleased]
+## [3.4] - 2016-06-02
 
 ### Changed
 - Implemented [#629](https://github.com/JabRef/jabref/issues/629): Explicit groups are now written in the "groups" field of the entry instead of at the end of the bib file
@@ -71,19 +71,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed button to refresh groups view. This button shouldn't be needed anymore. Please report any cases where the groups view is not updated automatically.
 - Medline and GVK importer no longer try to expand author initials (i.e.  `EH Wissler -> E. H. Wissler`).
 - Removed not-working option "Select Matches" under Groups -> Settings.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [3.3] - 2016-04-17
@@ -380,7 +367,7 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v3.3...HEAD
+[3.4]: https://github.com/JabRef/jabref/compare/v3.3...v3.4
 [3.3]: https://github.com/JabRef/jabref/compare/v3.2...v3.3
 [3.2]: https://github.com/JabRef/jabref/compare/v3.1...v3.2
 [3.1]: https://github.com/JabRef/jabref/compare/v3.0...v3.1
