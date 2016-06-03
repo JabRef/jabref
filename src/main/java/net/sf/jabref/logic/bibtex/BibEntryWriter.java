@@ -61,13 +61,18 @@ public class BibEntryWriter {
         String parsedSerialization = entry.getParsedSerialization();
 
         if(parsedSerialization != null) {
-            // get the text before the entry
-            String prolog = entry.getParsedSerialization().substring(0, entry.getParsedSerialization().indexOf('@'));
 
-            prolog = prolog.trim();
-            // if there is any non whitespace text, write it
-            if (prolog.length() > 0) {
-                out.write(prolog + Globals.NEWLINE);
+            try {
+                // get the text before the entry
+                String prolog = entry.getParsedSerialization().substring(0, entry.getParsedSerialization().indexOf('@'));
+
+                prolog = prolog.trim();
+                // if there is any non whitespace text, write it
+                if (prolog.length() > 0) {
+                    out.write(prolog + Globals.NEWLINE);
+                }
+            } catch(StringIndexOutOfBoundsException ignore) {
+                // if this occurs a broken parsed serialization has been set, so just do nothing
             }
         }
     }
