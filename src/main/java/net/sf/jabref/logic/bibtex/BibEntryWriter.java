@@ -39,10 +39,10 @@ public class BibEntryWriter {
     /**
      * Writes the given BibEntry using the given writer
      *
-     * @param entry The entry to write
-     * @param out The writer to use
+     * @param entry           The entry to write
+     * @param out             The writer to use
      * @param bibDatabaseMode The database mode (bibtex or biblatex)
-     * @param reformat Should the entry be in any case, even if no change occurred?
+     * @param reformat        Should the entry be in any case, even if no change occurred?
      */
     public void write(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
@@ -50,9 +50,26 @@ public class BibEntryWriter {
             out.write(entry.getParsedSerialization());
             return;
         }
+
+        writeUserComments(entry, out);
         out.write(Globals.NEWLINE);
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
         out.write(Globals.NEWLINE);
+    }
+
+    private void writeUserComments(BibEntry entry, Writer out) throws IOException {
+        String parsedSerialization = entry.getParsedSerialization();
+
+        if(parsedSerialization != null) {
+            // get the text before the entry
+            String prolog = entry.getParsedSerialization().substring(0, entry.getParsedSerialization().indexOf('@'));
+
+            prolog = prolog.trim();
+            // if there is any non whitespace text, write it
+            if (prolog.length() > 0) {
+                out.write(prolog + Globals.NEWLINE);
+            }
+        }
     }
 
     public void writeWithoutPrependedNewlines(BibEntry entry, Writer out, BibDatabaseMode bibDatabaseMode) throws IOException {
@@ -73,7 +90,7 @@ public class BibEntryWriter {
      * @throws IOException
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out,
-            BibDatabaseMode bibDatabaseMode) throws IOException {
+                                                               BibDatabaseMode bibDatabaseMode) throws IOException {
         // Write header with type and bibtex-key.
         TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), bibDatabaseMode);
         out.write('@' + typedEntry.getTypeForDisplay() + '{');
@@ -129,9 +146,9 @@ public class BibEntryWriter {
     /**
      * Write a single field, if it has any content.
      *
-     * @param entry             the entry to write
-     * @param out               the target of the write
-     * @param name              The field name
+     * @param entry the entry to write
+     * @param out   the target of the write
+     * @param name  The field name
      * @throws IOException In case of an IO error
      */
     private void writeField(BibEntry entry, Writer out, String name, int indentation) throws IOException {
