@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -1485,5 +1486,32 @@ public class BibtexParserTest {
         expected.add(c);
 
         assertEquals(expected, result.getDatabase().getEntries());
+    }
+
+    @Test
+    public void parsePrecedingComment () throws IOException {
+        // @formatter:off
+        String bibtexEntry = "% Some random comment that should stay here" + Globals.NEWLINE +
+                "@Article{test," + Globals.NEWLINE +
+                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
+                "  Note                     = {some note}," + Globals.NEWLINE +
+                "  Number                   = {1}" + Globals.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        assertEquals(1, entries.size());
+
+        BibEntry entry = entries.iterator().next();
+        assertEquals("test", entry.getCiteKey());
+        assertEquals(5, entry.getFieldNames().size());
+        Set<String> fields = entry.getFieldNames();
+        assertTrue(fields.contains("author"));
+        assertEquals("Foo Bar", entry.getField("author"));
+        assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 }
