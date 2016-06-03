@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- JabRef does no longer delete user comments outside of BibTeX entries [#1026]
 
 ### Fixed
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
