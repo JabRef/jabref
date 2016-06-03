@@ -1254,7 +1254,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseSavesOnlyRealNewlinesBeforeEntryInParsedSerialization() throws IOException {
+    public void parseRemovesEncodingLineInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(
                 new StringReader("%Encoding: no" + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry));
