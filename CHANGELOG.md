@@ -101,6 +101,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1457](https://github.com/JabRef/jabref/issues/1457): Support multiple words inside LaTeX commands to RTF export
 - Entries retain their groupmembership when undoing their cut/deletion
 - Fixed [#1450](https://github.com/JabRef/jabref/issues/1450): EntryEditor is restored in the correct size after preference changes
+- Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
 
 ### Removed
 - Removed possibility to export entries/databases to an `.sql` file, as the logic cannot easily use the correct escape logic
@@ -162,7 +163,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#969](https://github.com/JabRef/jabref/issues/969) Adding and replacing old event system mechanisms with Google Guava EventBus.
 
 ### Fixed
+<<<<<<< 973a39d9fa61ad9149db778e27112ecaeb13d712
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
+=======
+>>>>>>> Added double {} around all symbols with capital letters to avoid lowercasing in titles. Fixed #405
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
 - Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup

@@ -18,6 +18,9 @@ import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.layout.format.HTMLChars;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -34,8 +37,10 @@ import org.openjdk.jmh.runner.RunnerException;
 @State(Scope.Thread)
 public class Benchmarks {
 
-    String bibtexString;
-    BibDatabase database = new BibDatabase();
+    private String bibtexString;
+    private final BibDatabase database = new BibDatabase();
+    private String latexConversionString;
+    private String htmlConversionString;
 
     @Setup
     public void init() throws IOException, SaveException {
@@ -60,6 +65,9 @@ public class Benchmarks {
                 new SavePreferences());
         bibtexString = stringWriter.toString();
 
+        latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
+
+        htmlConversionString = "<b>&Ouml;sterreich</b> &#8211; &amp; characters &#x2aa2; <i>italic</i>";
     }
 
     @Benchmark
@@ -92,6 +100,24 @@ public class Benchmarks {
     @Benchmark
     public BibDatabaseMode inferBibDatabaseMode() {
         return BibDatabaseModeDetection.inferMode(database);
+    }
+
+    @Benchmark
+    public String latexToUnicodeConversion() {
+        LatexToUnicodeFormatter f = new LatexToUnicodeFormatter();
+        return f.format(latexConversionString);
+    }
+
+    @Benchmark
+    public String latexToHTMLConversion() {
+        HTMLChars f = new HTMLChars();
+        return f.format(latexConversionString);
+    }
+
+    @Benchmark
+    public String htmlToLatexConversion() {
+        HtmlToLatexFormatter f = new HtmlToLatexFormatter();
+        return f.format(htmlConversionString);
     }
 
     public static void main(String[] args) throws IOException, RunnerException {
