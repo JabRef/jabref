@@ -21,13 +21,13 @@
 <b:City>Stuttgart</b:City>
 <b:StateProvince>Bawü</b:StateProvince>
 <b:CountryRegion>Deutschland</b:CountryRegion>
-<b:LCID>z</b:LCID>
+<b:LCID>0</b:LCID>
 <b:MonthAccessed>July</b:MonthAccessed>
 <b:DayAccessed>3</b:DayAccessed>
 <b:YearAccessed>2010</b:YearAccessed>
 <b:BookTitle>Turingmaschinen</b:BookTitle>
 <b:ChapterNumber>3</b:ChapterNumber>
-<b:PeriodicalTitle>Besondere TuringMaschinen</b:PeriodicalTitle>
+<b:PeriodicalTitle>Besondere Turingmaschinen</b:PeriodicalTitle>
 <b:ConferenceName>Besondere Turingmaschinen</b:ConferenceName>
 <b:Department>Gymnasium Unterrieden</b:Department>
 <b:Institution>Institution</b:Institution>

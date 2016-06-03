@@ -22,30 +22,24 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-/**
- * @author Michael Wrighton
- * @author S M Mahbub Murshed
- *
- */
 public class PageNumbers {
-
     private String freeform;
     private int start;
     private int end;
 
     private static final Pattern PAGE_PATTERN = Pattern.compile("\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*");
 
-    public PageNumbers(String s) {
-        parsePageNums(s);
+    public PageNumbers(String pages) {
+        parsePageNums(pages);
     }
 
-    private void parsePageNums(String numberString) {
-        Matcher matcher = PAGE_PATTERN.matcher(numberString);
+    private void parsePageNums(String pages) {
+        Matcher matcher = PAGE_PATTERN.matcher(pages);
         if (matcher.matches()) {
             start = Integer.parseInt(matcher.group(1));
             end = Integer.parseInt(matcher.group(2));
         } else {
-            freeform = numberString;
+            freeform = pages;
         }
     }
 
@@ -75,7 +69,7 @@ public class PageNumbers {
 
     @Override
     public String toString() {
-        return toString("--");
+        return toString("-");
     }
 
 }
