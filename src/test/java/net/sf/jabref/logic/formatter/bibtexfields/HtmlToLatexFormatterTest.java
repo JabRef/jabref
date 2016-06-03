@@ -45,7 +45,7 @@ public class HtmlToLatexFormatterTest {
         assertEquals("{\\\"{a}}", formatter.format("&auml;"));
         assertEquals("{\\\"{a}}", formatter.format("&#228;"));
         assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
-        assertEquals("{$\\Epsilon$}", formatter.format("&Epsilon;"));
+        assertEquals("{{$\\Epsilon$}}", formatter.format("&Epsilon;"));
     }
 
     @Test

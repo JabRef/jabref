@@ -263,7 +263,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "&Epsilon;");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals("{$\\Epsilon$}", entry.getField("title"));
+        Assert.assertEquals("{{$\\Epsilon$}}", entry.getField("title"));
     }
 
     @Test

@@ -14,6 +14,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 ### Fixed
+- Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
+- Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
+
 
 ### Removed
 
@@ -162,7 +165,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#969](https://github.com/JabRef/jabref/issues/969) Adding and replacing old event system mechanisms with Google Guava EventBus.
 
 ### Fixed
-- Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#318](https://github.com/JabRef/jabref/issues/318): Improve normalization of author names
 - Fixed [#598](https://github.com/JabRef/jabref/issues/598) and [#402](https://github.com/JabRef/jabref/issues/402): No more issues with invalid icons for ExternalFileTypes in global search or after editing the settings
 - Fixed [#883](https://github.com/JabRef/jabref/issues/883): No NPE during cleanup

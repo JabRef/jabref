@@ -35,7 +35,7 @@ public class UnicodeConverterTest {
     @Test
     public void testUnicode() {
         assertEquals("{\\\"{a}}", formatter.format("ä"));
-        assertEquals("{$\\Epsilon$}", formatter.format("\u0395"));
+        assertEquals("{{$\\Epsilon$}}", formatter.format("\u0395"));
     }
 
     @Test
