@@ -194,7 +194,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         if (upgradeDatabase) {
             // Update file links links in the database:
             NamedCompound ce = upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
 

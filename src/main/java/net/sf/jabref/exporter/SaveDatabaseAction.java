@@ -140,7 +140,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
             panel.setSaving(false);
             if (success) {
-                panel.undoManager.markUnchanged();
+                panel.getUndoManager().markUnchanged();
 
                 if (!AutoSaveManager.deleteAutoSaveFile(panel)) {
                     //System.out.println("Deletion of autosave file failed");
@@ -191,10 +191,10 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 // Error occured during processing of
                 // be. Highlight it:
-                int row = panel.mainTable.findEntry(ex.getEntry());
+                int row = panel.getMainTable().findEntry(ex.getEntry());
                 int topShow = Math.max(0, row - 3);
-                panel.mainTable.setRowSelectionInterval(row, row);
-                panel.mainTable.scrollTo(topShow);
+                panel.getMainTable().setRowSelectionInterval(row, row);
+                panel.getMainTable().scrollTo(topShow);
                 panel.showEntry(ex.getEntry());
             } else {
                 LOGGER.error("Problem saving file", ex);
@@ -320,25 +320,23 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         }
 
-        if (f != null) {
-            File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
-            panel.getBibDatabaseContext().setDatabaseFile(f);
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
-            runCommand();
-            // If the operation failed, revert the file field and return:
-            if (!success) {
-                panel.getBibDatabaseContext().setDatabaseFile(oldFile);
-                return;
-            }
-            // Register so we get notifications about outside changes to the file.
-            try {
-                panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel,
-                        panel.getBibDatabaseContext().getDatabaseFile()));
-            } catch (IOException ex) {
-                LOGGER.error("Problem registering file change notifications", ex);
-            }
-            frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().getPath());
+        File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
+        panel.getBibDatabaseContext().setDatabaseFile(f);
+        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
+        runCommand();
+        // If the operation failed, revert the file field and return:
+        if (!success) {
+            panel.getBibDatabaseContext().setDatabaseFile(oldFile);
+            return;
         }
+        // Register so we get notifications about outside changes to the file.
+        try {
+            panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel,
+                    panel.getBibDatabaseContext().getDatabaseFile()));
+        } catch (IOException ex) {
+            LOGGER.error("Problem registering file change notifications", ex);
+        }
+        frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().getPath());
         frame.updateEnabledState();
     }
 

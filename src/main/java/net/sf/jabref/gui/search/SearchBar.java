@@ -245,9 +245,9 @@ public class SearchBar extends JPanel {
 
     private void endSearch() {
         // first focus request is necessary so that the UI stays nice
-        basePanel.mainTable.requestFocus();
+        basePanel.getMainTable().requestFocus();
         clearSearch();
-        basePanel.mainTable.requestFocus();
+        basePanel.getMainTable().requestFocus();
     }
 
     /**
@@ -281,7 +281,7 @@ public class SearchBar extends JPanel {
 
         this.currentResults.setText("");
 
-        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -324,7 +324,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
 
-        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
         searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));

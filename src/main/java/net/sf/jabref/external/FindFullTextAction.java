@@ -86,7 +86,7 @@ public class FindFullTextAction extends AbstractWorker {
                     String newValue = tm.getStringRepresentation();
                     UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
                     entry.setField(Globals.FILE_FIELD, newValue);
-                    basePanel.undoManager.addEdit(edit);
+                    basePanel.getUndoManager().addEdit(edit);
                     basePanel.markBaseChanged();
                 });
             } catch (IOException e) {

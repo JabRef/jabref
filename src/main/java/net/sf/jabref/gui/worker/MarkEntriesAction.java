@@ -86,7 +86,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
                 EntryMarker.markEntry(be, level + 1, false, ce);
             }
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
         }
     }
 

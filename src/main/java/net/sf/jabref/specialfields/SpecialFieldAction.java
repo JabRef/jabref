@@ -67,7 +67,7 @@ public class SpecialFieldAction implements BaseAction {
             }
             ce.end();
             if (ce.hasEdits()) {
-                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;

@@ -241,7 +241,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                     fileTypes.add(newType);
                                     Collections.sort(fileTypes);
                                     ExternalFileTypes.getInstance().setExternalFileTypes(fileTypes);
-                                    panel.mainTable.repaint();
+                                    panel.getMainTable().repaint();
                                 }
                             } else {
                                 // User wants to change the type of this link.
@@ -273,7 +273,7 @@ public class SynchronizeFileField extends AbstractWorker {
         if (!changedEntries.isEmpty()) {
             // Add the undo edit:
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
             entriesChangedCount = changedEntries.size();
         }

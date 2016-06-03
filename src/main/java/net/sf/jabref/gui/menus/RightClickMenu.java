@@ -72,8 +72,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         // If only one entry is selected, get a reference to it for adapting the menu.
         BibEntry be = null;
-        if (panel.mainTable.getSelectedRowCount() == 1) {
-            be = panel.mainTable.getSelected().get(0);
+        if (panel.getMainTable().getSelectedRowCount() == 1) {
+            be = panel.getMainTable().getSelected().get(0);
         }
 
         addPopupMenuListener(this);
@@ -218,11 +218,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     private boolean areMultipleEntriesSelected() {
-        return panel.mainTable.getSelectedRowCount() > 1;
+        return panel.getMainTable().getSelectedRowCount() > 1;
     }
 
     private boolean areExactlyTwoEntriesSelected() {
-        return panel.mainTable.getSelectedRowCount() == 2;
+        return panel.getMainTable().getSelectedRowCount() == 2;
     }
 
     /**
@@ -267,8 +267,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     private boolean isFieldSetForSelectedEntry(String fieldname) {
-        if (panel.mainTable.getSelectedRowCount() == 1) {
-            BibEntry entry = panel.mainTable.getSelected().get(0);
+        if (panel.getMainTable().getSelectedRowCount() == 1) {
+            BibEntry entry = panel.getMainTable().getSelected().get(0);
             return entry.getFieldNames().contains(fieldname);
         } else {
             return false;
@@ -276,8 +276,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     private Icon getFileIconForSelectedEntry() {
-        if (panel.mainTable.getSelectedRowCount() == 1) {
-            BibEntry entry = panel.mainTable.getSelected().get(0);
+        if (panel.getMainTable().getSelectedRowCount() == 1) {
+            BibEntry entry = panel.getMainTable().getSelected().get(0);
             if(entry.hasField(Globals.FILE_FIELD)) {
                 JLabel label = FileListTableModel.getFirstLabel(entry.getField(Globals.FILE_FIELD));
                 if (label != null) {

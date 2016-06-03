@@ -79,7 +79,7 @@ public class AddToGroupAction extends AbstractAction {
 
         undoAll.end();
 
-        panel.undoManager.addEdit(undoAll);
+        panel.getUndoManager().addEdit(undoAll);
         panel.markBaseChanged();
         panel.updateEntryEditorIfShowing();
         panel.getGroupSelector().valueChanged(null);

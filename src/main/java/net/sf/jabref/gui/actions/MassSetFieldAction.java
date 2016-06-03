@@ -247,7 +247,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             }
         }
         ce.end();
-        bp.undoManager.addEdit(ce);
+        bp.getUndoManager().addEdit(ce);
         bp.markBaseChanged();
     }
 

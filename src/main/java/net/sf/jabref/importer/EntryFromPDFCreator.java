@@ -56,7 +56,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
             return Optional.empty();
         }
 
-        PdfImporter pi = new PdfImporter(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable, -1);
+        PdfImporter pi = new PdfImporter(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable(), -1);
         String[] fileNames = {pdfFile.toString()};
         ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
         if (res.getEntries().size() == 1) {

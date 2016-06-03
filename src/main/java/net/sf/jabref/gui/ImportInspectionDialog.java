@@ -740,7 +740,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
 
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
         }
 
         private boolean addToGroups(NamedCompound ce, BibEntry entry, Set<GroupTreeNode> groups) {

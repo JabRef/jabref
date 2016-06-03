@@ -26,7 +26,6 @@ public class SpecialFieldDatabaseChangeListener {
 
     private static SpecialFieldDatabaseChangeListener INSTANCE;
 
-
     public static SpecialFieldDatabaseChangeListener getInstance() {
         if (SpecialFieldDatabaseChangeListener.INSTANCE == null) {
             SpecialFieldDatabaseChangeListener.INSTANCE = new SpecialFieldDatabaseChangeListener();

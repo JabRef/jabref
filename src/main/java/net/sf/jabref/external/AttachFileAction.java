@@ -46,7 +46,7 @@ public class AttachFileAction implements BaseAction {
             UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
                     entry.getField(Globals.FILE_FIELD), newVal);
             entry.setField(Globals.FILE_FIELD, newVal);
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
     }
