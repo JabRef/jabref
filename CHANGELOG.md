@@ -18,6 +18,35 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Removed
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## [3.4] - 2016-06-02
 
 ### Changed
