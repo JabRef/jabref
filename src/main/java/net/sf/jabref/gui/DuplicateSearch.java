@@ -105,13 +105,13 @@ public class DuplicateSearch implements Runnable {
 
                         duplicateCounter++;
                         DuplicateResolverResult answer = cb.getSelected();
-                        if ((answer == DuplicateResolverResult.KEEP_UPPER)
+                        if ((answer == DuplicateResolverResult.KEEP_LEFT)
                                 || (answer == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
                             toRemove.add(be[1]);
                             if (answer == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                                 autoRemoveExactDuplicates = true; // Remember choice
                             }
-                        } else if (answer == DuplicateResolverResult.KEEP_LOWER) {
+                        } else if (answer == DuplicateResolverResult.KEEP_RIGHT) {
                             toRemove.add(be[0]);
                         } else if (answer == DuplicateResolverResult.BREAK) {
                             st.setFinished(); // thread killing
