@@ -313,10 +313,10 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader(
                         "@article{canh05,"
-                        + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n"
-                        + "@inProceedings{foo,"
-                        + "  author={Norton Bar}}"));
+                                + "  author = {Crowston, K. and Annabi, H.},\n"
+                                + "  title = {Title A}}\n"
+                                + "@inProceedings{foo,"
+                                + "  author={Norton Bar}}"));
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
         List<BibEntry> expected = new ArrayList<>();
@@ -431,28 +431,28 @@ public class BibtexParserTest {
     public void parseRecognizesHeaderButIgnoresEncoding() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "This file was created with JabRef 2.1 beta 2."
-                + "\n"
-                + "Encoding: Cp1252"
-                + "\n"
-                + ""
-                + "\n"
-                + "@INPROCEEDINGS{CroAnnHow05,"
-                + "\n"
-                + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
-                + "\n"
-                + "  title = {Effective work practices for floss development: A model and propositions},"
-                + "\n"
-                + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
-                + "\n"
-                + "  year = {2005},"
-                + "\n"
-                + "  owner = {oezbek},"
-                + "\n"
-                + "  timestamp = {2006.05.29},"
-                + "\n"
-                + "  url = {http://james.howison.name/publications.html}"
-                + "\n"
-                + "}))"));
+                        + "\n"
+                        + "Encoding: Cp1252"
+                        + "\n"
+                        + ""
+                        + "\n"
+                        + "@INPROCEEDINGS{CroAnnHow05,"
+                        + "\n"
+                        + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
+                        + "\n"
+                        + "  title = {Effective work practices for floss development: A model and propositions},"
+                        + "\n"
+                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
+                        + "\n"
+                        + "  year = {2005},"
+                        + "\n"
+                        + "  owner = {oezbek},"
+                        + "\n"
+                        + "  timestamp = {2006.05.29},"
+                        + "\n"
+                        + "  url = {http://james.howison.name/publications.html}"
+                        + "\n"
+                        + "}))"));
         assertEquals(Globals.prefs.getDefaultEncoding(), result.getMetaData().getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
@@ -594,20 +594,20 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader(
                         "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},"
-                        + "\n"
-                        + "  title = {Effective work practices for floss development: A model and propositions},"
-                        + "\n"
-                        + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
-                        + "\n"
-                        + "  year = {2005},"
-                        + "\n"
-                        + "  owner = {oezbek},"
-                        + "\n"
-                        + "  timestamp = {2006.05.29},"
-                        + "\n"
-                        + "  url = {http://james.howison.name/publications.html}"
-                        + "\n"
-                        + "}))"));
+                                + "\n"
+                                + "  title = {Effective work practices for floss development: A model and propositions},"
+                                + "\n"
+                                + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},"
+                                + "\n"
+                                + "  year = {2005},"
+                                + "\n"
+                                + "  owner = {oezbek},"
+                                + "\n"
+                                + "  timestamp = {2006.05.29},"
+                                + "\n"
+                                + "  url = {http://james.howison.name/publications.html}"
+                                + "\n"
+                                + "}))"));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(0, c.size());
     }
@@ -953,16 +953,16 @@ public class BibtexParserTest {
     public void parseRecognizesStringAndEntry() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader(
-          ""
-        + "@string{bourdieu = {Bourdieu, Pierre}}"
-        + "@book{bourdieu-2002-questions-sociologie, "
-        + "	Address = {Paris},"
-        + "	Author = bourdieu,"
-        + "	Isbn = 2707318256,"
-        + "	Publisher = {Minuit},"
-        + "	Title = {Questions de sociologie},"
-        + "	Year = 2002"
-        + "}"));
+                ""
+                        + "@string{bourdieu = {Bourdieu, Pierre}}"
+                        + "@book{bourdieu-2002-questions-sociologie, "
+                        + "	Address = {Paris},"
+                        + "	Author = bourdieu,"
+                        + "	Isbn = 2707318256,"
+                        + "	Publisher = {Minuit},"
+                        + "	Title = {Questions de sociologie},"
+                        + "	Year = 2002"
+                        + "}"));
 
         assertEquals(1, result.getDatabase().getStringCount());
         BibtexString s = result.getDatabase().getStringValues().iterator().next();
@@ -1379,7 +1379,7 @@ public class BibtexParserTest {
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
         assertEquals(new SaveOrderConfig(false, new SaveOrderConfig.SortCriterion("author", false),
-                new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
+                        new SaveOrderConfig.SortCriterion("year", true), new SaveOrderConfig.SortCriterion("abstract", false)),
                 saveOrderConfig.get());
     }
 
@@ -1388,8 +1388,8 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader(
                         "@comment{jabref-meta: keypattern_article:articleTest;}"
-                        + Globals.NEWLINE
-                        + "@comment{jabref-meta: keypatterndefault:test;}"));
+                                + Globals.NEWLINE
+                                + "@comment{jabref-meta: keypatterndefault:test;}"));
 
         AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
 
@@ -1413,17 +1413,17 @@ public class BibtexParserTest {
     public void integrationTestGroupTree() throws IOException, ParseException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: groupsversion:3;}"
-                + Globals.NEWLINE +
-                "@comment{jabref-meta: groupstree:"
-                + Globals.NEWLINE
-                + "0 AllEntriesGroup:;"
-                + Globals.NEWLINE
-                + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;"
-                + Globals.NEWLINE
-                + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
-                + Globals.NEWLINE
-                + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;"
-                + "}"));
+                        + Globals.NEWLINE +
+                        "@comment{jabref-meta: groupstree:"
+                        + Globals.NEWLINE
+                        + "0 AllEntriesGroup:;"
+                        + Globals.NEWLINE
+                        + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;"
+                        + Globals.NEWLINE
+                        + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
+                        + Globals.NEWLINE
+                        + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;"
+                        + "}"));
 
         GroupTreeNode root = result.getMetaData().getGroups();
 
@@ -1435,7 +1435,7 @@ public class BibtexParserTest {
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
                 root.getChildren().get(1).getGroup());
-        assertEquals(Arrays.asList("Key1", "Key2"), ((ExplicitGroup)root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+        assertEquals(Arrays.asList("Key1", "Key2"), ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
 
     @Test
@@ -1458,7 +1458,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader(
                         "@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
-                        + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));
+                                + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"));
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
@@ -1489,7 +1489,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parsePrecedingComment () throws IOException {
+    public void parsePrecedingComment() throws IOException {
         // @formatter:off
         String bibtexEntry = "% Some random comment that should stay here" + Globals.NEWLINE +
                 "@Article{test," + Globals.NEWLINE +
@@ -1514,4 +1514,16 @@ public class BibtexParserTest {
         assertEquals("Foo Bar", entry.getField("author"));
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
+
+    @Test
+    public void preserveEncodingPrefixInsideEntry() {
+        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={" + Globals.ENCODING_PREFIX + "}}");
+
+        BibEntry expected = new BibEntry();
+        expected.setType("article");
+        expected.setCiteKey("test");
+        expected.setField("author", Globals.ENCODING_PREFIX);
+        assertEquals(Collections.singletonList(expected), parsed);
+    }
+
 }
