@@ -63,8 +63,9 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
+import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
@@ -1104,9 +1105,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, prefs, mainTable.getSelectedEntries());
+                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {
                 session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
             }

@@ -115,6 +115,10 @@ public class SavePreferences {
                 this.saveType, this.takeMetadataSaveOrderInAccount, reformatFile);
     }
 
+    public Charset getEncodingOrDefault() {
+        return encoding == null ? Charset.defaultCharset() : encoding;
+    }
+
     public enum DatabaseSaveType {
         ALL,
         PLAIN_BIBTEX

@@ -70,7 +70,7 @@ public class MSBibExportFormatTestFiles {
     }
 
     @Test
-    public final void testPerformExport() throws IOException, URISyntaxException {
+    public final void testPerformExport() throws IOException, URISyntaxException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = Paths.get(MSBibExportFormatTestFiles.class.getResource(filename).toURI());
         String tempFilename = tempFile.getCanonicalPath();

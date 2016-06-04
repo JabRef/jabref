@@ -190,15 +190,15 @@ public class ExportFormat implements IExportFormat {
         SaveSession ss = null;
         if (this.encoding != null) {
             try {
-                ss = new SaveSession(this.encoding, false);
-            } catch (IOException ex) {
+                ss = new FileSaveSession(this.encoding, false);
+            } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
                 LOGGER.warn("Can not get save session.", ex);
             }
         }
         if (ss == null) {
-            ss = new SaveSession(encoding, false);
+            ss = new FileSaveSession(encoding, false);
         }
 
         try (VerifyingWriter ps = ss.getWriter()) {

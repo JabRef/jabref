@@ -45,14 +45,14 @@ class ModsExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist
             return;
         }
 
-        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
+        SaveSession ss = new FileSaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
             MODSDatabase md = new MODSDatabase(databaseContext.getDatabase(), entries);
 
@@ -66,8 +66,8 @@ class ModsExportFormat extends ExportFormat {
                 throw new Error(e);
             }
             finalizeSaveSession(ss, new File(file));
-        } catch (SaveException | IOException ex) {
-            throw new IOException(ex.getMessage());
+        } catch (IOException ex) {
+            throw new SaveException(ex);
         }
     }
 }

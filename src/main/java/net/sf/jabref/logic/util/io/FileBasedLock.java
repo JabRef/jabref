@@ -1,14 +1,19 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
-
-import net.sf.jabref.exporter.SaveSession;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileBasedLock {
 
+    /**
+     * The age in ms of a lockfile before JabRef will offer to "steal" the locked file.
+     */
+    public static final long LOCKFILE_CRITICAL_AGE = 60000;
+    private static final String LOCKFILE_SUFFIX = ".lock";
     private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
 
 
@@ -44,7 +49,7 @@ public class FileBasedLock {
      * @return true if a lock file exists, false otherwise.
      */
     public static boolean hasLockFile(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
         return lock.exists();
     }
 
@@ -54,16 +59,17 @@ public class FileBasedLock {
      * @return the last modified time if lock file exists, -1 otherwise.
      */
     public static long getLockFileTimeStamp(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
         return lock.exists() ? lock.lastModified() : -1;
     }
 
     /**
      * Check if a lock file exists, and delete it if it does.
+     *
      * @return true if the lock file existed, false otherwise.
      */
     public static boolean deleteLockFile(File file) {
-        File lock = new File(file.getPath() + SaveSession.LOCKFILE_SUFFIX);
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
         if (!lock.exists()) {
             return false;
         }
@@ -71,5 +77,26 @@ public class FileBasedLock {
             LOGGER.warn("Cannot delete lock file");
         }
         return true;
+    }
+
+    /**
+     * Check if a lock file exists, and create it if it doesn't.
+     *
+     * @return true if the lock file already existed
+     * @throws IOException if something happens during creation.
+     */
+    public static boolean createLockFile(File file) throws IOException {
+        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
+        if (lock.exists()) {
+            return true;
+        }
+        try (FileOutputStream out = new FileOutputStream(lock)) {
+            out.write(0);
+            out.close();
+        } catch (IOException ex) {
+            LOGGER.error("Error when creating lock file.", ex);
+        }
+        lock.deleteOnExit();
+        return false;
     }
 }

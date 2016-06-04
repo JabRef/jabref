@@ -35,7 +35,6 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.IconTheme;
@@ -220,7 +219,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 if (FileBasedLock.hasLockFile(file)) {
                     long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
                     if ((modificationTIme != -1)
-                            && ((System.currentTimeMillis() - modificationTIme) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                            && ((System.currentTimeMillis() - modificationTIme) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "

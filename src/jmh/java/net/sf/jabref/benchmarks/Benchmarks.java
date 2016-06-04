@@ -2,7 +2,6 @@ package net.sf.jabref.benchmarks;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,8 +12,9 @@ import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.exporter.SavePreferences;
+import net.sf.jabref.exporter.StringSaveSession;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ParseException;
@@ -60,13 +60,11 @@ public class Benchmarks {
             entry.setField("rnd", "2" + randomizer.nextInt());
             database.insertEntry(entry);
         }
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        StringWriter stringWriter = new StringWriter();
-
-        databaseWriter.writePartOfDatabase(stringWriter,
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
+        StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
-        bibtexString = stringWriter.toString();
+        bibtexString = saveSession.getStringValue();
 
         latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
 
@@ -81,14 +79,12 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public String write() throws IOException {
-        StringWriter stringWriter = new StringWriter();
-
-        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
-        databaseWriter.writePartOfDatabase(stringWriter,
+    public String write() throws SaveException {
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
+        StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
-        return stringWriter.toString();
+        return saveSession.getStringValue();
     }
 
     @Benchmark

@@ -35,6 +35,8 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
@@ -164,7 +166,7 @@ public class ChangeScanner implements Runnable {
 
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {

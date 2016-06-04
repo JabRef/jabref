@@ -45,7 +45,7 @@ class MSBibExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
@@ -53,7 +53,7 @@ class MSBibExportFormat extends ExportFormat {
             return;
         }
         // forcing to use UTF8 output format for some problems with xml export in other encodings
-        SaveSession session = new SaveSession(StandardCharsets.UTF_8, false);
+        SaveSession session = new FileSaveSession(StandardCharsets.UTF_8, false);
         MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
         try (VerifyingWriter ps = session.getWriter()) {
@@ -67,8 +67,8 @@ class MSBibExportFormat extends ExportFormat {
                 throw new Error(e);
             }
             finalizeSaveSession(session, new File(file));
-        } catch (SaveException | IOException ex) {
-            throw new IOException(ex.getMessage());
+        } catch (IOException ex) {
+            throw new SaveException(ex);
         }
     }
 }

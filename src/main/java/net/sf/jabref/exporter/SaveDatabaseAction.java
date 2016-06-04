@@ -168,11 +168,10 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), prefs,
-                        panel.getSelectedEntries());
-
+                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(),
+                        prefs);
             } else {
                 session = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
 
