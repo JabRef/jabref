@@ -1,4 +1,3 @@
-
 import org.gradle.internal.os.OperatingSystem
 
 buildscript {
@@ -74,7 +73,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:1.8.12'
     compile 'org.apache.pdfbox:jempbox:1.8.12'
 
-    // required for reading write-procted PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
+    // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.54'
 
     compile 'commons-cli:commons-cli:1.3.1'
@@ -92,7 +91,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
 
-    compile 'mysql:mysql-connector-java:5.1.38'
+    compile 'mysql:mysql-connector-java:6.0.2'
     compile 'org.postgresql:postgresql:9.4.1208'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
@@ -102,13 +101,13 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.jsoup:jsoup:1.9.1'
+    compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.13'
 
-    compile 'org.apache.logging.log4j:log4j-jcl:2.5'
-    compile 'org.apache.logging.log4j:log4j-api:2.5'
-    compile 'org.apache.logging.log4j:log4j-core:2.5'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.6'
+    compile 'org.apache.logging.log4j:log4j-api:2.6'
+    compile 'org.apache.logging.log4j:log4j-core:2.6'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
