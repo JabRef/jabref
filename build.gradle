@@ -91,7 +91,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
 
-    compile 'mysql:mysql-connector-java:6.0.2'
+    compile 'mysql:mysql-connector-java:5.1.38'
     compile 'org.postgresql:postgresql:9.4.1208'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
