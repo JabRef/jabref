@@ -15,12 +15,13 @@
 */
 package net.sf.jabref.gui.help;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
+
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Alert.AlertType;
 
 public class AboutDialogView extends FXMLView {
 
@@ -31,7 +32,8 @@ public class AboutDialogView extends FXMLView {
 
     public void show() {
         FXAlert aboutDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("About JabRef"));
-        aboutDialog.setDialogPane((DialogPane) this.getView());
+        aboutDialog.setScene(new Scene(this.getView()));
+        //aboutDialog.setDialogPane((DialogPane) this.getView());
         aboutDialog.show();
     }
 

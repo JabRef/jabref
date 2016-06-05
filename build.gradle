@@ -121,6 +121,9 @@ sourceSets {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
         }
+        resources {
+            srcDirs = ["src/main/java", "src/main/resources"]
+        }
     }	
 	integrationTest {
         java {

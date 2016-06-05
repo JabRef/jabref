@@ -1251,7 +1251,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return searchBar;
     }
 
-
     /**
      * This listener is used to add a new entry to a group (or a set of groups) in case the Group View is selected and
      * one or more groups are marked

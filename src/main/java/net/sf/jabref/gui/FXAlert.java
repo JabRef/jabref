@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui;
 
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import net.sf.jabref.JabRefGUI;
 
@@ -38,7 +38,7 @@ import net.sf.jabref.JabRefGUI;
  * {@link FXMLLoader}.
  *
  */
-public class FXAlert extends Alert {
+public class FXAlert extends Stage {
 
     /**
      * The WindowAdapter will be added to all swing windows once an instance
@@ -67,18 +67,18 @@ public class FXAlert extends Alert {
         }
     };
 
-    public FXAlert(AlertType type, String title, Image image) {
+    public FXAlert(Alert.AlertType type, String title, Image image) {
         this(type, title);
         setDialogIcon(image);
     }
 
-    public FXAlert(AlertType type, String title) {
+    public FXAlert(Alert.AlertType type, String title) {
         this(type);
         setTitle(title);
     }
 
-    public FXAlert(AlertType type) {
-        super(type);
+    public FXAlert(Alert.AlertType type) {
+        //super(type);
         Stage fxDialogWindow = getDialogWindow();
 
         fxDialogWindow.setOnShown(evt -> {
@@ -92,7 +92,7 @@ public class FXAlert extends Alert {
     }
 
     public void setDialogStyle(String pathToStyleSheet) {
-        getDialogPane().getScene().getStylesheets().add(pathToStyleSheet);
+        this.getScene().getStylesheets().add(pathToStyleSheet);
     }
 
     public void setDialogIcon(Image image) {
@@ -101,7 +101,7 @@ public class FXAlert extends Alert {
     }
 
     private Stage getDialogWindow() {
-        return (Stage) getDialogPane().getScene().getWindow();
+        return this;
     }
 
     private void setSwingWindowsEnabledAndFocusable(boolean enabled) {

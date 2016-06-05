@@ -37,6 +37,10 @@ public class TypedBibEntry {
     private final Optional<BibDatabase> database;
     private final BibDatabaseMode mode;
 
+    public TypedBibEntry(BibEntry entry) {
+        this(entry, BibDatabaseMode.BIBLATEX);
+    }
+
     public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
         this(entry, Optional.empty(), mode);
     }

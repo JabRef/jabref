@@ -70,6 +70,8 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import javafx.application.Platform;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.HighlightMatchingGroupPreferences;
@@ -110,6 +112,7 @@ import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.menus.help.DonateAction;
 import net.sf.jabref.gui.menus.help.ForkMeOnGitHubAction;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
+import net.sf.jabref.gui.pdfviewer.TogglePdfViewerAction;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
@@ -141,7 +144,6 @@ import net.sf.jabref.sql.importer.DbImportAction;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
-import javafx.application.Platform;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
@@ -329,6 +331,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Toggle groups interface"),
             Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
             IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon()));
+    private final AbstractAction showPdvViewer = new TogglePdfViewerAction(Localization.menuTitle("Show PDF Viewer"), Localization.lang("Show PDF Viewer"),
+            IconTheme.JabRefIcon.PDF_FILE.getIcon());
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
@@ -1278,6 +1282,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
         view.add(new JCheckBoxMenuItem(toggleGroups));
         view.add(new JCheckBoxMenuItem(togglePreview));
+        view.add(showPdvViewer);
         view.add(getSwitchPreviewAction());
 
         mb.add(view);
