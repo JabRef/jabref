@@ -41,7 +41,7 @@ public enum HelpFiles {
     SPECIAL_FIELDS(
             "specialFieldsHelp"),
     LABEL_PATTERN(
-            "labelPatternHelp"),
+            "LabelPatterns"),
     OWNER(
             "OwnerHelp"),
     TIMESTAMP(
