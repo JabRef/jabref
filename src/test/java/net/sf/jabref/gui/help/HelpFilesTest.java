@@ -6,7 +6,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertEquals;
 
 public class HelpFilesTest {
     private final String jabrefHelp = "http://help.jabref.org/en/";
