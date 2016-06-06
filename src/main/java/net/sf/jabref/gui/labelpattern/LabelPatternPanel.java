@@ -120,13 +120,11 @@ public class LabelPatternPanel extends JPanel {
         // check mode of currently used DB
         if (panel != null) {
             mode = panel.getBibDatabaseContext().getMode();
-        } else { // use preferences value if no DB is open
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
-                mode = BibDatabaseMode.BIBLATEX;
-            } else {
-                mode = BibDatabaseMode.BIBTEX;
-            }
+        } else {
+            // use preferences value if no DB is open
+            mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
+
         for (EntryType type : EntryTypes.getAllValues(mode)) {
             textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
