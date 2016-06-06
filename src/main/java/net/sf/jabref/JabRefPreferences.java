@@ -71,6 +71,7 @@ import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -1035,6 +1036,19 @@ public class JabRefPreferences {
         String value = (String) defaults.get(key);
         int[] rgb = getRgb(value);
         return new Color(rgb[0], rgb[1], rgb[2]);
+    }
+
+    /**
+     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
+     *
+     * @return the default BibDatabaseMode
+     */
+    public BibDatabaseMode getDefaultBibDatabaseMode() {
+        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
+            return BibDatabaseMode.BIBLATEX;
+        } else {
+            return BibDatabaseMode.BIBTEX;
+        }
     }
 
     /**

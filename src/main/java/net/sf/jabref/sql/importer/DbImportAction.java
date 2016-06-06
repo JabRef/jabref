@@ -27,6 +27,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -69,11 +70,8 @@ public class DbImportAction extends AbstractWorker {
     }
 
     class DbImpAction extends MnemonicAwareAction {
-
         public DbImpAction() {
-            super();
             putValue(Action.NAME, Localization.menuTitle("Import from external SQL database"));
-
         }
 
         @Override
@@ -151,14 +149,14 @@ public class DbImportAction extends AbstractWorker {
                             Localization.lang("There are no available databases to be imported"),
                             Localization.lang("Import from SQL database"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
-                            DBImportExportDialog.DialogType.IMPORTER);
+                    DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix, DBImportExportDialog.DialogType.IMPORTER);
                     if (dialogo.removeAction) {
                         String dbName = dialogo.selectedDB;
                         DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
                         performImport();
                     } else if (dialogo.moreThanOne) {
-                        databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        // use default DB mode for import
+                        databases = importer.performImport(dbs, dialogo.listOfDBs, Globals.prefs.getDefaultBibDatabaseMode());
                         for (DBImporterResult res : databases) {
                             databaseContext = res.getDatabaseContext();
                             dbs.isConfigValid(true);
