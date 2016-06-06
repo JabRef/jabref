@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
+- Fixed [#1482](https://github.com/JabRef/jabref/issues/1482): Correct number of matched entries is displayed for refining subgroups
 
 ### Removed
 
