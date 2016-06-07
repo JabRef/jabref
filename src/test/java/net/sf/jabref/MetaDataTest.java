@@ -25,7 +25,7 @@ public class MetaDataTest {
 
     @Test
     public void serializeNewMetadataReturnsEmptyMap() throws Exception {
-        assertEquals(Collections.emptyMap(), metaData.serialize());
+        assertEquals(Collections.emptyMap(), metaData.getAsStringMap());
     }
 
     @Test
@@ -37,6 +37,6 @@ public class MetaDataTest {
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
                 "enabled;" + Globals.NEWLINE + "title[lower_case]" + Globals.NEWLINE + ";");
-        assertEquals(expectedSerialization, metaData.serialize());
+        assertEquals(expectedSerialization, metaData.getAsStringMap());
     }
 }

@@ -198,7 +198,7 @@ public class FieldFormatterCleanups {
         return result.toString();
     }
 
-    public List<String> convertToString() {
+    public List<String> getAsStringList() {
         List<String> stringRepresentation = new ArrayList<>();
 
         if (enabled) {
@@ -212,7 +212,7 @@ public class FieldFormatterCleanups {
         return stringRepresentation;
     }
 
-    public static FieldFormatterCleanups parseFromString(List<String> formatterMetaList) {
+    public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
 
         if (formatterMetaList != null && formatterMetaList.size() >= 2) {
             boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));

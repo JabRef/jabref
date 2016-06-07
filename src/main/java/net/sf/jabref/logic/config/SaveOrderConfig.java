@@ -19,6 +19,10 @@ public class SaveOrderConfig {
     // quick hack for outside modifications
     public final SortCriterion[] sortCriteria = new SortCriterion[3];
 
+    public static SaveOrderConfig parse(List<String> orderedData) {
+        return new SaveOrderConfig(orderedData);
+    }
+
     public static class SortCriterion {
 
         public String field;
@@ -112,7 +116,7 @@ public class SaveOrderConfig {
         return sb.toString();
     }
 
-    public SaveOrderConfig(List<String> data) {
+    private SaveOrderConfig(List<String> data) {
         Objects.requireNonNull(data);
 
         if (data.isEmpty()) {
@@ -188,7 +192,7 @@ public class SaveOrderConfig {
     /**
      * Outputs the current configuration to be consumed later by the constructor
      */
-    public List<String> getConfigurationList() {
+    public List<String> getAsStringList() {
         List<String> res = new ArrayList<>(7);
         if (saveInOriginalOrder) {
             res.add("original");

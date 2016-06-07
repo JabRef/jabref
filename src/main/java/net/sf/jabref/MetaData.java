@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +35,6 @@ import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
@@ -79,7 +77,7 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    public MetaData(Map<String, String> inData) throws ParseException {
+    private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
 
         for (Map.Entry<String, String> entry : inData.entrySet()) {
@@ -96,11 +94,9 @@ public class MetaData implements Iterable<String> {
             }
             if (GROUPSTREE.equals(entry.getKey())) {
                 putGroups(orderedData);
-                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not use them here
+                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not support them anymore
             } else if (SAVE_ACTIONS.equals(entry.getKey())) {
-                boolean enablementStatus = "enabled".equals(orderedData.get(0));
-                String formatterString = orderedData.get(1);
-                setSaveActions(new FieldFormatterCleanups(enablementStatus, formatterString));
+                setSaveActions(FieldFormatterCleanups.parse(orderedData));
             } else {
                 putData(entry.getKey(), orderedData);
             }
@@ -114,10 +110,14 @@ public class MetaData implements Iterable<String> {
         // No data
     }
 
+    public static MetaData parse(Map<String, String> data) throws ParseException {
+        return new MetaData(data);
+    }
+
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
         List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
         if (storedSaveOrderConfig != null) {
-            return Optional.of(new SaveOrderConfig(storedSaveOrderConfig));
+            return Optional.of(SaveOrderConfig.parse(storedSaveOrderConfig));
         }
         return Optional.empty();
     }
@@ -178,7 +178,7 @@ public class MetaData implements Iterable<String> {
      */
     private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = GroupsParser.importGroups(orderedData);
+            groupsRoot = GroupTreeNode.parse(orderedData);
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
                     "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
@@ -299,9 +299,7 @@ public class MetaData implements Iterable<String> {
         if (this.getData(SAVE_ACTIONS) == null) {
             return Optional.empty();
         } else {
-            boolean enablementStatus = "enabled".equals(this.getData(SAVE_ACTIONS).get(0));
-            String formatterString = this.getData(SAVE_ACTIONS).get(1);
-            return Optional.of(new FieldFormatterCleanups(enablementStatus, formatterString));
+            return Optional.of(FieldFormatterCleanups.parse(getData(SAVE_ACTIONS)));
         }
     }
 
@@ -310,7 +308,7 @@ public class MetaData implements Iterable<String> {
         if ((data == null) || data.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(BibDatabaseMode.valueOf(data.get(0).toUpperCase(Locale.ENGLISH)));
+        return Optional.of(BibDatabaseMode.parse(data.get(0)));
     }
 
     public boolean isProtected() {
@@ -352,7 +350,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> serialize() {
+    public Map<String, String> getAsStringMap() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 
@@ -394,17 +392,17 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setSaveActions(FieldFormatterCleanups saveActions) {
-        List<String> actionsSerialized = saveActions.convertToString();
+        List<String> actionsSerialized = saveActions.getAsStringList();
         putData(SAVE_ACTIONS, actionsSerialized);
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        List<String> serialized = saveOrderConfig.getConfigurationList();
+        List<String> serialized = saveOrderConfig.getAsStringList();
         putData(SAVE_ORDER_CONFIG, serialized);
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(DATABASE_TYPE, Collections.singletonList(mode.getFormattedName().toLowerCase(Locale.ENGLISH)));
+        putData(DATABASE_TYPE, Collections.singletonList(mode.getAsString()));
     }
 
     public void markAsProtected() {

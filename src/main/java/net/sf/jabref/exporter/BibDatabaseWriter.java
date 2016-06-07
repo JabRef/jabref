@@ -281,7 +281,7 @@ public class BibDatabaseWriter {
             return;
         }
 
-        Map<String, String> serializedMetaData = metaData.serialize();
+        Map<String, String> serializedMetaData = metaData.getAsStringMap();
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
 
@@ -392,13 +392,8 @@ public class BibDatabaseWriter {
                 CustomEntryType customType = (CustomEntryType) type;
                 writer.write(Globals.NEWLINE);
                 writer.write(COMMENT_PREFIX + "{");
-                writer.write(CustomEntryType.ENTRYTYPE_FLAG);
-                writer.write(customType.getName());
-                writer.write(": req[");
-                writer.write(customType.getRequiredFieldsString());
-                writer.write("] opt[");
-                writer.write(String.join(";", customType.getOptionalFields()));
-                writer.write("]}");
+                writer.write(customType.getAsString());
+                writer.write("}");
                 writer.write(Globals.NEWLINE);
             }
         }
