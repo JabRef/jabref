@@ -350,7 +350,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Writes all data in the format <key, serialized data>.
      */
-    public Map<String, String> getAsString() {
+    public Map<String, String> getAsStringMap() {
 
         Map<String, String> serializedMetaData = new TreeMap<>();
 
@@ -392,12 +392,12 @@ public class MetaData implements Iterable<String> {
     }
 
     public void setSaveActions(FieldFormatterCleanups saveActions) {
-        List<String> actionsSerialized = saveActions.getAsString();
+        List<String> actionsSerialized = saveActions.getAsStringList();
         putData(SAVE_ACTIONS, actionsSerialized);
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        List<String> serialized = saveOrderConfig.getAsString();
+        List<String> serialized = saveOrderConfig.getAsStringList();
         putData(SAVE_ORDER_CONFIG, serialized);
     }
 

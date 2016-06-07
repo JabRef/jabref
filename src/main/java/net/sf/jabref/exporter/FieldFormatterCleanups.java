@@ -198,7 +198,7 @@ public class FieldFormatterCleanups {
         return result.toString();
     }
 
-    public List<String> getAsString() {
+    public List<String> getAsStringList() {
         List<String> stringRepresentation = new ArrayList<>();
 
         if (enabled) {
