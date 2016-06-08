@@ -292,6 +292,22 @@ public class BibDatabaseWriterTest {
     }
 
     @Test
+    public void roundtripWithUserComment() throws IOException {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
+
+    @Test
     public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
