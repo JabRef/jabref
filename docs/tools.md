@@ -24,13 +24,11 @@ See also: https://help.github.com/articles/syncing-a-fork/
 ## General git tooling on Windows
 
 * Use [git for windows](https://git-for-windows.github.io/), no additional git tooling required
+  * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation
 * [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
-* [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) - Aim: Store password for GitHub permanently for https repository locations
-  * <s>Execute `"c:\Program Files\Git\bin\git.exe" push origin` once using **cmd** not `git bash` - reason: https://github.com/Microsoft/Git-Credential-Manager-for-Windows/issues/50.</s>
+*  - Aim: Store password for GitHub permanently for https repository locations
 
 ## Better console applications
-
-* [Cmder] or ConEmu plus clink.
 
 ### ConEmu plus clink
 
@@ -42,6 +40,11 @@ See also: https://help.github.com/articles/syncing-a-fork/
     * Startup/Tasks: Choose task no. 7 ("Bash::Git bash"). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
     * `Save Settings`
 * [clink] - Aim: Unix keys (Alt+b, Ctrl+s, etc.) also available at the prompt of `cmd.exe`
+
+### Other bundles
+
+* [Cmder] - bundles ConEmu plus clink
+
 
 ## Some useful keyboard shortcuts
 
