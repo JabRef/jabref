@@ -308,6 +308,26 @@ public class BibDatabaseWriterTest {
     }
 
     @Test
+    public void roundtripWithUserCommentAndEntryChange() throws IOException {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+
+        BibEntry entry = result.getDatabase().getEntryByKey("1137631");
+        entry.setField("author", "Mr. Author");
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+
+        try (Scanner scanner = new Scanner(Paths.get("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"),encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
+
+    @Test
     public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
