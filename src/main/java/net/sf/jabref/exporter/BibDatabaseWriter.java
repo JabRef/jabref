@@ -317,6 +317,8 @@ public class BibDatabaseWriter {
             return;
         }
 
+        writeUserCommentsForString(bs, fw);
+
         if(isFirstStringInType) {
             fw.write(Globals.NEWLINE);
         }
@@ -352,6 +354,26 @@ public class BibDatabaseWriter {
         }
 
         fw.write("}" + Globals.NEWLINE);
+    }
+
+    private void writeUserCommentsForString(BibtexString string, Writer out) throws IOException {
+        String parsedSerialization = string.getParsedSerialization();
+
+        if(parsedSerialization != null) {
+
+            try {
+                // get the text before the string
+                String prolog = string.getParsedSerialization().substring(0, string.getParsedSerialization().indexOf('@'));
+
+                prolog = prolog.trim();
+                // if there is any non whitespace text, write it with proper line separation
+                if (prolog.length() > 0) {
+                    out.write(Globals.NEWLINE + prolog + Globals.NEWLINE);
+                }
+            } catch(StringIndexOutOfBoundsException ignore) {
+                // if this occurs a broken parsed serialization has been set, so just do nothing
+            }
+        }
     }
 
     /**

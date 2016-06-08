@@ -344,6 +344,26 @@ public class BibDatabaseWriterTest {
     }
 
     @Test
+    public void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserCommentBeforeString.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+
+        BibtexString string = result.getDatabase().getString("00000000");
+        string.setContent("my first string");
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+
+        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
+
+    @Test
     public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
