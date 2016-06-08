@@ -615,4 +615,20 @@ public class BibDatabaseWriterTest {
                         + Globals.NEWLINE
                 , stringWriter.toString());
     }
+
+    @Test
+    public void writeEpilog() throws IOException {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithEpilog.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+        }
+    }
 }
