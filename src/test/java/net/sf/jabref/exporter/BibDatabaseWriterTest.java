@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Scanner;
 
 import net.sf.jabref.BibDatabaseContext;
@@ -349,7 +350,8 @@ public class BibDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
 
-        BibtexString string = result.getDatabase().getString("00000000");
+        Iterator<BibtexString> strings = result.getDatabase().getStringValues().iterator();
+        BibtexString string = result.getDatabase().getStringValues().iterator().next();
         string.setContent("my first string");
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
