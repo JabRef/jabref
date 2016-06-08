@@ -66,7 +66,9 @@ public class BibEntryWriter {
                 // get the text before the entry
                 String prolog = entry.getParsedSerialization().substring(0, entry.getParsedSerialization().indexOf('@'));
 
-                prolog = prolog.trim();
+                // delete trailing whitespaces (between entry and text)
+                prolog = prolog.replaceFirst("\\s+$", "");
+
                 // if there is any non whitespace text, write it
                 if (prolog.length() > 0) {
                     out.write(prolog + Globals.NEWLINE);

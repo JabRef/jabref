@@ -365,10 +365,11 @@ public class BibDatabaseWriter {
                 // get the text before the string
                 String prolog = string.getParsedSerialization().substring(0, string.getParsedSerialization().indexOf('@'));
 
-                prolog = prolog.trim();
+                // delete trailing whitespaces (between string and text)
+                prolog = prolog.replaceFirst("\\s+$", "");
                 // if there is any non whitespace text, write it with proper line separation
                 if (prolog.length() > 0) {
-                    out.write(Globals.NEWLINE + prolog + Globals.NEWLINE);
+                    out.write(prolog + Globals.NEWLINE);
                 }
             } catch(StringIndexOutOfBoundsException ignore) {
                 // if this occurs a broken parsed serialization has been set, so just do nothing
