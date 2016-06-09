@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- [#1485](https://github.com/JabRef/jabref/issues/1485) Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
 
 ### Fixed
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
