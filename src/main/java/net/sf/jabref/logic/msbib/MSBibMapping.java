@@ -34,7 +34,7 @@ public class MSBibMapping {
         bibtexToMSBib.put("institution", "Institution");
         bibtexToMSBib.put("doi", "DOI");
         bibtexToMSBib.put("url", "URL");
-        // BibTeX only fields
+        // BibTeX/Biblatex only fields
         bibtexToMSBib.put("series", BIBTEX_PREFIX + "Series");
         bibtexToMSBib.put("abstract", BIBTEX_PREFIX + "Abstract");
         bibtexToMSBib.put("keywords", BIBTEX_PREFIX + "KeyWords");
@@ -47,8 +47,8 @@ public class MSBibMapping {
         bibtexToMSBib.put("size", BIBTEX_PREFIX + "Size");
         bibtexToMSBib.put("intype", BIBTEX_PREFIX + "InType");
         bibtexToMSBib.put("paper", BIBTEX_PREFIX + "Paper");
+        bibtexToMSBib.put("shorttitle", "ShortTitle");
         // MSBib only fields
-        bibtexToMSBib.put(MSBIB_PREFIX + "shorttitle", "ShortTitle");
         bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
         //bibtexToMSBib.put(MSBIB_PREFIX + "day", "Day");
