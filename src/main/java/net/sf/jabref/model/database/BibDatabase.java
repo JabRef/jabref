@@ -110,9 +110,7 @@ public class BibDatabase {
      * sorted by the given Comparator.
      */
     public synchronized EntrySorter getSorter(Comparator<BibEntry> comp) {
-        EntrySorter sorter = new EntrySorter(entries, comp);
-        eventBus.register(sorter);
-        return sorter;
+        return new EntrySorter(new ArrayList<>(getEntries()), comp);
     }
 
     /**
