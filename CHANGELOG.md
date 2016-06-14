@@ -20,7 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
 - Fixed [#1481](https://github.com/JabRef/jabref/issues/1481): Mac OS X binary seems broken for JabRef 3.4 release
 - Fixed [#1430](https://github.com/JabRef/jabref/issues/1430): "review changes" did misinterpret changes
-
+- Fixed [#1434](https://github.com/JabRef/jabref/issues/1434): Static groups are now longer displayed as dynamic ones
 
 ### Removed
 
