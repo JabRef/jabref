@@ -197,7 +197,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 && JabRefGUI.getMainFrame() != null) {
             BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
             if (currentBasePanel != null) {
-                sb.append(" [").append(group.numberOfHits(currentBasePanel.getDatabase().getEntries())).append(']');
+                sb.append(" [").append(node.numberOfHits(currentBasePanel.getDatabase().getEntries())).append(']');
             }
         }
 
