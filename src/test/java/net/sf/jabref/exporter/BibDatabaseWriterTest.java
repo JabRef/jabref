@@ -349,8 +349,7 @@ public class BibDatabaseWriterTest {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserCommentBeforeString.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
-
-        Iterator<BibtexString> strings = result.getDatabase().getStringValues().iterator();
+        
         BibtexString string = result.getDatabase().getStringValues().iterator().next();
         string.setContent("my first string");
 
