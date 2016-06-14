@@ -434,26 +434,6 @@ return true;</string>
             </actions>
             <formComponents />
           </screen>
-          <screen name="" id="314" customizedId="" beanClass="com.install4j.runtime.beans.screens.CustomizableInfoScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
-            <serializedBean>
-              <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.screens.CustomizableInfoScreen">
-                  <void property="infoText">
-                    <string>Util.hasFullAdminRights()</string>
-                  </void>
-                  <void property="title">
-                    <string>Full Admin?</string>
-                  </void>
-                </object>
-              </java>
-            </serializedBean>
-            <condition />
-            <validation />
-            <preActivation />
-            <postActivation />
-            <actions />
-            <formComponents />
-          </screen>
           <screen name="" id="27" customizedId="" beanClass="com.install4j.runtime.beans.screens.FileAssociationsScreen" enabled="true" commentSet="false" comment="" actionElevationType="inherit" rollbackBarrier="false" backButton="2" finishScreen="false" wizardIndexChangeType="unchanged" wizardIndexKey="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">
