@@ -456,6 +456,31 @@ public class LabelPatternUtil {
 
                     // apply modifier if present
                     if (parts.length > 1) {
+
+						//##########################################
+						// field contains one or more field such as
+						// "pages:eid",
+						// "pages:upper:eid:upper"
+						int fieldEndIndex=1;
+						int fieldStartIndex=1;
+			       	 	for (int i = 1; i < parts.length; i++) {
+           					String modifier = parts[i];
+	                		if (!(("lower".equals(modifier)) || ("upper".equals(modifier)) || ("abbr".equals(modifier)) || (!modifier.isEmpty() && (modifier.charAt(0) == '(') && modifier.endsWith(")")))){
+								if(label.isEmpty()){
+                    				label = makeLabel(entry, parts[i]);
+									fieldStartIndex=i;
+								} else {
+									// if label is not empty and unkonw modifiders accurance,break
+									// However, this may conflict with your willings if you input "Lower" with mistake
+									//  and the following modifiers will be omitted.
+									fieldEndIndex=i;
+                                    parts = Arrays.copyOfRange(parts, fieldStartIndex - 1, fieldEndIndex + 1);
+									break;
+								}
+							}
+                     	}
+						//###################################3
+
                         label = applyModifiers(label, parts, 1);
                     }
 
