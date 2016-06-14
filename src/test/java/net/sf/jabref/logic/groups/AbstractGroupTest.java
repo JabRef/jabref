@@ -18,19 +18,14 @@
 package net.sf.jabref.logic.groups;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class AbstractGroupTest {
 
@@ -44,25 +39,4 @@ public class AbstractGroupTest {
         entries.add(new BibEntry().withField("author", "author1 and author2"));
         entries.add(new BibEntry().withField("author", "author1"));
     }
-
-    @Test
-    public void numberOfHitsReturnsZeroForEmptyList() throws Exception {
-        assertEquals(0, group.numberOfHits(Collections.emptyList()));
-    }
-
-    @Test
-    public void numberOfHitsCallsContainsToDetermineSingleHit() throws Exception {
-        when(group.contains(any())).then(invocation ->
-                invocation.getArgumentAt(0, BibEntry.class).getField("author").contains("author2"));
-        assertEquals(1, group.numberOfHits(entries));
-    }
-
-    @Test
-    public void numberOfHitsCallsContainsToDetermineMultipleHits() throws Exception {
-        when(group.contains(any())).then(invocation ->
-                invocation.getArgumentAt(0, BibEntry.class).getField("author").contains("author1"));
-        assertEquals(2, group.numberOfHits(entries));
-    }
-
-
 }

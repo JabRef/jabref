@@ -1,17 +1,30 @@
 package net.sf.jabref.logic.groups;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.matchers.AndMatcher;
 import net.sf.jabref.logic.search.matchers.OrMatcher;
+import net.sf.jabref.model.entry.BibEntry;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class GroupTreeNodeTest {
+
+    private List<BibEntry> entries = new ArrayList<>();
+
+    @Before
+    public void setUp() throws Exception {
+        entries.add(new BibEntry().withField("author", "author1 and author2"));
+        entries.add(new BibEntry().withField("author", "author1"));
+    }
+
 
     /**
      * Gets the marked node in the following tree of explicit groups:
@@ -173,5 +186,46 @@ public class GroupTreeNodeTest {
         matcher.addRule(node.getGroup());
         matcher.addRule(child.getGroup());
         assertEquals(matcher, node.getSearchRule());
+    }
+
+    @Test
+    public void numberOfHitsReturnsZeroForEmptyList() throws Exception {
+        assertEquals(0, getNodeInSimpleTree().numberOfHits(Collections.emptyList()));
+    }
+
+    @Test
+    public void numberOfHitsMatchesOneEntry() throws Exception {
+        GroupTreeNode parent = getNodeInSimpleTree();
+        GroupTreeNode node = parent.addSubgroup(
+                new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT));
+        assertEquals(1, node.numberOfHits(entries));
+    }
+
+    @Test
+    public void numberOfHitsMatchesMultipleEntries() throws Exception {
+        GroupTreeNode parent = getNodeInSimpleTree();
+        GroupTreeNode node = parent.addSubgroup(
+                new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT));
+        assertEquals(2, node.numberOfHits(entries));
+    }
+
+    @Test
+    public void numberOfHitsWorksForRefiningGroups() throws Exception {
+        GroupTreeNode grandParent = getNodeInSimpleTree();
+        GroupTreeNode parent = grandParent.addSubgroup(
+                new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT));
+        GroupTreeNode node = parent.addSubgroup(
+                new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.REFINING));
+        assertEquals(1, node.numberOfHits(entries));
+    }
+
+    @Test
+    public void numberOfHitsWorksForHierarchyOfIndependentGroups() throws Exception {
+        GroupTreeNode grandParent = getNodeInSimpleTree();
+        GroupTreeNode parent = grandParent.addSubgroup(
+                new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT));
+        GroupTreeNode node = parent.addSubgroup(
+                new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT));
+        assertEquals(2, node.numberOfHits(entries));
     }
 }
