@@ -347,7 +347,7 @@ class GroupDialog extends JDialog {
         m_sgCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
-        if (editedGroup instanceof KeywordGroup) {
+        if (editedGroup.getClass() == KeywordGroup.class) {
             KeywordGroup group = (KeywordGroup) editedGroup;
             m_name.setText(group.getName());
             m_kgSearchField.setText(group.getSearchField());
@@ -356,7 +356,7 @@ class GroupDialog extends JDialog {
             m_kgRegExp.setSelected(group.isRegExp());
             m_keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
-        } else if (editedGroup instanceof SearchGroup) {
+        } else if (editedGroup.getClass() == SearchGroup.class) {
             SearchGroup group = (SearchGroup) editedGroup;
             m_name.setText(group.getName());
             m_sgSearchExpression.setText(group.getSearchExpression());
@@ -364,7 +364,7 @@ class GroupDialog extends JDialog {
             m_sgRegExp.setSelected(group.isRegExp());
             m_searchRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
-        } else if (editedGroup instanceof ExplicitGroup) {
+        } else if (editedGroup.getClass() == ExplicitGroup.class) {
             m_name.setText(editedGroup.getName());
             m_explicitRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());

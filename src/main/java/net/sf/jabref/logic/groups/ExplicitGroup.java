@@ -172,4 +172,9 @@ public class ExplicitGroup extends KeywordGroup {
     public int hashCode() {
         return super.hashCode();
     }
+
+    @Override
+    public boolean isDynamic() {
+        return false;
+    }
 }
