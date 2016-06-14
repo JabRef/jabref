@@ -374,7 +374,7 @@ return true;</string>
                 </serializedBean>
                 <condition>context.getBooleanVariable("addToDockAction")</condition>
               </action>
-              <group name="Registry" id="239" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+              <group name="Registry" id="239" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="elevated">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup" />
@@ -617,48 +617,57 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <action name="PathAdmin" id="280" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <group name="Registry" id="312" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="elevated">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
-                      <void property="keyName">
-                        <string>SOFTWARE\JabRef</string>
-                      </void>
-                      <void property="onlyIfEmpty">
-                        <boolean>false</boolean>
-                      </void>
-                      <void property="registryRoot">
-                        <object class="java.lang.Enum" method="valueOf">
-                          <class>com.install4j.api.windows.RegistryRoot</class>
-                          <string>HKEY_LOCAL_MACHINE</string>
-                        </object>
-                      </void>
-                    </object>
+                    <object class="com.install4j.runtime.beans.groups.ActionGroup" />
                   </java>
                 </serializedBean>
-                <condition>Util.hasFullAdminRights()</condition>
-              </action>
-              <action name="PathUnprivileged" id="281" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
-                <serializedBean>
-                  <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
-                      <void property="keyName">
-                        <string>SOFTWARE\JabRef</string>
-                      </void>
-                      <void property="onlyIfEmpty">
-                        <boolean>false</boolean>
-                      </void>
-                      <void property="registryRoot">
-                        <object class="java.lang.Enum" method="valueOf">
-                          <class>com.install4j.api.windows.RegistryRoot</class>
-                          <string>HKEY_CURRENT_USER</string>
+                <beans>
+                  <action name="PathAdmin" id="280" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\JabRef</string>
+                          </void>
+                          <void property="onlyIfEmpty">
+                            <boolean>false</boolean>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_LOCAL_MACHINE</string>
+                            </object>
+                          </void>
                         </object>
-                      </void>
-                    </object>
-                  </java>
-                </serializedBean>
-                <condition>!Util.hasFullAdminRights()</condition>
-              </action>
+                      </java>
+                    </serializedBean>
+                    <condition>Util.hasFullAdminRights()</condition>
+                  </action>
+                  <action name="PathUnprivileged" id="281" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                    <serializedBean>
+                      <java class="java.beans.XMLDecoder">
+                        <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
+                          <void property="keyName">
+                            <string>SOFTWARE\JabRef</string>
+                          </void>
+                          <void property="onlyIfEmpty">
+                            <boolean>false</boolean>
+                          </void>
+                          <void property="registryRoot">
+                            <object class="java.lang.Enum" method="valueOf">
+                              <class>com.install4j.api.windows.RegistryRoot</class>
+                              <string>HKEY_CURRENT_USER</string>
+                            </object>
+                          </void>
+                        </object>
+                      </java>
+                    </serializedBean>
+                    <condition>!Util.hasFullAdminRights()</condition>
+                  </action>
+                </beans>
+              </group>
             </actions>
             <formComponents />
           </screen>
