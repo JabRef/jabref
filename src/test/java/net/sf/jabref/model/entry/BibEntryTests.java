@@ -5,16 +5,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.FieldChange;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BibtexEntryTests {
+public class BibEntryTests {
 
     private BibEntry keywordEntry;
     private BibEntry emptyEntry;
@@ -222,14 +224,14 @@ public class BibtexEntryTests {
     @Test
     public void testGetSeparatedKeywordsAreCorrect() {
         String[] expected = {"Foo",  "Bar"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testAddKeywordIsCorrect() {
         keywordEntry.addKeyword("FooBar");
         String[] expected = {"Foo", "Bar", "FooBar"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
@@ -243,14 +245,14 @@ public class BibtexEntryTests {
         keywordEntry.addKeyword("FooBar");
         keywordEntry.addKeyword("FooBar");
         String[] expected = {"Foo", "Bar", "FooBar"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testAddKeywordIsCaseInsensitive() {
         keywordEntry.addKeyword("FOO");
         String[] expected = {"Foo", "Bar"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
@@ -263,7 +265,7 @@ public class BibtexEntryTests {
     public void testAddKeywordEmptyKeywordIsNotAdded() {
         keywordEntry.addKeyword("");
         String[] expected = {"Foo", "Bar"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
@@ -274,13 +276,13 @@ public class BibtexEntryTests {
 
     @Test
     public void texNewBibEntryHasNoKeywords() {
-        Assert.assertTrue(emptyEntry.getSeparatedKeywords().isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords().isEmpty());
     }
 
     @Test
     public void texNewBibEntryHasNoKeywordsEvenAfterAddingEmptyKeyword() {
         emptyEntry.addKeyword("");
-        Assert.assertTrue(emptyEntry.getSeparatedKeywords().isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords().isEmpty());
     }
 
     @Test
@@ -292,15 +294,15 @@ public class BibtexEntryTests {
     @Test
     public void testAddKeywordsWorksAsExpected() {
         String[] expected = {"Foo", "Bar"};
-        emptyEntry.addKeywords(keywordEntry.getSeparatedKeywords());
-        Assert.assertArrayEquals(expected, emptyEntry.getSeparatedKeywords().toArray());
+        emptyEntry.addKeywords(keywordEntry.getKeywords());
+        Assert.assertArrayEquals(expected, emptyEntry.getKeywords().toArray());
     }
 
     @Test
     public void testPutKeywordsOverwritesOldKeywords() {
         keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"));
         String[] expected = {"Yin", "Yang"};
-        Assert.assertArrayEquals(expected, keywordEntry.getSeparatedKeywords().toArray());
+        Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
@@ -312,7 +314,7 @@ public class BibtexEntryTests {
     @Test
     public void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
         keywordEntry.putKeywords(Collections.emptyList());
-        Assert.assertTrue(keywordEntry.getSeparatedKeywords().isEmpty());
+        Assert.assertTrue(keywordEntry.getKeywords().isEmpty());
     }
 
     @Test
@@ -324,13 +326,37 @@ public class BibtexEntryTests {
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentry() {
         emptyEntry.putKeywords(Collections.emptyList());
-        Assert.assertTrue(emptyEntry.getSeparatedKeywords().isEmpty());
+        Assert.assertTrue(emptyEntry.getKeywords().isEmpty());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentryNotChanged() {
         emptyEntry.putKeywords(Collections.emptyList());
         Assert.assertFalse(emptyEntry.hasChanged());
+    }
+
+    @Test
+    public void putKeywordsToEmptyReturnsNoChange() {
+        Optional<FieldChange> change = emptyEntry.putKeywords(Collections.emptyList());
+        Assert.assertEquals(Optional.empty(), change);
+    }
+
+    @Test
+    public void clearKeywordsReturnsChange() {
+        Optional<FieldChange> change = keywordEntry.putKeywords(Collections.emptyList());
+        Assert.assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", null)), change);
+    }
+
+    @Test
+    public void changeKeywordsReturnsChange() {
+        Optional<FieldChange> change = keywordEntry.putKeywords(Arrays.asList("Test", "FooTest"));
+        Assert.assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", "Test, FooTest")), change);
+    }
+
+    @Test
+    public void putKeywordsToSameReturnsNoChange() {
+        Optional<FieldChange> change = keywordEntry.putKeywords(Arrays.asList("Foo", "Bar"));
+        Assert.assertEquals(Optional.empty(), change);
     }
 
     @Test

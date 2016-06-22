@@ -202,7 +202,7 @@ public class JabRefPreferences {
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
     public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
     public static final String EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
-    public static final String GROUP_KEYWORD_SEPARATOR = "groupKeywordSeparator";
+    public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String LIST_OF_FILE_COLUMNS = "listOfFileColumns";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
@@ -617,7 +617,7 @@ public class JabRefPreferences {
         defaults.put(GROUP_AUTO_HIDE, Boolean.TRUE);
         defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
-        defaults.put(GROUP_KEYWORD_SEPARATOR, ", ");
+        defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put(HIGHLIGHT_GROUPS_MATCHING, "all");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);

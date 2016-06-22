@@ -1,5 +1,6 @@
 package net.sf.jabref.event;
 
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -19,6 +20,10 @@ public class FieldChangedEvent extends EntryChangedEvent {
         super(bibEntry);
         this.fieldName = fieldName;
         this.newValue = newValue;
+    }
+
+    public FieldChangedEvent(FieldChange fieldChange) {
+        this(fieldChange.getEntry(), fieldChange.getField(), fieldChange.getNewValue());
     }
 
     public String getFieldName() {

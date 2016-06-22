@@ -136,7 +136,7 @@ public class KeywordGroup extends AbstractGroup {
                 if (!contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
-                    String pre = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
+                    String pre = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + searchExpression;
@@ -254,7 +254,7 @@ public class KeywordGroup extends AbstractGroup {
         int i;
         int j;
         int k;
-        final String separator = Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR);
+        final String separator = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
         while ((i = haystack.indexOf(needle)) >= 0) {
             sbOrig.replace(i, i + needle.length(), "");
             sbLower.replace(i, i + needle.length(), "");

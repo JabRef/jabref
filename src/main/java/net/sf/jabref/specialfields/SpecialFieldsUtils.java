@@ -16,17 +16,19 @@
 package net.sf.jabref.specialfields;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.entry.BibEntry;
 
+import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
+
 public class SpecialFieldsUtils {
 
-    private static final String KEYWORDS_FIELD = "keywords";
     public static final String FIELDNAME_PRIORITY = "priority";
     public static final String FIELDNAME_RANKING = "ranking";
     public static final String FIELDNAME_RELEVANCE = "relevance";
@@ -88,11 +90,11 @@ public class SpecialFieldsUtils {
         SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry be, NamedCompound ce) {
+    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry, NamedCompound ce) {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
-        List<String> keywordList = be.getSeparatedKeywords();
+        List<String> keywordList = entry.getKeywords();
         List<String> values = e.getKeyWords();
 
         int foundPos = -1;
@@ -113,13 +115,11 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
-        String oldValue = be.getField(KEYWORDS_FIELD);
-        be.putKeywords(keywordList);
-        String updatedValue = be.getField(KEYWORDS_FIELD);
-        if ((!Objects.equals(oldValue, updatedValue)) && (ce != null)) {
-            ce.addEdit(new UndoableFieldChange(be, KEYWORDS_FIELD, oldValue, updatedValue));
-        }
 
+        Optional<FieldChange> change = entry.putKeywords(keywordList);
+        if (ce != null && change.isPresent()) {
+            ce.addEdit(new UndoableFieldChange(change.get()));
+        }
     }
 
     /**
