@@ -20,9 +20,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,7 +51,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -315,20 +315,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             Set<String> keywordsToRemove) {
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
-            List<String> oldKeywords = entry.getKeywords();
-
-            // we "intercept" with a TreeSet
-            // pro: no duplicates
-            // possible con: alphabetical sorting of the keywords
-            Set<String> keywords = new TreeSet<>();
-            keywords.addAll(oldKeywords);
+            LinkedHashSet<String> keywords = entry.getKeywords();
 
             // update keywords
             keywords.removeAll(keywordsToRemove);
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(new ArrayList<>(keywords));
+            Optional<FieldChange> change = entry.putKeywords(keywords);
             if (change.isPresent()) {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }
@@ -406,7 +400,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         if (mergeKeywords.isSelected()) {
             for (BibEntry entry : entries) {
-                List<String> separatedKeywords = entry.getKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
@@ -414,7 +408,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
-            List<String> separatedKeywords = firstEntry.getKeywords();
+            Set<String> separatedKeywords = firstEntry.getKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used

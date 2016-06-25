@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;

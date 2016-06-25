@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,7 +36,7 @@ import java.util.TreeSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.google.common.base.Strings;
@@ -378,6 +379,10 @@ public class BibEntry implements Cloneable {
     public Optional<FieldChange> clearField(String name) {
         String fieldName = toLowerCase(name);
 
+        if (BibEntry.ID_FIELD.equals(fieldName)) {
+            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
+        }
+
         Optional<String> oldValue = getFieldOptional(fieldName);
         if (!oldValue.isPresent()) {
             return Optional.empty();
@@ -385,9 +390,6 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        if (BibEntry.ID_FIELD.equals(fieldName)) {
-            throw new IllegalArgumentException("The field name '" + name + "' is reserved");
-        }
         fields.remove(fieldName);
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
         eventBus.post(new FieldChangedEvent(change));
@@ -530,7 +532,7 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords) {
+    public Optional<FieldChange> putKeywords(Collection<String> keywords) {
         Objects.requireNonNull(keywords);
         Optional<String> oldValue = this.getFieldOptional(KEYWORDS_FIELD);
 
@@ -560,15 +562,7 @@ public class BibEntry implements Cloneable {
             return;
         }
 
-        List<String> keywords = this.getKeywords();
-
-        for (String key : keywords) {
-            if (keyword.equalsIgnoreCase(key)) {
-                // Duplicate so don't add it
-                return;
-            }
-        }
-
+        LinkedHashSet<String> keywords = this.getKeywords();
         keywords.add(keyword);
         this.putKeywords(keywords);
     }
@@ -578,7 +572,7 @@ public class BibEntry implements Cloneable {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(List<String> keywords) {
+    public void addKeywords(Collection<String> keywords) {
         Objects.requireNonNull(keywords);
 
         for (String keyword : keywords) {
@@ -586,7 +580,7 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public List<String> getKeywords() {
+    public LinkedHashSet<String> getKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField(KEYWORDS_FIELD));
     }
 

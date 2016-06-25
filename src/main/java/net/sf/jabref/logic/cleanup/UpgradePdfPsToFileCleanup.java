@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;

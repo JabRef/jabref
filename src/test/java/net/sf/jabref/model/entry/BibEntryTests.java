@@ -10,7 +10,7 @@ import java.util.Optional;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -249,16 +249,16 @@ public class BibEntryTests {
     }
 
     @Test
-    public void testAddKeywordIsCaseInsensitive() {
+    public void addKeywordIsCaseSensitive() {
         keywordEntry.addKeyword("FOO");
-        String[] expected = {"Foo", "Bar"};
+        String[] expected = {"Foo", "Bar", "FOO"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
-    public void testAddSameKeywordNotChanged() {
+    public void testAddKeywordWithDifferentCapitalizationChanges() {
         keywordEntry.addKeyword("FOO");
-        Assert.assertFalse(keywordEntry.hasChanged());
+        Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test

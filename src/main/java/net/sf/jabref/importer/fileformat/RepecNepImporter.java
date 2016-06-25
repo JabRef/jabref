@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -349,7 +350,7 @@ public class RepecNepImporter extends ImportFormat {
             if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
-                be.addKeywords(Arrays.asList(keywords));
+                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)));
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines(in));

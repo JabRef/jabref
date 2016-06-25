@@ -1,6 +1,6 @@
 package net.sf.jabref.event;
 
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**

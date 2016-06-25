@@ -17,6 +17,7 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -104,7 +105,7 @@ public class JSONEntryParser {
         // Keywords
         if (bibJsonEntry.has("keywords")) {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
-            List<String> keywordList = new ArrayList<>();
+            LinkedHashSet<String> keywordList = new LinkedHashSet<>();
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
                     keywordList.add(keywords.getString(i));

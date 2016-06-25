@@ -15,13 +15,15 @@
 */
 package net.sf.jabref.specialfields;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -94,13 +96,28 @@ public class SpecialFieldsUtils {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
-        List<String> keywordList = entry.getKeywords();
-        List<String> values = e.getKeyWords();
+        LinkedHashSet<String> keywordList = entry.getKeywords();
+        List<String> specialFieldsKeywords = e.getKeyWords();
 
+        /*
+        // Try to replace keyword at the same position
+        LinkedHashSet<String> newKeywordList = new LinkedHashSet<>();
+        Boolean firstHit = true;
+        for (String keyword : keywordList) {
+            if (specialFieldsKeywords.contains(keyword)) {
+                if (firstHit) {
+                    // Just replace it
+                    newKeywordList.add(newValue);
+                    firstHit = false;
+                }
+            } else {
+                newKeywordList.add(keyword);
+            }
+        }
         int foundPos = -1;
 
         // cleanup keywords
-        for (Object value : values) {
+        for (Object value : specialFieldsKeywords) {
             int pos = keywordList.indexOf(value);
             if (pos >= 0) {
                 foundPos = pos;
@@ -115,6 +132,7 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
+        */
 
         Optional<FieldChange> change = entry.putKeywords(keywordList);
         if (ce != null && change.isPresent()) {
@@ -136,7 +154,7 @@ public class SpecialFieldsUtils {
         SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
     }
 
-    private static void importKeywordsForField(List<String> keywordList, SpecialField c, BibEntry be,
+    private static void importKeywordsForField(Set<String> keywordList, SpecialField c, BibEntry be,
             NamedCompound nc) {
         List<String> values = c.getKeyWords();
         String newValue = null;
@@ -159,7 +177,7 @@ public class SpecialFieldsUtils {
         if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
-        List<String> keywordList = net.sf.jabref.model.entry.EntryUtil
+        Set<String> keywordList = net.sf.jabref.model.entry.EntryUtil
                 .getSeparatedKeywords(be.getField(KEYWORDS_FIELD));
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
