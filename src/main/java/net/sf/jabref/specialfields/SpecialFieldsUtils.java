@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.specialfields;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,8 +23,8 @@ import java.util.Set;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
@@ -96,24 +96,9 @@ public class SpecialFieldsUtils {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
-        LinkedHashSet<String> keywordList = entry.getKeywords();
+        List<String> keywordList = new ArrayList<>(entry.getKeywords());
         List<String> specialFieldsKeywords = e.getKeyWords();
 
-        /*
-        // Try to replace keyword at the same position
-        LinkedHashSet<String> newKeywordList = new LinkedHashSet<>();
-        Boolean firstHit = true;
-        for (String keyword : keywordList) {
-            if (specialFieldsKeywords.contains(keyword)) {
-                if (firstHit) {
-                    // Just replace it
-                    newKeywordList.add(newValue);
-                    firstHit = false;
-                }
-            } else {
-                newKeywordList.add(keyword);
-            }
-        }
         int foundPos = -1;
 
         // cleanup keywords
@@ -132,7 +117,7 @@ public class SpecialFieldsUtils {
                 keywordList.add(foundPos, newValue);
             }
         }
-        */
+
 
         Optional<FieldChange> change = entry.putKeywords(keywordList);
         if (ce != null && change.isPresent()) {
