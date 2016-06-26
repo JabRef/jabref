@@ -302,7 +302,7 @@ public class ArgumentProcessor {
                                         session.getEncoding().displayName())
                                 + " " + session.getWriter().getProblemCharacters());
                     }
-                    session.commit(new File(subName));
+                    session.commit(subName);
                 } catch (SaveException ex) {
                     System.err.println(
                             Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
@@ -344,7 +344,7 @@ public class ArgumentProcessor {
                                             session.getEncoding().displayName())
                                     + " " + session.getWriter().getProblemCharacters());
                         }
-                        session.commit(new File(data[0]));
+                        session.commit(data[0]);
                     } catch (SaveException ex) {
                         System.err.println(
                                 Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());

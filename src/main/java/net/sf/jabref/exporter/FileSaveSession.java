@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.exporter;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -84,16 +83,15 @@ public class FileSaveSession extends SaveSession {
     }
 
     @Override
-    public void commit(File file) throws SaveException {
+    public void commit(Path file) throws SaveException {
         if (file == null) {
             return;
         }
-        if (file.exists() && backup) {
-            String name = file.getName();
-            String path = file.getParent();
-            File backupFile = new File(path, name + BACKUP_EXTENSION);
+        if (backup && Files.exists(file)) {
+            Path fileName = file.getFileName();
+            Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
             try {
-                FileUtil.copyFile(file, backupFile, true);
+                FileUtil.copyFile(file.toFile(), backupFile.toFile(), true);
             } catch (IOException ex) {
                 LOGGER.error("Problem copying file", ex);
                 throw SaveException.BACKUP_CREATION;
@@ -113,7 +111,7 @@ public class FileSaveSession extends SaveSession {
                 }
             }
 
-            FileUtil.copyFile(temporaryFile.toFile(), file, true);
+            FileUtil.copyFile(temporaryFile.toFile(), file.toFile(), true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that

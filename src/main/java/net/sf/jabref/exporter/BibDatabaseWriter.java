@@ -229,9 +229,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
      * Writes all data to the specified writer, using each object's toString() method.
      */
     protected void writeMetaData(MetaData metaData) throws SaveException {
-        if (metaData == null) {
-            return;
-        }
+        Objects.requireNonNull(metaData);
 
         Map<String, String> serializedMetaData = metaData.getAsStringMap();
 
@@ -296,10 +294,12 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
             String foundLabel = m.group(1);
             int restIndex = content.indexOf(foundLabel) + foundLabel.length();
             content = content.substring(restIndex);
-            Object referred = remaining.get(foundLabel.substring(1, foundLabel.length() - 1));
+            String label = foundLabel.substring(1, foundLabel.length() - 1);
+
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
-            if (referred != null) {
-                writeString((BibtexString) referred, isFirstString, remaining, maxKeyLength, reformatFile);
+            if (remaining.containsKey(label)) {
+                BibtexString referred = remaining.get(label);
+                writeString(referred, isFirstString, remaining, maxKeyLength, reformatFile);
             }
         }
 

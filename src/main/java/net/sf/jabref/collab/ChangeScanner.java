@@ -17,6 +17,7 @@ package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -97,8 +98,8 @@ public class ChangeScanner implements Runnable {
         try {
 
             // Parse the temporary file.
-            File tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
-            ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile, Globals.prefs.getDefaultEncoding());
+            Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
+            ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile.toFile(), Globals.prefs.getDefaultEncoding());
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.

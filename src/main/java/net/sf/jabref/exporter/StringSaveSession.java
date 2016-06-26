@@ -18,11 +18,11 @@
 package net.sf.jabref.exporter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,9 +52,9 @@ public class StringSaveSession extends SaveSession {
     }
 
     @Override
-    public void commit(File file) throws SaveException {
+    public void commit(Path file) throws SaveException {
         try {
-            Files.write(file.toPath(), outputStream.toByteArray());
+            Files.write(file, outputStream.toByteArray());
         } catch (IOException e) {
             throw new SaveException(e);
         }

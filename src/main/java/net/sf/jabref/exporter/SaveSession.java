@@ -17,8 +17,9 @@
 
 package net.sf.jabref.exporter;
 
-import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +51,11 @@ public abstract class SaveSession {
         this.backup = useBackup;
     }
 
-    public abstract void commit(File file) throws SaveException;
+    public abstract void commit(Path file) throws SaveException;
+
+    public void commit(String path) throws SaveException {
+        commit(Paths.get(path));
+    }
 
     public abstract void cancel();
 

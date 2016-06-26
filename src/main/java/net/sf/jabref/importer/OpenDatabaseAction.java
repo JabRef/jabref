@@ -19,10 +19,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -216,10 +218,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
 
-                if (FileBasedLock.hasLockFile(file)) {
-                    long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modificationTIme != -1)
-                            && ((System.currentTimeMillis() - modificationTIme) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
+                if (FileBasedLock.hasLockFile(file.toPath())) {
+                    Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
+                    if ((modificationTime.isPresent()) && (
+                            (System.currentTimeMillis() - modificationTime.get().toMillis())
+                                    > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
@@ -227,11 +230,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                         + Localization.lang("Do you want to override the file lock?"),
                                 Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
-                            FileBasedLock.deleteLockFile(file);
+                            FileBasedLock.deleteLockFile(file.toPath());
                         } else {
                             return;
                         }
-                    } else if (!FileBasedLock.waitForFileLock(file, 10)) {
+                    } else if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
                         JOptionPane.showMessageDialog(null,
                                 Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance."),
@@ -382,7 +385,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
             }
 
-            if (!FileBasedLock.waitForFileLock(file, 10)) {
+            if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
                 return ParserResult.getNullResult();

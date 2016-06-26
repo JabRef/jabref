@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,7 +66,7 @@ class MSBibExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(session, new File(file));
+            finalizeSaveSession(session, Paths.get(file));
         } catch (IOException ex) {
             throw new SaveException(ex);
         }

@@ -120,7 +120,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // lacking keys, before saving:
             panel.autoGenerateKeysBeforeSaving();
 
-            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
                 // Check for external modifications to alleviate multiuser concurrency issue when near
                 // simultaneous saves occur to a shared database file: if true, do not perform the save
                 // rather return instead.
@@ -244,7 +244,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         try {
             if (commit) {
-                session.commit(file);
+                session.commit(file.toPath());
                 panel.getBibDatabaseContext().getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
             } else {
                 session.cancel();
@@ -256,7 +256,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
-                session.commit(file);
+                session.commit(file.toPath());
                 panel.getBibDatabaseContext().getMetaData().setEncoding(encoding);
             } else {
                 commit = false;
@@ -383,7 +383,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 JabRefExecutorService.INSTANCE.execute(() -> {
 
-                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile(), 10)) {
+                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
                         // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                         LOGGER.error("File locked, this will be trouble.");
                     }

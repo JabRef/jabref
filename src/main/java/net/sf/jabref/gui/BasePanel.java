@@ -1174,7 +1174,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         if (commit) {
-            session.commit(file);
+            session.commit(file.toPath());
             this.bibDatabaseContext.getMetaData().setEncoding(enc); // Make sure to remember which encoding we used.
         } else {
             session.cancel();
@@ -2171,7 +2171,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Test: running scan automatically in background
         if ((getBibDatabaseContext().getDatabaseFile() != null)
-                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile(), 10)) {
+                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:

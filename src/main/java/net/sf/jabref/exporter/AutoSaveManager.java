@@ -98,7 +98,7 @@ public class AutoSaveManager {
 
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
-            ss.commit(backupFile);
+            ss.commit(backupFile.toPath());
         } catch (SaveException e) {
             LOGGER.error("Problem with automatic save", e);
             return false;

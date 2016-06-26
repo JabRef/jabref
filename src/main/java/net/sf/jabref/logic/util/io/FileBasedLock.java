@@ -1,8 +1,11 @@
 package net.sf.jabref.logic.util.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +29,7 @@ public class FileBasedLock {
      * @param maxWaitCount The maximum number of times to wait.
      * @return true if the lock file is gone, false if it is still there.
      */
-    public static boolean waitForFileLock(File file, int maxWaitCount) {
+    public static boolean waitForFileLock(Path file, int maxWaitCount) {
         // Check if the file is locked by another JabRef user:
         int lockCheckCount = 0;
         while (hasLockFile(file)) {
@@ -48,19 +51,25 @@ public class FileBasedLock {
      * @param file The file to check.
      * @return true if a lock file exists, false otherwise.
      */
-    public static boolean hasLockFile(File file) {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
-        return lock.exists();
+    public static boolean hasLockFile(Path file) {
+        Path lockFile = getLockFilePath(file);
+        return Files.exists(lockFile);
     }
 
     /**
      * Find the lock file's last modified time, if it has a lock file.
      * @param file The file to check.
-     * @return the last modified time if lock file exists, -1 otherwise.
+     * @return the last modified time if lock file exists, empty optional otherwise.
      */
-    public static long getLockFileTimeStamp(File file) {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
-        return lock.exists() ? lock.lastModified() : -1;
+    public static Optional<FileTime> getLockFileTimeStamp(Path file) {
+        Path lockFile = getLockFilePath(file);
+        try {
+            return Files.exists(lockFile) ?
+                    Optional.of(Files.readAttributes(lockFile, BasicFileAttributes.class).lastModifiedTime()) :
+                    Optional.empty();
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -68,13 +77,15 @@ public class FileBasedLock {
      *
      * @return true if the lock file existed, false otherwise.
      */
-    public static boolean deleteLockFile(File file) {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
-        if (!lock.exists()) {
+    public static boolean deleteLockFile(Path file) {
+        Path lockFile = getLockFilePath(file);
+        if (!Files.exists(lockFile)) {
             return false;
         }
-        if (!lock.delete()) {
-            LOGGER.warn("Cannot delete lock file");
+        try {
+            Files.delete(lockFile);
+        } catch (IOException e) {
+            LOGGER.warn("Cannot delete lock file", e);
         }
         return true;
     }
@@ -85,18 +96,22 @@ public class FileBasedLock {
      * @return true if the lock file already existed
      * @throws IOException if something happens during creation.
      */
-    public static boolean createLockFile(File file) throws IOException {
-        File lock = new File(file.getPath() + LOCKFILE_SUFFIX);
-        if (lock.exists()) {
+    public static boolean createLockFile(Path file) throws IOException {
+        Path lockFile = getLockFilePath(file);
+        if (Files.exists(lockFile)) {
             return true;
         }
-        try (FileOutputStream out = new FileOutputStream(lock)) {
-            out.write(0);
-            out.close();
+
+        try {
+            Files.write(lockFile, "0".getBytes());
         } catch (IOException ex) {
             LOGGER.error("Error when creating lock file.", ex);
         }
-        lock.deleteOnExit();
+        lockFile.toFile().deleteOnExit();
         return false;
+    }
+
+    private static Path getLockFilePath(Path file) {
+        return file.resolveSibling(file.getFileName() + LOCKFILE_SUFFIX);
     }
 }

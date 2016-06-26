@@ -17,6 +17,8 @@ package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,7 +135,7 @@ public class FileUpdateMonitor implements Runnable {
      * @throws IllegalArgumentException If the handle doesn't correspond to an entry.
      * @return File The temporary file.
      */
-    public File getTempFile(String key) throws IllegalArgumentException {
+    public Path getTempFile(String key) throws IllegalArgumentException {
         Object o = entries.get(key);
         if (o == null) {
             throw new IllegalArgumentException("Entry not found");
@@ -149,7 +151,7 @@ public class FileUpdateMonitor implements Runnable {
 
         private final FileUpdateListener listener;
         private final File file;
-        private final File tmpFile;
+        private final Path tmpFile;
         private long timeStamp;
         private long fileSize;
 
@@ -161,7 +163,7 @@ public class FileUpdateMonitor implements Runnable {
             fileSize = file.length();
             tmpFile = FileUpdateMonitor.getTempFile();
             if (tmpFile != null) {
-                tmpFile.deleteOnExit();
+                tmpFile.toFile().deleteOnExit();
                 copy();
             }
         }
@@ -194,9 +196,9 @@ public class FileUpdateMonitor implements Runnable {
 
             boolean res = false;
             try {
-                res = FileUtil.copyFile(file, tmpFile, true);
+                res = FileUtil.copyFile(file, tmpFile.toFile(), true);
             } catch (IOException ex) {
-                LOGGER.info("Cannot copy to temporary file '" + tmpFile.getPath() + '\'', ex);
+                LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
             }
             return res;
         }
@@ -218,7 +220,7 @@ public class FileUpdateMonitor implements Runnable {
             listener.fileRemoved();
         }
 
-        public File getTmpFile() {
+        public Path getTmpFile() {
             return tmpFile;
         }
 
@@ -228,14 +230,14 @@ public class FileUpdateMonitor implements Runnable {
     }
 
 
-    private static synchronized File getTempFile() {
-        File f = null;
+    private static synchronized Path getTempFile() {
+        Path temporaryFile = null;
         try {
-            f = File.createTempFile("jabref", null);
-            f.deleteOnExit();
+            temporaryFile = Files.createTempFile("jabref", null);
+            temporaryFile.toFile().deleteOnExit();
         } catch (IOException ex) {
             LOGGER.warn("Could not create temporary file.", ex);
         }
-        return f;
+        return temporaryFile;
     }
 }
