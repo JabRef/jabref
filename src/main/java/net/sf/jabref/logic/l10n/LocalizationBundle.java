@@ -25,6 +25,11 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ * A bundle containing localized strings.
+ * It wraps an ordinary resource bundle and performs escaping/unescaping of keys and values similar to
+ * {@link Localization}. Needed to support JavaFX inline binding.
+ */
 public class LocalizationBundle extends ResourceBundle {
 
     private final ResourceBundle baseBundle;
