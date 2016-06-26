@@ -15,14 +15,14 @@
 */
 package net.sf.jabref.gui;
 
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import net.sf.jabref.JabRefGUI;
 
