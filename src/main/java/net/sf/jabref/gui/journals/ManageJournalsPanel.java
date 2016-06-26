@@ -58,7 +58,6 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -392,12 +391,8 @@ class ManageJournalsPanel extends JPanel {
         }
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
-        // Update the autocompleter for the "journal" field in all base panels,
-        // so added journal names are available:
-        for (BasePanel basePanel : frame.getBasePanelList()) {
-            basePanel.getAutoCompleters().addJournalListToAutoCompleter();
-        }
-
+        // Update journal abbreviation loader
+        Globals.journalAbbreviationLoader.update(Globals.prefs);
     }
 
 

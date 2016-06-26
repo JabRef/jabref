@@ -37,7 +37,7 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -146,14 +146,14 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
-    private final JournalAbbreviationRepository repository;
+    private final JournalAbbreviationLoader repositoryLoader;
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
 
-    public OOBibStyle(File styleFile, JournalAbbreviationRepository repository, Charset encoding) throws IOException {
-        this.repository = Objects.requireNonNull(repository);
+    public OOBibStyle(File styleFile, JournalAbbreviationLoader repositoryLoader, Charset encoding) throws IOException {
+        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
@@ -162,9 +162,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
-    public OOBibStyle(String resourcePath, JournalAbbreviationRepository repository)
+    public OOBibStyle(String resourcePath, JournalAbbreviationLoader repositoryLoader)
             throws IOException {
-        this.repository = Objects.requireNonNull(repository);
+        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
         initialize(JabRefMain.class.getResource(resourcePath).openStream());
@@ -378,7 +378,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString), this.repository).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), this.repositoryLoader).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

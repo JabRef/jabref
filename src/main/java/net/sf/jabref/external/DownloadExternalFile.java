@@ -266,9 +266,11 @@ public class DownloadExternalFile {
         editor.setOkEnabled(true);
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
+
     // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
-        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader.getRepository());
+        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(),
+                frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader);
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;

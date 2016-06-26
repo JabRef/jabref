@@ -38,11 +38,6 @@ public class JournalAbbreviationLoader {
     private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     private JournalAbbreviationRepository journalAbbrev;
 
-
-    public JournalAbbreviationLoader(JabRefPreferences preferences) {
-        update(preferences);
-    }
-
     public void update(JabRefPreferences jabRefPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
@@ -100,6 +95,9 @@ public class JournalAbbreviationLoader {
     }
 
     public JournalAbbreviationRepository getRepository() {
+        if (journalAbbrev == null) {
+            update(Globals.prefs);
+        }
         return journalAbbrev;
     }
 

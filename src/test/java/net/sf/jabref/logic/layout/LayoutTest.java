@@ -8,7 +8,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -53,7 +53,7 @@ public class LayoutTest {
 
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationRepository.class)).getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, mock(JournalAbbreviationLoader.class)).getLayoutFromText();
 
         return layout.doLayout(be, null);
     }
