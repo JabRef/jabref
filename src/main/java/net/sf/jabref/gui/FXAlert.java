@@ -20,11 +20,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 
 /**
  * This class shall provide a super class for future dialogs implemented in java fx.
@@ -67,6 +71,7 @@ public class FXAlert extends Alert {
         }
     };
 
+
     public FXAlert(AlertType type, String title, Image image) {
         this(type, title);
         setDialogIcon(image);
@@ -89,6 +94,13 @@ public class FXAlert extends Alert {
         fxDialogWindow.setOnHiding(evt -> setSwingWindowsEnabledAndFocusable(true));
 
         fxDialogWindow.setOnCloseRequest(evt -> this.close());
+
+        fxDialogWindow.getScene().setOnKeyPressed(evt -> {
+            KeyBindingPreferences keyPreferences = Globals.getKeyPrefs();
+            if (keyPreferences.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, evt)) {
+                fxDialogWindow.close();
+            }
+        });
     }
 
     public void setDialogStyle(String pathToStyleSheet) {

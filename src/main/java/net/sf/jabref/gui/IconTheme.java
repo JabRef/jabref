@@ -44,6 +44,7 @@ public class IconTheme {
 
     public static Font FONT;
     public static Font FONT_16;
+    public static javafx.scene.text.Font FX_FONT;
 
     /* Colors */
 
@@ -70,6 +71,9 @@ public class IconTheme {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
+            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+                FX_FONT = javafx.scene.text.Font.loadFont(stream2, DEFAULT_SIZE);
+            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }

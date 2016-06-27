@@ -104,8 +104,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.keyboard.KeyBindingRepository;
-import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
+import net.sf.jabref.gui.keyboard.KeyBindingAction;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -206,7 +205,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
     private final AbstractAction quit = new CloseAction();
-    private final AbstractAction selectKeys = new SelectKeysAction();
+    private final AbstractAction keyBindingAction = new KeyBindingAction();
     private final AbstractAction newBibtexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBTEX);
     private final AbstractAction newBiblatexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
@@ -1341,7 +1340,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(customFileTypesAction);
         options.add(manageJournals);
         options.add(manageSelectors);
-        options.add(selectKeys);
+        options.add(keyBindingAction);
         mb.add(options);
 
         helpMenu.add(help);
@@ -1661,23 +1660,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
                 }
             }
-        }
-    }
-
-    private class SelectKeysAction extends AbstractAction {
-
-        public SelectKeysAction() {
-            super(Localization.lang("Customize key bindings"));
-            this.putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.KEY_BINDINGS.getSmallIcon());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            KeyBindingsDialog d = new KeyBindingsDialog(new KeyBindingRepository(Globals.getKeyPrefs().getKeyBindings()));
-            d.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            d.pack(); //setSize(300,500);
-            d.setLocationRelativeTo(JabRefFrame.this);
-            d.setVisible(true);
         }
     }
 
