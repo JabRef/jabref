@@ -13,12 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer.actions;
 
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

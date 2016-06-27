@@ -24,7 +24,7 @@
  http://www.gnu.org/copyleft/gpl.ja.html
 
  */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -50,6 +50,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.importer.CustomImporter;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 

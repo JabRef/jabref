@@ -84,6 +84,7 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.importer.EntryFromFileCreatorManagerGUI;
 import net.sf.jabref.importer.EntryFromFileCreator;
 import net.sf.jabref.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.importer.UnlinkedFilesCrawler;
@@ -91,6 +92,7 @@ import net.sf.jabref.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -582,7 +584,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
             List<String> errors = new LinkedList<>();
-            creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(), entryType,
+            new EntryFromFileCreatorManagerGUI(creatorManager).addEntriesFromFiles(fileList, database,
+                    frame.getCurrentBasePanel(), entryType,
                     checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
                         int counter;

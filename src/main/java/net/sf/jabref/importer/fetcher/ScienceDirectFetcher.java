@@ -23,13 +23,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import net.sf.jabref.gui.help.HelpFiles;
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
 import org.apache.commons.logging.Log;
@@ -58,15 +51,20 @@ public class ScienceDirectFetcher implements EntryFetcher {
     private boolean stopFetching;
 
 
-    @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_SCIENCEDIRECT;
+    protected boolean isStopFetching() {
+        return stopFetching;
     }
 
-    @Override
-    public JPanel getOptionsPanel() {
-        // No Options panel
-        return null;
+    protected void setStopFetching(boolean stopFetching) {
+        this.stopFetching = stopFetching;
+    }
+
+    protected static String getScienceDirect() {
+        return SCIENCE_DIRECT;
+    }
+
+    protected static Log getLogger() {
+        return LOGGER;
     }
 
     @Override
@@ -79,39 +77,6 @@ public class ScienceDirectFetcher implements EntryFetcher {
         stopFetching = true;
     }
 
-    @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
-        stopFetching = false;
-        try {
-            List<String> citations = getCitations(query);
-            if (citations == null) {
-                return false;
-            }
-            if (citations.isEmpty()) {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'",
-                        query),
-                        Localization.lang("Search %0", SCIENCE_DIRECT), JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-
-            int i = 0;
-            for (String cit : citations) {
-                if (stopFetching) {
-                    break;
-                }
-                BibsonomyScraper.getEntry(cit).ifPresent(dialog::addEntry);
-                dialog.setProgress(++i, citations.size());
-            }
-
-            return true;
-
-        } catch (IOException e) {
-            LOGGER.warn("Communcation problems", e);
-            status.showMessage(
-                    Localization.lang("Error while fetching from %0", SCIENCE_DIRECT) + ": " + e.getMessage());
-        }
-        return false;
-    }
 
     /**
      *
@@ -120,7 +85,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
      * @return a list of IDs
      * @throws java.io.IOException
      */
-    private static List<String> getCitations(String query) throws IOException {
+    protected static List<String> getCitations(String query) throws IOException {
         String urlQuery;
         List<String> ids = new ArrayList<>();
         urlQuery = ScienceDirectFetcher.SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8.name());

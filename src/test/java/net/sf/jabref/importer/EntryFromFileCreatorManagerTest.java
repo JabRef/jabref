@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.importer.EntryFromFileCreatorManagerGUI;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -71,7 +72,8 @@ public class EntryFromFileCreatorManagerTest {
             files.add(ImportDataTest.NOT_EXISTING_PDF);
 
             EntryFromFileCreatorManager manager = new EntryFromFileCreatorManager();
-            List<String> errors = manager.addEntrysFromFiles(files, database, null, true);
+            List<String> errors = new EntryFromFileCreatorManagerGUI(manager).addEntrysFromFiles(files, database, null,
+                    true);
 
             /**
              * One file doesn't exist, so adding it as an entry should lead to an error message.

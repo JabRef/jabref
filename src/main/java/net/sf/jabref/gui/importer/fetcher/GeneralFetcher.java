@@ -13,28 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer.fetcher;
-
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+package net.sf.jabref.gui.importer.fetcher;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
@@ -48,8 +27,30 @@ import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.importer.fetcher.EntryFetcher;
+import net.sf.jabref.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
@@ -63,15 +64,15 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final SidePaneManager sidePaneManager;
     private final Action action;
     private final JabRefFrame frame;
-    private EntryFetcher activeFetcher;
+    private EntryFetcherGUI activeFetcher;
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
         super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
-        List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
-        EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
+        List<EntryFetcherGUI> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
+        EntryFetcherGUI[] fetcherArray = fetchers.toArray(new EntryFetcherGUI[fetchers.size()]);
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
         //JLabel[] choices = new JLabel[fetchers.size()];
         String[] choices = new String[fetcherArray.length];
@@ -220,11 +221,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         // We have two categories of fetchers. One category can show previews first and ask the
         // user which ones to download:
-        if (activeFetcher instanceof PreviewEntryFetcher) {
+        if (activeFetcher instanceof PreviewEntryFetcherGUI) {
             frame.output(Localization.lang("Searching..."));
             frame.setProgressBarIndeterminate(true);
             frame.setProgressBarVisible(true);
-            final PreviewEntryFetcher pFetcher = (PreviewEntryFetcher) activeFetcher;
+            final PreviewEntryFetcherGUI pFetcher = (PreviewEntryFetcherGUI) activeFetcher;
             final FetcherPreviewDialog dialog = new FetcherPreviewDialog(frame,
                     pFetcher.getWarningLimit(), pFetcher.getPreferredPreviewHeight());
             JabRefExecutorService.INSTANCE.execute(() -> {

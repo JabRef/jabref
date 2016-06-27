@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.actions.OpenDatabaseAction;
 import net.sf.jabref.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.importer.fileformat.BiblioscapeImporter;
 import net.sf.jabref.importer.fileformat.BibtexImporter;

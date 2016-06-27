@@ -75,7 +75,7 @@ public class ClipBoardManager implements ClipboardOwner {
         String result = "";
         //odd: the Object param of getContents is not currently used
         Transferable contents = CLIPBOARD.getContents(null);
-        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {

@@ -15,10 +15,7 @@
 */
 package net.sf.jabref.importer.fetcher;
 
-import javax.swing.JPanel;
-
 import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 
@@ -53,7 +50,9 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return True if the query was completed successfully, false if an error
      *         occurred.
      */
-    boolean processQuery(String query, ImportInspector inspector, OutputPrinter status);
+    default boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
+        return false;
+    };
 
     /**
      * The title for this activeFetcher, displayed in the menu and in the side pane.
@@ -61,24 +60,4 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * @return The title
      */
     String getTitle();
-
-    /**
-     * Get the name of the help page for this activeFetcher.
-     *
-     * If given, a question mark is displayed in the side pane which leads to
-     * the help page.
-     *
-     * @return The {@link HelpFiles} enum constant for the help page
-     */
-    HelpFiles getHelpPage();
-
-    /**
-     * If this activeFetcher requires additional options, a panel for setting up these
-     * should be returned in a JPanel by this method. This JPanel will be added
-     * to the side pane component automatically.
-     *
-     * @return Options panel for this activeFetcher or null if this activeFetcher does not
-     *         have any options.
-     */
-    JPanel getOptionsPanel();
 }

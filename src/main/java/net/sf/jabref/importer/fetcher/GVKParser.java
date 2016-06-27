@@ -27,8 +27,8 @@ import org.xml.sax.SAXException;
 public class GVKParser {
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
 
-    public List<BibEntry> parseEntries(InputStream is)
-            throws ParserConfigurationException, SAXException, IOException {
+
+    public List<BibEntry> parseEntries(InputStream is) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document content = dbuild.parse(is);
         return this.parseEntries(content);

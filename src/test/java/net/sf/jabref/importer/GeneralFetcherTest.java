@@ -9,9 +9,10 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneManager;
+import net.sf.jabref.gui.importer.fetcher.ACMPortalFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.importer.fetcher.ACMPortalFetcher;
 import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.testutils.GuiTestUtils;
 
 import org.junit.After;
@@ -61,7 +62,7 @@ public class GeneralFetcherTest {
         JabRefMain.main(new String[0]);
         GeneralFetcherTest.jrf = JabRefGUI.getMainFrame();
         GeneralFetcherTest.spm = GeneralFetcherTest.jrf.getSidePaneManager();
-        GeneralFetcherTest.acmpf = new ACMPortalFetcher();
+        GeneralFetcherTest.acmpf = new ACMPortalFetcherGUI();
         ArrayList<EntryFetcher> al = new ArrayList<>();
         al.add(GeneralFetcherTest.acmpf);
         GeneralFetcherTest.gf = new GeneralFetcher(GeneralFetcherTest.spm, GeneralFetcherTest.jrf);

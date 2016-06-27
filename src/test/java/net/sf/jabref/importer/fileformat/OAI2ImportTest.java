@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sf.jabref.gui.importer.fetcher.OAI2FetcherGUI;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.model.entry.BibEntry;
@@ -122,7 +123,7 @@ public class OAI2ImportTest {
     public void testOnline() throws InterruptedException {
 
         {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
+            OAI2FetcherGUI fetcher = new OAI2FetcherGUI();
             be = fetcher.importOai2Entry("math.RA/0612188");
             Assert.assertNotNull(be);
 
@@ -136,7 +137,7 @@ public class OAI2ImportTest {
         }
 
         {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
+            OAI2FetcherGUI fetcher = new OAI2FetcherGUI();
             be = fetcher.importOai2Entry("astro-ph/0702080");
             Assert.assertNotNull(be);
 
@@ -149,7 +150,7 @@ public class OAI2ImportTest {
         }
 
         {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
+            OAI2FetcherGUI fetcher = new OAI2FetcherGUI();
             be = fetcher.importOai2Entry("math.QA/0601001");
             Assert.assertNotNull(be);
 
@@ -158,7 +159,7 @@ public class OAI2ImportTest {
         }
 
         {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
+            OAI2FetcherGUI fetcher = new OAI2FetcherGUI();
             be = fetcher.importOai2Entry("hep-ph/0408155");
             Assert.assertNotNull(be);
 
@@ -166,7 +167,7 @@ public class OAI2ImportTest {
             Thread.sleep(20000);
         }
 
-        OAI2Fetcher fetcher = new OAI2Fetcher();
+        OAI2FetcherGUI fetcher = new OAI2FetcherGUI();
         be = fetcher.importOai2Entry("0709.3040");
         Assert.assertNotNull(be);
 

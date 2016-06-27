@@ -23,9 +23,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.JPanel;
-
 import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.importer.fetcher.EntryFetcherGUI;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -36,7 +35,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class CiteSeerXFetcher implements EntryFetcher {
+public class CiteSeerXFetcher implements EntryFetcherGUI {
 
     private static final int MAX_PAGES_TO_LOAD = 8;
     private static final String QUERY_MARKER = "___QUERY___";
@@ -58,6 +57,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
     private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
+
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -89,11 +89,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
     @Override
     public HelpFiles getHelpPage() {
         return HelpFiles.FETCHER_CITESEERX;
-    }
-
-    @Override
-    public JPanel getOptionsPanel() {
-        return null;
     }
 
     @Override
@@ -135,8 +130,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
         return null;
     }
-
-
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
         String cont = new URLDownload(urlString).downloadToString(StandardCharsets.UTF_8);

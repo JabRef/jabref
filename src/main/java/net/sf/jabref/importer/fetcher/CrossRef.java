@@ -122,7 +122,6 @@ public class CrossRef {
     }
 
     private static double editDistanceIgnoreCase(String a, String b) {
-        // TODO: locale is dependent on the language of the strings?!
         return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }

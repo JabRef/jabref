@@ -22,9 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JPanel;
-
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -54,8 +51,7 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String newQuery, ImportInspector inspector,
-            OutputPrinter status) {
+    public boolean processQuery(String newQuery, ImportInspector inspector, OutputPrinter status) {
 
         final HashMap<String, Boolean> bibentryKnown = new HashMap<>();
 
@@ -134,7 +130,6 @@ public class DBLPFetcher implements EntryFetcher {
                 count++;
             }
 
-
             // everything went smooth
             res = true;
 
@@ -159,16 +154,6 @@ public class DBLPFetcher implements EntryFetcher {
     @Override
     public String getTitle() {
         return "DBLP";
-    }
-
-    @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_DBLP;
-    }
-
-    @Override
-    public JPanel getOptionsPanel() {
-        return null;
     }
 
 }

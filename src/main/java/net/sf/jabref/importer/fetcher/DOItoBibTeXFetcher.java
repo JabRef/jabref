@@ -7,11 +7,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import javax.swing.JPanel;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
@@ -27,26 +24,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DOItoBibTeXFetcher implements EntryFetcher {
+
     private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
-    @Override
-    public void stopFetching() {
-        // not needed as the fetching is a single HTTP GET
+    protected static Log getLogger() {
+        return LOGGER;
+    }
+
+    protected ProtectTermsFormatter getProtectTermsFormatter() {
+        return protectTermsFormatter;
+    }
+
+    protected UnitsToLatexFormatter getUnitsToLatexFormatter() {
+        return unitsToLatexFormatter;
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        ParserResult parserResult = new ParserResult();
-        Optional<BibEntry> entry = getEntryFromDOI(query, parserResult);
-        if (parserResult.hasWarnings()) {
-            status.showMessage(parserResult.getErrorMessage());
-        }
-        entry.ifPresent(e -> inspector.addEntry(e));
-
-        return entry.isPresent();
+    public void stopFetching() {
+        // not needed as the fetching is a single HTTP GET
     }
 
     @Override
@@ -55,14 +53,17 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_DOI_TO_BIBTEX;
-    }
+    public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
+        ParserResult parserResult = new ParserResult();
 
-    @Override
-    public JPanel getOptionsPanel() {
-        // no additional options available
-        return null;
+        Optional<BibEntry> entry = getEntryFromDOI(query, parserResult);
+
+        if (parserResult.hasWarnings()) {
+            status.showMessage(parserResult.getErrorMessage());
+        }
+        entry.ifPresent(e -> inspector.addEntry(e));
+
+        return entry.isPresent();
     }
 
     public Optional<BibEntry> getEntryFromDOI(String doiStr) {
@@ -96,7 +97,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             }
             // Optionally re-format BibTeX entry
             formatTitleField(entry);
-
             return Optional.of(entry);
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad DOI URL", e);
@@ -113,6 +113,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
         }
     }
 
+
     private void formatTitleField(BibEntry entry) {
         // Optionally add curly brackets around key words to keep the case
         entry.getFieldOptional("title").ifPresent(title -> {
@@ -120,7 +121,6 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                 title = unitsToLatexFormatter.format(title);
             }
-
             // Case keeping
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                 title = protectTermsFormatter.format(title);

@@ -2,17 +2,9 @@ package net.sf.jabref.importer.fetcher;
 
 import java.util.Map;
 
-import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
 
-/**
- *
- */
-interface PreviewEntryFetcher extends EntryFetcher {
-
-    boolean processQueryGetPreview(String query, FetcherPreviewDialog preview,
-                                   OutputPrinter status);
+public interface PreviewEntryFetcher extends EntryFetcher {
 
     void getEntries(Map<String, Boolean> selection, ImportInspector inspector);
 

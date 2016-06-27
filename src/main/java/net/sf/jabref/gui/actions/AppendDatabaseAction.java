@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.actions;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +31,10 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
