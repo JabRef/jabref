@@ -12,16 +12,16 @@ install: true
 
 # allow gui testing on travis
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
   - psql -c 'create database jabref;' -U postgres
 
 script:
   - ./gradlew check
   # Integration tests currently often fail with "Process 'Gradle Test Executor 1' finished with non-zero exit value 137"
   # They should run, but the result is ignored
-  - ./gradlew integrationTest --info || exit 0
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  - ./gradlew integrationTest --info || true
 
 after_script:
   # enable codecov report
