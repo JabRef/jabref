@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<DialogPane prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.journals.ManageJournalAbbreviationsView">
+   <content>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <center>
+            <TableView fx:id="journalAbbreviationsTable" styleClass="abbreviations-table" BorderPane.alignment="CENTER">
+              <columns>
+                <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full_Journal_Name" />
+                <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation_Name" />
+                  <TableColumn fx:id="journalTableEditColumn" prefWidth="40.0" />
+                  <TableColumn fx:id="journalTableDeleteColumn" prefWidth="40.0" />
+              </columns>
+            </TableView>
+         </center>
+         <bottom>
+            <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
+                  <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save_Changes" />
+                  <Button fx:id="addAbbreviationButton" disable="true" mnemonicParsing="false" onAction="#addAbbreviation" text="+" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
+      </BorderPane>
+   </content>
+   <header>
+      <BorderPane>
+         <center>
+            <ComboBox fx:id="journalFilesBox" onAction="#fileChanged" styleClass="journal-lists" BorderPane.alignment="CENTER_LEFT" />
+         </center>
+         <right>
+            <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
+              <buttons>
+                  <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" text="%Create_new_list" />
+                <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" text="%Add_existing_file" />
+                  <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList" text="%Remove_list" />
+              </buttons>
+            </ButtonBar>
+         </right>
+      </BorderPane>
+   </header>
+</DialogPane>

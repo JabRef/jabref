@@ -23,9 +23,12 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
+import javafx.application.Platform;
+
 public class ManageJournalsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
+
 
     public ManageJournalsAction(JabRefFrame frame) {
         super();
@@ -35,9 +38,6 @@ public class ManageJournalsAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        ManageJournalsPanel panel = new ManageJournalsPanel(frame);
-        panel.getDialog().setLocationRelativeTo(frame);
-        panel.setValues();
-        panel.getDialog().setVisible(true);
+        Platform.runLater(() -> new ManageJournalAbbreviationsView().showAndWait());
     }
 }
