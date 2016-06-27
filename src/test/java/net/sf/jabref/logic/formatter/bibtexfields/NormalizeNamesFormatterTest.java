@@ -98,6 +98,18 @@ public class NormalizeNamesFormatterTest {
         expectCorrect("Name, della, first", "Name, della, first");
     }
 
+    @Test
+    public void testConcatenationOfAuthorsWithCommas() {
+        expectCorrect("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.",
+                "Ali Babar, M. and Dingsøyr, T. and Lago, P. and van der Vliet, H.");
+        expectCorrect("Ali Babar, M.", "Ali Babar, M.");
+    }
+
+    @Test
+    public void testOddCountOfCommas() {
+        expectCorrect("Ali Babar, M., Dingsøyr, T., Lago P.", "Ali Babar, M., Dingsøyr T. Lago P.");
+    }
+
     private void expectCorrect(String input, String expected) {
         Assert.assertEquals(expected, formatter.format(input));
     }
@@ -107,4 +119,35 @@ public class NormalizeNamesFormatterTest {
         assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
     }
 
+    @Test
+    public void testNameAffixe() {
+        expectCorrect("Surname, jr, First, Surname2, First2", "Surname, jr, First and Surname2, First2");
+    }
+
+    @Test
+    public void testAvoidSpecialCharacter() {
+        expectCorrect("Surname, {, First; Surname2, First2", "Surname, {, First; Surname2, First2");
+    }
+
+    @Test
+    public void testAndInName() {
+        expectCorrect("Surname, and , First, Surname2, First2", "Surname and , First, Surname2 First2");
+    }
+
+    @Test
+    public void testMultipleNameAffixes() {
+        expectCorrect("Mair, Jr, Daniel, Brühl, Sr, Daniel", "Mair, Jr, Daniel and Brühl, Sr, Daniel");
+    }
+
+    @Test
+    public void testCommaSeperatedNames() {
+        expectCorrect("Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur",
+                "Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal");
+    }
+
+    @Test
+    public void testMultipleSpaces() {
+        expectCorrect("Cristina    Bosoi,    Mariana Oliveira, Rafael Ochoa Sanchez   ,   Mélanie Tremblay  , Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur",
+                "Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal");
+    }
 }
