@@ -3,6 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,8 +26,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        //TODO:
-        assertEquals("", importer.getExtensions().get(0));
+        assertEquals(Arrays.asList(".txt",".xml"), importer.getExtensions());
     }
 
     @Test

@@ -20,20 +20,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertNull;
+
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
+    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
     private BibTeXMLImporter importer;
-
 
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/importer/fileformat"
+     *
      * @return A list of Names
      * @throws IOException
      */
     public List<Path> getTestFiles() throws IOException {
         List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(ImportFormat.FILEFORMAT_PATH))) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
             stream.forEach(files::add);
         }
         return files;

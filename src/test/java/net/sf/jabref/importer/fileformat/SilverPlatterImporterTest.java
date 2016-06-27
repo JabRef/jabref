@@ -25,7 +25,6 @@ import org.junit.runners.Parameterized.Parameters;
 public class SilverPlatterImporterTest {
 
     private SilverPlatterImporter testImporter;
-    private SilverPlatterImporter importer = new SilverPlatterImporter();
 
     @Parameter
     public String filename;
@@ -44,12 +43,12 @@ public class SilverPlatterImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(".txt", importer.getExtensions().get(0));
+        Assert.assertEquals(".txt", testImporter.getExtensions().get(0));
     }
 
     @Test
     public void testGetDescription() {
-        Assert.assertEquals("Imports a SilverPlatter exported file.", importer.getDescription());
+        Assert.assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
 
     @Parameters(name = "{index}: {0}")

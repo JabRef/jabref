@@ -22,6 +22,7 @@ import org.junit.Test;
 
 public class CopacImporterTest {
 
+    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
     private CopacImporter importer;
 
     /**
@@ -31,7 +32,7 @@ public class CopacImporterTest {
      */
     public List<String> getTestFiles() throws IOException {
         List<String> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(ImportFormat.FILEFORMAT_PATH))) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
             stream.forEach(n -> files.add(n.getFileName().toString()));
         }
         return files;

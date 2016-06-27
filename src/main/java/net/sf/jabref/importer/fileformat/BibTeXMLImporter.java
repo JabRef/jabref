@@ -35,7 +35,7 @@ import org.xml.sax.InputSource;
 
 /**
  * Importer for the BibTeXML format.
- *
+ * <p>
  * check here for details on the format
  * http://bibtexml.sourceforge.net/
  */

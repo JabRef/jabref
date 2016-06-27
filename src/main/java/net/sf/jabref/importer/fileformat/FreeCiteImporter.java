@@ -231,8 +231,7 @@ public class FreeCiteImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        //TODO:
-        return Collections.singletonList("");
+        return Arrays.asList(".txt",".xml");
     }
 
     @Override

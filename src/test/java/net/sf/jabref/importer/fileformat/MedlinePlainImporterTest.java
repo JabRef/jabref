@@ -50,9 +50,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals("Importer for the MedlinePlain format.\n" +
-                " check here for details on the format\n" +
-                " http://www.nlm.nih.gov/bsd/mms/medlineelements.html", importer.getDescription());
+        assertEquals("Importer for the MedlinePlain format.", importer.getDescription());
     }
 
     @Test
