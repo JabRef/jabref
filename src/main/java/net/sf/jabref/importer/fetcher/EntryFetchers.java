@@ -15,37 +15,52 @@
  */
 package net.sf.jabref.importer.fetcher;
 
+import net.sf.jabref.gui.importer.fetcher.ACMPortalFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.ADSFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.DBLPFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.DOAJFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.DiVAtoBibTeXFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.EntryFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.GVKFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.GoogleScholarFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.IEEEXploreFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.INSPIREFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.ISBNtoBibTeXFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.MedlineFetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.OAI2FetcherGUI;
+import net.sf.jabref.gui.importer.fetcher.SpringerFetcherGUI;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
 public class EntryFetchers {
 
-    private final List<EntryFetcher> entryFetchers = new LinkedList<>();
+    private final List<EntryFetcherGUI> entryFetchers = new LinkedList<>();
 
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
-        entryFetchers.add(new ADSFetcher());
+        entryFetchers.add(new ADSFetcherGUI());
         entryFetchers.add(new CiteSeerXFetcher());
-        entryFetchers.add(new DBLPFetcher());
-        entryFetchers.add(new DiVAtoBibTeXFetcher());
-        entryFetchers.add(new DOItoBibTeXFetcher());
-        entryFetchers.add(new GVKFetcher());
-        entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
-        entryFetchers.add(new INSPIREFetcher());
-        entryFetchers.add(new ISBNtoBibTeXFetcher());
-        entryFetchers.add(new MedlineFetcher());
-        entryFetchers.add(new OAI2Fetcher());
+        entryFetchers.add(new DBLPFetcherGUI());
+        entryFetchers.add(new DiVAtoBibTeXFetcherGUI());
+        entryFetchers.add(new DOItoBibTeXFetcherGUI());
+        entryFetchers.add(new GVKFetcherGUI());
+        entryFetchers.add(new IEEEXploreFetcherGUI(abbreviationLoader));
+        entryFetchers.add(new INSPIREFetcherGUI());
+        entryFetchers.add(new ISBNtoBibTeXFetcherGUI());
+        entryFetchers.add(new MedlineFetcherGUI());
+        entryFetchers.add(new OAI2FetcherGUI());
         // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
-        entryFetchers.add(new ACMPortalFetcher());
-        entryFetchers.add(new GoogleScholarFetcher());
-        entryFetchers.add(new DOAJFetcher());
-        entryFetchers.add(new SpringerFetcher());
+        entryFetchers.add(new ACMPortalFetcherGUI());
+        entryFetchers.add(new GoogleScholarFetcherGUI());
+        entryFetchers.add(new DOAJFetcherGUI());
+        entryFetchers.add(new SpringerFetcherGUI());
     }
 
-    public List<EntryFetcher> getEntryFetchers() {
+    public List<EntryFetcherGUI> getEntryFetchers() {
         return Collections.unmodifiableList(this.entryFetchers);
     }
 }

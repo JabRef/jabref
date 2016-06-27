@@ -13,9 +13,10 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer.actions;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.importer.ParserResult;
 
 /**
  * This interface defines potential actions that may need to be taken after

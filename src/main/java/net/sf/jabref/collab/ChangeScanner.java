@@ -40,7 +40,7 @@ import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.importer.OpenDatabaseAction;
+import net.sf.jabref.gui.actions.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.groups.GroupTreeNode;

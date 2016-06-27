@@ -47,6 +47,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
 
     private static final int MIN_PATH_TOKEN_LENGTH = 4;
 
+
     /**
      * Constructor. <br>
      * Forces subclasses to provide an {@link ExternalFileType} instance, which
@@ -155,7 +156,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory();
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 

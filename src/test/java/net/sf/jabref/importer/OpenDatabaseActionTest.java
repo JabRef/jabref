@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.gui.actions.OpenDatabaseAction;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 

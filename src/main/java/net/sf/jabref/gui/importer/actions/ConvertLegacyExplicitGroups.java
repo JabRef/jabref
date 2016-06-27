@@ -1,10 +1,11 @@
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer.actions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.model.entry.BibEntry;

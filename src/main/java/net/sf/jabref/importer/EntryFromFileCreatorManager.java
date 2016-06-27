@@ -19,23 +19,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.IdGenerator;
 
 /**
  * The class EntryFromFileCreatorManager manages entry creators.
@@ -67,15 +55,13 @@ public final class EntryFromFileCreatorManager {
         }
     }
 
-    private boolean hasSpecialisedCreatorForExternalFileType(
-            ExternalFileType externalFileType) {
+    private boolean hasSpecialisedCreatorForExternalFileType(ExternalFileType externalFileType) {
         for (EntryFromFileCreator entryCreator : entryCreators) {
             if ((entryCreator.getExternalFileType() == null)
                     || (entryCreator.getExternalFileType().getExtension().isEmpty())) {
                 continue;
             }
-            if (entryCreator.getExternalFileType().getExtension().equals(
-                    externalFileType.getExtension())) {
+            if (entryCreator.getExternalFileType().getExtension().equals(externalFileType.getExtension())) {
                 return true;
             }
         }
@@ -99,91 +85,6 @@ public final class EntryFromFileCreatorManager {
             }
         }
         return null;
-    }
-
-    /**
-     * Tries to add a entry for each file in the List.
-     *
-     * @param files
-     * @param database
-     * @param entryType
-     * @return List of unexpected import event messages including failures.
-     */
-    public List<String> addEntrysFromFiles(List<File> files,
-            BibDatabase database, EntryType entryType,
-            boolean generateKeywordsFromPathToFile) {
-        List<String> importGUIMessages = new LinkedList<>();
-        addEntriesFromFiles(files, database, null, entryType,
-                generateKeywordsFromPathToFile, null, importGUIMessages);
-        return importGUIMessages;
-    }
-
-    /**
-     * Tries to add a entry for each file in the List.
-     *
-     * @param files
-     * @param database
-     * @param panel
-     * @param entryType
-     * @param generateKeywordsFromPathToFile
-     * @param changeListener
-     * @param importGUIMessages list of unexpected import event - Messages including
-     *         failures
-     * @return Returns The number of entries added
-     */
-    public int addEntriesFromFiles(List<File> files,
-            BibDatabase database, BasePanel panel, EntryType entryType,
-            boolean generateKeywordsFromPathToFile,
-            ChangeListener changeListener, List<String> importGUIMessages) {
-
-        int count = 0;
-        CompoundEdit ce = new CompoundEdit();
-        for (File f : files) {
-            EntryFromFileCreator creator = getEntryCreator(f);
-            if (creator == null) {
-                importGUIMessages.add("Problem importing " + f.getPath() + ": Unknown filetype.");
-            } else {
-                Optional<BibEntry> entry = creator.createEntry(f, generateKeywordsFromPathToFile);
-                if (!entry.isPresent()) {
-                    importGUIMessages.add("Problem importing " + f.getPath() + ": Entry could not be created.");
-                    continue;
-                }
-                if (entryType != null) {
-                    entry.get().setType(entryType);
-                }
-                if (entry.get().getId() == null) {
-                    entry.get().setId(IdGenerator.next());
-                }
-                /*
-                 * TODO: database.insertEntry(BibEntry) is not sensible. Why
-                 * does 'true' mean "There were duplicates", while 'false' means
-                 * "Everything alright"?
-                 */
-                if (!database.containsEntryWithId(entry.get().getId())) {
-                    // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
-                    // Therefore, we only insert the entry if it is not already present
-                    if (database.insertEntry(entry.get())) {
-                        importGUIMessages.add("Problem importing " + f.getPath() + ": Insert into BibDatabase failed.");
-                    } else {
-                        count++;
-                        if (panel != null) {
-                            ce.addEdit(new UndoableInsertEntry(database, entry.get(), panel));
-                        }
-                    }
-                }
-            }
-
-            if (changeListener != null) {
-                changeListener.stateChanged(new ChangeEvent(this));
-            }
-        }
-
-        if ((count > 0) && (panel != null)) {
-            ce.end();
-            panel.getUndoManager().addEdit(ce);
-        }
-        return count;
-
     }
 
     /**

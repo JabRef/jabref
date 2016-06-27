@@ -24,11 +24,8 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import javax.swing.JPanel;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
@@ -81,9 +78,9 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        try(InputStream source = url.openStream()) {
+        try (InputStream source = url.openStream()) {
             String bibtexString;
-            try(Scanner scan = new Scanner(source)) {
+            try (Scanner scan = new Scanner(source)) {
                 bibtexString = scan.useDelimiter("\\A").next();
             }
 
@@ -132,16 +129,4 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
         return "ISBN to BibTeX";
 
     }
-
-    @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_ISBN_TO_BIBTEX;
-    }
-
-    @Override
-    public JPanel getOptionsPanel() {
-        // no additional options available
-        return null;
-    }
-
 }

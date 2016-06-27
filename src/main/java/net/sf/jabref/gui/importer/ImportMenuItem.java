@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,6 +41,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.importer.ImportFormatReader;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
@@ -138,13 +140,13 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
+
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
                         if (pr.hasWarnings()) {
                             frame.showMessage(pr.getErrorMessage());
                         }
 
-                        imports.add(new ImportFormatReader.UnknownFormatImport(importer
-                                .getFormatName(), pr));
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that
@@ -227,8 +229,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.parserResult;
 
-                anythingUseful = anythingUseful
-                        || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
+                anythingUseful = anythingUseful || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {

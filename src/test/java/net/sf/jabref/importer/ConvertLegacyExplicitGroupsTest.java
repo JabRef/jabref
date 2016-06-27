@@ -5,6 +5,7 @@ import java.util.Collections;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.importer.actions.ConvertLegacyExplicitGroups;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;

@@ -25,11 +25,11 @@ import javax.swing.JSeparator;
 
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcherGUI;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -51,7 +51,7 @@ public class MergeEntryDOIDialog extends JDialog {
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
-    private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
+    private final DOItoBibTeXFetcherGUI doiFetcher = new DOItoBibTeXFetcherGUI();
 
     private static final String MARGIN = "5px";
 

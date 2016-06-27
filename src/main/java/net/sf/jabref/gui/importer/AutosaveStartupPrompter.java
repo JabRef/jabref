@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.importer;
+package net.sf.jabref.gui.importer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +30,8 @@ import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.actions.OpenDatabaseAction;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
