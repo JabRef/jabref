@@ -16,6 +16,7 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
+import java.util.StringJoiner;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -33,7 +34,12 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     public ImportFileFilter(ImportFormat format) {
         this.format = format;
-        this.name = format.getFormatName();
+
+        StringJoiner sj = new StringJoiner(", ", format.getFormatName() + " (", ")");
+        for (String ext : format.getExtensions()) {
+            sj.add("*" + ext);
+        }
+        this.name = sj.toString();
     }
 
     public ImportFormat getImportFormat() {
@@ -42,11 +48,17 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean accept(File file) {
-        return true;
-        /*if (file.isDirectory())
+        if (format.getExtensions().isEmpty()) {
             return true;
-        else
-            return file.getPath().toLowerCase().endsWith(extension);*/
+        }
+
+        for (String extension : format.getExtensions()) {
+            if (file.getName().endsWith(extension)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
