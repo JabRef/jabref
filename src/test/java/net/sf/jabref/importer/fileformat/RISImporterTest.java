@@ -15,29 +15,39 @@ import org.junit.Test;
 
 public class RISImporterTest {
 
-    private RisImporter risImporter;
+    private RisImporter importer;
 
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        risImporter = new RisImporter();
+        importer = new RisImporter();
     }
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals(risImporter.getFormatName(), "RIS");
+        Assert.assertEquals(importer.getFormatName(), "RIS");
     }
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals(risImporter.getId(), "ris");
+        Assert.assertEquals(importer.getId(), "ris");
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        Assert.assertEquals(".ris", importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        Assert.assertEquals("Imports a Biblioscape Tag File.", importer.getDescription());
     }
 
     @Test
     public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
-        Assert.assertFalse(risImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+        Assert.assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
     }
 
 }

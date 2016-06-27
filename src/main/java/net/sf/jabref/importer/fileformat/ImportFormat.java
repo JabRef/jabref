@@ -33,6 +33,8 @@ import net.sf.jabref.importer.ParserResult;
  */
 public abstract class ImportFormat implements Comparable<ImportFormat> {
 
+    protected static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
+
     /**
      * Using this when I have no database open or when I read
      * non bibtex file formats (used by the ImportFormatReader.java)

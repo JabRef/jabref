@@ -17,9 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PdfXmpImporterTest {
 
@@ -35,6 +33,16 @@ public class PdfXmpImporterTest {
     @Test
     public void testGetFormatName() {
         assertEquals("XMP-annotated PDF", importer.getFormatName());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        assertEquals(".pdf", importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("Wraps the XMPUtility function to be used as an ImportFormat.", importer.getDescription());
     }
 
     @Test

@@ -38,7 +38,6 @@ public class ImportFormatTest {
     }
 
     @Test
-    @Ignore
     public void getExtensionsDoesNotReturnNull() {
         Assert.assertNotNull(format.getExtensions());
     }
@@ -62,7 +61,6 @@ public class ImportFormatTest {
     }
 
     @Test
-    @Ignore
     public void getDescriptionDoesNotReturnNull() {
         Assert.assertNotNull(format.getDescription());
     }

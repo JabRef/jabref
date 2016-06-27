@@ -91,6 +91,11 @@ public class RepecNepImporterTest {
     }
 
     @Test
+    public void testGetExtension() {
+        Assert.assertEquals(".txt", testImporter.getExtensions());
+    }
+
+    @Test
     public final void testGetDescription() {
         Assert.assertEquals("Imports a New Economics Papers-Message (see http://nep.repec.org)\n"
                 + "from the REPEC-NEP Service (see http://www.repec.org).\n"

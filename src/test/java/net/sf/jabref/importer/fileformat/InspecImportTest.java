@@ -19,18 +19,16 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class InspecImportTest {
 
-    private InspecImporter inspecImp;
+    private InspecImporter importer;
 
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        this.inspecImp = new InspecImporter();
+        this.importer = new InspecImporter();
     }
 
     @Test
@@ -38,7 +36,7 @@ public class InspecImportTest {
         List<String> testList = Arrays.asList("InspecImportTest.txt", "InspecImportTest2.txt");
         for (String str : testList) {
             Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertTrue(inspecImp.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
@@ -49,7 +47,7 @@ public class InspecImportTest {
                 "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "InspecImportTestFalse.txt");
         for (String str : testList) {
             Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertFalse(inspecImp.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
@@ -68,7 +66,7 @@ public class InspecImportTest {
         expectedEntry.setField("volume", "19");
 
         BibEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
-                InspecImportTest.class.getResource("InspecImportTest2.txt"), inspecImp);
+                InspecImportTest.class.getResource("InspecImportTest2.txt"), importer);
     }
 
     @Test
@@ -82,7 +80,7 @@ public class InspecImportTest {
         expectedEntry.setField("author", "Prechelt, Lutz");
 
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
-            List<BibEntry> entries = inspecImp.importDatabase(reader).getDatabase().getEntries();
+            List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(Collections.singletonList(expectedEntry), entries);
         }
     }
@@ -98,7 +96,7 @@ public class InspecImportTest {
         expectedEntry.setField("author", "Prechelt, Lutz");
 
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
-            List<BibEntry> entries = inspecImp.importDatabase(reader).getDatabase().getEntries();
+            List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.get(0);
             assertEquals(expectedEntry, entry);
@@ -107,12 +105,22 @@ public class InspecImportTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("INSPEC", inspecImp.getFormatName());
+        assertEquals("INSPEC", importer.getFormatName());
     }
 
     @Test
     public void testGetCLIId() {
-        assertEquals("inspec", inspecImp.getId());
+        assertEquals("inspec", importer.getId());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        assertEquals(".txt", importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("INSPEC format importer.", importer.getDescription());
     }
 
 }

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,7 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,12 +74,12 @@ public class MsBibImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Collections.singletonList(".xml");
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Importer for the MS Office 2007 XML bibliography format.";
     }
 
 }
