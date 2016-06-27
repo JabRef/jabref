@@ -15,10 +15,6 @@
 */
 package net.sf.jabref.gui.keyboard;
 
-import net.sf.jabref.gui.FXDialogs;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -36,6 +32,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import net.sf.jabref.gui.FXDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class KeyBindingsDialogViewModel {
 

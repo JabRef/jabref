@@ -15,11 +15,12 @@
 */
 package net.sf.jabref.gui.keyboard;
 
-import com.google.common.base.CaseFormat;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+
+import com.google.common.base.CaseFormat;
 
 /**
  * This class represents a view model for objects of the KeyBinding

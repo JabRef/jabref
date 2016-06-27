@@ -1,11 +1,12 @@
 package net.sf.jabref.gui.keyboard;
 
-import net.sf.jabref.JabRefPreferences;
-
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+
+import net.sf.jabref.JabRefPreferences;
+
 import org.junit.Before;
 import org.junit.Test;
 

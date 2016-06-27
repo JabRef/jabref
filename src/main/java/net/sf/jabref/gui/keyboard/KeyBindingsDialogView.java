@@ -1,12 +1,13 @@
 package net.sf.jabref.gui.keyboard;
 
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.DialogPane;
+import javafx.stage.Stage;
+
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.DialogPane;
-import javafx.stage.Stage;
 
 public class KeyBindingsDialogView extends FXMLView {
 

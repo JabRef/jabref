@@ -5,11 +5,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
+import javafx.application.Platform;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-
-import javafx.application.Platform;
 
 
 public class KeyBindingAction extends AbstractAction {
