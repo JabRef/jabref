@@ -1320,11 +1320,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 JabRefExecutorService.INSTANCE.submit(timerTask, 200);
             }
         }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            scheduleUpdate();
-        }
     }
 
     /**

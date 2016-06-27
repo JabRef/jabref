@@ -43,12 +43,10 @@ import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
-    private static final int MAX_DISPLAYED_LETTERS = 35;
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
     private static final Icon GROUP_REGULAR_ICON = null;
@@ -189,9 +187,8 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public String getText() {
         AbstractGroup group = node.getGroup();
-        String name = StringUtil.limitStringLength(group.getName(), MAX_DISPLAYED_LETTERS);
         StringBuilder sb = new StringBuilder(60);
-        sb.append(name);
+        sb.append(group.getName());
 
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
                 && JabRefGUI.getMainFrame() != null) {
