@@ -26,6 +26,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -497,6 +498,7 @@ public class OOBibStyleTest {
     }
 
     @Test
+    @Ignore
     public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
         String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
         OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationLoader.class));
