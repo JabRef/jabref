@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
@@ -92,12 +93,11 @@ public class RepecNepImporterTest {
 
     @Test
     public void testGetExtension() {
-        Assert.assertEquals(".txt", testImporter.getExtensions());
+        Assert.assertEquals(Collections.singletonList(".txt"), testImporter.getExtensions());
     }
 
     @Test
     public final void testGetDescription() {
-        Assert.assertEquals("Imports a New Economics Papers-Message \n"
-                + "from the REPEC-NEP Service.", testImporter.getDescription());
+        Assert.assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.", testImporter.getDescription());
     }
 }
