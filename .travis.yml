@@ -48,7 +48,7 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  - ./gradlew integrationTest --info || true
+  - ./gradlew integrationTest --info
 
 after_script:
   # enable codecov report
