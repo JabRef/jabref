@@ -25,6 +25,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
+import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -62,10 +63,14 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) value;
         JLabel label = (JLabel) c;
 
+        Border border;
         if (Objects.equals(highlightBorderCell, value)) {
-            label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            border = BorderFactory.createLineBorder(Color.BLACK);
         } else {
-            label.setBorder(BorderFactory.createEmptyBorder());
+            border = BorderFactory.createEmptyBorder();
+        }
+        if (label.getBorder() != border) {
+            label.setBorder(border);
         }
 
         Boolean red = printInRed(viewModel) && !selected; // do not print currently selected node in red

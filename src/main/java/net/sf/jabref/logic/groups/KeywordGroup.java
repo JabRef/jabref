@@ -218,7 +218,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param text The string to look in.
      * @return true if the word was found, false otherwise.
      */
-    private static boolean containsWord(String word, String text) {
+    public static boolean containsWord(String word, String text) {
         int piv = 0;
         while (piv < text.length()) {
             int index = text.indexOf(word, piv);

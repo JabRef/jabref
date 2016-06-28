@@ -685,7 +685,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     private void revalidateGroups(TreePath[] selectionPaths, Enumeration<TreePath> expandedNodes,
             GroupTreeNodeViewModel node) {
-        groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
             groupsTree.setSelectionPaths(selectionPaths);

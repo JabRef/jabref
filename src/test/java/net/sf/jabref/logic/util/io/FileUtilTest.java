@@ -23,7 +23,6 @@ public class FileUtilTest {
     @Before
     public void setUp() {
         Globals.prefs = mock(JabRefPreferences.class);
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
     }
 
     @After
@@ -41,7 +40,7 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
-        assertEquals("1234 - mytitle", FileUtil.createFileNameFromPattern(null, entry, Globals.journalAbbreviationLoader.getRepository()));
+        assertEquals("1234 - mytitle", FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class)));
     }
 
     @Test
@@ -53,7 +52,7 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, Globals.journalAbbreviationLoader.getRepository()));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class)));
     }
 
     @Test

@@ -990,8 +990,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
             Layout layout;
             try {
-                layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
-                        .getLayoutFromText();
+                layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader).getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1321,11 +1320,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 JabRefExecutorService.INSTANCE.submit(timerTask, 200);
             }
         }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            scheduleUpdate();
-        }
     }
 
     /**
@@ -1583,7 +1577,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters();
         }
 
         // restore floating search result
@@ -1603,7 +1597,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void instantiateSearchAutoCompleter() {
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
-        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences,
+                Globals.journalAbbreviationLoader);
         searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);

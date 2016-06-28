@@ -46,7 +46,7 @@ public class ExportFormatTest {
 
     @Before
     public void setUp() {
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
         databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         charset = Charsets.UTF_8;
         entries = Collections.emptyList();
