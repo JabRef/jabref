@@ -571,6 +571,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private void init() {
+
         tabbedPane = new DragDropPopupPane(tabPopupMenu());
 
         MyGlassPane glassPane = new MyGlassPane();
@@ -878,7 +879,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
-        splitPane.setDividerSize(2);
+        splitPane.setDividerSize(-3);
         splitPane.setBorder(null);
         //getContentPane().setBackground(GUIGlobals.lightGray);
         con.fill = GridBagConstraints.HORIZONTAL;

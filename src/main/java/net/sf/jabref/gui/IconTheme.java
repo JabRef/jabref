@@ -47,7 +47,6 @@ public class IconTheme {
     public static javafx.scene.text.Font FX_FONT;
 
     /* Colors */
-
     // JabRef's default colors
     public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
     public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
@@ -56,14 +55,12 @@ public class IconTheme {
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
 
-
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
-
 
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
