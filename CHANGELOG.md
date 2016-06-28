@@ -12,7 +12,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- [#1485](https://github.com/JabRef/jabref/issues/1485) Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
+- Implemented [#661](https://github.com/JabRef/jabref/issues/661): Introducing a "check for updates" mechnism (manually/automatic at startup)
+- [#1485](https://github.com/JabRef/jabref/issues/1485): Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
 - [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view
 
 ### Fixed
