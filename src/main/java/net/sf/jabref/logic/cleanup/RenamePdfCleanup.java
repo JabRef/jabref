@@ -21,10 +21,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
 
