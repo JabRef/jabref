@@ -92,6 +92,7 @@ import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.actions.NewDatabaseAction;
 import net.sf.jabref.gui.actions.NewEntryAction;
 import net.sf.jabref.gui.actions.NewSubDatabaseAction;
+import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
@@ -715,7 +716,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // General preferences dialog.  The MacAdapter calls this method when "Preferences..."
     // is selected from the application menu.
-    public void preferences() {
+    public void showPreferencesDialog() {
         output(Localization.lang("Opening preferences..."));
         if (prefsDialog == null) {
             prefsDialog = new PreferencesDialog(JabRefFrame.this);
@@ -1354,6 +1355,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         helpMenu.add(forkMeOnGitHubAction);
         helpMenu.add(donationAction);
         helpMenu.addSeparator();
+        helpMenu.add(new SearchForUpdateAction());
         helpMenu.add(about);
         mb.add(helpMenu);
 
@@ -1476,6 +1478,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.add(donationAction);
     }
 
+    /**
+     * displays the String on the Status Line visible on the bottom of the JabRef mainframe
+     */
     public void output(final String s) {
         SwingUtilities.invokeLater(() -> {
             statusLine.setText(s);
@@ -1703,7 +1708,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            preferences();
+            showPreferencesDialog();
         }
     }
 

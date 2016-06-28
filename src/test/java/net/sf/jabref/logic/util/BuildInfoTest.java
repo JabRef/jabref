@@ -9,13 +9,13 @@ public class BuildInfoTest {
     @Test
     public void testDefaults() {
         BuildInfo buildInfo = new BuildInfo("asdf");
-        assertEquals("*unknown*", buildInfo.getVersion());
+        assertEquals("*unknown*", buildInfo.getVersion().getFullVersion());
     }
 
     @Test
     public void testFileImport() {
         BuildInfo buildInfo = new BuildInfo("/net/sf/jabref/util/build.properties");
-        assertEquals("42", buildInfo.getVersion());
+        assertEquals("42", buildInfo.getVersion().getFullVersion());
     }
 
 }

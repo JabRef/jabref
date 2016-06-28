@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -70,6 +70,7 @@ import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
@@ -419,7 +420,7 @@ public class JabRefPreferences {
     private static final String USER_HOME = System.getProperty("user.home");
 
     /**
-     * Set with all custom {@link ImportFormat}s
+     * Set with all custom {@link net.sf.jabref.importer.fileformat.ImportFormat}s
      */
     public final CustomImportList customImports;
 
@@ -861,6 +862,9 @@ public class JabRefPreferences {
         defaults.put(MAX_BACK_HISTORY_SIZE, 10);
         defaults.put(LINE_LENGTH, 65);
         defaults.put(INDENT, 4);
+
+        //versioncheck defaults
+        defaults.put(VersionPreferences.VERSION_IGNORED_UPDATE, "");
     }
 
     public String getUser() {
