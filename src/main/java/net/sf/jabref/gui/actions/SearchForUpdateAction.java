@@ -1,4 +1,4 @@
-/*  Copyright (C) 2015 Oliver Kopp
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,30 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.menus.help;
+package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class DonateAction extends AbstractAction {
+public class SearchForUpdateAction extends AbstractAction {
 
-    private static final String DONATION_LINK = "https://github.com/JabRef/jabref/wiki/Donations";
-
-    public DonateAction() {
-        super(Localization.menuTitle("Donate to JabRef"));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Donate to JabRef"));
-        putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.DONATE.getSmallIcon());
-        putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.DONATE.getIcon());
+    public SearchForUpdateAction(){
+        super(Localization.lang("Check for updates"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JabRefDesktop.openBrowserShowPopup(DONATION_LINK);
+        JabRefGUI.checkForNewVersion(true);
     }
 }
