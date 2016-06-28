@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class MedlineImporterTest {
 
-    private MedlineImporter medlineImporter;
+    private MedlineImporter importer;
     private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
 
     /**
@@ -55,7 +55,7 @@ public class MedlineImporterTest {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        this.medlineImporter = new MedlineImporter();
+        this.importer = new MedlineImporter();
     }
 
     @Test
@@ -66,12 +66,27 @@ public class MedlineImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("Medline", medlineImporter.getFormatName());
+        assertEquals("Medline", importer.getFormatName());
     }
 
     @Test
     public void testGetCLIId() {
-        assertEquals("medline", medlineImporter.getId());
+        assertEquals("medline", importer.getId());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".nbib");
+        extensions.add(".xml");
+
+        assertEquals(extensions.get(0), importer.getExtensions().get(0));
+        assertEquals(extensions.get(1), importer.getExtensions().get(1));
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("Importer for the Medline format.", importer.getDescription());
     }
 
     @Test
@@ -80,7 +95,7 @@ public class MedlineImporterTest {
                 .collect(Collectors.toList());
 
         for (Path file : list) {
-            Assert.assertFalse(file.toString(), medlineImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 }

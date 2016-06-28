@@ -41,6 +41,16 @@ public class OvidImporterTest {
     }
 
     @Test
+    public void testsGetExtensions() {
+        Assert.assertEquals(".txt", importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        Assert.assertEquals("Imports an Ovid file.", importer.getDescription());
+    }
+
+    @Test
     public void testIsRecognizedFormatAccept() throws IOException, URISyntaxException {
 
         List<String> list = Arrays.asList("OvidImporterTest1.txt", "OvidImporterTest3.txt", "OvidImporterTest4.txt",

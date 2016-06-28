@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,9 +18,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class EndnoteImporterTest {
@@ -40,6 +39,22 @@ public class EndnoteImporterTest {
     @Test
     public void testGetCLIId() {
         assertEquals("refer", importer.getId());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        EndnoteImporter importer = new EndnoteImporter();
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".enw");
+
+        assertEquals(extensions.get(0), importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        EndnoteImporter importer = new EndnoteImporter();
+        assertEquals("Importer for the Refer/Endnote format." +
+                " Modified to use article number for pages if pages are missing.", importer.getDescription());
     }
 
     @Test

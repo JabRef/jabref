@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,21 @@ public class MsBibImporterTest {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        MsBibImporter importer = new MsBibImporter();
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".xml");
+
+        Assert.assertEquals(extensions.get(0), importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        MsBibImporter importer = new MsBibImporter();
+        Assert.assertEquals("Importer for the MS Office 2007 XML bibliography format.", importer.getDescription());
     }
 
     @Test

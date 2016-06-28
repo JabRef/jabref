@@ -1,5 +1,5 @@
 /* Copyright (C) 2005 Andreas Rudert
-   Copyright (C) 2015 JabRef contributors
+   Copyright (C) 2016 JabRef contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,21 +40,21 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
- *
+ * <p>
  * <p><a href="http://www.repec.org">RePEc (Research Papers in Economics)</a>
  * is a collaborative effort of over 100 volunteers in 49 countries
  * to enhance the dissemination of research in economics. The heart of
  * the project is a decentralized database of working papers, journal
  * articles and software components. All RePEc material is freely available.</p>
  * At the time of writing RePEc holds over 300.000 items.</p>
- *
+ * <p>
  * <p><a href="http://nep.repec.org">NEP (New Economic Papers)</a> is an announcement
  * service which filters information on new additions to RePEc into edited
  * reports. The goal is to provide subscribers with up-to-date information
  * to the research literature.</p>
- *
+ * <p>
  * <p>This importer is capable of importing NEP messages into JabRef.</p>
- *
+ * <p>
  * <p>There is no officially defined message format for NEP. NEP messages are assumed to have
  * (and almost always have) the form given by the following semi-formal grammar:
  * <pre>
@@ -155,8 +155,8 @@ import org.apache.commons.logging.LogFactory;
  * </pre>
  * </p>
  *
- * @see <a href="http://nep.repec.org">NEP</a>
  * @author andreas_sf at rudert-home dot de
+ * @see <a href="http://nep.repec.org">NEP</a>
  */
 public class RepecNepImporter extends ImportFormat {
 
@@ -186,12 +186,7 @@ public class RepecNepImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return
-        "Imports a New Economics Papers-Message (see http://nep.repec.org)\n"
-                + "from the REPEC-NEP Service (see http://www.repec.org).\n"
-                + "To import papers either save a NEP message as a text file and then import or\n"
-                + "copy&paste the papers you want to import and make sure, one of the first lines\n"
-                + "contains the line \"nep.repec.org\".";
+        return "Imports a New Economics Papers-Message from the REPEC-NEP Service.";
     }
 
     @Override
@@ -226,17 +221,17 @@ public class RepecNepImporter extends ImportFormat {
 
     /**
      * Read multiple lines.
-     *
+     * <p>
      * <p>Reads multiple lines until either
      * <ul>
-     *   <li>an empty line</li>
-     *   <li>the end of file</li>
-     *   <li>the next working paper or</li>
-     *   <li>a keyword</li>
+     * <li>an empty line</li>
+     * <li>the end of file</li>
+     * <li>the next working paper or</li>
+     * <li>a keyword</li>
      * </ul>
      * is found. Whitespace at start or end of lines is trimmed except for one blank character.</p>
      *
-     * @return  result
+     * @return result
      */
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
@@ -283,7 +278,7 @@ public class RepecNepImporter extends ImportFormat {
                         .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
                                 institutionDone && (this.lastLine
                                         .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
-                                                .indexOf(')') : this.lastLine.length())
+                                        .indexOf(')') : this.lastLine.length())
                                 .trim());
             } else {
                 author = this.lastLine.substring(0, this.lastLine.length()).trim();
@@ -363,7 +358,7 @@ public class RepecNepImporter extends ImportFormat {
             } else if (keyword.startsWith("Date")) {
                 Date date = null;
                 String content = readMultipleLines(in);
-                String[] recognizedDateFormats = new String[] {"yyyy-MM-dd", "yyyy-MM", "yyyy"};
+                String[] recognizedDateFormats = new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"};
                 int i = 0;
                 for (; (i < recognizedDateFormats.length) && (date == null); i++) {
                     try {

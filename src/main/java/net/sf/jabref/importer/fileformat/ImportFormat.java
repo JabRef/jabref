@@ -121,7 +121,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * Returns the file extensions that this importer can read.
      * The extension should contain the leading dot, so for example ".bib"
      *
-     * @return list of supported file extensions (not null but may be empty)
+     * @return list of supported file extensions (not null but may be empty). The list should never be null. Instead return an empty list.
      */
     public abstract List<String> getExtensions();
 

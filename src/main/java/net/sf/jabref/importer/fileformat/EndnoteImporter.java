@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,7 @@ package net.sf.jabref.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import net.sf.jabref.model.entry.BibEntry;
  * journals, e.g., Physical Review Letters, don't use pages anymore)
  *
  * check here for details on the format
- * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
+ * http://libguides.csuchico.edu/c.php?g=414245&p=2822898
  */
 public class EndnoteImporter extends ImportFormat {
 
@@ -50,7 +51,7 @@ public class EndnoteImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Collections.singletonList(".enw");
     }
 
     @Override
@@ -60,7 +61,7 @@ public class EndnoteImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return null;
+        return "Importer for the Refer/Endnote format. Modified to use article number for pages if pages are missing.";
     }
 
     @Override

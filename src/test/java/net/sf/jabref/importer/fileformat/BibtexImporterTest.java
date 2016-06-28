@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.Globals;
@@ -96,5 +97,17 @@ public class BibtexImporterTest {
     @Test
     public void testGetFormatName() {
         assertEquals("BibTeX", importer.getFormatName());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        assertEquals(Arrays.asList(".bib"), importer.getExtensions());
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("This importer exists only to enable `--importToOpen someEntry.bib`\n" +
+                            "It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields.\n" +
+                            "The metadata is not required to be read here, as this class is NOT called at --import.", importer.getDescription());
     }
 }

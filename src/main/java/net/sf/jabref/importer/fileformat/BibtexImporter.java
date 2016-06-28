@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -82,12 +82,14 @@ public class BibtexImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return Collections.singletonList("bib");
+        return Collections.singletonList(".bib");
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "This importer exists only to enable `--importToOpen someEntry.bib`\n" +
+                "It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields.\n" +
+                "The metadata is not required to be read here, as this class is NOT called at --import.";
     }
 
     /**
