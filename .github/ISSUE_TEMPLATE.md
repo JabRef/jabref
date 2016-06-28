@@ -1,4 +1,8 @@
-JabRef version <!-- version as shown in the about box--> on <!-- Windows 10|Ubuntu 14.04|Mac OS X 10.8|... -->
+<!-- Note: Please use the GitHub Issue tracker only for BugReports. 
+Feature requests,  questions and general feedback is now handled at http://discourse.jabref.org 
+Thanks! --> 
+
+JabRef version <!-- version as shown in the about box --> on <!-- Windows 10|Ubuntu 14.04|Mac OS X 10.8|... -->
 <!-- Hint: If you use a development version (available at http://builds.jabref.org/master/), ensure that you use the latest one. -->
 
 Steps to reproduce:
