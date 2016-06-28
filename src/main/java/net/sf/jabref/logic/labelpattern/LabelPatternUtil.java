@@ -19,9 +19,9 @@ package net.sf.jabref.logic.labelpattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -759,7 +759,7 @@ public class LabelPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                LinkedHashSet<String> separatedKeywords = entry.getKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
@@ -775,7 +775,7 @@ public class LabelPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                LinkedHashSet<String> separatedKeywords = entry.getKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
                 for (String keyword : separatedKeywords) {

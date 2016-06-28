@@ -1,6 +1,7 @@
 package net.sf.jabref.model.entry;
 
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class EntryUtil {
@@ -26,7 +27,7 @@ public class EntryUtil {
      * @param keywordString a String of keywords
      * @return an List containing the keywords. An empty list if keywords are null or empty
      */
-    public static LinkedHashSet<String> getSeparatedKeywords(String keywordString) {
+    public static Set<String> getSeparatedKeywords(String keywordString) {
         LinkedHashSet<String> keywords = new LinkedHashSet<>();
         if (keywordString == null) {
             return keywords;

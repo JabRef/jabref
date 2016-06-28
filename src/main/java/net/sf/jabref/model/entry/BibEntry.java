@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -562,7 +561,7 @@ public class BibEntry implements Cloneable {
             return;
         }
 
-        LinkedHashSet<String> keywords = this.getKeywords();
+        Set<String> keywords = this.getKeywords();
         keywords.add(keyword);
         this.putKeywords(keywords);
     }
@@ -580,7 +579,7 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public LinkedHashSet<String> getKeywords() {
+    public Set<String> getKeywords() {
         return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField(KEYWORDS_FIELD));
     }
 

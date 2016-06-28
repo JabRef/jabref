@@ -22,7 +22,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,9 +50,9 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -315,7 +314,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             Set<String> keywordsToRemove) {
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
-            LinkedHashSet<String> keywords = entry.getKeywords();
+            Set<String> keywords = entry.getKeywords();
 
             // update keywords
             keywords.removeAll(keywordsToRemove);
