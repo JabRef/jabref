@@ -1,9 +1,10 @@
 package net.sf.jabref.importer.fileformat;
 
+import java.util.Arrays;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
-import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
