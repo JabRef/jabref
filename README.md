@@ -35,7 +35,10 @@ JabRef can be run as a command line application to convert from any import forma
 ### Bug Reports, Suggestions, Other Feedback
 
 We are thankful for any bug reports or other feedback.
-If there are features you want included in JabRef, tell us!
+
+If there are features you want included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
+
+If you have questions regarding the usage, or you want to give general feedback the forum is also the right place for this: [discourse.jabref.org](http://discourse.jabref.org/c/features)
 
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to send in bug reports and suggestions.
 
