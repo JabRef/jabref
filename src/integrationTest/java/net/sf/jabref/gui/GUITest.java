@@ -10,6 +10,7 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.DialogFixture;
+import org.assertj.swing.timing.Pause;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -29,6 +30,7 @@ public class GUITest extends AbstractUITest {
         exitJabRef();
     }
 
+    @Ignore("Does not find main menu")
     @Test
     public void testCreateBibtexEntry() throws IOException {
         newDatabase();
@@ -41,7 +43,14 @@ public class GUITest extends AbstractUITest {
                         return "Book".equals(jButton.getText());
                     }
                 }).click();
+
+        // it takes some time until the entry editor is created and shown
+        Pause.pause(10_000);
+
         takeScreenshot(mainFrame, "MainWindowWithOneDatabase");
+
+        closeDatabase();
+        exitJabRef();
     }
 
     @Ignore
