@@ -127,7 +127,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoShow.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW));
         autoHide.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE));
-        keywordSeparator.setText(prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR));
+        keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
     }
 
@@ -140,7 +140,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.GROUP_AUTO_SHOW, autoShow.isSelected());
         prefs.putBoolean(JabRefPreferences.GROUP_AUTO_HIDE, autoHide.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
-        prefs.put(JabRefPreferences.GROUP_KEYWORD_SEPARATOR, keywordSeparator.getText());
+        prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());
     }
 
     @Override

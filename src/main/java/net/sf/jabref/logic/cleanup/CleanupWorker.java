@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class CleanupWorker {

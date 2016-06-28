@@ -521,7 +521,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         // Replace ; as keyword separator
         entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",
-                keys.replace(";", Globals.prefs.get(JabRefPreferences.GROUP_KEYWORD_SEPARATOR))));
+                keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }
 

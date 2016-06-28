@@ -32,7 +32,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.google.common.base.Strings;
@@ -46,6 +49,7 @@ public class BibEntry implements Cloneable {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
+    public static final String KEYWORDS_FIELD = "keywords";
     public static final String DEFAULT_TYPE = "misc";
 
     private String id;
@@ -334,20 +338,23 @@ public class BibEntry implements Cloneable {
 
     /**
      * Set a field, and notify listeners about the change.
-     *
-     * @param name  The field to set.
+     *  @param name  The field to set.
      * @param value The value to set.
      */
-    public void setField(String name, String value) {
+    public Optional<FieldChange> setField(String name, String value) {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
+        String fieldName = toLowerCase(name);
+
         if (value.isEmpty()) {
-            clearField(name);
-            return;
+            return clearField(fieldName);
         }
 
-        String fieldName = toLowerCase(name);
+        String oldValue = getField(fieldName);
+        if (value.equals(oldValue)) {
+            return Optional.empty();
+        }
 
         if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
@@ -356,7 +363,10 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.put(fieldName, value);
-        eventBus.post(new FieldChangedEvent(this, fieldName, value));
+
+        FieldChange change = new FieldChange(this, fieldName, oldValue, value);
+        eventBus.post(new FieldChangedEvent(change));
+        return Optional.of(change);
     }
 
     /**
@@ -365,16 +375,24 @@ public class BibEntry implements Cloneable {
      *
      * @param name The field to clear.
      */
-    public void clearField(String name) {
+    public Optional<FieldChange> clearField(String name) {
         String fieldName = toLowerCase(name);
-
-        changed = true;
 
         if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
+
+        Optional<String> oldValue = getFieldOptional(fieldName);
+        if (!oldValue.isPresent()) {
+            return Optional.empty();
+        }
+
+        changed = true;
+
         fields.remove(fieldName);
-        eventBus.post(new FieldChangedEvent(this, fieldName, null));
+        FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
+        eventBus.post(new FieldChangedEvent(change));
+        return Optional.of(change);
     }
 
     /**
@@ -513,25 +531,22 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    public void putKeywords(List<String> keywords) {
+    public Optional<FieldChange> putKeywords(Collection<String> keywords) {
         Objects.requireNonNull(keywords);
-        // Set Keyword Field
-        String oldValue = this.getField("keywords");
-        String newValue;
+        Optional<String> oldValue = this.getFieldOptional(KEYWORDS_FIELD);
+
         if (keywords.isEmpty()) {
-            newValue = null;
-        } else {
-            newValue = String.join(", ", keywords);
-        }
-        if (newValue == null) {
-            if (oldValue != null) {
-                this.clearField("keywords");
+            // Clear keyword field
+            if (oldValue.isPresent()) {
+                return this.clearField(KEYWORDS_FIELD);
+            } else {
+                return Optional.empty();
             }
-            return;
         }
-        if (!Objects.equals(oldValue, newValue)) {
-            this.setField("keywords", newValue);
-        }
+
+        // Set new keyword field
+        String newValue = String.join(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR), keywords);
+        return this.setField(KEYWORDS_FIELD, newValue);
     }
 
     /**
@@ -540,26 +555,15 @@ public class BibEntry implements Cloneable {
      * @param keyword Keyword to add
      */
     public void addKeyword(String keyword) {
-        Objects.requireNonNull(keyword, "keyword must not be empty");
+        Objects.requireNonNull(keyword, "keyword must not be null");
 
         if (keyword.isEmpty()) {
             return;
         }
 
-        List<String> keywords = this.getSeparatedKeywords();
-        Boolean duplicate = false;
-
-        for (String key : keywords) {
-            if (keyword.equalsIgnoreCase(key)) {
-                duplicate = true;
-                break;
-            }
-        }
-
-        if (!duplicate) {
-            keywords.add(keyword);
-            this.putKeywords(keywords);
-        }
+        Set<String> keywords = this.getKeywords();
+        keywords.add(keyword);
+        this.putKeywords(keywords);
     }
 
     /**
@@ -567,7 +571,7 @@ public class BibEntry implements Cloneable {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(List<String> keywords) {
+    public void addKeywords(Collection<String> keywords) {
         Objects.requireNonNull(keywords);
 
         for (String keyword : keywords) {
@@ -575,8 +579,8 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public List<String> getSeparatedKeywords() {
-        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField("keywords"));
+    public Set<String> getKeywords() {
+        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField(KEYWORDS_FIELD));
     }
 
     public Collection<String> getFieldValues() {

@@ -269,7 +269,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         showOverlappingGroups.addActionListener(e -> valueChanged(null));
         autoGroup.addActionListener(e -> {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel, groupsRoot,
-                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
+                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,",
+                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
             gd.setVisible(true);
             // gd does the operation itself
         });
