@@ -416,7 +416,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Unabbreviate journal names"),
             Localization.lang("Unabbreviate journal names of the selected entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.UNABBREVIATE));
-    private final AbstractAction manageJournals = new ManageJournalsAction(this);
+    private final AbstractAction manageJournals = new ManageJournalsAction();
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
     private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.getStreamEavesdropper(), GuiAppender.CACHE);

@@ -14,8 +14,8 @@
          <center>
             <TableView fx:id="journalAbbreviationsTable" styleClass="abbreviations-table" BorderPane.alignment="CENTER">
               <columns>
-                <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full_Journal_Name" />
-                <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation_Name" />
+                <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full journal name" />
+                <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name" />
                   <TableColumn fx:id="journalTableEditColumn" prefWidth="40.0" />
                   <TableColumn fx:id="journalTableDeleteColumn" prefWidth="40.0" />
               </columns>
@@ -25,7 +25,7 @@
             <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
                 <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
-                  <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save_Changes" />
+                  <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save changes" />
                   <Button fx:id="addAbbreviationButton" disable="true" mnemonicParsing="false" onAction="#addAbbreviation" text="+" />
               </buttons>
             </ButtonBar>
@@ -40,9 +40,9 @@
          <right>
             <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
-                  <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" text="%Create_new_list" />
-                <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" text="%Add_existing_file" />
-                  <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList" text="%Remove_list" />
+                  <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" text="%Create new list" />
+                <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" text="%Add existing file" />
+                  <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList" text="%Remove list" />
               </buttons>
             </ButtonBar>
          </right>

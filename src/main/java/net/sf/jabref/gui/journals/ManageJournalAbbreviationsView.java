@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.l10n.Localization;
@@ -179,8 +180,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         FileChooser chooser = new FileChooser();
         File file = chooser.showSaveDialog(null);
         if (file != null) {
-            viewModel.addNewFile(file);
-            journalFilesBox.getSelectionModel().selectLast();
+            try {
+                viewModel.addNewFile(file);
+                journalFilesBox.getSelectionModel().selectLast();
+            } catch (JabRefException e) {
+                showDuplicatedJournalFileErrorDialog();
+            }
         }
     }
 
@@ -189,8 +194,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         FileChooser chooser = new FileChooser();
         File file = chooser.showOpenDialog(null);
         if (file != null) {
-            viewModel.openFile(file);
-            journalFilesBox.getSelectionModel().selectLast();
+            try {
+                viewModel.openFile(file);
+                journalFilesBox.getSelectionModel().selectLast();
+            } catch (JabRefException e) {
+                showDuplicatedJournalFileErrorDialog();
+            }
         }
     }
 
@@ -206,89 +215,82 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void addAbbreviation() {
-        FXAlert alert = new FXAlert(AlertType.INFORMATION, "Create journal abbreviation");
-        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        GridPane content = createDialogContent();
 
-        TextField abbreviation = new TextField();
-        abbreviation.setPromptText("Abbreviation");
-
-        TextField name = new TextField();
-        name.setPromptText("Name");
-        name.requestFocus();
-
-        name.setMaxWidth(Double.MAX_VALUE);
-        name.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(name, Priority.ALWAYS);
-        GridPane.setHgrow(name, Priority.ALWAYS);
-
-        abbreviation.setMaxWidth(Double.MAX_VALUE);
-        abbreviation.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(abbreviation, Priority.ALWAYS);
-        GridPane.setHgrow(abbreviation, Priority.ALWAYS);
-
-        GridPane content = new GridPane();
-        content.setMaxWidth(Double.MAX_VALUE);
-        content.add(name, 0, 0);
-        content.add(abbreviation, 0, 1);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(content);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && (result.get() == ButtonType.OK)) {
-            viewModel.abbreviationsNameProperty().set(name.getText());
-            viewModel.abbreviationsAbbreviationProperty().set(abbreviation.getText());
-            try {
-                viewModel.addAbbreviation();
-            } catch (Exception e) {
-                FXAlert warningAlert = new FXAlert(AlertType.WARNING, "Duplicated Entry");
-                warningAlert.setHeaderText(null);
-                warningAlert.setContentText("Journal abbreviation already in this list.");
-                warningAlert.show();
-
+        DialogPane pane = new DialogPane();
+        pane.setContent(content);
+        Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(
+                Localization.lang("Create journal abbreviation"), pane, ButtonType.OK, ButtonType.CANCEL);
+        result.ifPresent((response -> {
+            if (response == ButtonType.OK) {
+                viewModel.abbreviationsNameProperty().set(((TextField) content.getChildren().get(0)).getText());
+                viewModel.abbreviationsAbbreviationProperty().set(((TextField) content.getChildren().get(1)).getText());
+                try {
+                    viewModel.addAbbreviation();
+                } catch (JabRefException e) {
+                    showDuplicatedEntryErrorDialog();
+                }
             }
-        }
+        }));
     }
 
     @FXML
     private void editAbbreviation() {
-        FXAlert alert = new FXAlert(AlertType.INFORMATION, "Edit journal abbreviation");
-        alert.getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+        GridPane content = createDialogContent();
 
-        TextField abbreviation = new TextField(viewModel.currentAbbreviationProperty().get().getAbbreviation());
-        abbreviation.setPromptText("Abbreviation");
+        DialogPane pane = new DialogPane();
+        pane.setContent(content);
+        Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(Localization.lang("Edit journal abbreviation"),
+                pane, ButtonType.OK, ButtonType.CANCEL);
+        result.ifPresent((response -> {
+            if (response == ButtonType.OK) {
+                viewModel.abbreviationsNameProperty().set(((TextField) content.getChildren().get(0)).getText());
+                viewModel.abbreviationsAbbreviationProperty().set(((TextField) content.getChildren().get(1)).getText());
+                try {
+                    viewModel.editAbbreviation();
+                } catch (JabRefException e) {
+                    showDuplicatedEntryErrorDialog();
+                }
+            }
+        }));
+    }
 
-        TextField name = new TextField(viewModel.currentAbbreviationProperty().get().getName());
-        name.setPromptText("Name");
-        name.requestFocus();
+    private GridPane createDialogContent() {
+        Abbreviation abbreviation = viewModel.currentAbbreviationProperty().get();
 
-        name.setMaxWidth(Double.MAX_VALUE);
-        name.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(name, Priority.ALWAYS);
-        GridPane.setHgrow(name, Priority.ALWAYS);
+        TextField abbreviationField = new TextField(abbreviation.getAbbreviation());
+        abbreviationField.setPromptText(Localization.lang("Abbreviation"));
 
-        abbreviation.setMaxWidth(Double.MAX_VALUE);
-        abbreviation.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(abbreviation, Priority.ALWAYS);
-        GridPane.setHgrow(abbreviation, Priority.ALWAYS);
+        TextField nameField = new TextField(abbreviation.getName());
+        nameField.setPromptText(Localization.lang("Name"));
+        nameField.requestFocus();
+
+        nameField.setMaxWidth(Double.MAX_VALUE);
+        nameField.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(nameField, Priority.ALWAYS);
+        GridPane.setHgrow(nameField, Priority.ALWAYS);
+
+        abbreviationField.setMaxWidth(Double.MAX_VALUE);
+        abbreviationField.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(abbreviationField, Priority.ALWAYS);
+        GridPane.setHgrow(abbreviationField, Priority.ALWAYS);
 
         GridPane content = new GridPane();
+        content.setVgap(5);
         content.setMaxWidth(Double.MAX_VALUE);
-        content.add(name, 0, 0);
-        content.add(abbreviation, 0, 1);
-        alert.setHeaderText(null);
-        alert.getDialogPane().setContent(content);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && (result.get() == ButtonType.OK)) {
-            viewModel.abbreviationsNameProperty().set(name.getText());
-            viewModel.abbreviationsAbbreviationProperty().set(abbreviation.getText());
-            try {
-                viewModel.editAbbreviation();
-            } catch (JabRefException e) {
-                FXAlert warningAlert = new FXAlert(AlertType.WARNING, "Duplicated Entry");
-                warningAlert.setHeaderText(null);
-                warningAlert.setContentText("Journal abbreviation already in this list.");
-                warningAlert.show();
-            }
-        }
+        content.add(nameField, 0, 0);
+        content.add(abbreviationField, 0, 1);
+        return content;
+    }
+
+    private void showDuplicatedEntryErrorDialog() {
+        FXDialogs.showErrorDialogAndWait(Localization.lang("Duplicated entry"),
+                Localization.lang("Journal abbreviation already exists in this list."));
+    }
+
+    private void showDuplicatedJournalFileErrorDialog() {
+        FXDialogs.showErrorDialogAndWait(Localization.lang("Duplicated journal file"),
+                Localization.lang("Journal abbreviation file already exists in this list."));
     }
 
     @FXML
