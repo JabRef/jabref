@@ -151,7 +151,13 @@ public class Version {
     }
 
     @Override
+    public int hashCode() {
+        return getFullVersion().hashCode();
+    }
+
+    @Override
     public String toString() {
         return this.getFullVersion();
     }
+
 }
