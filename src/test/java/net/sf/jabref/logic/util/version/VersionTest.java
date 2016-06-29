@@ -19,6 +19,12 @@ public class VersionTest {
     }
 
     @Test
+    public void initVersionFromWrongStringResultsInUnknownVersion() {
+        Version version = new Version("${version}");
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
     public void versionOneDigit() {
         String versionText = "1";
         Version version = new Version(versionText);
@@ -82,6 +88,14 @@ public class VersionTest {
         assertEquals(2, version.getMinor());
         assertEquals(3, version.getPatch());
         assertTrue(version.isDevelopmentVersion());
+    }
+
+    @Test
+    public void validVersionIsNotNewerThanUnknownVersion() {
+        // Reason: unknown version should only happen for developer builds where we don't want an update notification
+        Version unknownVersion = new Version(BuildInfo.UNKNOWN_VERSION);
+        Version validVersion = new Version("4.2");
+        assertFalse(validVersion.isNewerThan(unknownVersion));
     }
 
     @Test

@@ -23,6 +23,8 @@ import java.net.URLConnection;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
 /**
@@ -31,33 +33,34 @@ import org.json.JSONObject;
 public class Version {
 
     public final static String JABREF_DOWNLOAD_URL = "http://www.fosshub.com/JabRef.html";
+    private static final Log LOGGER = LogFactory.getLog(Version.class);
     private final static String JABREF_GITHUB_URL = "https://api.github.com/repos/JabRef/jabref/releases/latest";
 
-    private final String fullVersion;
-    private final int major;
-    private final int minor;
-    private final int patch;
-    private final boolean isDevelopmentVersion;
-
+    private String fullVersion = BuildInfo.UNKNOWN_VERSION;
+    private int major = 0;
+    private int minor = 0;
+    private int patch = 0;
+    private boolean isDevelopmentVersion = false;
 
     /**
      * @param version must be in form of X.X (eg 3.3; 3.4dev)
      */
     public Version(String version) {
         if (version == null || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)) {
-            this.fullVersion = BuildInfo.UNKNOWN_VERSION;
-            this.major = this.minor = this.patch = 0;
-            this.isDevelopmentVersion = false;
             return;
         }
 
-        this.fullVersion = version;
-        isDevelopmentVersion = version.contains("dev");
         String[] versionParts = version.split("dev");
         String[] versionNumbers = versionParts[0].split(Pattern.quote("."));
-        this.major = Integer.parseInt(versionNumbers[0]);
-        this.minor = versionNumbers.length >= 2 ? Integer.parseInt(versionNumbers[1]) : 0;
-        this.patch = versionNumbers.length >= 3 ? Integer.parseInt(versionNumbers[2]) : 0;
+        try {
+            this.major = Integer.parseInt(versionNumbers[0]);
+            this.minor = versionNumbers.length >= 2 ? Integer.parseInt(versionNumbers[1]) : 0;
+            this.patch = versionNumbers.length >= 3 ? Integer.parseInt(versionNumbers[2]) : 0;
+            this.fullVersion = version;
+            this.isDevelopmentVersion = version.contains("dev");
+        } catch (NumberFormatException exception) {
+            LOGGER.warn("Invalid version string used: " + version, exception);
+        }
     }
 
     /**
@@ -86,7 +89,7 @@ public class Version {
             return false;
         }
         if (otherVersion.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
-            return true;
+            return false;
         }
 
         if (this.getMajor() > otherVersion.getMajor()) {
