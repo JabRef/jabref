@@ -43,7 +43,7 @@ public class Version {
     private boolean isDevelopmentVersion = false;
 
     /**
-     * @param version must be in form of X.X (eg 3.3; 3.4dev)
+     * @param version must be in form of X.X (e.g., 3.3; 3.4dev)
      */
     public Version(String version) {
         if ((version == null) || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)) {
@@ -65,9 +65,6 @@ public class Version {
 
     /**
      * Grabs the latest release version from the JabRef GitHub repository
-     *
-     * @return
-     * @throws IOException
      */
     public static Version getLatestVersion() throws IOException {
         URLConnection connection = new URL(JABREF_GITHUB_URL).openConnection();
@@ -78,33 +75,29 @@ public class Version {
     }
 
     /**
-     * @return true if this version is newer than the passed one
+     * @return true iff this version is newer than the passed one
      */
     public boolean isNewerThan(Version otherVersion) {
         Objects.requireNonNull(otherVersion);
         if (Objects.equals(this, otherVersion)) {
             return false;
-        }
-        if (this.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
+        } else if (this.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
             return false;
-        }
-        if (otherVersion.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
+        } else if (otherVersion.getFullVersion().equals(BuildInfo.UNKNOWN_VERSION)) {
             return false;
-        }
-
-        if (this.getMajor() > otherVersion.getMajor()) {
+        } else if (this.getMajor() > otherVersion.getMajor()) {
             return true;
-        }
-        if (this.getMajor() == otherVersion.getMajor()) {
+        } else if (this.getMajor() == otherVersion.getMajor()) {
             if (this.getMinor() > otherVersion.getMinor()) {
                 return true;
-            }
-            if ((this.getMinor() == otherVersion.getMinor()) && (this.getPatch() > otherVersion.getPatch())) {
+            } else if ((this.getMinor() == otherVersion.getMinor()) && (this.getPatch() > otherVersion.getPatch())) {
                 return true;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public String getFullVersion() {
