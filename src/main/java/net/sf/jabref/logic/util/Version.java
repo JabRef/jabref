@@ -46,7 +46,7 @@ public class Version {
      * @param version must be in form of X.X (eg 3.3; 3.4dev)
      */
     public Version(String version) {
-        if (version == null || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)) {
+        if ((version == null) || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)) {
             return;
         }
 
@@ -99,7 +99,7 @@ public class Version {
             if (this.getMinor() > otherVersion.getMinor()) {
                 return true;
             }
-            if (this.getMinor() == otherVersion.getMinor() && this.getPatch() > otherVersion.getPatch()) {
+            if ((this.getMinor() == otherVersion.getMinor()) && (this.getPatch() > otherVersion.getPatch())) {
                 return true;
             }
         }

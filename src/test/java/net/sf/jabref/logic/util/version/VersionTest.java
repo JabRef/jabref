@@ -13,8 +13,23 @@ import static org.junit.Assert.assertTrue;
 public class VersionTest {
 
     @Test
-    public void unknownVersion() {
-        Version version = new Version(BuildInfo.UNKNOWN_VERSION);
+    public void unknownVersionAsString() {
+        String versionText = BuildInfo.UNKNOWN_VERSION;
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void unknownVersionAsNull() {
+        String versionText = null;
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void unknownVersionAsEmptyString() {
+        String versionText = "";
+        Version version = new Version(versionText);
         assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
     }
 
@@ -106,6 +121,27 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNotNewerThanSameVersion() {
+        Version version1 = new Version("4.2");
+        Version version2 = new Version("4.2");
+        assertFalse(version1.isNewerThan(version2));
+    }
+
+    @Test
+    public void concreteVersionNewerThanUnknownVersion() {
+        Version concreteVersion = new Version("4.2");
+        Version unknownVersion = new Version(BuildInfo.UNKNOWN_VERSION);
+        assertTrue(concreteVersion.isNewerThan(unknownVersion));
+    }
+
+    @Test
+    public void unknownVersionNotNewerThanConceteVersion() {
+        Version concreteVersion = new Version("4.2");
+        Version unknownVersion = new Version(BuildInfo.UNKNOWN_VERSION);
+        assertTrue(unknownVersion.isNewerThan(concreteVersion));
+    }
+
+    @Test
     public void versionNewerThanDevTwoDigits() {
         Version older = new Version("4.2");
         Version newer = new Version("4.3dev");
@@ -127,6 +163,20 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNotNewerPatch() {
+        Version older = new Version("4.2.1");
+        Version newer = new Version("4.2.2");
+        assertFalse(older.isNewerThan(newer));
+    }
+
+    @Test
+    public void equalVersionsNotNewer() {
+        Version version1 = new Version("4.2.2");
+        Version version2 = new Version("4.2.2");
+        assertTrue(version1.isNewerThan(version2));
+    }
+
+    @Test
     public void changelogWithTwoDigits(){
         Version version = new Version("3.4");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4/CHANGELOG.md", version.getChangelogUrl());
@@ -136,6 +186,27 @@ public class VersionTest {
     public void changelogWithThreeDigits(){
         Version version = new Version("3.4.1");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4.1/CHANGELOG.md", version.getChangelogUrl());
+    }
+
+    @Test
+    public void versionNotReplaced() {
+        String versionText = "${version}";
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void versionNull() {
+        String versionText = null;
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void versionEmpty() {
+        String versionText = "";
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
     }
 
 }
