@@ -90,10 +90,8 @@ public class Version {
         } else if (this.getMajor() == otherVersion.getMajor()) {
             if (this.getMinor() > otherVersion.getMinor()) {
                 return true;
-            } else if ((this.getMinor() == otherVersion.getMinor()) && (this.getPatch() > otherVersion.getPatch())) {
-                return true;
             } else {
-                return false;
+                return (this.getMinor() == otherVersion.getMinor()) && (this.getPatch() > otherVersion.getPatch());
             }
         } else {
             return false;
