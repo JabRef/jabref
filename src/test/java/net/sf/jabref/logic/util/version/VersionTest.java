@@ -153,6 +153,20 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNewerMinor() {
+        Version older = new Version("4.1");
+        Version newer = new Version("4.2.1");
+        assertTrue(newer.isNewerThan(older));
+    }
+
+    @Test
+    public void versionNotNewerMinor() {
+        Version older = new Version("4.1");
+        Version newer = new Version("4.2.1");
+        assertFalse(older.isNewerThan(newer));
+    }
+
+    @Test
     public void versionNewerPatch() {
         Version older = new Version("4.2.1");
         Version newer = new Version("4.2.2");
