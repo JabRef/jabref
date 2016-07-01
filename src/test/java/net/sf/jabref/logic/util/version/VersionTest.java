@@ -13,8 +13,26 @@ import static org.junit.Assert.assertTrue;
 public class VersionTest {
 
     @Test
-    public void unknownVersion() {
+    public void unknownVersionAsString() {
         Version version = new Version(BuildInfo.UNKNOWN_VERSION);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void unknownVersionAsNull() {
+        Version version = new Version(null);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void unknownVersionAsEmptyString() {
+        Version version = new Version("");
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void initVersionFromWrongStringResultsInUnknownVersion() {
+        Version version = new Version("${version}");
         assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
     }
 
@@ -85,10 +103,39 @@ public class VersionTest {
     }
 
     @Test
+    public void validVersionIsNotNewerThanUnknownVersion() {
+        // Reason: unknown version should only happen for developer builds where we don't want an update notification
+        Version unknownVersion = new Version(BuildInfo.UNKNOWN_VERSION);
+        Version validVersion = new Version("4.2");
+        assertFalse(validVersion.isNewerThan(unknownVersion));
+    }
+
+    @Test
+    public void unknownVersionIsNotNewerThanvalidVersion() {
+        Version unknownVersion = new Version(BuildInfo.UNKNOWN_VERSION);
+        Version validVersion = new Version("4.2");
+        assertFalse(unknownVersion.isNewerThan(validVersion));
+    }
+
+    @Test
     public void versionNewerThan() {
         Version olderVersion = new Version("2.4");
         Version newerVersion = new Version("4.2");
         assertTrue(newerVersion.isNewerThan(olderVersion));
+    }
+
+    @Test
+    public void versionNotNewerThan() {
+        Version olderVersion = new Version("2.4");
+        Version newerVersion = new Version("4.2");
+        assertFalse(olderVersion.isNewerThan(newerVersion));
+    }
+
+    @Test
+    public void versionNotNewerThanSameVersion() {
+        Version version1 = new Version("4.2");
+        Version version2 = new Version("4.2");
+        assertFalse(version1.isNewerThan(version2));
     }
 
     @Test
@@ -106,10 +153,38 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNewerMinor() {
+        Version older = new Version("4.1");
+        Version newer = new Version("4.2.1");
+        assertTrue(newer.isNewerThan(older));
+    }
+
+    @Test
+    public void versionNotNewerMinor() {
+        Version older = new Version("4.1");
+        Version newer = new Version("4.2.1");
+        assertFalse(older.isNewerThan(newer));
+    }
+
+    @Test
     public void versionNewerPatch() {
         Version older = new Version("4.2.1");
         Version newer = new Version("4.2.2");
         assertTrue(newer.isNewerThan(older));
+    }
+
+    @Test
+    public void versionNotNewerPatch() {
+        Version older = new Version("4.2.1");
+        Version newer = new Version("4.2.2");
+        assertFalse(older.isNewerThan(newer));
+    }
+
+    @Test
+    public void equalVersionsNotNewer() {
+        Version version1 = new Version("4.2.2");
+        Version version2 = new Version("4.2.2");
+        assertFalse(version1.isNewerThan(version2));
     }
 
     @Test
@@ -122,6 +197,20 @@ public class VersionTest {
     public void changelogWithThreeDigits(){
         Version version = new Version("3.4.1");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4.1/CHANGELOG.md", version.getChangelogUrl());
+    }
+
+    @Test
+    public void versionNull() {
+        String versionText = null;
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void versionEmpty() {
+        String versionText = "";
+        Version version = new Version(versionText);
+        assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
     }
 
 }
