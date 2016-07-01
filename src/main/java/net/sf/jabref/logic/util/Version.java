@@ -37,10 +37,10 @@ public class Version {
     private final static String JABREF_GITHUB_URL = "https://api.github.com/repos/JabRef/jabref/releases/latest";
 
     private String fullVersion = BuildInfo.UNKNOWN_VERSION;
-    private int major = 0;
-    private int minor = 0;
-    private int patch = 0;
-    private boolean isDevelopmentVersion = false;
+    private int major;
+    private int minor;
+    private int patch;
+    private boolean isDevelopmentVersion;
 
     /**
      * @param version must be in form of X.X (e.g., 3.3; 3.4dev)
