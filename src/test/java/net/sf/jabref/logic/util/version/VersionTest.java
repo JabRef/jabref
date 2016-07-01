@@ -125,6 +125,13 @@ public class VersionTest {
     }
 
     @Test
+    public void versionNotNewerThan() {
+        Version olderVersion = new Version("2.4");
+        Version newerVersion = new Version("4.2");
+        assertFalse(olderVersion.isNewerThan(newerVersion));
+    }
+
+    @Test
     public void versionNotNewerThanSameVersion() {
         Version version1 = new Version("4.2");
         Version version2 = new Version("4.2");
