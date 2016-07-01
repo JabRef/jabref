@@ -152,9 +152,7 @@ public class DBSynchronizerTest {
 
     @Test
     public void testSynchronizeLocalDatabase() {
-        List<BibEntry> expectedBibEntries = new ArrayList<>();
-        expectedBibEntries.add(getBibEntryExample(1));
-        expectedBibEntries.add(getBibEntryExample(2));
+        List<BibEntry> expectedBibEntries = Arrays.asList(getBibEntryExample(1), getBibEntryExample(2));
 
         dbProcessor.insertEntry(expectedBibEntries.get(0));
         dbProcessor.insertEntry(expectedBibEntries.get(1));
@@ -167,7 +165,7 @@ public class DBSynchronizerTest {
 
         dbProcessor.removeEntry(expectedBibEntries.get(0));
         dbProcessor.removeEntry(expectedBibEntries.get(1));
-        expectedBibEntries.clear();
+        expectedBibEntries = new ArrayList<>();
 
         dbSynchronizer.synchronizeLocalDatabase();
 

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,11 +88,7 @@ public class DBHelper {
      *  Useful to harmonize character case for different database systems (see {@link DBType}).
      */
     public Set<String> allToUpperCase(Set<String> stringSet) {
-        Set<String> upperCaseStringSet = new HashSet<>();
-        for (String string : stringSet) {
-            upperCaseStringSet.add(string.toUpperCase(Locale.ENGLISH));
-        }
-        return upperCaseStringSet;
+        return stringSet.stream().map(n -> n.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
     }
 
     /**

@@ -20,7 +20,6 @@ public class DBConnectorTest {
     public void testGetNewPostgreSQLConnection() {
         try {
             DBConnector.getNewConnection(DBType.POSTGRESQL, "localhost", "jabref", "postgres", "");
-
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }

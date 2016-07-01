@@ -209,20 +209,17 @@ public class DBProcessor {
         String query = "UPDATE " + escape(ENTRY) + " SET " + escape(ENTRY_ENTRYTYPE) + " = "
                 + escapeValue(bibEntry.getType());
 
-        List<String> fields = new ArrayList<>();
-        fields.addAll(bibEntry.getFieldNames());
-
-        List<String> emptyFields = new ArrayList<>();
-        emptyFields.addAll(getRemoteEntry(bibEntry.getRemoteId()).getFieldNames());
+        Set<String> fields = bibEntry.getFieldNames();
+        Set<String> emptyFields = getRemoteEntry(bibEntry.getRemoteId()).getFieldNames();
         emptyFields.removeAll(fields); // emptyFields now contains only fields which should be null.
 
-        for (int i = 0; i < emptyFields.size(); i++) {
-            query = query + ", " + escape(emptyFields.get(i).toUpperCase()) + " = NULL";
+        for (String emptyField : emptyFields) {
+            query = query + ", " + escape(emptyField.toUpperCase(Locale.ENGLISH)) + " = NULL";
         }
 
-        for (int i = 0; i < fields.size(); i++) {
-            query = query + ", " + escape(fields.get(i).toUpperCase()) + " = "
-                    + escapeValue(bibEntry.getField(fields.get(i)));
+        for (String field : fields) {
+            query = query + ", " + escape(field.toUpperCase(Locale.ENGLISH)) + " = "
+                    + escapeValue(bibEntry.getField(field));
         }
 
         query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
