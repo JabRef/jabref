@@ -333,7 +333,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
-        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+        GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
         this.getNode().addChild(newNode);
 
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,

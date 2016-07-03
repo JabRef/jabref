@@ -40,9 +40,13 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      *
      * @param group the group underlying this node
      */
-    public GroupTreeNode(AbstractGroup group) {
+    private GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
         setGroup(group);
+    }
+
+    public static GroupTreeNode fromGroup(AbstractGroup group) {
+        return new GroupTreeNode(group);
     }
 
     /**
@@ -229,7 +233,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup group) {
-        GroupTreeNode child = new GroupTreeNode(group);
+        GroupTreeNode child = GroupTreeNode.fromGroup(group);
         addChild(child);
         return child;
     }
@@ -241,7 +245,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     @Override
     public GroupTreeNode copyNode() {
-        return new GroupTreeNode(group);
+        return GroupTreeNode.fromGroup(group);
     }
 
     public static GroupTreeNode parse(List<String> orderedData) throws ParseException {

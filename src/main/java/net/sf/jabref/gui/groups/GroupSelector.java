@@ -355,7 +355,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
 
 
-        setGroups(new GroupTreeNode(new AllEntriesGroup()));
+        setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup()));
     }
 
     private void definePopup() {
@@ -838,7 +838,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 return; // ignore
             }
             final AbstractGroup newGroup = gd.getResultingGroup();
-            final GroupTreeNode newNode = new GroupTreeNode(newGroup);
+            final GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
             if (node == null) {
                 groupsRoot.getNode().addChild(newNode);
@@ -869,7 +869,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 return; // ignore
             }
             final AbstractGroup newGroup = gd.getResultingGroup();
-            final GroupTreeNode newNode = new GroupTreeNode(newGroup);
+            final GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
             node.getNode().addChild(newNode);
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
@@ -1219,7 +1219,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
         if (metaData.getGroups() == null) {
-            GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
+            GroupTreeNode newGroupsRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
         } else {

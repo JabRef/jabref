@@ -196,7 +196,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void writeGroups() throws IOException, ParseException {
-        GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
+        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
         groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING));
         metaData.setGroups(groupRoot);
 
@@ -215,8 +215,8 @@ public class BibDatabaseWriterTest {
     public void writeGroupsAndEncoding() throws IOException, ParseException {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
-        GroupTreeNode groupRoot = new GroupTreeNode(new AllEntriesGroup());
-        groupRoot.addChild(new GroupTreeNode(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
+        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
         metaData.setGroups(groupRoot);
 
         databaseWriter.writePartOfDatabase(stringWriter, bibtexContext, Collections.emptyList(), preferences);

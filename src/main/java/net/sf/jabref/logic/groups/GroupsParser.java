@@ -43,7 +43,7 @@ class GroupsParser {
             }
             int level = Integer.parseInt(string.substring(0, spaceIndex));
             AbstractGroup group = AbstractGroup.fromString(string.substring(spaceIndex + 1));
-            GroupTreeNode newNode = new GroupTreeNode(group);
+            GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
             if (cursor == null) {
                 // create new root
                 cursor = newNode;
