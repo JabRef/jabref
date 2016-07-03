@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.matchers.AndMatcher;
 import net.sf.jabref.logic.search.matchers.OrMatcher;
@@ -14,15 +16,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class GroupTreeNodeTest {
 
     private List<BibEntry> entries = new ArrayList<>();
+    private BibEntry entry;
 
     @Before
     public void setUp() throws Exception {
+        entries.clear();
+        entry = new BibEntry();
+        entries.add(entry);
         entries.add(new BibEntry().withField("author", "author1 and author2"));
         entries.add(new BibEntry().withField("author", "author1"));
+
+        Globals.prefs = JabRefPreferences.getInstance();
     }
 
 
@@ -227,5 +237,75 @@ public class GroupTreeNodeTest {
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT));
         assertEquals(2, node.numberOfHits(entries));
+    }
+
+    @Test
+    public void setGroupChangesUnderlyingGroup() throws Exception {
+        GroupTreeNode node = getNodeInSimpleTree();
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertEquals(newGroup, node.getGroup());
+    }
+
+    @Test
+    public void setGroupAddsPreviousAssignmentsExplicitToExplicit() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = new GroupTreeNode(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertTrue(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupWithFalseDoesNotAddsPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = new GroupTreeNode(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, false, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupAddsOnlyPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        assertFalse(oldGroup.isMatch(entry));
+        GroupTreeNode node = new GroupTreeNode(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupExplicitToSearchDoesNotKeepPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = new GroupTreeNode(oldGroup);
+        AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupExplicitToExplicitIsRenameAndSoRemovesPreviousAssignment() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = new GroupTreeNode(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(oldGroup.isMatch(entry));
     }
 }

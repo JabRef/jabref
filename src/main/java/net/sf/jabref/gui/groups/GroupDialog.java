@@ -22,9 +22,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -37,7 +34,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -45,7 +41,6 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
-import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -56,7 +51,6 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.KeywordGroup;
@@ -64,7 +58,6 @@ import net.sf.jabref.logic.groups.SearchGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -120,13 +113,7 @@ class GroupDialog extends JDialog {
 
     private boolean mOkPressed;
 
-    private final BasePanel m_basePanel;
-
     private AbstractGroup mResultingGroup;
-
-    private AbstractUndoableEdit mUndoAddPreviousEntires;
-
-    private final AbstractGroup m_editedGroup;
 
     private final CardLayout m_optionsLayout = new CardLayout();
 
@@ -141,8 +128,6 @@ class GroupDialog extends JDialog {
     public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
             AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
-        m_basePanel = basePanel;
-        m_editedGroup = editedGroup;
 
         // set default values (overwritten if editedGroup != null)
         m_kgSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -172,7 +157,7 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(m_kgSearchTerm);
-        builderKG.append(new FieldContentSelector(jabrefFrame, m_basePanel, this,
+        builderKG.append(new FieldContentSelector(jabrefFrame, basePanel, this,
                 m_kgSearchTerm, null, true, ", "));
         builderKG.nextLine();
         builderKG.append(m_kgCaseSensitive, 3);
@@ -295,27 +280,13 @@ class GroupDialog extends JDialog {
                 mOkPressed = true;
             try {
                 if (m_explicitRadioButton.isSelected()) {
-                    if (m_editedGroup instanceof ExplicitGroup) {
-                        // keep assignments from possible previous ExplicitGroup
-                        mResultingGroup = m_editedGroup.deepCopy();
-                        mResultingGroup.setName(m_name.getText().trim());
-                        mResultingGroup.setHierarchicalContext(getContext());
-                    } else {
-                        mResultingGroup = new ExplicitGroup(m_name.getText().trim(), getContext());
-                        if (m_editedGroup != null) {
-                            addPreviousEntries();
-                        }
-                    }
+                    mResultingGroup = new ExplicitGroup(m_name.getText().trim(), getContext());
                 } else if (m_keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     mResultingGroup = new KeywordGroup(m_name.getText().trim(), m_kgSearchField.getText().trim(),
                             m_kgSearchTerm.getText().trim(), m_kgCaseSensitive.isSelected(), m_kgRegExp.isSelected(),
                             getContext());
-                    if (((m_editedGroup instanceof ExplicitGroup) || (m_editedGroup instanceof SearchGroup))
-                            && mResultingGroup.supportsAdd()) {
-                        addPreviousEntries();
-                    }
                 } else if (m_searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
@@ -462,40 +433,6 @@ class GroupDialog extends JDialog {
         return m_sgCaseSensitive.isSelected();
     }
 
-    /**
-     * This is used when a group is converted and the new group supports
-     * explicit adding of entries: All entries that match the previous group are
-     * added to the new group.
-     */
-    private void addPreviousEntries() {
-        int i = JOptionPane.showConfirmDialog(m_basePanel.frame(),
-                Localization.lang("Assign the original group's entries to this group?"),
-                Localization.lang("Change of Grouping Method"),
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-        if (i == JOptionPane.NO_OPTION) {
-            return;
-        }
-        List<BibEntry> list = new ArrayList<>();
-        for (BibEntry entry : m_basePanel.getDatabase().getEntries()) {
-            if (m_editedGroup.contains(entry)) {
-                list.add(entry);
-            }
-        }
-        if (!list.isEmpty()) {
-            if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mResultingGroup, this)) {
-                return;
-            }
-            // the undo information for a conversion to an ExplicitGroup is
-            // contained completely in the UndoableModifyGroup object.
-            if (!(mResultingGroup instanceof ExplicitGroup) && mResultingGroup.supportsAdd()) {
-                Optional<EntriesGroupChange> addChange = mResultingGroup.add(list);
-                if(addChange.isPresent()) {
-                    mUndoAddPreviousEntires = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
-                }
-            }
-        }
-    }
-
     private void setDescription(String description) {
         m_description.setText("<html>" + description + "</html>");
     }
@@ -524,14 +461,6 @@ class GroupDialog extends JDialog {
             return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
         }
         return s;
-    }
-
-    /**
-     * Returns an undo object for adding the edited group's entries to the new
-     * group, or null if this did not occur.
-     */
-    public AbstractUndoableEdit getUndoForAddPreviousEntries() {
-        return mUndoAddPreviousEntires;
     }
 
     /**
