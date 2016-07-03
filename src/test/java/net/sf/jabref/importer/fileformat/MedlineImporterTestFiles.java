@@ -19,7 +19,6 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -61,7 +60,6 @@ public class MedlineImporterTestFiles {
     }
 
     @Test
-    @Ignore
     public void testImportEntries() throws IOException {
             List<BibEntry> medlineEntries = medlineImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase().getEntries();
             String bibFileName = importFile.getFileName().toString().replace(".xml", ".bib");
