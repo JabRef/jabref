@@ -110,7 +110,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             protected void updateItem(String item, boolean isEmpty) {
                 super.updateItem(item, isEmpty);
                 if (!isEmpty) {
-                    Text graphic = new Text(IconTheme.JabRefIcon.REMOVE.getCode());
+                    Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
                     graphic.getStyleClass().add("icon");
                     setGraphic(graphic);
                     setOnMouseClicked(evt -> {
@@ -167,7 +167,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         File file = chooser.showSaveDialog(null);
         if (file != null) {
             try {
-                viewModel.addNewFile(file);
+                viewModel.addNewFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
             } catch (JabRefException e) {
                 showDuplicatedJournalFileErrorDialog();
@@ -181,7 +181,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         File file = chooser.showOpenDialog(null);
         if (file != null) {
             try {
-                viewModel.openFile(file);
+                viewModel.openFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
             } catch (JabRefException e) {
                 showDuplicatedJournalFileErrorDialog();

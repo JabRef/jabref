@@ -32,6 +32,7 @@ import net.sf.jabref.logic.journals.Abbreviation;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import org.assertj.core.util.Files;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,11 +52,13 @@ public class ManageJournalAbbreviationsTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    private File emptyTestFile;
-    private File testFile1Entries;
-    private File testFile3Entries;
-    private File testFile4Entries;
-    private File testFile5EntriesWithDuplicate;
+    private String emptyTestFile;
+    private String testFile1Entries;
+    private String testFile3Entries;
+    private String testFile4Entries;
+    private String testFile5EntriesWithDuplicate;
+
+    private final static JabRefPreferences backupPreferences = Globals.prefs;
 
 
     @BeforeClass
@@ -79,6 +82,11 @@ public class ManageJournalAbbreviationsTest {
                 "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE + "Test Entry = TE"
                         + Globals.NEWLINE + "MoreEntries = ME" + Globals.NEWLINE + "EntryEntry = EE" + Globals.NEWLINE
                         + "");
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        Globals.prefs = backupPreferences;
     }
 
     @Test
@@ -108,7 +116,7 @@ public class ManageJournalAbbreviationsTest {
         int size = viewModel.journalFilesProperty().size();
 
         // simulate add new file button
-        savelyAddNewFileToViewModel(new File("newTestFile.txt"));
+        savelyAddNewFileToViewModel("newTestFile.txt");
 
         // size of the list of journal files should be incremented by one
         Assert.assertEquals(size + 1, viewModel.journalFilesProperty().size());
@@ -217,7 +225,7 @@ public class ManageJournalAbbreviationsTest {
         Assert.assertTrue(viewModel.abbreviationsProperty().contains(testAbbreviation));
 
         // simulate add new file button
-        savelyAddNewFileToViewModel(new File("newTestFile.txt"));
+        savelyAddNewFileToViewModel("newTestFile.txt");
         size++;
         viewModel.changeActiveFile(viewModel.journalFilesProperty().get(2));
 
@@ -417,12 +425,12 @@ public class ManageJournalAbbreviationsTest {
 
         String expected = "YetAnotherEntry = YAE" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE
                 + "MoreEntries = ME" + Globals.NEWLINE + "Entry = E" + Globals.NEWLINE + "";
-        String actual = Files.contentOf(testFile4Entries, StandardCharsets.UTF_8);
+        String actual = Files.contentOf(new File(testFile4Entries), StandardCharsets.UTF_8);
         Assert.assertEquals(expected, actual);
 
         expected = "Test Entry = TE" + Globals.NEWLINE + "MoreEntries = ME" + Globals.NEWLINE + "EntryEntry = EE"
                 + Globals.NEWLINE + "SomeOtherEntry = SOE" + Globals.NEWLINE + "";
-        actual = Files.contentOf(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
+        actual = Files.contentOf(new File(testFile5EntriesWithDuplicate), StandardCharsets.UTF_8);
         Assert.assertEquals(expected, actual);
     }
 
@@ -430,8 +438,8 @@ public class ManageJournalAbbreviationsTest {
     public void testSaveExternalFilesListToPreferences() {
         saveFilesToPreferences();
 
-        List<String> expected = Arrays.asList(testFile1Entries.getAbsolutePath(), testFile3Entries.getAbsolutePath(),
-                testFile4Entries.getAbsolutePath(), testFile5EntriesWithDuplicate.getAbsolutePath());
+        List<String> expected = Arrays.asList(testFile1Entries, testFile3Entries, testFile4Entries,
+                testFile5EntriesWithDuplicate);
         List<String> actual = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         Assert.assertEquals(expected, actual);
     }
@@ -452,7 +460,7 @@ public class ManageJournalAbbreviationsTest {
         Assert.assertEquals(testFile, viewModel.currentFileProperty().get());
     }
 
-    private File createTemporaryTestFile(String name, String content) {
+    private String createTemporaryTestFile(String name, String content) {
         File testFile = null;
         try {
             testFile = tempFolder.newFile(name);
@@ -462,7 +470,7 @@ public class ManageJournalAbbreviationsTest {
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
         }
-        return testFile;
+        return testFile.getAbsolutePath();
     }
 
     private void addAbbrevaition(Abbreviation testAbbreviation) throws JabRefException {
@@ -492,9 +500,9 @@ public class ManageJournalAbbreviationsTest {
      *
      * @param fileToAdd to the view model
      */
-    private void savelyAddNewFileToViewModel(File fileToAdd) {
+    private void savelyAddNewFileToViewModel(String path) {
         try {
-            viewModel.addNewFile(fileToAdd);
+            viewModel.addNewFile(path);
         } catch (JabRefException e) {
             Assert.fail("The same file has been opened/created multiple times.");
         }

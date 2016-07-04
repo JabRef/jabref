@@ -61,7 +61,7 @@ public class ManageJournalAbbreviationsViewModel {
         List<String> externalFiles = Globals.prefs.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
         externalFiles.forEach(name -> {
             try {
-                openFile(new File(name));
+                openFile(name);
             } catch (JabRefException e) {
                 logger.debug(e);
             }
@@ -73,11 +73,11 @@ public class ManageJournalAbbreviationsViewModel {
      * set of journal abbreviation files. It basically just calls the
      * {@link #openFile(File file)} method
      *
-     * @param file object to be created
+     * @param filePath where the new file should be written to
      * @throws JabRefException if journal file with same path is already open
      */
-    public void addNewFile(File file) throws JabRefException {
-        openFile(file);
+    public void addNewFile(String filePath) throws JabRefException {
+        openFile(filePath);
     }
 
     /**
@@ -86,11 +86,11 @@ public class ManageJournalAbbreviationsViewModel {
      * If the file also exists its abbreviations will be read and written
      * to the abbreviations property.
      *
-     * @param file to be opened
+     * @param filePath to the file
      * @throws JabRefException if journal file with same path is already open
      */
-    public void openFile(File file) throws JabRefException {
-        AbbreviationsFile abbreviationsFile = new AbbreviationsFile(file);
+    public void openFile(String filePath) throws JabRefException {
+        AbbreviationsFile abbreviationsFile = new AbbreviationsFile(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             throw new JabRefException("Duplicated Journal File");
         }
