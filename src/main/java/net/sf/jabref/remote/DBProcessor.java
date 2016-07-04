@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.event.location.EntryEventTargetScope;
+import net.sf.jabref.event.scope.EntryEventScope;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Localization;
@@ -322,7 +322,7 @@ public class DBProcessor {
                     } else {
                         String value = resultSet.getString(column);
                         if (value != null) {
-                            bibEntry.setField(column.toLowerCase(Locale.ENGLISH), value, EntryEventTargetScope.LOCAL);
+                            bibEntry.setField(column.toLowerCase(Locale.ENGLISH), value, EntryEventScope.LOCAL);
                         }
                     }
                 }

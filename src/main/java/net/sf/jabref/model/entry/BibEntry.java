@@ -37,7 +37,7 @@ import java.util.TreeSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.event.location.EntryEventTargetScope;
+import net.sf.jabref.event.scope.EntryEventScope;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -354,7 +354,7 @@ public class BibEntry implements Cloneable {
      * @param value The value to set.
      * @param eventLocation Event location affected while setting the field
      */
-    public Optional<FieldChange>  setField(String name, String value, EntryEventTargetScope eventLocation) {
+    public Optional<FieldChange>  setField(String name, String value, EntryEventScope eventLocation) {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
@@ -390,7 +390,7 @@ public class BibEntry implements Cloneable {
      * @param value The value to set.
      */
     public Optional<FieldChange> setField(String name, String value) {
-        return setField(name, value, EntryEventTargetScope.LOCAL_AND_REMOTE);
+        return setField(name, value, EntryEventScope.LOCAL_AND_REMOTE);
     }
 
     /**

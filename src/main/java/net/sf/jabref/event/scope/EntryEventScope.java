@@ -13,12 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.event.location;
+package net.sf.jabref.event.scope;
 
 /**
  * This enum represents the scope which is affected by posting EntryEvents.
  */
-public enum EntryEventTargetScope {
+public enum EntryEventScope {
+    LOCAL,
     LOCAL_AND_REMOTE,
-    LOCAL
+    UNDO
 }

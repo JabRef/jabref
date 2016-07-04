@@ -1,6 +1,6 @@
 package net.sf.jabref.event;
 
-import net.sf.jabref.event.location.EntryEventTargetScope;
+import net.sf.jabref.event.scope.EntryEventScope;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -21,7 +21,7 @@ public class EntryRemovedEvent extends EntryEvent {
      * @param bibEntry <code>BibEntry</code> object which has been removed.
      * @param location Location affected by this event
      */
-    public EntryRemovedEvent(BibEntry bibEntry, EntryEventTargetScope location) {
+    public EntryRemovedEvent(BibEntry bibEntry, EntryEventScope location) {
         super(bibEntry, location);
     }
 
