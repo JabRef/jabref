@@ -67,7 +67,6 @@ public class DBSynchronizer {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
-        System.out.println(">>> " + this.metaData.getAsStringMap());
     }
 
     /**
