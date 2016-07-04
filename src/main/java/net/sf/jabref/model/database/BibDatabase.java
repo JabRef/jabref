@@ -210,31 +210,6 @@ public class BibDatabase {
     }
 
     /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
-     *
-     * @param entry  the entry to insert into the database
-     * @param isUndo set to true if the insertion is caused by an undo
-     * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
-     */
-    public synchronized boolean insertEntry(BibEntry entry, boolean isUndo) throws KeyCollisionException {
-        Objects.requireNonNull(entry);
-
-        String id = entry.getId();
-        if (containsEntryWithId(id)) {
-            throw new KeyCollisionException("ID is already in use, please choose another");
-        }
-
-        internalIDs.add(id);
-        entries.add(entry);
-        entry.registerListener(this);
-
-        eventBus.post(new EntryAddedEvent(entry, isUndo));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
-    }
-
-    /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
      * @param toBeDeleted Entry to delete
