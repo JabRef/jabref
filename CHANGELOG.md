@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
+- [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system should be consistent
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
