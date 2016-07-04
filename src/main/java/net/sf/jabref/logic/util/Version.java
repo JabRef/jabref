@@ -32,9 +32,9 @@ import org.json.JSONObject;
  */
 public class Version {
 
-    public final static String JABREF_DOWNLOAD_URL = "http://www.fosshub.com/JabRef.html";
+    public static final String JABREF_DOWNLOAD_URL = "http://www.fosshub.com/JabRef.html";
     private static final Log LOGGER = LogFactory.getLog(Version.class);
-    private final static String JABREF_GITHUB_URL = "https://api.github.com/repos/JabRef/jabref/releases/latest";
+    private static final String JABREF_GITHUB_URL = "https://api.github.com/repos/JabRef/jabref/releases/latest";
 
     private String fullVersion = BuildInfo.UNKNOWN_VERSION;
     private int major;

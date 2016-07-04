@@ -17,7 +17,6 @@ package net.sf.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
@@ -39,7 +38,7 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if ("all".equals(field.toLowerCase(Locale.ENGLISH))) {
+        if ("all".equalsIgnoreCase(field)) {
             return cleanupAllFields(entry);
         } else {
             return cleanupSingleField(field, entry);

@@ -263,6 +263,8 @@ public class MedlinePlainImporter extends ImportFormat {
         case "overall":
             theType = "proceedings";
             break;
+        default:
+            break;
         }
         if ("".equals(theType)) {
             theType = "other";

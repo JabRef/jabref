@@ -31,11 +31,9 @@ public class EntrySorter {
 
     // guarded by itself
     private final List<BibEntry> entries;
-    private final Comparator<BibEntry> comp;
 
     public EntrySorter(List<BibEntry> entries, Comparator<BibEntry> comparator) {
         this.entries = new ArrayList<>(entries);
-        this.comp = comparator;
         Collections.sort(this.entries, comparator);
     }
 

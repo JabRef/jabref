@@ -160,7 +160,7 @@ public class KeywordGroup extends AbstractGroup {
             return Optional.empty();
         }
 
-        if ((entriesToRemove != null) && (entriesToRemove.size() > 0)) {
+        if ((entriesToRemove != null) && (!entriesToRemove.isEmpty())) {
             List<FieldChange> changes = new ArrayList<>();
             boolean modified = false;
             for (BibEntry entry : entriesToRemove) {
