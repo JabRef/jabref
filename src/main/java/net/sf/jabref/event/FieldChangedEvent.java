@@ -1,6 +1,6 @@
 package net.sf.jabref.event;
 
-import net.sf.jabref.event.location.EntryEventLocation;
+import net.sf.jabref.event.location.EntryEventTargetScope;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -29,14 +29,14 @@ public class FieldChangedEvent extends EntryChangedEvent {
      * @param newValue new field value
      * @param location location Location affected by this event
      */
-    public FieldChangedEvent(FieldChange fieldChange, EntryEventLocation location) {
+    public FieldChangedEvent(FieldChange fieldChange, EntryEventTargetScope location) {
         super(fieldChange.getEntry(), location);
         this.fieldName = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
-        this(fieldChange, EntryEventLocation.ALL);
+        this(fieldChange, EntryEventTargetScope.LOCAL_AND_REMOTE);
     }
 
     public String getFieldName() {

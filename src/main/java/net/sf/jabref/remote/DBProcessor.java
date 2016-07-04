@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.event.location.EntryEventLocation;
+import net.sf.jabref.event.location.EntryEventTargetScope;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Localization;
@@ -322,7 +322,7 @@ public class DBProcessor {
                     } else {
                         String value = resultSet.getString(column);
                         if (value != null) {
-                            bibEntry.setField(column.toLowerCase(Locale.ENGLISH), value, EntryEventLocation.LOCAL);
+                            bibEntry.setField(column.toLowerCase(Locale.ENGLISH), value, EntryEventTargetScope.LOCAL);
                         }
                     }
                 }
@@ -346,7 +346,7 @@ public class DBProcessor {
             String field = "";
             List<String> orderedData = new ArrayList<>();
 
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 if (!metaKey.equals(resultSet.getString(METADATA_KEY))) {
                     if (!orderedData.isEmpty()) {
                         metaData.put(metaKey, new ArrayList<>(orderedData));
@@ -361,7 +361,8 @@ public class DBProcessor {
                         orderedData.add(resultSet.getString(METADATA_VALUE));
                     } else {
                         if (field.isEmpty()) {
-                            orderedData.add(resultSet.getString(METADATA_FIELD) + "[" + resultSet.getString(METADATA_VALUE) + "]");
+                            orderedData.add(resultSet.getString(METADATA_FIELD) + "["
+                                    + resultSet.getString(METADATA_VALUE) + "]");
                         } else if (!field.equals(resultSet.getString(METADATA_FIELD))) {
                             String value = orderedData.remove(orderedData.size() - 1);
                             value = value + "\n" + resultSet.getString(METADATA_FIELD) + "[" + resultSet.getString(METADATA_VALUE) + "]";

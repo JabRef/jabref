@@ -25,7 +25,7 @@ import net.sf.jabref.event.EntryEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.event.location.EntryEventLocation;
+import net.sf.jabref.event.location.EntryEventTargetScope;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -67,6 +67,7 @@ public class DBSynchronizer {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
+        System.out.println(">>> " + this.metaData.getAsStringMap());
     }
 
     /**
@@ -145,7 +146,7 @@ public class DBSynchronizer {
                 }
             }
             if (!match) {
-                bibDatabase.removeEntry(localEntry, EntryEventLocation.LOCAL); // Should not reach the listeners above.
+                bibDatabase.removeEntry(localEntry, EntryEventTargetScope.LOCAL); // Should not reach the listeners above.
                 i--; // due to index shift on localEntries
             }
         }
@@ -159,12 +160,12 @@ public class DBSynchronizer {
                     match = true;
                     Set<String> fields = remoteEntry.getFieldNames();
                     for (String field : fields) {
-                        localEntry.setField(field, remoteEntry.getField(field), EntryEventLocation.LOCAL); // Should not reach the listeners above.
+                        localEntry.setField(field, remoteEntry.getField(field), EntryEventTargetScope.LOCAL); // Should not reach the listeners above.
                     }
                 }
             }
             if (!match) {
-                bibDatabase.insertEntry(remoteEntry, EntryEventLocation.LOCAL); // Should not reach the listeners above.
+                bibDatabase.insertEntry(remoteEntry, EntryEventTargetScope.LOCAL); // Should not reach the listeners above.
             }
         }
     }
@@ -194,13 +195,13 @@ public class DBSynchronizer {
     }
 
     /**
-     * Checks whether the {@link EntryEventLocation} of an {@link EntryEvent} is crucial for this class.
+     * Checks whether the {@link EntryEventTargetScope} of an {@link EntryEvent} is crucial for this class.
      * @param event An {@link EntryEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBSynchronizer}, else <code>false</code>
      */
     public boolean isInEventLocation(EntryEvent event) {
-        EntryEventLocation eventLocation = event.getEntryEventLocation();
-        return ((eventLocation == EntryEventLocation.REMOTE) || (eventLocation == EntryEventLocation.ALL));
+        EntryEventTargetScope eventLocation = event.getEntryEventLocation();
+        return (eventLocation == EntryEventTargetScope.LOCAL_AND_REMOTE);
     }
 
     public void setUp(Connection connection, DBType dbType, String dbName) {

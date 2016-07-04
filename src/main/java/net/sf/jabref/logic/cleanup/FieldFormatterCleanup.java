@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.event.location.EntryEventLocation;
+import net.sf.jabref.event.location.EntryEventTargetScope;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -71,7 +71,7 @@ public class FieldFormatterCleanup implements CleanupJob {
                 entry.clearField(fieldKey);
                 newValue = null;
             } else {
-                entry.setField(fieldKey, newValue, EntryEventLocation.LOCAL);
+                entry.setField(fieldKey, newValue, EntryEventTargetScope.LOCAL);
             }
             FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
             return Collections.singletonList(change);

@@ -47,7 +47,7 @@ import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.event.location.EntryEventLocation;
+import net.sf.jabref.event.location.EntryEventTargetScope;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
@@ -182,7 +182,7 @@ public class BibDatabase {
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntryEventLocation.ALL);
+        return insertEntry(entry, EntryEventTargetScope.LOCAL_AND_REMOTE);
     }
 
     /**
@@ -193,7 +193,7 @@ public class BibDatabase {
      * @param eventLocation Event location which is affected by inserting a new entry
      * @return false if the insert was done without a duplicate warning
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventLocation eventLocation)
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventTargetScope eventLocation)
             throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
@@ -240,7 +240,7 @@ public class BibDatabase {
      * @param toBeDeleted Entry to delete
      */
     public synchronized void removeEntry(BibEntry toBeDeleted) {
-        removeEntry(toBeDeleted, EntryEventLocation.ALL);
+        removeEntry(toBeDeleted, EntryEventTargetScope.LOCAL_AND_REMOTE);
     }
 
     /**
@@ -249,7 +249,7 @@ public class BibDatabase {
      * @param toBeDeleted Entry to delete
      * @param eventLocation Event location which is affected by deleting the entry
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventLocation eventLocation) {
+    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventTargetScope eventLocation) {
         Objects.requireNonNull(toBeDeleted);
 
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));

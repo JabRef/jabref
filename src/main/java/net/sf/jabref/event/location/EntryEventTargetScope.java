@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -16,10 +16,9 @@
 package net.sf.jabref.event.location;
 
 /**
- * This enum entries represent the radius which is affected by posting different EntryEvents.
+ * This enum represents the scope which is affected by posting EntryEvents.
  */
-public enum EntryEventLocation {
-    ALL,
-    REMOTE,
+public enum EntryEventTargetScope {
+    LOCAL_AND_REMOTE,
     LOCAL
 }
