@@ -47,7 +47,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
     @Override
     public void run() {
-        // Find all multiple occurences of BibTeX keys.
+        // Find all multiple occurrences of BibTeX keys.
         dupes = new HashMap<>();
 
         Map<String, BibEntry> foundKeys = new HashMap<>();
@@ -99,6 +99,8 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         toGenerateFor.add(dupeEntry.getValue().get(i));
                     }
                 }
+            } else if (rdld.isCancelPressed()) {
+                break;
             }
         }
 

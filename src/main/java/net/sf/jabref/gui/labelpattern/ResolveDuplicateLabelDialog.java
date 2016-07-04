@@ -51,6 +51,7 @@ class ResolveDuplicateLabelDialog {
     private final JDialog diag;
     private final List<JCheckBox> cbs = new ArrayList<>();
     private boolean okPressed;
+    private boolean cancelPressed;
 
     private static final String LAYOUT = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
             "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +
@@ -78,15 +79,10 @@ class ResolveDuplicateLabelDialog {
         int row = 3;
         for (BibEntry entry : entries) {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
-            //JPanel pan = new JPanel();
-            //pan.setLayout(new BorderLayout());
-            //pan.add(cb, BorderLayout.NORTH);
-            //cb.add(new JPanel(), BorderLayout.CENTER);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
             PreviewPanel pp = new PreviewPanel(null, entry, null, ResolveDuplicateLabelDialog.LAYOUT);
             pp.setPreferredSize(new Dimension(800, 90));
-            //pp.setBorder(BorderFactory.createEtchedBorder());
             b.add(new JScrollPane(pp)).xy(3, row);
             row += 2;
             cbs.add(cb);
@@ -97,6 +93,8 @@ class ResolveDuplicateLabelDialog {
         bb.addGlue();
         JButton ok = new JButton(Localization.lang("OK"));
         bb.addButton(ok);
+        JButton ignore = new JButton(Localization.lang("Ignore"));
+        bb.addButton(ignore);
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addGlue();
@@ -112,11 +110,13 @@ class ResolveDuplicateLabelDialog {
                 diag.dispose();
         });
 
+        ignore.addActionListener(e -> diag.dispose());
 
         AbstractAction closeAction = new AbstractAction() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                cancelPressed = true;
                 diag.dispose();
             }
         };
@@ -151,5 +151,9 @@ class ResolveDuplicateLabelDialog {
         okPressed = false;
         diag.setLocationRelativeTo(diag.getParent());
         diag.setVisible(true);
+    }
+
+    public boolean isCancelPressed() {
+        return cancelPressed;
     }
 }
