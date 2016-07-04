@@ -133,16 +133,20 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
-        String s1 = one.getField(field);
-        String s2 = two.getField(field);
-        if (s1 == null) {
-            if (s2 == null) {
+        Optional<String> os1 = one.getFieldOptional(field);
+        Optional<String> os2 = two.getFieldOptional(field);
+        if (!os1.isPresent()) {
+            if (!os2.isPresent()) {
                 return EMPTY_IN_BOTH;
             }
             return EMPTY_IN_ONE;
-        } else if (s2 == null) {
+        } else if (!os2.isPresent()) {
             return EMPTY_IN_TWO;
         }
+
+        // Both strings present
+        String s1 = os1.get();
+        String s2 = os2.get();
 
         if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
             // Specific for name fields.

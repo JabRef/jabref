@@ -78,26 +78,26 @@ public class AutoSetLinks {
             diag.setTitle(Localization.lang("Automatically setting file links"));
             diag.getContentPane().add(prog, BorderLayout.CENTER);
             diag.getContentPane().add(label, BorderLayout.SOUTH);
-    
+
             diag.pack();
             diag.setLocationRelativeTo(diag.getParent());
         }
-    
+
         Runnable r = new Runnable() {
-    
+
             @Override
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
                 List<String> dirsS = databaseContext.getFileDirectory();
                 dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
-    
+
                 // determine extensions
                 Collection<String> extensions = new ArrayList<>();
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }
-    
+
                 // Run the search operation:
                 Map<BibEntry, List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
@@ -106,17 +106,15 @@ public class AutoSetLinks {
                 } else {
                     result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
                 }
-    
+
                 boolean foundAny = false;
                 // Iterate over the entries:
                 for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    String oldVal = entryFilePair.getKey().getField(Globals.FILE_FIELD);
+                    Optional<String> oldVal = entryFilePair.getKey().getFieldOptional(Globals.FILE_FIELD);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
-                        if (oldVal != null) {
-                            tableModel.setContent(oldVal);
-                        }
+                        oldVal.ifPresent(tableModel::setContent);
                     } else {
                         assert entries.size() == 1;
                         tableModel = singleTableModel;
@@ -146,7 +144,7 @@ public class AutoSetLinks {
                             }
                             FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
-    
+
                             String newVal = tableModel.getStringRepresentation();
                             if (newVal.isEmpty()) {
                                 newVal = null;
@@ -154,7 +152,7 @@ public class AutoSetLinks {
                             if (ce != null) {
                                 // store undo information
                                 UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
-                                        Globals.FILE_FIELD, oldVal, newVal);
+                                        Globals.FILE_FIELD, oldVal.orElse(null), newVal);
                                 ce.addEdit(change);
                             }
                             // hack: if table model is given, do NOT modify entry
@@ -167,12 +165,12 @@ public class AutoSetLinks {
                         }
                     }
                 }
-    
+
                 // handle callbacks and dialog
                 // FIXME: The ID signals if action was successful :/
                 final int id = foundAny ? 1 : 0;
                 SwingUtilities.invokeLater(new Runnable() {
-    
+
                     @Override
                     public void run() {
                         if (diag != null) {

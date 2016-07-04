@@ -38,7 +38,7 @@ public class ACS implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // DOI search
-        Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        Optional<DOI> doi = DOI.build(entry.getFieldOptional("doi"));
 
         if(doi.isPresent()) {
             String source = String.format(SOURCE, doi.get().getDOI());

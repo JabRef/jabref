@@ -45,7 +45,7 @@ public class DoiResolution implements FullTextFinder {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        Optional<DOI> doi = DOI.build(entry.getFieldOptional("doi"));
 
         if(doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();

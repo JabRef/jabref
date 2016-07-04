@@ -40,9 +40,9 @@ public class ArXiv implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // 1. DOI
-        Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        Optional<DOI> doi = DOI.build(entry.getFieldOptional("doi"));
         // 2. Eprint
-        String eprint = entry.getField("eprint");
+        Optional<String> eprint = entry.getFieldOptional("eprint");
 
         if (doi.isPresent()) {
             String doiString = doi.get().getDOI();
@@ -72,10 +72,10 @@ public class ArXiv implements FullTextFinder {
             } catch (UnirestException | ParserConfigurationException | SAXException | IOException e) {
                 LOGGER.warn("arXiv DOI API request failed", e);
             }
-        } else if (eprint != null && !eprint.isEmpty()) {
+        } else if ((eprint.isPresent()) && !eprint.get().isEmpty()) {
             try {
                 // only lookup on id field
-                Document doc = queryApi("id:" + eprint);
+                Document doc = queryApi("id:" + eprint.get());
 
                 // Lookup PDF link
                 NodeList links = doc.getElementsByTagName("link");

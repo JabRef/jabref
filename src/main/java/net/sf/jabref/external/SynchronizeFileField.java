@@ -147,11 +147,11 @@ public class SynchronizeFileField extends AbstractWorker {
             boolean removeAllBroken = false;
             mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final String old = aSel.getField(Globals.FILE_FIELD);
+                final Optional<String> old = aSel.getFieldOptional(Globals.FILE_FIELD);
                 // Check if a extension is set:
-                if ((old != null) && !(old.isEmpty())) {
+                if (old.isPresent() && !(old.get().isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
-                    tableModel.setContentDontGuessTypes(old);
+                    tableModel.setContentDontGuessTypes(old.get());
 
                     // We need to specify which directories to search in for Util.expandFilename:
                     List<String> dirsS = panel.getBibDatabaseContext().getFileDirectory();
@@ -253,14 +253,14 @@ public class SynchronizeFileField extends AbstractWorker {
                         }
                     }
 
-                    if (!tableModel.getStringRepresentation().equals(old)) {
+                    if (!tableModel.getStringRepresentation().equals(old.orElse(null))) {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
                         if (toSet.isEmpty()) {
-                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, null));
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old.orElse(null), null));
                             aSel.clearField(Globals.FILE_FIELD);
                         } else {
-                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old, toSet));
+                            ce.addEdit(new UndoableFieldChange(aSel, Globals.FILE_FIELD, old.orElse(null), toSet));
                             aSel.setField(Globals.FILE_FIELD, toSet);
                         }
                         changedEntries.add(aSel);
