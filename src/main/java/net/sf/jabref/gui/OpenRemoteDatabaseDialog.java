@@ -21,6 +21,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -43,7 +44,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.remote.DBConnector;
-import net.sf.jabref.remote.DBSynchronizer;
 import net.sf.jabref.remote.DBType;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -103,19 +103,21 @@ public class OpenRemoteDatabaseDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     checkFields();
-                    int port = Integer.parseInt(portField.getText());
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-                    DBType selectedType = (DBType) dbTypeDropDown.getSelectedItem();
 
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(DatabaseLocation.REMOTE,
                             new Defaults(selectedMode));
-                    DBSynchronizer dbSynchronizer = bibDatabaseContext.getDBSynchronizer();
 
-                    //JPasswordField.getPassword() does not return a String, but a char array.
-                    dbSynchronizer.setUp(DBConnector.getNewConnection(selectedType, hostField.getText(), port,
-                                    databaseField.getText(), userField.getText(), new String(passwordField.getPassword())),
-                                    selectedType, databaseField.getText());
-                    dbSynchronizer.initializeDatabases();
+                    DBType selectedType = (DBType) dbTypeDropDown.getSelectedItem();
+                    String host = hostField.getText();
+                    int port = Integer.parseInt(portField.getText());
+                    String database = databaseField.getText();
+                    String user = userField.getText();
+                    String password = new String(passwordField.getPassword()); //JPasswordField.getPassword() does not return a String, but a char array.
+
+                    bibDatabaseContext.getDBSynchronizer()
+                            .openRemoteDatabase(selectedType, host, port, database, user, password);
+
                     frame.addTab(bibDatabaseContext, true);
 
                     setGlobalPrefs();
@@ -167,29 +169,33 @@ public class OpenRemoteDatabaseDialog extends JDialog {
      * Fetches possibly saved data and configures the control elements respectively.
      */
     private void applyGlobalPrefs() {
+        Optional<String> remoteDatabaseType = Globals.prefs.getAsOptional(REMOTE_DATABASE_TYPE);
+        Optional<String> remoteHost = Globals.prefs.getAsOptional(REMOTE_HOST);
+        Optional<String> remotePort = Globals.prefs.getAsOptional(REMOTE_PORT);
+        Optional<String> remoteDatabase = Globals.prefs.getAsOptional(REMOTE_DATABASE);
+        Optional<String> remoteUser = Globals.prefs.getAsOptional(REMOTE_USER);
 
-        String remoteDatabaseType = Globals.prefs.get(REMOTE_DATABASE_TYPE);
-        if (remoteDatabaseType != null) {
-            if (remoteDatabaseType.equals(DBType.ORACLE.toString())) {
-                dbTypeDropDown.setSelectedItem(DBType.ORACLE);
-            } else if (remoteDatabaseType.equals(DBType.POSTGRESQL.toString())) {
-                dbTypeDropDown.setSelectedItem(DBType.POSTGRESQL);
-            }
+        if (remoteDatabaseType.isPresent()) {
+            dbTypeDropDown.setSelectedItem(DBType.fromString(remoteDatabaseType.get()));
         }
 
-        hostField.setText(Globals.prefs.get(REMOTE_HOST));
+        if (remoteHost.isPresent()) {
+            hostField.setText(remoteHost.get());
+        }
 
-        String port = Globals.prefs.get(REMOTE_PORT);
-        if (port == null) {
-            portField
-                    .setText(Integer.toString(DBConnector.getDefaultPort((DBType) dbTypeDropDown.getSelectedItem())));
+        if (remotePort.isPresent()) {
+            portField.setText(remotePort.get());
         } else {
-            portField.setText(port);
+            portField.setText(Integer.toString(DBConnector.getDefaultPort((DBType) dbTypeDropDown.getSelectedItem())));
         }
 
-        databaseField.setText(Globals.prefs.get(REMOTE_DATABASE));
-        userField.setText(Globals.prefs.get(REMOTE_USER));
+        if (remoteDatabase.isPresent()) {
+            databaseField.setText(remoteDatabase.get());
+        }
 
+        if (remoteUser.isPresent()) {
+            userField.setText(remoteUser.get());
+        }
     }
 
     /**

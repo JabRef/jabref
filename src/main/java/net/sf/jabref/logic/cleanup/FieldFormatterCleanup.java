@@ -54,7 +54,7 @@ public class FieldFormatterCleanup implements CleanupJob {
      * @param entry the entry to be cleaned up
      * @return a list of changes of the entry
      */
-    public List<FieldChange> cleanupSingleField(String fieldKey, BibEntry entry) {
+    private List<FieldChange> cleanupSingleField(String fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
             return new ArrayList<>();

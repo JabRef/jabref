@@ -35,4 +35,14 @@ public enum DBType {
         return this.type;
     }
 
+    public static DBType fromString(String type) {
+        if (type.equals(DBType.MYSQL.toString())) {
+            return DBType.MYSQL;
+        } else if (type.equals(DBType.ORACLE.toString())) {
+            return DBType.ORACLE;
+        } else if (type.equals(DBType.POSTGRESQL.toString())) {
+            return DBType.POSTGRESQL;
+        }
+        return null;
+    }
 }

@@ -16,6 +16,7 @@
 package net.sf.jabref.remote;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -203,10 +204,16 @@ public class DBSynchronizer {
         return (eventLocation == EntryEventTargetScope.LOCAL_AND_REMOTE);
     }
 
-    public void setUp(Connection connection, DBType dbType, String dbName) {
-        this.dbType = dbType;
-        this.dbName = dbName;
-        this.dbProcessor = new DBProcessor(connection, dbType);
+    public void openRemoteDatabase(Connection connection, DBType type, String name) {
+        this.dbType = type;
+        this.dbName = name;
+        this.dbProcessor = new DBProcessor(connection, type);
+        initializeDatabases();
+    }
+
+    public void openRemoteDatabase(DBType type, String host, int port, String database, String user,
+            String password) throws ClassNotFoundException, SQLException {
+        openRemoteDatabase(DBConnector.getNewConnection(type, host, port, database, user, password), type, database);
     }
 
     public String getDBName() {

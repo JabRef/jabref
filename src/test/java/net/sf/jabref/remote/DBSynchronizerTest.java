@@ -55,8 +55,7 @@ public class DBSynchronizerTest {
 
         bibDatabase.registerListener(dbSynchronizer);
 
-        dbSynchronizer.setUp(connection, dbType, "TEST");
-        dbProcessor.setUpRemoteDatabase();
+        dbSynchronizer.openRemoteDatabase(connection, dbType, "TEST");
     }
 
     @Parameters(name = "Test with {0} database system")

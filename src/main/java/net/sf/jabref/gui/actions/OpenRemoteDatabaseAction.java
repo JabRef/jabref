@@ -26,8 +26,8 @@ public class OpenRemoteDatabaseAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        OpenRemoteDatabaseDialog csd = new OpenRemoteDatabaseDialog(jabRefFrame);
-        csd.setLocationRelativeTo(jabRefFrame);
-        csd.setVisible(true);
+        OpenRemoteDatabaseDialog openRemoteDBDialog = new OpenRemoteDatabaseDialog(jabRefFrame);
+        openRemoteDBDialog.setLocationRelativeTo(jabRefFrame);
+        openRemoteDBDialog.setVisible(true);
     }
 }
