@@ -32,30 +32,9 @@
 </Journal>
 <ArticleTitle>Formate assay in body fluids: application in methanol poisoning.</ArticleTitle>
 <Pagination>
-<MedlinePgn>117-26</MedlinePgn>
+<StartPage>25</StartPage>
+<EndPage>138</EndPage>
 </Pagination>
-<AuthorList CompleteYN="Y">
-<Author ValidYN="Y">
-<LastName>Makar</LastName>
-<ForeName>A B</ForeName>
-<Initials>AB</Initials>
-</Author>
-<Author ValidYN="Y">
-<LastName>McMartin</LastName>
-<ForeName>K E</ForeName>
-<Initials>KE</Initials>
-</Author>
-<Author ValidYN="Y">
-<LastName>Palese</LastName>
-<ForeName>M</ForeName>
-<Initials>M</Initials>
-</Author>
-<Author ValidYN="Y">
-<LastName>Tephly</LastName>
-<ForeName>T R</ForeName>
-<Initials>TR</Initials>
-</Author>
-</AuthorList>
 <Language>eng</Language>
 <PublicationTypeList>
 <PublicationType UI="D016428">Journal Article</PublicationType>
@@ -87,51 +66,18 @@
 </Chemical>
 </ChemicalList>
 <CitationSubset>IM</CitationSubset>
-<MeshHeadingList>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D000445">Aldehyde Oxidoreductases</DescriptorName>
-<QualifierName MajorTopicYN="N" UI="Q000378">metabolism</QualifierName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D000818">Animals</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D001826">Body Fluids</DescriptorName>
-<QualifierName MajorTopicYN="Y" UI="Q000032">analysis</QualifierName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D002245">Carbon Dioxide</DescriptorName>
-<QualifierName MajorTopicYN="N" UI="Q000097">blood</QualifierName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D005561">Formates</DescriptorName>
-<QualifierName MajorTopicYN="N" UI="Q000097">blood</QualifierName>
-<QualifierName MajorTopicYN="Y" UI="Q000506">poisoning</QualifierName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D000882">Haplorhini</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D006801">Humans</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D006863">Hydrogen-Ion Concentration</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D007700">Kinetics</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D000432">Methanol</DescriptorName>
-<QualifierName MajorTopicYN="N" UI="Q000097">blood</QualifierName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D008722">Methods</DescriptorName>
-</MeshHeading>
-<MeshHeading>
-<DescriptorName MajorTopicYN="N" UI="D011549">Pseudomonas</DescriptorName>
-<QualifierName MajorTopicYN="N" UI="Q000201">enzymology</QualifierName>
-</MeshHeading>
-</MeshHeadingList>
+<KeywordList Owner="NOTNLM">
+<Keyword MajorTopicYN="N">apnea syndrome</Keyword>
+<Keyword MajorTopicYN="N">cardiovascular disease</Keyword>
+<Keyword MajorTopicYN="N">self management</Keyword>
+</KeywordList>
+<PersonalNameSubjectList>
+<PersonalNameSubject>
+<LastName>Koop</LastName>
+<ForeName>C Everett</ForeName>
+<Initials>CE</Initials>
+</PersonalNameSubject>
+</PersonalNameSubjectList>
 </MedlineCitation>
 <PubmedData>
 <PublicationStatus>ppublish</PublicationStatus>

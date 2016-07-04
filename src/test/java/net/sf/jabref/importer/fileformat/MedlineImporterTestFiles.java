@@ -50,7 +50,8 @@ public class MedlineImporterTestFiles {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
             stream.forEach(files::add);
         }
-        return files.stream().filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest") && n.getFileName().toString().endsWith(".xml"))
+        return files.stream().filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest")
+                && n.getFileName().toString().endsWith(".xml"))
                 .collect(Collectors.toList());
     }
 

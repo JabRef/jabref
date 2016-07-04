@@ -51,7 +51,6 @@ import generated.GeneralNote;
 import generated.ISSN;
 import generated.Investigator;
 import generated.InvestigatorList;
-import generated.IsoLanguageCodes;
 import generated.Journal;
 import generated.JournalIssue;
 import generated.Keyword;
@@ -68,6 +67,7 @@ import generated.PubDate;
 import generated.PubmedArticle;
 import generated.PubmedArticleSet;
 import generated.QualifierName;
+import generated.Text;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -130,10 +130,11 @@ public class MedlineImporter extends ImportFormat {
             //check whether we have an article set or just an article
             if (unmarshalledObject instanceof PubmedArticleSet) {
                 PubmedArticleSet articleSet = (PubmedArticleSet) unmarshalledObject;
-                for (int i = 0; i < articleSet.getPubmedArticleOrPubmedBookArticle().size(); i++) {
-                    PubmedArticle currentArticle = (PubmedArticle) articleSet.getPubmedArticleOrPubmedBookArticle()
-                            .get(i);
-                    parseArticle(currentArticle, bibItems);
+                for (Object article : articleSet.getPubmedArticleOrPubmedBookArticle()) {
+                    if (article instanceof PubmedArticle) {
+                        PubmedArticle currentArticle = (PubmedArticle) article;
+                        parseArticle(currentArticle, bibItems);
+                    }
                 }
             } else {
                 PubmedArticle article = (PubmedArticle) unmarshalledObject;
@@ -161,9 +162,13 @@ public class MedlineImporter extends ImportFormat {
             DateCreated dateCreated = medlineCitation.getDateCreated();
             fields.put("created", dateCreated.getDay() + "/" + dateCreated.getMonth() + "/" + dateCreated.getYear());
             fields.put("pubmodel", medlineCitation.getArticle().getPubModel());
-            DateCompleted dateCompleted = medlineCitation.getDateCompleted();
-            fields.put("completed",
-                    dateCompleted.getDay() + "/" + dateCompleted.getMonth() + "/" + dateCompleted.getYear());
+
+            if (medlineCitation.getDateCompleted() != null) {
+                DateCompleted dateCompleted = medlineCitation.getDateCompleted();
+                fields.put("completed",
+                        dateCompleted.getDay() + "/" + dateCompleted.getMonth() + "/" + dateCompleted.getYear());
+            }
+
             fields.put("pmid", medlineCitation.getPMID().getContent());
             fields.put("owner", medlineCitation.getOwner());
 
@@ -174,8 +179,10 @@ public class MedlineImporter extends ImportFormat {
             putIfNotNull(fields, "journal-abbreviation", medlineJournalInfo.getMedlineTA());
             putIfNotNull(fields, "nlm-id", medlineJournalInfo.getNlmUniqueID());
             putIfNotNull(fields, "issn-linking", medlineJournalInfo.getISSNLinking());
-            if (medlineCitation.getChemicalList().getChemical() != null) {
-                addChemicals(fields, medlineCitation.getChemicalList().getChemical());
+            if (medlineCitation.getChemicalList() != null) {
+                if (medlineCitation.getChemicalList().getChemical() != null) {
+                    addChemicals(fields, medlineCitation.getChemicalList().getChemical());
+                }
             }
             if (medlineCitation.getCitationSubset() != null) {
                 fields.put("citation-subset", join(medlineCitation.getCitationSubset(), ", "));
@@ -264,17 +271,17 @@ public class MedlineImporter extends ImportFormat {
                         keywordStrings.add((String) content);
                     }
                 }
-                //Check whether MeshHeadingList exist or not
-                if (fields.get("keywords") == null) {
-                    fields.put("keywords", join(keywordStrings, "; "));
-                } else {
-                    if (keywordStrings.size() > 0) {
-                        //if it exists, combine the MeshHeading with the keywords
-                        String result = join(keywordStrings, "; ");
-                        result = fields.get("keywords") + "; " + result;
-                        fields.put("keywords", result);
-                    }
-                }
+            }
+        }
+        //Check whether MeshHeadingList exist or not
+        if (fields.get("keywords") == null) {
+            fields.put("keywords", join(keywordStrings, "; "));
+        } else {
+            if (keywordStrings.size() > 0) {
+                //if it exists, combine the MeshHeading with the keywords
+                String result = join(keywordStrings, "; ");
+                result = fields.get("keywords") + "; " + result;
+                fields.put("keywords", result);
             }
         }
     }
@@ -296,7 +303,7 @@ public class MedlineImporter extends ImportFormat {
                 for (PersonalNameSubject personalName : personalNameSubject) {
                     String name = personalName.getLastName();
                     if (personalName.getForeName() != null) {
-                        name += ", " + personalName.getForeName();
+                        name += ", " + personalName.getForeName().toString();
                     }
                     personalNames.add(name);
                 }
@@ -374,12 +381,10 @@ public class MedlineImporter extends ImportFormat {
                         //it could happen, that the article has only a start page
                         startPage = element.getValue() + endPage;
                         putIfNotNull(fields, "pages", startPage);
-                    } else if ("EndPage".equals(element.getName())) {
+                    } else if ("EndPage".equals(element.getName().getLocalPart())) {
                         endPage = element.getValue();
                         //but it should not happen, that a endpage appears without startpage
-                        if (!"".equals(startPage)) {
-                            fields.put("pages", fixPageRange(startPage + "-" + endPage));
-                        }
+                        fields.put("pages", fixPageRange(startPage + "-" + endPage));
                     }
                 }
             } else if (object instanceof ELocationID) {
@@ -405,9 +410,6 @@ public class MedlineImporter extends ImportFormat {
             } else if (object instanceof AuthorList) {
                 AuthorList authors = (AuthorList) object;
                 handleAuthors(fields, authors);
-            } else if (object instanceof IsoLanguageCodes) {
-                IsoLanguageCodes language = (IsoLanguageCodes) object;
-                putIfNotNull(fields, "language", language.value());
             }
         }
     }
@@ -428,8 +430,13 @@ public class MedlineImporter extends ImportFormat {
         List<String> authorNames = new ArrayList<>();
         for (Author author : authors.getAuthor()) {
             if (author.getCollectiveName() != null) {
-                authorNames.add(author.getCollectiveName().toString());
-            } else if (author.getLastName() != null) {
+                Text collectiveNames = author.getCollectiveName();
+                for (Serializable content : collectiveNames.getContent()) {
+                    if (content instanceof String) {
+                        authorNames.add((String) content);
+                    }
+                }
+            } else {
                 String authorName = author.getLastName();
                 if (author.getForeName() != null) {
                     authorName += ", " + author.getForeName();
