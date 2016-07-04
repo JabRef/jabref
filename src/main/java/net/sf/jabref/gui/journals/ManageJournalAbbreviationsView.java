@@ -40,7 +40,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.scene.control.Alert.AlertType;
 
 public class ManageJournalAbbreviationsView extends FXMLView {
@@ -89,52 +88,39 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void setUpTable() {
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         journalTableAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
-        journalTableEditColumn
-                .setCellFactory(new Callback<TableColumn<Abbreviation, String>, TableCell<Abbreviation, String>>() {
+        journalTableEditColumn.setCellFactory(column -> new TableCell<Abbreviation, String>() {
 
-                    @Override
-                    public TableCell<Abbreviation, String> call(TableColumn<Abbreviation, String> stringListView) {
-                        return new TableCell<Abbreviation, String>() {
+            @Override
+            protected void updateItem(String item, boolean isEmpty) {
+                super.updateItem(item, isEmpty);
+                if (!isEmpty) {
+                    Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
+                    graphic.getStyleClass().add("icon");
+                    setGraphic(graphic);
+                    setOnMouseClicked(evt -> {
+                        editAbbreviation();
+                    });
+                }
+                journalAbbreviationsTable.refresh();
+            }
+        });
+        journalTableDeleteColumn.setCellFactory(column -> new TableCell<Abbreviation, String>() {
 
-                            @Override
-                            protected void updateItem(String s, boolean b) {
-                                super.updateItem(s, b);
-                                if (!b) {
-                                    Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
-                                    graphic.getStyleClass().add("icon");
-                                    setGraphic(graphic);
-                                    setOnMouseClicked(evt -> {
-                                        editAbbreviation();
-                                    });
-                                }
-                                journalAbbreviationsTable.refresh();
-                            }
-                        };
-                    }
-                });
-        journalTableDeleteColumn
-                .setCellFactory(new Callback<TableColumn<Abbreviation, String>, TableCell<Abbreviation, String>>() {
+            @Override
+            protected void updateItem(String item, boolean isEmpty) {
+                super.updateItem(item, isEmpty);
+                if (!isEmpty) {
+                    Text graphic = new Text(IconTheme.JabRefIcon.REMOVE.getCode());
+                    graphic.getStyleClass().add("icon");
+                    setGraphic(graphic);
+                    setOnMouseClicked(evt -> {
+                        removeAbbreviation();
+                    });
+                }
+                journalAbbreviationsTable.refresh();
+            }
 
-                    @Override
-                    public TableCell<Abbreviation, String> call(TableColumn<Abbreviation, String> stringListView) {
-                        return new TableCell<Abbreviation, String>() {
-
-                            @Override
-                            protected void updateItem(String s, boolean b) {
-                                super.updateItem(s, b);
-                                if (!b) {
-                                    Text graphic = new Text(IconTheme.JabRefIcon.REMOVE.getCode());
-                                    graphic.getStyleClass().add("icon");
-                                    setGraphic(graphic);
-                                    setOnMouseClicked(evt -> {
-                                        removeAbbreviation();
-                                    });
-                                }
-                                journalAbbreviationsTable.refresh();
-                            }
-                        };
-                    }
-                });
+        });
     }
 
     private void setBindings() {
