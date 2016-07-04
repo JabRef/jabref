@@ -63,7 +63,7 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.event.scope.EntryEventScope;
+import net.sf.jabref.event.scope.EntryEventSource;
 import net.sf.jabref.external.AttachFileAction;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;
@@ -1198,7 +1198,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntryEventLocation() == EntryEventScope.UNDO) {
+            if (addedEntryEvent.getEntryEventLocation() == EntryEventSource.UNDO) {
                 scheduleUpdate();
                 return;
             }

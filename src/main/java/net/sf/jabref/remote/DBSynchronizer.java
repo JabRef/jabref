@@ -26,7 +26,7 @@ import net.sf.jabref.event.EntryEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.event.scope.EntryEventScope;
+import net.sf.jabref.event.scope.EntryEventSource;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -146,7 +146,7 @@ public class DBSynchronizer {
                 }
             }
             if (!match) {
-                bibDatabase.removeEntry(localEntry, EntryEventScope.LOCAL); // Should not reach the listeners above.
+                bibDatabase.removeEntry(localEntry, EntryEventSource.REMOTE); // Should not reach the listeners above.
                 i--; // due to index shift on localEntries
             }
         }
@@ -160,12 +160,12 @@ public class DBSynchronizer {
                     match = true;
                     Set<String> fields = remoteEntry.getFieldNames();
                     for (String field : fields) {
-                        localEntry.setField(field, remoteEntry.getField(field), EntryEventScope.LOCAL); // Should not reach the listeners above.
+                        localEntry.setField(field, remoteEntry.getField(field), EntryEventSource.REMOTE); // Should not reach the listeners above.
                     }
                 }
             }
             if (!match) {
-                bibDatabase.insertEntry(remoteEntry, EntryEventScope.LOCAL); // Should not reach the listeners above.
+                bibDatabase.insertEntry(remoteEntry, EntryEventSource.REMOTE); // Should not reach the listeners above.
             }
         }
     }
@@ -195,13 +195,13 @@ public class DBSynchronizer {
     }
 
     /**
-     * Checks whether the {@link EntryEventScope} of an {@link EntryEvent} is crucial for this class.
+     * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
      * @param event An {@link EntryEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBSynchronizer}, else <code>false</code>
      */
     public boolean isInEventLocation(EntryEvent event) {
-        EntryEventScope eventLocation = event.getEntryEventLocation();
-        return (eventLocation == EntryEventScope.LOCAL_AND_REMOTE);
+        EntryEventSource eventLocation = event.getEntryEventLocation();
+        return (eventLocation == EntryEventSource.LOCAL);
     }
 
     public void openRemoteDatabase(Connection connection, DBType type, String name) {

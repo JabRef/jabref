@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.event;
 
-import net.sf.jabref.event.scope.EntryEventScope;
+import net.sf.jabref.event.scope.EntryEventSource;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -35,7 +35,7 @@ public class EntryAddedEvent extends EntryEvent {
      * @param bibEntry <code>BibEntry</code> object which has been added.
      * @param location Location affected by this event
      */
-    public EntryAddedEvent(BibEntry bibEntry, EntryEventScope location) {
+    public EntryAddedEvent(BibEntry bibEntry, EntryEventSource location) {
         super(bibEntry, location);
     }
 }

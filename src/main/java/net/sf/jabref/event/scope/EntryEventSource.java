@@ -16,10 +16,10 @@
 package net.sf.jabref.event.scope;
 
 /**
- * This enum represents the scope which is affected by posting EntryEvents.
+ * This enum represents the context EntryEvents were sent from.
  */
-public enum EntryEventScope {
+public enum EntryEventSource {
     LOCAL,
-    LOCAL_AND_REMOTE,
+    REMOTE,
     UNDO
 }

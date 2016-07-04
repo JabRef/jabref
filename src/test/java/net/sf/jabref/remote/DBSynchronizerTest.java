@@ -13,7 +13,7 @@ import java.util.Set;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.event.scope.EntryEventScope;
+import net.sf.jabref.event.scope.EntryEventSource;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -81,7 +81,7 @@ public class DBSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry);
         // should not add remotely.
-        bibDatabase.insertEntry(furtherEntry, EntryEventScope.LOCAL);
+        bibDatabase.insertEntry(furtherEntry, EntryEventSource.REMOTE);
 
         List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
 
@@ -96,7 +96,7 @@ public class DBSynchronizerTest {
 
         bibDatabase.insertEntry(expectedEntry);
         expectedEntry.setField("author", "Brad L and Gilson");
-        expectedEntry.setField("title", "The micro multiplexer", EntryEventScope.LOCAL);
+        expectedEntry.setField("title", "The micro multiplexer", EntryEventSource.REMOTE);
 
         List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());
@@ -120,7 +120,7 @@ public class DBSynchronizerTest {
         Assert.assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
-        bibDatabase.removeEntry(bibEntry, EntryEventScope.LOCAL);
+        bibDatabase.removeEntry(bibEntry, EntryEventSource.REMOTE);
 
         actualEntries = dbProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());

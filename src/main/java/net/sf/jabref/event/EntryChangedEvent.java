@@ -1,6 +1,6 @@
 package net.sf.jabref.event;
 
-import net.sf.jabref.event.scope.EntryEventScope;
+import net.sf.jabref.event.scope.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -20,7 +20,7 @@ public class EntryChangedEvent extends EntryEvent {
      * @param bibEntry <code>BibEntry</code> object the changes were applied on.
      * @param location Location affected by this event
      */
-    public EntryChangedEvent(BibEntry bibEntry, EntryEventScope location) {
+    public EntryChangedEvent(BibEntry bibEntry, EntryEventSource location) {
         super(bibEntry, location);
     }
 
