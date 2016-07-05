@@ -208,6 +208,7 @@ public class BibEntry implements Cloneable {
     /**
      * Returns the contents of the given field, or null if it is not set.
      */
+    @Deprecated //Use getFieldOptional instead
     public String getField(String name) {
         return fields.get(toLowerCase(name));
     }

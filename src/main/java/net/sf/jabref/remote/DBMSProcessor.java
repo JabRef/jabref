@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.MetaData;
@@ -173,7 +174,7 @@ public class DBMSProcessor {
         }
         query = query + escape(ENTRY_ENTRYTYPE) + ") VALUES(";
         for (int i = 0; i < fieldNames.size(); i++) {
-            query = query + escapeValue(bibEntry.getField(fieldNames.get(i))) + ", ";
+            query = query + escapeValue(bibEntry.getFieldOptional(fieldNames.get(i))) + ", ";
         }
         query = query + escapeValue(bibEntry.getType()) + ")";
 
@@ -215,7 +216,7 @@ public class DBMSProcessor {
 
         for (String field : fields) {
             query = query + ", " + escape(field.toUpperCase(Locale.ENGLISH)) + " = "
-                    + escapeValue(bibEntry.getField(field));
+                    + escapeValue(bibEntry.getFieldOptional(field));
         }
 
         query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
@@ -523,6 +524,13 @@ public class DBMSProcessor {
             }
         }
         return stringValue;
+    }
+
+    public static String escapeValue(Optional<String> value) {
+        if (value.isPresent()) {
+            return "'" + value.get() + "'";
+        }
+        return "NULL";
     }
 
     public void setDBType(DBMSType dbType) {
