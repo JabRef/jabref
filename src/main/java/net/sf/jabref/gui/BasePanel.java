@@ -264,7 +264,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public String getTabTitle() {
         StringBuilder title = new StringBuilder();
-        DatabaseLocation databaseLocation = this.bibDatabaseContext.getDatabase().getLocation();
+        DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
             if (this.bibDatabaseContext.getDatabaseFile() == null) {

@@ -25,6 +25,7 @@ public class BibDatabaseContext {
     /** The file where this database was last saved to. */
     private File file;
     private DBMSSynchronizer dbSynchronizer;
+    private final DatabaseLocation location;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -38,24 +39,21 @@ public class BibDatabaseContext {
         this(database, new Defaults());
     }
 
-    public BibDatabaseContext(DatabaseLocation location) {
-        this(new BibDatabase(location));
-    }
-
-    public BibDatabaseContext(DatabaseLocation location, Defaults defaults) {
-        this(new BibDatabase(location), defaults);
-    }
-
     public BibDatabaseContext(BibDatabase database, Defaults defaults) {
         this(database, new MetaData(), defaults);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
+        this(database, metaData, defaults, DatabaseLocation.LOCAL);
+    }
+
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults, DatabaseLocation location) {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
+        this.location = Objects.requireNonNull(location);
 
-        if (database.getLocation() == DatabaseLocation.REMOTE) {
+        if (this.location == DatabaseLocation.REMOTE) {
             this.dbSynchronizer = new DBMSSynchronizer(database, metaData);
             this.database.registerListener(dbSynchronizer);
             this.metaData.registerListener(dbSynchronizer);
@@ -74,6 +72,10 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData, file, new Defaults());
+    }
+
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location) {
+        this(new BibDatabase(), new MetaData(), defaults, location);
     }
 
     public BibDatabaseMode getMode() {
@@ -198,5 +200,9 @@ public class BibDatabaseContext {
 
     public DBMSSynchronizer getDBSynchronizer() {
         return this.dbSynchronizer;
+    }
+
+    public DatabaseLocation getLocation() {
+        return this.location;
     }
 }

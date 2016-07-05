@@ -683,14 +683,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
         String changeFlag = panel.isModified() ? "*" : "";
 
-        if (panel.getBibDatabaseContext().getDatabase().getLocation() == DatabaseLocation.LOCAL) {
+        if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
                 setTitle(FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
             } else {
                 String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().getPath();
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
             }
-        } else if (panel.getBibDatabaseContext().getDatabase().getLocation() == DatabaseLocation.REMOTE) {
+        } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.REMOTE) {
             setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " (remote)"
                     + modeInfo);
         }
@@ -819,7 +819,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (getBasePanelAt(i).isModified() && (getBasePanelAt(i).getBibDatabaseContext().getDatabase().getLocation() == DatabaseLocation.LOCAL)) {
+                if (getBasePanelAt(i).isModified()
+                        && (getBasePanelAt(i).getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
                     tabbedPane.setSelectedIndex(i);
                     String filename;
 
@@ -1569,7 +1570,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 setEnabled(openAndSavedDatabasesOnlyActions, saved);
             }
             setEnabled(remoteDatabasesOnlyActions,
-                    current.getBibDatabaseContext().getDatabase().getLocation() == DatabaseLocation.REMOTE);
+                    current.getBibDatabaseContext().getLocation() == DatabaseLocation.REMOTE);
         }
     }
 
@@ -2084,7 +2085,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             return;
         }
 
-        if (panel.isModified() && (panel.getBibDatabaseContext().getDatabase().getLocation() == DatabaseLocation.LOCAL)) {
+        if (panel.isModified() && (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
                 removeTab(panel);
             }

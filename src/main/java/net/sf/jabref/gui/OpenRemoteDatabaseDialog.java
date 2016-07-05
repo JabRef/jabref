@@ -105,8 +105,8 @@ public class OpenRemoteDatabaseDialog extends JDialog {
                     checkFields();
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
 
-                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(DatabaseLocation.REMOTE,
-                            new Defaults(selectedMode));
+                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
+                            DatabaseLocation.REMOTE);
 
                     DBMSType selectedType = (DBMSType) dbTypeDropDown.getSelectedItem();
                     String host = hostField.getText();
