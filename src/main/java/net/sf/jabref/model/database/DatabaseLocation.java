@@ -1,8 +1,9 @@
 package net.sf.jabref.model.database;
 
+import net.sf.jabref.BibDatabaseContext;
+
 /**
- *  Used to define the location of an opened database,
- *  since remote (SQL) database is supported.
+ *  This enum represents the location for {@link BibDatabaseContext}.
  */
 public enum DatabaseLocation {
     LOCAL,
