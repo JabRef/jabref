@@ -67,21 +67,19 @@ public class DBConnector {
         String url = "jdbc:";
 
         try {
-            if (dbType == DBType.MYSQL) {
-                Class.forName("com.mysql.jdbc.Driver");
+            switch (dbType) {
+            case MYSQL:
                 url = url + "mysql://" + host + ":" + port + "/" + database;
-            } else if (dbType == DBType.ORACLE) {
-                Class.forName("oracle.jdbc.driver.OracleDriver");
+                break;
+            case ORACLE:
                 url = url + "oracle:thin:@" + host + ":" + port + ":" + database;
-            } else if (dbType == DBType.POSTGRESQL) {
-                Class.forName("org.postgresql.Driver");
+                break;
+            case POSTGRESQL:
                 url = url + "postgresql://" + host + ":" + port + "/" + database;
+                break;
             }
             DriverManager.setLoginTimeout(3);
             return DriverManager.getConnection(url, user, password);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Could not load JDBC driver: " + e.getMessage());
-            throw e;
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
