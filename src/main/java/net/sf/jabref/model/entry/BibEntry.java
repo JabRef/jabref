@@ -37,7 +37,7 @@ import java.util.TreeSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.event.scope.EntryEventSource;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 

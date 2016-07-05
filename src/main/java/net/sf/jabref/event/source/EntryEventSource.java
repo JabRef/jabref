@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.event.scope;
+package net.sf.jabref.event.source;
 
 /**
  * This enum represents the context EntryEvents were sent from.

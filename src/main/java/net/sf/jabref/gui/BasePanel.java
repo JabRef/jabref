@@ -63,7 +63,7 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.event.scope.EntryEventSource;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.external.AttachFileAction;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;

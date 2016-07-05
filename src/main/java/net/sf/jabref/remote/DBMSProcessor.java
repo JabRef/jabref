@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.event.scope.EntryEventSource;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Localization;

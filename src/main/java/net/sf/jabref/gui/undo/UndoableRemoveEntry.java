@@ -17,7 +17,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.event.scope.EntryEventSource;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;

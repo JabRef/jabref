@@ -47,7 +47,7 @@ import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.event.scope.EntryEventSource;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
