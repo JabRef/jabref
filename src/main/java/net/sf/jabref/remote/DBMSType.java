@@ -18,7 +18,7 @@ package net.sf.jabref.remote;
 /**
  * Enumerates all supported database systems (DBS) by JabRef.
  */
-public enum DBType {
+public enum DBMSType {
 
     MYSQL("MySQL"),
     ORACLE("Oracle"),
@@ -26,7 +26,7 @@ public enum DBType {
 
     private String type;
 
-    private DBType(String type) {
+    private DBMSType(String type) {
         this.type = type;
     }
 
@@ -35,13 +35,13 @@ public enum DBType {
         return this.type;
     }
 
-    public static DBType fromString(String type) {
-        if (type.equals(DBType.MYSQL.toString())) {
-            return DBType.MYSQL;
-        } else if (type.equals(DBType.ORACLE.toString())) {
-            return DBType.ORACLE;
-        } else if (type.equals(DBType.POSTGRESQL.toString())) {
-            return DBType.POSTGRESQL;
+    public static DBMSType fromString(String type) {
+        if (type.equals(DBMSType.MYSQL.toString())) {
+            return DBMSType.MYSQL;
+        } else if (type.equals(DBMSType.ORACLE.toString())) {
+            return DBMSType.ORACLE;
+        } else if (type.equals(DBMSType.POSTGRESQL.toString())) {
+            return DBMSType.POSTGRESQL;
         }
         return null;
     }

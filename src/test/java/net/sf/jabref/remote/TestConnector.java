@@ -5,23 +5,23 @@ import java.sql.SQLException;
 
 public class TestConnector {
 
-    public static DBType currentConnectionType;
+    public static DBMSType currentConnectionType;
 
 
-    public static Connection getTestConnection(DBType dbType) throws ClassNotFoundException, SQLException {
+    public static Connection getTestConnection(DBMSType dbType) throws ClassNotFoundException, SQLException {
         String user = "root";
         String password = "";
         String database = "jabref";
 
-        if (dbType == DBType.POSTGRESQL) {
+        if (dbType == DBMSType.POSTGRESQL) {
             user = "postgres";
-        } else if (dbType == DBType.ORACLE) {
+        } else if (dbType == DBMSType.ORACLE) {
             user = "travis";
             password = "travis";
             database = "xe";
         }
         currentConnectionType = dbType;
 
-        return DBConnector.getNewConnection(dbType, "localhost", database, user, password);
+        return DBMSConnector.getNewConnection(dbType, "localhost", database, user, password);
     }
 }

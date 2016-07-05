@@ -25,16 +25,16 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Used to establish connections between JabRef and database systems like MySQL, PostgreSQL and Oracle.
  */
-public class DBConnector {
+public class DBMSConnector {
 
-    private static final Log LOGGER = LogFactory.getLog(DBConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
 
     /**
      * Determines the suitable driver and retrieves a working SQL Connection in normal case.
      * A default port is going to be taken.
      *
-     * @param dbType Enum entry of {@link DBType} which determines the driver
+     * @param dbType Enum entry of {@link DBMSType} which determines the driver
      * @param host Hostname, Domain or IP address
      * @param database An already existent database name.
      * @param user Username
@@ -43,7 +43,7 @@ public class DBConnector {
      * @throws ClassNotFoundException Thrown if no suitable drivers were found
      * @throws SQLException Thrown if connection has failed
      */
-    public static Connection getNewConnection(DBType dbType, String host, String database, String user, String password)
+    public static Connection getNewConnection(DBMSType dbType, String host, String database, String user, String password)
             throws ClassNotFoundException, SQLException {
         return getNewConnection(dbType, host, getDefaultPort(dbType), database, user, password);
     }
@@ -51,7 +51,7 @@ public class DBConnector {
     /**
      * Determines the suitable driver and retrieves a working SQL Connection in normal case.
      *
-     * @param dbType Enum entry of {@link DBType} which determines the driver
+     * @param dbType Enum entry of {@link DBMSType} which determines the driver
      * @param host Hostname, Domain or IP address
      * @param port Port number the server is listening on
      * @param database An already existent database name.
@@ -61,7 +61,7 @@ public class DBConnector {
      * @throws ClassNotFoundException Thrown if no suitable drivers were found
      * @throws SQLException Thrown if connection has failed
      */
-    public static Connection getNewConnection(DBType dbType, String host, int port, String database, String user,
+    public static Connection getNewConnection(DBMSType dbType, String host, int port, String database, String user,
             String password) throws ClassNotFoundException, SQLException {
 
         String url = "jdbc:";
@@ -93,14 +93,14 @@ public class DBConnector {
     /**
      * Retrieves the port number dependent on the type of the database system.
      */
-    public static int getDefaultPort(DBType dbType) {
-        if (dbType == DBType.MYSQL) {
+    public static int getDefaultPort(DBMSType dbType) {
+        if (dbType == DBMSType.MYSQL) {
             return 3306;
         }
-        if (dbType == DBType.POSTGRESQL) {
+        if (dbType == DBMSType.POSTGRESQL) {
             return 5432;
         }
-        if (dbType == DBType.ORACLE) {
+        if (dbType == DBMSType.ORACLE) {
             return 1521;
         }
         return -1;

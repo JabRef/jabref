@@ -16,6 +16,8 @@
 package net.sf.jabref.remote;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -30,14 +32,14 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Contains some helping methods related to the external SQL database.
  */
-public class DBHelper {
+public class DBMSHelper {
 
-    private static final Log LOGGER = LogFactory.getLog(DBConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
     private final Connection connection;
 
 
-    public DBHelper(Connection connection) {
+    public DBMSHelper(Connection connection) {
         this.connection = connection;
     }
 
@@ -84,8 +86,36 @@ public class DBHelper {
     }
 
     /**
+     * Executes the given query as SQL update
+     * @param query SQL Query
+     */
+    public void executeUpdate(String query) {
+        try {
+            connection.createStatement().executeUpdate(query);
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+    }
+
+    /**
+     * @return {@link DatabaseMetaData} of the current {@link Connection}
+     */
+    public DatabaseMetaData getMetaData() throws SQLException {
+        return connection.getMetaData();
+    }
+
+    /**
+     * @param query SQL query
+     * @param columnNames Column names which should be returned
+     * @return Instance of {@link PreparedStatement}
+     */
+    public PreparedStatement prepareStatement(String query, String... columnNames) throws SQLException {
+        return connection.prepareStatement(query, columnNames);
+    }
+
+    /**
      *  Converts even String value to uppercase representation.
-     *  Useful to harmonize character case for different database systems (see {@link DBType}).
+     *  Useful to harmonize character case for different database systems (see {@link DBMSType}).
      */
     public Set<String> allToUpperCase(Set<String> stringSet) {
         return stringSet.stream().map(n -> n.toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());

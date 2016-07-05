@@ -10,7 +10,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.remote.DBSynchronizer;
+import net.sf.jabref.remote.DBMSSynchronizer;
 
 /**
  * Represents everything related to a .bib file.
@@ -24,7 +24,7 @@ public class BibDatabaseContext {
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
-    private DBSynchronizer dbSynchronizer;
+    private DBMSSynchronizer dbSynchronizer;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -56,7 +56,7 @@ public class BibDatabaseContext {
         this.metaData = Objects.requireNonNull(metaData);
 
         if (database.getLocation() == DatabaseLocation.REMOTE) {
-            this.dbSynchronizer = new DBSynchronizer(database, metaData);
+            this.dbSynchronizer = new DBMSSynchronizer(database, metaData);
             this.database.registerListener(dbSynchronizer);
             this.metaData.registerListener(dbSynchronizer);
         }
@@ -196,7 +196,7 @@ public class BibDatabaseContext {
         return getFileDirectory(Globals.FILE_FIELD);
     }
 
-    public DBSynchronizer getDBSynchronizer() {
+    public DBMSSynchronizer getDBSynchronizer() {
         return this.dbSynchronizer;
     }
 }

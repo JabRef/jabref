@@ -27,15 +27,15 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class DBSynchronizerTest {
+public class DBMSSynchronizerTest {
 
-    private DBSynchronizer dbSynchronizer;
+    private DBMSSynchronizer dbSynchronizer;
     private Connection connection;
-    private DBProcessor dbProcessor;
+    private DBMSProcessor dbProcessor;
     private BibDatabase bibDatabase;
 
     @Parameter
-    public DBType dbType;
+    public DBMSType dbType;
 
 
     @Before
@@ -50,8 +50,8 @@ public class DBSynchronizerTest {
         }
 
         bibDatabase = new BibDatabase();
-        dbSynchronizer = new DBSynchronizer(bibDatabase, new MetaData());
-        dbProcessor = new DBProcessor(connection, dbType);
+        dbSynchronizer = new DBMSSynchronizer(bibDatabase, new MetaData());
+        dbProcessor = new DBMSProcessor(new DBMSHelper(connection), dbType);
 
         bibDatabase.registerListener(dbSynchronizer);
 
@@ -59,14 +59,14 @@ public class DBSynchronizerTest {
     }
 
     @Parameters(name = "Test with {0} database system")
-    public static Collection<DBType> getTestingDatabaseSystems() {
-        Set<DBType> dbTypes = new HashSet<>();
-        dbTypes.add(DBType.MYSQL);
-        dbTypes.add(DBType.POSTGRESQL);
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        Set<DBMSType> dbTypes = new HashSet<>();
+        dbTypes.add(DBMSType.MYSQL);
+        dbTypes.add(DBMSType.POSTGRESQL);
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            dbTypes.add(DBType.ORACLE);
+            dbTypes.add(DBMSType.ORACLE);
         } catch (ClassNotFoundException e) {
             // In case that Oracle interface is not available do not perform tests for this system.
             System.out.println("Oracle driver not available. Skipping tests for this system...");
@@ -202,14 +202,14 @@ public class DBSynchronizerTest {
     @After
     public void clear() {
         try {
-            if ((dbType == DBType.MYSQL) || (dbType == DBType.POSTGRESQL)) {
-                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBProcessor.ENTRY));
-                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBProcessor.METADATA));
-            } else if (dbType == DBType.ORACLE) {
+            if ((dbType == DBMSType.MYSQL) || (dbType == DBMSType.POSTGRESQL)) {
+                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.ENTRY));
+                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.METADATA));
+            } else if (dbType == DBMSType.ORACLE) {
                 connection.createStatement()
-                        .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBProcessor.ENTRY) + "';\n"
-                                + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBProcessor.METADATA) + "';\n"
-                                + "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape(DBProcessor.ENTRY + "_SEQ") + "';\n"
+                        .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.ENTRY) + "';\n"
+                                + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.METADATA) + "';\n"
+                                + "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape(DBMSProcessor.ENTRY + "_SEQ") + "';\n"
                                 + "EXCEPTION\n" + "WHEN OTHERS THEN\n" + "IF SQLCODE != -942 THEN\n" + "RAISE;\n"
                                 + "END IF;\n" + "END;");
             }

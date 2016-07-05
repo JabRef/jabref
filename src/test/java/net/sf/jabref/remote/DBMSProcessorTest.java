@@ -23,14 +23,14 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class DBPProcessorTest {
+public class DBMSProcessorTest {
 
     private static Connection connection;
-    private DBProcessor dbProcessor;
-    private DBHelper dbHelper;
+    private DBMSProcessor dbProcessor;
+    private DBMSHelper dbHelper;
 
     @Parameter
-    public DBType dbType;
+    public DBMSType dbType;
 
 
     @Before
@@ -44,21 +44,21 @@ public class DBPProcessorTest {
                 Assert.fail(e.getMessage());
             }
         }
-        dbProcessor = new DBProcessor(connection, dbType);
-        dbHelper = new DBHelper(connection);
+        dbHelper = new DBMSHelper(connection);
+        dbProcessor = new DBMSProcessor(dbHelper, dbType);
         dbProcessor.setUpRemoteDatabase();
 
     }
 
     @Parameters(name = "Test with {0} database system")
-    public static Collection<DBType> getTestingDatabaseSystems() {
-        Set<DBType> dbTypes = new HashSet<>();
-        dbTypes.add(DBType.MYSQL);
-        dbTypes.add(DBType.POSTGRESQL);
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        Set<DBMSType> dbTypes = new HashSet<>();
+        dbTypes.add(DBMSType.MYSQL);
+        dbTypes.add(DBMSType.POSTGRESQL);
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            dbTypes.add(DBType.ORACLE);
+            dbTypes.add(DBMSType.ORACLE);
         } catch (ClassNotFoundException e) {
             // In case that Oracle interface is not available do not perform tests for this system.
             System.out.println("Oracle driver not available. Skipping tests for this system...");
@@ -98,7 +98,7 @@ public class DBPProcessorTest {
         emptyEntry.setRemoteId(1);
         dbProcessor.insertEntry(emptyEntry); // does not insert, due to same remoteId.
 
-        try (ResultSet resultSet = selectFrom(DBProcessor.ENTRY)) {
+        try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
 
             Assert.assertTrue(resultSet.next());
             Assert.assertEquals(realEntry.getType(), resultSet.getString("ENTRYTYPE"));
@@ -120,7 +120,7 @@ public class DBPProcessorTest {
         dbProcessor.insertEntry(bibEntry);
 
         try {
-            try (ResultSet resultSet = selectFrom(DBProcessor.ENTRY)) {
+            try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
 
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
@@ -134,7 +134,7 @@ public class DBPProcessorTest {
             bibEntry.setField("title", "The nano multiplexer");
             dbProcessor.updateEntry(bibEntry);
 
-            try (ResultSet resultSet = selectFrom(DBProcessor.ENTRY)) {
+            try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
                 Assert.assertEquals(bibEntry.getField("author"), resultSet.getString("AUTHOR"));
@@ -153,7 +153,7 @@ public class DBPProcessorTest {
         dbProcessor.insertEntry(bibEntry);
         dbProcessor.removeEntry(bibEntry);
 
-        try (ResultSet resultSet = selectFrom(DBProcessor.ENTRY)) {
+        try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
             Assert.assertFalse(resultSet.next());
         } catch (SQLException e) {
             Assert.fail(e.getMessage());
@@ -165,11 +165,11 @@ public class DBPProcessorTest {
         BibEntry bibEntry = getBibEntryExample();
 
         dbProcessor.prepareEntryTableStructure(bibEntry);
-        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBProcessor.ENTRY));
+        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBMSProcessor.ENTRY));
 
         Set<String> expectedColumns = new HashSet<>();
-        expectedColumns.add(DBProcessor.ENTRY_REMOTE_ID);
-        expectedColumns.add(DBProcessor.ENTRY_ENTRYTYPE);
+        expectedColumns.add(DBMSProcessor.ENTRY_REMOTE_ID);
+        expectedColumns.add(DBMSProcessor.ENTRY_ENTRYTYPE);
         expectedColumns.add("AUTHOR");
         expectedColumns.add("TITLE");
 
@@ -185,11 +185,11 @@ public class DBPProcessorTest {
         dbProcessor.insertEntry(bibEntry);
         dbProcessor.normalizeEntryTable();
 
-        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBProcessor.ENTRY));
+        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBMSProcessor.ENTRY));
         Set<String> expectedColumns = new HashSet<>();
 
-        expectedColumns.add(DBProcessor.ENTRY_REMOTE_ID);
-        expectedColumns.add(DBProcessor.ENTRY_ENTRYTYPE);
+        expectedColumns.add(DBMSProcessor.ENTRY_REMOTE_ID);
+        expectedColumns.add(DBMSProcessor.ENTRY_ENTRYTYPE);
         expectedColumns.add("AUTHOR");
 
         Assert.assertEquals(expectedColumns, actualColumns);
@@ -241,25 +241,25 @@ public class DBPProcessorTest {
     @Test
     public void testEscape() {
 
-        if (dbType == DBType.MYSQL) {
+        if (dbType == DBMSType.MYSQL) {
             Assert.assertEquals("`TABLE`", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("`TABLE`", DBProcessor.escape("TABLE", dbType));
-        } else if (dbType == DBType.POSTGRESQL) {
+            Assert.assertEquals("`TABLE`", DBMSProcessor.escape("TABLE", dbType));
+        } else if (dbType == DBMSType.POSTGRESQL) {
             Assert.assertEquals("TABLE", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("TABLE", DBProcessor.escape("TABLE", dbType));
-        } else if (dbType == DBType.ORACLE) {
+            Assert.assertEquals("TABLE", DBMSProcessor.escape("TABLE", dbType));
+        } else if (dbType == DBMSType.ORACLE) {
             Assert.assertEquals("\"TABLE\"", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("\"TABLE\"", DBProcessor.escape("TABLE", dbType));
+            Assert.assertEquals("\"TABLE\"", DBMSProcessor.escape("TABLE", dbType));
         }
 
-        Assert.assertEquals("TABLE", DBProcessor.escape("TABLE", null));
+        Assert.assertEquals("TABLE", DBMSProcessor.escape("TABLE", null));
     }
 
     @Test
     public void testEscapeValue() {
-        Assert.assertEquals("NULL", DBProcessor.escapeValue(null));
-        Assert.assertEquals("'value'", DBProcessor.escapeValue("value"));
-        Assert.assertEquals("1", DBProcessor.escapeValue(1));
+        Assert.assertEquals("NULL", DBMSProcessor.escapeValue(null));
+        Assert.assertEquals("'value'", DBMSProcessor.escapeValue("value"));
+        Assert.assertEquals("1", DBMSProcessor.escapeValue(1));
     }
 
     private Map<String, List<String>> getMetaDataExample() {
@@ -305,9 +305,9 @@ public class DBPProcessorTest {
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(int sortId, String key, String field, String value) {
         try {
-            connection.createStatement().executeUpdate("INSERT INTO " + escape(DBProcessor.METADATA) + "("
-                    + escape(DBProcessor.METADATA_SORT_ID) + ", " + escape(DBProcessor.METADATA_KEY) + ", "
-                    + escape(DBProcessor.METADATA_FIELD) + ", " + escape(DBProcessor.METADATA_VALUE) + ") VALUES(" +
+            connection.createStatement().executeUpdate("INSERT INTO " + escape(DBMSProcessor.METADATA) + "("
+                    + escape(DBMSProcessor.METADATA_SORT_ID) + ", " + escape(DBMSProcessor.METADATA_KEY) + ", "
+                    + escape(DBMSProcessor.METADATA_FIELD) + ", " + escape(DBMSProcessor.METADATA_VALUE) + ") VALUES(" +
                     escapeValue(sortId) + ", " +
                     escapeValue(key) + ", " +
                     escapeValue(field) + ", " +
@@ -322,21 +322,21 @@ public class DBPProcessorTest {
     }
 
     private String escapeValue(Object value) {
-        return DBProcessor.escapeValue(value);
+        return DBMSProcessor.escapeValue(value);
     }
 
     @After
     public void clear() {
         try {
-            if ((dbType == DBType.MYSQL) || (dbType == DBType.POSTGRESQL)) {
-                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBProcessor.ENTRY));
-                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBProcessor.METADATA));
-            } else if (dbType == DBType.ORACLE) {
+            if ((dbType == DBMSType.MYSQL) || (dbType == DBMSType.POSTGRESQL)) {
+                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.ENTRY));
+                connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.METADATA));
+            } else if (dbType == DBMSType.ORACLE) {
                 connection.createStatement().executeUpdate(
                             "BEGIN\n" +
-                            "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBProcessor.ENTRY) + "';\n" +
-                            "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBProcessor.METADATA) + "';\n" +
-                            "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape(DBProcessor.ENTRY + "_SEQ") + "';\n" +
+                            "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.ENTRY) + "';\n" +
+                            "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.METADATA) + "';\n" +
+                            "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape(DBMSProcessor.ENTRY + "_SEQ") + "';\n" +
                             "EXCEPTION\n" +
                             "WHEN OTHERS THEN\n" +
                             "IF SQLCODE != -942 THEN\n" +

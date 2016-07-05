@@ -40,17 +40,17 @@ import org.apache.commons.logging.LogFactory;
  * Synchronizes the remote or local databases with their opposite side.
  * Local changes are pushed by {@link EntryEvent} using Google's Guava EventBus.
  */
-public class DBSynchronizer {
+public class DBMSSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
-    private DBProcessor dbProcessor;
-    private DBType dbType;
+    private DBMSProcessor dbProcessor;
+    private DBMSType dbType;
     private String dbName;
     private MetaData metaData;
     private final BibDatabase bibDatabase;
 
-    public DBSynchronizer(BibDatabase bibDatabase, MetaData metaData) {
+    public DBMSSynchronizer(BibDatabase bibDatabase, MetaData metaData) {
         this.bibDatabase = bibDatabase;
         this.metaData = metaData;
     }
@@ -197,34 +197,34 @@ public class DBSynchronizer {
     /**
      * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
      * @param event An {@link EntryEvent}
-     * @return <code>true</code> if the event is able to trigger operations in {@link DBSynchronizer}, else <code>false</code>
+     * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */
     public boolean isInEventLocation(EntryEvent event) {
         EntryEventSource eventLocation = event.getEntryEventLocation();
         return (eventLocation == EntryEventSource.LOCAL);
     }
 
-    public void openRemoteDatabase(Connection connection, DBType type, String name) {
+    public void openRemoteDatabase(Connection connection, DBMSType type, String name) {
         this.dbType = type;
         this.dbName = name;
-        this.dbProcessor = new DBProcessor(connection, type);
+        this.dbProcessor = new DBMSProcessor(new DBMSHelper(connection), type);
         initializeDatabases();
     }
 
-    public void openRemoteDatabase(DBType type, String host, int port, String database, String user,
+    public void openRemoteDatabase(DBMSType type, String host, int port, String database, String user,
             String password) throws ClassNotFoundException, SQLException {
-        openRemoteDatabase(DBConnector.getNewConnection(type, host, port, database, user, password), type, database);
+        openRemoteDatabase(DBMSConnector.getNewConnection(type, host, port, database, user, password), type, database);
     }
 
     public String getDBName() {
         return dbName;
     }
 
-    public DBType getDBType() {
+    public DBMSType getDBType() {
         return this.dbType;
     }
 
-    public DBProcessor getDBProcessor() {
+    public DBMSProcessor getDBProcessor() {
         return dbProcessor;
     }
 

@@ -17,37 +17,37 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class DBHelperTest {
+public class DBMSHelperTest {
 
     private Connection connection;
-    private DBHelper dbHelper;
+    private DBMSHelper dbHelper;
 
     @Parameter
-    public DBType dbType;
+    public DBMSType dbType;
 
 
     @Before
     public void setUp() {
         try {
             connection = TestConnector.getTestConnection(dbType);
-            dbHelper = new DBHelper(connection);
+            dbHelper = new DBMSHelper(connection);
             connection.createStatement().executeUpdate(
                     "CREATE TABLE " + escape("TEST") + " (" + escape("A") + " INT, " + escape("B") + " "
-                            + (dbType == DBType.ORACLE ? "CLOB" : "TEXT") + ")");
+                            + (dbType == DBMSType.ORACLE ? "CLOB" : "TEXT") + ")");
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
 
     @Parameters(name = "Test with {0} database system")
-    public static Collection<DBType> getTestingDatabaseSystems() {
-        Set<DBType> dbTypes = new HashSet<>();
-        dbTypes.add(DBType.MYSQL);
-        dbTypes.add(DBType.POSTGRESQL);
+    public static Collection<DBMSType> getTestingDatabaseSystems() {
+        Set<DBMSType> dbTypes = new HashSet<>();
+        dbTypes.add(DBMSType.MYSQL);
+        dbTypes.add(DBMSType.POSTGRESQL);
 
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            dbTypes.add(DBType.ORACLE);
+            dbTypes.add(DBMSType.ORACLE);
         } catch (ClassNotFoundException e) {
             // In case that Oracle interface is not available do not perform tests for this system.
             System.out.println("Oracle driver not available. Skipping tests for this system...");
@@ -146,7 +146,7 @@ public class DBHelperTest {
     }
 
     public String escape(String expression) {
-        return DBProcessor.escape(expression, dbType);
+        return DBMSProcessor.escape(expression, dbType);
     }
 
 }

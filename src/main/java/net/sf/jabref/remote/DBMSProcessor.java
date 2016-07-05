@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.remote;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,14 +40,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
  */
-public class DBProcessor {
+public class DBMSProcessor {
 
-    private static final Log LOGGER = LogFactory.getLog(DBConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
-    private Connection connection;
-
-    private DBType dbType;
-    private final DBHelper dbHelper;
+    private DBMSType dbType;
+    private final DBMSHelper dbHelper;
 
     public static final String ENTRY = "ENTRY";
     public static final String METADATA = "METADATA";
@@ -68,12 +65,11 @@ public class DBProcessor {
 
     /**
      * @param connection Working SQL connection
-     * @param dbType Instance of {@link DBType}
+     * @param dbType Instance of {@link DBMSType}
      */
-    public DBProcessor(Connection connection, DBType dbType) {
-        this.connection = connection;
+    public DBMSProcessor(DBMSHelper dbmsHelper, DBMSType dbType) {
         this.dbType = dbType;
-        this.dbHelper = new DBHelper(connection);
+        this.dbHelper = dbmsHelper;
     }
 
     /**
@@ -83,7 +79,7 @@ public class DBProcessor {
     public boolean checkBaseIntegrity() {
         List<String> requiredTables = new ArrayList<>(ALL_TABLES);
         try {
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            DatabaseMetaData databaseMetaData = dbHelper.getMetaData();
 
             // ...getTables(null, ...): no restrictions
             try (ResultSet databaseMetaDataResultSet = databaseMetaData.getTables(null, null, null, null)) {
@@ -105,37 +101,37 @@ public class DBProcessor {
      * Creates and sets up the needed tables and columns according to the database type.
      */
     public void setUpRemoteDatabase() {
-        if (dbType == DBType.MYSQL) {
-            executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
+        if (dbType == DBMSType.MYSQL) {
+            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
                     + ENTRY_ENTRYTYPE + " VARCHAR(255) DEFAULT NULL"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
-            executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
+            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
                     + METADATA_SORT_ID + " int(11) NOT NULL,"
                     + METADATA_KEY + " varchar(255) NOT NULL,"
                     + METADATA_FIELD + " varchar(255) DEFAULT NULL,"
                     + METADATA_VALUE + " text NOT NULL,"
                     + "UNIQUE(" + METADATA_SORT_ID + ")"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
-        } else if (dbType == DBType.POSTGRESQL) {
-            executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
+        } else if (dbType == DBMSType.POSTGRESQL) {
+            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " SERIAL PRIMARY KEY,"
                     + ENTRY_ENTRYTYPE + " VARCHAR);");
-            executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
+            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
                     + METADATA_SORT_ID + " INT UNIQUE,"
                     + METADATA_KEY + " VARCHAR,"
                     + METADATA_FIELD + " VARCHAR,"
                     + METADATA_VALUE + " TEXT);");
-        } else if (dbType == DBType.ORACLE) {
-            executeUpdate("CREATE TABLE \"" + ENTRY + "\" (" + "\""
+        } else if (dbType == DBMSType.ORACLE) {
+            dbHelper.executeUpdate("CREATE TABLE \"" + ENTRY + "\" (" + "\""
                     + ENTRY_REMOTE_ID + "\"  NUMBER NOT NULL," + "\""
                     + ENTRY_ENTRYTYPE + "\"  VARCHAR2(255) NULL,"
                     + "CONSTRAINT  \"" + ENTRY + "_PK\" PRIMARY KEY (\"" + ENTRY_REMOTE_ID + "\"))");
-            executeUpdate("CREATE SEQUENCE \"" + ENTRY + "_SEQ\"");
-            executeUpdate("CREATE TRIGGER \"BI_" + ENTRY + "\" BEFORE INSERT ON \"" + ENTRY + "\" "
+            dbHelper.executeUpdate("CREATE SEQUENCE \"" + ENTRY + "_SEQ\"");
+            dbHelper.executeUpdate("CREATE TRIGGER \"BI_" + ENTRY + "\" BEFORE INSERT ON \"" + ENTRY + "\" "
                     + "FOR EACH ROW BEGIN " + "SELECT \"" + ENTRY + "_SEQ\".NEXTVAL INTO :NEW."
                     + ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH) + " FROM DUAL; " + "END;");
-            executeUpdate("CREATE TABLE \"" + METADATA + "\" (" + "\""
+            dbHelper.executeUpdate("CREATE TABLE \"" + METADATA + "\" (" + "\""
                     + METADATA_SORT_ID + "\"  NUMBER NOT NULL," + "\""
                     + METADATA_KEY + "\"  VARCHAR2(255) NULL," + "\""
                     + METADATA_FIELD + "\"  VARCHAR2(255) NULL," + "\""
@@ -181,8 +177,8 @@ public class DBProcessor {
         }
         query = query + escapeValue(bibEntry.getType()) + ")";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query,
-                new String[] {ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH)})) { // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
+        try (PreparedStatement preparedStatement = dbHelper.prepareStatement(query,
+                ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH))) { // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
             preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
@@ -199,7 +195,7 @@ public class DBProcessor {
     }
 
     /**
-     * Updates the hole bibEntry remotely.
+     * Updates the whole bibEntry remotely.
      *
      * @param bibEntry {@link BibEntry} affected by changes
      */
@@ -223,7 +219,7 @@ public class DBProcessor {
         }
 
         query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
-        executeUpdate(query);
+        dbHelper.executeUpdate(query);
         LOGGER.info("SQL UPDATE: " + query);
     }
 
@@ -234,7 +230,7 @@ public class DBProcessor {
     public void removeEntry(BibEntry bibEntry) {
         String query = "DELETE FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = "
                 + bibEntry.getRemoteId();
-        executeUpdate(query);
+        dbHelper.executeUpdate(query);
         LOGGER.info("SQL DELETE: " + query);
         normalizeEntryTable();
     }
@@ -250,10 +246,10 @@ public class DBProcessor {
         Set<String> fieldNames = dbHelper.allToUpperCase(bibEntry.getFieldNames());
         fieldNames.removeAll(dbHelper.allToUpperCase(dbHelper.getColumnNames(escape(ENTRY))));
 
-        String columnType = dbType == DBType.ORACLE ? " CLOB NULL" : " TEXT NULL DEFAULT NULL";
+        String columnType = dbType == DBMSType.ORACLE ? " CLOB NULL" : " TEXT NULL DEFAULT NULL";
 
         for (String fieldName : fieldNames) {
-            executeUpdate("ALTER TABLE " + escape(ENTRY) + " ADD " + escape(fieldName) + columnType);
+            dbHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " ADD " + escape(fieldName) + columnType);
         }
     }
 
@@ -454,7 +450,7 @@ public class DBProcessor {
             query = i < (columnValueMapping.length - 2) ? query + ", " : query;
         }
         query = query + ")";
-        executeUpdate(query);
+        dbHelper.executeUpdate(query);
     }
 
     /**
@@ -479,7 +475,7 @@ public class DBProcessor {
         }
 
         if (columnsToRemove.size() > 0) {
-            executeUpdate("ALTER TABLE " + escape(ENTRY) + " " + columnExpression);
+            dbHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " " + columnExpression);
         }
     }
 
@@ -490,10 +486,10 @@ public class DBProcessor {
      * @param type Type of database system
      * @return Correctly escape expression
      */
-    public static String escape(String expression, DBType type) {
-        if (type == DBType.ORACLE) {
+    public static String escape(String expression, DBMSType type) {
+        if (type == DBMSType.ORACLE) {
             return "\"" + expression + "\"";
-        } else if (type == DBType.MYSQL) {
+        } else if (type == DBMSType.MYSQL) {
             return "`" + expression + "`";
         }
         return expression;
@@ -529,23 +525,11 @@ public class DBProcessor {
         return stringValue;
     }
 
-    public void executeUpdate(String query) {
-        try {
-            connection.createStatement().executeUpdate(query);
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
-        }
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    public void setDBType(DBType dbType) {
+    public void setDBType(DBMSType dbType) {
         this.dbType = dbType;
     }
 
-    public DBType getDBType() {
+    public DBMSType getDBType() {
         return this.dbType;
     }
 
