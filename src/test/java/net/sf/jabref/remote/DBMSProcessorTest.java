@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -102,10 +103,10 @@ public class DBMSProcessorTest {
 
             Assert.assertTrue(resultSet.next());
             Assert.assertEquals(realEntry.getType(), resultSet.getString("ENTRYTYPE"));
-            Assert.assertEquals(realEntry.getField("author"), resultSet.getString("AUTHOR"));
-            Assert.assertEquals(realEntry.getField("title"), resultSet.getString("TITLE"));
-            Assert.assertEquals(realEntry.getField("booktitle"), resultSet.getString("BOOKTITLE"));
-            Assert.assertEquals(realEntry.getField("year"), resultSet.getString("YEAR"));
+            Assert.assertEquals(realEntry.getFieldOptional("author").get(), resultSet.getString("AUTHOR"));
+            Assert.assertEquals(realEntry.getFieldOptional("title").get(), resultSet.getString("TITLE"));
+            Assert.assertEquals(realEntry.getFieldOptional("booktitle").get(), resultSet.getString("BOOKTITLE"));
+            Assert.assertEquals(realEntry.getFieldOptional("year").get(), resultSet.getString("YEAR"));
             Assert.assertEquals(realEntry.getCiteKey(), resultSet.getString("BIBTEXKEY"));
             Assert.assertFalse(resultSet.next());
 
@@ -124,8 +125,8 @@ public class DBMSProcessorTest {
 
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
-                Assert.assertEquals(bibEntry.getField("author"), resultSet.getString("AUTHOR"));
-                Assert.assertEquals(bibEntry.getField("title"), resultSet.getString("TITLE"));
+                Assert.assertEquals(bibEntry.getFieldOptional("author").get(), resultSet.getString("AUTHOR"));
+                Assert.assertEquals(bibEntry.getFieldOptional("title").get(), resultSet.getString("TITLE"));
                 Assert.assertFalse(resultSet.next());
             }
 
@@ -137,8 +138,8 @@ public class DBMSProcessorTest {
             try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
-                Assert.assertEquals(bibEntry.getField("author"), resultSet.getString("AUTHOR"));
-                Assert.assertEquals(bibEntry.getField("title"), resultSet.getString("TITLE"));
+                Assert.assertEquals(bibEntry.getFieldOptional("author").get(), resultSet.getString("AUTHOR"));
+                Assert.assertEquals(bibEntry.getFieldOptional("title").get(), resultSet.getString("TITLE"));
                 Assert.assertFalse(resultSet.next());
             }
 
@@ -210,19 +211,13 @@ public class DBMSProcessorTest {
 
     @Test
     public void testGetRemoteMetaData() {
-        insertMetaData(1, "databaseType", null, "bibtex");
-        insertMetaData(2, "protectedFlag", null, "true");
-        insertMetaData(3, "saveActions", null, "enabled");
-        insertMetaData(4, "saveActions", "author", "capitalize");
-        insertMetaData(5, "saveActions", "title", "title_case");
-        insertMetaData(6, "saveActions", "title", "html_to_latex");
-        insertMetaData(7, "saveOrderConfig", null, "specified");
-        insertMetaData(8, "saveOrderConfig", "title", "false");
-        insertMetaData(9, "saveOrderConfig", "author", "false");
-        insertMetaData(10, "saveOrderConfig", "year", "false");
+        insertMetaData("databaseType", "bibtex;");
+        insertMetaData("protectedFlag", "true;");
+        insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
+        insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;");
 
-        Map<String, List<String>> expectedMetaData = getMetaDataExample();
-        Map<String, List<String>> actualMetaData = dbProcessor.getRemoteMetaData();
+        Map<String, String> expectedMetaData = getMetaDataExample();
+        Map<String, String> actualMetaData = dbProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMetaData, actualMetaData);
 
@@ -230,10 +225,10 @@ public class DBMSProcessorTest {
 
     @Test
     public void testSetRemoteMetaData() {
-        Map<String, List<String>> expectedMetaData = getMetaDataExample();
-
+        Map<String, String> expectedMetaData = getMetaDataExample();
         dbProcessor.setRemoteMetaData(expectedMetaData);
-        Map<String, List<String>> actualMetaData = dbProcessor.getRemoteMetaData();
+
+        Map<String, String> actualMetaData = dbProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMetaData, actualMetaData);
     }
@@ -257,20 +252,17 @@ public class DBMSProcessorTest {
 
     @Test
     public void testEscapeValue() {
-        Assert.assertEquals("NULL", DBMSProcessor.escapeValue(null));
+        Assert.assertEquals("NULL", DBMSProcessor.escapeValue(Optional.ofNullable(null)));
         Assert.assertEquals("'value'", DBMSProcessor.escapeValue("value"));
-        Assert.assertEquals("1", DBMSProcessor.escapeValue(1));
     }
 
-    private Map<String, List<String>> getMetaDataExample() {
-        Map<String, List<String>> expectedMetaData = new HashMap<>();
+    private Map<String, String> getMetaDataExample() {
+        Map<String, String> expectedMetaData = new HashMap<>();
 
-        expectedMetaData.put("databaseType", Arrays.asList("bibtex"));
-        expectedMetaData.put("protectedFlag", Arrays.asList("true"));
-        expectedMetaData.put("saveActions",
-                Arrays.asList("enabled", "author[capitalize]\ntitle[title_case,html_to_latex]"));
-        expectedMetaData.put("saveOrderConfig",
-                Arrays.asList("specified", "title", "false", "author", "false", "year", "false"));
+        expectedMetaData.put("databaseType", "bibtex;");
+        expectedMetaData.put("protectedFlag", "true;");
+        expectedMetaData.put("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;");
+        expectedMetaData.put("saveOrderConfig", "specified;author;false;title;false;year;true;");
 
         return expectedMetaData;
     }
@@ -303,15 +295,11 @@ public class DBMSProcessorTest {
 
     // Oracle does not support multiple tuple insertion in one INSERT INTO command.
     // Therefore this function was defined to improve the readability and to keep the code short.
-    private void insertMetaData(int sortId, String key, String field, String value) {
+    private void insertMetaData(String key, String value) {
         try {
             connection.createStatement().executeUpdate("INSERT INTO " + escape(DBMSProcessor.METADATA) + "("
-                    + escape(DBMSProcessor.METADATA_SORT_ID) + ", " + escape(DBMSProcessor.METADATA_KEY) + ", "
-                    + escape(DBMSProcessor.METADATA_FIELD) + ", " + escape(DBMSProcessor.METADATA_VALUE) + ") VALUES(" +
-                    escapeValue(sortId) + ", " +
-                    escapeValue(key) + ", " +
-                    escapeValue(field) + ", " +
-                    escapeValue(value) + ")");
+                    + escape(DBMSProcessor.METADATA_KEY) + ", " + escape(DBMSProcessor.METADATA_VALUE) + ") VALUES("
+                    + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
             Assert.fail(e.getMessage());
         }
@@ -321,7 +309,7 @@ public class DBMSProcessorTest {
         return dbProcessor.escape(expression);
     }
 
-    private String escapeValue(Object value) {
+    private String escapeValue(String value) {
         return DBMSProcessor.escapeValue(value);
     }
 

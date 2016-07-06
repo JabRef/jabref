@@ -62,7 +62,7 @@ public class MetaData implements Iterable<String> {
     public static final String SELECTOR_META_PREFIX = "selector_";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
 
-    private Map<String, List<String>> metaData = new HashMap<>();
+    private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
     private final EventBus eventBus = new EventBus();
 
@@ -78,7 +78,22 @@ public class MetaData implements Iterable<String> {
      */
     private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
+        setData(inData);
+    }
 
+    /**
+     * The MetaData object can be constructed with no data in it.
+     */
+    public MetaData() {
+        // No data
+    }
+
+    public static MetaData parse(Map<String, String> data) throws ParseException {
+        return new MetaData(data);
+    }
+
+    public void setData(Map<String, String> inData) throws ParseException {
+        clearMetaData();
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
             List<String> orderedData = new ArrayList<>();
@@ -97,20 +112,9 @@ public class MetaData implements Iterable<String> {
             } else if (SAVE_ACTIONS.equals(entry.getKey())) {
                 setSaveActions(FieldFormatterCleanups.parse(orderedData));
             } else {
-                putData(entry.getKey(), orderedData);
+                metaData.put(entry.getKey(), orderedData);
             }
         }
-    }
-
-    /**
-     * The MetaData object can be constructed with no data in it.
-     */
-    public MetaData() {
-        // No data
-    }
-
-    public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data);
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
@@ -460,14 +464,6 @@ public class MetaData implements Iterable<String> {
 
     public void clearMetaData() {
         metaData.clear();
-    }
-
-    public Map<String, List<String>> getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(Map<String, List<String>> metaData) {
-        this.metaData = metaData;
     }
 
     public void registerListener(Object listener) {

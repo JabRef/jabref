@@ -27,6 +27,7 @@ import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -160,7 +161,7 @@ public class DBMSSynchronizer {
                     match = true;
                     Set<String> fields = remoteEntry.getFieldNames();
                     for (String field : fields) {
-                        localEntry.setField(field, remoteEntry.getField(field), EntryEventSource.REMOTE); // Should not reach the listeners above.
+                        localEntry.setField(field, remoteEntry.getFieldOptional(field), EntryEventSource.REMOTE); // Should not reach the listeners above.
                     }
                 }
             }
@@ -174,14 +175,18 @@ public class DBMSSynchronizer {
      * Synchronizes all meta data locally.
      */
     public void synchronizeLocalMetaData() {
-        metaData.setMetaData(dbProcessor.getRemoteMetaData());
+        try {
+            metaData.setData(dbProcessor.getRemoteMetaData());
+        } catch (ParseException e) {
+            LOGGER.error("Parse error", e);
+        }
     }
 
     /**
      * Synchronizes all meta data remotely.
      */
     public void synchronizeRemoteMetaData(MetaData data) {
-        dbProcessor.setRemoteMetaData(data.getMetaData());
+        dbProcessor.setRemoteMetaData(data.getAsStringMap());
     }
 
     /**

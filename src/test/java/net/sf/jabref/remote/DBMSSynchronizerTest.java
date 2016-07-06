@@ -100,8 +100,8 @@ public class DBMSSynchronizerTest {
 
         List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
-        Assert.assertEquals("The nano processor1", actualEntries.get(0).getField("title"));
+        Assert.assertEquals(expectedEntry.getFieldOptional("author"), actualEntries.get(0).getFieldOptional("author"));
+        Assert.assertEquals("The nano processor1", actualEntries.get(0).getFieldOptional("title").get());
 
     }
 
@@ -134,8 +134,8 @@ public class DBMSSynchronizerTest {
         dbSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
 
-        Map<String, List<String>> expectedMap = testMetaData.getMetaData();
-        Map<String, List<String>> actualMap = dbProcessor.getRemoteMetaData();
+        Map<String, String> expectedMap = testMetaData.getAsStringMap();
+        Map<String, String> actualMap = dbProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
     }
@@ -182,7 +182,7 @@ public class DBMSSynchronizerTest {
 
         dbSynchronizer.applyMetaData();
 
-        Assert.assertEquals("wirthlin, michael j1", bibEntry.getField("author"));
+        Assert.assertEquals("wirthlin, michael j1", bibEntry.getFieldOptional("author").get());
 
     }
 

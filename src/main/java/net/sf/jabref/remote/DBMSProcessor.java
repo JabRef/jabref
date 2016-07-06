@@ -28,10 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.event.source.EntryEventSource;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -108,20 +105,15 @@ public class DBMSProcessor {
                     + ENTRY_ENTRYTYPE + " VARCHAR(255) DEFAULT NULL"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
             dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
-                    + METADATA_SORT_ID + " int(11) NOT NULL,"
                     + METADATA_KEY + " varchar(255) NOT NULL,"
-                    + METADATA_FIELD + " varchar(255) DEFAULT NULL,"
-                    + METADATA_VALUE + " text NOT NULL,"
-                    + "UNIQUE(" + METADATA_SORT_ID + ")"
+                    + METADATA_VALUE + " text NOT NULL"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
         } else if (dbType == DBMSType.POSTGRESQL) {
             dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " SERIAL PRIMARY KEY,"
                     + ENTRY_ENTRYTYPE + " VARCHAR);");
             dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
-                    + METADATA_SORT_ID + " INT UNIQUE,"
                     + METADATA_KEY + " VARCHAR,"
-                    + METADATA_FIELD + " VARCHAR,"
                     + METADATA_VALUE + " TEXT);");
         } else if (dbType == DBMSType.ORACLE) {
             dbHelper.executeUpdate("CREATE TABLE \"" + ENTRY + "\" (" + "\""
@@ -133,11 +125,8 @@ public class DBMSProcessor {
                     + "FOR EACH ROW BEGIN " + "SELECT \"" + ENTRY + "_SEQ\".NEXTVAL INTO :NEW."
                     + ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH) + " FROM DUAL; " + "END;");
             dbHelper.executeUpdate("CREATE TABLE \"" + METADATA + "\" (" + "\""
-                    + METADATA_SORT_ID + "\"  NUMBER NOT NULL," + "\""
                     + METADATA_KEY + "\"  VARCHAR2(255) NULL," + "\""
-                    + METADATA_FIELD + "\"  VARCHAR2(255) NULL," + "\""
-                    + METADATA_VALUE + "\"  CLOB NOT NULL,"
-                    + "CONSTRAINT  \"" + METADATA + "_UQ\" UNIQUE (\"" + METADATA_SORT_ID + "\"))");
+                    + METADATA_VALUE + "\"  CLOB NOT NULL)");
         }
         if (!checkBaseIntegrity()) {
             // can only happen with users direct intervention in remote database
@@ -334,124 +323,34 @@ public class DBMSProcessor {
     /**
      * Fetches all remotely present meta data.
      */
-    public Map<String, List<String>> getRemoteMetaData() {
-        Map<String, List<String>> metaData = new HashMap<>();
-        String query = "SELECT * FROM " + escape(METADATA) + " ORDER BY " + escape(METADATA_SORT_ID);
+    public Map<String, String> getRemoteMetaData() {
+        Map<String, String> data = new HashMap<>();
 
-        try (ResultSet resultSet = dbHelper.query(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-            String metaKey = "";
-            String field = "";
-            List<String> orderedData = new ArrayList<>();
+        String query = "SELECT * FROM " + escape(METADATA);
 
-            while (resultSet.next()) {
-                if (!metaKey.equals(resultSet.getString(METADATA_KEY))) {
-                    if (!orderedData.isEmpty()) {
-                        metaData.put(metaKey, new ArrayList<>(orderedData));
-                    }
-                    orderedData.clear();
-                    metaKey = resultSet.getString(METADATA_KEY);
-                    field = "";
-                }
-
-                if (metaKey.equals(MetaData.SAVE_ACTIONS)) {
-                    if (resultSet.getString(METADATA_FIELD) == null) {
-                        orderedData.add(resultSet.getString(METADATA_VALUE));
-                    } else {
-                        if (field.isEmpty()) {
-                            orderedData.add(resultSet.getString(METADATA_FIELD) + "["
-                                    + resultSet.getString(METADATA_VALUE) + "]");
-                        } else if (!field.equals(resultSet.getString(METADATA_FIELD))) {
-                            String value = orderedData.remove(orderedData.size() - 1);
-                            value = value + "\n" + resultSet.getString(METADATA_FIELD) + "[" + resultSet.getString(METADATA_VALUE) + "]";
-                            orderedData.add(value);
-                        } else {
-                            String value = orderedData.remove(orderedData.size() - 1);
-                            value = value.substring(0, value.lastIndexOf(']')) + ",";
-                            value = value + resultSet.getString(METADATA_VALUE) + "]";
-                            orderedData.add(value);
-                        }
-                        field = resultSet.getString(METADATA_FIELD);
-                    }
-                } else if (metaKey.equals(MetaData.SAVE_ORDER_CONFIG)) {
-                    if (resultSet.getString(METADATA_FIELD) == null) {
-                        orderedData.add(resultSet.getString(METADATA_VALUE));
-                    } else {
-                        orderedData.add(resultSet.getString(METADATA_FIELD));
-                        orderedData.add(resultSet.getString(METADATA_VALUE));
-                    }
-                } else {
-                    orderedData.add(resultSet.getString(METADATA_VALUE));
-                }
-
-                if (resultSet.isLast()) {
-                    metaData.put(metaKey, new ArrayList<>(orderedData));
-                }
+        try (ResultSet resultSet = dbHelper.query(query)) {
+            while(resultSet.next()) {
+                data.put(resultSet.getString(METADATA_KEY), resultSet.getString(METADATA_VALUE));
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error", e);
         }
-        return metaData;
+
+        return data;
     }
 
     /**
      * Clears and sets all meta data remotely.
      * @param metaData JabRef meta data.
      */
-    public void setRemoteMetaData(Map<String, List<String>> metaData) {
+    public void setRemoteMetaData(Map<String, String> data) {
         dbHelper.clearTables(METADATA);
 
-        for (String metaKey : metaData.keySet()) {
-            List<String> values = metaData.get(metaKey);
-
-            if (metaKey.equals(MetaData.SAVE_ACTIONS)) {
-                insertMetaData(METADATA, METADATA_KEY, metaKey, METADATA_VALUE, values.get(0));
-                for (FieldFormatterCleanup cleanUp : FieldFormatterCleanups.parse(values.get(1))) {
-                    insertMetaData(METADATA, METADATA_KEY, metaKey, METADATA_FIELD, cleanUp.getField(),
-                            METADATA_VALUE, cleanUp.getFormatter().getKey());
-                }
-            } else if (metaKey.equals(MetaData.SAVE_ORDER_CONFIG)) {
-                insertMetaData(METADATA, METADATA_KEY, metaKey, METADATA_VALUE, values.get(0));
-
-                for (int i = 1; i < values.size(); i+=2) {
-                    insertMetaData(METADATA, METADATA_KEY, metaKey, METADATA_FIELD, values.get(i), METADATA_VALUE, values.get(i+1));
-                }
-            } else {
-                insertMetaData(METADATA, METADATA_KEY, metaKey, METADATA_VALUE, values.get(0));
-            }
+        for (Map.Entry<String, String> metaEntry : data.entrySet()) {
+            dbHelper.executeUpdate("INSERT INTO " + escape(METADATA) + "(" +
+                    escape(METADATA_KEY) + ", " + escape(METADATA_VALUE) + ") VALUES(" +
+                    escapeValue(metaEntry.getKey()) + ", " + escapeValue(metaEntry.getValue()) + ")");
         }
-    }
-
-    /**
-     * Inserts the given data into database.
-     * @param table Relational table the data should be inserted in
-     * @param columnValueMapping Mapping between columns and values in form of an usual array
-     * Call example: <code>insert("table", "column1", "value1", "column2", "value2");</code>
-     */
-    private void insertMetaData(String table, Object... columnValueMapping) {
-        int sortId = 1;
-
-        // To unify all three systems it was necessary to work around with the following code
-        // Only reseting a sequence in Oracle takes 20-30 LOC (!)
-        try (ResultSet resultSet = dbHelper.query("SELECT MAX(" + escape(METADATA_SORT_ID) + ") FROM " + escape(METADATA))) {
-            if (resultSet.next()) {
-                sortId = resultSet.getInt(1) + 1;
-            }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
-        }
-
-        String query = "INSERT INTO " + escape(table) + "(" + escape(METADATA_SORT_ID) + ", ";
-        for (int i = 0; i < columnValueMapping.length; i += 2) { // Prepare columns
-            query = query + escape(String.valueOf(columnValueMapping[i]));
-            query = i < (columnValueMapping.length - 2) ? query + ", " : query;
-        }
-        query = query + ") VALUES(" + escapeValue(sortId) + ", ";
-        for (int i = 1; i < columnValueMapping.length; i += 2) { // Prepare values
-            query = query + escapeValue(columnValueMapping[i]);
-            query = i < (columnValueMapping.length - 2) ? query + ", " : query;
-        }
-        query = query + ")";
-        dbHelper.executeUpdate(query);
     }
 
     /**
@@ -510,22 +409,18 @@ public class DBMSProcessor {
      * Escapes the value indication of SQL expressions.
      *
      * @param Value to be escaped
-     * @return Correctly escaped expression or "NULL" if <code>value</code> is real <code>null</code> object.
+     * @return Correctly escaped expression or "NULL" if no value is present.
      */
-    public static String escapeValue(Object obj) {
-        String stringValue;
-        if (obj == null) {
-            stringValue = "NULL";
-        } else {
-            if (obj instanceof String) {
-                stringValue = "'" + obj + "'";
-            } else {
-                stringValue = String.valueOf(obj);
-            }
-        }
-        return stringValue;
+    public static String escapeValue(String value) {
+        return escapeValue(Optional.ofNullable(value));
     }
 
+    /**
+     * Escapes the value indication of SQL expressions.
+     *
+     * @param Value to be escaped
+     * @return Correctly escaped expression or "NULL" if no value is present.
+     */
     public static String escapeValue(Optional<String> value) {
         if (value.isPresent()) {
             return "'" + value.get() + "'";
