@@ -22,10 +22,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -69,7 +71,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
     private final JTextField databaseField = new JTextField(14);
 
     private final JPasswordField passwordField = new JPasswordField(14);
-    private final JComboBox<DBMSType> dbmsTypeDropDown = new JComboBox<>(new DBMSType[] {DBMSType.MYSQL, DBMSType.ORACLE, DBMSType.POSTGRESQL});
+    private final JComboBox<DBMSType> dbmsTypeDropDown = new JComboBox<>();
 
     private final JButton connectButton = new JButton(Localization.lang("Connect"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -209,6 +211,12 @@ public class OpenRemoteDatabaseDialog extends JDialog {
 
         connectionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Connection")));
         connectionPanel.setLayout(gridBagLayout);
+
+        Set<DBMSType> availableDBMSTypes = DBMSConnector.getAvailableDBMSTypes();
+        DefaultComboBoxModel<DBMSType> comboBoxModel = new DefaultComboBoxModel<>(
+                availableDBMSTypes.toArray(new DBMSType[availableDBMSTypes.size()]));
+
+        dbmsTypeDropDown.setModel(comboBoxModel);
 
         gridBagConstraints.insets = defautInsets;
         gridBagConstraints.fill = GridBagConstraints.BOTH;

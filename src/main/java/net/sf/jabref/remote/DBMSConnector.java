@@ -18,6 +18,8 @@ package net.sf.jabref.remote;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,5 +106,20 @@ public class DBMSConnector {
             return 1521;
         }
         return -1;
+    }
+
+    public static Set<DBMSType> getAvailableDBMSTypes() {
+        Set<DBMSType> dbmsTypes = new HashSet<>();
+
+        for (DBMSType dbms : DBMSType.values()) {
+            try {
+                Class.forName(dbms.getDriverClassPath());
+                dbmsTypes.add(dbms);
+            } catch (ClassNotFoundException e) {
+                // In case that the driver is not available do not perform tests for this system.
+                System.out.println(dbms + " driver not available. Skipping tests for this system...");
+            }
+        }
+        return dbmsTypes;
     }
 }

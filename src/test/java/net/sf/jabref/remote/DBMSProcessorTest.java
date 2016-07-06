@@ -53,7 +53,7 @@ public class DBMSProcessorTest {
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestConnector.getAvailableDBMSTypes();
+        return DBMSConnector.getAvailableDBMSTypes();
     }
 
     @Test
